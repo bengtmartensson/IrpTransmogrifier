@@ -14,11 +14,13 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.harctoolbox.IrpMaster;
+package org.harctoolbox.ircore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class models an IR Sequence, which is a sequence of pulse pairs, often called "bursts".
@@ -267,10 +269,10 @@ public class IrSequence implements Cloneable, Serializable {
      * @param irStream
      * @throws IncompatibleArgumentException
      * @throws UnassignedException
-     */
+     * /
     public IrSequence(PrimaryIrStream irStream) throws IncompatibleArgumentException, UnassignedException {
         this(irStream.toIrSequence());
-    }
+    }*/
 
     /**
      * Constructs an IrSequence from the parameter data, by cloning.
@@ -507,11 +509,11 @@ public class IrSequence implements Cloneable, Serializable {
     }
 
     /**
-     * Return last entry, of -1 of empty.
-     * @return
+     * Return last entry, or <code>-ModulatedIrSequence.unknownPulseTime</code> if the data is empty.
+     * @return last entry, or <code>-ModulatedIrSequence.unknownPulseTime</code> if the data is empty.
      */
     public double getGap() {
-        return data.length > 0 ? Math.abs(data[data.length - 1]) : -1.0;
+        return data.length > 0 ? Math.abs(data[data.length - 1]) : ModulatedIrSequence.unknownPulseTime;
     }
 
     /**
@@ -562,7 +564,10 @@ public class IrSequence implements Cloneable, Serializable {
      * @return Length of the IR sequence in microseconds.
      */
     public double getDuration() {
-        return IrpUtils.l1Norm(data);
+        double sum = 0;
+        for (int i = 0; i < data.length; i++)
+            sum += Math.abs(data[i]);
+        return sum;
     }
 
     /**
@@ -663,8 +668,8 @@ public class IrSequence implements Cloneable, Serializable {
             IrSequence[] seqs = irSequence.chop(25000);
             for (IrSequence irs : seqs)
                 System.out.println(irs);
-        } catch (IrpMasterException ex) {
-            System.err.println(ex);
+        } catch (IncompatibleArgumentException ex) {
+            Logger.getLogger(IrSequence.class.getName()).log(Level.SEVERE, null, ex);
         }
         double[] d = {1, 2, 3, -4};
         String raw = " +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +1266 -7096 +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270  +422 -1270 +1266 -7096   ";

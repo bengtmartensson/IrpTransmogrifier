@@ -14,9 +14,10 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.harctoolbox.IrpMaster;
+package org.harctoolbox.ircore;
 
-import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class allows for the creation of integer arrays
@@ -58,7 +59,8 @@ public class Pronto {
     public Pronto(IrSignal irSignal) throws IncompatibleArgumentException {
         this.irSignal = irSignal;
         if (irSignal.getEndingLength() != 0) {
-            UserComm.warning("When computing the Pronto representation, a (non-empty) ending sequence was ignored");
+            Logger.getLogger(Pronto.class.getName()).log(Level.WARNING,
+                    "When computing the Pronto representation, a (non-empty) ending sequence was ignored");
         }
     }
 
@@ -89,7 +91,7 @@ public class Pronto {
      */
     public static double getFrequency(int code) {
         return code == 0
-                ? IrpUtils.invalid // Invalid value
+                ? ModulatedIrSequence.unknownFrequency // Invalid value
                 : 1000000.0 / ((double) code * pronto_constant);
     }
 
@@ -108,7 +110,7 @@ public class Pronto {
      */
     public static double getPulseTime(int code) { // in microseconds
         return code == 0
-                ? IrpUtils.invalid // Invalid value
+                ? ModulatedIrSequence.unknownPulseTime // Invalid value
                 : code * pronto_constant;
     }
 
@@ -154,13 +156,9 @@ public class Pronto {
      * Creates a new IrSignals by interpreting its argument as CCF signal.
      * @param ccf CCF signal
      * @return  IrSignal
-     * @throws ParseException
      * @throws IncompatibleArgumentException
-     * @throws UnassignedException
-     * @throws DomainViolationException
-     * @throws InvalidRepeatException
      */
-    public static IrSignal ccfSignal(int[] ccf) throws ParseException, IncompatibleArgumentException, UnassignedException, DomainViolationException, InvalidRepeatException {
+    public static IrSignal ccfSignal(int[] ccf) throws IncompatibleArgumentException {
         if (ccf.length < 4)
             throw new IncompatibleArgumentException("CCF is invalid since less than 4 numbers long.");
         if (ccf.length % 2 != 0)
@@ -175,11 +173,11 @@ public class Pronto {
             throw new IncompatibleArgumentException("Inconsistent length in CCF (claimed "
                     + (introLength + repeatLength) + " pairs, was " + (ccf.length - 4)/2 + " pairs).");
         IrSignal irSignal = null;
-        String irp = null;
+        /*String irp = null;
         int dev = (int) IrpUtils.invalid;
         int subdev = (int) IrpUtils.invalid;
         int cmd = (int) IrpUtils.invalid;
-        int pass = (int) IrpUtils.all;
+        int pass = (int) IrpUtils.all*/
 
         switch (type) {
             case learnedCode: // 0x0000
@@ -189,9 +187,9 @@ public class Pronto {
                 IrSequence introSequence = new IrSequence(intro);
                 IrSequence repeatSequence = new IrSequence(repeat);
                 irSignal = new IrSignal(type == learnedCode ? getFrequency(frequencyCode) : 0,
-                        IrpUtils.invalid, introSequence, repeatSequence, null);
+                        ModulatedIrSequence.unknownDutyCycle, introSequence, repeatSequence, null);
                 break;
-
+/*
             case rc5Code: // 0x5000:
                 if (repeatLength != 1)
                     throw new IncompatibleArgumentException("wrong repeat length");
@@ -231,11 +229,11 @@ public class Pronto {
 		if (cmd != cmd_chk)
 		    throw new IncompatibleArgumentException("checksum erroneous");
                 break;
-
+*/
             default:
                 throw new IncompatibleArgumentException("CCF type 0x" + Integer.toHexString(type) + " not supported");
         }
-
+/*
         if (irSignal == null) {
             HashMap<String, Long> parameters = new HashMap<>();
             parameters.put("D", (long) dev);
@@ -247,7 +245,7 @@ public class Pronto {
 
             //Protocol protocol = new Protocol(null, irp, null);
             //irSignal = protocol.renderIrSignal(parameters, pass);
-        }
+        }*/
         return irSignal;
     }
 
@@ -255,17 +253,17 @@ public class Pronto {
      * Creates a new IrSignals by interpreting its argument as CCF string.
      * @param ccfString CCF signal
      * @return  IrSignal
-     * @throws IrpMasterException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public static IrSignal ccfSignal(String ccfString) throws IrpMasterException {
+    public static IrSignal ccfSignal(String ccfString) throws IncompatibleArgumentException {
         int[] ccf;
         try {
             ccf = parseString(ccfString);
         } catch (NumberFormatException ex) {
-            throw new IrpMasterException("Non-parseable CCF string: " + ccfString);
+            throw new IncompatibleArgumentException("Non-parseable CCF string: " + ccfString);
         }
         if (ccf == null)
-            throw new IrpMasterException("Invalid CCF string: " + ccfString);
+            throw new IncompatibleArgumentException("Invalid CCF string: " + ccfString);
 
         return ccfSignal(ccf);
     }
@@ -275,17 +273,17 @@ public class Pronto {
      * @param array Strings representing hexadecimal numbers
      * @param begin Starting index
      * @return  IrSignal
-     * @throws IrpMasterException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public static IrSignal ccfSignal(String[] array, int begin) throws IrpMasterException {
+    public static IrSignal ccfSignal(String[] array, int begin) throws IncompatibleArgumentException {
         int[] ccf;
         try {
             ccf = parseStringArray(array, begin);
         } catch (NumberFormatException ex) {
-            throw new IrpMasterException("Non-parseable CCF strings");
+            throw new IncompatibleArgumentException("Non-parseable CCF strings");
         }
         if (ccf == null)
-            throw new IrpMasterException("Invalid CCF strings");
+            throw new IncompatibleArgumentException("Invalid CCF strings");
 
         return ccfSignal(ccf);
     }
@@ -438,7 +436,7 @@ public class Pronto {
      * @param command
      * @return CCF as string, or null on failure.
      * @throws IncompatibleArgumentException
-     */
+     * /
     public static String shortCCFString(String protocolName, int device, int subdevice, int command)
             throws IncompatibleArgumentException {
         int[] ccf = shortCCF(protocolName, device, subdevice, command);
@@ -454,7 +452,7 @@ public class Pronto {
      * @param command
      * @return integer array of short CCF, or null om failure.
      * @throws IncompatibleArgumentException for paramters outside of its allowed domain.
-     */
+     * /
     public static int[] shortCCF(String protocolName, int device, int subdevice, int command) throws IncompatibleArgumentException {
         int index = 0;
         if (protocolName.equalsIgnoreCase("rc5")) {
@@ -514,8 +512,12 @@ public class Pronto {
         } else {
             return null;
         }
-    }
+    }*/
 
+    /**
+     *
+     * @param args
+     * /
     public static void main(String[] args) {
         try {
             IrSignal irSignal = null;
@@ -528,8 +530,8 @@ public class Pronto {
                 int device = Integer.parseInt(args[index++]);
                 int subdevice = Integer.parseInt(args[index++]);
                 int command = Integer.parseInt(args[index++]);
-                System.out.println(shortCCFString(protocol, device, subdevice, command));
-                System.exit(IrpUtils.exitSuccess);
+                //System.out.println(shortCCFString(protocol, device, subdevice, command));
+                System.exit(0/*IrpUtils.exitSuccess* /);
             } else {
                 int[] ccf = new int[args.length];
                 for (int i = 0; i < args.length; i++) {
@@ -538,8 +540,8 @@ public class Pronto {
                 irSignal = ccfSignal(ccf);
             }
             System.out.println(irSignal);
-        } catch (IrpMasterException ex) {
-            System.err.println(ex.getMessage());
+        } catch (IncompatibleArgumentException ex) {
+            Logger.getLogger(Pronto.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
 }

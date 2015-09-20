@@ -14,12 +14,17 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.harctoolbox.IrpMaster;
+package org.harctoolbox.irp;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,8 +36,6 @@ public class IrpUtils {
     public final static String defaultConfigfile = "data" + File.separator + "IrpProtocols.ini";
 
     public final static String dumbCharsetName = "US-ASCII";
-    public final static Charset dumbCharset = Charset.forName(dumbCharsetName);
-    public final static Locale dumbLocale = Locale.US;
 
     public final static long invalid = -1L;
     public final static long all = -2L;
@@ -59,10 +62,10 @@ public class IrpUtils {
     /**
      * Use if no information at all available.
      */
-    public final static double defaultFrequency = 38000f;
+    //public final static double defaultFrequency = 38000f;
 
-    public final static double microseconds2seconds = 1E-6;
-    public final static double seconds2microseconds = 1E6;
+    //public final static double microseconds2seconds = 1E-6;
+    //public final static double seconds2microseconds = 1E6;
 
     /**
      * Joins the Strings in the second argument, starting at the first argument, separating them with the third argument.
@@ -141,7 +144,7 @@ public class IrpUtils {
         byte[] buf = new byte[length];
         for (int i = 0; i < length; i++)
             buf[i] = 0x20;
-        return new String(buf, IrpUtils.dumbCharset);
+        return new String(buf, Charset.forName("US-ASCII"));
     }
 
     /**
@@ -290,7 +293,7 @@ public class IrpUtils {
         return prefix + map.get(name) + postfix;
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         for (String arg : args)
             System.out.println(arg);
 
@@ -304,5 +307,8 @@ public class IrpUtils {
 
         int status = IrpMaster.makeHex(outFile, true, configFilename, preamble, protocolName, device, OBC);
         System.out.println(status);
+    }*/
+
+    private IrpUtils() {
     }
 }

@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 */
 
-package org.harctoolbox.IrpMaster;
+package org.harctoolbox.ircore;
 
 import java.util.Collection;
 
@@ -25,15 +25,25 @@ import java.util.Collection;
  */
 public class ModulatedIrSequence extends IrSequence {
     private static final long serialVersionUID = 1L;
-
+    
     private static final double allowedFrequencyDeviation = 0.05;
     private static final double zeroModulationLimit = 0.000001;
+    public static final double unknownFrequency = -1.0;
+    public static final double unknownDutyCycle = -1.0;
+    public static final double unknownPulseTime = -1.0;
+    public static final double defaultFrequency = 38000.0;
 
-    /** Modulation frequency in Hz. Use 0 for no modulation, use -1 for no information. */
-    protected double frequency = 0;
 
-    /** Duty cycle of the modulation, a number between 0 and 1. Use -1 for unassigned.*/
-    protected double dutyCycle = (double) IrpUtils.invalid;
+    /**
+     * Modulation frequency in Hz. Use 0 for no modulation. Use
+     * <code>unknownFrequency</code> for no information.
+     */
+    protected double frequency = unknownFrequency;
+
+    /**
+     * Duty cycle of the modulation, a number between 0 and 1. Use <code>unknownDutyCycle</code> for unassigned.
+     */
+    protected double dutyCycle = unknownDutyCycle;
 
     /**
      *
@@ -92,7 +102,7 @@ public class ModulatedIrSequence extends IrSequence {
      * @throws IncompatibleArgumentException if duration has odd length.
      */
     public ModulatedIrSequence(int[] durations, double frequency) throws IncompatibleArgumentException {
-        this(new IrSequence(durations), frequency, (double) IrpUtils.invalid);
+        this(new IrSequence(durations), frequency, unknownDutyCycle);
     }
 
     /**
@@ -114,8 +124,8 @@ public class ModulatedIrSequence extends IrSequence {
             cumulatedLength += seq.getLength();
         }
 
-        dutyCycle = mindc > 0 ? (mindc + maxdc)/2 : (double) IrpUtils.invalid;
-        frequency = minf > 0 ? (minf + maxf)/2 : 0;
+        dutyCycle = mindc > 0 ? (mindc + maxdc)/2 : unknownDutyCycle;
+        frequency = minf > 0 ? (minf + maxf)/2 : 0.0;
         data = new double[cumulatedLength];
         int beginIndex = 0;
         for (ModulatedIrSequence seq : seqs) {
@@ -135,7 +145,7 @@ public class ModulatedIrSequence extends IrSequence {
     public String toPrintString(boolean alternatingSigns, boolean noSigns, String separator) {
         return toPrintString(alternatingSigns, noSigns, separator, true);
     }
-    
+
     /**
      * Formats IR signal as sequence of durations, with alternating signs, ignoring all signs, or by preserving signs.
      * @param alternatingSigns if true, generate alternating signs (ignoring original signs).

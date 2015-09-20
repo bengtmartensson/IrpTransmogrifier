@@ -53,7 +53,7 @@ tokens {
 }
 
 @header {
-package org.harctoolbox.IrpTransmogrifier;
+package org.harctoolbox.irp;
 }
 
 //@lexer::header {

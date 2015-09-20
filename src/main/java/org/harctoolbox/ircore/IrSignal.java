@@ -14,18 +14,16 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
-package org.harctoolbox.IrpMaster;
+package org.harctoolbox.ircore;
 
-import java.io.FileNotFoundException;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 /**
  * This class models a rendered IR signals.
  * It consists of a frequency, a duty cycle, and an intro sequence,
  * a repeat sequence, and an ending sequence. Any of the latter three,
- * but not all, can be empty, but not null.
+ * but not all, can be empty, but not null. If the ending sequence is non-empty,
+ * the repeat sequence has to be non-empty too.
  * <p>
  * The "count" semantic: The "count" argument in functions like toModulatedIrSequece(int count) is interpreted like this:
  * If the intro sequence is null, then "count" copies or the repeat sequence are used, otherwise count-1.
@@ -41,6 +39,12 @@ import java.util.LinkedHashMap;
  */
 public class IrSignal {
 
+    public enum Pass {
+        intro,
+        repeat,
+        ending
+    }
+
     /** Intro sequence, always sent once. Can be empty, but not null. */
     protected IrSequence introSequence;
 
@@ -51,14 +55,14 @@ public class IrSignal {
      * actually, most often is. */
     protected IrSequence endingSequence;
 
-    /** "Table" for mapping Pass to intro, repeat, or ending sequence. */
+    //** "Table" for mapping Pass to intro, repeat, or ending sequence. */
     protected EnumMap<Pass, IrSequence>map;
 
     /** Modulation frequency in Hz. Use 0 for not modulated. */
     protected double frequency;
 
     /** Duty cycle of the modulation. Between 0 and 1. Use -1 for not assigned. */
-    protected double dutyCycle = (double) IrpUtils.invalid;
+    protected double dutyCycle = ModulatedIrSequence.unknownDutyCycle;
 
     public double getFrequency() {
         return frequency;
@@ -249,7 +253,7 @@ public class IrSignal {
 
     /**
      * Equivalent to toIntArray(1)
-     * @return
+     * @return array of ints.
      */
     public int[] toIntArray() {
         return toIntArray(1);
@@ -293,15 +297,19 @@ public class IrSignal {
 
     /**
      * Replace all zero durations. Changes the signal in-place.
-     * @param replacement Duration in pulses to replace zero durations with. If frequency == 0, interpret as microseconds instead.
+     *
+     * @param replacement Duration in pulses to replace zero durations with.
+     * If frequency == 0, interpret as microseconds instead.
      */
     public void replaceZeros(int replacement) {
-        replaceZeros(frequency > 0 ?  replacement / frequency * IrpUtils.seconds2microseconds : (double) replacement);
+        replaceZeros(frequency > 0
+                ? IrCoreUtils.seconds2microseconds(replacement / frequency)
+                : (double) replacement);
     }
 
     /**
      * Returns max gap of intro- and repeat sequences.
-     * @return
+     * @return max gap of intro- and repeat sequences.
      */
     public double getGap() {
         return Math.max(introSequence.getGap(), repeatSequence.getGap());
@@ -339,7 +347,7 @@ public class IrSignal {
      * @param frequency
      */
     public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) {
-        this(durations, noIntroBursts, noRepeatBursts, frequency, (double) IrpUtils.invalid);
+        this(durations, noIntroBursts, noRepeatBursts, frequency, ModulatedIrSequence.unknownDutyCycle);
     }
 
     /**
@@ -381,11 +389,11 @@ public class IrSignal {
      * Constructs an IrSignal of zero length.
      */
     public IrSignal() {
-        this(new int[0], 0, 0, (int) IrpUtils.defaultFrequency);
+        this(new int[0], 0, 0, (int) ModulatedIrSequence.defaultFrequency);
     }
 
     // Plunders the victim. Therefore private, othewise would violate immutability.
-    private void copyFrom(IrSignal victim) throws IrpMasterException {
+    private void copyFrom(IrSignal victim) {
         dutyCycle = victim.dutyCycle;
         frequency = victim.frequency;
         introSequence = victim.introSequence;
@@ -396,35 +404,35 @@ public class IrSignal {
 
     /**
      * Creates an IrSignal from a CCF string. Also some "short formats" of CCF are recognized.
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      * @see Pronto
      *
      * @param ccf String supposed to represent a valid CCF signal.
-     * @throws IrpMasterException Error in CCF
      */
-    public IrSignal(String ccf) throws IrpMasterException {
+    public IrSignal(String ccf) throws IncompatibleArgumentException {
         copyFrom(Pronto.ccfSignal(ccf));
     }
 
     /**
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      * @see Pronto
      *
      * @param ccf Integer array supposed to represent a valid CCF signal.
-     * @throws IrpMasterException Error in CCF
      */
-    public IrSignal(int[] ccf) throws IrpMasterException {
+    public IrSignal(int[] ccf) throws IncompatibleArgumentException {
         copyFrom(Pronto.ccfSignal(ccf));
     }
 
     /**
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
      * @param begin starting index
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      * @see Pronto
      *
      * @param ccf String array supposed to represent a valid CCF signal.
-     * @throws IrpMasterException Error in CCF
      */
-    public IrSignal(String[] ccf, int begin) throws IrpMasterException {
+    public IrSignal(String[] ccf, int begin) throws IncompatibleArgumentException {
         copyFrom(Pronto.ccfSignal(ccf, begin));
     }
 
@@ -447,7 +455,7 @@ public class IrSignal {
      * @throws IrpMasterException
      * @throws FileNotFoundException
      * @throws UnassignedException
-     */
+     * /
     public IrSignal(String protocolsIniPath, int offset, String... args) throws IrpMasterException, FileNotFoundException, UnassignedException {
         if (args == null || args.length - offset < 1)
             throw new IncompatibleArgumentException("Too few arguments");
@@ -516,7 +524,7 @@ public class IrSignal {
      * @param parameters Dictionary of parameter values
      * @throws FileNotFoundException
      * @throws IrpMasterException
-     */
+     * /
     public IrSignal(String protocolsIniPath, String protocolName, HashMap<String, Long> parameters) throws FileNotFoundException, IrpMasterException {
         this(new IrpMaster(protocolsIniPath), protocolName, parameters);
     }
@@ -527,7 +535,7 @@ public class IrSignal {
      * @param protocolName name of protocol
      * @param parameters Dictionary of parameter values
      * @throws IrpMasterException
-     */
+     * /
     public IrSignal(IrpMaster irpMaster, String protocolName, HashMap<String, Long> parameters) throws IrpMasterException {
         Protocol protocol = irpMaster.newProtocol(protocolName);
         if (protocol == null)
@@ -544,11 +552,11 @@ public class IrSignal {
      * @param parameters String of parameter assignments like "D=12 F=34"
      * @throws FileNotFoundException
      * @throws IrpMasterException
-     */
+     * /
     public IrSignal(String protocolsIniPath, String protocolName, String parameters)
             throws FileNotFoundException, IrpMasterException {
         //this(protocolsIniPath, protocolName, Protocol.parseParams(parameters));
-    }
+    }*/
 
     /**
      * Returns a ModulatedIrSequence consisting of one intro sequence,
@@ -624,7 +632,7 @@ public class IrSignal {
      * and tests the result.
      *
      * @param args
-     */
+     * /
     public static void main(String[] args) {
         if (args.length == 0) {
             int times[] = {
@@ -659,5 +667,5 @@ public class IrSignal {
                 System.err.println(ex.getMessage());
             }
         }
-    }
+    }*/
 }

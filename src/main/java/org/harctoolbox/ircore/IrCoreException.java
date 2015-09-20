@@ -18,12 +18,12 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 /**
- * Fatally incompatible arguments discovered.
+ * Superclass for exceptions thrown in IrCore package.
  */
 @SuppressWarnings("serial")
-public class IncompatibleArgumentException extends IrCoreException {
+public abstract class IrCoreException extends Exception {
 
-    public IncompatibleArgumentException(String string) {
+    public IrCoreException(String string) {
         super(string);
     }
 }

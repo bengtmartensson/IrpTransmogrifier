@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 Bengt Martensson.
+Copyright (C) 2015 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,17 +13,23 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
- */
+*/
 
 package org.harctoolbox.ircore;
 
 /**
- * Fatally incompatible arguments discovered.
+ * Some useful static functions.
  */
-@SuppressWarnings("serial")
-public class IncompatibleArgumentException extends IrCoreException {
+public class IrCoreUtils {
+    /**
+     * Convert its argument from seconds to microseconds.
+     * @param secs
+     * @return Argument converted to microseconds.
+     */
+    public static double seconds2microseconds(double secs) {
+        return 1000000.0 * secs;
+    }
 
-    public IncompatibleArgumentException(String string) {
-        super(string);
+    private IrCoreUtils() {
     }
 }

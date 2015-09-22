@@ -34,7 +34,10 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
     private BitDirection bitDirection = BitDirection.lsb;
 
     private ParseTreeProperty<Object> values = new ParseTreeProperty<>();
-    private GeneralSpec generalSpec;
+    private GeneralSpec generalSpec = null;
+    private ParameterSpecs parameterSpecs = null;
+    private IrpParser.Bitspec_irstreamContext topBitspecIrstream = null;
+
     public void setValue(ParseTree node, Object value) {
         values.put(node, value);
     }
@@ -50,6 +53,19 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
         return generalSpec;
     }
 
+    /**
+     * @return the topBitspecIrstream
+     */
+    public ParseTree getTopBitspecIrstream() {
+        return topBitspecIrstream;
+    }
+
+    /**
+     * @return the topBitspecIrstream
+     */
+    public ParameterSpecs getParameterSpecs() {
+        return parameterSpecs;
+    }
 
 //    @Override
 //    public Object visitProtocol(IrpParser.ProtocolContext ctx) {
@@ -96,6 +112,7 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
      */
     @Override
     public Object visitProtocol(IrpParser.ProtocolContext ctx) {
+        topBitspecIrstream = ctx.bitspec_irstream();
         return visitChildren(ctx);
     }
 
@@ -658,6 +675,7 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
      */
     @Override
     public Object visitParameter_specs(IrpParser.Parameter_specsContext ctx) {
+        parameterSpecs = new ParameterSpecs(ctx);
         return visitChildren(ctx);
     }
 
@@ -668,10 +686,10 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
      * The default implementation returns the result of calling
      * {@link #visitChildren} on {@code ctx}.</p>
      */
-    @Override
-    public Object visitParameter_spec(IrpParser.Parameter_specContext ctx) {
-        return visitChildren(ctx);
-    }
+    //@Override
+    //public Object visitParameter_spec(IrpParser.Parameter_specContext ctx) {
+    //    return visitChildren(ctx);
+    //}
 
     /**
      * {@inheritDoc}

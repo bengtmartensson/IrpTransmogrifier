@@ -294,8 +294,8 @@ parameter_specs:
     ;
 
 parameter_spec:
-	name ':' INT '.' '.' number ('=' bare_expression)?
-	|	name  '@' ':' INT '.' '.' number '=' bare_expression
+	   name      ':' INT '.' '.' INT ('=' bare_expression)? # memorylessParameterSpec
+	|  name  '@' ':' INT '.' '.' INT  '=' bare_expression   # memoryfullParameterSpec
     ;
 
 float_number:

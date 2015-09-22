@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 Bengt Martensson.
+Copyright (C) 2011, 2015 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,24 +15,23 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
 
-package org.harctoolbox.IrpMaster;
+package org.harctoolbox.irp;
 
-//import org.antlr.v4.runtime.ANTLRStringStream;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 
 /**
  * This class implements GeneralSpec as given in Chapter 2 of Dixon: "Specification of IRP Notation", second draft.
  * This class is immutable; can only be build by the constructor, and not altered.
- *
  */
 public class GeneralSpec {
 
     /** Carrier frequency in Hz */
-    private double frequency = IrpUtils.defaultFrequency;
+    private double frequency = ModulatedIrSequence.defaultFrequency;
 
     /** Duty cycle in percent. IrpUtils.invalid (-1) is defined to denote "don't care". */
     private double dutyCycle = defaultDutyCycle;
 
-    public final static double defaultDutyCycle = IrpUtils.invalid;
+    public final static double defaultDutyCycle = ModulatedIrSequence.unknownDutyCycle;
 
     /** BitDirection */
     private BitDirection bitDirection = defaultBitDirection;
@@ -40,58 +39,56 @@ public class GeneralSpec {
     public final static BitDirection defaultBitDirection = BitDirection.lsb;
 
     /** Timing unit in us */
-    private double unit = 1;
+    private double unit = defaultUnit;
 
     public final static double defaultUnit = 1;
-
-    /** Timing unit in pulses, if and only if given by the user.*/
-    private double unit_pulses = IrpUtils.invalid;
-
-    //private CommonTree AST;
 
     @Override
     public String toString() {
         return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection + (dutyCycle > 0 ? (", Duty cycle = " + dutyCycle + "%.") : ", Duty cycle: -.");
     }
 
-    private void updateUnit() {
+    /*private void updateUnit() {
         if (unit_pulses != IrpUtils.invalid) {
             if (frequency == 0)
                 throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
-            unit = (int) (((double)unit_pulses)*(1000000.0/frequency));
+            unit = (int) (unit_pulses*(1000000.0/frequency));
         }
-    }
+    }*/
 
     /**
      * This constructor is intended for debugging and testing only.
      *
      * @param bitDirection
      * @param unit
-     * @param unit_pulses
      * @param frequency
      * @param dutyCycle
      */
-    public GeneralSpec(BitDirection bitDirection, double unit, double unit_pulses, double frequency, double dutyCycle) {
+    public GeneralSpec(BitDirection bitDirection, double unit, /*double unit_pulses,*/ double frequency, double dutyCycle) {
         this.bitDirection = bitDirection;
         this.unit = unit;
-        this.unit_pulses = unit_pulses;
+        //this.unit_pulses = unit_pulses;
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
-        updateUnit();
+        //updateUnit();
     }
 
+    /**
+     * Copy constructor. Performs deep copy.
+     * @param src
+     */
     private GeneralSpec(GeneralSpec src) {
         this.bitDirection = src.bitDirection;
         this.unit = src.unit;
-        this.unit_pulses = src.unit_pulses;
+        //this.unit_pulses = src.unit_pulses;
         this.frequency = src.frequency;
         this.dutyCycle = src.dutyCycle;
-        updateUnit();
+        //updateUnit();
     }
 
     /** This constructor is intended for debugging and testing only */
     public GeneralSpec() {
-        this(defaultBitDirection, defaultUnit, -1, IrpUtils.defaultFrequency, defaultDutyCycle);
+        this(defaultBitDirection, defaultUnit, /*-1,*/ ModulatedIrSequence.defaultFrequency, ModulatedIrSequence.unknownDutyCycle);
     }
 /*
     private static CommonTree toAST(String str) {

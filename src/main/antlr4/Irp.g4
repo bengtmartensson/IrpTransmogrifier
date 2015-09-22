@@ -99,7 +99,7 @@ generalspec:
 
 generalspec_list:
         /* Empty */
-    | generalspec_item (',' generalspec_list )?
+    | generalspec_item (',' generalspec_item )*
     ;
 
 generalspec_item:
@@ -118,11 +118,13 @@ dutycycle_item:
 ;
 
 unit_item:
-             number_with_decimals ('u' | 'p')?
-	;
+             number_with_decimals ('u')?  # unitInMicroseconds
+           | number_with_decimals 'p'     # unitInPeriods
+;
 
 order_item:
-              (LSB | MSB)
+        LSB         # orderLSB
+        | MSB       # orderMSB
 	;
 
 //3.2
@@ -275,7 +277,8 @@ number:
 ;
 
 number_with_decimals:
-        INT | float_number
+        INT             # integerAsFloat
+      | float_number    # float
     ;
 
 name:

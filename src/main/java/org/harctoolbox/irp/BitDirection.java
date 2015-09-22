@@ -15,13 +15,16 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
 
-package org.harctoolbox.IrpMaster;
+package org.harctoolbox.irp;
 
 public enum BitDirection {
-    
-    /** Least significant bit first */
+
+    /**
+     * Least significant bit first
+     */
     lsb,
-    
-    /** Most significant bit first */
-    msb
+    /**
+     * Most significant bit first
+     */
+    msb;
 }

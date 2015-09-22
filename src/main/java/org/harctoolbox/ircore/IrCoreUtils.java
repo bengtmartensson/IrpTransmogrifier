@@ -30,6 +30,10 @@ public class IrCoreUtils {
         return 1000000.0 * secs;
     }
 
+    public static double khz2Hz(double khz) {
+        return 1000.0 * khz;
+    }
+
     private IrCoreUtils() {
     }
 }

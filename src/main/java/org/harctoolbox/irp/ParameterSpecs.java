@@ -20,8 +20,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -51,22 +51,16 @@ public class ParameterSpecs {
         map = new LinkedHashMap<>();
     }
 
-    public ParameterSpecs(String parameter_specs) {
-        this();
-        IrpLexer lex = new IrpLexer(new ANTLRInputStream(parameter_specs));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        irpParser = new IrpParser(tokens);
-        IrpParser.Parameter_specsContext parseTree = irpParser.parameter_specs();
-        System.out.println(parseTree.toStringTree(irpParser));
-        load(parseTree);
+    public ParameterSpecs(String parameter_specs) throws IrpSyntaxException {
+        this(new Parsinator(parameter_specs).parameterSpecs());
+    }
+
+    public ParameterSpecs(IrpParser.ProtocolContext t) {
+        this(t.parameter_specs());
     }
 
     public ParameterSpecs(IrpParser.Parameter_specsContext t) {
         this();
-        load(t);
-    }
-
-    private void load(IrpParser.Parameter_specsContext t) {
         for (IrpParser.Parameter_specContext parameterSpec : t.parameter_spec()) {
             ParameterSpec ps = parameterSpec instanceof IrpParser.MemoryfullParameterSpecContext
                     ? new ParameterSpec((IrpParser.MemoryfullParameterSpecContext) parameterSpec)
@@ -90,10 +84,10 @@ public class ParameterSpecs {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        try {
+        try {
             System.out.println(new ParameterSpecs("[T@:0..1=0,D:0..31,F:0..128,S:0..255=D-255]"));
-  //      } catch (ParseException ex) {
-    //        System.err.println(ex.getMessage());
-      //  }
+        } catch (IrpSyntaxException ex) {
+            Logger.getLogger(ParameterSpecs.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

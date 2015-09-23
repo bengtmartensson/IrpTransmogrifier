@@ -17,6 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 
 /**
@@ -48,14 +51,6 @@ public class GeneralSpec {
         return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection + (dutyCycle > 0 ? (", Duty cycle = " + dutyCycle + "%.") : ", Duty cycle: -.");
     }
 
-    /*private void updateUnit() {
-        if (unit_pulses != IrpUtils.invalid) {
-            if (frequency == 0)
-                throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
-            unit = (int) (unit_pulses*(1000000.0/frequency));
-        }
-    }*/
-
     /**
      * This constructor is intended for debugging and testing only.
      *
@@ -67,61 +62,61 @@ public class GeneralSpec {
     public GeneralSpec(BitDirection bitDirection, double unit, /*double unit_pulses,*/ double frequency, double dutyCycle) {
         this.bitDirection = bitDirection;
         this.unit = unit;
-        //this.unit_pulses = unit_pulses;
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
-        //updateUnit();
     }
 
     /**
-     * Copy constructor. Performs deep copy.
+     * Copy constructor.
      * @param src
      */
     private GeneralSpec(GeneralSpec src) {
         this.bitDirection = src.bitDirection;
         this.unit = src.unit;
-        //this.unit_pulses = src.unit_pulses;
         this.frequency = src.frequency;
         this.dutyCycle = src.dutyCycle;
-        //updateUnit();
     }
 
     /** This constructor is intended for debugging and testing only */
     public GeneralSpec() {
-        this(defaultBitDirection, defaultUnit, /*-1,*/ ModulatedIrSequence.defaultFrequency, ModulatedIrSequence.unknownDutyCycle);
+        this(defaultBitDirection, defaultUnit, ModulatedIrSequence.defaultFrequency, ModulatedIrSequence.unknownDutyCycle);
     }
-/*
-    private static CommonTree toAST(String str) {
-        IrpLexer lex = new IrpLexer(new ANTLRStringStream(str));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        IrpParser parser = new IrpParser(tokens);
-        IrpParser.generalspec_return r;
-        CommonTree AST = null;
-        try {
-            r = parser.generalspec();
-            AST = (CommonTree) r.getTree();
-        } catch (RecognitionException ex) {
-            System.err.println(ex.getMessage());
+
+    public GeneralSpec(String str) throws IrpSyntaxException {
+        this(new Parsinator(str).generalspec());
+    }
+
+    public GeneralSpec(IrpParser.ProtocolContext ctx) {
+        this(ctx.generalspec());
+    }
+
+    public GeneralSpec(IrpParser.GeneralspecContext ctx) {
+        this(ctx.generalspec_list());
+    }
+
+    public GeneralSpec(IrpParser.Generalspec_listContext ctx) {
+        double unitInPeriods = -1f;
+        for (IrpParser.Generalspec_itemContext item : ctx.generalspec_item()) {
+            if (item instanceof IrpParser.FrequencyContext) {
+                frequency = Parsinator.visit(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals());
+            } else if (item instanceof IrpParser.UnitContext) {
+                IrpParser.Unit_itemContext unitItem = ((IrpParser.UnitContext) item).unit_item();
+                if (unitItem instanceof IrpParser.UnitInMicrosecondsContext)
+                    unit = Parsinator.visit(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
+                else
+                    unitInPeriods = Parsinator.visit(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
+            } else if (item instanceof IrpParser.DutycycleContext) {
+                dutyCycle = Parsinator.visit(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals());
+            } else if (item instanceof IrpParser.ByteorderContext) {
+                bitDirection = ((IrpParser.ByteorderContext) item).order_item() instanceof IrpParser.OrderLSBContext
+                        ? BitDirection.lsb : BitDirection.msb;
+            }
+            if (unitInPeriods > 0) {
+                if (frequency == 0)
+                   throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
+                unit = IrCoreUtils.seconds2microseconds(unitInPeriods/frequency);
+            }
         }
-        return AST;
-    }
-
-    private static GeneralSpec newGeneralSpec(CommonTree AST) {
-        GeneralSpec generalSpec = null;
-        try {
-            generalSpec = ASTTraverser.generalspec(AST);
-        } catch (UnassignedException ex) {
-            assert false; //this cannot happen
-        }
-        return generalSpec;
-    }
-
-    public GeneralSpec(CommonTree tree) {
-        this(newGeneralSpec(tree));
-    }*/
-
-    public GeneralSpec(String str) {
-        //this(newGeneralSpec(toAST(str)));
     }
 
     BitDirection getBitDirection() {
@@ -140,9 +135,8 @@ public class GeneralSpec {
         return dutyCycle;
     }
 
-    /*private static void test(String str) {
+    private static void test(String str) throws IrpSyntaxException {
         GeneralSpec gs = new GeneralSpec(str);
-        System.out.println(toAST(str).toStringTree());
         System.out.println(gs);
     }
 
@@ -150,19 +144,24 @@ public class GeneralSpec {
      * Just for testing and debugging.
      *
      * @param args the command line arguments
-     * /
+     */
     public static void main(String[] args) {
-        if (args.length > 0) {
-            test(args[0]);
-        } else {
-            //test("{0k,,10p}"); // Thows error
-            //test("{ }"); // Seem to trigger bug in ANTLR
-            test("{38.4k,564}");
-            test("{564,38.4k}");
-            test("{msb, 889u}");
-            test("{42%, 10p,msb,40k}");
-            test("{msb ,40k , 33.33333% ,10p }");
-            test("{msb, 123u, 100k, 10p, 1000k}");
+        try {
+            if (args.length > 0)
+                test(args[0]);
+            else {
+                //test("{0k,,10p}"); // Thows error
+                test("{ }"); // Seem to trigger bug in ANTLR
+                test("{38.4k,564}");
+                test("{564,38.4k}");
+                test("{22p,38.4k}");
+                test("{msb, 889u}");
+                test("{42%, 10p,msb,40k}");
+                test("{msb ,40k , 33.33333% ,10p }");
+                test("{msb, 123u, 100k, 10p, 1000k}");
+            }
+        } catch (IrpSyntaxException ex) {
+            Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }*/
+    }
 }

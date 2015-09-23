@@ -19,10 +19,6 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * This class implements the Protocol, per Chapter 1.6--1.7.
@@ -41,11 +37,12 @@ public class Protocol {
     private GeneralSpec generalSpec;
     private NameEngine nameEngine;
     private ParameterSpecs parameterSpecs;
-    private ParseTree topBitspecIrsteam;
-    private CommonTokenStream tokens;
-    private final IrpLexer lexer;
-    private final IrpParser parser;
+    private IrpParser.Bitspec_irstreamContext topBitspecIrsteam;
+    //private CommonTokenStream tokens;
+    //private final IrpLexer lexer;
+    //private final IrpParser parser;
     private IrpParser.ProtocolContext parseTree;
+    private final Parsinator parsinator;
 /*
     // True the first time render is called, then false -- to be able to initialize.
     private boolean virgin = true;
@@ -246,58 +243,30 @@ public class Protocol {
      * @param name
      * @param irpString
      * @param documentation
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @throws org.harctoolbox.irp.IrpSemanticException
      */
-    public Protocol(String name, String irpString, String documentation) {
+    public Protocol(String name, String irpString, String documentation) throws IrpSyntaxException, IrpSemanticException {
         this.name = name;
         this.documentation = documentation;
         this.irpString = irpString;
         this.nameEngine = new NameEngine();
 
-        lexer = new IrpLexer(new ANTLRInputStream(irpString));
-        tokens = new CommonTokenStream(lexer);
-        parser = new IrpParser(tokens);
-        parser.setErrorHandler(new ErrorStrategy());
-        try {
-            parseTree = parser.protocol();
-        } catch (ParseCancellationException ex) {
-            logger.log(Level.WARNING, "Parse error {0}", ex.getCause().getMessage());
-            parseTree = null;
-            return;
-        }
-        IrpTraverser irpTraverser = new IrpTraverser();
-        irpTraverser.visit(parseTree);
-        generalSpec = irpTraverser.getGeneralSpec();
-        parameterSpecs = irpTraverser.getParameterSpecs();
-        topBitspecIrsteam = irpTraverser.getTopBitspecIrstream();
-        /*IrpParser.protocol_return r;
-        try {
-            r = parser.protocol();
-        } catch (RecognitionException ex) {
-            throw new ParseException(ex);
-        }
-        AST = (CommonTree) r.getTree();
+        parsinator = new Parsinator(irpString);
+        parseTree = parsinator.protocol();
 
-        for (int i = 0; i < AST.getChildCount(); i++) {
-            CommonTree ch = (CommonTree) AST.getChild(i);
-            if (ch.getText().equals("GENERALSPEC"))
-                generalSpec = new GeneralSpec(ch);
-            else if (ch.getText().equals("PARAMETER_SPECS"))
-                parameterSpecs = new ParameterSpecs(ch);
-            else if (ch.getText().equals("BITSPEC_IRSTREAM"))
-                topBitspecIrsteam = ch;
-        }*/
-        /*if (parameterSpecs == null) {
-            UserComm.warning("Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
+        generalSpec = new GeneralSpec(parseTree);
+        topBitspecIrsteam = parseTree.bitspec_irstream();
+        //generalSpec = irpTraverser.getGeneralSpec();
+        parameterSpecs = new ParameterSpecs(parseTree);
+
+        if (parameterSpecs.isEmpty()) {
+            logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
             parameterSpecs = new ParameterSpecs();
         }
         if (generalSpec == null) {
-            //throw new UnassignedException("GeneralSpec missing from protocol");
+            throw new IrpSemanticException("GeneralSpec missing from protocol");
         }
-
-        Debug.debugIrpParser("GeneralSpec: " + generalSpec);
-        Debug.debugIrpParser("nameEngine: " + nameEngine);
-        Debug.debugIrpParser("parameterSpec: " + parameterSpecs);
-        */
     }
 
     /**
@@ -324,11 +293,11 @@ public class Protocol {
         return name + ": " + AST.toStringTree();
     }*/
 
-    public String toDOT() {
+    //public String toDOT() {
         //DOTTreeGenerator gen = new DOTTreeGenerator();
         //StringTemplate st = (new DOTTreeGenerator()).toDOT(AST);
-        return parseTree.toStringTree(parser);//st.toString();
-    }
+        //return parseTree.toStringTree(parser);//st.toString();
+    //}
 /*
     public void setupDOM() {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -736,20 +705,19 @@ public class Protocol {
             return params;
     }*/
 
+    /**
+     * Testing only.
+     * @param args
+     */
+
     public static void main(String[] args) {
         String irpString = //"{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
-                "{38.4k,22p,33%,msb}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255]";
-        Protocol protocol = new Protocol("name", irpString, "dox");
-        System.exit(0);
-        IrpLexer lex = new IrpLexer(new ANTLRInputStream(irpString));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        IrpParser parser = new IrpParser(tokens);
-        ParseTree parseTree = parser.protocol();
-        System.out.println(parseTree.getChild(0).getChild(1).getChild(0).getChild(0).toStringTree(parser));
-
-        System.out.println(parseTree.toStringTree(parser));
-        //((IrpParser.ProtocolContext)parseTree).
-        IrpTraverser irpTraverser = new IrpTraverser();
-        irpTraverser.visit(parseTree);
+                "{38.4k,22p,33%,msb}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
+        try {
+            Protocol protocol = new Protocol("name", irpString, "dox");
+            System.out.println(protocol);
+        } catch (IrpSyntaxException | IrpSemanticException ex) {
+            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

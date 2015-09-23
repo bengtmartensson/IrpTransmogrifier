@@ -113,6 +113,7 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
     @Override
     public Object visitProtocol(IrpParser.ProtocolContext ctx) {
         topBitspecIrstream = ctx.bitspec_irstream();
+        parameterSpecs = new ParameterSpecs(ctx.parameter_specs());
         return visitChildren(ctx);
     }
 
@@ -675,7 +676,6 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
      */
     @Override
     public Object visitParameter_specs(IrpParser.Parameter_specsContext ctx) {
-        parameterSpecs = new ParameterSpecs(ctx);
         return visitChildren(ctx);
     }
 

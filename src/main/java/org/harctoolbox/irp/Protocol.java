@@ -17,9 +17,11 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
@@ -43,7 +45,7 @@ public class Protocol {
     private CommonTokenStream tokens;
     private final IrpLexer lexer;
     private final IrpParser parser;
-    private final IrpParser.ProtocolContext parseTree;
+    private IrpParser.ProtocolContext parseTree;
 /*
     // True the first time render is called, then false -- to be able to initialize.
     private boolean virgin = true;
@@ -250,10 +252,18 @@ public class Protocol {
         this.documentation = documentation;
         this.irpString = irpString;
         this.nameEngine = new NameEngine();
+
         lexer = new IrpLexer(new ANTLRInputStream(irpString));
         tokens = new CommonTokenStream(lexer);
         parser = new IrpParser(tokens);
-        parseTree = parser.protocol();
+        parser.setErrorHandler(new ErrorStrategy());
+        try {
+            parseTree = parser.protocol();
+        } catch (ParseCancellationException ex) {
+            logger.log(Level.WARNING, "Parse error {0}", ex.getCause().getMessage());
+            parseTree = null;
+            return;
+        }
         IrpTraverser irpTraverser = new IrpTraverser();
         irpTraverser.visit(parseTree);
         generalSpec = irpTraverser.getGeneralSpec();
@@ -728,7 +738,7 @@ public class Protocol {
 
     public static void main(String[] args) {
         String irpString = //"{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
-                "{38.4k,22p,33%,msb}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
+                "{38.4k,22p,33%,msb}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255]";
         Protocol protocol = new Protocol("name", irpString, "dox");
         System.exit(0);
         IrpLexer lex = new IrpLexer(new ANTLRInputStream(irpString));

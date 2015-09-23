@@ -56,32 +56,6 @@ tokens {
 package org.harctoolbox.irp;
 }
 
-//@lexer::header {
-//package org.harctoolbox.IrpMaster;
-//}
-
-@members {
-//public static CommonTree newIntegerTree(long val) {
-//    return new CommonTree(new CommonToken(INT, Long.toString(val)));
-//}
-
-//protected void mismatch(IntStream input, int ttype, BitSet follow) throws RecognitionException {
-   //throw new MismatchedTokenException(ttype, input);
-//}
-
-//public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
-//   throw e;
-//}
-
-}
-
-@rulecatch {
-catch (RecognitionException e) {
-   reportError(e);
-   throw e;
-}
-}
-
 // TODO
 // Due to the lexer, there can be no "name"s called k, u, m ,p, lsb, or msb.
 // I am not sure if it is an issue, but it is ugly.
@@ -204,7 +178,7 @@ expression:
         '(' bare_expression ')'
 	;
 
-// Following rules was previously rewritten to avoid left recursion
+// Following rules were rewritten to avoid left recursion
 bare_expression:
         inclusive_or_expression
 	;
@@ -230,7 +204,7 @@ multiplicative_expression:
 	;
 
 exponential_expression:
-                          unary_expression ('**' exponential_expression)?
+        unary_expression ('**' exponential_expression)?
 	;
 
 unary_expression:
@@ -286,6 +260,9 @@ name:
     | 'k'
     | 'u'
     | 'p'
+    | 'm'
+    | 'lsb'
+    | 'msb'
     ;
 
 parameter_specs:

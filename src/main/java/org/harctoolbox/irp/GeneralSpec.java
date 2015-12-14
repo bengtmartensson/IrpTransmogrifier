@@ -111,11 +111,11 @@ public class GeneralSpec {
                 bitDirection = ((IrpParser.ByteorderContext) item).order_item() instanceof IrpParser.OrderLSBContext
                         ? BitDirection.lsb : BitDirection.msb;
             }
-            if (unitInPeriods > 0) {
-                if (frequency == 0)
-                   throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
-                unit = IrCoreUtils.seconds2microseconds(unitInPeriods/frequency);
-            }
+        }
+        if (unitInPeriods > 0) {
+            if (frequency == 0)
+                throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
+            unit = IrCoreUtils.seconds2microseconds(unitInPeriods / IrCoreUtils.khz2Hz(frequency));
         }
     }
 
@@ -154,7 +154,7 @@ public class GeneralSpec {
                 test("{ }"); // Seem to trigger bug in ANTLR
                 test("{38.4k,564}");
                 test("{564,38.4k}");
-                test("{22p,38.4k}");
+                test("{22p,40k}");
                 test("{msb, 889u}");
                 test("{42%, 10p,msb,40k}");
                 test("{msb ,40k , 33.33333% ,10p }");

@@ -31,9 +31,7 @@ public class Parsinator {
     private final CommonTokenStream tokens;
     private IrpParser parser;
 
-
     public Parsinator(String irpString) {
-
         lexer = new IrpLexer(new ANTLRInputStream(irpString));
         tokens = new CommonTokenStream(lexer);
         parser = new IrpParser(tokens);
@@ -59,6 +57,14 @@ public class Parsinator {
     public IrpParser.Parameter_specsContext parameterSpecs() throws IrpSyntaxException {
         try {
             return parser.parameter_specs();
+        } catch (ParseCancellationException ex) {
+            throw new IrpSyntaxException(ex);
+        }
+    }
+
+    public IrpParser.ExpressionContext expression() throws IrpSyntaxException {
+        try {
+            return parser.expression();
         } catch (ParseCancellationException ex) {
             throw new IrpSyntaxException(ex);
         }

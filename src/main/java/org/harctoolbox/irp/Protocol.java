@@ -30,20 +30,24 @@ public class Protocol {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
-    private String name;
-    private String documentation;
-    private String irpString;
+    private String name = null;
+    private String documentation = null;
+    private String irpString = null;
     //private CommonTree AST;*/
-    private GeneralSpec generalSpec;
-    private NameEngine nameEngine;
-    private ParameterSpecs parameterSpecs;
-    private IrpParser.Bitspec_irstreamContext topBitspecIrsteam;
+    private GeneralSpec generalSpec = null;
+    private NameEngine nameEngine = null;
+    private ParameterSpecs parameterSpecs = null;
+    private IrpParser.Bitspec_irstreamContext topBitspecIrsteam = null;
     //private CommonTokenStream tokens;
     //private final IrpLexer lexer;
     //private final IrpParser parser;
-    private IrpParser.ProtocolContext parseTree;
-    private final Parsinator parsinator;
-/*
+    private IrpParser.ProtocolContext parseTree = null;
+    private Parsinator parsinator = null;
+
+
+
+
+    /*
     // True the first time render is called, then false -- to be able to initialize.
     private boolean virgin = true;
 
@@ -237,6 +241,14 @@ public class Protocol {
         this(new GeneralSpec());
     }*/
 
+    public Protocol() {
+        this.name = null;
+        this.documentation = null;
+        this.irpString = null;
+        this.nameEngine = null;
+    }
+
+
     /**
      * Main constructor.
      *
@@ -247,6 +259,7 @@ public class Protocol {
      * @throws org.harctoolbox.irp.IrpSemanticException
      */
     public Protocol(String name, String irpString, String documentation) throws IrpSyntaxException, IrpSemanticException {
+        this();
         this.name = name;
         this.documentation = documentation;
         this.irpString = irpString;
@@ -719,5 +732,12 @@ public class Protocol {
         } catch (IrpSyntaxException | IrpSemanticException ex) {
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * @return the nameEngine
+     */
+    public NameEngine getNameEngine() {
+        return nameEngine;
     }
 }

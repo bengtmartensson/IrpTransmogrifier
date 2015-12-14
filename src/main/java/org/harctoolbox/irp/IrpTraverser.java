@@ -529,7 +529,7 @@ public class IrpTraverser extends org.harctoolbox.irp.IrpBaseVisitor<Object> {
      * The default implementation returns the result of calling
      * {@link #visitChildren} on {@code ctx}.</p>
      */
-    @Override
+    //@Override
     public Object visitUnary_expression(IrpParser.Unary_expressionContext ctx) {
         return visitChildren(ctx);
     }

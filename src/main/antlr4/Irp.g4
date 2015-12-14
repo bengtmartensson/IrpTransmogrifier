@@ -57,7 +57,7 @@ package org.harctoolbox.irp;
 }
 
 // TODO
-// Due to the lexer, there can be no "name"s called k, u, m ,p, lsb, or msb.
+// Due to the lexer, there can be no "name"s called k, u, m, p, lsb, or msb.
 // I am not sure if it is an issue, but it is ugly.
 
 // 1.7
@@ -204,18 +204,17 @@ multiplicative_expression:
 	;
 
 exponential_expression:
-        unary_expression ('**' exponential_expression)?
+        unary_expression ('**' unary_expression)*
 	;
 
 unary_expression:
-                    (bitfield | primary_item)
-        | '-'   (  bitfield
-                 | primary_item
-                )
-        | '#'   (  bitfield
-                 | primary_item
-                )
-;
+        bitfield            # bitfield_expression
+        | primary_item      # primary_item_expression
+        | '-' bitfield      # minus_bitfield_expresson
+        | '-' primary_item  # minus_primary_item_expression
+        | '#' bitfield      # count_bitfield_expression
+        | '#' primary_item  # count_primary_item_expression
+                ;
 
 // 10.2
 definitions:
@@ -288,6 +287,13 @@ LSB:
 MSB:
         'msb'
     ;
+
+ADD: '+';
+SUB: '-';
+MUL: '*';
+DIV: '/';
+PERCENT: '%';
+EXP: '**';
 
 // Diff: Allow C syntax identifiers; Graham disallowed lower case and underscores.
 ID:

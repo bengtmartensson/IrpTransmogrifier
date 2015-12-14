@@ -52,7 +52,7 @@ public class ParameterSpecs {
     }
 
     public ParameterSpecs(String parameter_specs) throws IrpSyntaxException {
-        this(new Parsinator(parameter_specs).parameterSpecs());
+        this(new ParserDriver(parameter_specs).parameterSpecs());
     }
 
     public ParameterSpecs(IrpParser.ProtocolContext t) {

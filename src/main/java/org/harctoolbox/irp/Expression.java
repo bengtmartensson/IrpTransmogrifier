@@ -31,7 +31,7 @@ public class Expression {
     private NameEngine nameEngine;
 
     public Expression(String irp) throws IrpSyntaxException {
-        this(new Parsinator(irp).expression());
+        this(new ParserDriver(irp).expression());
     }
 
     public Expression(IrpParser.ExpressionContext parseTree) {

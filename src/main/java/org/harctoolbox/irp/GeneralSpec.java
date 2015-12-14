@@ -83,7 +83,7 @@ public class GeneralSpec {
     }
 
     public GeneralSpec(String str) throws IrpSyntaxException {
-        this(new Parsinator(str).generalspec());
+        this(new ParserDriver(str).generalspec());
     }
 
     public GeneralSpec(IrpParser.ProtocolContext ctx) {
@@ -98,15 +98,15 @@ public class GeneralSpec {
         double unitInPeriods = -1f;
         for (IrpParser.Generalspec_itemContext item : ctx.generalspec_item()) {
             if (item instanceof IrpParser.FrequencyContext) {
-                frequency = Parsinator.visit(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals());
+                frequency = ParserDriver.visit(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals());
             } else if (item instanceof IrpParser.UnitContext) {
                 IrpParser.Unit_itemContext unitItem = ((IrpParser.UnitContext) item).unit_item();
                 if (unitItem instanceof IrpParser.UnitInMicrosecondsContext)
-                    unit = Parsinator.visit(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
+                    unit = ParserDriver.visit(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
                 else
-                    unitInPeriods = Parsinator.visit(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
+                    unitInPeriods = ParserDriver.visit(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
             } else if (item instanceof IrpParser.DutycycleContext) {
-                dutyCycle = Parsinator.visit(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals());
+                dutyCycle = ParserDriver.visit(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals());
             } else if (item instanceof IrpParser.ByteorderContext) {
                 bitDirection = ((IrpParser.ByteorderContext) item).order_item() instanceof IrpParser.OrderLSBContext
                         ? BitDirection.lsb : BitDirection.msb;

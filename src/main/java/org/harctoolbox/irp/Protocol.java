@@ -42,7 +42,7 @@ public class Protocol {
     //private final IrpLexer lexer;
     //private final IrpParser parser;
     private IrpParser.ProtocolContext parseTree = null;
-    private Parsinator parsinator = null;
+    private ParserDriver parsinator = null;
 
 
 
@@ -265,7 +265,7 @@ public class Protocol {
         this.irpString = irpString;
         this.nameEngine = new NameEngine();
 
-        parsinator = new Parsinator(irpString);
+        parsinator = new ParserDriver(irpString);
         parseTree = parsinator.protocol();
 
         generalSpec = new GeneralSpec(parseTree);

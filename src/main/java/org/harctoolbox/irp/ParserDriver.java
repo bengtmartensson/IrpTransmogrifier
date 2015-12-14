@@ -25,13 +25,13 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 /**
  * This class encapsulates the IrpParser.
  */
-public class Parsinator {
+public class ParserDriver {
 
     private final IrpLexer lexer;
     private final CommonTokenStream tokens;
     private IrpParser parser;
 
-    public Parsinator(String irpString) {
+    public ParserDriver(String irpString) {
         lexer = new IrpLexer(new ANTLRInputStream(irpString));
         tokens = new CommonTokenStream(lexer);
         parser = new IrpParser(tokens);

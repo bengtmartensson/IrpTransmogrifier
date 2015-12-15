@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * Implementation of Definitions in Chapter 10 and Assignments in Chapter 11; these are not independent objects.
@@ -31,13 +30,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class NameEngine {
 
-    private HashMap<String, ParseTree> map;
+    private HashMap<String, /*ParseTree*/IrpParser.Bare_expressionContext> map;
 
     public NameEngine() {
         map = new LinkedHashMap<>();
     }
 
-    public ParseTree get(String name) {
+    public /*ParseTree*/ IrpParser.Bare_expressionContext get(String name) {
         //Debug.debugNameEngine("NameEngine: " + name + (map.containsKey(name) ? (" = " + map.get(name).toStringTree()) : "-"));
         return map.get(name);
     }

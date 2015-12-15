@@ -38,6 +38,10 @@ public class ParserDriver {
         parser.setErrorHandler(new ErrorStrategy());
     }
 
+    public IrpParser getParser() {
+        return parser;
+    }
+
     public IrpParser.ProtocolContext protocol() throws IrpSyntaxException {
         try {
             return parser.protocol();

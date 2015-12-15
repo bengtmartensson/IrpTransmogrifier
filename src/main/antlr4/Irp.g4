@@ -192,7 +192,11 @@ exclusive_or_expression:
 	;
 
 and_expression:
-    additive_expression ('&'  additive_expression)*
+        shift_expression ('&' shift_expression)*
+        ;
+
+shift_expression:
+        additive_expression (('<' '<' | '>' '>')  additive_expression)*
 	;
 
 additive_expression:

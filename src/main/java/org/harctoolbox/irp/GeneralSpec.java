@@ -82,31 +82,31 @@ public class GeneralSpec {
         this(defaultBitDirection, defaultUnit, ModulatedIrSequence.defaultFrequency, ModulatedIrSequence.unknownDutyCycle);
     }
 
-    public GeneralSpec(String str) throws IrpSyntaxException {
+    public GeneralSpec(String str) throws IrpSyntaxException, IrpSemanticException {
         this(new ParserDriver(str).generalspec());
     }
 
-    public GeneralSpec(IrpParser.ProtocolContext ctx) {
+    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException {
         this(ctx.generalspec());
     }
 
-    public GeneralSpec(IrpParser.GeneralspecContext ctx) {
+    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException {
         this(ctx.generalspec_list());
     }
 
-    public GeneralSpec(IrpParser.Generalspec_listContext ctx) {
+    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException {
         double unitInPeriods = -1f;
         for (IrpParser.Generalspec_itemContext item : ctx.generalspec_item()) {
             if (item instanceof IrpParser.FrequencyContext) {
-                frequency = ParserDriver.visit(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals());
+                frequency = IrCoreUtils.khz2Hz(ParserDriver.parse(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals()));
             } else if (item instanceof IrpParser.UnitContext) {
                 IrpParser.Unit_itemContext unitItem = ((IrpParser.UnitContext) item).unit_item();
                 if (unitItem instanceof IrpParser.UnitInMicrosecondsContext)
-                    unit = ParserDriver.visit(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
+                    unit = ParserDriver.parse(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
                 else
-                    unitInPeriods = ParserDriver.visit(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
+                    unitInPeriods = ParserDriver.parse(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
             } else if (item instanceof IrpParser.DutycycleContext) {
-                dutyCycle = ParserDriver.visit(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals());
+                dutyCycle = IrCoreUtils.percent2real(ParserDriver.parse(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals()));
             } else if (item instanceof IrpParser.ByteorderContext) {
                 bitDirection = ((IrpParser.ByteorderContext) item).order_item() instanceof IrpParser.OrderLSBContext
                         ? BitDirection.lsb : BitDirection.msb;
@@ -114,8 +114,8 @@ public class GeneralSpec {
         }
         if (unitInPeriods > 0) {
             if (frequency == 0)
-                throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
-            unit = IrCoreUtils.seconds2microseconds(unitInPeriods / IrCoreUtils.khz2Hz(frequency));
+                throw new IrpSemanticException("Units in p and frequency == 0 do not go together.");
+            unit = IrCoreUtils.seconds2microseconds(unitInPeriods / frequency);
         }
     }
 
@@ -135,7 +135,7 @@ public class GeneralSpec {
         return dutyCycle;
     }
 
-    private static void test(String str) throws IrpSyntaxException {
+    private static void test(String str) throws IrpSyntaxException, IrpSemanticException {
         GeneralSpec gs = new GeneralSpec(str);
         System.out.println(gs);
     }
@@ -160,7 +160,7 @@ public class GeneralSpec {
                 test("{msb ,40k , 33.33333% ,10p }");
                 test("{msb, 123u, 100k, 10p, 1000k}");
             }
-        } catch (IrpSyntaxException ex) {
+        } catch (IrpSyntaxException | IrpSemanticException ex) {
             Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

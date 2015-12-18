@@ -28,7 +28,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 public class Expression {
 
     //private static boolean debug;
-    private IrpParser.ExpressionContext parseTree;
+    private IrpParser.Bare_expressionContext parseTree;
     private NameEngine nameEngine;
     private ParserDriver parserDriver; // FIXME
 
@@ -40,18 +40,18 @@ public class Expression {
         this(parserDriver, new NameEngine());
     }
 
-    public Expression(IrpParser.ExpressionContext parseTree) throws IrpSyntaxException {
-        this(parseTree, new NameEngine());
+    public Expression(IrpParser.ExpressionContext ctx) throws IrpSyntaxException {
+        this(ctx.bare_expression(), new NameEngine());
     }
 
-    public Expression(IrpParser.ExpressionContext parseTree, NameEngine nameEngine) throws IrpSyntaxException {
+    public Expression(IrpParser.Bare_expressionContext parseTree, NameEngine nameEngine) throws IrpSyntaxException {
         this.parserDriver = null;
         this.parseTree = parseTree;
         this.nameEngine = nameEngine;
     }
     public Expression(ParserDriver parserDriver, NameEngine nameEngine) throws IrpSyntaxException {
         this.parserDriver = parserDriver;
-        this.parseTree = parserDriver.expression();
+        this.parseTree = parserDriver.bare_expression();
         this.nameEngine = nameEngine;
     }
 
@@ -287,7 +287,7 @@ bitfield_expression
     /**
      * @return the parseTree
      */
-    public IrpParser.ExpressionContext getParseTree() {
+    public IrpParser.Bare_expressionContext getParseTree() {
         return parseTree;
     }
 
@@ -305,7 +305,7 @@ bitfield_expression
         this.nameEngine = nameEngine;
     }
 
-    private static void test(String str) throws IrpSyntaxException {
+    public static long evaluate(String str) throws IrpSyntaxException {
         String string = str;
         if (!string.startsWith("("))
             string = "(" + string;
@@ -313,7 +313,11 @@ bitfield_expression
             string += ")";
 
         Expression expression = new Expression(string);
-        System.out.println(expression.evaluate());
+        return expression.evaluate();
+    }
+
+    private static void evalPrint(String str) throws IrpSyntaxException {
+        System.out.println(evaluate(str));
     }
 
     /**
@@ -324,12 +328,12 @@ bitfield_expression
     public static void main(String[] args) {
         try {
             if (args.length > 0)
-                test(args[0]);
+                evalPrint(args[0]);
             else {
-                test("3*4");
-                test("35/5");
-                test("3*4<<2");
-                test("3*4>>1");
+                evalPrint("3*4");
+                evalPrint("35/5");
+                evalPrint("3*4<<2");
+                evalPrint("3*4>>1");
             }
         } catch (IrpSyntaxException ex) {
             Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);

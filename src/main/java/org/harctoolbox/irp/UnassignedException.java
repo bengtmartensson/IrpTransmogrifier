@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * This class does something interesting and useful. Or not...
+ * This exception is thrown when accessing a variable that has not been assigned.
  */
 public class UnassignedException extends IrpException {
 

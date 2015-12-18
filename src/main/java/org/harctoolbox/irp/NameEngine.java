@@ -19,6 +19,8 @@ package org.harctoolbox.irp;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Implementation of Definitions in Chapter 10 and Assignments in Chapter 11; these are not independent objects.
@@ -30,78 +32,59 @@ import java.util.LinkedHashMap;
 
 public class NameEngine {
 
-    private HashMap<String, /*ParseTree*/IrpParser.Bare_expressionContext> map;
+    private HashMap<String, IrpParser.Bare_expressionContext> map;
+    private IrpParser parser;
 
     public NameEngine() {
         map = new LinkedHashMap<>();
+        parser = null;
     }
 
-    public /*ParseTree*/ IrpParser.Bare_expressionContext get(String name) {
-        //Debug.debugNameEngine("NameEngine: " + name + (map.containsKey(name) ? (" = " + map.get(name).toStringTree()) : "-"));
-        return map.get(name);
-    }
-/*
-    public void parseDefines(String str) throws ParseException {
-        String s[] = str.replaceAll("[{}]", "").split(",");
-        for (String item : s)
-            define(item);
-
+    public NameEngine(String str) throws IrpSyntaxException {
+        this();
+        ParserDriver parserDriver = new ParserDriver(str);
+        parser = parserDriver.getParser();
+        parseDefinitions(parserDriver.definitions());
     }
 
-    private void define(String str) throws ParseException {
-        String[] s = str.split("=");
-        define(s[0], s[1]);
+    //private void define(String str) throws IrpSyntaxException {
+    //    String[] s = str.split("=");
+    //    define(s[0], s[1]);
+    //}
+
+    private void define(String name, String value) throws IrpSyntaxException {
+        Expression exp = new Expression(value);
+        define(name, exp.getParseTree());
     }
 
-    private void define(String name, CommonTree t) {
-        map.put(name.trim(), t);
+    private void define(String name, IrpParser.Bare_expressionContext tree) throws IrpSyntaxException {
+        if (!ParserDriver.validName(name))
+            throw new IrpSyntaxException("Invalid name: " + name);
+        map.put(name, tree);
     }
 
-    private void define(CommonTree t /* DEFINITION * /) {
-        define(t.getChild(0).getText(), (CommonTree) t.getChild(1));
-    }
-
-    public void readDefinitions(CommonTree t /* DEFINITIONS * /) {
-        for (int i = 0; i < t.getChildCount(); i++)
-            define((CommonTree)t.getChild(i));
+    public void define(String name, long value) throws IrpSyntaxException {
+        define(name, Long.toString(value));
     }
 
     /**
      * Invoke the parser on the supplied argument, and stuff the result into the name engine.
      *
      * @param str String to be parsed, like "{C = F*4 + D + 3}".
-     * /
-    public void readDefinitions(String str) {
-        IrpLexer lex = new IrpLexer(new ANTLRStringStream(str));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        IrpParser parser = new IrpParser(tokens);
-        IrpParser.definitions_return r;
-        try {
-            r = parser.definitions();
-            CommonTree AST = (CommonTree) r.getTree();
-            //System.out.println(AST.toStringTree());
-            readDefinitions(AST);
-        } catch (RecognitionException ex) {
-            System.err.println(ex.getMessage());
-        }
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     */
+    public void parseDefinitions(String str) throws IrpSyntaxException {
+        ParserDriver parserDriver = new ParserDriver(str);
+        parseDefinitions(parserDriver.definitions());
     }
 
-    // FIXME: should not enter anything if the bare_expression does not parse,
-    public void define(String name, String bare_expression) throws ParseException {
-        IrpLexer lex = new IrpLexer(new ANTLRStringStream(bare_expression));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        IrpParser parser = new IrpParser(tokens);
-        IrpParser.bare_expression_return r;
-        try {
-            r = parser.bare_expression();
-            map.put(name.trim(), (CommonTree) r.getTree());
-        } catch (RecognitionException ex) {
-            throw new ParseException(ex);
-        }
+    public final void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) throws IrpSyntaxException {
+        for (IrpParser.DefinitionContext definition : ctx.definitions_list().definition())
+            parseDefinition(definition);
     }
 
-    public void assign(String name, long value) {
-        define(name, IrpParser.newIntegerTree(value));
+    private void parseDefinition(IrpParser.DefinitionContext ctx /* DEFINITION */) throws IrpSyntaxException {
+        define(ctx.name().getText(), ctx.bare_expression());
     }
 
     /**
@@ -141,6 +124,16 @@ public class NameEngine {
                 throw new UnassignedException("Parameter `" + name + "' has not been assigned.");
             }
         }
+    }*/
+
+    /**
+     * Returns the parse tree associated to the name given as parameter.
+     * @param name
+     * @return
+     */
+    public IrpParser.Bare_expressionContext get(String name) {
+        //Debug.debugNameEngine("NameEngine: " + name + (map.containsKey(name) ? (" = " + map.get(name).toStringTree()) : "-"));
+        return map.get(name);
     }
 
     /**
@@ -148,33 +141,37 @@ public class NameEngine {
      * @param name Input name
      * @return StringTree of the value.
      * @throws UnassignedException
-     * /
-    public String evaluate(String name) throws UnassignedException {
+     */
+    public IrpParser.Bare_expressionContext evaluate(String name) throws UnassignedException {
         if (map.containsKey(name))
-            return map.get(name).toStringTree();
+            return map.get(name);
         else
             throw new UnassignedException("Name `" + name + "' not defined.");
+    }
+
+    public IrpParser.Bare_expressionContext evaluate(IrpParser.NameContext ctx) throws UnassignedException {
+        return evaluate(ctx.getText());
     }
 
     public boolean containsKey(String name) {
         return map.containsKey(name);
     }
 
-    public String tryEvaluate(String name) {
-        String result = null;
+    /*public String tryEvaluate(String name) {
+        IrpParser.Bare_expressionContext result ;
         try {
             result = evaluate(name);
         } catch (UnassignedException ex) {
             System.err.println(ex.getMessage());
         }
         return result;
-    }
+    }*/
 
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         for (String name : map.keySet()) {
-            str.append(name).append("=").append(map.get(name).toStringTree()).append(",");
+            str.append(name).append("=").append(map.get(name).toStringTree(parser)).append(",");
         }
         return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
     }
@@ -186,7 +183,7 @@ public class NameEngine {
      * @param equals String between name and value, often "=",
      * @param separator String between name-value pairs, often ",".
      * @return String
-     * /
+     */
     public String notationString(String equals, String separator) {
         StringBuilder str = new StringBuilder();
         for (String name : map.keySet()) {
@@ -196,7 +193,12 @@ public class NameEngine {
         return (str.length() == 0 ? "" : str.substring(0, str.length()-1));
     }
 
-    private static void usage(int code) {
+    public Element toElement(Document document) {
+        Element root = document.createElement("definitions");
+        return root;
+    }
+
+    /*private static void usage(int code) {
         System.err.println("Usage:");
         System.err.println("\tNameEngine [<name>=<value>|{<name>=<expression>}]+");
         System.exit(code);
@@ -208,15 +210,12 @@ public class NameEngine {
      * @param args the command line arguments
      * /
     public static void main(String[] args) {
-        if (args.length == 0)
-            usage(IrpUtils.exitUsageError);
-        Protocol prot = new Protocol(new GeneralSpec());
         try {
-            prot.assign(args, 0);
-        } catch (IncompatibleArgumentException ex) {
-            System.err.println(ex.getMessage());
-            usage(IrpUtils.exitFatalProgramFailure);
+            NameEngine nameEngine = new NameEngine("{answer = 42, C = F*4 + D + 3}");
+            System.out.println(nameEngine);
+        } catch (IrpSyntaxException ex) {
+            Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(prot.nameEngineString());
-    }*/
+    }
+    */
 }

@@ -19,6 +19,12 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.harctoolbox.ircore.IrCoreUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements the Protocol, per Chapter 1.6--1.7.
@@ -30,24 +36,16 @@ public class Protocol {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
-    private String name = null;
-    private String documentation = null;
-    private String irpString = null;
-    //private CommonTree AST;*/
-    private GeneralSpec generalSpec = null;
-    private NameEngine nameEngine = null;
-    private ParameterSpecs parameterSpecs = null;
-    private IrpParser.Bitspec_irstreamContext topBitspecIrsteam = null;
-    //private CommonTokenStream tokens;
-    //private final IrpLexer lexer;
-    //private final IrpParser parser;
-    private IrpParser.ProtocolContext parseTree = null;
-    private ParserDriver parsinator = null;
+    private String name;
+    private String documentation;
+    private String irpString;
+    private GeneralSpec generalSpec;
+    private NameEngine nameEngine;
+    private ParameterSpecs parameterSpecs;
+    private BitspecIrstream bitspecIrsteam;
+    private IrpParser.ProtocolContext parseTree;
+    private ParserDriver parseDriver;
 
-
-
-
-    /*
     // True the first time render is called, then false -- to be able to initialize.
     private boolean virgin = true;
 
@@ -57,10 +55,67 @@ public class Protocol {
     private Element root = null;
     private Element currentElement = null;
 
+    /**
+     *
+     * @param generalSpec
+     */
+    public Protocol(GeneralSpec generalSpec) {
+        this();
+        this.generalSpec = generalSpec;
+    }
+
+    public Protocol() {
+        this.parseDriver = null;
+        this.parseTree = null;
+        this.bitspecIrsteam = null;
+        this.parameterSpecs = null;
+        this.nameEngine = null;
+        this.irpString = null;
+        this.documentation = null;
+        this.name = null;
+        this.documentation = null;
+        this.irpString = null;
+        this.nameEngine = new NameEngine();
+        this.generalSpec = new GeneralSpec();
+    }
+
+    /**
+     * Main constructor.
+     *
+     * @param name
+     * @param irpString
+     * @param documentation
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @throws org.harctoolbox.irp.IrpSemanticException
+     */
+    public Protocol(String name, String irpString, String documentation) throws IrpSyntaxException, IrpSemanticException {
+        this();
+        this.name = name;
+        this.documentation = documentation;
+        this.irpString = irpString;
+        this.nameEngine = new NameEngine();
+
+        parseDriver = new ParserDriver(irpString);
+        parseTree = parseDriver.protocol();
+
+        generalSpec = new GeneralSpec(parseTree);
+        bitspecIrsteam = new BitspecIrstream(parseTree);
+        parameterSpecs = new ParameterSpecs(parseTree);
+
+        if (parameterSpecs.isEmpty()) {
+            logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
+            parameterSpecs = new ParameterSpecs();
+        }
+        if (generalSpec == null) {
+            throw new IrpSemanticException("GeneralSpec missing from protocol");
+        }
+    }
+
+/*
     public long evaluateName(String name) throws UnassignedException, DomainViolationException {
         long result;
-        Debug.debugNameEngine("evaluateName(" + name + ") called");
-        CommonTree tree = nameEngine.get(name);
+        //Debug.debugNameEngine("evaluateName(" + name + ") called");
+        IrpParser.Bare_expressionContext tree = nameEngine.get(name);
         if (tree == null)
             throw new UnassignedException("Name `" + name + "' not assigned.");
         try {
@@ -130,6 +185,58 @@ public class Protocol {
     public double getDutyCycle() {
         return generalSpec.getDutyCycle();
     }
+    public String toStringTree() throws IrpSyntaxException {
+        return parseTree.toStringTree(parseDriver.getParser());
+    }
+
+    // from irpmaster.XmlExport
+    private static Document newDocument() {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(false);
+        Document doc = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            doc = builder.newDocument();
+        } catch (ParserConfigurationException e) {
+        }
+        return doc;
+    }
+
+    public Document toDocument() throws IrpSyntaxException {
+        Document document = newDocument();
+        document.appendChild(toElement(document));
+        return document;
+    }
+
+    public Element toElement(Document document) throws IrpSyntaxException {
+        Element root = document.createElement("protocol-renderer");
+        root.setAttribute("name", name);
+        root.setAttribute("frequency", Long.toString(Math.round(IrCoreUtils.khz2Hz(getFrequency()))));
+        root.setAttribute("bitdirection", getBitDirection().toString());
+        root.setAttribute("timeunit", Long.toString(Math.round(getUnit())));
+        if (getDutyCycle() != -1)
+            root.setAttribute("dutycycle", Long.toString(100*Math.round(getDutyCycle())));
+        Element irp = document.createElement("irp");
+        irp.appendChild(document.createCDATASection("\n" + irpString + "\n"));
+        root.appendChild(irp);
+        Element docu = document.createElement("documentation");
+        docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
+        root.appendChild(docu);
+        Element stringTree = document.createElement("stringTree");
+        stringTree.appendChild(document.createCDATASection("\n" + toStringTree() + "\n"));
+        root.appendChild(stringTree);
+
+        Element renderer = document.createElement("renderer");
+        root.appendChild(renderer);
+        renderer.appendChild(parameterSpecs.toElement(document));
+        renderer.appendChild(nameEngine.toElement(document));
+
+        Element body = bitspecIrsteam.toElement(document);
+        renderer.appendChild(body);
+        return root;
+    }
+
     /*
     public long getParameterMin(String name) throws UnassignedException {
         ParameterSpec ps = parameterSpecs.getParameterSpec(name);
@@ -223,63 +330,6 @@ public class Protocol {
     public boolean hasParameterDefault(String name) {
         ParameterSpec ps = parameterSpecs.getParameterSpec(name);
         return ps != null && ps.getDefault() != null;
-    }
-
-    /**
-     *
-     * @param generalSpec
-     * /
-    public Protocol(GeneralSpec generalSpec) {
-        if (generalSpec == null)
-            throw new RuntimeException("empty generalSpec");
-        this.generalSpec = generalSpec;
-        this.nameEngine = new NameEngine();
-    }
-
-    /** Just for testing and debugging * /
-    public Protocol() {
-        this(new GeneralSpec());
-    }*/
-
-    public Protocol() {
-        this.name = null;
-        this.documentation = null;
-        this.irpString = null;
-        this.nameEngine = null;
-    }
-
-
-    /**
-     * Main constructor.
-     *
-     * @param name
-     * @param irpString
-     * @param documentation
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     * @throws org.harctoolbox.irp.IrpSemanticException
-     */
-    public Protocol(String name, String irpString, String documentation) throws IrpSyntaxException, IrpSemanticException {
-        this();
-        this.name = name;
-        this.documentation = documentation;
-        this.irpString = irpString;
-        this.nameEngine = new NameEngine();
-
-        parsinator = new ParserDriver(irpString);
-        parseTree = parsinator.protocol();
-
-        generalSpec = new GeneralSpec(parseTree);
-        topBitspecIrsteam = parseTree.bitspec_irstream();
-        //generalSpec = irpTraverser.getGeneralSpec();
-        parameterSpecs = new ParameterSpecs(parseTree);
-
-        if (parameterSpecs.isEmpty()) {
-            logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
-            parameterSpecs = new ParameterSpecs();
-        }
-        if (generalSpec == null) {
-            throw new IrpSemanticException("GeneralSpec missing from protocol");
-        }
     }
 
     /**

@@ -17,18 +17,19 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  */
 public class ParameterSpecs {
 
-    private HashMap<String, ParameterSpec>map;
+    private LinkedHashMap<String, ParameterSpec>map;
     private IrpParser irpParser;
 
     public boolean isEmpty() {
@@ -78,6 +79,14 @@ public class ParameterSpecs {
         if (str.length() > 0)
             str.deleteCharAt(str.length()-2);
         return "[" + str.toString() + "]";
+    }
+
+    public Element toElement(Document document) {
+        Element el = document.createElement("parameters");
+        //el.appendChild(document.createComment(toString()));
+        for (ParameterSpec parameterSpec : map.values())
+            el.appendChild(parameterSpec.toElement(document));
+        return el;
     }
 
     /**

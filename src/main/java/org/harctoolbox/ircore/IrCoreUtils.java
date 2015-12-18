@@ -27,11 +27,19 @@ public class IrCoreUtils {
      * @return Argument converted to microseconds.
      */
     public static double seconds2microseconds(double secs) {
-        return 1000000.0 * secs;
+        return 1000000f * secs;
+    }
+
+    public static double milliseconds2microseconds(double secs) {
+        return 1000f * secs;
     }
 
     public static double khz2Hz(double khz) {
-        return 1000.0 * khz;
+        return 1000f * khz;
+    }
+
+    public static double percent2real(double percent) {
+        return 0.01f * percent;
     }
 
     private IrCoreUtils() {

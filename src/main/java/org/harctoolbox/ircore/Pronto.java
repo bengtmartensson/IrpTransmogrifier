@@ -253,15 +253,7 @@ public class Pronto {
      * @throws IncompatibleArgumentException
      */
     public static IrSignal parse(String ccfString) throws IncompatibleArgumentException {
-        int[] ccf;
-        try {
-            ccf = parseAsInts(ccfString);
-        } catch (NumberFormatException ex) {
-            throw new IncompatibleArgumentException("Non-parseable CCF string: " + ccfString);
-        }
-        if (ccf == null)
-            throw new IncompatibleArgumentException("Invalid CCF string: " + ccfString);
-
+        int[] ccf = parseAsInts(ccfString);
         return parse(ccf);
     }
 
@@ -291,9 +283,9 @@ public class Pronto {
      *
      * @param ccfString Input string, to be parsed/tested.
      * @return Integer array of numbers if successful, null if unsuccessful.
-     * @throws NumberFormatException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public static int[] parseAsInts(String ccfString) throws NumberFormatException {
+    public static int[] parseAsInts(String ccfString) throws IncompatibleArgumentException {
         String[] array = ccfString.trim().split("\\s+");
         return parseAsInts(array, 0);
     }
@@ -305,17 +297,18 @@ public class Pronto {
      * @param array Input strings, to be parsed/tested.
      * @param begin Starting index
      * @return Integer array of numbers if successful, null if unsuccessful (e.g. by NumberFormatException).
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public static int[] parseAsInts(String[] array, int begin) {
+    public static int[] parseAsInts(String[] array, int begin) throws IncompatibleArgumentException {
         int[] ccf = new int[array.length];
 
         for (int i = begin; i < array.length; i++) {
             if (array[i].length() != charsInDigit)
-                return null;
+                throw new IncompatibleArgumentException("Non-pronto format of " + array[i]);
             try {
                 ccf[i] = Integer.parseInt(array[i], 16);
             } catch (NumberFormatException ex) {
-                return null;
+                throw new IncompatibleArgumentException(ex);
             }
         }
         return ccf;

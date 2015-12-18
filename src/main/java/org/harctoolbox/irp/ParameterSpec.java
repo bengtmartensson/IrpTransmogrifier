@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -36,6 +38,17 @@ public class ParameterSpec {
     @Override
     public String toString() {
         return toString(null);
+    }
+
+    public Element toElement(Document document) {
+        Element el = document.createElement("parameter");
+        el.setAttribute("name", name);
+        el.setAttribute("min", Long.toString(min));
+        el.setAttribute("max", Long.toString(max));
+        el.setAttribute("memory", Boolean.toString(memory));
+        if (deflt != null)
+            el.setAttribute("default", deflt.toString());
+        return el;
     }
 
     public ParameterSpec(String name, int min, int max, boolean memory, int deflt) {

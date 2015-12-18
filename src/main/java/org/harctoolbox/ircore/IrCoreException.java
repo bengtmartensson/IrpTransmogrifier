@@ -26,4 +26,8 @@ public abstract class IrCoreException extends Exception {
     public IrCoreException(String string) {
         super(string);
     }
+
+    public IrCoreException(Throwable ex) {
+        super(ex);
+    }
 }

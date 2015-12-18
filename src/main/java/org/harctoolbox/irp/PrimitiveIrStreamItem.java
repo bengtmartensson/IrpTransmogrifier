@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 Bengt Martensson.
+Copyright (C) 2011, 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,20 +14,11 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
+package org.harctoolbox.irp;
 
-package org.harctoolbox.ircore;
+public abstract class PrimitiveIrStreamItem extends PrimaryIrStreamItem {
 
-/**
- * Fatally incompatible arguments discovered.
- */
-@SuppressWarnings("serial")
-public class IncompatibleArgumentException extends IrCoreException {
-
-    public IncompatibleArgumentException(String string) {
-        super(string);
-    }
-
-    public IncompatibleArgumentException(Throwable ex) {
-        super(ex);
+    protected PrimitiveIrStreamItem(Protocol env) {
+        super(env);
     }
 }

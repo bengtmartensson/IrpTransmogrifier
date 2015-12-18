@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
@@ -38,8 +39,55 @@ public class ParserDriver {
         parser.setErrorHandler(new ErrorStrategy());
     }
 
-    public IrpParser getParser() {
+    public String toStringTree() throws IrpSyntaxException {
+        IrpParser.ProtocolContext protocol = parser.protocol();
+        return protocol != null ? protocol.toStringTree(parser) : null;
+    }
+
+    public IrpParser getParser() throws IrpSyntaxException {
         return parser;
+    }
+
+    /**
+     * Check the syntactical correctness of the name.
+     *
+     * This invokes a newly constructed parser, i.e. is comparatively expensive.
+     *
+     * @param name Name to be checked
+     * @return true iff the name is syntactically valid.
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     */
+    //  Alternatively, could check agains a regexp. But this keeps the grammar in one place.
+    public static String parseName(String name) throws IrpSyntaxException {
+        try {
+            ParserDriver parserDriver = new ParserDriver(name);
+            IrpParser.NameContext nam = parserDriver.parser.name();
+            return nam.getText();
+        } catch (ParseCancellationException ex) {
+            throw new IrpSyntaxException("Invalid name: " + name);
+        }
+    }
+
+    /**
+     * Check the syntactical correctness of the name.
+     *
+     * This invokes a newly constructed parser, i.e. is comparatively expensive.
+     *
+     * @param name Name to be checked
+     * @return true iff the name is syntactically valid.
+     */
+    public static boolean validName(String name) {
+        try {
+            String nam = parseName(name);
+            return nam.equals(name.trim());
+        } catch (IrpSyntaxException ex) {
+            return false;
+        }
+    }
+
+    // TODO: having both getParser() and all these is silly...
+    public IrpParser.DurationContext duration() {
+        return parser.duration();
     }
 
     public IrpParser.ProtocolContext protocol() throws IrpSyntaxException {
@@ -74,23 +122,63 @@ public class ParserDriver {
         }
     }
 
-    public static double visit(IrpParser.Number_with_decimalsContext ctx) {
+    public IrpParser.Bare_expressionContext bare_expression() throws IrpSyntaxException {
+        try {
+            return parser.bare_expression();
+        } catch (ParseCancellationException ex) {
+            throw new IrpSyntaxException(ex);
+        }
+    }
+
+    public IrpParser.BitfieldContext bitfield() throws IrpSyntaxException {
+        try {
+            return parser.bitfield();
+        } catch (ParseCancellationException ex) {
+            throw new IrpSyntaxException(ex);
+        }
+    }
+
+    public IrpParser.DefinitionsContext definitions() throws IrpSyntaxException {
+        try {
+            return parser.definitions();
+        } catch (ParseCancellationException ex) {
+            throw new IrpSyntaxException(ex);
+        }
+    }
+
+    public static double parse(IrpParser.Name_or_numberContext ctx, NameEngine nameEngine) throws IrpSyntaxException {
+        ParseTree child = ctx.getChild(0);
+        return child instanceof IrpParser.NameContext ? parse((IrpParser.NameContext) child, nameEngine)
+                : parse((IrpParser.Number_with_decimalsContext) child);
+    }
+
+    public static double parse(IrpParser.NameContext ctx, NameEngine nameEngine) throws IrpSyntaxException {
+        IrpParser.Bare_expressionContext tree = nameEngine.get(parse(ctx));
+        Expression exp = new Expression(tree, nameEngine);
+        return exp.evaluate();
+    }
+
+    public static String parse(IrpParser.NameContext ctx) {
+        return ctx.getText();
+    }
+
+    public static double parse(IrpParser.Number_with_decimalsContext ctx) {
         return (ctx instanceof IrpParser.IntegerAsFloatContext)
                 ? parseINT(((IrpParser.IntegerAsFloatContext) ctx).INT())
-                : visit(((IrpParser.FloatContext) ctx).float_number());
+                : parse(((IrpParser.FloatContext) ctx).float_number());
     }
 
-    public static double visit(IrpParser.Float_numberContext ctx) {
+    public static double parse(IrpParser.Float_numberContext ctx) {
         return (ctx instanceof IrpParser.DotIntContext)
-                ? visit((IrpParser.DotIntContext) ctx)
-                : visit((IrpParser.IntDotIntContext) ctx);
+                ? parse((IrpParser.DotIntContext) ctx)
+                : parse((IrpParser.IntDotIntContext) ctx);
     }
 
-    public static double visit(IrpParser.DotIntContext ctx) {
+    public static double parse(IrpParser.DotIntContext ctx) {
         return parseFloat(ctx.INT());
     }
 
-    public static double visit(IrpParser.IntDotIntContext ctx) {
+    public static double parse(IrpParser.IntDotIntContext ctx) {
         return parseFloat(ctx.INT(0), ctx.INT(1));
     }
 
@@ -105,4 +193,12 @@ public class ParserDriver {
     private static double parseFloat(TerminalNode matissa) {
         return Double.parseDouble("0." + matissa.getText());
     }
+
+    /*public static void main(String[] args) {
+        System.out.println(validName(" ksdjfk "));
+        System.out.println(validName(" 4ksdjfk "));
+        System.out.println(validName(" _4ksdjfk "));
+        System.out.println(validName("msb"));
+        System.out.println(validName("May the force be with you"));
+    }*/
 }

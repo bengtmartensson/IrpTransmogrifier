@@ -56,10 +56,6 @@ tokens {
 package org.harctoolbox.irp;
 }
 
-// TODO
-// Due to the lexer, there can be no "name"s called k, u, m, p, lsb, or msb.
-// I am not sure if it is an issue, but it is ugly.
-
 // 1.7
 protocol:
         generalspec bitspec_irstream definitions* parameter_specs? // Difference: * instead of ?, parameterspec
@@ -125,9 +121,8 @@ extent:
 
 //  5.2
 bitfield:
-        t='~'? data=primary_item ':'  (m='-'? length=primary_item (':' chop=primary_item)?
-                                    |  ':'  chop=primary_item
-                                      )
+        t='~'? data=primary_item ':'  m='-'? length=primary_item (':' chop=primary_item)? # finite_bitfield
+        | t='~'? data=primary_item ':' ':'  chop=primary_item                             # infinite_bitfield
 	;
 
 primary_item:
@@ -227,7 +222,7 @@ definitions:
 
 definitions_list:
 	/* Empty */
-        | definitions_list (',' definition)
+        | definition (',' definition)*
 	;
 
 definition:
@@ -258,6 +253,9 @@ number_with_decimals:
       | float_number    # float
     ;
 
+// Due to the lexer, have to take special precaitions to allow name-s
+// to be called k, u, m, p, lsb, or msb.
+// Extract withn ame().getText in the code.
 name:
     ID
     | 'k'

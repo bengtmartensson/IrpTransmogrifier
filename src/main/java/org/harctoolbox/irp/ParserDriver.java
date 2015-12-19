@@ -20,8 +20,6 @@ package org.harctoolbox.irp;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * This class encapsulates the IrpParser.
@@ -39,16 +37,16 @@ public class ParserDriver {
         parser.setErrorHandler(new ErrorStrategy());
     }
 
-    public String toStringTree() throws IrpSyntaxException {
+    public String toStringTree() {
         IrpParser.ProtocolContext protocol = parser.protocol();
         return protocol != null ? protocol.toStringTree(parser) : null;
     }
 
-    public IrpParser getParser() throws IrpSyntaxException {
+    public IrpParser getParser() {
         return parser;
     }
 
-    /**
+    /* *
      * Check the syntactical correctness of the name.
      *
      * This invokes a newly constructed parser, i.e. is comparatively expensive.
@@ -56,7 +54,7 @@ public class ParserDriver {
      * @param name Name to be checked
      * @return true iff the name is syntactically valid.
      * @throws org.harctoolbox.irp.IrpSyntaxException
-     */
+     * /
     //  Alternatively, could check agains a regexp. But this keeps the grammar in one place.
     public static String parseName(String name) throws IrpSyntaxException {
         try {
@@ -75,7 +73,7 @@ public class ParserDriver {
      *
      * @param name Name to be checked
      * @return true iff the name is syntactically valid.
-     */
+     * /
     public static boolean validName(String name) {
         try {
             String nam = parseName(name);
@@ -83,7 +81,7 @@ public class ParserDriver {
         } catch (IrpSyntaxException ex) {
             return false;
         }
-    }
+    }*/
 
     // TODO: having both getParser() and all these is silly...
     public IrpParser.DurationContext duration() {
@@ -145,7 +143,7 @@ public class ParserDriver {
             throw new IrpSyntaxException(ex);
         }
     }
-
+/*
     public static double parse(IrpParser.Name_or_numberContext ctx, NameEngine nameEngine) throws IrpSyntaxException {
         ParseTree child = ctx.getChild(0);
         return child instanceof IrpParser.NameContext ? parse((IrpParser.NameContext) child, nameEngine)

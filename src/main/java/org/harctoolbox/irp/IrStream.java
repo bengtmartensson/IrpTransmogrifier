@@ -28,10 +28,6 @@ import org.w3c.dom.Element;
 public class IrStream extends BareIrStream {
     private RepeatMarker repeatMarker;
 
-    IrStream(IrpParser.Irstream_itemContext item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     //private ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems() {
     //    return toPrimaryIrStreamItems(environment, irStreamItems);
     //}
@@ -88,7 +84,7 @@ public class IrStream extends BareIrStream {
         this.repeatMarker = repeatMarker != null ? repeatMarker : new RepeatMarker();
     }
 
-    public IrStream(IrpParser.IrstreamContext ctx) {
+    public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException {
         super(ctx.bare_irstream());
         repeatMarker = new RepeatMarker(ctx.repeat_marker());
     }

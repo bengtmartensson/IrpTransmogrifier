@@ -16,6 +16,8 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.List;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 /**
@@ -51,11 +53,37 @@ public abstract class IrStreamItem {
                 null;
     }
 
+    public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
+        ParseTree child = ctx.getChild(0);
+        return //ctx instanceof IrpParser.VariationContext ? new Variation((Va))
+                child instanceof IrpParser.BitfieldContext ? new BitField((IrpParser.BitfieldContext) child)
+                //: ctx instanceof IrpParser.AssignmentContext ? new Assignment((IrpParser.AssignmentContext) ctx)
+                //: ctx instanceof IrpParser.ExtentContext ? new BitField((IrpParser.ExtentContext) ctx)
+                //: ctx instanceof IrpParser.DurationContext ? new Duration(ctx.duration())
+                //: ctx instanceof IrpParser.IrstreamContext ? new IrStream(ctx.irstream())
+                //: ctx instanceof IrpParser.Bitspec_irstreamContext ? new BitspecIrstream(ctx.bitspec_irstream())
+                : null;
+    }
+
     /**
      * To be overridden in Variation
      * @return noAlternatives
      */
     public int getNoAlternatives() {
         return noAlternatives;
+    }
+
+    public abstract List<IrStreamItem> evaluate(BitSpec bitSpec) throws UnassignedException, IncompatibleArgumentException;
+
+    protected void debugBegin() {
+
+    }
+
+    protected void debugEnd() {
+
+    }
+
+    protected void debugEnd(List<IrStreamItem>list) {
+
     }
 }

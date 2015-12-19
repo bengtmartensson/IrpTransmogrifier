@@ -77,19 +77,19 @@ public class BareIrStream extends IrStreamItem {
         return primaryItems;
     }*/
 
-    public BareIrStream(IrpParser.Bare_irstreamContext ctx/*, Protocol env*/) {
+    public BareIrStream(IrpParser.Bare_irstreamContext ctx/*, Protocol env*/) throws IrpSyntaxException {
         this(ctx.irstream_item());
         //this(toList(ctx, env), env);
     }
 
-    public BareIrStream(List<IrpParser.Irstream_itemContext> list) {
+    public BareIrStream(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException {
         irStreamItems = new ArrayList<>();
         for (IrpParser.Irstream_itemContext item : list) {
-            IrStream irStream = new IrStream(item);
-            irStreamItems.add(irStream);
+            IrStreamItem irStreamItem = newIrStreamItem(item);
+            irStreamItems.add(irStreamItem);
         }
     }
-
+/*
     private static List<IrStreamItem> toList(IrpParser.Bare_irstreamContext ctx, Protocol env) {
         List<IrStreamItem> array = new ArrayList<>();
         for (IrpParser.Irstream_itemContext item : ctx.irstream_item())
@@ -131,4 +131,9 @@ public class BareIrStream extends IrStreamItem {
         }
         return list;
     }*/
+
+    @Override
+    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

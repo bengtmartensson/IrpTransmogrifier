@@ -48,7 +48,8 @@ public class GeneralSpec {
 
     @Override
     public String toString() {
-        return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection + (dutyCycle > 0 ? (", Duty cycle = " + dutyCycle + "%.") : ", Duty cycle: -.");
+        return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection
+                + (dutyCycle > 0 ? (", Duty cycle = " + IrCoreUtils.real2percent(dutyCycle) + "%.") : ", Duty cycle: -.");
     }
 
     /**
@@ -86,27 +87,27 @@ public class GeneralSpec {
         this(new ParserDriver(str).generalspec());
     }
 
-    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException {
+    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException, IrpSyntaxException {
         this(ctx.generalspec());
     }
 
-    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException {
+    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException, IrpSyntaxException {
         this(ctx.generalspec_list());
     }
 
-    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException {
+    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException, IrpSyntaxException {
         double unitInPeriods = -1f;
         for (IrpParser.Generalspec_itemContext item : ctx.generalspec_item()) {
             if (item instanceof IrpParser.FrequencyContext) {
-                frequency = IrCoreUtils.khz2Hz(ParserDriver.parse(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals()));
+                frequency = IrCoreUtils.khz2Hz(FloatNumber.toFloat(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals()));
             } else if (item instanceof IrpParser.UnitContext) {
                 IrpParser.Unit_itemContext unitItem = ((IrpParser.UnitContext) item).unit_item();
                 if (unitItem instanceof IrpParser.UnitInMicrosecondsContext)
-                    unit = ParserDriver.parse(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
+                    unit = FloatNumber.toFloat(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
                 else
-                    unitInPeriods = ParserDriver.parse(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
+                    unitInPeriods = FloatNumber.toFloat(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
             } else if (item instanceof IrpParser.DutycycleContext) {
-                dutyCycle = IrCoreUtils.percent2real(ParserDriver.parse(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals()));
+                dutyCycle = IrCoreUtils.percent2real(FloatNumber.toFloat(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals()));
             } else if (item instanceof IrpParser.ByteorderContext) {
                 bitDirection = ((IrpParser.ByteorderContext) item).order_item() instanceof IrpParser.OrderLSBContext
                         ? BitDirection.lsb : BitDirection.msb;

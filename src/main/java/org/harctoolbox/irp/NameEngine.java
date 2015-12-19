@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,35 +33,28 @@ import org.w3c.dom.Element;
 
 public class NameEngine {
 
-    private HashMap<String, IrpParser.Bare_expressionContext> map;
-    private IrpParser parser;
+    private HashMap<String, Expression> map;
 
     public NameEngine() {
         map = new LinkedHashMap<>();
-        parser = null;
     }
 
     public NameEngine(String str) throws IrpSyntaxException {
         this();
         ParserDriver parserDriver = new ParserDriver(str);
-        parser = parserDriver.getParser();
         parseDefinitions(parserDriver.definitions());
     }
-
-    //private void define(String str) throws IrpSyntaxException {
-    //    String[] s = str.split("=");
-    //    define(s[0], s[1]);
-    //}
 
     private void define(String name, String value) throws IrpSyntaxException {
         Expression exp = new Expression(value);
         define(name, exp.getParseTree());
     }
 
-    private void define(String name, IrpParser.Bare_expressionContext tree) throws IrpSyntaxException {
-        if (!ParserDriver.validName(name))
+    private void define(String name, IrpParser.Bare_expressionContext ctx) throws IrpSyntaxException {
+        if (!Name.validName(name))
             throw new IrpSyntaxException("Invalid name: " + name);
-        map.put(name, tree);
+        Expression expression = new Expression(ctx);
+        map.put(name, expression);
     }
 
     public void define(String name, long value) throws IrpSyntaxException {
@@ -127,21 +121,33 @@ public class NameEngine {
     }*/
 
     /**
-     * Returns the parse tree associated to the name given as parameter.
+     * Returns the expression associated to the name given as parameter.
      * @param name
      * @return
+     * @throws org.harctoolbox.irp.UnassignedException
      */
-    public IrpParser.Bare_expressionContext get(String name) {
+    public Expression get(String name) throws UnassignedException {
         //Debug.debugNameEngine("NameEngine: " + name + (map.containsKey(name) ? (" = " + map.get(name).toStringTree()) : "-"));
+        if (!map.containsKey(name))
+            throw new UnassignedException("Name " + name + " not defined");
         return map.get(name);
     }
 
-    /**
+    public long toNumber(String name) throws UnassignedException, IrpSyntaxException {
+        Expression expression = get(name);
+        return expression.toNumber(this);
+    }
+
+    private ParseTree toParseTree(String name) throws UnassignedException {
+        return get(name).getParseTree();
+    }
+
+    /* *
      *
      * @param name Input name
      * @return StringTree of the value.
      * @throws UnassignedException
-     */
+     * /
     public IrpParser.Bare_expressionContext evaluate(String name) throws UnassignedException {
         if (map.containsKey(name))
             return map.get(name);
@@ -151,7 +157,7 @@ public class NameEngine {
 
     public IrpParser.Bare_expressionContext evaluate(IrpParser.NameContext ctx) throws UnassignedException {
         return evaluate(ctx.getText());
-    }
+    }*/
 
     public boolean containsKey(String name) {
         return map.containsKey(name);
@@ -167,11 +173,10 @@ public class NameEngine {
         return result;
     }*/
 
-    @Override
-    public String toString() {
+    public String toString(IrpParser parser) {
         StringBuilder str = new StringBuilder();
         for (String name : map.keySet()) {
-            str.append(name).append("=").append(map.get(name).toStringTree(parser)).append(",");
+            str.append(name).append("=").append(map.get(name).getParseTree().toStringTree(parser)).append(",");
         }
         return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
     }
@@ -183,12 +188,13 @@ public class NameEngine {
      * @param equals String between name and value, often "=",
      * @param separator String between name-value pairs, often ",".
      * @return String
+     * @throws org.harctoolbox.irp.UnassignedException
      */
-    public String notationString(String equals, String separator) {
+    public String notationString(String equals, String separator) throws UnassignedException {
         StringBuilder str = new StringBuilder();
         for (String name : map.keySet()) {
-            if (!name.startsWith("$") && !map.get(name).toStringTree().startsWith("("))
-                str.append(name).append(equals).append(map.get(name).toStringTree()).append(separator);
+            if (!name.startsWith("$") && !toParseTree(name).toStringTree().startsWith("("))
+                str.append(name).append(equals).append(toParseTree(name).toStringTree()).append(separator);
         }
         return (str.length() == 0 ? "" : str.substring(0, str.length()-1));
     }

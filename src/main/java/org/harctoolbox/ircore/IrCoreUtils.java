@@ -42,6 +42,10 @@ public class IrCoreUtils {
         return 0.01f * percent;
     }
 
+    public static long real2percent(double x) {
+        return Math.round(100f * x);
+    }
+
     private IrCoreUtils() {
     }
 }

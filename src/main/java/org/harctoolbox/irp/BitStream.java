@@ -17,9 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
-public class BitStream extends PrimitiveIrStreamItem {
+public class BitStream extends IrStreamItem {
 
     private int length;
     private long data[];
@@ -47,18 +48,18 @@ public class BitStream extends PrimitiveIrStreamItem {
         length = 0;
     }
 
-    public void add(BitField bitField) throws IncompatibleArgumentException {
-        add(bitField, environment.getBitDirection());
+    public void add(BitField bitField, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        add(bitField, environment.getBitDirection(), nameEngine);
     }
 
-    public void add(BitField bitField, BitDirection bitDirection) throws IncompatibleArgumentException {
+    public void add(BitField bitField, BitDirection bitDirection, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         if (bitField.isInfinite())
             throw new IncompatibleArgumentException("Infinite bitfields cannot be converted to bitstreams.");
 
         long newData = this.environment.getBitDirection() == BitDirection.msb
-                    ? bitField.toLong()
-                    : IrpUtils.reverse(bitField.toLong(), bitField.getWidth());
-        length += bitField.getWidth();
+                    ? bitField.toNumber(nameEngine)
+                    : IrpUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine));
+        length += bitField.getWidth(nameEngine);
 
         if (length > Long.SIZE) {
             // "abnormal" case
@@ -70,11 +71,11 @@ public class BitStream extends PrimitiveIrStreamItem {
                 data = newdata;
             }
             for (int i = data.length - 1; i > 0; i--) {
-                long x = data[i] << bitField.getWidth() | getLeftmostBits(data[i-1], bitField.getWidth());
+                long x = data[i] << bitField.getWidth(nameEngine) | getLeftmostBits(data[i-1], (int) bitField.getWidth(nameEngine));
                 data[i] = x;
             }
         }
-        data[0] = data[0] << bitField.getWidth() | newData;
+        data[0] = data[0] << bitField.getWidth(nameEngine) | newData;
     }
 
     private long getLeftmostBits(long x, int n) {
@@ -99,19 +100,19 @@ public class BitStream extends PrimitiveIrStreamItem {
     }
 
     @Override
-    public ArrayList<PrimitiveIrStreamItem> evaluate(BitSpec bitSpec) throws UnassignedException, IncompatibleArgumentException {
+    public List<IrStreamItem> evaluate(BitSpec bitSpec) throws UnassignedException, IncompatibleArgumentException {
         debugBegin();
         if (bitSpec == null)
-            throw new UnassignedException("BitStream " + toString() + " has no associated BitSpec, cannot compute IRStream");
-        ArrayList<PrimitiveIrStreamItem> list = new ArrayList<>();
+            throw new UnassignedException("BitStream " + toString() + " has no associated BitSpec, cannot compute IrStream");
+        List<IrStreamItem> list = new ArrayList<>();
         if (length % bitSpec.getChunkSize() != 0)
             throw new IncompatibleArgumentException("chunksize (= " + bitSpec.getChunkSize() + ") does not divide bitstream length (= " + length + ").");
 
         int noChunks = length/bitSpec.getChunkSize();
         for (int n = 0; n < noChunks; n++) {
             int chunkNo = noChunks - n - 1;
-            PrimaryIrStream irs = bitSpec.getBitIrsteam(getChunkNo(chunkNo, bitSpec.getChunkSize()));
-            ArrayList<PrimitiveIrStreamItem> items = irs.evaluate(null);
+            BareIrStream irs = bitSpec.getBitIrsteam(getChunkNo(chunkNo, bitSpec.getChunkSize()));
+            List<IrStreamItem> items = irs.evaluate(null);
             list.addAll(items);
         }
         //Debug.debugBitStream(toString());

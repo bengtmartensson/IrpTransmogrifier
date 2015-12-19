@@ -1,7 +1,6 @@
 package org.harctoolbox.irp;
 
-import static org.testng.Assert.fail;
-import static org.testng.Assert.assertTrue;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -44,7 +43,7 @@ public class NameEngineTest {
         NameEngine instance = new NameEngine();
         try {
             instance.define(name, value);
-            fail("testDefine failed.");
+            Assert.fail("testDefine failed.");
         } catch (IrpSyntaxException ex) {
         }
     }
@@ -53,14 +52,15 @@ public class NameEngineTest {
     public void testDefineValid() {
         System.out.println("define valid");
         String name = "valid";
-        long value = 0L;
+        long value = 73L;
         NameEngine instance = new NameEngine();
         try {
             instance.define(name, value);
-            System.out.println(instance.get(name).toStringTree());
-            assertTrue(instance.containsKey(name));
-        } catch (IrpSyntaxException ex) {
-            fail("testDefine valid failed.");
+            //System.out.println(instance.get(name));
+            Assert.assertTrue(instance.containsKey(name));
+            Assert.assertEquals(instance.toNumber(name), value);
+        } catch (IrpSyntaxException | UnassignedException ex) {
+            Assert.fail("testDefine valid failed.");
         }
     }
 
@@ -71,11 +71,12 @@ public class NameEngineTest {
     @Test
     public void testParseDefinitions_String() throws Exception {
         System.out.println("parseDefinitions");
-        String str = "{answer = 42, sheldon = 73}";
+        String str = "{answer = 42, sheldon = 73, diff = sheldon - answer}";
         NameEngine instance = new NameEngine(str);
         //instance.parseDefinitions(str);
-        assertTrue(instance.containsKey("answer"));
-        assertTrue(instance.containsKey("sheldon"));
+        Assert.assertTrue(instance.containsKey("answer"));
+        Assert.assertTrue(instance.containsKey("sheldon"));
+        Assert.assertEquals(instance.toNumber("diff"), 31);
     }
 
     /**

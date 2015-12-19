@@ -25,85 +25,124 @@ import org.antlr.v4.runtime.tree.ParseTree;
  * This class corresponds to Chapter 9.
  * An expression is evaluated during execution time with the current name bindings.
  */
-public class Expression {
+public class Expression implements Numerical, InfixCode {
 
     //private static boolean debug;
     private IrpParser.Bare_expressionContext parseTree;
-    private NameEngine nameEngine;
-    private ParserDriver parserDriver; // FIXME
+    private static final String expfunctionName = "powl";
 
-    public Expression(String irp) throws IrpSyntaxException {
-        this(new ParserDriver(irp));
+    /**
+     * Construct an Expression from the number supplied as argument.
+     * @param value
+     * @throws IrpSyntaxException
+     */
+    public Expression(long value) throws IrpSyntaxException {
+        this(new ParserDriver(Long.toString(value)));
     }
 
-    public Expression(ParserDriver parserDriver) throws IrpSyntaxException {
-        this(parserDriver, new NameEngine());
+    /**
+     * Construct an Expression by parsing the argument.
+     * @param str
+     * @throws IrpSyntaxException
+     */
+    public Expression(String str) throws IrpSyntaxException {
+        this(new ParserDriver(str));
     }
 
-    public Expression(IrpParser.ExpressionContext ctx) throws IrpSyntaxException {
-        this(ctx.bare_expression(), new NameEngine());
+    Expression(ParserDriver parserDriver) throws IrpSyntaxException {
+        this(parserDriver.bare_expression());
     }
 
-    public Expression(IrpParser.Bare_expressionContext parseTree, NameEngine nameEngine) throws IrpSyntaxException {
-        this.parserDriver = null;
-        this.parseTree = parseTree;
-        this.nameEngine = nameEngine;
-    }
-    public Expression(ParserDriver parserDriver, NameEngine nameEngine) throws IrpSyntaxException {
-        this.parserDriver = parserDriver;
-        this.parseTree = parserDriver.bare_expression();
-        this.nameEngine = nameEngine;
+    Expression(IrpParser.ExpressionContext ctx) {
+        this(ctx.bare_expression());
     }
 
-    public long evaluate(Protocol env) {
-        this.nameEngine = env.getNameEngine();
-        return evaluate();
+    Expression(IrpParser.Expression_asitemContext ctx) {
+        this(ctx.expression());
     }
 
-    // FIXME: If this function encounters an unknown token (for example when extending the input grammar)
-    // it will report that that name is not found in the name engine. Fix.
-    public long evaluate() {
-        return eval(parseTree);
+    Expression(IrpParser.Bare_expressionContext ctx) {
+        this.parseTree = ctx;
     }
 
-    public long eval(IrpParser.ExpressionContext ctx) {
-        return eval(ctx.bare_expression());
+    @Override
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+        return toNumber(parseTree, nameEngine);
     }
 
-    public long eval(IrpParser.Bare_expressionContext ctx) {
-        return eval(ctx.inclusive_or_expression());
+    @Override
+    public String toInfixCode() throws IrpSyntaxException {
+        return toInfixCode(parseTree);
     }
 
-    private long eval(IrpParser.Inclusive_or_expressionContext ctx) {
+    private long toNumber(IrpParser.Bare_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+        return toNumber(ctx.inclusive_or_expression(), nameEngine);
+    }
+
+    private String toInfixCode(IrpParser.Bare_expressionContext ctx) throws IrpSyntaxException {
+        return toInfixCode(ctx.inclusive_or_expression());
+    }
+
+    private long toNumber(IrpParser.Inclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
         long result = 0L;
         for (IrpParser.Exclusive_or_expressionContext expr : ctx.exclusive_or_expression())
-            result |= eval(expr);
+            result |= toNumber(expr, nameEngine);
 
         return result;
     }
 
-    private long eval(IrpParser.Exclusive_or_expressionContext ctx) {
+    private String toInfixCode(IrpParser.Inclusive_or_expressionContext ctx) throws IrpSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        for (IrpParser.Exclusive_or_expressionContext expr : ctx.exclusive_or_expression()) {
+            if (sb.length() > 0)
+                sb.append("|");
+            sb.append(toInfixCode(expr));
+        }
+        return sb.toString();
+    }
+
+    private long toNumber(IrpParser.Exclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
         long result = 0L;
         for (IrpParser.And_expressionContext expr : ctx.and_expression())
-            result ^= eval(expr);
+            result ^= toNumber(expr, nameEngine);
 
         return result;
     }
 
-    private long eval(IrpParser.And_expressionContext ctx) {
+    private String toInfixCode(IrpParser.Exclusive_or_expressionContext ctx) throws IrpSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        for (IrpParser.And_expressionContext expr : ctx.and_expression()) {
+            if (sb.length() > 0)
+                sb.append("^");
+            sb.append(toInfixCode(expr));
+        }
+        return sb.toString();
+    }
+
+    private long toNumber(IrpParser.And_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
         long result = -1L;
         for (IrpParser.Shift_expressionContext expr : ctx.shift_expression()) {
-            result &= eval(expr);
+            result &= toNumber(expr, nameEngine);
         }
         return result;
     }
 
-    private long eval(IrpParser.Shift_expressionContext ctx) {
-        long result = eval(ctx.additive_expression(0));
+    private String toInfixCode(IrpParser.And_expressionContext ctx) throws IrpSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        for (IrpParser.Shift_expressionContext expr : ctx.shift_expression()) {
+            if (sb.length() > 0)
+                sb.append("^");
+            sb.append(toInfixCode(expr));
+        }
+        return sb.toString();
+    }
+
+    private long toNumber(IrpParser.Shift_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+        long result = toNumber(ctx.additive_expression(0), nameEngine);
         for (int i = 1; i < ctx.children.size(); i++) {
             ParseTree x = ctx.children.get(i);
             if (x instanceof IrpParser.Additive_expressionContext) {
-                long op = eval((IrpParser.Additive_expressionContext) x);
+                long op = toNumber((IrpParser.Additive_expressionContext) x, nameEngine);
                 result = (ctx.children.get(i - 1).getText().charAt(0) == '<')
                         ? result << op : result >> op;
             }
@@ -111,12 +150,22 @@ public class Expression {
         return result;
     }
 
-    private long eval(IrpParser.Additive_expressionContext ctx) {
+    private String toInfixCode(IrpParser.Shift_expressionContext ctx) throws IrpSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        for (IrpParser.Additive_expressionContext expr : ctx.additive_expression()) {
+            if (sb.length() > 0)
+                sb.append("^");
+            sb.append(toInfixCode(expr));
+        }
+        return sb.toString();
+    }
+
+    private long toNumber(IrpParser.Additive_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
         long result = 0L;
         for (int i = 0; i < ctx.children.size(); i++) {
             ParseTree x = ctx.children.get(i);
             if (x instanceof IrpParser.Multiplicative_expressionContext) {
-                long op = eval((IrpParser.Multiplicative_expressionContext) x);
+                long op = toNumber((IrpParser.Multiplicative_expressionContext) x, nameEngine);
                 if (i == 0 || ctx.children.get(i - 1).getText().charAt(0) == '+')
                     result += op;
                 else
@@ -126,12 +175,23 @@ public class Expression {
         return result;
     }
 
-    private long eval(IrpParser.Multiplicative_expressionContext ctx) {
+    private String toInfixCode(IrpParser.Additive_expressionContext ctx) throws IrpSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        for (ParseTree child : ctx.children) {
+            if (child instanceof IrpParser.Multiplicative_expressionContext)
+                sb.append(toInfixCode((IrpParser.Multiplicative_expressionContext) child));
+            else
+                sb.append(child.getText());
+        }
+        return sb.toString();
+    }
+
+    private long toNumber(IrpParser.Multiplicative_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
         long result = 1L;
         for (int i = 0; i < ctx.children.size(); i++) {
             ParseTree x = ctx.children.get(i);
             if (x instanceof IrpParser.Exponential_expressionContext) {
-                long op = eval((IrpParser.Exponential_expressionContext) x);
+                long op = toNumber((IrpParser.Exponential_expressionContext) x, nameEngine);
                 if (i == 0 || ctx.children.get(i - 1).getText().charAt(0) == '*')
                     result *= op;
                 else
@@ -141,147 +201,45 @@ public class Expression {
         return result;
     }
 
+    private String toInfixCode(IrpParser.Multiplicative_expressionContext ctx) throws IrpSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        for (ParseTree child : ctx.children) {
+            if (child instanceof IrpParser.Exponential_expressionContext)
+                sb.append(toInfixCode((IrpParser.Exponential_expressionContext) child));
+            else
+                sb.append(child.getText());
+        }
+        return sb.toString();
+    }
+
     // Note: exponentiation is right-associative, so we evaluate the arguments in descending  order
-    private long eval(IrpParser.Exponential_expressionContext ctx) {
+    private long toNumber(IrpParser.Exponential_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
         List<IrpParser.Unary_expressionContext> children = ctx.unary_expression();
-        long result = eval(children.get(children.size() - 1));
-        for (int i = children.size() - 2; i >= 0; i++)
-            result = IrpUtils.power(eval(children.get(i)), result);
+        //long result = toNumber(children.get(children.size() - 1), nameEngine);
+        UnaryExpression unaryExpession = new UnaryExpression(children.get(children.size()-1));
+        long result = unaryExpession.toNumber(nameEngine);
+        for (int i = children.size() - 2; i >= 0; i++) {
+            unaryExpession = new UnaryExpression(children.get(i));
+            result = IrpUtils.power(unaryExpession.toNumber(nameEngine), result);
+        }
         return result;
     }
 
-    private long eval(IrpParser.Unary_expressionContext ctx) {
-        return ctx instanceof IrpParser.Bitfield_expressionContext ? eval((IrpParser.Bitfield_expressionContext) ctx)
-                : ctx instanceof IrpParser.Primary_item_expressionContext ? eval((IrpParser.Primary_item_expressionContext) ctx)
-                : ctx instanceof IrpParser.Minus_bitfield_expressonContext ? eval((IrpParser.Minus_bitfield_expressonContext) ctx)
-                : ctx instanceof IrpParser.Minus_primary_item_expressionContext ? eval((IrpParser.Minus_primary_item_expressionContext) ctx)
-                : ctx instanceof IrpParser.Count_bitfield_expressionContext ? eval((IrpParser.Count_bitfield_expressionContext) ctx)
-                : eval((IrpParser.Count_primary_item_expressionContext) ctx);
-    }
-
-    private long eval(IrpParser.Bitfield_expressionContext ctx) {
-        return eval(ctx.bitfield());
-    }
-
-    private long eval(IrpParser.Primary_item_expressionContext ctx) {
-        return eval(ctx.primary_item());
-    }
-
-    private long eval(IrpParser.Minus_bitfield_expressonContext ctx) {
-        return -eval(ctx.bitfield());
-    }
-
-    private long eval(IrpParser.Minus_primary_item_expressionContext ctx) {
-        return -eval(ctx.primary_item());
-    }
-
-    private long eval(IrpParser.Count_bitfield_expressionContext ctx) {
-        return (long) Long.bitCount(eval(ctx.bitfield()));
-    }
-
-    private long eval(IrpParser.Count_primary_item_expressionContext ctx) {
-        return (long) Long.bitCount(eval(ctx.primary_item()));
-    }
-
-    private long eval(IrpParser.Primary_itemContext ctx) {
-        if (ctx.DOLLAR_ID() != null)
-            return  eval(ctx.DOLLAR_ID().getText());
-
-        ParseTree child = ctx.children.get(0);
-        return child instanceof IrpParser.NameContext ? eval((IrpParser.NameContext) child)
-                : child instanceof IrpParser.NumberContext ? eval((IrpParser.NumberContext) child)
-                : /*child instanceof IrpParser.ExpressionContext ?*/ eval((IrpParser.ExpressionContext) child);
-    }
-
-    private long eval(IrpParser.NameContext ctx) {
-        return eval(ctx.getText());
-    }
-
-    private long eval(String name) {
-        return eval(nameEngine.get(name));
-    }
-
-    private long eval(IrpParser.NumberContext ctx) {
-        return Long.parseLong(ctx.INT().getText());
-    }
-
-    private long eval(IrpParser.BitfieldContext ctx) {
-        // TODO
-        return 0;
-    }
-
-    /*
-
-bitfield_expression
-        | primary_item      # primary_item_expession
-        | '-' bitfield      # minus_bitfield_expresson
-        | '-' primary_item  # minus_primary_item_expression
-        | '#' bitfield      # count_bitfield
-        | '#' primary_item  # count_primary_item
-
-        //public long expression(CommonTree tree, int level) throws UnassignedException, DomainViolationException {
-        //nodeBegin(tree, level);
-        //String type = tree.getText();
-        long result =
-                  type.equals("**") ? IrpUtils.power(expression((CommonTree) tree.getChild(0), level+1), expression((CommonTree) tree.getChild(1), level+1))
-                : type.equals("%")  ? expression((CommonTree) tree.getChild(0), level+1) % expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("/")  ? expression((CommonTree) tree.getChild(0), level+1) / expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("*")  ? expression((CommonTree) tree.getChild(0), level+1) * expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("-")  ? expression((CommonTree) tree.getChild(0), level+1) - expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("+")  ? expression((CommonTree) tree.getChild(0), level+1) + expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("&")  ? expression((CommonTree) tree.getChild(0), level+1) & expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("^")  ? expression((CommonTree) tree.getChild(0), level+1) ^ expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("|")  ? expression((CommonTree) tree.getChild(0), level+1) | expression((CommonTree) tree.getChild(1), level+1)
-                : type.equals("UMINUS")   ? -expression((CommonTree) tree.getChild(0), level+1)
-                : type.equals("BITCOUNT") ? (long) Long.bitCount(expression((CommonTree) tree.getChild(0), level+1))
-                : type.equals("BITFIELD") ? bitfield(tree, level+1, true).toLong()
-                : type.equals("INFINITE_BITFIELD") ? bitfield(tree, level+1, true).toLong()
-                : type.matches("[0-9]+")  ? Long.parseLong(type)
-                : env.evaluateName(type);
-        nodeEnd(tree, level, result);
-        return result;
-    }
-
-    public static long evaluate(Protocol env, String irp) throws IrpSyntaxException {
-        Expression expression = new Expression(irp);
-        return expression.evaluate(env);
-    }
-
-    private static void usage(int code) {
-        System.out.println("Usage:");
-        System.out.println("\tExpression [-d]? <expression> [<name>=<value>|{<name>=<expression>}]*");
-        System.exit(code);
-    }
-
-    /**
-     * @param args the command line arguments
-     * /
-    public static void main(String[] args) {
-        //if (args.length == 0)
-        //    usage(IrpUtils.exitUsageError);
-        int arg_i = 0;
-        //if (args[0].equals("-d")) {
-        //    debug = true;
-        //    arg_i++;
-        //}
-        Protocol prot = new Protocol();
-        String expression = null;
-        //try {
-            expression = args[arg_i].trim();
-            //prot.assign(args, arg_i+1);
-        //} catch (IncompatibleArgumentException ex) {
-            //System.err.println(ex.getMessage());
-            //usage(IrpUtils.exitUsageError);
-        //} catch (ArrayIndexOutOfBoundsException ex) {
-            //usage(IrpUtils.exitUsageError);
-        //}
-        if (expression != null && ((expression.charAt(0) != '(') || (expression.charAt(expression.length()-1) != ')')))
-            expression = '(' + expression + ')';
-//        try {
-//            System.out.println(evaluate(prot, expression));
-//        } catch (UnassignedException | DomainViolationException ex) {
-//            System.err.println(ex.getMessage());
-//        }
+    private String toInfixCode(IrpParser.Exponential_expressionContext ctx) throws IrpSyntaxException {
+        StringBuilder sb = new StringBuilder();
+        List<IrpParser.Unary_expressionContext> children = ctx.unary_expression();
+        //long result = toNumber(children.get(children.size() - 1), nameEngine);
+        for (int i = children.size() - 1; i >= 0; i++) {
+            IrpParser.Unary_expressionContext child = children.get(i);
+            if (i < children.size() - 1) {
+                sb.append(")");
+                sb.insert(0, ",");
+            }
+            sb.insert(0, (new UnaryExpression(child)).toInfixCode());
+            if (i < children.size() - 1)
+                sb.insert(0, expfunctionName + "(");
+        }
+        return sb.toString();
     }
 
     /**
@@ -291,52 +249,33 @@ bitfield_expression
         return parseTree;
     }
 
-    /**
-     * @return the nameEngine
-     */
-    public NameEngine getNameEngine() {
-        return nameEngine;
+    private static void usage(int code) {
+        System.out.println("Usage:");
+        System.out.println("\tExpression [-d]? <expression> [<name>=<value>|{<name>=<expression>}]*");
+        System.exit(code);
     }
 
     /**
-     * @param nameEngine the nameEngine to set
-     */
-    public void setNameEngine(NameEngine nameEngine) {
-        this.nameEngine = nameEngine;
-    }
-
-    public static long evaluate(String str) throws IrpSyntaxException {
-        String string = str;
-        if (!string.startsWith("("))
-            string = "(" + string;
-        if (!string.endsWith(")"))
-            string += ")";
-
-        Expression expression = new Expression(string);
-        return expression.evaluate();
-    }
-
-    private static void evalPrint(String str) throws IrpSyntaxException {
-        System.out.println(evaluate(str));
-    }
-
-    /**
-     * Just for testing and debugging.
-     *
-     * @param args the command line arguments
+     * Evaluate the argument supplied on the command line, possibly with a name assignment.
+     * @param args: First argument should be the expression to be evaliated, second argument
+     * a name engine initialization string.
      */
     public static void main(String[] args) {
+        if (args.length == 0)
+            usage(IrpUtils.exitUsageError);
+        int arg_i = 0;
+        //if (args[0].equals("-d")) {
+        //    debug = true;
+        //    arg_i++;
+        //}
+        String str = args[arg_i++];
         try {
-            if (args.length > 0)
-                evalPrint(args[0]);
-            else {
-                evalPrint("3*4");
-                evalPrint("35/5");
-                evalPrint("3*4<<2");
-                evalPrint("3*4>>1");
-            }
-        } catch (IrpSyntaxException ex) {
-            Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
+            Expression expression = new Expression(str);
+            NameEngine nameEngine = arg_i >= args.length - 1 ? new NameEngine(args[arg_i]) : new NameEngine();
+            long result = expression.toNumber(nameEngine);
+            System.out.println(result);
+        } catch (IrpSyntaxException | UnassignedException ex) {
+            Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -27,11 +27,11 @@ public class BitspecIrstream {
     private BitSpec bitSpec;
     private IrStream irStream;
 
-    public BitspecIrstream(IrpParser.ProtocolContext ctx) {
+    public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException {
         this(ctx.bitspec_irstream());
     }
 
-    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) {
+    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException {
         bitSpec = new BitSpec(ctx.bitspec());
         irStream = new IrStream(ctx.irstream());
     }

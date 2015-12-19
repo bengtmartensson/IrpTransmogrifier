@@ -31,7 +31,7 @@ public class BitSpec extends IrStreamItem {
     // Number of bits encoded
     private int chunkSize;
 
-    private List<PrimaryIrStream> bitCodes;
+    private List<BareIrStream> bitCodes;
 
     // Computes the upper integer part of the 2-logarithm of the integer n.
     // Treat n = 1 differently, since coding on a one-letter alphaber is ... special.
@@ -44,8 +44,8 @@ public class BitSpec extends IrStreamItem {
             x >>= 1;
         return m;
     }
-
-    public BitSpec(List<PrimaryIrStream> s, Protocol env) {
+/*
+    public BitSpec(List<BareIrStream> s, Protocol env) {
         super(env);
         bitCodes = s;
         chunkSize = computeNoBits(s.size());
@@ -55,25 +55,25 @@ public class BitSpec extends IrStreamItem {
     //    this(env, list.toArray(new PrimaryIrStream[list.size()]));
     //}
 
-    public BitSpec(IrpParser.BitspecContext ctx, Protocol env) {
-        this(toList(ctx, env), env);
-    }
+    //public BitSpec(IrpParser.BitspecContext ctx, Protocol env) {
+    //    this(toList(ctx, env), env);
+    //}
+    */
 
-    public BitSpec(IrpParser.BitspecContext ctx) {
+    public BitSpec(IrpParser.BitspecContext ctx) throws IrpSyntaxException {
         this(ctx.bare_irstream());
-        //this(toList(ctx, env), env);
     }
 
-    private BitSpec(List<IrpParser.Bare_irstreamContext> list) {
-        chunkSize = list.size();
+    private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException {
+        chunkSize = computeNoBits(list.size());
         bitCodes = new ArrayList<>();
         for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list) {
             BareIrStream bareIrStream = new BareIrStream(bareIrStreamCtx);
-            PrimaryIrStream primaryIrStream = new PrimaryIrStream(bareIrStream);
-            bitCodes.add(primaryIrStream);
+            bitCodes.add(bareIrStream);
         }
     }
 
+    /*
     private static List<PrimaryIrStream> toList(IrpParser.BitspecContext ctx, Protocol env) {
         List<PrimaryIrStream> array = new ArrayList<>();
         //for (int i = 0; i < ctx.getChildCount(); i++)
@@ -89,17 +89,17 @@ public class BitSpec extends IrStreamItem {
         return b;
     }*/
 
-    public PrimaryIrStream getBitIrsteam(int index) throws IncompatibleArgumentException {
+    public BareIrStream getBitIrsteam(int index) throws IncompatibleArgumentException {
         if (index >= bitCodes.size())
             throw new IncompatibleArgumentException("Cannot encode " + index + " with current bitspec.");
         return bitCodes.get(index);
     }
 
-    public void assignBitSpecs(BitSpec bitSpec) {
-        for (PrimaryIrStream pis : bitCodes) {
+    /*public void assignBitSpecs(BitSpec bitSpec) {
+        for (IrStream pis : bitCodes) {
             pis.assignBitSpecs(bitSpec);
         }
-    }
+    }*/
 
     @Override
     public String toString() {
@@ -126,6 +126,13 @@ public class BitSpec extends IrStreamItem {
 
     public Element toElement(Document document) {
         Element root = document.createElement("bitspec");
+        root.setAttribute("size", Integer.toString(bitCodes.size()));
+        root.setAttribute("chunksize", Integer.toString(chunkSize));
         return root;
+    }
+
+    @Override
+    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

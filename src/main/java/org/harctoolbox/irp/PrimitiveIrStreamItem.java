@@ -16,7 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-public abstract class PrimitiveIrStreamItem extends PrimaryIrStreamItem {
+public abstract class PrimitiveIrStreamItem extends IrStreamItem {
 
     protected PrimitiveIrStreamItem(Protocol env) {
         super(env);

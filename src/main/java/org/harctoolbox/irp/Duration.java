@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 
@@ -111,7 +112,7 @@ public class Duration extends PrimitiveIrStreamItem {
         }
     }
 
-    /** Returns a new Duration instance by invoking the parser on the second argument.
+    /* * Returns a new Duration instance by invoking the parser on the second argument.
      *
      * @param env Protocol, containing GeneralSpec and NameEngine
      * @param str String to be parsed
@@ -137,9 +138,9 @@ public class Duration extends PrimitiveIrStreamItem {
     }
 
     @Override
-    public ArrayList<PrimitiveIrStreamItem> evaluate(BitSpec bitSpec) {
+    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
         debugBegin();
-        ArrayList<PrimitiveIrStreamItem> list = new ArrayList<>(1);
+        List<IrStreamItem> list = new ArrayList<>(1);
         list.add(this);
         return list;
     }

@@ -45,7 +45,9 @@ public class GeneralSpecTest {
     @Test
     public void testToString() throws IrpSyntaxException, IrpSemanticException {
         System.out.println("toString");
-        test("{ }"); // Seem to trigger bug in ANTLR
+        GeneralSpec instance = new GeneralSpec("{42%, 10p,msb,40k}");
+        Assert.assertEquals(instance.toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 42%.");
+        test("{ }");
         test("{38.4k,564}");
         test("{564,38.4k}");
         test("{22p,40k}");
@@ -53,6 +55,11 @@ public class GeneralSpecTest {
         test("{42%, 10p,msb,40k}");
         test("{msb ,40k , 33.33333% ,10p }");
         test("{msb, 123u, 100k, 10p, 1000k}");
+        try {
+            test("{1+2}");
+            Assert.fail();
+        } catch (IrpSyntaxException ex) {
+        }
     }
 
     /**

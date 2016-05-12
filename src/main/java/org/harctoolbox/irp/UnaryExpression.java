@@ -17,15 +17,17 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IncompatibleArgumentException;
+
 /**
  * This class
  */
-public class UnaryExpression implements InfixCode {
+public class UnaryExpression implements Numerical {
 
     private final static String bitCountName = "bitCount";
     //private final BitField bitField;
     //private final PrimaryItem primaryItem;
-    private final InfixCode thing;
+    private final Numerical thing;
     private final boolean negate;
     private final boolean count;
 
@@ -65,16 +67,16 @@ public class UnaryExpression implements InfixCode {
         }
     }
 
-    @Override
-    public String toInfixCode() throws IrpSyntaxException {
-        String code = thing.toInfixCode();
-        return negate ? "-(" + code + ")"
-                : count ? bitCountName + "(" + code + ")"
-                : code;
-    }
+//    @Override
+//    public String toInfixCode() throws IrpSyntaxException {
+//        String code = thing.toInfixCode();
+//        return negate ? "-(" + code + ")"
+//                : count ? bitCountName + "(" + code + ")"
+//                : code;
+//    }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long x = thing.toNumber(nameEngine);
         return negate ? -x
                 : count ? (long) Long.bitCount(x)

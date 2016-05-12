@@ -30,7 +30,7 @@ public abstract class IrStreamItem {
     protected Protocol environment;
     protected int noAlternatives = 0;
 
-    public abstract boolean isEmpty() throws IncompatibleArgumentException;
+    public abstract boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
 
     protected IrStreamItem(Protocol env) {
         environment = env;

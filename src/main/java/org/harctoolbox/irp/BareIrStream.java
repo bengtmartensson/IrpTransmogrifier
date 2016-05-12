@@ -40,7 +40,7 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty(NameEngine nameEngine) {
         return irStreamItems.isEmpty();
     }
 

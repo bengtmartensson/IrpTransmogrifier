@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 /**
  *
  */
-public class Number implements Numerical,InfixCode {
+public class Number implements Numerical {
     long data;
 
     public Number(long n) {
@@ -45,6 +45,16 @@ public class Number implements Numerical,InfixCode {
         }
     }
 
+    public static long parse(String str) throws IrpSyntaxException {
+        Number number = new Number(str);
+        return number.toNumber();
+    }
+
+    public static long parse(IrpParser.NumberContext ctx) throws IrpSyntaxException {
+        Number number = new Number(ctx);
+        return number.toNumber();
+    }
+
     @Override
     public long toNumber(NameEngine nameEngine) {
         return data;
@@ -54,7 +64,6 @@ public class Number implements Numerical,InfixCode {
         return data;
     }
 
-    @Override
     public String toInfixCode() throws IrpSyntaxException {
         return Long.toString(data);
     }

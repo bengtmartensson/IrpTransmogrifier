@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 
@@ -26,84 +27,70 @@ import org.harctoolbox.ircore.IrCoreUtils;
  * This class implements Durations in Chapter 3 and 4.
  * Depends on its Protocol (GeneralSpec and NameEngine), except for this, it is immutable.
  */
-// Should this instead be an abstract class, implemented by Gap, Flash, and Extent?
-public class Duration extends PrimitiveIrStreamItem {
 
-    /**
-     * This is a helper Enum for the Durations in Chapter 3 and 4.
-     */
-    public static enum Type {
-
-        /**
-         * Off
-         */
-        gap,
-        /**
-         * On
-         */
-        flash,
-        /**
-         * Also off, but with different meaning of the time parameter
-         */
-        extent
-    }
-
-    private Type type;
-
+public abstract class Duration extends PrimitiveIrStreamItem implements Floatable {
     private double us = IrCoreUtils.invalid;
     private double time_periods = IrCoreUtils.invalid;
     private double time_units = IrCoreUtils.invalid;
+    private NameOrNumber nameOrNumber = null;
+    private String unit = null;
 
-    public static Duration newDuration(Protocol env, double time, String unit, Type durationType) throws IncompatibleArgumentException {
-        return durationType == Type.extent ? new Extent(env, time, unit) : new Duration(env, time, unit, durationType);
+    public static Duration newDuration(String str) throws IrpSyntaxException {
+        IrpParser parser = new ParserDriver(str).getParser();
+
+        try {
+            IrpParser.DurationContext d = parser.duration();
+            return (d instanceof IrpParser.FlashDurationContext)
+                    ? new Flash(((IrpParser.FlashDurationContext) d).flash_duration())
+                    : new Gap(((IrpParser.GapDurationContext) d).gap_duration());
+        } catch (ParseCancellationException ex) {
+            return new Extent(parser.extent());
+        }
     }
 
-    public Duration(String str) throws IncompatibleArgumentException {
-        this(new ParserDriver(str));
-    }
-
-    public Duration(ParserDriver parserDriver) throws IncompatibleArgumentException {
-        this(parserDriver.duration(), null); // FIXME
-    }
-
-    public Duration(IrpParser.DurationContext ctx, Protocol env) throws IncompatibleArgumentException {
-        this(0f, Type.flash, env); // FIXME
-    }
-
-    public Duration(double time, Type dt, Protocol env) throws IncompatibleArgumentException {
-        this(env, time, "u", dt);
-    }
-
-    public Duration(Protocol env, double time, String unit, Type dt) throws IncompatibleArgumentException {
-        super(env);
-        if (time == 0)
+    private void compute(NameEngine nameEngine, GeneralSpec generalSpec)
+            throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        double time = nameOrNumber.toFloat(nameEngine, generalSpec);
+        if (time == 0f)
             throw new IncompatibleArgumentException("Duration of 0 not sensible");
-            //UserComm.warning("Duration of 0 detected. This is normally not sensible.");
-        type = dt;
-        if (unit == null || unit.isEmpty())
-            time_units = time;
-        else if (unit.equals("p"))
-            time_periods = time;
-        else if (unit.equals("m"))
-            us = IrCoreUtils.milliseconds2microseconds(time);
-        else if (unit.equals("u"))
-            us = time;
+
+        switch (unit) {
+            case "p":
+                time_periods = time;
+                break;
+            case "m":
+                us = IrCoreUtils.milliseconds2microseconds(time);
+                break;
+            case "u":
+                us = time;
+                break;
+            default:
+                time_units = time;
+                break;
+        }
     }
 
-    public double evaluateWithSign(double elapsed) throws ArithmeticException, IncompatibleArgumentException {
-        return (type == Type.flash) ? evaluate(elapsed) : -evaluate(elapsed);
+    protected Duration(IrpParser.Name_or_numberContext ctx, String unit) throws IrpSyntaxException {
+        super();
+        nameOrNumber = new NameOrNumber(ctx);
+        this.unit = unit != null ? unit : "1";
     }
 
-    public double evaluate(double elapsed) throws ArithmeticException, IncompatibleArgumentException {
+    public abstract double evaluateWithSign(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+
+    public double evaluate(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec)
+            throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        compute(nameEngine, generalSpec);
         if (time_periods != IrCoreUtils.invalid) {
-            if (environment.getFrequency() > 0)
-                return IrCoreUtils.seconds2microseconds(time_periods/environment.getFrequency());
+            if (generalSpec.getFrequency() > 0)
+                return IrCoreUtils.seconds2microseconds(time_periods/generalSpec.getFrequency());
             else
                 throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
 
         } else if (time_units != IrCoreUtils.invalid) {
-            if (environment.getUnit() > 0)
-                return time_units * environment.getUnit();
+            if (generalSpec.getUnit() > 0)
+                return time_units * generalSpec.getUnit();
             else
                 throw new ArithmeticException("Relative units and unit == 0 do not go together.");
         } else {
@@ -111,29 +98,8 @@ public class Duration extends PrimitiveIrStreamItem {
         }
     }
 
-    /* * Returns a new Duration instance by invoking the parser on the second argument.
-     *
-     * @param env Protocol, containing GeneralSpec and NameEngine
-     * @param str String to be parsed
-     * @return newly constructed Duration instance.
-     * /
-    public static Duration newDuration(Protocol env, String str) {
-        IrpLexer lex = new IrpLexer(new ANTLRStringStream(str));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        IrpParser parser = new IrpParser(tokens);
-        IrpParser.duration_return r;
-        try {
-            r = parser.duration();
-            CommonTree AST = (CommonTree) r.getTree();
-            return ASTTraverser.duration(env, AST);
-        } catch (RecognitionException | UnassignedException | DomainViolationException ex) {
-            System.err.println(ex.getMessage());
-        }
-        return null;
-    }*/
-
-    public Type getType() {
-        return type;
+    private double evaluate(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        return evaluate(0, nameEngine, generalSpec);
     }
 
     @Override
@@ -144,59 +110,18 @@ public class Duration extends PrimitiveIrStreamItem {
         return list;
     }
 
-    @Override
-    public String toString() {
-        return type + ":" + (us != IrCoreUtils.invalid ? (us + "u") : time_periods != IrCoreUtils.invalid  ? (time_periods + "p") : (this.time_units + "u"));
-    }
-
-    /*private static void test(Protocol protocol, String str) throws ArithmeticException, IncompatibleArgumentException {
-        Duration d = newDuration(protocol, str);
-        System.out.println(d + "\t" + Math.round(d.evaluate_sign(0.0)));
-    }
-
-    private static void test(String str) throws ArithmeticException, IncompatibleArgumentException {
-        test(new Protocol(), str);
-    }
-
-    private static void test(String gs, String str) throws ArithmeticException, IncompatibleArgumentException {
-        test(new Protocol(new GeneralSpec(gs)), str);
-    }
-
-    private static void usage(int code) {
-        System.out.println("Usage:");
-        System.out.println("\tDuration [<generalSpec>] <duration> [<variable>=<value>]*");
-        System.exit(code);
-    }
-
-    public static void main(String[] args) {
-        try {
-            switch (args.length) {
-                case 0:
-                    usage(IrpUtils.exitUsageError);
-                    break;
-                case 1:
-                    test(args[0]);
-                    break;
-                case 2:
-                    test(args[0], args[1]);
-                    break;
-                default:
-                    Protocol prot = new Protocol(new GeneralSpec(args[0]));
-                    try {
-                        prot.assign(args, 2);
-                    } catch (IncompatibleArgumentException ex) {
-                        System.err.println(ex.getMessage());
-                        usage(IrpUtils.exitFatalProgramFailure);
-                    }
-                    test(prot, args[1]);
-            }
-        } catch (ArithmeticException | IncompatibleArgumentException ex) {
-            System.err.println(ex.getMessage());
-        }
-    }*/
+//    @Override
+//    public long toNumber(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        return Math.round(toFloat(nameEngine, generalSpec));
+//    }
 
     @Override
-    public boolean isEmpty() throws IncompatibleArgumentException {
-        return evaluate(0.0) == 0;
+    public final boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        return evaluate(0.0, nameEngine, null) == 0;
+    }
+
+    @Override
+    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        return evaluate(0, nameEngine, generalSpec);
     }
 }

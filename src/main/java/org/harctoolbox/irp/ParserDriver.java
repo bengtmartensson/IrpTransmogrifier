@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -45,43 +45,6 @@ public class ParserDriver {
     public IrpParser getParser() {
         return parser;
     }
-
-    /* *
-     * Check the syntactical correctness of the name.
-     *
-     * This invokes a newly constructed parser, i.e. is comparatively expensive.
-     *
-     * @param name Name to be checked
-     * @return true iff the name is syntactically valid.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     * /
-    //  Alternatively, could check agains a regexp. But this keeps the grammar in one place.
-    public static String parseName(String name) throws IrpSyntaxException {
-        try {
-            ParserDriver parserDriver = new ParserDriver(name);
-            IrpParser.NameContext nam = parserDriver.parser.name();
-            return nam.getText();
-        } catch (ParseCancellationException ex) {
-            throw new IrpSyntaxException("Invalid name: " + name);
-        }
-    }
-
-    /**
-     * Check the syntactical correctness of the name.
-     *
-     * This invokes a newly constructed parser, i.e. is comparatively expensive.
-     *
-     * @param name Name to be checked
-     * @return true iff the name is syntactically valid.
-     * /
-    public static boolean validName(String name) {
-        try {
-            String nam = parseName(name);
-            return nam.equals(name.trim());
-        } catch (IrpSyntaxException ex) {
-            return false;
-        }
-    }*/
 
     // TODO: having both getParser() and all these is silly...
     public IrpParser.DurationContext duration() {

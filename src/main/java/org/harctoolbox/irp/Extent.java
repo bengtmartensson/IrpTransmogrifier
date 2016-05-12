@@ -24,20 +24,20 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
  */
 public class Extent extends Duration {
 
-    public Extent(Protocol env, double time, String unit) throws IncompatibleArgumentException {
-        super(env, time, unit, Type.extent);
+    Extent(IrpParser.ExtentContext ctx) throws IrpSyntaxException {
+        super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
     }
 
     @Override
-    public double evaluate(double elapsed) throws IncompatibleArgumentException{
-        double time = super.evaluate(0.0) - elapsed;
+    public double evaluate(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        double time = super.evaluate(0f, nameEngine, generalSpec) - elapsed;
         if (time < 0)
             throw new IncompatibleArgumentException("Argument of extent smaller than actual duration.");
-        return super.evaluate(0.0) - elapsed;
+        return time;
     }
 
     @Override
-    public double evaluateWithSign(double elapsed) throws IncompatibleArgumentException {
-        return -evaluate(elapsed);
+    public double evaluateWithSign(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        return -evaluate(elapsed, nameEngine, generalSpec);
     }
 }

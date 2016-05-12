@@ -20,12 +20,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 /**
  * This class corresponds to Chapter 9.
  * An expression is evaluated during execution time with the current name bindings.
  */
-public class Expression implements Numerical, InfixCode {
+public class Expression implements Numerical {
 
     //private static boolean debug;
     private IrpParser.Bare_expressionContext parseTree;
@@ -66,24 +67,24 @@ public class Expression implements Numerical, InfixCode {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         return toNumber(parseTree, nameEngine);
     }
 
-    @Override
-    public String toInfixCode() throws IrpSyntaxException {
-        return toInfixCode(parseTree);
-    }
+//    @Override
+//    public String toInfixCode() throws IrpSyntaxException {
+//        return toInfixCode(parseTree);
+//    }
 
-    private long toNumber(IrpParser.Bare_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.Bare_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         return toNumber(ctx.inclusive_or_expression(), nameEngine);
     }
 
-    private String toInfixCode(IrpParser.Bare_expressionContext ctx) throws IrpSyntaxException {
-        return toInfixCode(ctx.inclusive_or_expression());
-    }
+//    private String toInfixCode(IrpParser.Bare_expressionContext ctx) throws IrpSyntaxException {
+//        return toInfixCode(ctx.inclusive_or_expression());
+//    }
 
-    private long toNumber(IrpParser.Inclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.Inclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long result = 0L;
         for (IrpParser.Exclusive_or_expressionContext expr : ctx.exclusive_or_expression())
             result |= toNumber(expr, nameEngine);
@@ -91,17 +92,17 @@ public class Expression implements Numerical, InfixCode {
         return result;
     }
 
-    private String toInfixCode(IrpParser.Inclusive_or_expressionContext ctx) throws IrpSyntaxException {
-        StringBuilder sb = new StringBuilder();
-        for (IrpParser.Exclusive_or_expressionContext expr : ctx.exclusive_or_expression()) {
-            if (sb.length() > 0)
-                sb.append("|");
-            sb.append(toInfixCode(expr));
-        }
-        return sb.toString();
-    }
+//    private String toInfixCode(IrpParser.Inclusive_or_expressionContext ctx) throws IrpSyntaxException {
+//        StringBuilder sb = new StringBuilder();
+//        for (IrpParser.Exclusive_or_expressionContext expr : ctx.exclusive_or_expression()) {
+//            if (sb.length() > 0)
+//                sb.append("|");
+//            sb.append(toInfixCode(expr));
+//        }
+//        return sb.toString();
+//    }
 
-    private long toNumber(IrpParser.Exclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.Exclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long result = 0L;
         for (IrpParser.And_expressionContext expr : ctx.and_expression())
             result ^= toNumber(expr, nameEngine);
@@ -109,17 +110,17 @@ public class Expression implements Numerical, InfixCode {
         return result;
     }
 
-    private String toInfixCode(IrpParser.Exclusive_or_expressionContext ctx) throws IrpSyntaxException {
-        StringBuilder sb = new StringBuilder();
-        for (IrpParser.And_expressionContext expr : ctx.and_expression()) {
-            if (sb.length() > 0)
-                sb.append("^");
-            sb.append(toInfixCode(expr));
-        }
-        return sb.toString();
-    }
+//    private String toInfixCode(IrpParser.Exclusive_or_expressionContext ctx) throws IrpSyntaxException {
+//        StringBuilder sb = new StringBuilder();
+//        for (IrpParser.And_expressionContext expr : ctx.and_expression()) {
+//            if (sb.length() > 0)
+//                sb.append("^");
+//            sb.append(toInfixCode(expr));
+//        }
+//        return sb.toString();
+//    }
 
-    private long toNumber(IrpParser.And_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.And_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long result = -1L;
         for (IrpParser.Shift_expressionContext expr : ctx.shift_expression()) {
             result &= toNumber(expr, nameEngine);
@@ -127,17 +128,17 @@ public class Expression implements Numerical, InfixCode {
         return result;
     }
 
-    private String toInfixCode(IrpParser.And_expressionContext ctx) throws IrpSyntaxException {
-        StringBuilder sb = new StringBuilder();
-        for (IrpParser.Shift_expressionContext expr : ctx.shift_expression()) {
-            if (sb.length() > 0)
-                sb.append("^");
-            sb.append(toInfixCode(expr));
-        }
-        return sb.toString();
-    }
+//    private String toInfixCode(IrpParser.And_expressionContext ctx) throws IrpSyntaxException {
+//        StringBuilder sb = new StringBuilder();
+//        for (IrpParser.Shift_expressionContext expr : ctx.shift_expression()) {
+//            if (sb.length() > 0)
+//                sb.append("^");
+//            sb.append(toInfixCode(expr));
+//        }
+//        return sb.toString();
+//    }
 
-    private long toNumber(IrpParser.Shift_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.Shift_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long result = toNumber(ctx.additive_expression(0), nameEngine);
         for (int i = 1; i < ctx.children.size(); i++) {
             ParseTree x = ctx.children.get(i);
@@ -150,17 +151,17 @@ public class Expression implements Numerical, InfixCode {
         return result;
     }
 
-    private String toInfixCode(IrpParser.Shift_expressionContext ctx) throws IrpSyntaxException {
-        StringBuilder sb = new StringBuilder();
-        for (IrpParser.Additive_expressionContext expr : ctx.additive_expression()) {
-            if (sb.length() > 0)
-                sb.append("^");
-            sb.append(toInfixCode(expr));
-        }
-        return sb.toString();
-    }
+//    private String toInfixCode(IrpParser.Shift_expressionContext ctx) throws IrpSyntaxException {
+//        StringBuilder sb = new StringBuilder();
+//        for (IrpParser.Additive_expressionContext expr : ctx.additive_expression()) {
+//            if (sb.length() > 0)
+//                sb.append("^");
+//            sb.append(toInfixCode(expr));
+//        }
+//        return sb.toString();
+//    }
 
-    private long toNumber(IrpParser.Additive_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.Additive_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long result = 0L;
         for (int i = 0; i < ctx.children.size(); i++) {
             ParseTree x = ctx.children.get(i);
@@ -175,18 +176,18 @@ public class Expression implements Numerical, InfixCode {
         return result;
     }
 
-    private String toInfixCode(IrpParser.Additive_expressionContext ctx) throws IrpSyntaxException {
-        StringBuilder sb = new StringBuilder();
-        for (ParseTree child : ctx.children) {
-            if (child instanceof IrpParser.Multiplicative_expressionContext)
-                sb.append(toInfixCode((IrpParser.Multiplicative_expressionContext) child));
-            else
-                sb.append(child.getText());
-        }
-        return sb.toString();
-    }
+//    private String toInfixCode(IrpParser.Additive_expressionContext ctx) throws IrpSyntaxException {
+//        StringBuilder sb = new StringBuilder();
+//        for (ParseTree child : ctx.children) {
+//            if (child instanceof IrpParser.Multiplicative_expressionContext)
+//                sb.append(toInfixCode((IrpParser.Multiplicative_expressionContext) child));
+//            else
+//                sb.append(child.getText());
+//        }
+//        return sb.toString();
+//    }
 
-    private long toNumber(IrpParser.Multiplicative_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.Multiplicative_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long result = 1L;
         for (int i = 0; i < ctx.children.size(); i++) {
             ParseTree x = ctx.children.get(i);
@@ -201,19 +202,19 @@ public class Expression implements Numerical, InfixCode {
         return result;
     }
 
-    private String toInfixCode(IrpParser.Multiplicative_expressionContext ctx) throws IrpSyntaxException {
-        StringBuilder sb = new StringBuilder();
-        for (ParseTree child : ctx.children) {
-            if (child instanceof IrpParser.Exponential_expressionContext)
-                sb.append(toInfixCode((IrpParser.Exponential_expressionContext) child));
-            else
-                sb.append(child.getText());
-        }
-        return sb.toString();
-    }
+//    private String toInfixCode(IrpParser.Multiplicative_expressionContext ctx) throws IrpSyntaxException {
+//        StringBuilder sb = new StringBuilder();
+//        for (ParseTree child : ctx.children) {
+//            if (child instanceof IrpParser.Exponential_expressionContext)
+//                sb.append(toInfixCode((IrpParser.Exponential_expressionContext) child));
+//            else
+//                sb.append(child.getText());
+//        }
+//        return sb.toString();
+//    }
 
     // Note: exponentiation is right-associative, so we evaluate the arguments in descending  order
-    private long toNumber(IrpParser.Exponential_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    private long toNumber(IrpParser.Exponential_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         List<IrpParser.Unary_expressionContext> children = ctx.unary_expression();
         //long result = toNumber(children.get(children.size() - 1), nameEngine);
         UnaryExpression unaryExpession = new UnaryExpression(children.get(children.size()-1));
@@ -225,22 +226,22 @@ public class Expression implements Numerical, InfixCode {
         return result;
     }
 
-    private String toInfixCode(IrpParser.Exponential_expressionContext ctx) throws IrpSyntaxException {
-        StringBuilder sb = new StringBuilder();
-        List<IrpParser.Unary_expressionContext> children = ctx.unary_expression();
-        //long result = toNumber(children.get(children.size() - 1), nameEngine);
-        for (int i = children.size() - 1; i >= 0; i++) {
-            IrpParser.Unary_expressionContext child = children.get(i);
-            if (i < children.size() - 1) {
-                sb.append(")");
-                sb.insert(0, ",");
-            }
-            sb.insert(0, (new UnaryExpression(child)).toInfixCode());
-            if (i < children.size() - 1)
-                sb.insert(0, expfunctionName + "(");
-        }
-        return sb.toString();
-    }
+//    private String toInfixCode(IrpParser.Exponential_expressionContext ctx) throws IrpSyntaxException {
+//        StringBuilder sb = new StringBuilder();
+//        List<IrpParser.Unary_expressionContext> children = ctx.unary_expression();
+//        //long result = toNumber(children.get(children.size() - 1), nameEngine);
+//        for (int i = children.size() - 1; i >= 0; i++) {
+//            IrpParser.Unary_expressionContext child = children.get(i);
+//            if (i < children.size() - 1) {
+//                sb.append(")");
+//                sb.insert(0, ",");
+//            }
+//            sb.insert(0, (new UnaryExpression(child)).toInfixCode());
+//            if (i < children.size() - 1)
+//                sb.insert(0, expfunctionName + "(");
+//        }
+//        return sb.toString();
+//    }
 
     /**
      * @return the parseTree
@@ -274,7 +275,7 @@ public class Expression implements Numerical, InfixCode {
             NameEngine nameEngine = arg_i >= args.length - 1 ? new NameEngine(args[arg_i]) : new NameEngine();
             long result = expression.toNumber(nameEngine);
             System.out.println(result);
-        } catch (IrpSyntaxException | UnassignedException ex) {
+        } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
             Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

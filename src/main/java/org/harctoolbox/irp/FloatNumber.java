@@ -34,35 +34,39 @@ public class FloatNumber implements Floatable {
         data = toFloat(ctx);
     }
 
-    public static double toFloat(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
-        return (ctx instanceof IrpParser.IntegerAsFloatContext)
-                ? toFloat(((IrpParser.IntegerAsFloatContext) ctx).INT())
-                : toFloat(((IrpParser.FloatContext) ctx).float_number());
+    public FloatNumber(String str) throws IrpSyntaxException {
+        this(new ParserDriver((str)).getParser().float_number());
     }
 
-    public static double toFloat(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
+//    public static double toFloat(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
+//        return (ctx instanceof IrpParser.IntegerAsFloatContext)
+//                ? toFloat(((IrpParser.IntegerAsFloatContext) ctx).INT())
+//                : toFloat(((IrpParser.FloatContext) ctx).float_number());
+//    }
+
+    private static double toFloat(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
         return (ctx instanceof IrpParser.DotIntContext)
                 ? toFloat((IrpParser.DotIntContext) ctx)
                 : toFloat((IrpParser.IntDotIntContext) ctx);
     }
 
-    public static double toFloat(IrpParser.DotIntContext ctx) throws IrpSyntaxException {
+    private static double toFloat(IrpParser.DotIntContext ctx) throws IrpSyntaxException {
         return toFloat("0." + ctx.INT().getText());
     }
 
-    public static double toFloat(IrpParser.IntDotIntContext ctx) throws IrpSyntaxException {
+    private static double toFloat(IrpParser.IntDotIntContext ctx) throws IrpSyntaxException {
         return toFloat(ctx.INT(0), ctx.INT(1));
     }
 
-    public static double toFloat(TerminalNode integ, TerminalNode matissa) throws IrpSyntaxException {
+    private static double toFloat(TerminalNode integ, TerminalNode matissa) throws IrpSyntaxException {
         return toFloat(integ.getText() + "." + matissa.getText());
     }
 
-    public static double toFloat(TerminalNode matissa) throws IrpSyntaxException {
+    private static double toFloat(TerminalNode matissa) throws IrpSyntaxException {
         return toFloat(matissa.getText());
     }
 
-    public static double toFloat(String string) throws IrpSyntaxException {
+    private static double toFloat(String string) throws IrpSyntaxException {
         try {
             return Double.parseDouble(string);
         } catch (NumberFormatException ex) {
@@ -71,7 +75,26 @@ public class FloatNumber implements Floatable {
     }
 
     @Override
+    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return toFloat();
+    }
+
     public double toFloat() {
         return data;
+    }
+
+    @Override
+    public String toString() {
+        return Double.toString(data);
+    }
+
+    public static double parse(String str) throws IrpSyntaxException {
+        FloatNumber floatNumber = new FloatNumber(str);
+        return floatNumber.toFloat();
+    }
+
+    public static double parse(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
+        FloatNumber floatNumber = new FloatNumber(ctx);
+        return floatNumber.toFloat();
     }
 }

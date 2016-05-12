@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2016 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,9 +16,21 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-public abstract class PrimitiveIrStreamItem extends IrStreamItem {
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 
-    protected PrimitiveIrStreamItem() {
-        super();
+/**
+ * This class implements Gap as per Chapter 3.
+ *
+ */
+public class Gap extends Duration {
+
+    Gap(IrpParser.Gap_durationContext ctx) throws IrpSyntaxException {
+        super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
+    }
+
+    @Override
+    public double evaluateWithSign(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        return -evaluate(elapsed, nameEngine, generalSpec);
     }
 }

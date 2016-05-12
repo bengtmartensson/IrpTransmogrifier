@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -133,7 +134,7 @@ public class NameEngine {
         return map.get(name);
     }
 
-    public long toNumber(String name) throws UnassignedException, IrpSyntaxException {
+    public long toNumber(String name) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         Expression expression = get(name);
         return expression.toNumber(this);
     }
@@ -177,6 +178,15 @@ public class NameEngine {
         StringBuilder str = new StringBuilder();
         for (String name : map.keySet()) {
             str.append(name).append("=").append(map.get(name).getParseTree().toStringTree(parser)).append(",");
+        }
+        return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        for (String name : map.keySet()) {
+            str.append(name).append("=").append(map.get(name).toString()).append(",");
         }
         return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
     }

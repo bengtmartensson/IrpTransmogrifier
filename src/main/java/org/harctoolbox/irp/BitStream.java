@@ -121,7 +121,7 @@ public class BitStream extends IrStreamItem {
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty(NameEngine nameEngine) {
         return length == 0;
     }
 }

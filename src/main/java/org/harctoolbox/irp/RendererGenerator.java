@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
 
 /**
@@ -60,11 +61,11 @@ public class RendererGenerator {
         String necIrp = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
         String necDocu = "A few devices use NEC1 protocol at 40Khz, rather than the typical frequency.  When getting a decode of NEC1, if you notice that the frequency is closer to 40Khz than to 38Khz, examine multiple learns from the same device to estimate whether the 40Khz frequency is a learning error or a true characteristic of the device. If the 40Khz is correct, there are methods in JP1, or MakeHex (whichever you are using) to reproduce NEC1 at 40Khz rather than the usual frequency.";
         try {
-            Protocol protocol = new Protocol("nec1", necIrp, necDocu);
+            NamedProtocol protocol = new NamedProtocol("nec1", necIrp, necDocu);
             //System.out.println(protocol.toStringTree());
             Document doc = protocol.toDocument();
             printDom(doc, System.out, null, null);
-        } catch (IrpSyntaxException | IrpSemanticException ex) {
+        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
             Logger.getLogger(RendererGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

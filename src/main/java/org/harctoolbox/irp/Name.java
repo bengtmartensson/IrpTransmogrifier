@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 /**
  *
@@ -30,7 +31,7 @@ public class Name implements Numerical,InfixCode {
     }
 
     public Name(String name) throws IrpSyntaxException {
-        parseName(name);
+        parse(name);
         this.name = name;
     }
 
@@ -49,7 +50,7 @@ public class Name implements Numerical,InfixCode {
      * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     //  Alternatively, could check agains a regexp. But this keeps the grammar in one place.
-    public static String parseName(String name) throws IrpSyntaxException {
+    public static String parse(String name) throws IrpSyntaxException {
         try {
             ParserDriver parserDriver = new ParserDriver(name);
             IrpParser.NameContext nam = parserDriver.getParser().name();
@@ -57,6 +58,10 @@ public class Name implements Numerical,InfixCode {
         } catch (ParseCancellationException ex) {
             throw new IrpSyntaxException("Invalid name: " + name);
         }
+    }
+
+    public static String parse(IrpParser.NameContext ctx) {
+        return ctx.getText();
     }
 
     /**
@@ -69,14 +74,14 @@ public class Name implements Numerical,InfixCode {
      */
     public static boolean validName(String name) {
         try {
-            String nam = parseName(name);
+            String nam = parse(name);
             return nam.equals(name.trim());
         } catch (IrpSyntaxException ex) {
             return false;
         }
     }
 
-    public static long toNumber(IrpParser.NameContext ctx, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException {
+    public static long toNumber(IrpParser.NameContext ctx, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
         Expression exp = nameEngine.get(toString(ctx));
         return exp.toNumber(nameEngine);
     }
@@ -91,7 +96,7 @@ public class Name implements Numerical,InfixCode {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         Expression expression = nameEngine.get(name);
         return expression.toNumber(nameEngine);
     }

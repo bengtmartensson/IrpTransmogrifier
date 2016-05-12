@@ -73,33 +73,37 @@ order_item:
         | MSB       # orderMSB
 ;
 
-//3.2
-// class Duration implements Numerical
+// 3.2
+// abstract class Duration implements Numerical
 duration:
-        flash_duration | gap_duration
+          flash_duration    # flashDuration
+        | gap_duration      # gapDuration
 ;
 
+// class Flash extends Duration
 flash_duration:
         name_or_number ('m' | 'u' | 'p')?
 ;
 
+// class Gap extends Duration
 gap_duration:
         '-' name_or_number ('m' | 'u' | 'p')?
 ;
 
+// class NameOrNumber implements Floatable
 name_or_number:
 // Extension: Graham allowed number (integers) only
         name | number_with_decimals
 ;
 
 // 4.2
-// class extent (extends duration)
+// class extent (extends Duration)
 extent:
         '^' name_or_number ('m' | 'u' | 'p')?
 ;
 
 //  5.2
-// class bitfield (extends IrStreamItem implements Numerical)
+// class BitField (extends IrStreamItem implements Numerical)
 bitfield:
           '~'? primary_item ':' '-'? primary_item (':' primary_item)? # finite_bitfield
         | '~'? primary_item ':'                    ':' primary_item   # infinite_bitfield
@@ -240,6 +244,7 @@ number:
         INT
 ;
 
+// class numberWithDecimals extends Floatable
 number_with_decimals:
         INT             # integerAsFloat
       | float_number    # float

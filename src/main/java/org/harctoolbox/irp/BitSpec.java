@@ -120,7 +120,7 @@ public class BitSpec extends IrStreamItem {
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty(NameEngine nameEngine) {
         return bitCodes.isEmpty();
     }
 

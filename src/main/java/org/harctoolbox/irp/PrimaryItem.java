@@ -17,18 +17,20 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IncompatibleArgumentException;
+
 /**
  *
  */
-public class PrimaryItem implements Numerical, InfixCode {
-    private InfixCode data; // Number, Name, or Expression
+public class PrimaryItem implements Numerical {
+    private Numerical data; // Number, Name, or Expression
 
     public PrimaryItem(IrpParser.Primary_itemContext ctx) throws IrpSyntaxException {
         data = ctx instanceof IrpParser.Number_asitemContext
                 ? new Number(((IrpParser.Number_asitemContext) ctx).number())
                 : ctx instanceof IrpParser.Expression_asitemContext
                 ? new Expression(((IrpParser.Expression_asitemContext) ctx).expression().bare_expression())
-                : new Name(ctx.getText());
+                : new Name(((IrpParser.Name_asitemContext) ctx).name());
     }
 
     public PrimaryItem(long n) {
@@ -40,12 +42,12 @@ public class PrimaryItem implements Numerical, InfixCode {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         return data.toNumber(nameEngine);
     }
 
-    @Override
-    public String toInfixCode() throws IrpSyntaxException {
-        return data.toInfixCode();
-    }
+//    @Override
+//    public String toInfixCode() throws IrpSyntaxException {
+//        return data.toInfixCode();
+//    }
 }

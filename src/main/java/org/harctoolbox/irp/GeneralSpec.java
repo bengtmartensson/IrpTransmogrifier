@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 
@@ -83,31 +84,32 @@ public class GeneralSpec {
         this(defaultBitDirection, defaultUnit, ModulatedIrSequence.defaultFrequency, ModulatedIrSequence.unknownDutyCycle);
     }
 
-    public GeneralSpec(String str) throws IrpSyntaxException, IrpSemanticException {
+    public GeneralSpec(String str) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
         this(new ParserDriver(str).generalspec());
     }
 
-    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException, IrpSyntaxException {
+    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException {
         this(ctx.generalspec());
     }
 
-    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException, IrpSyntaxException {
+    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException {
         this(ctx.generalspec_list());
     }
 
-    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException, IrpSyntaxException {
+    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException {
         double unitInPeriods = -1f;
         for (IrpParser.Generalspec_itemContext item : ctx.generalspec_item()) {
             if (item instanceof IrpParser.FrequencyContext) {
-                frequency = IrCoreUtils.khz2Hz(FloatNumber.toFloat(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals()));
+                double kHz = NumberWithDecimals.parse(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals());
+                frequency = IrCoreUtils.khz2Hz(kHz);
             } else if (item instanceof IrpParser.UnitContext) {
                 IrpParser.Unit_itemContext unitItem = ((IrpParser.UnitContext) item).unit_item();
                 if (unitItem instanceof IrpParser.UnitInMicrosecondsContext)
-                    unit = FloatNumber.toFloat(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
+                    unit = NumberWithDecimals.parse(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
                 else
-                    unitInPeriods = FloatNumber.toFloat(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
+                    unitInPeriods = NumberWithDecimals.parse(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
             } else if (item instanceof IrpParser.DutycycleContext) {
-                dutyCycle = IrCoreUtils.percent2real(FloatNumber.toFloat(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals()));
+                dutyCycle = IrCoreUtils.percent2real(NumberWithDecimals.parse(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals()));
             } else if (item instanceof IrpParser.ByteorderContext) {
                 bitDirection = ((IrpParser.ByteorderContext) item).order_item() instanceof IrpParser.OrderLSBContext
                         ? BitDirection.lsb : BitDirection.msb;
@@ -136,7 +138,7 @@ public class GeneralSpec {
         return dutyCycle;
     }
 
-    static void evaluatePrint(String str) throws IrpSyntaxException, IrpSemanticException {
+    static void evaluatePrint(String str) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
         GeneralSpec gs = new GeneralSpec(str);
         System.out.println(gs);
     }
@@ -149,7 +151,7 @@ public class GeneralSpec {
     public static void main(String[] args) {
         try {
             evaluatePrint(args[0]);
-        } catch (IrpSyntaxException | IrpSemanticException ex) {
+        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
             Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

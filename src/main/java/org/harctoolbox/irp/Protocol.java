@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,8 +37,8 @@ public class Protocol {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
-    private String name;
-    private String documentation;
+    //private String name;
+    //private String documentation;
     private String irpString;
     private GeneralSpec generalSpec;
     private NameEngine nameEngine;
@@ -51,9 +52,9 @@ public class Protocol {
 
     private int count = 0;
 
-    private Document doc = null;
-    private Element root = null;
-    private Element currentElement = null;
+//    private Document doc = null;
+//    private Element root = null;
+//    private Element currentElement = null;
 
     /**
      *
@@ -71,9 +72,8 @@ public class Protocol {
         this.parameterSpecs = null;
         this.nameEngine = null;
         this.irpString = null;
-        this.documentation = null;
-        this.name = null;
-        this.documentation = null;
+        //this.documentation = null;
+        //this.name = null;
         this.irpString = null;
         this.nameEngine = new NameEngine();
         this.generalSpec = new GeneralSpec();
@@ -82,16 +82,11 @@ public class Protocol {
     /**
      * Main constructor.
      *
-     * @param name
      * @param irpString
-     * @param documentation
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.IrpSemanticException
      */
-    public Protocol(String name, String irpString, String documentation) throws IrpSyntaxException, IrpSemanticException {
-        this();
-        this.name = name;
-        this.documentation = documentation;
+    public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
         this.irpString = irpString;
         this.nameEngine = new NameEngine();
 
@@ -203,25 +198,25 @@ public class Protocol {
         return doc;
     }
 
-    public Document toDocument() throws IrpSyntaxException {
-        Document document = newDocument();
-        document.appendChild(toElement(document));
-        return document;
-    }
+//    public Document toDocument() throws IrpSyntaxException {
+//        Document document = newDocument();
+//        document.appendChild(toElement(document));
+//        return document;
+//    }
 
     public Element toElement(Document document) throws IrpSyntaxException {
         Element root = document.createElement("protocol-renderer");
-        root.setAttribute("name", name);
+        //root.setAttribute("name", name);
         root.setAttribute("frequency", Long.toString(Math.round(IrCoreUtils.khz2Hz(getFrequency()))));
         root.setAttribute("bitdirection", getBitDirection().toString());
         root.setAttribute("timeunit", Long.toString(Math.round(getUnit())));
-        if (getDutyCycle() != -1)
+        if (getDutyCycle() > 0)
             root.setAttribute("dutycycle", Long.toString(100*Math.round(getDutyCycle())));
         Element irp = document.createElement("irp");
         irp.appendChild(document.createCDATASection("\n" + irpString + "\n"));
         root.appendChild(irp);
         Element docu = document.createElement("documentation");
-        docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
+        //docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
         root.appendChild(docu);
         Element stringTree = document.createElement("stringTree");
         stringTree.appendChild(document.createCDATASection("\n" + toStringTree() + "\n"));
@@ -767,22 +762,6 @@ public class Protocol {
             }
             return params;
     }*/
-
-    /**
-     * Testing only.
-     * @param args
-     */
-
-    public static void main(String[] args) {
-        String irpString = //"{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
-                "{38.4k,22p,33%,msb}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
-        try {
-            Protocol protocol = new Protocol("name", irpString, "dox");
-            System.out.println(protocol);
-        } catch (IrpSyntaxException | IrpSemanticException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     /**
      * @return the nameEngine

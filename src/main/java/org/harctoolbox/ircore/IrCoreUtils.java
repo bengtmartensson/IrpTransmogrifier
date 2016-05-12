@@ -21,6 +21,22 @@ package org.harctoolbox.ircore;
  * Some useful static functions.
  */
 public class IrCoreUtils {
+
+    /**
+     * Default absolute tolerance in micro seconds.
+     */
+    public static final double defaultAbsoluteTolerance = 60;
+
+    /**
+     * Default relative tolerance as a number between 0 and 1.
+     */
+    public static final double defaultRelativeTolerance = 0.2;
+
+    /**
+     * Default absolute tolerance for frequency comparison.
+     */
+    public static final double defaultFrequencyTolerance = 500;
+
     /**
      * Convert its argument from seconds to microseconds.
      * @param secs
@@ -44,6 +60,40 @@ public class IrCoreUtils {
 
     public static long real2percent(double x) {
         return Math.round(100f * x);
+    }
+
+    /**
+     * Tests for approximate equality.
+     *
+     * @param x first argument
+     * @param y second argument
+     * @param absoluteTolerance
+     * @param relativeTolerance
+     * @return true if either absolute or relative requirement is satisfied.
+     */
+    public static boolean isEqual(double x, double y, double absoluteTolerance, double relativeTolerance) {
+        double absDiff = Math.abs(x - y);
+        boolean absoluteOk = absDiff <= absoluteTolerance;
+        double max = Math.max(Math.abs(x), Math.abs(y));
+        boolean relativeOk = max > 0 && absDiff / max <= relativeTolerance;
+        return absoluteOk || relativeOk;
+    }
+
+    /**
+     * Tests for approximate equality.
+     *
+     * @param x first argument
+     * @param y second argument
+     * @param absoluteTolerance
+     * @param relativeTolerance
+     * @return true if either absolute or relative requirement is satisfied.
+     */
+    public static boolean isEqual(int x, int y, int absoluteTolerance, double relativeTolerance) {
+        int absDiff = Math.abs(x - y);
+        boolean absoluteOk = absDiff <= absoluteTolerance;
+        int max = Math.max(Math.abs(x), Math.abs(y));
+        boolean relativeOk = max > 0 && (double) absDiff / (double) max <= relativeTolerance;
+        return absoluteOk || relativeOk;
     }
 
     private IrCoreUtils() {

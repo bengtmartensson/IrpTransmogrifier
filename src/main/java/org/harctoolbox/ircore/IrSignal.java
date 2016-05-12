@@ -55,7 +55,7 @@ public class IrSignal {
      * actually, most often is. */
     protected IrSequence endingSequence;
 
-    //** "Table" for mapping Pass to intro, repeat, or ending sequence. */
+    /** "Table" for mapping Pass to intro, repeat, or ending sequence. */
     protected EnumMap<Pass, IrSequence>map;
 
     /** Modulation frequency in Hz. Use 0 for not modulated. */
@@ -206,14 +206,20 @@ public class IrSignal {
     /**
      * Analog to the IrSequence toPrintString.
      * @param alternatingSigns If true, generated signs will have alternating signs, ignoring original signs, otherwise signs are preserved.
+     * @param noSigns If true, suppress explict signs
+     * @param separator separator between the numbers
      * @return Nicely formatted string.
      *
      * @see IrSequence
      */
+    public String toPrintString(boolean alternatingSigns, boolean noSigns, String separator) {
+        return introSequence.toPrintString(alternatingSigns, noSigns, separator) + "\n"
+                + repeatSequence.toPrintString(alternatingSigns, noSigns, separator)
+                + (endingSequence.getLength() > 0 ? "\n" + endingSequence.toPrintString(alternatingSigns, noSigns, separator) : "");
+    }
+
     public String toPrintString(boolean alternatingSigns) {
-        return introSequence.toPrintString(alternatingSigns) + "\n"
-                + repeatSequence.toPrintString(alternatingSigns)
-                + (endingSequence.getLength() > 0 ? "\n" + endingSequence.toPrintString(alternatingSigns) : "");
+        return toPrintString(alternatingSigns, false, " ");
     }
 
     public String toPrintString() {
@@ -561,7 +567,7 @@ public class IrSignal {
     /**
      * Returns a ModulatedIrSequence consisting of one intro sequence,
      * count or count-1 number of repeat sequence, dependent on if intro is empty or not, followed by one ending sequence.
-     * @param count Number of times to send signal. Must be > 0.
+     * @param count Number of times to send signal. Must be &gt; 0.
      * @return ModulatedIrSequence.
      */
     public final ModulatedIrSequence toModulatedIrSequence(int count) {
@@ -585,11 +591,38 @@ public class IrSignal {
     /**
      * Returns an IrSignal consisting of count repetitions (count semantic) as the intro sequence,
      * while repeat and ending are empty.
-     * @param count Number of times to send signal. Must be > 0.
+     * @param count Number of times to send signal. Must be &gt; 0.
      * @return IrSignal consisting of count repetitions (count semantic) as the intro sequence.
      */
     public final IrSignal toOneShot(int count) {
         return new IrSignal(frequency, dutyCycle, toModulatedIrSequence(count), null, null);
+    }
+
+    /**
+     * Compares two ModulatedIrSequences for (approximate) equality.
+     *
+     * @param irSignal to be compared against this.
+     * @param absoluteTolerance tolerance threshold in microseconds.
+     * @param relativeTolerance relative threshold, between 0 and 1.
+     * @param frequencyTolerance tolerance (absolute) for frequency in Hz.
+     * @return equality within tolerance.
+     */
+    public boolean isEqual(IrSignal irSignal, double absoluteTolerance, double relativeTolerance,
+            double frequencyTolerance) {
+        return IrCoreUtils.isEqual(frequency, irSignal.frequency, frequencyTolerance, 0)
+                && introSequence.isEqual(irSignal.introSequence, absoluteTolerance, relativeTolerance)
+                && repeatSequence.isEqual(irSignal.repeatSequence, absoluteTolerance, relativeTolerance)
+                && endingSequence.isEqual(irSignal.endingSequence, absoluteTolerance, relativeTolerance);
+    }
+
+    /**
+     * Compares two ModulatedIrSequences for (approximate) equality.
+     *
+     * @param irSignal to be compared against this.
+     * @return equality within tolerance.
+     */
+    public boolean isEqual(IrSignal irSignal) {
+        return isEqual(irSignal, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance, IrCoreUtils.defaultFrequencyTolerance);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
- */
+*/
 
 grammar Irp;
 
@@ -29,12 +29,14 @@ package org.harctoolbox.irp;
 
 // 1.7
 // class Protocol
+// Extension: * instead of ?, parameterspec
 protocol:
-        generalspec bitspec_irstream definitions* parameter_specs? // Difference: * instead of ?, parameterspec
+        generalspec bitspec_irstream definitions* parameter_specs?
 ;
 
 // 2.2, simplified
-// This is simpler than Graham in the sense that some silly input is not rejected.
+// Difference: This a simplified version; implementing exclusions is not really
+// mainstream... Some silly input is not rejected.
 // class GeneralSpec
 generalspec:
 	'{' generalspec_list '}'
@@ -86,7 +88,8 @@ gap_duration:
 ;
 
 name_or_number:
-        name | number_with_decimals // Diff: Graham allowed number (integers) only
+// Extension: Graham allowed number (integers) only
+        name | number_with_decimals
 ;
 
 // 4.2
@@ -175,7 +178,8 @@ and_expression:
         shift_expression ('&' shift_expression)*
 ;
 
-shift_expression:       // Added
+// Extension: not present by Graham or by John Fine
+shift_expression:
         additive_expression (('<' '<' | '>' '>')  additive_expression)*
 ;
 
@@ -241,7 +245,7 @@ number_with_decimals:
       | float_number    # float
 ;
 
-// Due to the lexer, have to take special precaitions to allow name-s
+// Due to the lexer, have to take special precautions to allow name-s
 // to be called k, u, m, p, lsb, or msb.
 // class Name implements Numerical,InfixCode
 name:
@@ -281,7 +285,8 @@ DIV:        '/';
 PERCENT:    '%';
 EXP:        '**';
 
-// Diff: Allow C syntax identifiers; Graham disallowed lower case and underscores.
+// Extension: Here allow C syntax identifiers;
+// Graham allowed only one letter capitals.
 ID:
 	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 ;
@@ -294,7 +299,7 @@ INT:
 	( '0' .. '9')+
 ;
 
-// Diff: Not present by Graham.
+// Extension: Not present by Graham.
 COMMENT:
           ('//' ~('\n'|'\r')* '\r'? '\n'
         | '/*' .*? '*/') -> skip

@@ -1,5 +1,6 @@
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -7,13 +8,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author bengt
- */
-public class GeneralSpecTest {
+public class GeneralSpecNGTest {
 
-    public GeneralSpecTest() {
+    public GeneralSpecNGTest() {
     }
 
     @BeforeClass
@@ -32,11 +29,6 @@ public class GeneralSpecTest {
     public void tearDownMethod() throws Exception {
     }
 
-    private static void test(String str) throws IrpSyntaxException, IrpSemanticException {
-        GeneralSpec gs = new GeneralSpec(str);
-        System.out.println(gs);
-    }
-
     /**
      * Test of toString method, of class GeneralSpec.
      * @throws org.harctoolbox.irp.IrpSyntaxException
@@ -47,16 +39,16 @@ public class GeneralSpecTest {
         System.out.println("toString");
         GeneralSpec instance = new GeneralSpec("{42%, 10p,msb,40k}");
         Assert.assertEquals(instance.toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 42%.");
-        test("{ }");
-        test("{38.4k,564}");
-        test("{564,38.4k}");
-        test("{22p,40k}");
-        test("{msb, 889u}");
-        test("{42%, 10p,msb,40k}");
-        test("{msb ,40k , 33.33333% ,10p }");
-        test("{msb, 123u, 100k, 10p, 1000k}");
+        GeneralSpec.evaluatePrint("{ }");
+        GeneralSpec.evaluatePrint("{38.4k,564}");
+        GeneralSpec.evaluatePrint("{564,38.4k}");
+        GeneralSpec.evaluatePrint("{22p,40k}");
+        GeneralSpec.evaluatePrint("{msb, 889u}");
+        GeneralSpec.evaluatePrint("{42%, 10p,msb,40k}");
+        GeneralSpec.evaluatePrint("{msb ,40k , 33.33333% ,10p }");
+        GeneralSpec.evaluatePrint("{msb, 123u, 100k, 10p, 1000k}");
         try {
-            test("{1+2}");
+            GeneralSpec.evaluatePrint("{1+2}");
             Assert.fail();
         } catch (IrpSyntaxException ex) {
         }
@@ -73,6 +65,12 @@ public class GeneralSpecTest {
         GeneralSpec instance = new GeneralSpec("{msb ,40k , 33.33333% ,10p }");
         BitDirection result = instance.getBitDirection();
         Assert.assertEquals(result, BitDirection.msb);
+        instance = new GeneralSpec("{lsb ,40k , 33.33333% ,10p }");
+        result = instance.getBitDirection();
+        Assert.assertEquals(result, BitDirection.lsb);
+        instance = new GeneralSpec("{40k , 33.33333% ,10p }");
+        result = instance.getBitDirection();
+        Assert.assertEquals(result, BitDirection.lsb);
     }
 
     /**
@@ -84,9 +82,9 @@ public class GeneralSpecTest {
     public void testGetFrequency() throws IrpSyntaxException, IrpSemanticException {
         System.out.println("getFrequency");
         GeneralSpec instance = new GeneralSpec("{msb, 12.3k, 33.33333% ,10p }");
-        double expResult = 12300f;
         double result = instance.getFrequency();
-        Assert.assertEquals(result, expResult, 0.0001);
+        Assert.assertEquals(result, 12300f, 0.0001);
+        Assert.assertEquals(new GeneralSpec("{msb, 33.33333% ,10p }").getFrequency(), ModulatedIrSequence.defaultFrequency, 0.0001);
     }
 
     /**
@@ -97,25 +95,9 @@ public class GeneralSpecTest {
     @Test
     public void testGetUnit() throws IrpSyntaxException, IrpSemanticException {
         System.out.println("getUnit");
-        GeneralSpec instance = new GeneralSpec("{msb ,40k , 33.33333% ,10p }");
+        GeneralSpec instance = new GeneralSpec("{msb ,40k , 33.33333% ,10p }"); // Do not remove the silly formatting!!
         double expResult = 250f;
         double result = instance.getUnit();
-        Assert.assertEquals(result, expResult, 0.0001);
-        // TODO review the generated test code and remove the default call to fail.
-        //fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getDutyCycle method, of class GeneralSpec.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     * @throws org.harctoolbox.irp.IrpSemanticException
-     */
-    @Test
-    public void testGetDutyCycle() throws IrpSyntaxException, IrpSemanticException {
-        System.out.println("getDutyCycle");
-        GeneralSpec instance = new GeneralSpec("{msb ,40k , 33% ,10p }");
-        double expResult = 0.33;
-        double result = instance.getDutyCycle();
         Assert.assertEquals(result, expResult, 0.0001);
     }
 }

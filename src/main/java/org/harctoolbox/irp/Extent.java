@@ -37,7 +37,7 @@ public class Extent extends Duration {
     }
 
     @Override
-    public double evaluate_sign(double elapsed) throws IncompatibleArgumentException {
+    public double evaluateWithSign(double elapsed) throws IncompatibleArgumentException {
         return -evaluate(elapsed);
     }
 }

@@ -38,6 +38,11 @@ public class IrCoreUtils {
     public static final double defaultFrequencyTolerance = 500;
 
     /**
+     * Default absolute tolerance for frequency comparison.
+     */
+    public static final double invalid = -1f;
+
+    /**
      * Convert its argument from seconds to microseconds.
      * @param secs
      * @return Argument converted to microseconds.

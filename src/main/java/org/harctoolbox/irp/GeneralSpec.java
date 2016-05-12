@@ -120,23 +120,23 @@ public class GeneralSpec {
         }
     }
 
-    BitDirection getBitDirection() {
+    public final BitDirection getBitDirection() {
         return bitDirection;
     }
 
-    public double getFrequency() {
+    public final double getFrequency() {
         return frequency;
     }
 
-    public double getUnit() {
+    public final double getUnit() {
         return unit;
     }
 
-    public double getDutyCycle() {
+    public final double getDutyCycle() {
         return dutyCycle;
     }
 
-    private static void test(String str) throws IrpSyntaxException, IrpSemanticException {
+    static void evaluatePrint(String str) throws IrpSyntaxException, IrpSemanticException {
         GeneralSpec gs = new GeneralSpec(str);
         System.out.println(gs);
     }
@@ -148,19 +148,7 @@ public class GeneralSpec {
      */
     public static void main(String[] args) {
         try {
-            if (args.length > 0)
-                test(args[0]);
-            else {
-                //test("{0k,,10p}"); // Thows error
-                test("{ }"); // Seem to trigger bug in ANTLR
-                test("{38.4k,564}");
-                test("{564,38.4k}");
-                test("{22p,40k}");
-                test("{msb, 889u}");
-                test("{42%, 10p,msb,40k}");
-                test("{msb ,40k , 33.33333% ,10p }");
-                test("{msb, 123u, 100k, 10p, 1000k}");
-            }
+            evaluatePrint(args[0]);
         } catch (IrpSyntaxException | IrpSemanticException ex) {
             Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
         }

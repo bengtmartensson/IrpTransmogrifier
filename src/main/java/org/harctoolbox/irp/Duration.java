@@ -26,7 +26,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
  * This class implements Durations in Chapter 3 and 4.
  * Depends on its Protocol (GeneralSpec and NameEngine), except for this, it is immutable.
  */
-
+// Should this instead be an abstract class, implemented by Gap, Flash, and Extent?
 public class Duration extends PrimitiveIrStreamItem {
 
     /**
@@ -50,9 +50,9 @@ public class Duration extends PrimitiveIrStreamItem {
 
     private Type type;
 
-    private double us = IrpUtils.invalid;
-    private double time_periods = IrpUtils.invalid;
-    private double time_units = IrpUtils.invalid;
+    private double us = IrCoreUtils.invalid;
+    private double time_periods = IrCoreUtils.invalid;
+    private double time_units = IrCoreUtils.invalid;
 
     public static Duration newDuration(Protocol env, double time, String unit, Type durationType) throws IncompatibleArgumentException {
         return durationType == Type.extent ? new Extent(env, time, unit) : new Duration(env, time, unit, durationType);
@@ -90,23 +90,22 @@ public class Duration extends PrimitiveIrStreamItem {
             us = time;
     }
 
-    public double evaluate_sign(double elapsed) throws ArithmeticException, IncompatibleArgumentException {
+    public double evaluateWithSign(double elapsed) throws ArithmeticException, IncompatibleArgumentException {
         return (type == Type.flash) ? evaluate(elapsed) : -evaluate(elapsed);
     }
 
     public double evaluate(double elapsed) throws ArithmeticException, IncompatibleArgumentException {
-        if (time_periods != IrpUtils.invalid) {
-            if (environment.getFrequency() > 0) {
+        if (time_periods != IrCoreUtils.invalid) {
+            if (environment.getFrequency() > 0)
                 return IrCoreUtils.seconds2microseconds(time_periods/environment.getFrequency());
-            } else {
+            else
                 throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
-            }
-        } else if (time_units != IrpUtils.invalid) {
-            if (environment.getUnit() > 0) {
+
+        } else if (time_units != IrCoreUtils.invalid) {
+            if (environment.getUnit() > 0)
                 return time_units * environment.getUnit();
-            } else {
+            else
                 throw new ArithmeticException("Relative units and unit == 0 do not go together.");
-            }
         } else {
             return us;
         }
@@ -147,7 +146,7 @@ public class Duration extends PrimitiveIrStreamItem {
 
     @Override
     public String toString() {
-        return type + ":" + (us != IrpUtils.invalid ? (us + "u") : time_periods != IrpUtils.invalid  ? (time_periods + "p") : (this.time_units + "u"));
+        return type + ":" + (us != IrCoreUtils.invalid ? (us + "u") : time_periods != IrCoreUtils.invalid  ? (time_periods + "p") : (this.time_units + "u"));
     }
 
     /*private static void test(Protocol protocol, String str) throws ArithmeticException, IncompatibleArgumentException {

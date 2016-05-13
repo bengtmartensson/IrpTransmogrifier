@@ -53,7 +53,7 @@ public class BitStream extends IrStreamItem {
     }
 
     public void add(BitField bitField, BitDirection bitDirection, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        if (bitField.isInfinite())
+        if (bitField instanceof InfiniteBitField)
             throw new IncompatibleArgumentException("Infinite bitfields cannot be converted to bitstreams.");
 
         long newData = this.environment.getBitDirection() == BitDirection.msb

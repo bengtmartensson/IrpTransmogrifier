@@ -33,7 +33,7 @@ public class UnaryExpression implements Numerical {
 
     public UnaryExpression(IrpParser.Unary_expressionContext ctx) throws IrpSyntaxException {
         if (ctx instanceof IrpParser.Bitfield_expressionContext) {
-            thing = new BitField(((IrpParser.Bitfield_expressionContext)ctx).bitfield());
+            thing = BitField.newBitField(((IrpParser.Bitfield_expressionContext)ctx).bitfield());
             //primaryItem = null;
             negate = false;
             count = false;
@@ -43,7 +43,7 @@ public class UnaryExpression implements Numerical {
             negate = false;
             count = false;
         } else if (ctx instanceof IrpParser.Minus_bitfield_expressonContext) {
-            thing = new BitField(((IrpParser.Minus_bitfield_expressonContext)ctx).bitfield());
+            thing = BitField.newBitField(((IrpParser.Minus_bitfield_expressonContext)ctx).bitfield());
             //primaryItem = null;
             negate = true;
             count = false;
@@ -53,7 +53,7 @@ public class UnaryExpression implements Numerical {
             negate = true;
             count = false;
         } else if (ctx instanceof IrpParser.Count_bitfield_expressionContext) {
-            thing = new BitField(((IrpParser.Count_bitfield_expressionContext)ctx).bitfield());
+            thing = BitField.newBitField(((IrpParser.Count_bitfield_expressionContext)ctx).bitfield());
             //primaryItem = null;
             negate = false;
             count = true;

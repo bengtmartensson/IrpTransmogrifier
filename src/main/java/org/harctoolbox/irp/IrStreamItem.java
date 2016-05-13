@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 import java.util.List;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import static org.harctoolbox.irp.BitField.newBitField;
 
 /**
  * This class is an abstract superclass of the things that make up an IRStream (see "Directly known subclasses").
@@ -56,7 +57,7 @@ public abstract class IrStreamItem {
     public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
         ParseTree child = ctx.getChild(0);
         return //ctx instanceof IrpParser.VariationContext ? new Variation((Va))
-                child instanceof IrpParser.BitfieldContext ? new BitField((IrpParser.BitfieldContext) child)
+                child instanceof IrpParser.BitfieldContext ? newBitField((IrpParser.BitfieldContext) child)
                 //: ctx instanceof IrpParser.AssignmentContext ? new Assignment((IrpParser.AssignmentContext) ctx)
                 //: ctx instanceof IrpParser.ExtentContext ? new BitField((IrpParser.ExtentContext) ctx)
                 //: ctx instanceof IrpParser.DurationContext ? new Duration(ctx.duration())

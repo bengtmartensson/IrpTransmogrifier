@@ -26,72 +26,50 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
  *
  * @see BitStream
  */
-public class BitField extends IrStreamItem implements Numerical {
+public abstract class BitField extends IrStreamItem implements Numerical {
 
     /**
      * Max length of a BitField in this implementation.
      */
     public static final int maxWidth = Long.SIZE - 1; // = 63
 
-    private boolean complement;
-    boolean reverse;
-    boolean infinite;
+    protected boolean complement;
+    //protected boolean reverse;
+    //boolean infinite;
     //long data;
     //int width = maxWidth;
     //int skip = 0;
     //long value;
-    private PrimaryItem data;
-    private PrimaryItem width;
-    private PrimaryItem chop;
+    protected PrimaryItem data;
+    //protected PrimaryItem width;
+    protected PrimaryItem chop;
 
     //private long evaluatePrimaryItem(String s, long deflt) {
     //    return (s == null || s.isEmpty()) ? deflt : Long.parseLong(s);
     //}
 
-    public BitField() {
-        data = null;
-        chop = null;
-        width = null;
-        complement = false;
-        reverse = false;
-        infinite = false;
+//    public BitField() {
+//        data = null;
+//        chop = null;
+//        width = null;
+//        complement = false;
+//        reverse = false;
+//        //infinite = false;
+//    }
+
+    public static BitField newBitField(String str) throws IrpSyntaxException {
+        return newBitField(new ParserDriver(str).bitfield());
     }
 
-    public BitField(String str) throws IrpSyntaxException {
-        this(new ParserDriver(str).bitfield());
+    public static BitField newBitField(IrpParser.BitfieldContext ctx) throws IrpSyntaxException {
+        return (ctx instanceof IrpParser.Finite_bitfieldContext)
+            ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
+                : new InfiniteBitField((IrpParser.Infinite_bitfieldContext) ctx);
     }
 
-    public BitField(IrpParser.BitfieldContext ctx) throws IrpSyntaxException {
-        this();
-        init(ctx);
-    }
 
-    private void init(IrpParser.BitfieldContext bitfield) throws IrpSyntaxException {
-        if (bitfield instanceof IrpParser.Finite_bitfieldContext)
-            init((IrpParser.Finite_bitfieldContext) bitfield);
-        else
-            init((IrpParser.Infinite_bitfieldContext) bitfield);
-    }
 
-    private void init(IrpParser.Finite_bitfieldContext ctx) throws IrpSyntaxException {
-        int index = 0;
-        if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext)) {
-            complement = true;
-            index++;
-        }
-        data = new PrimaryItem(ctx.primary_item(0));
-        width = new PrimaryItem(ctx.primary_item(1));
-        chop = ctx.primary_item().size() > 2 ? new PrimaryItem(ctx.primary_item(2)) : new PrimaryItem(0);
-        reverse = ! (ctx.getChild(index+2) instanceof IrpParser.Primary_itemContext);
-    }
 
-    private void init(IrpParser.Infinite_bitfieldContext ctx) throws IrpSyntaxException {
-        infinite = true;
-        if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext))
-            complement = true;
-        data = new PrimaryItem(ctx.primary_item(0));
-        chop = new PrimaryItem(ctx.primary_item(2));
-    }
 
 /*
     public void init(boolean complement, boolean reverse, boolean infinite, long data, long width, long skip) throws DomainViolationException {
@@ -114,21 +92,8 @@ public class BitField extends IrStreamItem implements Numerical {
         //Debug.debugBitFields("new Bitfield: " + toString() + " = " + toLong());
     }*/
 
-    @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long x = data.toNumber(nameEngine) >> chop.toNumber(nameEngine);
-        if (complement)
-            x = ~x;
-        x &= ((1L << width.toNumber(nameEngine)) - 1L);
-        if (reverse)
-            x = IrpUtils.reverse(x, (int) width.toNumber(nameEngine));
-
-        return x;
-        //lsb_value = environment.getBitDirection() == BitDirection.msb ? IrpUtils.reverse(value, width) : value;
-    }
-
     public static long parse(String str, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
-        BitField bitField = new BitField(str);
+        BitField bitField = newBitField(str);
         return bitField.toNumber(nameEngine);
     }
 
@@ -141,34 +106,27 @@ public class BitField extends IrStreamItem implements Numerical {
         }
     }
 
-    public final String toString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        return (complement ? "~" : "") + data.toNumber(nameEngine) + ":" + (reverse ? "-" : "") + (infinite ? "" : width.toNumber(nameEngine)) + ":" + chop.toNumber(nameEngine);
-    }
-/*
-    public String evaluateAsString() {
-        String padding = value >= 0
-                ? "0000000000000000000000000000000000000000000000000000000000000000"
-                : "1111111111111111111111111111111111111111111111111111111111111111";
-        String s = Long.toBinaryString(value);
-        if (s.length() > width)
-            s = s.substring(s.length() - width);
-        else if (s.length() < width)
-            s = padding.substring(0, width - s.length()) + s;
-        return s;
-    }*/
+    public abstract String toString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
 
-    public long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        return width.toNumber(nameEngine);
-    }
 
-    public boolean isInfinite() {
-        return infinite;
-    }
+//    public String evaluateAsString() {
+//        String padding = value >= 0
+//                ? "0000000000000000000000000000000000000000000000000000000000000000"
+//                : "1111111111111111111111111111111111111111111111111111111111111111";
+//        String s = Long.toBinaryString(value);
+//        if (s.length() > width)
+//            s = s.substring(s.length() - width);
+//        else if (s.length() < width)
+//            s = padding.substring(0, width - s.length()) + s;
+//        return s;
+//    }
+
+    public abstract long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
 
     @Override
     public boolean isEmpty(NameEngine nameEngine) {
         try {
-            return width.toNumber(nameEngine) == 0;
+            return getWidth(nameEngine) == 0;
         } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
             return false;
         }
@@ -197,7 +155,7 @@ public class BitField extends IrStreamItem implements Numerical {
         try {
             NameEngine nameEngine = args.length > arg_i + 1
                     ? new NameEngine(args[arg_i + 1]) : new NameEngine();
-            BitField bitField = new BitField(args[arg_i]);
+            BitField bitField = newBitField(args[arg_i]);
             usage(IrpUtils.exitFatalProgramFailure);
         } catch (ArrayIndexOutOfBoundsException | IrpSyntaxException ex) {
             System.err.println(ex.getMessage());

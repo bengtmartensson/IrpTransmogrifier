@@ -29,7 +29,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.5.1-1</version>
+                <version>4.5.3</version>
                 <executions>
                     <execution>
                         <id>antlr</id>
@@ -37,11 +37,10 @@
                             <goal>antlr4</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/generated-sources/antlr4/org/harctoolbox/irp</outputDirectory>
-                            <!--atn>true</atn-->
-                            <treatWarningsAsErrors>true</treatWarningsAsErrors>
-                            <listener>false</listener>
+                            <atn>false</atn>
+                            <listener>true</listener>
                             <visitor>true</visitor>
+                            <treatWarningsAsErrors>true</treatWarningsAsErrors>
                         </configuration>
                     </execution>
 

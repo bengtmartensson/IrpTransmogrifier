@@ -23,10 +23,6 @@ options {
 tokens {
 }
 
-@header {
-package org.harctoolbox.irp;
-}
-
 // 1.7
 // class Protocol
 // Extension: * instead of ?, parameterspec

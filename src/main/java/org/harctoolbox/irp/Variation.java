@@ -19,30 +19,18 @@ package org.harctoolbox.irp;
 
 import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  *
  */
-public class BitspecIrstream extends IrStreamItem {
-    private BitSpec bitSpec;
-    private IrStream irStream;
+class Variation extends IrStreamItem {
 
-    public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException {
-        this(ctx.bitspec_irstream());
+    public Variation(String str) {
+        this((new ParserDriver(str)).getParser().variation());
     }
 
-    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException {
-        bitSpec = new BitSpec(ctx.bitspec());
-        irStream = new IrStream(ctx.irstream());
-    }
+    public Variation(IrpParser.VariationContext variation) {
 
-    public Element toElement(Document document) {
-        Element root = document.createElement("bitspec-irstream");
-        root.appendChild(bitSpec.toElement(document));
-        root.appendChild(irStream.toElement(document));
-        return root;
     }
 
     @Override
@@ -54,4 +42,5 @@ public class BitspecIrstream extends IrStreamItem {
     public List<IrStreamItem> evaluate(BitSpec bitSpec) throws UnassignedException, IncompatibleArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
 }

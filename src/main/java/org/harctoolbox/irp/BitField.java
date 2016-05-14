@@ -58,7 +58,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 //    }
 
     public static BitField newBitField(String str) throws IrpSyntaxException {
-        return newBitField(new ParserDriver(str).bitfield());
+        return newBitField(new ParserDriver(str).getParser().bitfield());
     }
 
     public static BitField newBitField(IrpParser.BitfieldContext ctx) throws IrpSyntaxException {

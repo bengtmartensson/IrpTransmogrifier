@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 public class ParameterSpecs {
 
     private LinkedHashMap<String, ParameterSpec>map;
-    private IrpParser irpParser;
 
     public boolean isEmpty() {
         return map.isEmpty();
@@ -53,11 +52,11 @@ public class ParameterSpecs {
     }
 
     public ParameterSpecs(String parameter_specs) throws IrpSyntaxException {
-        this(new ParserDriver(parameter_specs).parameterSpecs());
+        this(new ParserDriver(parameter_specs).getParser().parameter_specs());
     }
 
-    public ParameterSpecs(IrpParser.ProtocolContext t) {
-        this(t.parameter_specs());
+    public ParameterSpecs(IrpParser.ProtocolContext ctx) {
+        this(ctx.parameter_specs());
     }
 
     public ParameterSpecs(IrpParser.Parameter_specsContext t) {
@@ -72,13 +71,14 @@ public class ParameterSpecs {
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder();
+        StringBuilder str = new StringBuilder("[");
         for (ParameterSpec ps : map.values())
-            str.append(ps.toString(irpParser)).append(", ");
+            str.append(ps.toString()).append(", ");
 
         if (str.length() > 0)
             str.deleteCharAt(str.length()-2);
-        return "[" + str.toString() + "]";
+        str.append("]");
+        return str.toString();
     }
 
     public Element toElement(Document document) {

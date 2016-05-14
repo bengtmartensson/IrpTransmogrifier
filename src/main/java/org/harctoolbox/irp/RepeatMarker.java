@@ -21,53 +21,28 @@ package org.harctoolbox.irp;
  */
 public class RepeatMarker {
 
-    int min = 1;
-    int max = 1;
+    private int min;
+    private int max;
 
-    public RepeatMarker(String s) {
-        String str = s.trim();
-        if (str.isEmpty()) {
-            min = 1;
-            max = 1;
-        } else if (str.charAt(0) == '*') {
-            min = 0;
-            max = Integer.MAX_VALUE;
-        } else if (str.charAt(0) == '+') {
-            min = 1;
-            max = Integer.MAX_VALUE;
-        } else if (str.endsWith("+")) {
-            min = Integer.parseInt(str.substring(0, str.length() - 1));
-            max = Integer.MAX_VALUE;
-        } else {
-            try {
-                min = Integer.parseInt(str);
-                max = min;
-            } catch (NumberFormatException ex) {
-            }
-        }
+    public RepeatMarker(String str) {
+        this((new ParserDriver(str)).getParser().repeat_marker());
     }
 
-    public RepeatMarker(int i) {
-        this(i, ' ');
-    }
-
-    public RepeatMarker(int i, char c) {
-        switch (c) {
-            case '*':
+    public RepeatMarker(IrpParser.Repeat_markerContext ctx) {
+        String ch = ctx.getChild(0).getText();
+        switch (ch) {
+            case "*":
                 min = 0;
                 max = Integer.MAX_VALUE;
                 break;
-            case '+':
-                min = i > 0 ? i : 1;
+            case "+":
+                min = 1;
                 max = Integer.MAX_VALUE;
                 break;
-            case ' ':
-                min = i;
-                max = i;
-                break;
             default:
-                throw new RuntimeException("Invalid alternative in RepeatMarker");
-                //break;
+                min = Integer.parseInt(ch);
+                max = ctx.getChildCount() > 1 ? max = Integer.MAX_VALUE : min;
+                break;
         }
     }
 
@@ -80,14 +55,10 @@ public class RepeatMarker {
         this(Character.toString(ch));
     }
 
-    public RepeatMarker(IrpParser.Repeat_markerContext ctx) {
-        this(ctx.getText());
-    }
-
     public boolean isInfinite() {
         return max == Integer.MAX_VALUE;
     }
-
+/*
     public boolean is(int n) {
         return n == min && n == max;
     }
@@ -119,12 +90,12 @@ public class RepeatMarker {
                 : (s.equals("n+")) ? min != Integer.MAX_VALUE && max == Integer.MAX_VALUE
                 : false;
     }
-
+*/
     @Override
     public String toString() {
         return
-                (min == 1 && max == 1) ? ""
-                : (min == 0 && max == Integer.MAX_VALUE) ? "*"
+                //(min == 1 && max == 1) ? ""
+                  (min == 0 && max == Integer.MAX_VALUE) ? "*"
                 : (min == 1 && max == Integer.MAX_VALUE) ? "+"
                 : (min == max) ? Integer.toString(min)
                 : (max == Integer.MAX_VALUE) ? Integer.toString(min) + "+"
@@ -135,14 +106,27 @@ public class RepeatMarker {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println((new RepeatMarker("")));
-        System.out.println((new RepeatMarker('*')));
+        //System.out.println((new RepeatMarker("")));
         System.out.println((new RepeatMarker("*")));
         System.out.println((new RepeatMarker('+')));
         System.out.println((new RepeatMarker("1+")));
         System.out.println((new RepeatMarker("0+")));
         System.out.println((new RepeatMarker("7")));
-        System.out.println((new RepeatMarker("7+")));
+        System.out.println((new RepeatMarker("17+")));
         System.out.println((new RepeatMarker("\t7+   ")));
+    }
+
+    /**
+     * @return the min
+     */
+    public int getMin() {
+        return min;
+    }
+
+    /**
+     * @return the max
+     */
+    public int getMax() {
+        return max;
     }
 }

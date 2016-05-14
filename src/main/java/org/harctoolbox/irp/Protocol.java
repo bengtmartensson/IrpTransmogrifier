@@ -91,7 +91,7 @@ public class Protocol {
         this.nameEngine = new NameEngine();
 
         parseDriver = new ParserDriver(irpString);
-        parseTree = parseDriver.protocol();
+        parseTree = parseDriver.getParser().protocol();
 
         generalSpec = new GeneralSpec(parseTree);
         bitspecIrsteam = new BitspecIrstream(parseTree);

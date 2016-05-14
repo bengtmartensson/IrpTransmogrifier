@@ -2,6 +2,7 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.testng.Assert;
@@ -54,7 +55,7 @@ public class GeneralSpecNGTest {
             try {
                 GeneralSpec.evaluatePrint("{1+2}");
                 Assert.fail();
-            } catch (IrpSyntaxException ex) {
+            } catch (ParseCancellationException ex) {
             }
         } catch (ArithmeticException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);

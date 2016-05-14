@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 /**
  *
  */
-public class Number implements Numerical {
+public class Number extends PrimaryItem {
     long data;
 
     public Number(long n) {

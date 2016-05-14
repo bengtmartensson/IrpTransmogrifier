@@ -37,15 +37,21 @@ public abstract class Duration extends PrimitiveIrStreamItem implements Floatabl
 
     public static Duration newDuration(String str) throws IrpSyntaxException {
         IrpParser parser = new ParserDriver(str).getParser();
-
         try {
-            IrpParser.DurationContext d = parser.duration();
-            return (d instanceof IrpParser.FlashDurationContext)
-                    ? new Flash(((IrpParser.FlashDurationContext) d).flash_duration())
-                    : new Gap(((IrpParser.GapDurationContext) d).gap_duration());
+            return newDuration(parser.duration());
         } catch (ParseCancellationException ex) {
-            return new Extent(parser.extent());
+            return newDuration(parser.extent());
         }
+    }
+
+    public static Duration newDuration(IrpParser.DurationContext d) throws IrpSyntaxException {
+        return (d instanceof IrpParser.FlashDurationContext)
+                ? new Flash(((IrpParser.FlashDurationContext) d).flash_duration())
+                : new Gap(((IrpParser.GapDurationContext) d).gap_duration());
+    }
+
+    public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
+        return new Extent(e);
     }
 
     private void compute(NameEngine nameEngine, GeneralSpec generalSpec)

@@ -85,7 +85,7 @@ public class GeneralSpec {
     }
 
     public GeneralSpec(String str) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
-        this(new ParserDriver(str).generalspec());
+        this(new ParserDriver(str).getParser().generalspec());
     }
 
     public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException {

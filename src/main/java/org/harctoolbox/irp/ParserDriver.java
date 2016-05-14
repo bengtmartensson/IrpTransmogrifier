@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /**
  * This class encapsulates the IrpParser.
@@ -45,7 +44,7 @@ public class ParserDriver {
     public IrpParser getParser() {
         return parser;
     }
-
+/*
     // TODO: having both getParser() and all these is silly...
     public IrpParser.DurationContext duration() {
         return parser.duration();

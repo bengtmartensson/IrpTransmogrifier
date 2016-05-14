@@ -27,7 +27,7 @@ public class FiniteBitField extends BitField {
     private boolean reverse;
 
     public FiniteBitField(String str) throws IrpSyntaxException {
-        this((IrpParser.Finite_bitfieldContext) new ParserDriver(str).bitfield());
+        this((IrpParser.Finite_bitfieldContext) new ParserDriver(str).getParser().bitfield());
     }
 
     public FiniteBitField(IrpParser.Finite_bitfieldContext ctx) throws IrpSyntaxException {
@@ -36,9 +36,9 @@ public class FiniteBitField extends BitField {
             complement = true;
             index++;
         }
-        data = new PrimaryItem(ctx.primary_item(0));
-        width = new PrimaryItem(ctx.primary_item(1));
-        chop = ctx.primary_item().size() > 2 ? new PrimaryItem(ctx.primary_item(2)) : new PrimaryItem(0);
+        data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
+        width = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
+        chop = ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0);
         reverse = ! (ctx.getChild(index+2) instanceof IrpParser.Primary_itemContext);
     }
 

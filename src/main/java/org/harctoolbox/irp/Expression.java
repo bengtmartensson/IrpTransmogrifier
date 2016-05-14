@@ -26,7 +26,7 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
  * This class corresponds to Chapter 9.
  * An expression is evaluated during execution time with the current name bindings.
  */
-public class Expression implements Numerical {
+public class Expression extends PrimaryItem {
 
     //private static boolean debug;
     private IrpParser.Bare_expressionContext parseTree;
@@ -51,7 +51,7 @@ public class Expression implements Numerical {
     }
 
     Expression(ParserDriver parserDriver) throws IrpSyntaxException {
-        this(parserDriver.bare_expression());
+        this(parserDriver.getParser().bare_expression());
     }
 
     Expression(IrpParser.ExpressionContext ctx) {

@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -59,17 +58,17 @@ public class IrStream extends BareIrStream {
     }
 
     // I hate the missing default arguments in Java!!!
-    public IrStream(Protocol env) {
-        this(env, null);
-    }
+//    public IrStream(Protocol env) {
+//        this(env, null);
+//    }
 
-    public IrStream(Protocol env, ArrayList<IrStreamItem>items) {
-        this(env, items, null, null);
-    }
-
-    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker) {
-        this(env, items, repeatMarker, null);
-    }
+//    public IrStream(Protocol env, ArrayList<IrStreamItem>items) {
+//        this(env, items, null, null);
+//    }
+//
+//    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker) {
+//        this(env, items, repeatMarker, null);
+//    }
 
     //public IrStream(Protocol env, BareIrStream bareIrStream, RepeatMarker repeatMarker, BitSpec bitSpec) {
         //this(env, bareIrStream != null ? bareIrStream.irStreamItems : null, repeatMarker, bitSpec);
@@ -79,10 +78,10 @@ public class IrStream extends BareIrStream {
     //    this(env, src, src != null ? src.repeatMarker : null, bitSpec);
     //}
 
-    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker, BitSpec bitSpec) {
-        super(env, items, bitSpec, 0);
-        this.repeatMarker = repeatMarker != null ? repeatMarker : new RepeatMarker();
-    }
+//    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker, BitSpec bitSpec) {
+//        super(env, items, bitSpec, 0);
+//        this.repeatMarker = repeatMarker != null ? repeatMarker : new RepeatMarker();
+//    }
 
     public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException {
         super(ctx.bare_irstream());

@@ -39,7 +39,7 @@ public class UnaryExpression implements Numerical {
             count = false;
         } else if (ctx instanceof IrpParser.Primary_item_expressionContext) {
             //bitField = null;
-            thing = new PrimaryItem(((IrpParser.Primary_item_expressionContext)ctx).primary_item());
+            thing = PrimaryItem.newPrimaryItem(((IrpParser.Primary_item_expressionContext)ctx).primary_item());
             negate = false;
             count = false;
         } else if (ctx instanceof IrpParser.Minus_bitfield_expressonContext) {
@@ -49,7 +49,7 @@ public class UnaryExpression implements Numerical {
             count = false;
         } else if (ctx instanceof IrpParser.Minus_primary_item_expressionContext) {
             //bitField = null;
-            thing = new PrimaryItem(((IrpParser.Minus_primary_item_expressionContext)ctx).primary_item());
+            thing = PrimaryItem.newPrimaryItem(((IrpParser.Minus_primary_item_expressionContext)ctx).primary_item());
             negate = true;
             count = false;
         } else if (ctx instanceof IrpParser.Count_bitfield_expressionContext) {
@@ -59,7 +59,7 @@ public class UnaryExpression implements Numerical {
             count = true;
         } else if (ctx instanceof IrpParser.Count_primary_item_expressionContext) {
             //bitField = null;
-            thing = new PrimaryItem(((IrpParser.Count_primary_item_expressionContext)ctx).primary_item());
+            thing = PrimaryItem.newPrimaryItem(((IrpParser.Count_primary_item_expressionContext)ctx).primary_item());
             negate = false;
             count = true;
         } else {

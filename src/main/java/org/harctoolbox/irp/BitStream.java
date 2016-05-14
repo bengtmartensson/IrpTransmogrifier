@@ -41,42 +41,42 @@ public class BitStream extends IrStreamItem {
         }
     }
 
-    public BitStream(Protocol env) {
-        super(env);
-        data = new long[1];
-        data[0] = 0L;
-        length = 0;
-    }
+//    public BitStream(Protocol env) {
+//        super(env);
+//        data = new long[1];
+//        data[0] = 0L;
+//        length = 0;
+//    }
 
-    public void add(BitField bitField, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        add(bitField, environment.getBitDirection(), nameEngine);
-    }
+//    public void add(BitField bitField, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+//        add(bitField, environment.getBitDirection(), nameEngine);
+//    }
 
-    public void add(BitField bitField, BitDirection bitDirection, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        if (bitField instanceof InfiniteBitField)
-            throw new IncompatibleArgumentException("Infinite bitfields cannot be converted to bitstreams.");
-
-        long newData = this.environment.getBitDirection() == BitDirection.msb
-                    ? bitField.toNumber(nameEngine)
-                    : IrpUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine));
-        length += bitField.getWidth(nameEngine);
-
-        if (length > Long.SIZE) {
-            // "abnormal" case
-            if (longsNeeded(length) > data.length) {
-                // need to extend
-                long[] newdata = new long[data.length + 1];
-                System.arraycopy(data, 0, newdata, 0, data.length);
-                newdata[data.length] = 0L;
-                data = newdata;
-            }
-            for (int i = data.length - 1; i > 0; i--) {
-                long x = data[i] << bitField.getWidth(nameEngine) | getLeftmostBits(data[i-1], (int) bitField.getWidth(nameEngine));
-                data[i] = x;
-            }
-        }
-        data[0] = data[0] << bitField.getWidth(nameEngine) | newData;
-    }
+//    public void add(BitField bitField, BitDirection bitDirection, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+//        if (bitField instanceof InfiniteBitField)
+//            throw new IncompatibleArgumentException("Infinite bitfields cannot be converted to bitstreams.");
+//
+//        long newData = this.environment.getBitDirection() == BitDirection.msb
+//                    ? bitField.toNumber(nameEngine)
+//                    : IrpUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine));
+//        length += bitField.getWidth(nameEngine);
+//
+//        if (length > Long.SIZE) {
+//            // "abnormal" case
+//            if (longsNeeded(length) > data.length) {
+//                // need to extend
+//                long[] newdata = new long[data.length + 1];
+//                System.arraycopy(data, 0, newdata, 0, data.length);
+//                newdata[data.length] = 0L;
+//                data = newdata;
+//            }
+//            for (int i = data.length - 1; i > 0; i--) {
+//                long x = data[i] << bitField.getWidth(nameEngine) | getLeftmostBits(data[i-1], (int) bitField.getWidth(nameEngine));
+//                data[i] = x;
+//            }
+//        }
+//        data[0] = data[0] << bitField.getWidth(nameEngine) | newData;
+//    }
 
     private long getLeftmostBits(long x, int n) {
         return x >> (Long.SIZE - n) & ((1L << n) - 1L);

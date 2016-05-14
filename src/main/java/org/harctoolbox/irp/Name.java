@@ -23,7 +23,7 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
 /**
  *
  */
-public class Name implements Numerical,InfixCode {
+public class Name extends PrimaryItem {
     String name;
 
     public Name(IrpParser.NameContext ctx) {
@@ -31,7 +31,7 @@ public class Name implements Numerical,InfixCode {
     }
 
     public Name(String name) throws IrpSyntaxException {
-        parse(name);
+        parse(name); // just to check validity
         this.name = name;
     }
 
@@ -90,7 +90,6 @@ public class Name implements Numerical,InfixCode {
         return ctx.getText();
     }
 
-    @Override
     public String toInfixCode() {
         return name;
     }

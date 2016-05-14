@@ -33,8 +33,8 @@ public class InfiniteBitField extends BitField {
     public InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx) throws IrpSyntaxException {
         if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext))
             complement = true;
-        data = new PrimaryItem(ctx.primary_item(0));
-        chop = new PrimaryItem(ctx.primary_item(2));
+        data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
+        chop = PrimaryItem.newPrimaryItem(ctx.primary_item(2));
     }
 
     @Override

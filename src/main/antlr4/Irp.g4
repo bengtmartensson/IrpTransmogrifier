@@ -103,13 +103,15 @@ extent:
 ;
 
 //  5.2
-// class BitField (extends IrStreamItem implements Numerical)
+// abstact class BitField extends IrStreamItem implements Numerical
+// class FiniteBitField extends BitField
+// class InfiniteBitField extends BitField
 bitfield:
           '~'? primary_item ':' '-'? primary_item (':' primary_item)? # finite_bitfield
         | '~'? primary_item ':'                    ':' primary_item   # infinite_bitfield
 ;
 
-// class PrimaryItem implements Numerical, InfixCode
+// abstract class PrimaryItem implements Numerical
 primary_item:
           name          # name_asitem
         | DOLLAR_ID     # DOLLAR_ID_asitem
@@ -134,7 +136,7 @@ irstream_item:
           variation         # variation_asitem
         | bitfield          # bitfield_asitem // must come before duration!
         | assignment        # assignment_asitem
-        | extent            # extend_asitem
+        | extent            # extent_asitem
         | duration          # duration_asitem
         | irstream          # irstream_asitem
         | bitspec_irstream  # bitspec_irstream_asitem

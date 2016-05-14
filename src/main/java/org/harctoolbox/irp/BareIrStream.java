@@ -77,7 +77,7 @@ public class BareIrStream extends IrStreamItem {
         return primaryItems;
     }*/
 
-    public BareIrStream(IrpParser.Bare_irstreamContext ctx/*, Protocol env*/) throws IrpSyntaxException {
+    public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException {
         this(ctx.irstream_item());
         //this(toList(ctx, env), env);
     }
@@ -101,12 +101,12 @@ public class BareIrStream extends IrStreamItem {
         this(env, null, null, 0);
     }*/
 
-    public BareIrStream(Protocol env, List<IrStreamItem>items, BitSpec bitSpec, int noAlternatives) {
-        super(env);
-        this.irStreamItems = items;
-        this.noAlternatives = noAlternatives;
-        //this.bitSpec = bitSpec;
-    }
+//    public BareIrStream(Protocol env, List<IrStreamItem>items, BitSpec bitSpec, int noAlternatives) {
+//        super(env);
+//        this.irStreamItems = items;
+//        this.noAlternatives = noAlternatives;
+//        //this.bitSpec = bitSpec;
+//    }
 
     @Override
     public String toString() {

@@ -17,34 +17,37 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
-
 /**
  *
  */
-public class PrimaryItem implements Numerical {
-    private Numerical data; // Number, Name, or Expression
+public abstract class PrimaryItem implements Numerical {
+    //private Numerical data; // Number, Name, or Expression
 
-    public PrimaryItem(IrpParser.Primary_itemContext ctx) throws IrpSyntaxException {
-        data = ctx instanceof IrpParser.Number_asitemContext
+    public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) throws IrpSyntaxException {
+        return (ctx instanceof IrpParser.Name_asitemContext)
+                ? new Name(((IrpParser.Name_asitemContext) ctx).name())
+                : (ctx instanceof IrpParser.DOLLAR_ID_asitemContext)
+                ? new Name(((IrpParser.DOLLAR_ID_asitemContext) ctx).getText())
+                : (ctx instanceof IrpParser.Number_asitemContext)
                 ? new Number(((IrpParser.Number_asitemContext) ctx).number())
-                : ctx instanceof IrpParser.Expression_asitemContext
-                ? new Expression(((IrpParser.Expression_asitemContext) ctx).expression().bare_expression())
-                : new Name(((IrpParser.Name_asitemContext) ctx).name());
+                : new Expression(((IrpParser.Expression_asitemContext) ctx).expression());
     }
 
-    public PrimaryItem(long n) {
-        data = new Number(n);
+    protected PrimaryItem() {
     }
 
-    public PrimaryItem(String name) throws IrpSyntaxException {
-        data = new Name(name);
+    public static PrimaryItem newPrimaryItem(long n) {
+        return new Number(n);
     }
 
-    @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        return data.toNumber(nameEngine);
+    public static PrimaryItem newPrimaryItem(String name) throws IrpSyntaxException {
+        return new Name(name);
     }
+
+//    @Override
+//    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        return data.toNumber(nameEngine);
+//    }
 
 //    @Override
 //    public String toInfixCode() throws IrpSyntaxException {

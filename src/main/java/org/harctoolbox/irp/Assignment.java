@@ -19,30 +19,34 @@ package org.harctoolbox.irp;
 
 import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  *
  */
-public class BitspecIrstream extends IrStreamItem {
-    private BitSpec bitSpec;
-    private IrStream irStream;
+public class Assignment extends IrStreamItem implements Numerical {
+    private Name name;
+    private Expression value;
 
-    public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException {
-        this(ctx.bitspec_irstream());
+    public Assignment(String str) {
+        this((new ParserDriver(str)).getParser().assignment());
     }
 
-    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException {
-        bitSpec = new BitSpec(ctx.bitspec());
-        irStream = new IrStream(ctx.irstream());
+    public Assignment(IrpParser.AssignmentContext assignment) {
+        this(assignment.name(), assignment.bare_expression());
     }
 
-    public Element toElement(Document document) {
-        Element root = document.createElement("bitspec-irstream");
-        root.appendChild(bitSpec.toElement(document));
-        root.appendChild(irStream.toElement(document));
-        return root;
+    public Assignment(IrpParser.NameContext name, IrpParser.Bare_expressionContext be) {
+        this(new Name(name), new Expression(be));
+    }
+
+    public Assignment(Name name, Expression expression) {
+        this.name = name;
+        this.value = expression;
+    }
+
+    public static long parse(String str, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        Assignment assignment = new Assignment(str);
+        return assignment.toNumber(nameEngine);
     }
 
     @Override
@@ -53,5 +57,19 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     public List<IrStreamItem> evaluate(BitSpec bitSpec) throws UnassignedException, IncompatibleArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        return value.toNumber(nameEngine);
+    }
+
+    public String getName() {
+        return name.toString();
+    }
+
+    @Override
+    public String toString() {
+        return name + "=" + value;
     }
 }

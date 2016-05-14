@@ -43,7 +43,7 @@ public class NameEngine {
     public NameEngine(String str) throws IrpSyntaxException {
         this();
         ParserDriver parserDriver = new ParserDriver(str);
-        parseDefinitions(parserDriver.definitions());
+        parseDefinitions(parserDriver.getParser().definitions());
     }
 
     private void define(String name, String value) throws IrpSyntaxException {
@@ -70,7 +70,7 @@ public class NameEngine {
      */
     public void parseDefinitions(String str) throws IrpSyntaxException {
         ParserDriver parserDriver = new ParserDriver(str);
-        parseDefinitions(parserDriver.definitions());
+        parseDefinitions(parserDriver.getParser().definitions());
     }
 
     public final void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) throws IrpSyntaxException {

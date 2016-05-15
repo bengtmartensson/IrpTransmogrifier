@@ -5,7 +5,6 @@
  */
 package org.harctoolbox.irp;
 
-import static org.harctoolbox.irp.IrStreamItem.newIrStreamItem;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -40,13 +39,14 @@ public class IrStreamItemNGTest {
 
     /**
      * Test of evaluate method, of class IrStreamItem.
+     * @throws java.lang.Exception
      */
     @Test
     public void testEvaluate() throws Exception {
         System.out.println("evaluate");
         BitSpec bitSpec = null;
-        IrStreamItem instance = newIrStreamItem("10");
-        
+        //IrStreamItem instance = newIrStreamItem("10");
+
         //assertEquals(result, expResult);
 
     }

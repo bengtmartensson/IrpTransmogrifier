@@ -62,9 +62,9 @@ public class FloatNumber implements Floatable {
         return toFloat(integ.getText() + "." + matissa.getText());
     }
 
-    private static double toFloat(TerminalNode matissa) throws IrpSyntaxException {
-        return toFloat(matissa.getText());
-    }
+//    private static double toFloat(TerminalNode matissa) throws IrpSyntaxException {
+//        return toFloat(matissa.getText());
+//    }
 
     private static double toFloat(String string) throws IrpSyntaxException {
         try {

@@ -38,6 +38,7 @@ public class NameOrNumberNGTest {
 
     /**
      * Test of toNumber method, of class NameOrNumber.
+     * @throws java.lang.Exception
      */
     @Test
     public void testToNumber() throws Exception {

@@ -28,7 +28,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
  * Depends on its Protocol (GeneralSpec and NameEngine), except for this, it is immutable.
  */
 
-public abstract class Duration extends PrimitiveIrStreamItem implements Floatable {
+public abstract class Duration extends IrStreamItem implements Floatable {
     private double us = IrCoreUtils.invalid;
     private double time_periods = IrCoreUtils.invalid;
     private double time_units = IrCoreUtils.invalid;
@@ -104,7 +104,7 @@ public abstract class Duration extends PrimitiveIrStreamItem implements Floatabl
         }
     }
 
-    private double evaluate(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         return evaluate(0, nameEngine, generalSpec);
     }
 

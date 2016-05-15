@@ -6,6 +6,7 @@
 package org.harctoolbox.irp;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -38,7 +39,7 @@ public class RepeatMarkerNGTest {
     }
 
 
-    private void testit(String str, int min, int max) {
+    private void testit(String str, int min, int max) throws InvalidRepeatException {
         RepeatMarker rep = new RepeatMarker(str);
         assertEquals(rep.getMin(), min);
         assertEquals(rep.getMax(), max);
@@ -49,14 +50,18 @@ public class RepeatMarkerNGTest {
      */
     @Test
     public void testGetMax() {
-        System.out.println("getMax");
-        testit("*", 0, Integer.MAX_VALUE);
-        testit("+", 1, Integer.MAX_VALUE);
-        testit("1+", 1, Integer.MAX_VALUE);
-        testit("0+", 0, Integer.MAX_VALUE);
-        testit("7", 7, 7);
-        testit("17+", 17, Integer.MAX_VALUE);
-        testit("\t7+   ", 7, Integer.MAX_VALUE);
+        try {
+            System.out.println("getMax");
+            testit("*", 0, Integer.MAX_VALUE);
+            testit("+", 1, Integer.MAX_VALUE);
+            testit("1+", 1, Integer.MAX_VALUE);
+            testit("0+", 0, Integer.MAX_VALUE);
+            testit("7", 7, 7);
+            testit("17+", 17, Integer.MAX_VALUE);
+            testit("\t7+   ", 7, Integer.MAX_VALUE);
+        } catch (InvalidRepeatException ex) {
+            fail();
+        }
     }
 
 }

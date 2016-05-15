@@ -26,14 +26,14 @@ import java.util.List;
  */
 public class BareIrStream extends IrStreamItem {
 
-    //@Override
-    boolean stringOk(String s) {
-        return s.startsWith("(");
-    }
-
     protected List<IrStreamItem> irStreamItems = null;
     //protected BitSpec bitSpec;
-    private int noAlternatives = 0;
+    //private int noAlternatives = 0;
+
+//@Override
+//    boolean stringOk(String s) {
+//        return s.startsWith("(");
+//    }
 
     public void concatenate(BareIrStream bareIrStream) {
         irStreamItems.addAll(bareIrStream.irStreamItems);
@@ -77,12 +77,12 @@ public class BareIrStream extends IrStreamItem {
         return primaryItems;
     }*/
 
-    public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException {
+    public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         this(ctx.irstream_item());
         //this(toList(ctx, env), env);
     }
 
-    public BareIrStream(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException {
+    public BareIrStream(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException, InvalidRepeatException {
         irStreamItems = new ArrayList<>();
         for (IrpParser.Irstream_itemContext item : list) {
             IrStreamItem irStreamItem = newIrStreamItem(item);

@@ -28,7 +28,7 @@ public class ParameterSpec {
     private String name;
     private long min;
     private long max;
-    private Expression defaultValue;
+    //private Expression defaultValue;
     private IrpParser.Bare_expressionContext deflt;
     private boolean memory = false;
 

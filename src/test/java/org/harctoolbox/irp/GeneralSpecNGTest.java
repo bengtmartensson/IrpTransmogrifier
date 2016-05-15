@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.testng.Assert;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -57,10 +58,8 @@ public class GeneralSpecNGTest {
                 Assert.fail();
             } catch (ParseCancellationException ex) {
             }
-        } catch (ArithmeticException ex) {
-            Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IncompatibleArgumentException ex) {
-            Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ArithmeticException | IncompatibleArgumentException ex) {
+            fail();
         }
     }
 

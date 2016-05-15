@@ -59,6 +59,7 @@ public class FiniteBitField extends BitField {
         return width.toNumber(nameEngine);
     }
 
+    @Override
     public String toString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         return (complement ? "~" : "") + data.toNumber(nameEngine) + ":" + (reverse ? "-" : "") + width.toNumber(nameEngine) + ":" + chop.toNumber(nameEngine);
     }

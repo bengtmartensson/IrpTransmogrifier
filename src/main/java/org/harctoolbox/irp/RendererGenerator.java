@@ -65,7 +65,7 @@ public class RendererGenerator {
             //System.out.println(protocol.toStringTree());
             Document doc = protocol.toDocument();
             printDom(doc, System.out, null, null);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException | InvalidRepeatException ex) {
             Logger.getLogger(RendererGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

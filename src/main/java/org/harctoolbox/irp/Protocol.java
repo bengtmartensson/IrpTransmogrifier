@@ -85,8 +85,9 @@ public class Protocol {
      * @param irpString
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.IrpSemanticException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
+    public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
         this.irpString = irpString;
         this.nameEngine = new NameEngine();
 
@@ -185,7 +186,7 @@ public class Protocol {
     }
 
     // from irpmaster.XmlExport
-    private static Document newDocument() {
+    public static Document newDocument() {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
         factory.setNamespaceAware(false);

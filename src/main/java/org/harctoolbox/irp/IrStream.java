@@ -83,7 +83,7 @@ public class IrStream extends BareIrStream {
 //        this.repeatMarker = repeatMarker != null ? repeatMarker : new RepeatMarker();
 //    }
 
-    public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException {
+    public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         super(ctx.bare_irstream());
         repeatMarker = new RepeatMarker(ctx.repeat_marker());
     }

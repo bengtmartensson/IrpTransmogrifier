@@ -47,11 +47,11 @@ public abstract class IrStreamItem {
                 : null;
     }
 
-    public static IrStreamItem newIrStreamItem(String str) throws IrpSyntaxException {
+    public static IrStreamItem newIrStreamItem(String str) throws IrpSyntaxException, InvalidRepeatException {
         return newIrStreamItem((new ParserDriver(str)).getParser().irstream_item());
     }
 
-    public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
+    public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         //ParseTree child = ctx.getChild(0);
         return (ctx instanceof IrpParser.Variation_asitemContext) ? new Variation(((IrpParser.Variation_asitemContext)ctx).variation())
                 : (ctx instanceof IrpParser.Bitfield_asitemContext) ? BitField.newBitField(((IrpParser.Bitfield_asitemContext) ctx).bitfield())

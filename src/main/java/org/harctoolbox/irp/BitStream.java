@@ -78,14 +78,14 @@ public class BitStream extends IrStreamItem {
 //        data[0] = data[0] << bitField.getWidth(nameEngine) | newData;
 //    }
 
-    private long getLeftmostBits(long x, int n) {
-        return x >> (Long.SIZE - n) & ((1L << n) - 1L);
-    }
+//    private long getLeftmostBits(long x, int n) {
+//        return x >> (Long.SIZE - n) & ((1L << n) - 1L);
+//    }
 
     // really ceal(n/Long.Size)
-    private int longsNeeded(int n) {
-        return n/Long.SIZE + ((n % Long.SIZE == 0) ? 0 : 1);
-    }
+//    private int longsNeeded(int n) {
+//        return n/Long.SIZE + ((n % Long.SIZE == 0) ? 0 : 1);
+//    }
 
     /** Extracts bit n*chunksize .. (n+1)*chunksize-1 */
     private int getChunkNo(int n, int chunksize) {

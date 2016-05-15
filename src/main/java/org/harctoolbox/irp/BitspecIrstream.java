@@ -29,11 +29,11 @@ public class BitspecIrstream extends IrStreamItem {
     private BitSpec bitSpec;
     private IrStream irStream;
 
-    public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException {
+    public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         this(ctx.bitspec_irstream());
     }
 
-    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException {
+    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         bitSpec = new BitSpec(ctx.bitspec());
         irStream = new IrStream(ctx.irstream());
     }

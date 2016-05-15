@@ -23,7 +23,7 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
 /**
  *
  */
-class Variation extends IrStreamItem {
+public class Variation extends IrStreamItem {
 
     public Variation(String str) {
         this((new ParserDriver(str)).getParser().variation());

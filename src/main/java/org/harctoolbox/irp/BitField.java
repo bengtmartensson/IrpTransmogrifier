@@ -137,29 +137,29 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private static void usage(int code) {
-        System.out.println("Usage:");
-        System.out.println("\tBitfield [-d]? <bitfield> [{ NameEngine }]*");
-        System.exit(code);
-    }
+//    private static void usage(int code) {
+//        System.out.println("Usage:");
+//        System.out.println("\tBitfield [-d]? <bitfield> [{ NameEngine }]*");
+//        System.exit(code);
+//    }
 
-    public static void main(String[] args) {
-        boolean debug = false;
-        if (args.length == 0)
-            usage(IrpUtils.exitUsageError);
-        int arg_i = 0;
-        if (args[0].equals("-d")) {
-            debug = true;
-            arg_i++;
-        }
-        try {
-            NameEngine nameEngine = args.length > arg_i + 1
-                    ? new NameEngine(args[arg_i + 1]) : new NameEngine();
-            BitField bitField = newBitField(args[arg_i]);
-            usage(IrpUtils.exitFatalProgramFailure);
-        } catch (ArrayIndexOutOfBoundsException | IrpSyntaxException ex) {
-            System.err.println(ex.getMessage());
-            usage(IrpUtils.exitUsageError);
-        }
-    }
+//    public static void main(String[] args) {
+//        boolean debug = false;
+//        if (args.length == 0)
+//            usage(IrpUtils.exitUsageError);
+//        int arg_i = 0;
+//        if (args[0].equals("-d")) {
+//            debug = true;
+//            arg_i++;
+//        }
+//        try {
+//            NameEngine nameEngine = args.length > arg_i + 1
+//                    ? new NameEngine(args[arg_i + 1]) : new NameEngine();
+//            BitField bitField = newBitField(args[arg_i]);
+//            usage(IrpUtils.exitFatalProgramFailure);
+//        } catch (ArrayIndexOutOfBoundsException | IrpSyntaxException ex) {
+//            System.err.println(ex.getMessage());
+//            usage(IrpUtils.exitUsageError);
+//        }
+//    }
 }

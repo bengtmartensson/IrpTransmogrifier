@@ -16,32 +16,48 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * This class implements Repeatmarker as per Chapter 8.
  */
 public class RepeatMarker {
 
+    private static int noInfiniteRepeats = 0;
+
     private int min;
     private int max;
 
-    public RepeatMarker(String str) {
+    private static void incrementInfiniteRepeats() throws InvalidRepeatException {
+        if (noInfiniteRepeats > 0)
+            throw new InvalidRepeatException("Multiple infinite repeats discovered");
+    }
+
+    public RepeatMarker(String str) throws InvalidRepeatException {
         this((new ParserDriver(str)).getParser().repeat_marker());
     }
 
-    public RepeatMarker(IrpParser.Repeat_markerContext ctx) {
+    public RepeatMarker(IrpParser.Repeat_markerContext ctx) throws InvalidRepeatException {
         String ch = ctx.getChild(0).getText();
         switch (ch) {
             case "*":
                 min = 0;
                 max = Integer.MAX_VALUE;
+                incrementInfiniteRepeats();
                 break;
             case "+":
                 min = 1;
                 max = Integer.MAX_VALUE;
+                incrementInfiniteRepeats();
                 break;
             default:
                 min = Integer.parseInt(ch);
-                max = ctx.getChildCount() > 1 ? max = Integer.MAX_VALUE : min;
+                if (ctx.getChildCount() > 1) {
+                    max = Integer.MAX_VALUE;
+                    incrementInfiniteRepeats();
+                } else
+                    max = min;
                 break;
         }
     }
@@ -51,7 +67,7 @@ public class RepeatMarker {
         max = 1;
     }
 
-    public RepeatMarker(char ch) {
+    public RepeatMarker(char ch) throws InvalidRepeatException {
         this(Character.toString(ch));
     }
 
@@ -106,14 +122,18 @@ public class RepeatMarker {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //System.out.println((new RepeatMarker("")));
-        System.out.println((new RepeatMarker("*")));
-        System.out.println((new RepeatMarker('+')));
-        System.out.println((new RepeatMarker("1+")));
-        System.out.println((new RepeatMarker("0+")));
-        System.out.println((new RepeatMarker("7")));
-        System.out.println((new RepeatMarker("17+")));
-        System.out.println((new RepeatMarker("\t7+   ")));
+        try {
+            //System.out.println((new RepeatMarker("")));
+            System.out.println((new RepeatMarker("*")));
+            System.out.println((new RepeatMarker('+')));
+            System.out.println((new RepeatMarker("1+")));
+            System.out.println((new RepeatMarker("0+")));
+            System.out.println((new RepeatMarker("7")));
+            System.out.println((new RepeatMarker("17+")));
+            System.out.println((new RepeatMarker("\t7+   ")));
+        } catch (InvalidRepeatException ex) {
+            Logger.getLogger(RepeatMarker.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

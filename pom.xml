@@ -37,7 +37,7 @@
                             <goal>antlr4</goal>
                         </goals>
                         <configuration>
-                            <atn>false</atn>
+                            <atn>true</atn>
                             <listener>true</listener>
                             <visitor>true</visitor>
                             <treatWarningsAsErrors>true</treatWarningsAsErrors>

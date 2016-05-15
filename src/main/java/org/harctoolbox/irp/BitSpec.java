@@ -60,11 +60,11 @@ public class BitSpec extends IrStreamItem {
     //}
     */
 
-    public BitSpec(IrpParser.BitspecContext ctx) throws IrpSyntaxException {
+    public BitSpec(IrpParser.BitspecContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         this(ctx.bare_irstream());
     }
 
-    private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException {
+    private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
         chunkSize = computeNoBits(list.size());
         bitCodes = new ArrayList<>();
         for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list) {

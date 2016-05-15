@@ -39,11 +39,12 @@ public class FloatNumberNGTest {
 
     /**
      * Test of parseFloatNumber method, of class FloatNumber.
+     * @throws java.lang.Exception
      */
     @Test
     public void testParse() throws Exception {
         System.out.println("parseFloatNumber");
         assertEquals(FloatNumber.parse(".42"), 0.42, 0.0000001);
-        assertEquals(FloatNumber.parse("3.1415926"), 3.1415926, 0.000001);
+        assertEquals(FloatNumber.parse("3.12345"), 3.12345, 0.000001);
     }
 }

@@ -14,6 +14,7 @@ public class BitFieldNGTest {
 
     /**
      * Test of parse method, of class BitField.
+     * @throws java.lang.Exception
      */
     @Test
     public void testParse() throws Exception {

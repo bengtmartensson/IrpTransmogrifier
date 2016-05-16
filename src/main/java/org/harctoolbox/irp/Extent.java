@@ -29,15 +29,15 @@ public class Extent extends Duration {
     }
 
     @Override
-    public double evaluate(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        double time = super.evaluate(0f, nameEngine, generalSpec) - elapsed;
+    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
         if (time < 0)
             throw new IncompatibleArgumentException("Argument of extent smaller than actual duration.");
         return time;
     }
 
     @Override
-    public double evaluateWithSign(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        return -evaluate(elapsed, nameEngine, generalSpec);
+    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        return -evaluate(nameEngine, generalSpec, elapsed);
     }
 }

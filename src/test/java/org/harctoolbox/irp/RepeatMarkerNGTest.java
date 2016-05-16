@@ -40,6 +40,7 @@ public class RepeatMarkerNGTest {
 
 
     private void testit(String str, int min, int max) throws InvalidRepeatException {
+        RepeatMarker.reset();
         RepeatMarker rep = new RepeatMarker(str);
         assertEquals(rep.getMin(), min);
         assertEquals(rep.getMax(), max);
@@ -61,6 +62,21 @@ public class RepeatMarkerNGTest {
             testit("\t7+   ", 7, Integer.MAX_VALUE);
         } catch (InvalidRepeatException ex) {
             fail();
+        }
+        RepeatMarker rep;
+        try {
+            RepeatMarker.reset();
+            rep = new RepeatMarker("*");
+            assertEquals(rep.getMin(), 0);
+            assertEquals(rep.getMax(), Integer.MAX_VALUE);
+        } catch (InvalidRepeatException ex) {
+            fail();
+        }
+
+        try {
+            rep = new RepeatMarker("7+");
+            fail();
+        } catch (InvalidRepeatException ex) {
         }
     }
 

@@ -32,6 +32,11 @@ public class RepeatMarker {
     private static void incrementInfiniteRepeats() throws InvalidRepeatException {
         if (noInfiniteRepeats > 0)
             throw new InvalidRepeatException("Multiple infinite repeats discovered");
+        noInfiniteRepeats++;
+    }
+
+    static void reset() {
+        noInfiniteRepeats = 0;
     }
 
     public RepeatMarker(String str) throws InvalidRepeatException {

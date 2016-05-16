@@ -29,8 +29,8 @@ public class Gap extends Duration {
     }
 
     @Override
-    public double evaluateWithSign(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec)
+    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        return -evaluate(elapsed, nameEngine, generalSpec);
+        return -evaluate(nameEngine, generalSpec, elapsed);
     }
 }

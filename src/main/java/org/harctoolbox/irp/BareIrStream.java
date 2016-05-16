@@ -18,6 +18,8 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This class implements Irstream as of Chapter 6.
@@ -48,6 +50,19 @@ public class BareIrStream extends IrStreamItem {
     public int getNoAlternatives() {
         return noAlternatives;
     }
+
+    @Override
+    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed_)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            double elapsed = result.getElapsed();
+            EvaluatedIrStream irStream = irStreamItem.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
+            result.add(irStream);
+        }
+        return result;
+    }
+
     /*
     private static ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems(Protocol environment, ArrayList<IrStreamItem> irstreamItems) {
         ArrayList<PrimaryIrStreamItem> primaryItems = new ArrayList<PrimaryIrStreamItem>();
@@ -131,9 +146,4 @@ public class BareIrStream extends IrStreamItem {
         }
         return list;
     }*/
-
-    @Override
-    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

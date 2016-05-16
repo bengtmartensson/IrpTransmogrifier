@@ -19,6 +19,7 @@ package org.harctoolbox.ircore;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -254,8 +255,8 @@ public class IrSequence implements Cloneable, Serializable {
      * @param list List of durations as Double, containing signs.
      * @throws IncompatibleArgumentException If data ens with a flash, not a gap.
      */
-    public IrSequence(ArrayList<Double>list) throws IncompatibleArgumentException {
-        ArrayList<Double> normalized = normalize(list, true);
+    public IrSequence(List<Double>list) throws IncompatibleArgumentException {
+        List<Double> normalized = normalize(list, true);
         if (normalized.size() % 2 != 0)
             throw new IncompatibleArgumentException("IrSequence cannot end with a flash.");
         data = new double[normalized.size()];
@@ -536,7 +537,7 @@ public class IrSequence implements Cloneable, Serializable {
         return isEqual(beginning, compareStart, length, absoluteTolerance, relativeTolerance, 0f);
     }
 
-    private static ArrayList<Double> normalize(ArrayList<Double> list, boolean nukeLeadingZeros) {
+    private static List<Double> normalize(List<Double> list, boolean nukeLeadingZeros) {
         if (list == null || list.isEmpty())
             return list;
 

@@ -329,7 +329,7 @@ public class IrSignal {
      * @param repeatSequence
      * @param endingSequence
      */
-    public IrSignal(double frequency, double dutyCycle, IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence) {
+    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, double frequency, double dutyCycle) {
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
         // If the given intro sequence is identical to the repeat sequence, reject it.
@@ -366,10 +366,10 @@ public class IrSignal {
      * @param endingSequence
      * @throws IncompatibleArgumentException
      */
-    public IrSignal(double frequency, double dutyCycle, String introSequence, String repeatSequence,
-            String endingSequence) throws IncompatibleArgumentException {
-        this(frequency, dutyCycle, new IrSequence(introSequence), new IrSequence(repeatSequence),
-                new IrSequence(endingSequence));
+    public IrSignal(String introSequence, String repeatSequence,
+            String endingSequence, double frequency, double dutyCycle) throws IncompatibleArgumentException {
+        this(new IrSequence(introSequence), new IrSequence(repeatSequence),
+                new IrSequence(endingSequence), frequency, dutyCycle);
     }
 
     /**
@@ -384,11 +384,11 @@ public class IrSignal {
      * @param frequency Modulation frequency in Hz.
      * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
      */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency, double dutyCycle) {
-        this((double) frequency, dutyCycle,
-                new IrSequence(durations, 0, 2*noIntroBursts),
+    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, double frequency, double dutyCycle) {
+        this(new IrSequence(durations, 0, 2*noIntroBursts),
                 new IrSequence(durations, 2*noIntroBursts, 2*noRepeatBursts),
-                new IrSequence(durations, 2*(noIntroBursts+noRepeatBursts), durations.length - 2*(noIntroBursts + noRepeatBursts)));
+                new IrSequence(durations, 2*(noIntroBursts+noRepeatBursts), durations.length - 2*(noIntroBursts + noRepeatBursts)),
+                (double) frequency, dutyCycle);
     }
 
     /**
@@ -595,7 +595,7 @@ public class IrSignal {
      * @return IrSignal consisting of count repetitions (count semantic) as the intro sequence.
      */
     public final IrSignal toOneShot(int count) {
-        return new IrSignal(frequency, dutyCycle, toModulatedIrSequence(count), null, null);
+        return new IrSignal(toModulatedIrSequence(count), null, null, frequency, dutyCycle);
     }
 
     /**

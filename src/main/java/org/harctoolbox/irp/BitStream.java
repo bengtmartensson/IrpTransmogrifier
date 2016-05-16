@@ -16,10 +16,9 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
-
+import org.harctoolbox.ircore.IrSignal;
+// TODO: remove (merge into BitField/BitSpec)
 public class BitStream extends IrStreamItem {
 
     private int length;
@@ -99,12 +98,15 @@ public class BitStream extends IrStreamItem {
         return chunk;
     }
 
+
     @Override
-    public List<IrStreamItem> evaluate(BitSpec bitSpec) throws UnassignedException, IncompatibleArgumentException {
+    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         debugBegin();
         if (bitSpec == null)
             throw new UnassignedException("BitStream " + toString() + " has no associated BitSpec, cannot compute IrStream");
-        List<IrStreamItem> list = new ArrayList<>();
+
+        EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         if (length % bitSpec.getChunkSize() != 0)
             throw new IncompatibleArgumentException("chunksize (= " + bitSpec.getChunkSize() + ") does not divide bitstream length (= " + length + ").");
 
@@ -112,11 +114,13 @@ public class BitStream extends IrStreamItem {
         for (int n = 0; n < noChunks; n++) {
             int chunkNo = noChunks - n - 1;
             BareIrStream irs = bitSpec.getBitIrsteam(getChunkNo(chunkNo, bitSpec.getChunkSize()));
-            List<IrStreamItem> items = irs.evaluate(null);
-            list.addAll(items);
+            EvaluatedIrStream evaluatedIrStream = irs.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
+            //List<IrStreamItem> items = irs.evaluate(null);
+            //list.addAll(items);
+            list.add(evaluatedIrStream);
         }
         //Debug.debugBitStream(toString());
-        debugEnd(list);
+        //debugEnd(list);
         return list;
     }
 

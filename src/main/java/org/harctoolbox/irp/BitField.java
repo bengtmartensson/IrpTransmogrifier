@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 /**
@@ -132,11 +131,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         }
     }
 
-    @Override
-    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
 //    private static void usage(int code) {
 //        System.out.println("Usage:");
 //        System.out.println("\tBitfield [-d]? <bitfield> [{ NameEngine }]*");
@@ -162,4 +156,8 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 //            usage(IrpUtils.exitUsageError);
 //        }
 //    }
+
+    BitField append(BitField bitField, BitDirection bitDirection) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

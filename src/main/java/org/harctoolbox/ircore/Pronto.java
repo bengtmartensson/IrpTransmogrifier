@@ -183,8 +183,9 @@ public class Pronto {
                 double[] repeat = usArray(frequencyCode, ccf, index + 2*introLength, ccf.length);
                 IrSequence introSequence = new IrSequence(intro);
                 IrSequence repeatSequence = new IrSequence(repeat);
-                irSignal = new IrSignal(type == learnedCode ? getFrequency(frequencyCode) : 0,
-                        ModulatedIrSequence.unknownDutyCycle, introSequence, repeatSequence, null);
+                irSignal = new IrSignal(introSequence, repeatSequence, null,
+                        type == learnedCode ? getFrequency(frequencyCode) : 0,
+                        ModulatedIrSequence.unknownDutyCycle);
                 break;
 /*
             case rc5Code: // 0x5000:

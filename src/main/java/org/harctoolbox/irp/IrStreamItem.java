@@ -18,6 +18,7 @@ package org.harctoolbox.irp;
 
 import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This class is an abstract superclass of the things that make up an IRStream (see "Directly known subclasses").
@@ -71,8 +72,6 @@ public abstract class IrStreamItem {
         return noAlternatives;
     }
 
-    public abstract List<IrStreamItem> evaluate(BitSpec bitSpec) throws UnassignedException, IncompatibleArgumentException;
-
     protected void debugBegin() {
 
     }
@@ -84,4 +83,7 @@ public abstract class IrStreamItem {
     protected void debugEnd(List<IrStreamItem>list) {
 
     }
+
+    abstract EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
 }

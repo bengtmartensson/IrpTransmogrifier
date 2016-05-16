@@ -24,6 +24,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrSignal.Pass;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,9 +45,9 @@ public class Protocol {
     //private String documentation;
     private String irpString;
     private GeneralSpec generalSpec;
-    private NameEngine nameEngine;
+    //private NameEngine nameEngine;
     private ParameterSpecs parameterSpecs;
-    private BitspecIrstream bitspecIrsteam;
+    private BitspecIrstream bitspecIrstream;
     private IrpParser.ProtocolContext parseTree;
     private ParserDriver parseDriver;
 
@@ -68,14 +72,10 @@ public class Protocol {
     public Protocol() {
         this.parseDriver = null;
         this.parseTree = null;
-        this.bitspecIrsteam = null;
+        this.bitspecIrstream = null;
         this.parameterSpecs = null;
-        this.nameEngine = null;
         this.irpString = null;
-        //this.documentation = null;
-        //this.name = null;
-        this.irpString = null;
-        this.nameEngine = new NameEngine();
+        //this.nameEngine = new NameEngine();
         this.generalSpec = new GeneralSpec();
     }
 
@@ -86,16 +86,17 @@ public class Protocol {
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.irp.InvalidRepeatException
      */
     public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
         this.irpString = irpString;
-        this.nameEngine = new NameEngine();
+        //this.nameEngine = new NameEngine();
 
         parseDriver = new ParserDriver(irpString);
         parseTree = parseDriver.getParser().protocol();
 
         generalSpec = new GeneralSpec(parseTree);
-        bitspecIrsteam = new BitspecIrstream(parseTree);
+        bitspecIrstream = new BitspecIrstream(parseTree);
         parameterSpecs = new ParameterSpecs(parseTree);
 
         if (parameterSpecs.isEmpty()) {
@@ -105,6 +106,55 @@ public class Protocol {
         if (generalSpec == null) {
             throw new IrpSemanticException("GeneralSpec missing from protocol");
         }
+    }
+
+    /**
+     *
+     * @param nameEngine
+     * @return
+     * @throws IncompatibleArgumentException
+     * @throws IrpSemanticException
+     * @throws ArithmeticException
+     * @throws UnassignedException
+     * @throws IrpSyntaxException
+     */
+    public IrSignal toIrSignal(NameEngine nameEngine)
+            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        IrSequence intro  = toIrSequence(nameEngine, Pass.intro);
+        IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
+        IrSequence ending = toIrSequence(nameEngine, Pass.ending);
+        return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
+    }
+
+    /**
+     *
+     * @param nameEngine, NameEngine, may be altered.
+     * @param pass
+     * @return
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.irp.IrpSemanticException
+     * @throws org.harctoolbox.irp.UnassignedException
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     */
+    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        return new ModulatedIrSequence(toIrSequence(nameEngine, pass), getFrequency(), getDutyCycle());
+    }
+
+    /**
+     *
+     * @param nameEngine Name engine, may be altered
+     * @param pass
+     * @return
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.irp.IrpSemanticException
+     * @throws org.harctoolbox.irp.UnassignedException
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     */
+    public IrSequence toIrSequence(NameEngine nameEngine, Pass pass)
+            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        parameterSpecs.check(nameEngine); // ??
+        EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(nameEngine, generalSpec, pass, 0);
+        return evaluatedIrStream.toIrSequence();
     }
 
 /*
@@ -226,9 +276,9 @@ public class Protocol {
         Element renderer = document.createElement("renderer");
         root.appendChild(renderer);
         renderer.appendChild(parameterSpecs.toElement(document));
-        renderer.appendChild(nameEngine.toElement(document));
+        //renderer.appendChild(nameEngine.toElement(document));
 
-        Element body = bitspecIrsteam.toElement(document);
+        Element body = bitspecIrstream.toElement(document);
         renderer.appendChild(body);
         return root;
     }
@@ -767,7 +817,7 @@ public class Protocol {
     /**
      * @return the nameEngine
      */
-    public NameEngine getNameEngine() {
-        return nameEngine;
-    }
+//    public NameEngine getNameEngine() {
+//        return nameEngine;
+//    }
 }

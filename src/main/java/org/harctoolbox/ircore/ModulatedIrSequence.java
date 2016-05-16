@@ -192,7 +192,7 @@ public class ModulatedIrSequence extends IrSequence {
      * @return IrSignal
      */
     public final IrSignal toIrSignal() {
-        return new IrSignal(frequency, dutyCycle, this, new IrSequence(), new IrSequence());
+        return new IrSignal(this, new IrSequence(), new IrSequence(), frequency, dutyCycle);
     }
 
     /**
@@ -209,7 +209,7 @@ public class ModulatedIrSequence extends IrSequence {
         int startEnding = beginningLength + noRepeats * repeatLength;
         int lengthEnding = getLength() - startEnding;
         IrSequence ending = subSequence(startEnding, lengthEnding);
-        return new IrSignal(frequency, dutyCycle, intro, repeat, ending);
+        return new IrSignal(intro, repeat, ending, frequency, dutyCycle);
     }
 
     /**

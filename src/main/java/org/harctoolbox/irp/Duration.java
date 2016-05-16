@@ -17,11 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This class implements Durations in Chapter 3 and 4.
@@ -82,10 +81,10 @@ public abstract class Duration extends IrStreamItem implements Floatable {
         this.unit = unit != null ? unit : "1";
     }
 
-    public abstract double evaluateWithSign(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec)
+    public abstract double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
 
-    public double evaluate(double elapsed, NameEngine nameEngine, GeneralSpec generalSpec)
+    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         compute(nameEngine, generalSpec);
         if (time_periods != IrCoreUtils.invalid) {
@@ -105,15 +104,7 @@ public abstract class Duration extends IrStreamItem implements Floatable {
     }
 
     public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        return evaluate(0, nameEngine, generalSpec);
-    }
-
-    @Override
-    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
-        debugBegin();
-        List<IrStreamItem> list = new ArrayList<>(1);
-        list.add(this);
-        return list;
+        return evaluate(nameEngine, generalSpec, 0);
     }
 
 //    @Override
@@ -123,11 +114,20 @@ public abstract class Duration extends IrStreamItem implements Floatable {
 
     @Override
     public final boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        return evaluate(0.0, nameEngine, null) == 0;
+        return evaluate(nameEngine, null, 0f) == 0;
     }
 
     @Override
     public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        return evaluate(0, nameEngine, generalSpec);
+        return evaluate(nameEngine, generalSpec, 0f);
+    }
+
+    @Override
+    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
+        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        evaluatedIrStream.add(duration);
+        return evaluatedIrStream;
     }
 }

@@ -99,4 +99,10 @@ public class ParameterSpecs {
             Logger.getLogger(ParameterSpecs.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    void check(NameEngine nameEngine) {
+//        for (ParameterSpec param : map.values()) {
+//            param.check(nameEngine);
+//        }
+    }
 }

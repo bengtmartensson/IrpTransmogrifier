@@ -16,6 +16,8 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -57,6 +59,22 @@ public class IrStream extends BareIrStream {
         return repeatMarker;
     }
 
+    @Override
+    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        EvaluatedIrStream total = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+
+        if (pass == IrSignal.Pass.repeat && repeatMarker.isInfinite())
+            return total;
+
+        for (int i = 0; i < repeatMarker.getMin(); i++) {
+            EvaluatedIrStream irSequence = super.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
+            total.add(irSequence);
+        }
+
+        return total;
+    }
+
     // I hate the missing default arguments in Java!!!
 //    public IrStream(Protocol env) {
 //        this(env, null);
@@ -85,7 +103,7 @@ public class IrStream extends BareIrStream {
 
     public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         super(ctx.bare_irstream());
-        repeatMarker = new RepeatMarker(ctx.repeat_marker());
+        repeatMarker = new RepeatMarker(ctx.repeat_marker()); // FIXME
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  * This class implements BitSpecs, as described in Chapter 7.
  *
  */
-public class BitSpec extends IrStreamItem {
+public class BitSpec /*extends IrStreamItem*/ {
 
     // Number of bits encoded
     private int chunkSize;
@@ -119,7 +119,6 @@ public class BitSpec extends IrStreamItem {
         return chunkSize;
     }
 
-    @Override
     public boolean isEmpty(NameEngine nameEngine) {
         return bitCodes.isEmpty();
     }
@@ -131,7 +130,6 @@ public class BitSpec extends IrStreamItem {
         return root;
     }
 
-    @Override
     public List<IrStreamItem> evaluate(BitSpec bitSpec) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

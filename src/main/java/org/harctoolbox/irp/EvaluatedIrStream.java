@@ -44,8 +44,9 @@ class EvaluatedIrStream {
         elapsed = 0f;
     }
 
-    IrSequence toIrSequence() throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        evaluateBitField();
+    IrSequence toIrSequence()
+            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        evaluateBitStream();
         //canonicalize();
         List<Double>times = new ArrayList<>();
         for (Object object : elements) {
@@ -61,12 +62,12 @@ class EvaluatedIrStream {
             return;
 
         int lastIndex = elements.size() - 1;
-        if (elements.get(lastIndex) instanceof BitField) {
-            if (evaluatedIrStream.elements.get(0) instanceof BitField) {
+        if (lastIndex >= 0 && elements.get(lastIndex) instanceof BitStream) {
+            if (evaluatedIrStream.elements.get(0) instanceof BitStream) {
                 assert (evaluatedIrStream.elements.size() == 1);
-                squeezeBitFields((BitField) evaluatedIrStream.elements.get(0));
+                squeezeBitStreams((BitStream) evaluatedIrStream.elements.get(0));
             } else {
-                evaluateBitField();
+                evaluateBitStream();
                 elements.addAll(evaluatedIrStream.elements);
             }
         } else {
@@ -76,17 +77,17 @@ class EvaluatedIrStream {
     }
 
     void add(double duration) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        evaluateBitField();
+        evaluateBitStream();
         elements.add(duration);
         updateElapsed();
     }
 
-    private void evaluateBitField() throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    private void evaluateBitStream() throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         int lastIndex = elements.size() - 1;
-        if (lastIndex >= 0 && elements.get(lastIndex) instanceof BitField) {
-            BitField bitField = (BitField) elements.get(lastIndex);
+        if (lastIndex >= 0 && elements.get(lastIndex) instanceof BitStream) {
+            BitStream bitStream = (BitStream) elements.get(lastIndex);
             elements.remove(lastIndex);
-            EvaluatedIrStream bitFieldDurations = bitField.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
+            EvaluatedIrStream bitFieldDurations = bitStream.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
             add(bitFieldDurations);
         }
     }
@@ -95,12 +96,23 @@ class EvaluatedIrStream {
         return elements.isEmpty();
     }
 
-    private void squeezeBitFields(BitField bitField) {
+    public int getLenght() {
+        return elements.size();
+    }
+
+    public double get(int i) throws IrpSemanticException {
+        Object object = elements.get(i);
+        if (!(object instanceof Double))
+            throw new IrpSemanticException("Not numeric");
+        return (Double) object;
+    }
+
+    private void squeezeBitStreams(BitStream bitStream) {
         int lastIndex = elements.size() - 1;
-        BitField old = (BitField) elements.get(lastIndex);
-        elements.remove(lastIndex);
-        BitField newBitField = old.append(bitField, generalSpec.getBitDirection());
-        elements.add(newBitField);
+        BitStream old = (BitStream) elements.get(lastIndex);
+        //elements.remove(lastIndex);
+        old.add(bitStream, nameEngine, generalSpec);
+        //elements.add(newBitField);
     }
 
     private void updateElapsed() {

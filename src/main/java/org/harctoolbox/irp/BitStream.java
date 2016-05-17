@@ -13,31 +13,50 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
- */
+*/
+
 package org.harctoolbox.irp;
 
+import java.math.BigInteger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
-// TODO: remove (merge into BitField/BitSpec)
-public class BitStream extends IrStreamItem {
 
-    private int length;
-    private long data[];
+class BitStream extends IrStreamItem {
+
+    private long length;
+    private BigInteger data;
 
     @Override
     public String toString() {
-        if (data.length == 1)
-            return "BitStream, length = " + length + ", data = " + data[0] + " = " + Long.toBinaryString(data[0]);
-        else {
-            StringBuilder dataString = new StringBuilder();
-            dataString.append("[ ");
-            StringBuilder binString = new StringBuilder();
-            for (int i = data.length - 1; i >= 0; i--) {
-                dataString.append(Long.toString(data[i])).append(" ");
-                binString.append(Long.toBinaryString(data[i])).append(" ");
-            }
-            return "BitStream, length = " + length + ", data = " + dataString + "] = " + binString;
-        }
+        return "BitStream, length = " + length + ", data = " + data + " = 0x" + data.toString(16) + " = 0b" + data.toString(2);
+    }
+
+//        else {
+//            StringBuilder dataString = new StringBuilder();
+//            dataString.append("[ ");
+//            StringBuilder binString = new StringBuilder();
+//            for (int i = data.length - 1; i >= 0; i--) {
+//                dataString.append(Long.toString(data[i])).append(" ");
+//                binString.append(Long.toBinaryString(data[i])).append(" ");
+//            }
+//            return "BitStream, length = " + length + ", data = " + dataString + "] = " + binString;
+//    }
+
+    BitStream() {
+        data = BigInteger.ZERO;
+        length = 0;
+    }
+
+    BitStream(BitField bitField, NameEngine nameEngine, GeneralSpec generalSpec)
+            throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        if (bitField instanceof InfiniteBitField)
+            throw new IncompatibleArgumentException("Infinite bitfields cannot be converted to BitStreams.");
+
+        data = BigInteger.valueOf(generalSpec.getBitDirection() == BitDirection.msb
+                    ? bitField.toNumber(nameEngine)
+                    : IrpUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine)));
+        length = bitField.getWidth(nameEngine);
+
     }
 
 //    public BitStream(Protocol env) {
@@ -51,11 +70,17 @@ public class BitStream extends IrStreamItem {
 //        add(bitField, environment.getBitDirection(), nameEngine);
 //    }
 
-//    public void add(BitField bitField, BitDirection bitDirection, NameEngine nameEngine) throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+    void add(BitStream bitStream, NameEngine nameEngine, GeneralSpec generalSpec) {
+        data = data.shiftLeft((int)bitStream.length).or(bitStream.data);
+        length += bitStream.length;
+    }
+
+//    public void add(BitField bitField, NameEngine nameEngine, GeneralSpec generalSpec)
+//            throws IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
 //        if (bitField instanceof InfiniteBitField)
 //            throw new IncompatibleArgumentException("Infinite bitfields cannot be converted to bitstreams.");
 //
-//        long newData = this.environment.getBitDirection() == BitDirection.msb
+//        long newData = generalSpec.getBitDirection() == BitDirection.msb
 //                    ? bitField.toNumber(nameEngine)
 //                    : IrpUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine));
 //        length += bitField.getWidth(nameEngine);
@@ -92,10 +117,11 @@ public class BitStream extends IrStreamItem {
             throw new IndexOutOfBoundsException("Illegal bit " + n + " in getChunkNo");
         // If a chunk goes over the data[] limits, this has to be implemented extra.
         // I have more interesting thing to do :-)
-        if (((n+1)*chunksize-1)/Long.SIZE != (n*chunksize)/Long.SIZE)
-            throw new RuntimeException("Case not implemented");
-        int chunk = (int)(data[n*chunksize/Long.SIZE] >> n*chunksize) & ((1 << chunksize)- 1);
-        return chunk;
+        //if (((n+1)*chunksize-1)/Long.SIZE != (n*chunksize)/Long.SIZE)
+        //    throw new RuntimeException("Case not implemented");
+        //int chunk = (int)(data[n*chunksize/Long.SIZE] >> n*chunksize) & ((1 << chunksize)- 1);
+        int mask = (1 << chunksize)- 1;
+        return data.shiftRight(n*chunksize).intValueExact() & mask;
     }
 
 
@@ -110,10 +136,10 @@ public class BitStream extends IrStreamItem {
         if (length % bitSpec.getChunkSize() != 0)
             throw new IncompatibleArgumentException("chunksize (= " + bitSpec.getChunkSize() + ") does not divide bitstream length (= " + length + ").");
 
-        int noChunks = length/bitSpec.getChunkSize();
+        int noChunks = ((int)length)/bitSpec.getChunkSize();
         for (int n = 0; n < noChunks; n++) {
             int chunkNo = noChunks - n - 1;
-            BareIrStream irs = bitSpec.getBitIrsteam(getChunkNo(chunkNo, bitSpec.getChunkSize()));
+            BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
             EvaluatedIrStream evaluatedIrStream = irs.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
             //List<IrStreamItem> items = irs.evaluate(null);
             //list.addAll(items);

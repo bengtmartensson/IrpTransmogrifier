@@ -19,6 +19,9 @@ package org.harctoolbox.irp;
 import java.util.ArrayList;
 import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -26,7 +29,16 @@ import org.w3c.dom.Element;
  * This class implements BitSpecs, as described in Chapter 7.
  *
  */
-public class BitSpec /*extends IrStreamItem*/ {
+public class BitSpec {
+    private static int noInstances = 0;
+
+    public static void reset() {
+        noInstances = 0;
+    }
+
+    public static int getNoInstances() {
+        return noInstances;
+    }
 
     // Number of bits encoded
     private int chunkSize;
@@ -60,17 +72,27 @@ public class BitSpec /*extends IrStreamItem*/ {
     //}
     */
 
+    public BitSpec(String str) throws IrpSyntaxException, InvalidRepeatException {
+        this(new ParserDriver(str).getParser().bitspec());
+    }
+
     public BitSpec(IrpParser.BitspecContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         this(ctx.bare_irstream());
     }
 
     private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
+        noInstances++;
         chunkSize = computeNoBits(list.size());
-        bitCodes = new ArrayList<>();
+        bitCodes = new ArrayList<>(list.size());
         for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list) {
             BareIrStream bareIrStream = new BareIrStream(bareIrStreamCtx);
             bitCodes.add(bareIrStream);
         }
+    }
+
+    BitSpec() {
+        chunkSize = 0;
+        bitCodes = new ArrayList<>();
     }
 
     /*
@@ -89,7 +111,7 @@ public class BitSpec /*extends IrStreamItem*/ {
         return b;
     }*/
 
-    public BareIrStream getBitIrsteam(int index) throws IncompatibleArgumentException {
+    public BareIrStream get(int index) throws IncompatibleArgumentException {
         if (index >= bitCodes.size())
             throw new IncompatibleArgumentException("Cannot encode " + index + " with current bitspec.");
         return bitCodes.get(index);
@@ -103,7 +125,7 @@ public class BitSpec /*extends IrStreamItem*/ {
 
     @Override
     public String toString() {
-        if (bitCodes == null || bitCodes.isEmpty())
+        if (bitCodes.isEmpty())
             return "<null>";
 
         StringBuilder s = new StringBuilder();
@@ -119,8 +141,58 @@ public class BitSpec /*extends IrStreamItem*/ {
         return chunkSize;
     }
 
-    public boolean isEmpty(NameEngine nameEngine) {
+    public boolean isEmpty() {
         return bitCodes.isEmpty();
+    }
+
+    /**
+     * Checks if the BitSpec is of type <a,-b|c,-d>, for a,b,c,d > 0.
+     * @param nameEngine
+     * @param generalSpec
+     * @return
+     */
+    public boolean isStandardPWM(NameEngine nameEngine, GeneralSpec generalSpec) {
+        if (bitCodes.size() != 2)
+            return false;
+        for (BareIrStream bitCode : bitCodes) {
+            try {
+                // toIrSequence throws exception if not positive, negative
+                IrSequence irSequence = bitCode.evaluate(nameEngine, generalSpec, new BitSpec(), IrSignal.Pass.intro, 0).toIrSequence();
+                if (irSequence.getLength() != 2)
+                    return false;
+            } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the BitSpec is of type <a,-a|-a,a> (a != 0)
+     * @param nameEngine
+     * @param generalSpec
+     * @return
+     */
+    public boolean isStandardBiPhase(NameEngine nameEngine, GeneralSpec generalSpec) {
+        if (bitCodes.size() != 2)
+            return false;
+
+        Double a = null;
+        for (BareIrStream bitCode : bitCodes) {
+            try {
+                EvaluatedIrStream on = bitCode.evaluate(nameEngine, generalSpec, new BitSpec(), IrSignal.Pass.intro, 0);
+                if (on.getLenght() != 2)
+                    return false;
+                if (a == null)
+                    a = on.get(0);
+                if (! (IrCoreUtils.isEqual(a, on.get(0), 1, 0) && IrCoreUtils.isEqual(-a, on.get(1), 1, 0)))
+                    return false;
+                a = -a;
+            } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public Element toElement(Document document) {
@@ -130,7 +202,7 @@ public class BitSpec /*extends IrStreamItem*/ {
         return root;
     }
 
-    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+//    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
+//        throw new UnsupportedOperationException("Not supported yet.");
+//    }
 }

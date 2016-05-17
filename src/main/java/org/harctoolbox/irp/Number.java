@@ -23,6 +23,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  *
  */
 public class Number extends PrimaryItem {
+    //public final static int SIZE = Integer.MAX_VALUE;
+    //BigInteger data;
+
+    public final static int SIZE = Long.SIZE;
     long data;
 
     public Number(long n) {

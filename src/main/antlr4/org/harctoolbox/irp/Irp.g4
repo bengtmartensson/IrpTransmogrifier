@@ -109,10 +109,10 @@ bitfield:
 
 // abstract class PrimaryItem implements Numerical
 primary_item:
-          name          # name_asitem
-        | DOLLAR_ID     # DOLLAR_ID_asitem
-	| number        # number_asitem
-	| expression    # expression_asitem
+          name              # name_asitem
+        | DOLLAR_ID         # DOLLAR_ID_asitem
+	| number            # number_asitem
+	| para_expression   # expression_asitem
 ;
 
 // 6.2
@@ -159,12 +159,12 @@ bitspec_irstream:
 
 // 9.2
 // class Expression implements Numerical, InfixCode
-expression:
-        '(' bare_expression ')'
+para_expression:            // was previously called expression
+        '(' expression ')'
 ;
 
 // Following rules were rewritten to avoid left recursion
-bare_expression:
+expression:                 // was previously called bare_expression
         inclusive_or_expression
 ;
 
@@ -219,12 +219,12 @@ definitions_list:
 ;
 
 definition:
-	name '=' bare_expression
+	name '=' expression
 ;
 
 // 11.2
 assignment:
-        name '=' bare_expression
+        name '=' expression
 ;
 
 // 12.2
@@ -269,8 +269,8 @@ parameter_specs:
 
 // class ParameterSpec
 parameter_spec:
-	   name      ':' INT '.' '.' INT ('=' bare_expression)? # memorylessParameterSpec
-	|  name  '@' ':' INT '.' '.' INT  '=' bare_expression   # memoryfullParameterSpec
+	   name      ':' INT '.' '.' INT ('=' expression)? # memorylessParameterSpec
+	|  name  '@' ':' INT '.' '.' INT  '=' expression   # memoryfullParameterSpec
 ;
 
 // class FloatNumber implements Floatable

@@ -38,7 +38,7 @@ public class Expression extends PrimaryItem {
     private static JCommander argumentParser;
 
     //private static boolean debug;
-    private IrpParser.Bare_expressionContext parseTree;
+    private IrpParser.ExpressionContext parseTree;
     private static final String expfunctionName = "powl";
 
     /**
@@ -60,18 +60,18 @@ public class Expression extends PrimaryItem {
     }
 
     Expression(ParserDriver parserDriver) throws IrpSyntaxException {
-        this(parserDriver.getParser().bare_expression());
+        this(parserDriver.getParser().expression());
     }
 
-    Expression(IrpParser.ExpressionContext ctx) {
-        this(ctx.bare_expression());
-    }
-
-    Expression(IrpParser.Expression_asitemContext ctx) {
+    Expression(IrpParser.Para_expressionContext ctx) {
         this(ctx.expression());
     }
 
-    Expression(IrpParser.Bare_expressionContext ctx) {
+    Expression(IrpParser.Expression_asitemContext ctx) {
+        this(ctx.para_expression());
+    }
+
+    Expression(IrpParser.ExpressionContext ctx) {
         this.parseTree = ctx;
     }
 
@@ -89,7 +89,7 @@ public class Expression extends PrimaryItem {
 //        return toInfixCode(parseTree);
 //    }
 
-    private long toNumber(IrpParser.Bare_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    private long toNumber(IrpParser.ExpressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         return toNumber(ctx.inclusive_or_expression(), nameEngine);
     }
 
@@ -259,7 +259,7 @@ public class Expression extends PrimaryItem {
     /**
      * @return the parseTree
      */
-    public IrpParser.Bare_expressionContext getParseTree() {
+    public IrpParser.ExpressionContext getParseTree() {
         return parseTree;
     }
 
@@ -328,7 +328,7 @@ public class Expression extends PrimaryItem {
         try {
             String text = IrpUtils.join(commandLineArgs.expression, "");
             IrpParser parser = new ParserDriver(text).getParser();
-            Expression expression = new Expression(parser.bare_expression());
+            Expression expression = new Expression(parser.expression());
             if (!parser.isMatchedEOF()) {
                 System.err.println("Did not match all input");
                 System.exit(IrpUtils.exitFatalProgramFailure);

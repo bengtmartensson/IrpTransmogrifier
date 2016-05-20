@@ -32,10 +32,10 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     public Assignment(IrpParser.AssignmentContext assignment) {
-        this(assignment.name(), assignment.bare_expression());
+        this(assignment.name(), assignment.expression());
     }
 
-    public Assignment(IrpParser.NameContext name, IrpParser.Bare_expressionContext be) {
+    public Assignment(IrpParser.NameContext name, IrpParser.ExpressionContext be) {
         this(new Name(name), new Expression(be));
     }
 

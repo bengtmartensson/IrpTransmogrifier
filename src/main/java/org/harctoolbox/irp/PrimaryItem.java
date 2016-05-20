@@ -30,7 +30,7 @@ public abstract class PrimaryItem implements Numerical {
                 ? new Name(((IrpParser.DOLLAR_ID_asitemContext) ctx).getText())
                 : (ctx instanceof IrpParser.Number_asitemContext)
                 ? new Number(((IrpParser.Number_asitemContext) ctx).number())
-                : new Expression(((IrpParser.Expression_asitemContext) ctx).expression());
+                : new Expression(((IrpParser.Expression_asitemContext) ctx).para_expression());
     }
 
     protected PrimaryItem() {

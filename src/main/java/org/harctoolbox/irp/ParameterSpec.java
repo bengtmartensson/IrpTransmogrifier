@@ -29,7 +29,7 @@ public class ParameterSpec {
     private long min;
     private long max;
     //private Expression defaultValue;
-    private IrpParser.Bare_expressionContext deflt;
+    private IrpParser.ExpressionContext deflt;
     private boolean memory = false;
 
     public String toString(IrpParser parser) {
@@ -61,7 +61,7 @@ public class ParameterSpec {
         this(name, min, max, false);
     }
 
-    public ParameterSpec(String name, int min, int max, boolean memory, IrpParser.Bare_expressionContext deflt) {
+    public ParameterSpec(String name, int min, int max, boolean memory, IrpParser.ExpressionContext deflt) {
         this.name = name;
         this.min = min;
         this.max = max;
@@ -70,7 +70,7 @@ public class ParameterSpec {
     }
 
     public ParameterSpec(String name, int min, int max, boolean memory) {
-        this(name, min, max, memory, (IrpParser.Bare_expressionContext) null);
+        this(name, min, max, memory, (IrpParser.ExpressionContext) null);
     }
 
     /*public ParameterSpec(String name, int min, int max, boolean memory, String bare_expression) {
@@ -118,7 +118,7 @@ public class ParameterSpec {
         name = t.name().ID().getText();//.getChild(0).getText();
         min = Long.parseLong(t.INT(0).getText());
         max = Long.parseLong(t.INT(1).getText());
-        deflt = t.bare_expression();
+        deflt = t.expression();
     }
 
     private void load(IrpParser.MemoryfullParameterSpecContext t) {
@@ -126,7 +126,7 @@ public class ParameterSpec {
         name = t.name().ID().getText();//.getChild(0).getText();
         min = Long.parseLong(t.INT(0).getText());
         max = Long.parseLong(t.INT(1).getText());
-        deflt = t.bare_expression();
+        deflt = t.expression();
     }
 
     public boolean isOK(long x) {

@@ -17,12 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 grammar Irp;
 
-options {
-}
-
-tokens {
-}
-
 // 1.7
 // class Protocol
 // Extension: * instead of ?, parameterspec
@@ -44,10 +38,10 @@ generalspec_list:
 ;
 
 generalspec_item:
-          frequency_item    # frequency
-        | unit_item         # unit
-        | order_item        # byteorder
-        | dutycycle_item    # dutycycle  // Not present by Graham
+          frequency_item
+        | unit_item
+        | order_item
+        | dutycycle_item // Not present by Graham
 ;
 
 frequency_item:
@@ -59,21 +53,21 @@ dutycycle_item:
 ;
 
 unit_item:
-          number_with_decimals 'u'?  # unitInMicroseconds
-        | number_with_decimals 'p'   # unitInPeriods
+          number_with_decimals 'u'?
+        | number_with_decimals 'p'
 ;
 
 // enum BitDirection
 order_item:
-          LSB       # orderLSB
-        | MSB       # orderMSB
+          'lsb'
+        | 'msb'
 ;
 
 // 3.2
 // abstract class Duration implements Numerical
 duration:
-          flash_duration    # flashDuration
-        | gap_duration      # gapDuration
+          flash_duration
+        | gap_duration
 ;
 
 // class Flash extends Duration
@@ -109,10 +103,10 @@ bitfield:
 
 // abstract class PrimaryItem implements Numerical
 primary_item:
-          name              # name_asitem
-        | DOLLAR_ID         # DOLLAR_ID_asitem
-	| number            # number_asitem
-	| para_expression   # expression_asitem
+          name
+        | DOLLAR_ID
+	| number
+	| para_expression
 ;
 
 // 6.2
@@ -129,13 +123,13 @@ bare_irstream:
 
 // abstract class IrStreamItem
 irstream_item:
-          variation         # variation_asitem
-        | bitfield          # bitfield_asitem // must come before duration!
-        | assignment        # assignment_asitem
-        | extent            # extent_asitem
-        | duration          # duration_asitem
-        | irstream          # irstream_asitem
-        | bitspec_irstream  # bitspec_irstream_asitem
+          variation
+        | bitfield  // must come before duration!
+        | assignment
+        | extent
+        | duration
+        | irstream
+        | bitspec_irstream
 ;
 
 // 7.4
@@ -163,48 +157,24 @@ para_expression:            // was previously called expression
         '(' expression ')'
 ;
 
-// Following rules were rewritten to avoid left recursion
 expression:                 // was previously called bare_expression
-        inclusive_or_expression
-;
-
-inclusive_or_expression	:
-        exclusive_or_expression ('|' exclusive_or_expression)*
-;
-
-exclusive_or_expression:
-	and_expression ('^' and_expression)*
-;
-
-and_expression:
-        shift_expression ('&' shift_expression)*
-;
-
-// Extension: not present by Graham or by John Fine
-shift_expression:
-        additive_expression (('<' '<' | '>' '>')  additive_expression)*
-;
-
-additive_expression:
-        multiplicative_expression (('+' | '-')  multiplicative_expression)*
-;
-
-multiplicative_expression:
-        exponential_expression ( ('*' | '/' | '%')  exponential_expression)*
-;
-
-exponential_expression:
-        unary_expression ('**' unary_expression)*
-;
-
-// class UnaryExpression implements Numeric, InfixCode
-unary_expression:
-        bitfield            # bitfield_expression
-        | primary_item      # primary_item_expression
-        | '-' bitfield      # minus_bitfield_expresson
-        | '-' primary_item  # minus_primary_item_expression
-        | '#' bitfield      # count_bitfield_expression
-        | '#' primary_item  # count_primary_item_expression
+                    primary_item
+    |               bitfield
+    |               '!'             expression
+    |               '-'             expression
+    |               '#'             expression
+    | <assoc=right> expression '**'                 expression
+    |               expression ('*' | '/' | '%')    expression
+    |               expression ('+' | '-')          expression
+    |               expression ('<<' | '>>')        expression
+    |               expression ('<=' | '>=' | '>' | '<') expression
+    |               expression ('==' | '!=')        expression
+    |               expression '&'                  expression
+    |               expression '^'                  expression
+    |               expression '|'                  expression
+    |               expression '&&'                 expression
+    |               expression '||'                 expression
+    | <assoc=right> expression '?'                  expression ':' expression
 ;
 
 // 10.2
@@ -244,8 +214,8 @@ number:
 
 // class numberWithDecimals extends Floatable
 number_with_decimals:
-        INT             # integerAsFloat
-      | float_number    # float
+        INT
+      | float_number
 ;
 
 // Due to the lexer, have to take special precautions to allow name-s
@@ -275,18 +245,9 @@ parameter_spec:
 
 // class FloatNumber implements Floatable
 float_number:
-           '.' INT         # dotInt
-	|   INT '.' INT    # intDotInt
+           '.' INT
+	|   INT '.' INT
 ;
-
-LSB:        'lsb';
-MSB:        'msb';
-ADD:        '+';
-SUB:        '-';
-MUL:        '*';
-DIV:        '/';
-PERCENT:    '%';
-EXP:        '**';
 
 // Extension: Here allow C syntax identifiers;
 // Graham allowed only one letter capitals.

@@ -67,9 +67,9 @@ public class Expression extends PrimaryItem {
         this(ctx.expression());
     }
 
-    Expression(IrpParser.Expression_asitemContext ctx) {
-        this(ctx.para_expression());
-    }
+//    Expression(IrpParser.Expression_asitemContext ctx) {
+//        this(ctx.para_expression());
+//    }
 
     Expression(IrpParser.ExpressionContext ctx) {
         this.parseTree = ctx;
@@ -90,20 +90,91 @@ public class Expression extends PrimaryItem {
 //    }
 
     private long toNumber(IrpParser.ExpressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        return toNumber(ctx.inclusive_or_expression(), nameEngine);
+        int noChilden = ctx.getChildCount();
+        return noChilden == 1
+                ? toNumberPrimary(ctx.getChild(0), nameEngine)
+                : noChilden == 2 ? toNumberUnary(ctx.getChild(0).getText(), (IrpParser.ExpressionContext)ctx.getChild(1), nameEngine)
+                : noChilden == 3 ? toNumberBinary((IrpParser.ExpressionContext) ctx.getChild(0), ctx.getChild(1).getText(),
+                        (IrpParser.ExpressionContext) ctx.getChild(2), nameEngine)
+                : noChilden == 5 ? toNumberTernary((IrpParser.ExpressionContext) ctx.getChild(0), (IrpParser.ExpressionContext) ctx.getChild(2),
+                        (IrpParser.ExpressionContext) ctx.getChild(4), nameEngine)
+                : throwNewRuntimeException();
     }
+
+    private long toNumberPrimary(ParseTree child, NameEngine nameEngine) throws IrpSyntaxException, IncompatibleArgumentException, UnassignedException {
+        return child instanceof IrpParser.Primary_itemContext
+                ? newPrimaryItem((IrpParser.Primary_itemContext) child).toNumber(nameEngine)
+                : child instanceof IrpParser.BitfieldContext ? BitField.newBitField((IrpParser.BitfieldContext) child).toNumber(nameEngine)
+                : throwNewRuntimeException();
+    }
+
+    private long toNumberUnary(String operator, IrpParser.ExpressionContext expressionContext, NameEngine nameEngine)
+            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        long operand = new Expression(expressionContext).toNumber(nameEngine);
+        return operator.equals("!") ? (operand == 0L ? 1L : 0L)
+                : operator.equals("#") ? Long.bitCount(operand)
+                : operator.equals("-") ? - operand
+                : throwNewRuntimeException();
+    }
+
+    private long toNumberBinary(IrpParser.ExpressionContext expressionContext, String operator,
+            IrpParser.ExpressionContext expressionContext0, NameEngine nameEngine)
+            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        long left = new Expression(expressionContext).toNumber(nameEngine);
+        long right = new Expression(expressionContext0).toNumber(nameEngine);
+
+        return    operator.equals("**") ? IrpUtils.power(left, right)
+                : operator.equals("*")  ? left * right
+                : operator.equals("/")  ? left / right
+                : operator.equals("%")  ? left % right
+                : operator.equals("+")  ? left + right
+                : operator.equals("-")  ? left - right
+                : operator.equals("<<") ? left << right
+                : operator.equals(">>") ? left >> right
+                : operator.equals("<=") ? cBinary(left <= right)
+                : operator.equals(">=") ? cBinary(left >= right)
+                : operator.equals("<")  ? cBinary(left < right)
+                : operator.equals(">")  ? cBinary(left > right)
+                : operator.equals("==") ? cBinary(left == right)
+                : operator.equals("!=") ? cBinary(left != right)
+                : operator.equals("&")  ? left & right
+                : operator.equals("|")  ? left | right
+                : operator.equals("&&") ? (left != 0 ? right : 0L)
+                : operator.equals("||") ? (left != 0 ? left : right)
+                : throwNewRuntimeException();
+    }
+
+    private long toNumberTernary(IrpParser.ExpressionContext expressionContext, IrpParser.ExpressionContext trueExpContext,
+            IrpParser.ExpressionContext falseExpContext, NameEngine nameEngine)
+            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        long ctrl = new Expression(expressionContext).toNumber(nameEngine);
+        return ctrl = new Expression(ctrl != 0L ? trueExpContext : falseExpContext).toNumber(nameEngine);
+    }
+
+    private long throwNewRuntimeException() {
+        throw new RuntimeException("This cannot happen");
+    }
+
+    private long cBinary(long x) {
+        return x != 0L ? 1L : 0L;
+    }
+
+    private long cBinary(boolean x) {
+        return x ? 1L : 0L;
+    }
+
 
 //    private String toInfixCode(IrpParser.Bare_expressionContext ctx) throws IrpSyntaxException {
 //        return toInfixCode(ctx.inclusive_or_expression());
 //    }
 
-    private long toNumber(IrpParser.Inclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long result = 0L;
-        for (IrpParser.Exclusive_or_expressionContext expr : ctx.exclusive_or_expression())
-            result |= toNumber(expr, nameEngine);
-
-        return result;
-    }
+//    private long toNumber(IrpParser.Inclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        long result = 0L;
+//        for (IrpParser.Exclusive_or_expressionContext expr : ctx.exclusive_or_expression())
+//            result |= toNumber(expr, nameEngine);
+//
+//        return result;
+//    }
 
 //    private String toInfixCode(IrpParser.Inclusive_or_expressionContext ctx) throws IrpSyntaxException {
 //        StringBuilder sb = new StringBuilder();
@@ -115,13 +186,13 @@ public class Expression extends PrimaryItem {
 //        return sb.toString();
 //    }
 
-    private long toNumber(IrpParser.Exclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long result = 0L;
-        for (IrpParser.And_expressionContext expr : ctx.and_expression())
-            result ^= toNumber(expr, nameEngine);
-
-        return result;
-    }
+//    private long toNumber(IrpParser.Exclusive_or_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        long result = 0L;
+//        for (IrpParser.And_expressionContext expr : ctx.and_expression())
+//            result ^= toNumber(expr, nameEngine);
+//
+//        return result;
+//    }
 
 //    private String toInfixCode(IrpParser.Exclusive_or_expressionContext ctx) throws IrpSyntaxException {
 //        StringBuilder sb = new StringBuilder();
@@ -133,13 +204,13 @@ public class Expression extends PrimaryItem {
 //        return sb.toString();
 //    }
 
-    private long toNumber(IrpParser.And_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long result = -1L;
-        for (IrpParser.Shift_expressionContext expr : ctx.shift_expression()) {
-            result &= toNumber(expr, nameEngine);
-        }
-        return result;
-    }
+//    private long toNumber(IrpParser.And_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        long result = -1L;
+//        for (IrpParser.Shift_expressionContext expr : ctx.shift_expression()) {
+//            result &= toNumber(expr, nameEngine);
+//        }
+//        return result;
+//    }
 
 //    private String toInfixCode(IrpParser.And_expressionContext ctx) throws IrpSyntaxException {
 //        StringBuilder sb = new StringBuilder();
@@ -151,18 +222,18 @@ public class Expression extends PrimaryItem {
 //        return sb.toString();
 //    }
 
-    private long toNumber(IrpParser.Shift_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long result = toNumber(ctx.additive_expression(0), nameEngine);
-        for (int i = 1; i < ctx.children.size(); i++) {
-            ParseTree x = ctx.children.get(i);
-            if (x instanceof IrpParser.Additive_expressionContext) {
-                long op = toNumber((IrpParser.Additive_expressionContext) x, nameEngine);
-                result = (ctx.children.get(i - 1).getText().charAt(0) == '<')
-                        ? result << op : result >> op;
-            }
-        }
-        return result;
-    }
+//    private long toNumber(IrpParser.Shift_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        long result = toNumber(ctx.additive_expression(0), nameEngine);
+//        for (int i = 1; i < ctx.children.size(); i++) {
+//            ParseTree x = ctx.children.get(i);
+//            if (x instanceof IrpParser.Additive_expressionContext) {
+//                long op = toNumber((IrpParser.Additive_expressionContext) x, nameEngine);
+//                result = (ctx.children.get(i - 1).getText().charAt(0) == '<')
+//                        ? result << op : result >> op;
+//            }
+//        }
+//        return result;
+//    }
 
 //    private String toInfixCode(IrpParser.Shift_expressionContext ctx) throws IrpSyntaxException {
 //        StringBuilder sb = new StringBuilder();
@@ -174,20 +245,20 @@ public class Expression extends PrimaryItem {
 //        return sb.toString();
 //    }
 
-    private long toNumber(IrpParser.Additive_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long result = 0L;
-        for (int i = 0; i < ctx.children.size(); i++) {
-            ParseTree x = ctx.children.get(i);
-            if (x instanceof IrpParser.Multiplicative_expressionContext) {
-                long op = toNumber((IrpParser.Multiplicative_expressionContext) x, nameEngine);
-                if (i == 0 || ctx.children.get(i - 1).getText().charAt(0) == '+')
-                    result += op;
-                else
-                    result -= op;
-            }
-        }
-        return result;
-    }
+//    private long toNumber(IrpParser.Additive_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        long result = 0L;
+//        for (int i = 0; i < ctx.children.size(); i++) {
+//            ParseTree x = ctx.children.get(i);
+//            if (x instanceof IrpParser.Multiplicative_expressionContext) {
+//                long op = toNumber((IrpParser.Multiplicative_expressionContext) x, nameEngine);
+//                if (i == 0 || ctx.children.get(i - 1).getText().charAt(0) == '+')
+//                    result += op;
+//                else
+//                    result -= op;
+//            }
+//        }
+//        return result;
+//    }
 
 //    private String toInfixCode(IrpParser.Additive_expressionContext ctx) throws IrpSyntaxException {
 //        StringBuilder sb = new StringBuilder();
@@ -200,20 +271,20 @@ public class Expression extends PrimaryItem {
 //        return sb.toString();
 //    }
 
-    private long toNumber(IrpParser.Multiplicative_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long result = 1L;
-        for (int i = 0; i < ctx.children.size(); i++) {
-            ParseTree x = ctx.children.get(i);
-            if (x instanceof IrpParser.Exponential_expressionContext) {
-                long op = toNumber((IrpParser.Exponential_expressionContext) x, nameEngine);
-                if (i == 0 || ctx.children.get(i - 1).getText().charAt(0) == '*')
-                    result *= op;
-                else
-                    result /= op;
-            }
-        }
-        return result;
-    }
+//    private long toNumber(IrpParser.Multiplicative_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        long result = 1L;
+//        for (int i = 0; i < ctx.children.size(); i++) {
+//            ParseTree x = ctx.children.get(i);
+//            if (x instanceof IrpParser.Exponential_expressionContext) {
+//                long op = toNumber((IrpParser.Exponential_expressionContext) x, nameEngine);
+//                if (i == 0 || ctx.children.get(i - 1).getText().charAt(0) == '*')
+//                    result *= op;
+//                else
+//                    result /= op;
+//            }
+//        }
+//        return result;
+//    }
 
 //    private String toInfixCode(IrpParser.Multiplicative_expressionContext ctx) throws IrpSyntaxException {
 //        StringBuilder sb = new StringBuilder();
@@ -227,17 +298,17 @@ public class Expression extends PrimaryItem {
 //    }
 
     // Note: exponentiation is right-associative, so we evaluate the arguments in descending  order
-    private long toNumber(IrpParser.Exponential_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        List<IrpParser.Unary_expressionContext> children = ctx.unary_expression();
-        //long result = toNumber(children.get(children.size() - 1), nameEngine);
-        UnaryExpression unaryExpession = new UnaryExpression(children.get(children.size()-1));
-        long result = unaryExpession.toNumber(nameEngine);
-        for (int i = children.size() - 2; i >= 0; i--) {
-            unaryExpession = new UnaryExpression(children.get(i));
-            result = IrpUtils.power(unaryExpession.toNumber(nameEngine), result);
-        }
-        return result;
-    }
+//    private long toNumber(IrpParser.Exponential_expressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+//        List<IrpParser.Unary_expressionContext> children = ctx.unary_expression();
+//        //long result = toNumber(children.get(children.size() - 1), nameEngine);
+//        UnaryExpression unaryExpession = new UnaryExpression(children.get(children.size()-1));
+//        long result = unaryExpession.toNumber(nameEngine);
+//        for (int i = children.size() - 2; i >= 0; i--) {
+//            unaryExpession = new UnaryExpression(children.get(i));
+//            result = IrpUtils.power(unaryExpession.toNumber(nameEngine), result);
+//        }
+//        return result;
+//    }
 
 //    private String toInfixCode(IrpParser.Exponential_expressionContext ctx) throws IrpSyntaxException {
 //        StringBuilder sb = new StringBuilder();
@@ -329,10 +400,10 @@ public class Expression extends PrimaryItem {
             String text = IrpUtils.join(commandLineArgs.expression, "");
             IrpParser parser = new ParserDriver(text).getParser();
             Expression expression = new Expression(parser.expression());
-            if (!parser.isMatchedEOF()) {
-                System.err.println("Did not match all input");
-                System.exit(IrpUtils.exitFatalProgramFailure);
-            }
+            //if (!parser.isMatchedEOF()) {
+            //    System.err.println("Did not match all input");
+            //    System.exit(IrpUtils.exitFatalProgramFailure);
+            //}
             NameEngine nameEngine = new NameEngine(commandLineArgs.names);
             long result = expression.toNumber(nameEngine);
             System.out.println(result);
@@ -344,7 +415,7 @@ public class Expression extends PrimaryItem {
 
                 // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
                 TreeViewer tv = new TreeViewer(ruleNames, expression.getParseTree());
-                showTreeViewer(tv, text);
+                showTreeViewer(tv, text+"="+result);
             }
         } catch (ParseCancellationException | IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
             System.err.println(ex);

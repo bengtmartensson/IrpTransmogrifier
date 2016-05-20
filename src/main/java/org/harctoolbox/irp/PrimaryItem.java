@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+
 /**
  *
  */
@@ -24,13 +26,14 @@ public abstract class PrimaryItem implements Numerical {
     //private Numerical data; // Number, Name, or Expression
 
     public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) throws IrpSyntaxException {
-        return (ctx instanceof IrpParser.Name_asitemContext)
-                ? new Name(((IrpParser.Name_asitemContext) ctx).name())
-                : (ctx instanceof IrpParser.DOLLAR_ID_asitemContext)
-                ? new Name(((IrpParser.DOLLAR_ID_asitemContext) ctx).getText())
-                : (ctx instanceof IrpParser.Number_asitemContext)
-                ? new Number(((IrpParser.Number_asitemContext) ctx).number())
-                : new Expression(((IrpParser.Expression_asitemContext) ctx).para_expression());
+        ParseTree child = ctx.getChild(0);
+        return (child instanceof IrpParser.NameContext)
+                ? new Name((IrpParser.NameContext) child)
+                : (child instanceof IrpParser.NumberContext)
+                ? new Number((IrpParser.NumberContext) child)
+                : (child instanceof IrpParser.Para_expressionContext)
+                ? new Expression((IrpParser.Para_expressionContext) child)
+                : new Name(child.getText());
     }
 
     protected PrimaryItem() {

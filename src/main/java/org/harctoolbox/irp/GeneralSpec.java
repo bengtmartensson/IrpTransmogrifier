@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -98,20 +99,21 @@ public class GeneralSpec {
 
     public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException {
         double unitInPeriods = -1f;
-        for (IrpParser.Generalspec_itemContext item : ctx.generalspec_item()) {
-            if (item instanceof IrpParser.FrequencyContext) {
-                double kHz = NumberWithDecimals.parse(((IrpParser.FrequencyContext) item).frequency_item().number_with_decimals());
+        for (IrpParser.Generalspec_itemContext node : ctx.generalspec_item()) {
+            ParseTree item = node.getChild(0);
+            if (item instanceof IrpParser.Frequency_itemContext) {
+                double kHz = NumberWithDecimals.parse(((IrpParser.Frequency_itemContext) item).number_with_decimals());
                 frequency = IrCoreUtils.khz2Hz(kHz);
-            } else if (item instanceof IrpParser.UnitContext) {
-                IrpParser.Unit_itemContext unitItem = ((IrpParser.UnitContext) item).unit_item();
-                if (unitItem instanceof IrpParser.UnitInMicrosecondsContext)
-                    unit = NumberWithDecimals.parse(((IrpParser.UnitInMicrosecondsContext) unitItem).number_with_decimals());
+            } else if (item instanceof IrpParser.Unit_itemContext) {
+                IrpParser.Unit_itemContext unitItem = (IrpParser.Unit_itemContext) item;
+                if (unitItem.getChildCount() == 1 || unitItem.getChild(1).getText().equals("u"))
+                    unit = NumberWithDecimals.parse(unitItem.number_with_decimals());
                 else
-                    unitInPeriods = NumberWithDecimals.parse(((IrpParser.UnitInPeriodsContext) unitItem).number_with_decimals());
-            } else if (item instanceof IrpParser.DutycycleContext) {
-                dutyCycle = IrCoreUtils.percent2real(NumberWithDecimals.parse(((IrpParser.DutycycleContext) item).dutycycle_item().number_with_decimals()));
-            } else if (item instanceof IrpParser.ByteorderContext) {
-                bitDirection = ((IrpParser.ByteorderContext) item).order_item() instanceof IrpParser.OrderLSBContext
+                    unitInPeriods = NumberWithDecimals.parse(unitItem.number_with_decimals());
+            } else if (item instanceof IrpParser.Dutycycle_itemContext) {
+                dutyCycle = IrCoreUtils.percent2real(NumberWithDecimals.parse(((IrpParser.Dutycycle_itemContext) item).number_with_decimals()));
+            } else if (item instanceof IrpParser.Order_itemContext) {
+                bitDirection = ((IrpParser.Order_itemContext) item).getText().equals("lsb")
                         ? BitDirection.lsb : BitDirection.msb;
             }
         }

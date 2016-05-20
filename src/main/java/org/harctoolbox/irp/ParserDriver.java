@@ -34,6 +34,8 @@ public class ParserDriver {
         tokens = new CommonTokenStream(lexer);
         parser = new IrpParser(tokens);
         parser.setErrorHandler(new ErrorStrategy());
+        RepeatMarker.reset();
+        Extent.reset();
     }
 
     public String toStringTree() {

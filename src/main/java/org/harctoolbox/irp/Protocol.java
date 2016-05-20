@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -89,15 +90,22 @@ public class Protocol {
      * @throws org.harctoolbox.irp.InvalidRepeatException
      */
     public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
+        if (irpString == null)
+            throw new NullPointerException("IrpString cannot be null");
+
         this.irpString = irpString;
         //this.nameEngine = new NameEngine();
 
-        parseDriver = new ParserDriver(irpString);
-        parseTree = parseDriver.getParser().protocol();
+        try {
+            parseDriver = new ParserDriver(irpString);
+            parseTree = parseDriver.getParser().protocol();
 
-        generalSpec = new GeneralSpec(parseTree);
-        bitspecIrstream = new BitspecIrstream(parseTree);
-        parameterSpecs = new ParameterSpecs(parseTree);
+            generalSpec = new GeneralSpec(parseTree);
+            bitspecIrstream = new BitspecIrstream(parseTree);
+            parameterSpecs = new ParameterSpecs(parseTree);
+        } catch (ParseCancellationException ex) {
+            throw new IrpSyntaxException(ex);
+        }
 
         if (parameterSpecs.isEmpty()) {
             logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");

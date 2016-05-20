@@ -103,7 +103,8 @@ public class IrStream extends BareIrStream {
 
     public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         super(ctx.bare_irstream());
-        repeatMarker = new RepeatMarker(ctx.repeat_marker()); // FIXME
+        IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
+        repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : null;
     }
 
     @Override

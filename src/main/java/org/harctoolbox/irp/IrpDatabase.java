@@ -325,6 +325,9 @@ public class IrpDatabase {
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file")
         private String configfile = "src/main/config/IrpProtocols.ini";
 
+        @Parameter(names = {"-p", "--parse"}, description = "Test parse the protocol(s)")
+        private boolean parse = false;
+
         @Parameter(description = "Protocols")
         private List<String> protocols = new ArrayList<>();
     }
@@ -357,13 +360,19 @@ public class IrpDatabase {
             IrpDatabase db = new IrpDatabase(commandLineArgs.configfile);
             System.out.println("Version: " + db.getConfigFileVersion());
             if (commandLineArgs.protocols.isEmpty()) {
-                for (String proto : db.getNames())
+                for (String proto : db.getNames()) {
                     System.out.println(proto);
+                    if (commandLineArgs.parse)
+                        new Protocol(db.getIrp(proto));
+                }
             } else {
-                for (String proto : commandLineArgs.protocols)
+                for (String proto : commandLineArgs.protocols) {
                     db.dump("-", proto);
+                    if (commandLineArgs.parse)
+                        new Protocol(db.getIrp(proto));
+                }
             }
-        } catch (FileNotFoundException | IncompatibleArgumentException ex) {
+        } catch (FileNotFoundException | IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }

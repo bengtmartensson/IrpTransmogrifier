@@ -70,6 +70,28 @@ public class IrpUtils {
     /**
      * Joins the Strings in the second argument, starting at the first argument, separating them with the third argument.
      *
+     * @param iterable Iterable over strings to be joined
+     * @param separator
+     * @return String
+     */
+
+    public static String join(Iterable<String> iterable, String separator) {
+        if (iterable == null)
+            return "";
+
+        StringBuilder res = new StringBuilder();
+        for (String str : iterable) {
+            if (res.length() > 0)
+                res.append(separator);
+            res.append(str);
+        }
+
+        return res.toString();
+    }
+
+    /**
+     * Joins the Strings in the second argument, starting at the first argument, separating them with the third argument.
+     *
      * @param beg Index of first argument to consider,
      * @param s Array of strings to be joined
      * @param separator

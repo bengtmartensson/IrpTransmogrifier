@@ -34,6 +34,9 @@ public class ParserDriver {
         tokens = new CommonTokenStream(lexer);
         parser = new IrpParser(tokens);
         parser.setErrorHandler(new ErrorStrategy());
+    }
+
+    public static void reset() {
         RepeatMarker.reset();
         Extent.reset();
     }

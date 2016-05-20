@@ -42,8 +42,10 @@ public class NameEngine {
 
     public NameEngine(String str) throws IrpSyntaxException {
         this();
-        ParserDriver parserDriver = new ParserDriver(str);
-        parseDefinitions(parserDriver.getParser().definitions());
+        if (str != null && !str.isEmpty()) {
+            ParserDriver parserDriver = new ParserDriver(str);
+            parseDefinitions(parserDriver.getParser().definitions());
+        }
     }
 
     private void define(String name, String value) throws IrpSyntaxException {

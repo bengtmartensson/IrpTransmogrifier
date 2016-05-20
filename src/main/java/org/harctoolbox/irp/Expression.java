@@ -16,9 +16,16 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import org.antlr.v4.gui.TreeViewer;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
@@ -27,6 +34,8 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
  * An expression is evaluated during execution time with the current name bindings.
  */
 public class Expression extends PrimaryItem {
+
+    private static JCommander argumentParser;
 
     //private static boolean debug;
     private IrpParser.Bare_expressionContext parseTree;
@@ -64,6 +73,10 @@ public class Expression extends PrimaryItem {
 
     Expression(IrpParser.Bare_expressionContext ctx) {
         this.parseTree = ctx;
+    }
+
+    public long toNumber() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        return toNumber(parseTree, new NameEngine());
     }
 
     @Override
@@ -219,7 +232,7 @@ public class Expression extends PrimaryItem {
         //long result = toNumber(children.get(children.size() - 1), nameEngine);
         UnaryExpression unaryExpession = new UnaryExpression(children.get(children.size()-1));
         long result = unaryExpession.toNumber(nameEngine);
-        for (int i = children.size() - 2; i >= 0; i++) {
+        for (int i = children.size() - 2; i >= 0; i--) {
             unaryExpession = new UnaryExpression(children.get(i));
             result = IrpUtils.power(unaryExpession.toNumber(nameEngine), result);
         }
@@ -250,33 +263,91 @@ public class Expression extends PrimaryItem {
         return parseTree;
     }
 
-    private static void usage(int code) {
-        System.out.println("Usage:");
-        System.out.println("\tExpression [-d]? <expression> [<name>=<value>|{<name>=<expression>}]*");
-        System.exit(code);
+    /**
+     * show the given Tree Viewer
+     *
+     * @param tv
+     * @return
+     */
+    public static int showTreeViewer(TreeViewer tv, String title) {
+        JPanel panel = new JPanel();
+        tv.setScale(2);
+        panel.add(tv);
+
+        return JOptionPane.showConfirmDialog(null, panel, title,
+                JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     }
 
-    /**
+//    private static void usage(int code) {
+//        System.out.println("Usage:");
+//        System.out.println("\tExpression [-d]? <expression> [<name>=<value>|{<name>=<expression>}]*");
+//        System.exit(code);
+//    }
+
+    private final static class CommandLineArgs {
+//        @Parameter(names = {"-d", "--debug"}, description = "Debug, not yet implemented")
+//        private int debug = 0;
+
+        @Parameter(names = {"--gui"}, description = "Display parse tree")
+        private boolean gui = false;
+
+        @Parameter(names = {"-h", "?", "--help"}, description = "List options")
+        private boolean help = false;
+
+        @Parameter(names = {"-p", "--parsetree"}, description = "Print parse tree")
+        private boolean parseTree = false;
+
+        @Parameter(names = {"-n", "--nameengine"}, description = "Name engine")
+        private String names = null;
+
+        @Parameter(description = "expression")
+        private List<String> expression = new ArrayList<>();
+    }
+
+   /**
      * Evaluate the argument supplied on the command line, possibly with a name assignment.
-     * @param args: First argument should be the expression to be evaliated, second argument
-     * a name engine initialization string.
      */
     public static void main(String[] args) {
-        if (args.length == 0)
-            usage(IrpUtils.exitUsageError);
-        int arg_i = 0;
-        //if (args[0].equals("-d")) {
-        //    debug = true;
-        //    arg_i++;
-        //}
-        String str = args[arg_i++];
+        CommandLineArgs commandLineArgs = new CommandLineArgs();
+        argumentParser = new JCommander(commandLineArgs);
+        argumentParser.setProgramName("IrpDatabase");
+
         try {
-            Expression expression = new Expression(str);
-            NameEngine nameEngine = arg_i >= args.length - 1 ? new NameEngine(args[arg_i]) : new NameEngine();
+            argumentParser.parse(args);
+        } catch (ParameterException ex) {
+            System.err.println(ex.getMessage());
+            argumentParser.usage();
+            //usage(IrpUtils.exitUsageError);
+        }
+
+        if (commandLineArgs.help || commandLineArgs.expression.isEmpty()) {
+            argumentParser.usage();
+            System.exit(IrpUtils.exitSuccess);
+        }
+
+        try {
+            String text = IrpUtils.join(commandLineArgs.expression, "");
+            IrpParser parser = new ParserDriver(text).getParser();
+            Expression expression = new Expression(parser.bare_expression());
+            if (!parser.isMatchedEOF()) {
+                System.err.println("Did not match all input");
+                System.exit(IrpUtils.exitFatalProgramFailure);
+            }
+            NameEngine nameEngine = new NameEngine(commandLineArgs.names);
             long result = expression.toNumber(nameEngine);
             System.out.println(result);
-        } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
-            Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
+            if (commandLineArgs.parseTree)
+                System.out.println(expression.getParseTree().toStringTree(parser));
+
+            if (commandLineArgs.gui) {
+                List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+
+                // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
+                TreeViewer tv = new TreeViewer(ruleNames, expression.getParseTree());
+                showTreeViewer(tv, text);
+            }
+        } catch (ParseCancellationException | IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
+            System.err.println(ex);
         }
     }
 }

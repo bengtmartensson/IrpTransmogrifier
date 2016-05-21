@@ -143,7 +143,7 @@ bitspec:
 repeat_marker:
 	 '*'
         | '+'
-        | INT '+'?
+        | number '+'?
 ;
 
 // class BitspecIrstream
@@ -210,11 +210,20 @@ alternative:
 // class Number implements Numerical,InfixCode
 number:
         INT
+    | HEXINT
+//  | OCTINT
+    | BININT
+    | 'UINT8_MAX'
+    | 'UINT16_MAX'
+    | 'UINT24_MAX'
+    | 'UINT32_MAX'
+    | 'UINT48_MAX'
+    | 'UINT64_MAX'
 ;
 
 // class numberWithDecimals extends Floatable
 number_with_decimals:
-        INT
+        number
       | float_number
 ;
 
@@ -239,8 +248,8 @@ parameter_specs:
 
 // class ParameterSpec
 parameter_spec:
-	   name      ':' INT '.' '.' INT ('=' expression)? # memorylessParameterSpec
-	|  name  '@' ':' INT '.' '.' INT  '=' expression   # memoryfullParameterSpec
+	   name      ':' number '.' '.' number ('=' expression)?
+	|  name  '@' ':' number '.' '.' number  '=' expression
 ;
 
 // class FloatNumber implements Floatable
@@ -261,6 +270,18 @@ DOLLAR_ID:
 
 INT:
 	( '0' .. '9')+
+;
+
+HEXINT:
+        '0x' ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )+
+;
+
+//OCTINT:
+//        '0' ( '0' .. '7' )*
+//;
+
+BININT:
+        '0b' ( '0' | '1' )+
 ;
 
 // Extension: Not present by Graham.

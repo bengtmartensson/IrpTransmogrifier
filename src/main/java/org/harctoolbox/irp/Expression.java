@@ -28,14 +28,14 @@ import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class corresponds to Chapter 9.
  * An expression is evaluated during execution time with the current name bindings.
  */
 public class Expression extends PrimaryItem {
-
-    private static JCommander argumentParser;
 
     //private static boolean debug;
     private IrpParser.ExpressionContext parseTree;
@@ -63,7 +63,7 @@ public class Expression extends PrimaryItem {
         this(parserDriver.getParser().expression());
     }
 
-    Expression(IrpParser.Para_expressionContext ctx) {
+    public Expression(IrpParser.Para_expressionContext ctx) {
         this(ctx.expression());
     }
 
@@ -71,8 +71,21 @@ public class Expression extends PrimaryItem {
 //        this(ctx.para_expression());
 //    }
 
-    Expression(IrpParser.ExpressionContext ctx) {
+    public Expression(IrpParser.ExpressionContext ctx) {
         this.parseTree = ctx;
+    }
+
+    @Override
+    public String toString() {
+        return toStringTree();
+    }
+
+    public String toStringTree(IrpParser parser) {
+        return parseTree.toStringTree(parser);
+    }
+
+    public String toStringTree() {
+        return parseTree.toStringTree();
     }
 
     public long toNumber() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
@@ -334,6 +347,10 @@ public class Expression extends PrimaryItem {
         return parseTree;
     }
 
+    Element toElement(Document document) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     /**
      * show the given Tree Viewer
      *
@@ -348,6 +365,8 @@ public class Expression extends PrimaryItem {
         return JOptionPane.showConfirmDialog(null, panel, title,
                 JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     }
+
+    private static JCommander argumentParser;
 
 //    private static void usage(int code) {
 //        System.out.println("Usage:");

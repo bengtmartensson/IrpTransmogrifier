@@ -30,8 +30,8 @@ public class Name extends PrimaryItem {
         name = ctx.getText();
     }
 
-    public Name(String name) throws IrpSyntaxException {
-        parse(name); // just to check validity
+    public Name(String name) {
+        //parse(name); // just to check validity
         this.name = name;
     }
 

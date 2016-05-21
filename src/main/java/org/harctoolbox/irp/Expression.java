@@ -144,12 +144,12 @@ public class Expression extends PrimaryItem {
                 : operator.equals("-")  ? left - right
                 : operator.equals("<<") ? left << right
                 : operator.equals(">>") ? left >> right
-                : operator.equals("<=") ? cBinary(left <= right)
-                : operator.equals(">=") ? cBinary(left >= right)
-                : operator.equals("<")  ? cBinary(left < right)
-                : operator.equals(">")  ? cBinary(left > right)
-                : operator.equals("==") ? cBinary(left == right)
-                : operator.equals("!=") ? cBinary(left != right)
+                : operator.equals("<=") ? cBoolean(left <= right)
+                : operator.equals(">=") ? cBoolean(left >= right)
+                : operator.equals("<")  ? cBoolean(left < right)
+                : operator.equals(">")  ? cBoolean(left > right)
+                : operator.equals("==") ? cBoolean(left == right)
+                : operator.equals("!=") ? cBoolean(left != right)
                 : operator.equals("&")  ? left & right
                 : operator.equals("|")  ? left | right
                 : operator.equals("&&") ? (left != 0 ? right : 0L)
@@ -161,18 +161,18 @@ public class Expression extends PrimaryItem {
             IrpParser.ExpressionContext falseExpContext, NameEngine nameEngine)
             throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         long ctrl = new Expression(expressionContext).toNumber(nameEngine);
-        return ctrl = new Expression(ctrl != 0L ? trueExpContext : falseExpContext).toNumber(nameEngine);
+        return new Expression(ctrl != 0L ? trueExpContext : falseExpContext).toNumber(nameEngine);
     }
 
     private long throwNewRuntimeException() {
         throw new RuntimeException("This cannot happen");
     }
 
-    private long cBinary(long x) {
-        return x != 0L ? 1L : 0L;
-    }
+//    private long cBinary(long x) {
+//        return x != 0L ? 1L : 0L;
+//    }
 
-    private long cBinary(boolean x) {
+    private long cBoolean(boolean x) {
         return x ? 1L : 0L;
     }
 
@@ -355,6 +355,7 @@ public class Expression extends PrimaryItem {
      * show the given Tree Viewer
      *
      * @param tv
+     * @param title
      * @return
      */
     public static int showTreeViewer(TreeViewer tv, String title) {
@@ -396,6 +397,7 @@ public class Expression extends PrimaryItem {
 
    /**
      * Evaluate the argument supplied on the command line, possibly with a name assignment.
+     * @param args
      */
     public static void main(String[] args) {
         CommandLineArgs commandLineArgs = new CommandLineArgs();

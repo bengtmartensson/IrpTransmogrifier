@@ -23,7 +23,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
  *
  */
 public abstract class PrimaryItem implements Numerical {
-    //private Numerical data; // Number, Name, or Expression
 
     public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) throws IrpSyntaxException {
         ParseTree child = ctx.getChild(0);
@@ -46,14 +45,4 @@ public abstract class PrimaryItem implements Numerical {
     public static PrimaryItem newPrimaryItem(String name) throws IrpSyntaxException {
         return new Name(name);
     }
-
-//    @Override
-//    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-//        return data.toNumber(nameEngine);
-//    }
-
-//    @Override
-//    public String toInfixCode() throws IrpSyntaxException {
-//        return data.toInfixCode();
-//    }
 }

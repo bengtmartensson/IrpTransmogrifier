@@ -19,9 +19,9 @@ grammar Irp;
 
 // 1.7
 // class Protocol
-// Extension: * instead of ?, parameterspec
+// Extension: * instead of ?, parameter_specs
 protocol:
-        generalspec bitspec_irstream definitions* parameter_specs?
+    generalspec bitspec_irstream definitions* parameter_specs?
 ;
 
 // 2.2, simplified
@@ -29,67 +29,66 @@ protocol:
 // mainstream... Some silly input is not rejected.
 // class GeneralSpec
 generalspec:
-	'{' generalspec_list '}'
+    '{' generalspec_list '}'
 ;
 
 generalspec_list:
-        /* Empty */
-        | generalspec_item (',' generalspec_item )*
+    /* Empty */
+    | generalspec_item (',' generalspec_item )*
 ;
 
 generalspec_item:
-          frequency_item
-        | unit_item
-        | order_item
-        | dutycycle_item // Not present by Graham
+    frequency_item
+    | unit_item
+    | order_item
+    | dutycycle_item // Not present by Graham
 ;
 
 frequency_item:
-        number_with_decimals 'k'
+    number_with_decimals 'k'
 ;
 
 dutycycle_item:
-        number_with_decimals '%'
+    number_with_decimals '%'
 ;
 
 unit_item:
-          number_with_decimals 'u'?
-        | number_with_decimals 'p'
+    number_with_decimals ('u' | 'p')?
 ;
 
 // enum BitDirection
 order_item:
-          'lsb'
-        | 'msb'
+    'lsb' | 'msb'
 ;
 
 // 3.2
 // abstract class Duration implements Numerical
 duration:
-          flash_duration
-        | gap_duration
+    flash_duration
+    | gap_duration
 ;
 
 // class Flash extends Duration
 flash_duration:
-        name_or_number ('m' | 'u' | 'p')?
+    name_or_number ('m' | 'u' | 'p')?
 ;
 
 // class Gap extends Duration
 gap_duration:
-        '-' name_or_number ('m' | 'u' | 'p')?
+    '-' name_or_number ('m' | 'u' | 'p')?
 ;
 
 // class NameOrNumber implements Floatable
+// Extension: Spec allowed number (integers) only
 name_or_number:
-// Extension: Graham allowed number (integers) only
-        name | number_with_decimals
+    name
+    | number_with_decimals
 ;
 
 // 4.2
 // class extent (extends Duration)
 extent:
-        '^' name_or_number ('m' | 'u' | 'p')?
+    '^' name_or_number ('m' | 'u' | 'p')?
 ;
 
 //  5.2
@@ -97,67 +96,67 @@ extent:
 // class FiniteBitField extends BitField
 // class InfiniteBitField extends BitField
 bitfield:
-          '~'? primary_item ':' '-'? primary_item (':' primary_item)? # finite_bitfield
-        | '~'? primary_item ':'                    ':' primary_item   # infinite_bitfield
+    '~'? primary_item ':' '-'? primary_item (':' primary_item)? # finite_bitfield
+    | '~'? primary_item '::' primary_item                    # infinite_bitfield
 ;
 
 // abstract class PrimaryItem implements Numerical
 primary_item:
-          name
-        | DOLLAR_ID
-	| number
-	| para_expression
+    name
+    | DOLLAR_ID
+    | number
+    | para_expression
 ;
 
 // 6.2
 // class IrStream extends BareIrStream
 irstream:
-        '(' bare_irstream ')' repeat_marker?
+    '(' bare_irstream ')' repeat_marker?
 ;
 
 // class BareIrStream extends IrStreamItem
 bare_irstream:
-        /* Empty */
-        | irstream_item (','  irstream_item)*
+    /* Empty */
+    | irstream_item (','  irstream_item)*
 ;
 
 // abstract class IrStreamItem
 irstream_item:
-          variation
-        | bitfield  // must come before duration!
-        | assignment
-        | extent
-        | duration
-        | irstream
-        | bitspec_irstream
+    variation
+    | bitfield  // must come before duration!
+    | assignment
+    | extent
+    | duration
+    | irstream
+    | bitspec_irstream
 ;
 
 // 7.4
 // class BitSpec extends IrStreamItem
 bitspec:
-        '<'  bare_irstream ('|'  bare_irstream)* '>'
+    '<'  bare_irstream ('|' bare_irstream)* '>'
 ;
 
 // 8.2
 // class RepeatMarker
 repeat_marker:
-	 '*'
-        | '+'
-        | number '+'?
+    '*'
+    | '+'
+    | number '+'?
 ;
 
 // class BitspecIrstream
 bitspec_irstream:
-	bitspec irstream
+    bitspec irstream
 ;
 
 // 9.2
 // class Expression implements Numerical, InfixCode
-para_expression:            // was previously called expression
-        '(' expression ')'
+para_expression:            // called expression in spec
+    '(' expression ')'
 ;
 
-expression:                 // was previously called bare_expression
+expression:                 // called bare_expression in spec
                     primary_item
     |               bitfield
     |               '!'             expression
@@ -180,38 +179,37 @@ expression:                 // was previously called bare_expression
 // 10.2
 // (class NameEngine)
 definitions:
-	'{' definitions_list '}'
+    '{' definitions_list '}'
 ;
 
 definitions_list:
-	/* Empty */
-        | definition (',' definition)*
+    /* Empty */
+    | definition (',' definition)*
 ;
 
 definition:
-	name '=' expression
+    name '=' expression
 ;
 
 // 11.2
 assignment:
-        name '=' expression
+    name '=' expression
 ;
 
 // 12.2
 variation:
-        alternative alternative alternative?
+    alternative alternative alternative?
 ;
 
 alternative:
-        '[' bare_irstream ']'
+    '[' bare_irstream ']'
 ;
 
 // 13.2
 // class Number implements Numerical,InfixCode
 number:
-        INT
+      INT
     | HEXINT
-//  | OCTINT
     | BININT
     | 'UINT8_MAX'
     | 'UINT16_MAX'
@@ -223,81 +221,72 @@ number:
 
 // class numberWithDecimals extends Floatable
 number_with_decimals:
-        number
-      | float_number
+    number
+    | float_number
 ;
 
 // Due to the lexer, have to take special precautions to allow name-s
-// to be called k, u, m, p, lsb, or msb.
+// to be called k, u, m, p, lsb, or msb. See Parr p.209-211.
 // class Name implements Numerical,InfixCode
 name:
-           ID
-        | 'k'
-        | 'u'
-        | 'p'
-        | 'm'
-        | 'lsb'
-        | 'msb'
+    ID
+    | 'k'
+    | 'u'
+    | 'p'
+    | 'm'
+    | 'lsb'
+    | 'msb'
 ;
 
 // class ParameterSpecs
 parameter_specs:
-          '[' parameter_spec (',' parameter_spec )* ']'
-        | '['  ']'
+    '[' parameter_spec (',' parameter_spec )* ']'
+    | '['  ']'
 ;
 
 // class ParameterSpec
 parameter_spec:
-	   name      ':' number '.' '.' number ('=' expression)?
-	|  name  '@' ':' number '.' '.' number  '=' expression
+      name     ':' number '..' number ('=' expression)?
+    | name '@' ':' number '..' number  '=' expression
 ;
 
 // class FloatNumber implements Floatable
 float_number:
-           '.' INT
-	|   INT '.' INT
+    '.' INT
+    | INT '.' INT
 ;
 
 // Extension: Here allow C syntax identifiers;
 // Graham allowed only one letter capitals.
 ID:
-	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+    ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 ;
 
 DOLLAR_ID:
-        '$' ID
+    '$' ID
 ;
 
 INT:
-	( '0' .. '9')+
+    ( '0' .. '9')+
 ;
 
 HEXINT:
-        '0x' ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )+
+    '0x' ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )+
 ;
 
-//OCTINT:
-//        '0' ( '0' .. '7' )*
-//;
-
 BININT:
-        '0b' ( '0' | '1' )+
+    '0b' ( '0' | '1' )+
 ;
 
 // Extension: Not present by Graham.
-COMMENT:
-          ('//' ~('\n'|'\r')* '\r'? '\n'
-        | '/*' .*? '*/') -> skip
+COMMENT: // non-greedy
+    '/*' .*? '*/'                       -> skip
+;
+
+LINECOMMENT:
+    '//' ~('\n'|'\r')* '\r'? '\n'       -> skip
 ;
 
 WS:
-        ( ' '
-        | '\t'
-        | '\r'
-        | '\n'
-        ) -> skip
-;
-
-NEWLINE:
-        '\r'? '\n'
+    [ \t\r\n\u000C]+                    -> skip
 ;

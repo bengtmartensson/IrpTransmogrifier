@@ -53,7 +53,6 @@ public class ProtocolNGTest {
             double expResult = 56000f;
             double result = instance.getFrequency();
             assertEquals(result, expResult, 0.0);
-            // TODO review the generated test code and remove the default call to fail.
         } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException | InvalidRepeatException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }

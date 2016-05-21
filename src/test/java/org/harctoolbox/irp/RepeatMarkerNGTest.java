@@ -74,7 +74,7 @@ public class RepeatMarkerNGTest {
         }
 
         try {
-            rep = new RepeatMarker("7+");
+            new RepeatMarker("7+");
             fail();
         } catch (InvalidRepeatException ex) {
         }

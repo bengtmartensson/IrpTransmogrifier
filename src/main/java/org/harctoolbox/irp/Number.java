@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2014 Bengt Martensson.
+Copyright (C) 2014, 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,28 +33,31 @@ public class Number extends PrimaryItem {
         data = n;
     }
 
-    public Number(IrpParser.NumberContext ctx) throws IrpSyntaxException {
-        this(ctx.INT());
+    public Number(IrpParser.NumberContext ctx) {
+        this(ctx.getText());
     }
 
-    public Number(TerminalNode n) throws IrpSyntaxException {
+    public Number(TerminalNode n) {
         this(n.getText());
     }
 
-    public Number(String str) throws IrpSyntaxException {
-        try {
-            data = Long.parseLong(str);
-        } catch (NumberFormatException ex) {
-            throw new IrpSyntaxException("Invalid number: " + str);
-        }
+    public Number(String str) {
+        data = str.equals("UINT8_MAX") ? 255L
+                : str.equals("UINT16_MAX") ? 65535L
+                : str.equals("UINT24_MAX") ? 16777215L
+                : str.equals("UINT32_MAX") ? 4294967295L
+                : str.equals("UINT64_MAX") ? -1L // FIXME: 18446744073709551615
+                : str.length() >= 3 && str.substring(0, 2).equals("0x") ? Long.parseLong(str.substring(2), 16)
+                : str.length() >= 3 && str.substring(0, 2).equals("0b") ? Long.parseLong(str.substring(2), 2)
+                : str.length() >= 1 && str.substring(0, 1).equals("0")  ? Long.parseLong(str, 8)
+                : Long.parseLong(str);
     }
 
-    public static long parse(String str) throws IrpSyntaxException {
-        Number number = new Number(str);
-        return number.toNumber();
+    static long parse(String str) {
+        return parse(new ParserDriver(str).getParser().number());
     }
 
-    public static long parse(IrpParser.NumberContext ctx) throws IrpSyntaxException {
+    static long parse(IrpParser.NumberContext ctx) {
         Number number = new Number(ctx);
         return number.toNumber();
     }
@@ -68,7 +71,7 @@ public class Number extends PrimaryItem {
         return data;
     }
 
-    public String toInfixCode() throws IrpSyntaxException {
+    public String toInfixCode() {
         return Long.toString(data);
     }
 }

@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+
 /**
  *
  */
@@ -28,9 +30,10 @@ public class NumberWithDecimals implements Floatable {
     }
 
     public NumberWithDecimals(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
-        data = (ctx instanceof IrpParser.IntegerAsFloatContext)
-                ? (float) Integer.parseInt(((IrpParser.IntegerAsFloatContext) ctx).INT().getText())
-                : FloatNumber.parse(((IrpParser.FloatContext) ctx).float_number());
+        ParseTree child = ctx.getChild(0);
+        data = (child instanceof IrpParser.Float_numberContext)
+                ? FloatNumber.parse((IrpParser.Float_numberContext) child)
+                : (double) Integer.parseInt(child.getText());
     }
 
     @Override

@@ -58,9 +58,9 @@ public class BitSpecNGTest {
             System.out.println("getNoInstances");
             //BitSpec.reset();
             assertEquals(BitSpec.getNoInstances(), 0);
-            BitSpec junk = new BitSpec();
+            new BitSpec();
             assertEquals(BitSpec.getNoInstances(), 0);
-            junk = new BitSpec(NEC1BitSpec);
+            new BitSpec(NEC1BitSpec);
             assertEquals(BitSpec.getNoInstances(), 1);
             BitSpec.reset();
             assertEquals(BitSpec.getNoInstances(), 0);
@@ -73,6 +73,7 @@ public class BitSpecNGTest {
 
     /**
      * Test of get method, of class BitSpec.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGet() throws Exception {
@@ -144,7 +145,7 @@ public class BitSpecNGTest {
             BitSpec nec1 = new BitSpec(NEC1BitSpec);
             BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
             BitSpec rc5 = new BitSpec(RC5BitSpec);
-            BitSpec empty = new BitSpec();
+            //BitSpec empty = new BitSpec();
             assertTrue(nec1.isStandardPWM(nameEngine, generalSpec));
             assertFalse(nokia32.isStandardPWM(nameEngine, generalSpec));
             assertFalse(rc5.isStandardPWM(nameEngine, generalSpec));
@@ -169,7 +170,7 @@ public class BitSpecNGTest {
             BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
             BitSpec rc5 = new BitSpec(RC5BitSpec);
             BitSpec rc6 = new BitSpec(RC6BitSpec);
-            BitSpec empty = new BitSpec();
+            //BitSpec empty = new BitSpec();
             assertFalse(nec1.isStandardBiPhase(nameEngine, generalSpec));
             assertFalse(nokia32.isStandardBiPhase(nameEngine, generalSpec));
             assertTrue(rc5.isStandardBiPhase(nameEngine, generalSpec));

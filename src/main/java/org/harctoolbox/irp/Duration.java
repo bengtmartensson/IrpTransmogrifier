@@ -44,9 +44,9 @@ public abstract class Duration extends IrStreamItem implements Floatable {
     }
 
     public static Duration newDuration(IrpParser.DurationContext d) throws IrpSyntaxException {
-        return (d instanceof IrpParser.FlashDurationContext)
-                ? new Flash(((IrpParser.FlashDurationContext) d).flash_duration())
-                : new Gap(((IrpParser.GapDurationContext) d).gap_duration());
+        return (d.getChild(0) instanceof IrpParser.Flash_durationContext)
+                ? new Flash((IrpParser.Flash_durationContext) d.getChild(0))
+                : new Gap((IrpParser.Gap_durationContext) d.getChild(0));
     }
 
     public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {

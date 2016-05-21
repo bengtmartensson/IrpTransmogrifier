@@ -3,7 +3,6 @@ package org.harctoolbox.irp;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -94,33 +93,15 @@ public class NameNGTest {
         assertEquals(result, expResult);
     }
 
-//    /**
-//     * Test of toString method, of class Name.
-//     */
-//    @Test
-//    public void testToString_IrpParserNameContext() {
-//        System.out.println("toString");
-//        IrpParser.NameContext ctx = null;
-//        String expResult = "";
-//        String result = Name.toString(ctx);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
     /**
      * Test of toInfixCode method, of class Name.
      */
     @Test
     public void testToInfixCode() {
-        try {
-            System.out.println("toInfixCode");
-            Name instance = new Name("zweckentfremdung");
-            String expResult = "zweckentfremdung";
-            String result = instance.toInfixCode();
-            assertEquals(result, expResult);
-        } catch (IrpSyntaxException ex) {
-            fail();
-        }
+        System.out.println("toInfixCode");
+        Name instance = new Name("zweckentfremdung");
+        String expResult = "zweckentfremdung";
+        String result = instance.toInfixCode();
+        assertEquals(result, expResult);
     }
 }

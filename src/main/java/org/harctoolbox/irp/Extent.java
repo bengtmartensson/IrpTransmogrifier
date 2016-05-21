@@ -34,9 +34,13 @@ public class Extent extends Duration {
         return noInstances;
     }
 
+    private static synchronized void incrementNoInstances() {
+        noInstances++;
+    }
+
     Extent(IrpParser.ExtentContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
-        noInstances++;
+        incrementNoInstances();
     }
 
     @Override

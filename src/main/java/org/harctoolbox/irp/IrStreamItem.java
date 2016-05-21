@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.List;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 
@@ -38,11 +39,12 @@ public abstract class IrStreamItem {
     }
 
     public static IrStreamItem parse(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
+        ParseTree child = ctx.getChild(0);
         return //ctx instanceof IrpParser.VariationContext ? new Variation((Va))
                 //ctx.bitfield() != null ? new BitField(ctx.bitfield())
                 //: ctx instanceof IrpParser.AssignmentContext ? new Assignment((IrpParser.AssignmentContext) ctx)
                 //: ctx instanceof IrpParser.ExtentContext ? new BitField((IrpParser.ExtentContext) ctx)
-                (ctx instanceof IrpParser.Duration_asitemContext) ? Duration.newDuration(((IrpParser.Duration_asitemContext) ctx).duration())
+                (child instanceof IrpParser.DurationContext) ? Duration.newDuration(((IrpParser.DurationContext) child))
                 //: ctx instanceof IrpParser.IrstreamContext ? new IrStream(ctx.irstream())
                 //: ctx instanceof IrpParser.Bitspec_irstreamContext ? new BitspecIrstream(ctx.bitspec_irstream())
                 : null;
@@ -53,14 +55,14 @@ public abstract class IrStreamItem {
     }
 
     public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException, InvalidRepeatException {
-        //ParseTree child = ctx.getChild(0);
-        return (ctx instanceof IrpParser.Variation_asitemContext) ? new Variation(((IrpParser.Variation_asitemContext)ctx).variation())
-                : (ctx instanceof IrpParser.Bitfield_asitemContext) ? BitField.newBitField(((IrpParser.Bitfield_asitemContext) ctx).bitfield())
-                : (ctx instanceof IrpParser.Assignment_asitemContext) ? new Assignment(((IrpParser.Assignment_asitemContext) ctx).assignment())
-                : (ctx instanceof IrpParser.Extent_asitemContext) ? new Extent(((IrpParser.Extent_asitemContext) ctx).extent())
-                : (ctx instanceof IrpParser.Duration_asitemContext) ? Duration.newDuration(((IrpParser.Duration_asitemContext) ctx).duration())
-                : (ctx instanceof IrpParser.Irstream_asitemContext) ? new IrStream(((IrpParser.Irstream_asitemContext) ctx).irstream())
-                : (ctx instanceof IrpParser.Bitspec_irstream_asitemContext) ? new BitspecIrstream(((IrpParser.Bitspec_irstream_asitemContext) ctx).bitspec_irstream())
+        ParseTree child = ctx.getChild(0);
+        return (child instanceof IrpParser.VariationContext) ? new Variation(((IrpParser.VariationContext) child))
+                : (child instanceof IrpParser.BitfieldContext) ? BitField.newBitField((IrpParser.BitfieldContext) child)
+                : (child instanceof IrpParser.AssignmentContext) ? new Assignment((IrpParser.AssignmentContext) child)
+                : (child instanceof IrpParser.ExtentContext) ? new Extent((IrpParser.ExtentContext) child)
+                : (child instanceof IrpParser.DurationContext) ? Duration.newDuration((IrpParser.DurationContext) child)
+                : (child instanceof IrpParser.IrstreamContext) ? new IrStream((IrpParser.IrstreamContext) child)
+                : (child instanceof IrpParser.Bitspec_irstreamContext) ? new BitspecIrstream((IrpParser.Bitspec_irstreamContext) child)
                 : null;
     }
 

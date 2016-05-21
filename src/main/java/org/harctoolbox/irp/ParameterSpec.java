@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -25,11 +24,10 @@ import org.w3c.dom.Element;
  *
  */
 public class ParameterSpec {
-    private String name;
-    private long min;
-    private long max;
-    //private Expression defaultValue;
-    private IrpParser.Bare_expressionContext deflt;
+    private Name name;
+    private Number min;
+    private Number max;
+    private Expression deflt;
     private boolean memory = false;
 
     public String toString(IrpParser parser) {
@@ -43,94 +41,48 @@ public class ParameterSpec {
 
     public Element toElement(Document document) {
         Element el = document.createElement("parameter");
-        el.setAttribute("name", name);
-        el.setAttribute("min", Long.toString(min));
-        el.setAttribute("max", Long.toString(max));
+        el.setAttribute("name", name.toString());
+        el.setAttribute("min", min.toString());
+        el.setAttribute("max", max.toString());
         el.setAttribute("memory", Boolean.toString(memory));
-        if (deflt != null)
-            el.setAttribute("default", deflt.toString());
+        if (deflt != null) {
+            Element def = document.createElement("default");
+            el.appendChild(def);
+            def.appendChild(deflt.toElement(document));
+        }
         return el;
     }
 
-    public ParameterSpec(String name, int min, int max, boolean memory, int deflt) {
-// FIXME
-//    this(name, min, max, memory, IrpParser.newIntegerTree(deflt));
+    public ParameterSpec(String str) {
+        this(new ParserDriver(str).getParser().parameter_spec());
     }
 
-    public ParameterSpec(String name, int min, int max) {
-        this(name, min, max, false);
+    public ParameterSpec(IrpParser.Parameter_specContext ctx) {
+        this(ctx.name(), ctx.getChild(1).getText().equals("@"), ctx.number(0), ctx.number(1), ctx.expression());
     }
 
-    public ParameterSpec(String name, int min, int max, boolean memory, IrpParser.Bare_expressionContext deflt) {
-        this.name = name;
-        this.min = min;
-        this.max = max;
+    public ParameterSpec(IrpParser.NameContext name, boolean hasMemory, IrpParser.NumberContext min, IrpParser.NumberContext max, IrpParser.ExpressionContext deflt) {
+        this.name = new Name(name);
+        this.memory = hasMemory;
+        this.min = new Number(min);
+        this.max = new Number(max);
+        this.deflt = new Expression(deflt);
+    }
+
+    public ParameterSpec(String name, boolean memory, int min, int max, Expression deflt) {
+        this.name = new Name(name);
+        this.min = new Number(min);
+        this.max = new Number(max);
         this.memory = memory;
         this.deflt = deflt;
     }
 
-    public ParameterSpec(String name, int min, int max, boolean memory) {
-        this(name, min, max, memory, (IrpParser.Bare_expressionContext) null);
-    }
-
-    /*public ParameterSpec(String name, int min, int max, boolean memory, String bare_expression) {
-        this.name = name;
-        this.min = min;
-        this.max = max;
-        this.memory = memory;
-        IrpLexer lex = new IrpLexer(new ANTLRStringStream(bare_expression));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        IrpParser parser = new IrpParser(tokens);
-        IrpParser.bare_expression_return r;
-        try {
-            r = parser.bare_expression();
-            CommonTree ct = (CommonTree) r.getTree();
-            deflt = ct;
-        } catch (RecognitionException ex) {
-            throw new ParseException(ex);
-        }
-    }*/
-
-    public ParameterSpec(IrpParser.MemoryfullParameterSpecContext t) {
-        load(t);
-    }
-
-    public ParameterSpec(IrpParser.MemorylessParameterSpecContext t) {
-        load(t);
-    }
-
-    /*public ParameterSpec(String parameter_spec) {
-        IrpLexer lex = new IrpLexer(new ANTLRStringStream(parameter_spec));
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        IrpParser parser = new IrpParser(tokens);
-        IrpParser.parameter_spec_return r;
-        try {
-            r = parser.parameter_spec();
-            CommonTree ct = (CommonTree) r.getTree();
-            load(ct);
-        } catch (RecognitionException ex) {
-            throw new ParseException(ex);
-        }
-    */
-
-    private void load(IrpParser.MemorylessParameterSpecContext t) {
-        memory = false;
-        name = t.name().ID().getText();//.getChild(0).getText();
-        min = Long.parseLong(t.INT(0).getText());
-        max = Long.parseLong(t.INT(1).getText());
-        deflt = t.bare_expression();
-    }
-
-    private void load(IrpParser.MemoryfullParameterSpecContext t) {
-        memory = true;
-        name = t.name().ID().getText();//.getChild(0).getText();
-        min = Long.parseLong(t.INT(0).getText());
-        max = Long.parseLong(t.INT(1).getText());
-        deflt = t.bare_expression();
+    public ParameterSpec(String name, boolean memory, int min, int max) {
+        this(name, memory, min, max, null);
     }
 
     public boolean isOK(long x) {
-        return min <= x && x <= max;
+        return min.toNumber() <= x && x <= max.toNumber();
     }
 
     public String domainAsString() {
@@ -138,19 +90,19 @@ public class ParameterSpec {
     }
 
     public String getName() {
-        return name;
+        return name.toString();
     }
 
-    public ParseTree getDefault() {
+    public Expression getDefault() {
         return deflt;
     }
 
     public long getMin() {
-        return min;
+        return min.toNumber();
     }
 
     public long getMax() {
-        return max;
+        return max.toNumber();
     }
 
     public boolean hasMemory() {

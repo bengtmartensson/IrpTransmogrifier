@@ -53,7 +53,7 @@ public class NameEngine {
         define(name, exp.getParseTree());
     }
 
-    private void define(String name, IrpParser.Bare_expressionContext ctx) throws IrpSyntaxException {
+    private void define(String name, IrpParser.ExpressionContext ctx) throws IrpSyntaxException {
         if (!Name.validName(name))
             throw new IrpSyntaxException("Invalid name: " + name);
         Expression expression = new Expression(ctx);
@@ -81,7 +81,7 @@ public class NameEngine {
     }
 
     private void parseDefinition(IrpParser.DefinitionContext ctx /* DEFINITION */) throws IrpSyntaxException {
-        define(ctx.name().getText(), ctx.bare_expression());
+        define(ctx.name().getText(), ctx.expression());
     }
 
     /**

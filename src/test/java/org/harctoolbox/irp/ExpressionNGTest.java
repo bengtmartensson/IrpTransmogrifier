@@ -58,7 +58,7 @@ public class ExpressionNGTest {
             fail();
         }
         try {
-            long result = new Expression("A+2*B*C+").toNumber(nameEngine);
+            new Expression("A+2*B*C+").toNumber(nameEngine);
             fail();
         } catch (ParseCancellationException | IrpSyntaxException ex) {
         } catch (UnassignedException | IncompatibleArgumentException ex) {

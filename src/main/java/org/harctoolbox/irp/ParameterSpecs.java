@@ -62,9 +62,7 @@ public class ParameterSpecs {
     public ParameterSpecs(IrpParser.Parameter_specsContext t) {
         this();
         for (IrpParser.Parameter_specContext parameterSpec : t.parameter_spec()) {
-            ParameterSpec ps = parameterSpec instanceof IrpParser.MemoryfullParameterSpecContext
-                    ? new ParameterSpec((IrpParser.MemoryfullParameterSpecContext) parameterSpec)
-                    : new ParameterSpec((IrpParser.MemorylessParameterSpecContext) parameterSpec);
+            ParameterSpec ps = new ParameterSpec(parameterSpec);
             map.put(ps.getName(), ps);
         }
     }

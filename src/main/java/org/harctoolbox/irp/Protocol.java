@@ -97,6 +97,7 @@ public class Protocol {
         //this.nameEngine = new NameEngine();
 
         try {
+            ParserDriver.reset();
             parseDriver = new ParserDriver(irpString);
             parseTree = parseDriver.getParser().protocol();
 

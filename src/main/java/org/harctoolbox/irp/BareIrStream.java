@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements Irstream as of Chapter 6.
@@ -146,4 +148,63 @@ public class BareIrStream extends IrStreamItem {
         }
         return list;
     }*/
+
+    @Override
+    boolean interleavingOk() {
+        boolean ok = true;
+        boolean lastWasGap = true;
+        for (IrStreamItem item : this.irStreamItems) {
+            if (item instanceof Gap || item instanceof Extent) {
+                if (lastWasGap)
+                    return false;
+                else
+                    lastWasGap = true;
+            } else if (item instanceof Flash) {
+                if (lastWasGap)
+                    lastWasGap = false;
+                else
+                    return false;
+            } else if (item instanceof BitField) {
+                if (!lastWasGap)
+                    return false;
+            }
+            if (!item.interleavingOk())
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    int numberOfBitSpecs() {
+        int sum = 0;
+        for (IrStreamItem item : irStreamItems)
+            sum += item.numberOfBitSpecs();
+        return sum;
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("bare_irstream");
+        element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
+        element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        for (IrStreamItem item : this.irStreamItems)
+            element.appendChild(item.toElement(document));
+        return element;
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        int sum = 0;
+        for (IrStreamItem item : irStreamItems)
+            sum += item.numberOfBareDurations();
+        return sum;
+    }
+
+    @Override
+    int numberOfBits() {
+        int sum = 0;
+        for (IrStreamItem item : irStreamItems)
+            sum += item.numberOfBits();
+        return sum;
+    }
 }

@@ -19,11 +19,13 @@ package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  */
-public class Assignment extends IrStreamItem implements Numerical {
+public class Assignment extends IrStreamItem implements Numerical,XmlExport {
     private Name name;
     private Expression value;
 
@@ -74,5 +76,25 @@ public class Assignment extends IrStreamItem implements Numerical {
         long val = value.toNumber(nameEngine);
         nameEngine.define(name.toString(), val);
         return new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    boolean interleavingOk() {
+        return true;
+    }
+
+    @Override
+    int numberOfBits() {
+        return 0;
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        return 0;
     }
 }

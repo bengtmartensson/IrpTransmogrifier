@@ -18,11 +18,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  */
-public class NumberWithDecimals implements Floatable {
+public class NumberWithDecimals implements Floatable, XmlExport {
     private double data;
 
     public NumberWithDecimals(String str) throws IrpSyntaxException {
@@ -58,5 +60,12 @@ public class NumberWithDecimals implements Floatable {
     public static double parse(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
         NumberWithDecimals numberWithDecimals = new NumberWithDecimals(ctx);
         return numberWithDecimals.toFloat();
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("number_with_decimals");
+        element.setTextContent(toString());
+        return element;
     }
 }

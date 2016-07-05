@@ -19,13 +19,13 @@ package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  */
 public class InfiniteBitField extends BitField {
-
-
 
     public InfiniteBitField(String str) throws IrpSyntaxException {
         this((IrpParser.Infinite_bitfieldContext) (new ParserDriver(str)).getParser().bitfield());
@@ -64,5 +64,20 @@ public class InfiniteBitField extends BitField {
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    int numberOfBits() {
+        return -99999;
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        return -99999;
     }
 }

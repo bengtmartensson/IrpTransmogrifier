@@ -352,7 +352,7 @@ public class IrSignal {
      * @param noRepeatBursts
      * @param frequency
      */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) {
+    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) throws IncompatibleArgumentException {
         this(durations, noIntroBursts, noRepeatBursts, frequency, ModulatedIrSequence.unknownDutyCycle);
     }
 
@@ -364,10 +364,10 @@ public class IrSignal {
      * @param introSequence
      * @param repeatSequence
      * @param endingSequence
-     * @throws IncompatibleArgumentException
+     * @throws OddSequenceLenghtException
      */
     public IrSignal(String introSequence, String repeatSequence,
-            String endingSequence, double frequency, double dutyCycle) throws IncompatibleArgumentException {
+            String endingSequence, double frequency, double dutyCycle) throws OddSequenceLenghtException {
         this(new IrSequence(introSequence), new IrSequence(repeatSequence),
                 new IrSequence(endingSequence), frequency, dutyCycle);
     }
@@ -385,16 +385,17 @@ public class IrSignal {
      * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
      */
     public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, double frequency, double dutyCycle) {
-        this(new IrSequence(durations, 0, 2*noIntroBursts),
-                new IrSequence(durations, 2*noIntroBursts, 2*noRepeatBursts),
-                new IrSequence(durations, 2*(noIntroBursts+noRepeatBursts), durations.length - 2*(noIntroBursts + noRepeatBursts)),
-                (double) frequency, dutyCycle);
+        this(new IrSequence(durations, 0, 2 * noIntroBursts),
+                new IrSequence(durations, 2 * noIntroBursts, 2 * noRepeatBursts),
+                new IrSequence(durations, 2 * (noIntroBursts + noRepeatBursts), durations.length - 2 * (noIntroBursts + noRepeatBursts)),
+                frequency, dutyCycle);
     }
 
     /**
      * Constructs an IrSignal of zero length.
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public IrSignal() {
+    public IrSignal() throws IncompatibleArgumentException {
         this(new int[0], 0, 0, (int) ModulatedIrSequence.defaultFrequency);
     }
 
@@ -652,11 +653,11 @@ public class IrSignal {
     /**
      * Computes the CCF form, if possible. Since a CCF does not have an ending sequence,
      * a nonempty ending sequence will be ignored.
+     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      * @see Pronto
      * @return CCF as string.
-     * @throws IncompatibleArgumentException
      */
-    public final String ccfString() throws IncompatibleArgumentException {
+    public final String ccfString() throws OddSequenceLenghtException {
         return Pronto.toPrintString(this);
     }
 

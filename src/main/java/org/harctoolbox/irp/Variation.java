@@ -19,11 +19,13 @@ package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  */
-public class Variation extends IrStreamItem {
+public class Variation extends IrStreamItem implements XmlExport {
 
     public Variation(String str) {
         this((new ParserDriver(str)).getParser().variation());
@@ -42,5 +44,25 @@ public class Variation extends IrStreamItem {
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    boolean interleavingOk() {
+        return true;
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        return -999999999;
+    }
+
+    @Override
+    int numberOfBits() {
+        return -999999999;
     }
 }

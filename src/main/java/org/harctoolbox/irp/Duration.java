@@ -21,6 +21,8 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements Durations in Chapter 3 and 4.
@@ -28,11 +30,11 @@ import org.harctoolbox.ircore.IrSignal;
  */
 
 public abstract class Duration extends IrStreamItem implements Floatable {
-    private double us = IrCoreUtils.invalid;
-    private double time_periods = IrCoreUtils.invalid;
-    private double time_units = IrCoreUtils.invalid;
-    private NameOrNumber nameOrNumber = null;
-    private String unit = null;
+    protected double us = IrCoreUtils.invalid;
+    protected double time_periods = IrCoreUtils.invalid;
+    protected double time_units = IrCoreUtils.invalid;
+    protected NameOrNumber nameOrNumber = null;
+    protected String unit = null;
 
     public static Duration newDuration(String str) throws IrpSyntaxException {
         IrpParser parser = new ParserDriver(str).getParser();
@@ -129,5 +131,22 @@ public abstract class Duration extends IrStreamItem implements Floatable {
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         evaluatedIrStream.add(duration);
         return evaluatedIrStream;
+    }
+
+    protected Element toElement(Document document, String tagName) {
+        Element element = document.createElement(tagName);
+        element.setAttribute("unit", unit);
+        element.appendChild(nameOrNumber.toElement(document));
+        return element;
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        return 1;
+    }
+
+    @Override
+    int numberOfBits() {
+        return 0;
     }
 }

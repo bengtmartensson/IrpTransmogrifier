@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  * This class corresponds to Chapter 9.
  * An expression is evaluated during execution time with the current name bindings.
  */
-public class Expression extends PrimaryItem {
+public class Expression extends PrimaryItem /* ??? */ {
 
     //private static boolean debug;
     private IrpParser.ExpressionContext parseTree;
@@ -347,8 +347,12 @@ public class Expression extends PrimaryItem {
         return parseTree;
     }
 
-    Element toElement(Document document) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("expression");
+        element.setTextContent("Expression.toElement");
+        return element;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**

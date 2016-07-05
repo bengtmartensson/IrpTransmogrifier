@@ -160,4 +160,9 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     BitField append(BitField bitField, BitDirection bitDirection) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    boolean interleavingOk() {
+        return true;
+    }
 }

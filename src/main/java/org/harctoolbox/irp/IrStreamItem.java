@@ -26,7 +26,7 @@ import org.harctoolbox.ircore.IrSignal;
  *
  * @author Bengt Martensson
  */
-public abstract class IrStreamItem {
+public abstract class IrStreamItem implements XmlExport {
 
     //protected Protocol environment;
     protected int noAlternatives = 0;
@@ -88,4 +88,14 @@ public abstract class IrStreamItem {
 
     abstract EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+
+    int numberOfBitSpecs() {
+        return 0;
+    }
+
+    abstract boolean interleavingOk();
+
+    abstract int numberOfBits();
+
+    abstract int numberOfBareDurations();
 }

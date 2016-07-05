@@ -38,8 +38,10 @@ public class BitspecIrstream extends IrStreamItem {
         irStream = new IrStream(ctx.irstream());
     }
 
+    @Override
     public Element toElement(Document document) {
-        Element root = document.createElement("bitspec-irstream");
+        Element root = document.createElement("bitspec_irstream");
+        root.setAttribute("interleavingOk", Boolean.toString(interleavingOk()));
         root.appendChild(bitSpec.toElement(document));
         root.appendChild(irStream.toElement(document));
         return root;
@@ -59,5 +61,25 @@ public class BitspecIrstream extends IrStreamItem {
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    int numberOfBitSpecs() {
+        return irStream.numberOfBitSpecs() + 1;
+    }
+
+    @Override
+    boolean interleavingOk() {
+        return bitSpec.isStandardPWM(new NameEngine(), new GeneralSpec()) && irStream.interleavingOk();
+    }
+
+    @Override
+    int numberOfBits() {
+        return irStream.numberOfBits();
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        return irStream.numberOfBareDurations();
     }
 }

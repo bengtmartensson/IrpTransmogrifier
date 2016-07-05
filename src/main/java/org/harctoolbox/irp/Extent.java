@@ -17,12 +17,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements Extents as per Chapter 4.
  *
  */
-public class Extent extends Duration {
+public class Extent extends Duration implements XmlExport {
 
     private static int noInstances = 0;
 
@@ -54,5 +56,15 @@ public class Extent extends Duration {
     @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         return -evaluate(nameEngine, generalSpec, elapsed);
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        return toElement(document, "extent");
+    }
+
+    @Override
+    boolean interleavingOk() {
+        return true;
     }
 }

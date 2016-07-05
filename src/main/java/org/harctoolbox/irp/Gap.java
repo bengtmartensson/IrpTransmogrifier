@@ -17,12 +17,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements Gap as per Chapter 3.
  *
  */
-public class Gap extends Duration {
+public class Gap extends Duration implements XmlExport {
 
     Gap(IrpParser.Gap_durationContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
@@ -32,5 +34,15 @@ public class Gap extends Duration {
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         return -evaluate(nameEngine, generalSpec, elapsed);
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        return toElement(document, "gap");
+    }
+
+    @Override
+    boolean interleavingOk() {
+        return true;
     }
 }

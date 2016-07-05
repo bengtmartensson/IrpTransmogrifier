@@ -19,6 +19,8 @@ package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -98,5 +100,12 @@ public class Name extends PrimaryItem {
     public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         Expression expression = nameEngine.get(name);
         return expression.toNumber(nameEngine);
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("name");
+        element.setAttribute("name", toString());
+        return element;
     }
 }

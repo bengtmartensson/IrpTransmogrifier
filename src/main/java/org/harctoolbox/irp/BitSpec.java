@@ -145,6 +145,21 @@ public class BitSpec {
         return bitCodes.isEmpty();
     }
 
+    public int numberOfBitspecDurations() {
+        int numberDurations = -1;
+        for (BareIrStream bitCode : bitCodes) {
+            int n = bitCode.numberOfBareDurations();
+            if (numberDurations == -1)
+                numberDurations = n;
+            else if (numberDurations == n) {
+                // ok
+            } else {
+                return -1;
+            }
+        }
+        return numberDurations;
+    }
+
     /**
      * Checks if the BitSpec is of type <a,-b|c,-d>, for a,b,c,d > 0.
      * @param nameEngine
@@ -196,10 +211,15 @@ public class BitSpec {
     }
 
     public Element toElement(Document document) {
-        Element root = document.createElement("bitspec");
-        root.setAttribute("size", Integer.toString(bitCodes.size()));
-        root.setAttribute("chunksize", Integer.toString(chunkSize));
-        return root;
+        Element element = document.createElement("bitspec");
+        element.setAttribute("size", Integer.toString(bitCodes.size()));
+        element.setAttribute("chunksize", Integer.toString(chunkSize));
+        element.setAttribute("standard_pwm", Boolean.toString(isStandardPWM(new NameEngine(), new GeneralSpec())));
+        element.setAttribute("standard_biphase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
+        element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));
+        for (BareIrStream bitCode : bitCodes)
+            element.appendChild(bitCode.toElement(document));
+        return element;
     }
 
 //    public List<IrStreamItem> evaluate(BitSpec bitSpec) {

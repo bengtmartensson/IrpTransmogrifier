@@ -20,8 +20,10 @@ package org.harctoolbox.irp;
 import java.math.BigInteger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-class BitStream extends IrStreamItem {
+class BitStream extends IrStreamItem implements XmlExport {
 
     private long length;
     private BigInteger data;
@@ -153,5 +155,25 @@ class BitStream extends IrStreamItem {
     @Override
     public boolean isEmpty(NameEngine nameEngine) {
         return length == 0;
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    boolean interleavingOk() {
+        return true;
+    }
+
+    @Override
+    int numberOfBits() {
+        return 0;
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        return (int) length;
     }
 }

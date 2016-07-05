@@ -19,11 +19,13 @@ package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  */
-public class NameOrNumber implements Floatable {
+public class NameOrNumber implements Floatable,XmlExport {
     private Object thing;
 
     public NameOrNumber(String str) throws IrpSyntaxException {
@@ -60,5 +62,13 @@ public class NameOrNumber implements Floatable {
 
     Object toNumber(NameEngine nameEngine) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("name_or_number");
+        // TODO: name
+        element.appendChild(((NumberWithDecimals) thing).toElement(document));
+        return element;
     }
 }

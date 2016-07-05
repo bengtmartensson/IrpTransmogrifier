@@ -61,7 +61,7 @@ public class Pronto {
      * @param irSignal
      * @throws IncompatibleArgumentException
      */
-    /*public Pronto(IrSignal irSignal) throws IncompatibleArgumentException {
+    /*public Pronto(IrSignal irSignal) {
         this.irSignal = irSignal;
         if (irSignal.getEndingLength() != 0) {
             logger.log(Level.WARNING,
@@ -129,7 +129,7 @@ public class Pronto {
      * @return CCF array
      * @throws IncompatibleArgumentException
      */
-    /*public static int[] toArray(double frequency, double[] sequence) throws IncompatibleArgumentException {
+    /*public static int[] toArray(double frequency, double[] sequence) {
         if (sequence.length % 2 == 1)
             throw new IncompatibleArgumentException("IR Sequence must be of even length.");
 
@@ -155,11 +155,11 @@ public class Pronto {
      * @return  IrSignal
      * @throws IncompatibleArgumentException
      */
-    public static IrSignal parse(int[] ccf) throws IncompatibleArgumentException {
+    public static IrSignal parse(int[] ccf) throws OddSequenceLenghtException, IncompatibleArgumentException {
         if (ccf.length < 4)
             throw new IncompatibleArgumentException("CCF is invalid since less than 4 numbers long.");
         if (ccf.length % 2 != 0)
-            throw new IncompatibleArgumentException("CCF is invalid since it has an odd number ("
+            throw new OddSequenceLenghtException("CCF is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
         int index = 0;
         int type = ccf[index++];
@@ -262,8 +262,8 @@ public class Pronto {
      * Creates a new IrSignals by interpreting its argument as CCF string.
      * @param array Strings representing hexadecimal numbers
      * @param begin Starting index
-     * @return  IrSignal
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @return IrSignal
+     * @throws IncompatibleArgumentException
      */
     public static IrSignal parse(String[] array, int begin) throws IncompatibleArgumentException {
         int[] ccf;
@@ -321,7 +321,7 @@ public class Pronto {
      * @return CCF array
      * @throws IncompatibleArgumentException
      */
-//    public static int[] initArray(IrSignal irSignal) throws IncompatibleArgumentException {
+//    public static int[] initArray(IrSignal irSignal) {
 //        return toArray(irSignal.frequency, irSignal.introSequence.data);
 //    }
 
@@ -331,7 +331,7 @@ public class Pronto {
      * @return CCF array
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-//    public static int[] repeatArray(IrSignal irSignal) throws IncompatibleArgumentException {
+//    public static int[] repeatArray(IrSignal irSignal) {
 //        return toArray(irSignal.frequency, irSignal.repeatSequence.data);
 //    }
 
@@ -365,12 +365,12 @@ public class Pronto {
      * CCF array of complete signal, i.e. the CCF string before formatting, including the header.
      * @param irSignal
      * @return CCF array
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws OddSequenceLenghtException
      */
-    public static int[] toArray(IrSignal irSignal) throws IncompatibleArgumentException {
+    public static int[] toArray(IrSignal irSignal) throws OddSequenceLenghtException {
         if (irSignal.getIntroLength() % 2 != 0 || irSignal.getRepeatLength() % 2 != 0)
             // Probably forgot normalize() if I get here.
-            throw new IncompatibleArgumentException("IR Sequences must be of even length.");
+            throw new OddSequenceLenghtException("IR Sequences must be of even length.");
         if (irSignal.getEndingLength() != 0)
             logger.log(Level.WARNING,
                     "When computing the Pronto representation, a (non-empty) ending sequence was ignored");
@@ -394,9 +394,9 @@ public class Pronto {
      * Computes the ("long", raw) CCF string
      * @param irSignal
      * @return CCF string
-     * @throws IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      */
-    public static String toPrintString(IrSignal irSignal) throws IncompatibleArgumentException {
+    public static String toPrintString(IrSignal irSignal) throws OddSequenceLenghtException {
         return toPrintString(toArray(irSignal));
     }
 
@@ -423,7 +423,7 @@ public class Pronto {
      * @throws IncompatibleArgumentException
      * /
     public static String shortCCFString(String protocolName, int device, int subdevice, int command)
-            throws IncompatibleArgumentException {
+            {
         int[] ccf = shortCCF(protocolName, device, subdevice, command);
         return ccf == null ? null : toPrintString(ccf);
     }
@@ -438,7 +438,7 @@ public class Pronto {
      * @return integer array of short CCF, or null om failure.
      * @throws IncompatibleArgumentException for paramters outside of its allowed domain.
      * /
-    public static int[] shortCCF(String protocolName, int device, int subdevice, int command) throws IncompatibleArgumentException {
+    public static int[] shortCCF(String protocolName, int device, int subdevice, int command) {
         int index = 0;
         if (protocolName.equalsIgnoreCase("rc5")) {
             if (device > 31 || subdevice != (int) IrpUtils.invalid || command > 127)

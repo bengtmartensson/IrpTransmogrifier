@@ -45,7 +45,7 @@ public class ParameterSpec {
         el.setAttribute("min", min.toString());
         el.setAttribute("max", max.toString());
         el.setAttribute("memory", Boolean.toString(memory));
-        if (deflt != null) {
+        if (deflt.getParseTree() != null) {
             Element def = document.createElement("default");
             el.appendChild(def);
             def.appendChild(deflt.toElement(document));

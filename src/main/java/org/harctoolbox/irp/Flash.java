@@ -17,12 +17,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements Flash as per Chapter 3.
  *
  */
-public class Flash extends Duration {
+public class Flash extends Duration implements XmlExport {
 
     public Flash(IrpParser.Flash_durationContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : null);
@@ -32,5 +34,15 @@ public class Flash extends Duration {
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         return evaluate(nameEngine, generalSpec, elapsed);
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        return toElement(document, "flash");
+    }
+
+    @Override
+    boolean interleavingOk() {
+        return true;
     }
 }

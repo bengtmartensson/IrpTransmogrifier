@@ -19,11 +19,13 @@ package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
  */
-public class FiniteBitField extends BitField {
+public class FiniteBitField extends BitField implements XmlExport {
     private PrimaryItem width;
     private boolean reverse;
 
@@ -69,5 +71,38 @@ public class FiniteBitField extends BitField {
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("finite_bitfield");
+        element.setAttribute("reverse", Boolean.toString(reverse));
+        element.setAttribute("compliment", Boolean.toString(complement));
+        Element dataElement = document.createElement("data");
+        dataElement.appendChild(data.toElement(document));
+        element.appendChild(dataElement);
+        Element widthElement = document.createElement("width");
+        widthElement.appendChild(width.toElement(document));
+        element.appendChild(widthElement);
+        if (!(chop instanceof Number && ((Number) chop).data == 0)) {
+            Element chopElement = document.createElement("chop");
+            chopElement.appendChild(chop.toElement(document));
+            element.appendChild(chopElement);
+        }
+        return element;
+    }
+
+    @Override
+    int numberOfBits() {
+        try {
+            return (int) getWidth(new NameEngine());
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            return -99999;
+        }
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        return 0;
     }
 }

@@ -126,20 +126,20 @@ public class IrSequence implements Cloneable, Serializable {
     /**
      * Constructs an IrSequence from the parameter data.
      * @param data Array of durations. Is copied.
-     * @throws IncompatibleArgumentException If data is not of even length.
+     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      */
-    public IrSequence(double[] data) throws IncompatibleArgumentException {
+    public IrSequence(double[] data) throws OddSequenceLenghtException {
         if (data.length % 2 != 0)
-            throw new IncompatibleArgumentException("IrSequence has odd length = " + data.length);
+            throw new OddSequenceLenghtException(data.length);
         this.data = data.clone();
     }
 
     /**
      * Constructs an IrSequence from the parameter data.
      * @param idata Array of durations. Data is copied.
-     * @throws IncompatibleArgumentException If data is not of even length.
+     * @throws OddSequenceLenghtException If data is not of even length.
      */
-    public IrSequence(int[] idata) throws IncompatibleArgumentException {
+    public IrSequence(int[] idata) throws OddSequenceLenghtException {
         this(idata, false);
     }
 
@@ -147,15 +147,15 @@ public class IrSequence implements Cloneable, Serializable {
      * Constructs an IrSequence from the parameter data.
      * @param idata Array of durations. Data is copied.
      * @param acceptOdd If odd length: if true, force length even by ignoring the last, otherwise throw exception.
-     * @throws IncompatibleArgumentException If data is not of even length.
+     * @throws OddSequenceLenghtException
      */
-    public IrSequence(int[] idata, boolean acceptOdd) throws IncompatibleArgumentException {
+    public IrSequence(int[] idata, boolean acceptOdd) throws OddSequenceLenghtException {
         int length = idata.length;
         if (length % 2 != 0) {
             if (acceptOdd)
                 length--;
             else
-                throw new IncompatibleArgumentException("IrSequence has odd length = " + idata.length);
+                throw new OddSequenceLenghtException(idata.length);
         }
 
         data = new double[length];
@@ -169,9 +169,9 @@ public class IrSequence implements Cloneable, Serializable {
      * This version does not require flashes and gaps to be interleaved (signs alternating).
      * @param str String of durations, possibly using signed numbers.
      * @param fixOddSequences it true, odd sequences (ending with space) are silently fixed by adding a dummy gap.
-     * @throws IncompatibleArgumentException If last duration is not a gap, and fixOddSequences false.
+     * @throws OddSequenceLenghtException If last duration is not a gap, and fixOddSequences false.
      */
-    public IrSequence(String str, boolean fixOddSequences) throws IncompatibleArgumentException {
+    public IrSequence(String str, boolean fixOddSequences) throws OddSequenceLenghtException {
         if (str == null || str.trim().isEmpty()) {
             data = new double[0];
         } else {
@@ -205,7 +205,7 @@ public class IrSequence implements Cloneable, Serializable {
                 if (fixOddSequences)
                     tmplist[++index] = dummySpaceDuration;
                 else
-                    throw new IncompatibleArgumentException("IrSequence ends with a space");
+                    throw new OddSequenceLenghtException("IrSequence ends with a space");
             }
             data = new double[index+1];
             for (int i = 0; i < index+1; i++)
@@ -217,9 +217,9 @@ public class IrSequence implements Cloneable, Serializable {
      * Constructs an IrSequence from the parameter data.
      * This version does not require flashes and gaps to be interleaved (signs alternating).
      * @param str String of durations, possibly using signed numbers.
-     * @throws IncompatibleArgumentException If last duration is not a gap.
+     * @throws OddSequenceLenghtException If last duration is not a gap.
      */
-    public IrSequence(String str) throws IncompatibleArgumentException {
+    public IrSequence(String str) throws OddSequenceLenghtException {
         this(str, false);
     }
 
@@ -253,26 +253,16 @@ public class IrSequence implements Cloneable, Serializable {
      * Leading gaps are discarded, while meaningless.
      * Consecutive gaps (flashes) are combined into one gap (flash).
      * @param list List of durations as Double, containing signs.
-     * @throws IncompatibleArgumentException If data ens with a flash, not a gap.
+     * @throws OddSequenceLenghtException If data ens with a flash, not a gap.
      */
-    public IrSequence(List<Double>list) throws IncompatibleArgumentException {
+    public IrSequence(List<Double>list) throws OddSequenceLenghtException {
         List<Double> normalized = normalize(list, true);
         if (normalized.size() % 2 != 0)
-            throw new IncompatibleArgumentException("IrSequence cannot end with a flash.");
+            throw new OddSequenceLenghtException("IrSequence cannot end with a flash.");
         data = new double[normalized.size()];
         for (int i = 0; i < normalized.size(); i++)
             data[i] = normalized.get(i);
     }
-
-    /**
-     * Constructs an IrSequence from input parameter.
-     * @param irStream
-     * @throws IncompatibleArgumentException
-     * @throws UnassignedException
-     * /
-    public IrSequence(PrimaryIrStream irStream) throws IncompatibleArgumentException, UnassignedException {
-        this(irStream.toIrSequence());
-    }*/
 
     /**
      * Constructs an IrSequence from the parameter data, by cloning.
@@ -387,7 +377,7 @@ public class IrSequence implements Cloneable, Serializable {
                 System.arraycopy(data, beg, arr, 0, i - beg + 1);
                 try {
                     arrayList.add(new IrSequence(arr));
-                } catch (IncompatibleArgumentException ex) {
+                } catch (OddSequenceLenghtException ex) {
                     assert(false);
                 }
                 beg = i + 1;
@@ -740,7 +730,7 @@ public class IrSequence implements Cloneable, Serializable {
             irs = new IrSequence(raw);
             System.out.println(irs);
             System.out.println(new IrSequence());
-        } catch (IncompatibleArgumentException e) {
+        } catch (OddSequenceLenghtException e) {
         }
     }
 }

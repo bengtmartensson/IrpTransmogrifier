@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 /**
  *
  */
-public abstract class PrimaryItem implements Numerical {
+public abstract class PrimaryItem implements Numerical,XmlExport {
 
     public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) throws IrpSyntaxException {
         ParseTree child = ctx.getChild(0);

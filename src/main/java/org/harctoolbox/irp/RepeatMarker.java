@@ -18,11 +18,13 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements Repeatmarker as per Chapter 8.
  */
-public class RepeatMarker {
+public class RepeatMarker implements XmlExport {
 
     private static int noInfiniteRepeats = 0;
 
@@ -153,5 +155,16 @@ public class RepeatMarker {
      */
     public int getMax() {
         return max;
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("repeat_marker");
+        if (min > 0)
+            element.setAttribute("min", Integer.toString(min));
+        if (max < Integer.MAX_VALUE)
+            element.setAttribute("max", Integer.toString(max));
+        element.setTextContent(toString());
+        return element;
     }
 }

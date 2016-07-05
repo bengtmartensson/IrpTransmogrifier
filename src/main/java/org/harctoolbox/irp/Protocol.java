@@ -24,7 +24,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
@@ -267,7 +266,7 @@ public class Protocol {
     public Element toElement(Document document) throws IrpSyntaxException {
         Element root = document.createElement("protocol-renderer");
         //root.setAttribute("name", name);
-        root.setAttribute("frequency", Long.toString(Math.round(IrCoreUtils.khz2Hz(getFrequency()))));
+        root.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
         root.setAttribute("bitdirection", getBitDirection().toString());
         root.setAttribute("timeunit", Long.toString(Math.round(getUnit())));
         if (getDutyCycle() > 0)
@@ -275,9 +274,9 @@ public class Protocol {
         Element irp = document.createElement("irp");
         irp.appendChild(document.createCDATASection("\n" + irpString + "\n"));
         root.appendChild(irp);
-        Element docu = document.createElement("documentation");
+        //Element docu = document.createElement("documentation");
         //docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
-        root.appendChild(docu);
+        //root.appendChild(docu);
         Element stringTree = document.createElement("stringTree");
         stringTree.appendChild(document.createCDATASection("\n" + toStringTree() + "\n"));
         root.appendChild(stringTree);

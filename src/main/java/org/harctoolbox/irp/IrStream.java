@@ -112,8 +112,70 @@ public class IrStream extends BareIrStream {
         return super.toString() + (repeatMarker != null ? repeatMarker.toString() : "");
     }
 
+    public boolean isRepeatSequence() {
+        return repeatMarker != null && repeatMarker.isInfinite();
+    }
+
+    @Override
     public Element toElement(Document document) {
-        Element root = document.createElement("bitspec");
-        return root;
+        Element element = document.createElement("irstream");
+        element.setAttribute("is_repeat", Boolean.toString(isRepeatSequence()));
+        element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
+        element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
+        Element intro = document.createElement("intro");
+        element.appendChild(intro);
+        Element repeat = document.createElement("repeat");
+        element.appendChild(repeat);
+        Element ending = document.createElement("ending");
+        element.appendChild(ending);
+
+        if (!isRepeatSequence()) {
+            Element current = intro;
+            int bareDurations = 0;
+            int bits = 0;
+            for (IrStreamItem item : irStreamItems) {
+                if (item instanceof IrStream && ((IrStream) item).isRepeatSequence()) {
+                    intro.setAttribute("numberOfBits", Integer.toString(bits));
+                    intro.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
+                    bits = 0;
+                    bareDurations = 0;
+                    repeat.appendChild(item.toElement(document));
+                    repeat.setAttribute("numberOfBareDurations", Integer.toString(item.numberOfBareDurations()));
+                    repeat.setAttribute("numberOfBits", Integer.toString(item.numberOfBits()));
+                    current = ending;
+
+                } else {
+                    current.appendChild(item.toElement(document));
+                    bareDurations += item.numberOfBareDurations();
+                    bits += item.numberOfBits();
+                }
+            }
+            ending.setAttribute("numberOfBits", Integer.toString(bits));
+            ending.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
+        } else {
+            for (IrStreamItem item : irStreamItems)
+                repeat.appendChild(item.toElement(document));
+        }
+
+        if (repeatMarker != null)
+            element.appendChild(repeatMarker.toElement(document));
+        return element;
+    }
+
+    @Override
+    int numberOfBareDurations() {
+        int sum = 0;
+        for (IrStreamItem item : irStreamItems)
+            sum += item.numberOfBareDurations();
+        return sum;
+    }
+
+    @Override
+    int numberOfBits() {
+        int sum = 0;
+        for (IrStreamItem item : irStreamItems)
+            sum += item.numberOfBits();
+        return sum;
     }
 }

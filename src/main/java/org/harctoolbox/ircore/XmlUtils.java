@@ -179,8 +179,7 @@ public class XmlUtils {
 
     public static void printDOM(File file, Document doc, String encoding)
             throws FileNotFoundException {
-        printDOM(file != null ? new FileOutputStream(file) : System.out,
-                doc, encoding);
+        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding);
         System.err.println("File " + file + " written.");
     }
 
@@ -189,6 +188,10 @@ public class XmlUtils {
 
     public static void printDOM(File file, Document doc) throws FileNotFoundException {
         printDOM(file, doc, null);
+    }
+
+    public static void printDOM(Document doc) {
+        printDOM(System.out, doc, null);
     }
 
     private static Schema readSchemaFromFile(File schemaFile) throws SAXException {

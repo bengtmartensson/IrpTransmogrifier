@@ -18,6 +18,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -73,5 +75,17 @@ public class Number extends PrimaryItem {
 
     public String toInfixCode() {
         return Long.toString(data);
+    }
+
+    @Override
+    public String toString() {
+        return Long.toString(data);
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("number");
+        element.setTextContent(toString());
+        return element;
     }
 }

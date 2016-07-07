@@ -61,9 +61,11 @@ public class ParameterSpecs {
 
     public ParameterSpecs(IrpParser.Parameter_specsContext t) {
         this();
-        for (IrpParser.Parameter_specContext parameterSpec : t.parameter_spec()) {
-            ParameterSpec ps = new ParameterSpec(parameterSpec);
-            map.put(ps.getName(), ps);
+        if (t != null) {
+            for (IrpParser.Parameter_specContext parameterSpec : t.parameter_spec()) {
+                ParameterSpec ps = new ParameterSpec(parameterSpec);
+                map.put(ps.getName(), ps);
+            }
         }
     }
 

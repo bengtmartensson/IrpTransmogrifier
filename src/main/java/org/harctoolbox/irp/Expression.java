@@ -22,6 +22,8 @@ import com.beust.jcommander.ParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.antlr.v4.gui.TreeViewer;
@@ -350,9 +352,47 @@ public class Expression extends PrimaryItem /* ??? */ {
     @Override
     public Element toElement(Document document) {
         Element element = document.createElement("expression");
-        element.setTextContent("Expression.toElement");
+        Element op = null;
+        switch (parseTree.children.size()) {
+            case 1:
+                ParseTree child = parseTree.children.get(0);
+
+                try {
+                    if (child instanceof IrpParser.Primary_itemContext)
+                        element.appendChild(newPrimaryItem((IrpParser.Primary_itemContext) child).toElement(document));
+                    else if (child instanceof IrpParser.BitfieldContext)
+                        element.appendChild(BitField.newBitField((IrpParser.BitfieldContext) child).toElement(document));
+                    else
+                        ;
+                } catch (IrpSyntaxException ex) {
+                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+
+            case 2:
+                op = document.createElement("unary_operator");
+                op.setAttribute("type", parseTree.children.get(0).getText());
+                element.appendChild(op);
+                op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
+                break;
+            case 3:
+                op = document.createElement("binary_operator");
+                op.setAttribute("type", parseTree.children.get(1).getText());
+                element.appendChild(op);
+                op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
+                op.appendChild(new Expression(parseTree.expression(1)).toElement(document));
+                break;
+            case 5:
+                op = document.createElement("ternary_operator");
+                element.appendChild(op);
+                op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
+                op.appendChild(new Expression(parseTree.expression(1)).toElement(document));
+                op.appendChild(new Expression(parseTree.expression(2)).toElement(document));
+                break;
+            default:
+                element.setTextContent("Unknown case in Expression.toElement");
+        }
         return element;
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**

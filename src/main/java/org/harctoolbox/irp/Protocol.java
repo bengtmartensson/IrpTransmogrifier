@@ -43,7 +43,7 @@ public class Protocol {
 
     //private String name;
     //private String documentation;
-    private String irpString;
+    private String irp;
     private GeneralSpec generalSpec;
     //private NameEngine nameEngine;
     private ParameterSpecs parameterSpecs;
@@ -74,9 +74,13 @@ public class Protocol {
         this.parseTree = null;
         this.bitspecIrstream = null;
         this.parameterSpecs = null;
-        this.irpString = null;
+        this.irp = null;
         //this.nameEngine = new NameEngine();
         this.generalSpec = new GeneralSpec();
+    }
+
+    public final String getIrp() {
+        return irp;
     }
 
     /**
@@ -92,7 +96,7 @@ public class Protocol {
         if (irpString == null)
             throw new NullPointerException("IrpString cannot be null");
 
-        this.irpString = irpString;
+        this.irp = irpString;
         //this.nameEngine = new NameEngine();
 
         try {
@@ -264,24 +268,24 @@ public class Protocol {
 //    }
 
     public Element toElement(Document document) throws IrpSyntaxException {
-        Element root = document.createElement("protocol-renderer");
+        Element root = document.createElement("protocol");
         //root.setAttribute("name", name);
         root.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
         root.setAttribute("bitdirection", getBitDirection().toString());
         root.setAttribute("timeunit", Long.toString(Math.round(getUnit())));
         if (getDutyCycle() > 0)
             root.setAttribute("dutycycle", Long.toString(100*Math.round(getDutyCycle())));
-        Element irp = document.createElement("irp");
-        irp.appendChild(document.createCDATASection("\n" + irpString + "\n"));
-        root.appendChild(irp);
+        Element irpElement = document.createElement("irp");
+        irpElement.appendChild(document.createCDATASection(irp));
+        root.appendChild(irpElement);
         //Element docu = document.createElement("documentation");
         //docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
         //root.appendChild(docu);
         Element stringTree = document.createElement("stringTree");
-        stringTree.appendChild(document.createCDATASection("\n" + toStringTree() + "\n"));
+        stringTree.appendChild(document.createCDATASection(toStringTree()));
         root.appendChild(stringTree);
 
-        Element renderer = document.createElement("renderer");
+        Element renderer = document.createElement("implementation");
         root.appendChild(renderer);
         renderer.appendChild(parameterSpecs.toElement(document));
         //renderer.appendChild(nameEngine.toElement(document));

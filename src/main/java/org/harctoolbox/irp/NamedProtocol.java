@@ -62,7 +62,7 @@ public class NamedProtocol extends Protocol {
         Element root = super.toElement(document);
         root.setAttribute("name", name);
         Element docu = document.createElement("documentation");
-        docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
+        docu.appendChild(document.createCDATASection(documentation));
         root.appendChild(docu);
         return root;
     }

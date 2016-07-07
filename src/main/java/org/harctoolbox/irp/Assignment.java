@@ -80,7 +80,10 @@ public class Assignment extends IrStreamItem implements Numerical,XmlExport {
 
     @Override
     public Element toElement(Document document) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Element element = document.createElement("assignment");
+        element.appendChild(name.toElement(document));
+        element.appendChild(value.toElement(document));
+        return element;
     }
 
     @Override

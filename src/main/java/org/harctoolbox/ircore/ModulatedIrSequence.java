@@ -221,10 +221,10 @@ public class ModulatedIrSequence extends IrSequence {
      * @param frequencyTolerance tolerance (absolute) for frequency in Hz.
      * @return equality within tolerance.
      */
-    public boolean isEqual(ModulatedIrSequence irSequence, double absoluteTolerance,
+    public boolean approximatelyEquals(ModulatedIrSequence irSequence, double absoluteTolerance,
             double relativeTolerance, double frequencyTolerance) {
-        return IrCoreUtils.isEqual(this.getFrequency(), irSequence.getFrequency(), 500, 0)
-                && super.isEqual(irSequence, absoluteTolerance, relativeTolerance);
+        return IrCoreUtils.approximatelyEquals(this.getFrequency(), irSequence.getFrequency(), 500, 0)
+                && super.approximatelyEquals(irSequence, absoluteTolerance, relativeTolerance);
     }
 
     /**

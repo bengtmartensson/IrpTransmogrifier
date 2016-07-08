@@ -463,8 +463,8 @@ public class IrSequence implements Cloneable, Serializable {
      * @param irSequence to be compared against this.
      * @return equality
      */
-    public boolean isEqual(IrSequence irSequence) {
-        return isEqual(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    public boolean approximatelyEquals(IrSequence irSequence) {
+        return IrSequence.this.approximatelyEquals(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
     /**
@@ -475,12 +475,12 @@ public class IrSequence implements Cloneable, Serializable {
      * @param relativeTolerance relative threshold, between 0 and 1.
      * @return equality within tolerance.
      */
-    public boolean isEqual(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+    public boolean approximatelyEquals(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         if (irSequence == null || (data.length != irSequence.data.length))
             return false;
 
         for (int i = 0; i < data.length; i++)
-            if (!IrCoreUtils.isEqual(data[i], irSequence.data[i], absoluteTolerance, relativeTolerance))
+            if (!IrCoreUtils.approximatelyEquals(data[i], irSequence.data[i], absoluteTolerance, relativeTolerance))
                 return false;
 
         return true;
@@ -497,16 +497,16 @@ public class IrSequence implements Cloneable, Serializable {
      * @param lastLimit
      * @return if the subsequences are approximately equal.
      */
-    public boolean isEqual(int beginning, int compareStart, int length, double absoluteTolerance, double relativeTolerance, double lastLimit) {
+    public boolean approximatelyEquals(int beginning, int compareStart, int length, double absoluteTolerance, double relativeTolerance, double lastLimit) {
         boolean specialTreatment = compareStart + length == data.length && lastLimit > 0;
         for (int i = 0; i < (specialTreatment ? length - 1 : length); i++) {
-            if (!IrCoreUtils.isEqual(Math.abs(data[beginning+i]), Math.abs(data[compareStart+i]), absoluteTolerance, relativeTolerance))
+            if (!IrCoreUtils.approximatelyEquals(Math.abs(data[beginning+i]), Math.abs(data[compareStart+i]), absoluteTolerance, relativeTolerance))
                 return false;
         }
 
         if (specialTreatment) {
             if (!(
-                    IrCoreUtils.isEqual(Math.abs(data[beginning+length-1]), Math.abs(data[compareStart+length-1]), absoluteTolerance, relativeTolerance)
+                    IrCoreUtils.approximatelyEquals(Math.abs(data[beginning+length-1]), Math.abs(data[compareStart+length-1]), absoluteTolerance, relativeTolerance)
                     || (Math.abs(data[beginning+length-1]) >= lastLimit && Math.abs(data[compareStart+length-1]) >= lastLimit)))
                 return false;
         }
@@ -523,8 +523,8 @@ public class IrSequence implements Cloneable, Serializable {
      * @param relativeTolerance relative threshold, between 0 and 1.
      * @return if the subsequences are approximately equal.
      */
-    public boolean isEqual(int beginning, int compareStart, int length, double absoluteTolerance, double relativeTolerance) {
-        return isEqual(beginning, compareStart, length, absoluteTolerance, relativeTolerance, 0f);
+    public boolean approximatelyEquals(int beginning, int compareStart, int length, double absoluteTolerance, double relativeTolerance) {
+        return IrSequence.this.approximatelyEquals(beginning, compareStart, length, absoluteTolerance, relativeTolerance, 0f);
     }
 
     private static List<Double> normalize(List<Double> list, boolean nukeLeadingZeros) {
@@ -619,6 +619,17 @@ public class IrSequence implements Cloneable, Serializable {
         for (int i = 0; i < data.length; i++)
             sum += Math.abs(data[i]);
         return sum;
+    }
+
+    /**
+     * Computes the total duration of a subsequence of the IR sequence modeled.
+     *
+     * @param begin start of subsequence.
+     * @param length length of subsequence.
+     * @return Length of the IR sequence in microseconds.
+     */
+    public double getDuration(int begin, int length) {
+        return IrCoreUtils.l1Norm(data, begin, length);
     }
 
     /**

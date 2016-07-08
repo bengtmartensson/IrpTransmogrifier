@@ -200,7 +200,7 @@ public class BitSpec {
                     return false;
                 if (a == null)
                     a = on.get(0);
-                if (! (IrCoreUtils.isEqual(a, on.get(0), 1, 0) && IrCoreUtils.isEqual(-a, on.get(1), 1, 0)))
+                if (! (IrCoreUtils.approximatelyEquals(a, on.get(0), 1, 0) && IrCoreUtils.approximatelyEquals(-a, on.get(1), 1, 0)))
                     return false;
                 a = -a;
             } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {

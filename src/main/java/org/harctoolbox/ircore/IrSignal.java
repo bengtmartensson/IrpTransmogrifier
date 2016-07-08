@@ -333,9 +333,9 @@ public class IrSignal {
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
         // If the given intro sequence is identical to the repeat sequence, reject it.
-        this.introSequence = ((introSequence != null) && !introSequence.isEqual(repeatSequence)) ? introSequence : new IrSequence();
+        this.introSequence = ((introSequence != null) && !introSequence.approximatelyEquals(repeatSequence)) ? introSequence : new IrSequence();
         this.repeatSequence = repeatSequence != null ? repeatSequence : new IrSequence();
-        this.endingSequence = ((endingSequence != null) && !endingSequence.isEqual(repeatSequence)) ? endingSequence : new IrSequence();
+        this.endingSequence = ((endingSequence != null) && !endingSequence.approximatelyEquals(repeatSequence)) ? endingSequence : new IrSequence();
 
         map = new EnumMap<>(Pass.class);
 
@@ -609,12 +609,12 @@ public class IrSignal {
      * @param frequencyTolerance tolerance (absolute) for frequency in Hz.
      * @return equality within tolerance.
      */
-    public boolean isEqual(IrSignal irSignal, double absoluteTolerance, double relativeTolerance,
+    public boolean approximatelyEquals(IrSignal irSignal, double absoluteTolerance, double relativeTolerance,
             double frequencyTolerance) {
-        return IrCoreUtils.isEqual(frequency, irSignal.frequency, frequencyTolerance, 0)
-                && introSequence.isEqual(irSignal.introSequence, absoluteTolerance, relativeTolerance)
-                && repeatSequence.isEqual(irSignal.repeatSequence, absoluteTolerance, relativeTolerance)
-                && endingSequence.isEqual(irSignal.endingSequence, absoluteTolerance, relativeTolerance);
+        return IrCoreUtils.approximatelyEquals(frequency, irSignal.frequency, frequencyTolerance, 0)
+                && introSequence.approximatelyEquals(irSignal.introSequence, absoluteTolerance, relativeTolerance)
+                && repeatSequence.approximatelyEquals(irSignal.repeatSequence, absoluteTolerance, relativeTolerance)
+                && endingSequence.approximatelyEquals(irSignal.endingSequence, absoluteTolerance, relativeTolerance);
     }
 
     /**
@@ -623,8 +623,8 @@ public class IrSignal {
      * @param irSignal to be compared against this.
      * @return equality within tolerance.
      */
-    public boolean isEqual(IrSignal irSignal) {
-        return isEqual(irSignal, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance, IrCoreUtils.defaultFrequencyTolerance);
+    public boolean approximatelyEquals(IrSignal irSignal) {
+        return approximatelyEquals(irSignal, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance, IrCoreUtils.defaultFrequencyTolerance);
     }
 
     /**

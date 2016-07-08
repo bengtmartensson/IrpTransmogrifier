@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * This class implements Extents as per Chapter 4.
  *
  */
-public class Extent extends Duration implements XmlExport {
+public class Extent extends Duration {
 
     private static int noInstances = 0;
 

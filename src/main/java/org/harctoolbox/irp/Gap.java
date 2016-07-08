@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * This class implements Gap as per Chapter 3.
  *
  */
-public class Gap extends Duration implements XmlExport {
+public class Gap extends Duration {
 
     Gap(IrpParser.Gap_durationContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);

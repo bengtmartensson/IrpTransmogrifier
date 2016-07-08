@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.List;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -74,17 +73,17 @@ public abstract class IrStreamItem implements XmlExport {
         return noAlternatives;
     }
 
-    protected void debugBegin() {
-
-    }
-
-    protected void debugEnd() {
-
-    }
-
-    protected void debugEnd(List<IrStreamItem>list) {
-
-    }
+//    protected void debugBegin() {
+//
+//    }
+//
+//    protected void debugEnd() {
+//
+//    }
+//
+//    protected void debugEnd(List<IrStreamItem>list) {
+//
+//    }
 
     abstract EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;

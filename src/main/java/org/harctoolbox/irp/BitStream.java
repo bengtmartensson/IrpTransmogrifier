@@ -23,7 +23,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class BitStream extends IrStreamItem implements XmlExport {
+class BitStream extends IrStreamItem {
 
     private long length;
     private BigInteger data;
@@ -130,7 +130,7 @@ class BitStream extends IrStreamItem implements XmlExport {
     @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        debugBegin();
+        //debugBegin();
         if (bitSpec == null)
             throw new UnassignedException("BitStream " + toString() + " has no associated BitSpec, cannot compute IrStream");
 

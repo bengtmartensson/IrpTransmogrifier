@@ -351,6 +351,7 @@ public class IrSignal {
      * @param noIntroBursts
      * @param noRepeatBursts
      * @param frequency
+     * @throws IncompatibleArgumentException
      */
     public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) throws IncompatibleArgumentException {
         this(durations, noIntroBursts, noRepeatBursts, frequency, ModulatedIrSequence.unknownDutyCycle);

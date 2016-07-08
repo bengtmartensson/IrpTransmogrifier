@@ -28,11 +28,13 @@ import org.w3c.dom.Element;
  *
  */
 public class NamedProtocol extends Protocol {
+    private String irp;
     private String name;
     private String documentation;
 
     public NamedProtocol(String name, String irp, String documentation) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
         super(irp);
+        this.irp = irp;
         this.name = name;
         this.documentation = documentation;
     }
@@ -49,6 +51,10 @@ public class NamedProtocol extends Protocol {
      */
     public String getDocumentation() {
         return documentation;
+    }
+
+    public String getIrp() {
+        return irp;
     }
 
     public Document toDocument() throws IrpSyntaxException {

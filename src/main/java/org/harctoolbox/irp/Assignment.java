@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class Assignment extends IrStreamItem implements Numerical,XmlExport {
+public class Assignment extends IrStreamItem implements Numerical {
     private Name name;
     private Expression value;
 

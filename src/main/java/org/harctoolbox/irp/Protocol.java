@@ -43,13 +43,14 @@ public class Protocol {
 
     //private String name;
     //private String documentation;
-    private String irp;
+    //private String irp;
     private GeneralSpec generalSpec;
     //private NameEngine nameEngine;
     private ParameterSpecs parameterSpecs;
     private BitspecIrstream bitspecIrstream;
     private IrpParser.ProtocolContext parseTree;
     private ParserDriver parseDriver;
+    private NameEngine nameEngine;
 
     // True the first time render is called, then false -- to be able to initialize.
     private boolean virgin = true;
@@ -74,14 +75,18 @@ public class Protocol {
         this.parseTree = null;
         this.bitspecIrstream = null;
         this.parameterSpecs = null;
-        this.irp = null;
+        //this.irp = null;
         //this.nameEngine = new NameEngine();
         this.generalSpec = new GeneralSpec();
     }
 
-    public final String getIrp() {
-        return irp;
+    public IrpParser.ProtocolContext getParseTree() {
+        return parseTree;
     }
+
+//    public final String getIrp() {
+//        return irp;
+//    }
 
     /**
      * Main constructor.
@@ -92,20 +97,37 @@ public class Protocol {
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      * @throws org.harctoolbox.irp.InvalidRepeatException
      */
-    public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
-        if (irpString == null)
-            throw new NullPointerException("IrpString cannot be null");
+    public Protocol(String irpString) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
+        this(new ParserDriver(irpString).getParser().protocol());
+    }
 
-        this.irp = irpString;
-        //this.nameEngine = new NameEngine();
+//    public Protocol(ParserDriver parserDriver) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
+//        this(parserDriver.getParser().protocol());
+//    }
 
+//    public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
+//        if (irpString == null)
+//            throw new NullPointerException("IrpString cannot be null");
+//
+//        this.irp = irpString;
+//        //this.nameEngine = new NameEngine();
+//
+//
+//            ParserDriver.reset();
+//            parseDriver = new ParserDriver(irpString);
+//            parseTree = parseDriver.getParser().protocol();
+//    }
+
+    public Protocol(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
+        this.parseTree = parseTree;
         try {
-            ParserDriver.reset();
-            parseDriver = new ParserDriver(irpString);
-            parseTree = parseDriver.getParser().protocol();
-
             generalSpec = new GeneralSpec(parseTree);
             bitspecIrstream = new BitspecIrstream(parseTree);
+            nameEngine = new NameEngine();
+            for (IrpParser.DefinitionsContext definitions : parseTree.definitions())
+                nameEngine.parseDefinitions(definitions);
+
+            //definitionss = new Defi
             parameterSpecs = new ParameterSpecs(parseTree);
         } catch (ParseCancellationException ex) {
             throw new IrpSyntaxException(ex);
@@ -276,7 +298,7 @@ public class Protocol {
         if (getDutyCycle() > 0)
             root.setAttribute("dutycycle", Long.toString(100*Math.round(getDutyCycle())));
         Element irpElement = document.createElement("irp");
-        irpElement.appendChild(document.createCDATASection(irp));
+        //irpElement.appendChild(document.createCDATASection(irp));
         root.appendChild(irpElement);
         //Element docu = document.createElement("documentation");
         //docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
@@ -287,11 +309,12 @@ public class Protocol {
 
         Element renderer = document.createElement("implementation");
         root.appendChild(renderer);
-        renderer.appendChild(parameterSpecs.toElement(document));
         //renderer.appendChild(nameEngine.toElement(document));
-
         Element body = bitspecIrstream.toElement(document);
         renderer.appendChild(body);
+        Element definitionsElement = nameEngine.toElement(document);
+        renderer.appendChild(definitionsElement);
+        renderer.appendChild(parameterSpecs.toElement(document));
         return root;
     }
 

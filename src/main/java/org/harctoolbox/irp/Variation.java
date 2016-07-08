@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class Variation extends IrStreamItem implements XmlExport {
+public class Variation extends IrStreamItem {
 
     public Variation(String str) {
         this((new ParserDriver(str)).getParser().variation());

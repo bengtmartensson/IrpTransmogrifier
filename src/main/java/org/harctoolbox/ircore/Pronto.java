@@ -153,6 +153,7 @@ public class Pronto {
      * Creates a new IrSignals by interpreting its argument as CCF signal.
      * @param ccf CCF signal
      * @return  IrSignal
+     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      * @throws IncompatibleArgumentException
      */
     public static IrSignal parse(int[] ccf) throws OddSequenceLenghtException, IncompatibleArgumentException {

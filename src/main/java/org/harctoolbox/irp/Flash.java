@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * This class implements Flash as per Chapter 3.
  *
  */
-public class Flash extends Duration implements XmlExport {
+public class Flash extends Duration {
 
     public Flash(IrpParser.Flash_durationContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : null);

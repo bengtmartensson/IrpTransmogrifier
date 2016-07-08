@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
@@ -213,9 +214,17 @@ public class NameEngine {
 
     public Element toElement(Document document) {
         Element root = document.createElement("definitions");
+        for (Map.Entry<String, Expression> definition : map.entrySet())
+            root.appendChild(mkElement(document, definition));
         return root;
     }
 
+    private static Element mkElement(Document document, Map.Entry<String, Expression> definition) {
+        Element element = document.createElement("definition");
+        element.appendChild(new Name(definition.getKey()).toElement(document));
+        element.appendChild(definition.getValue().toElement(document));
+        return element;
+    }
     /*private static void usage(int code) {
         System.err.println("Usage:");
         System.err.println("\tNameEngine [<name>=<value>|{<name>=<expression>}]+");

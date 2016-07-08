@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class FiniteBitField extends BitField implements XmlExport {
+public class FiniteBitField extends BitField {
     private PrimaryItem width;
     private boolean reverse;
 

@@ -462,7 +462,7 @@ public class Expression extends PrimaryItem /* ??? */ {
         }
 
         try {
-            String text = IrpUtils.join(commandLineArgs.expression, "");
+            String text = String.join("", commandLineArgs.expression);
             IrpParser parser = new ParserDriver(text).getParser();
             Expression expression = new Expression(parser.expression());
             //if (!parser.isMatchedEOF()) {

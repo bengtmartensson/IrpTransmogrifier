@@ -24,12 +24,17 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import org.antlr.v4.gui.TreeViewer;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
@@ -58,7 +63,8 @@ public class IrpTransmogrifier {
     }
 
     private static void doList(IrpDatabase irpDatabase, CommandList commandList) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
-        List<String> list = commandList.protocols == null ? new ArrayList<>(irpDatabase.getNames()) : commandList.protocols;
+        List<String> list = commandList.protocols == null ? new ArrayList<>(irpDatabase.getNames())
+                : irpDatabase.getMatchingNames(commandList.protocols);
         if (commandList.sort)
             Collections.sort(list);
 
@@ -69,6 +75,16 @@ public class IrpTransmogrifier {
                 System.out.println(irpDatabase.getIrp(proto));
             if (commandList.documentation)
                 System.out.println(irpDatabase.getDocumentation(proto));
+            if (commandList.stringTree) {
+                Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
+                System.out.println(protocol.toStringTree());
+            }
+            if (commandList.gui) {
+                IrpParser parser = new ParserDriver(irpDatabase.getIrp(proto)).getParser();
+                //parser = new ParserDriver(irpDatabase.getIrp(proto)).getParser();
+                Protocol protocol = new Protocol(parser.protocol());
+                showTreeViewer(parser, protocol.getParseTree(), "Parse tree for " + proto);
+            }
             if (commandList.parse)
                 try {
                     new Protocol(irpDatabase.getIrp(proto));
@@ -99,6 +115,30 @@ public class IrpTransmogrifier {
 
     private static void doRecognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * show the given Tree Viewer
+     *
+     * @param tv
+     * @param title
+     * @return
+     */
+    public static int showTreeViewer(TreeViewer tv, String title) {
+        JPanel panel = new JPanel();
+        //tv.setScale(2);
+        panel.add(tv);
+
+        return JOptionPane.showConfirmDialog(null, panel, title,
+                JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    public static int showTreeViewer(IrpParser parser, ParserRuleContext parserRuleContext, String title) {
+        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+
+        // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
+        TreeViewer tv = new TreeViewer(ruleNames, parserRuleContext);
+        return showTreeViewer(tv, title);
     }
 
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
@@ -138,6 +178,9 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"list"}, commandDescription = "List the protocols known")
     private static class CommandList {
 
+        @Parameter(names = { "--gui"}, description = "Display parse diagram")
+        private boolean gui = false;
+
         @Parameter(names = { "--irp"}, description = "List IRP")
         private boolean irp = false;
 
@@ -150,7 +193,10 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-s", "--sort"}, description = "Sort the output")
         private boolean sort = false;
 
-        @Parameter(description = "List of protocols (default all)")
+        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+        private boolean stringTree = false;
+
+        @Parameter(description = "List of protocols (regexps) (default all)")
         private List<String> protocols;
     }
 
@@ -258,8 +304,10 @@ public class IrpTransmogrifier {
         try {
             IrpDatabase irpDatabase = IrpDatabase.newIrpDatabase(commandLineArgs.configfile);
             String command = argumentParser.getParsedCommand();
-            if (command == null)
+            if (command == null) {
                 usage(IrpUtils.exitUsageError);
+                return;
+            }
             switch (command) {
                 case "list":
                     doList(irpDatabase, commandList);

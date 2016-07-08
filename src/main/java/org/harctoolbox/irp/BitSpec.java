@@ -161,7 +161,7 @@ public class BitSpec {
     }
 
     /**
-     * Checks if the BitSpec is of type <a,-b|c,-d>, for a,b,c,d > 0.
+     * Checks if the BitSpec is of type &lt;a,-b|c,-d&gt;, for a,b,c,d &gt; 0.
      * @param nameEngine
      * @param generalSpec
      * @return
@@ -183,7 +183,7 @@ public class BitSpec {
     }
 
     /**
-     * Checks if the BitSpec is of type <a,-a|-a,a> (a != 0)
+     * Checks if the BitSpec is of type &lt;a,-a|-a,a&gt; (a != 0)
      * @param nameEngine
      * @param generalSpec
      * @return

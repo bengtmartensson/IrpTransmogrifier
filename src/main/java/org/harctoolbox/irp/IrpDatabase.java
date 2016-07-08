@@ -20,8 +20,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,9 +33,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 // TODO: allow more than one file; include directive.
@@ -182,6 +180,24 @@ public class IrpDatabase {
         return protocols.keySet();
     }
 
+    public List<String> getMatchingNames(String regexp) {
+        Pattern pattern = Pattern.compile(regexp.toLowerCase(Locale.US));
+        List<String> result = new ArrayList<>();
+        for (String candidate : protocols.keySet()) {
+            if (pattern.matcher(candidate).matches())
+                result.add(candidate);
+        }
+        return result;
+    }
+
+    public List<String> getMatchingNames(Iterable<String> iterable) {
+        List<String> result = new ArrayList<>();
+        for (String s : iterable) {
+            result.addAll(getMatchingNames(s));
+        }
+        return result;
+    }
+
     public final String getDocumentation(String name) {
         UnparsedProtocol prot = protocols.get(name);
         return prot == null ? null : prot.getDocumentation();
@@ -263,7 +279,7 @@ public class IrpDatabase {
         protocols = new LinkedHashMap<>();
     }
 
-    public class WrongCharSetException extends RuntimeException {
+    public static class WrongCharSetException extends RuntimeException {
         WrongCharSetException(String charSet) {
             super(charSet);
         }
@@ -299,10 +315,10 @@ public class IrpDatabase {
     private static String determineCharSet(Reader reader) throws IOException {
         BufferedReader in = new BufferedReader(reader);
         String line = in.readLine();
-        if (!line.trim().equals("[encoding]"))
+        if (line == null || !line.trim().equals("[encoding]"))
             return null;
         line = in.readLine();
-        return line.trim();
+        return line != null ? line.trim() : null;
     }
 
     /**
@@ -317,10 +333,10 @@ public class IrpDatabase {
      */
     public static IrpDatabase newIrpDatabase(String datafile) throws IOException, WrongCharSetException, IncompatibleArgumentException {
         String charSet;
-        try (InputStreamReader is = new InputStreamReader(IrpUtils.getInputSteam(datafile))) {
+        try (InputStreamReader is = new InputStreamReader(IrpUtils.getInputSteam(datafile), "US-ASCII")) {
             charSet = determineCharSet(is);
         }
-        IrpDatabase db = new IrpDatabase(new InputStreamReader(IrpUtils.getInputSteam(datafile)), charSet);
+        IrpDatabase db = new IrpDatabase(new InputStreamReader(IrpUtils.getInputSteam(datafile), charSet), charSet);
         return db;
     }
 
@@ -364,8 +380,8 @@ public class IrpDatabase {
                 if (line.startsWith("#")) {
                     // comment, ignore
                 } else if (line.equals("[encoding]")) {
-                    String fileEncoding = in.readLine().toLowerCase(Locale.US);
-                    if (!fileEncoding.equalsIgnoreCase(encoding))
+                    String fileEncoding = in.readLine();
+                    if (fileEncoding == null || !fileEncoding.equalsIgnoreCase(encoding))
                         throw new WrongCharSetException(fileEncoding);
                 } else if (line.equals("[version]")) {
                     configFileVersion = in.readLine();
@@ -409,78 +425,5 @@ public class IrpDatabase {
         }
         expand();
         logger.log(Level.FINE, "{0} protocols read.", protocols.size());
-    }
-
-    private static void usage(int exitcode) {
-        StringBuilder str = new StringBuilder();
-        argumentParser.usage(str);
-
-        str.append("\n"
-                + "parameters: <protocol> <deviceno> [<subdevice_no>] commandno [<toggle>]\n"
-                + "   or       <Pronto code>");
-
-        (exitcode == IrpUtils.exitSuccess ? System.out : System.err).println(str);
-        doExit(exitcode);
-    }
-
-    private static void doExit(int exitcode) {
-        System.exit(exitcode);
-    }
-
-    private final static class CommandLineArgs {
-        private final static int defaultTimeout = 2000;
-
-        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file")
-        private String configfile = "src/main/config/IrpProtocols.ini";
-
-        @Parameter(names = {"-p", "--parse"}, description = "Test parse the protocol(s)")
-        private boolean parse = false;
-
-        @Parameter(description = "protocols")
-        private List<String> protocols = new ArrayList<>();
-    }
-
-
-    /**
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        CommandLineArgs commandLineArgs = new CommandLineArgs();
-        argumentParser = new JCommander(commandLineArgs);
-        argumentParser.setProgramName("IrpDatabase");
-
-        try {
-            argumentParser.parse(args);
-        } catch (ParameterException ex) {
-            System.err.println(ex.getMessage());
-            usage(IrpUtils.exitUsageError);
-        }
-
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setLevel(Level.FINE);
-        logger.addHandler(handler);
-        logger.setUseParentHandlers(false);
-        logger.setLevel(Level.ALL);
-
-        try {
-            IrpDatabase db = newIrpDatabase(commandLineArgs.configfile);
-            System.out.println("Version: " + db.getConfigFileVersion());
-            if (commandLineArgs.protocols.isEmpty()) {
-                for (String proto : db.getNames()) {
-                    System.out.println(proto);
-                    if (commandLineArgs.parse)
-                        new Protocol(db.getIrp(proto));
-                }
-            } else {
-                for (String proto : commandLineArgs.protocols) {
-                    db.dump("-", proto);
-                    if (commandLineArgs.parse)
-                        new Protocol(db.getIrp(proto));
-                }
-            }
-        } catch (IOException | WrongCharSetException | IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
     }
 }

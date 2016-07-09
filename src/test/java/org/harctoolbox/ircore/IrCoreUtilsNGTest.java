@@ -95,7 +95,7 @@ public class IrCoreUtilsNGTest {
     @Test
     public void testL1Norm_DoubleArr() {
         System.out.println("l1Norm");
-        Double[] sequence = new Double[] { new Double(1f), new Double(2f), new Double(3f), new Double(4f) };
+        Double[] sequence = new Double[] { Double.valueOf(1f), Double.valueOf(2f), Double.valueOf(3f), Double.valueOf(4f) };
         double expResult = 10.0;
         double result = IrCoreUtils.l1Norm(sequence);
         assertEquals(result, expResult, 0.0000001);

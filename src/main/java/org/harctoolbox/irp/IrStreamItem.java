@@ -25,7 +25,7 @@ import org.harctoolbox.ircore.IrSignal;
  *
  * @author Bengt Martensson
  */
-public abstract class IrStreamItem implements XmlExport {
+public abstract class IrStreamItem extends IrpObject {
 
     //protected Protocol environment;
     protected int noAlternatives = 0;
@@ -69,7 +69,7 @@ public abstract class IrStreamItem implements XmlExport {
      * To be overridden in Variation
      * @return noAlternatives
      */
-    public int getNoAlternatives() {
+    public int numberOfAlternatives() {
         return noAlternatives;
     }
 

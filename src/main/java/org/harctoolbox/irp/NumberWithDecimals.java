@@ -18,13 +18,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  *
  */
-public class NumberWithDecimals implements Floatable, XmlExport {
+public class NumberWithDecimals extends IrpObject implements Floatable {
     private double data;
 
     public NumberWithDecimals(String str) throws IrpSyntaxException {
@@ -49,7 +50,14 @@ public class NumberWithDecimals implements Floatable, XmlExport {
 
     @Override
     public String toString() {
-        return Double.toString(data);
+        return (IrCoreUtils.approximatelyEquals(data, (double)(long)data, 0, 0.000001)
+                ? Long.toString((long)data)
+                : Double.toString(data));
+    }
+
+    @Override
+    public String toIrpString() {
+        return toString();
     }
 
     public static double parse(String str) throws IrpSyntaxException {

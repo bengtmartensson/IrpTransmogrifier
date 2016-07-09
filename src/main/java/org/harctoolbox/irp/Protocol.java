@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * There are too many public functions in the API...
  *
  */
-public class Protocol {
+public class Protocol extends IrpObject {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
@@ -71,7 +71,7 @@ public class Protocol {
     }
 
     public Protocol() {
-        this.parseDriver = null;
+        //this.parseDriver = null;
         this.parseTree = null;
         this.bitspecIrstream = null;
         this.parameterSpecs = null;
@@ -98,12 +98,13 @@ public class Protocol {
      * @throws org.harctoolbox.irp.InvalidRepeatException
      */
     public Protocol(String irpString) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
-        this(new ParserDriver(irpString).getParser().protocol());
+        this(new ParserDriver(irpString));
     }
 
-//    public Protocol(ParserDriver parserDriver) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
-//        this(parserDriver.getParser().protocol());
-//    }
+    public Protocol(ParserDriver parserDriver) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
+        this.parseDriver = parserDriver;
+        setup(parserDriver.getParser().protocol());
+    }
 
 //    public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
 //        if (irpString == null)
@@ -119,6 +120,10 @@ public class Protocol {
 //    }
 
     public Protocol(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
+        setup(parseTree);
+    }
+
+    private void setup(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException {
         this.parseTree = parseTree;
         try {
             generalSpec = new GeneralSpec(parseTree);
@@ -131,6 +136,10 @@ public class Protocol {
             parameterSpecs = new ParameterSpecs(parseTree);
         } catch (ParseCancellationException ex) {
             throw new IrpSyntaxException(ex);
+        }
+
+        if (numberOfInfiniteRepeats() > 1) {
+            throw new InvalidRepeatException("More than one infinite repeat found.");
         }
 
         if (parameterSpecs.isEmpty()) {
@@ -189,6 +198,11 @@ public class Protocol {
         parameterSpecs.check(nameEngine); // ??
         EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(nameEngine, generalSpec, pass, 0);
         return evaluatedIrStream.toIrSequence();
+    }
+
+    @Override
+    public int numberOfInfiniteRepeats() {
+        return bitspecIrstream.numberOfInfiniteRepeats();
     }
 
 /*
@@ -266,7 +280,7 @@ public class Protocol {
         return generalSpec.getDutyCycle();
     }
     public String toStringTree() throws IrpSyntaxException {
-        return parseTree.toStringTree(parseDriver.getParser());
+        return parseDriver != null ? parseTree.toStringTree(parseDriver.getParser()) : null;
     }
 
     // from irpmaster.XmlExport
@@ -289,17 +303,13 @@ public class Protocol {
 //        return document;
 //    }
 
+    @Override
     public Element toElement(Document document) throws IrpSyntaxException {
         Element root = document.createElement("protocol");
         //root.setAttribute("name", name);
-        root.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
-        root.setAttribute("bitdirection", getBitDirection().toString());
-        root.setAttribute("timeunit", Long.toString(Math.round(getUnit())));
-        if (getDutyCycle() > 0)
-            root.setAttribute("dutycycle", Long.toString(100*Math.round(getDutyCycle())));
-        Element irpElement = document.createElement("irp");
+        //Element irpElement = document.createElement("irp");
         //irpElement.appendChild(document.createCDATASection(irp));
-        root.appendChild(irpElement);
+        //root.appendChild(irpElement);
         //Element docu = document.createElement("documentation");
         //docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
         //root.appendChild(docu);
@@ -309,13 +319,24 @@ public class Protocol {
 
         Element renderer = document.createElement("implementation");
         root.appendChild(renderer);
+        Element generalSpecElement = generalSpec.toElement(document);
+        renderer.appendChild(generalSpecElement);
         //renderer.appendChild(nameEngine.toElement(document));
-        Element body = bitspecIrstream.toElement(document);
-        renderer.appendChild(body);
+        Element bitspecIrstreamElement = bitspecIrstream.toElement(document);
+        renderer.appendChild(bitspecIrstreamElement);
         Element definitionsElement = nameEngine.toElement(document);
         renderer.appendChild(definitionsElement);
         renderer.appendChild(parameterSpecs.toElement(document));
         return root;
+    }
+
+    @Override
+    public String toIrpString() {
+        return
+                generalSpec.toIrpString()
+                + bitspecIrstream.toIrpString()
+                + nameEngine.toIrpString()
+                + parameterSpecs.toIrpString();
     }
 
     /*

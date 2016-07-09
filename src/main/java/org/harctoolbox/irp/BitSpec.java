@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * This class implements BitSpecs, as described in Chapter 7.
  *
  */
-public class BitSpec {
+public class BitSpec extends IrpObject {
     private static int noInstances = 0;
 
     public static void reset() {
@@ -55,6 +55,14 @@ public class BitSpec {
         for (m = 0; x != 0; m++)
             x >>= 1;
         return m;
+    }
+
+    @Override
+    public int numberOfInfiniteRepeats() {
+        int sum = 0;
+        for (BareIrStream code : bitCodes)
+            sum += code.numberOfInfiniteRepeats();
+        return sum;
     }
 /*
     public BitSpec(List<BareIrStream> s, Protocol env) {
@@ -137,6 +145,17 @@ public class BitSpec {
         return s.append(">").toString();
     }
 
+    @Override
+    public String toIrpString() {
+        StringBuilder s = new StringBuilder();
+        s.append("<");
+        List<String> list = new ArrayList<>();
+        for (BareIrStream bitCode : bitCodes)
+           list.add(bitCode.toIrpString());
+
+        return s.append(String.join("|", list)).append(">").toString();
+    }
+
     public int getChunkSize() {
         return chunkSize;
     }
@@ -210,7 +229,8 @@ public class BitSpec {
         return true;
     }
 
-    public Element toElement(Document document) {
+    @Override
+    public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("bitspec");
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunksize", Integer.toString(chunkSize));

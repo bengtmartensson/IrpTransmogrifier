@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -55,6 +56,22 @@ public class ProtocolNGTest {
             assertEquals(result, expResult, 0.0);
         } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException | InvalidRepeatException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Test of numberOfInfiniteRepeats method, of class Protocol.
+     */
+    @Test
+    public void testNumberOfInfiniteRepeats() {
+        System.out.println("numberOfInfiniteRepeats");
+        try {
+            new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,(F:8)+,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
+            fail();
+        } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | IncompatibleArgumentException ex) {
+            fail();
+        } catch (InvalidRepeatException ex) {
+            // success!
         }
     }
 }

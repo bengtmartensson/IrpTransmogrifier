@@ -23,12 +23,14 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class implements GeneralSpec as given in Chapter 2 of Dixon: "Specification of IRP Notation", second draft.
  * This class is immutable; can only be build by the constructor, and not altered.
  */
-public class GeneralSpec {
+public class GeneralSpec extends IrpObject {
 
     /** Carrier frequency in Hz */
     private double frequency = ModulatedIrSequence.defaultFrequency;
@@ -156,5 +158,26 @@ public class GeneralSpec {
         } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
             Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public String toIrpString() {
+        return "{"
+                + getFrequency() + "k,"
+                + getUnit() + ","
+                + getBitDirection()
+                + (getDutyCycle() > 0 ? ("," + getBitDirection()) : "")
+                + "}";
+    }
+
+    @Override
+    public Element toElement(Document document) {
+        Element element = document.createElement("generalspec");
+        element.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
+        element.setAttribute("bitdirection", getBitDirection().toString());
+        element.setAttribute("timeunit", Long.toString(Math.round(getUnit())));
+        if (getDutyCycle() > 0)
+            element.setAttribute("dutycycle", Long.toString(100 * Math.round(getDutyCycle())));
+        return element;
     }
 }

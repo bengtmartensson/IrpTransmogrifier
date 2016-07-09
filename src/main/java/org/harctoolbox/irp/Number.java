@@ -83,6 +83,11 @@ public class Number extends PrimaryItem {
     }
 
     @Override
+    public String toIrpString() {
+        return Long.toString(data);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element element = document.createElement("number");
         element.setTextContent(toString());

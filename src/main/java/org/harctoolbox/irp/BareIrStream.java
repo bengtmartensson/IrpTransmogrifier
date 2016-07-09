@@ -49,8 +49,16 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public int getNoAlternatives() {
+    public int numberOfAlternatives() {
         return noAlternatives;
+    }
+
+    @Override
+    public int numberOfInfiniteRepeats() {
+        int sum = 0;
+        for (IrStreamItem item : irStreamItems)
+            sum += item.numberOfInfiniteRepeats();
+        return sum;
     }
 
     @Override
@@ -106,6 +114,8 @@ public class BareIrStream extends IrStreamItem {
             irStreamItems.add(irStreamItem);
         }
     }
+
+
 /*
     private static List<IrStreamItem> toList(IrpParser.Bare_irstreamContext ctx, Protocol env) {
         List<IrStreamItem> array = new ArrayList<>();
@@ -127,7 +137,16 @@ public class BareIrStream extends IrStreamItem {
 
     @Override
     public String toString() {
-        return irStreamItems.toString();
+        return toIrpString();
+    }
+
+    @Override
+    public String toIrpString() {
+        StringBuilder str = new StringBuilder();
+        List<String> list = new ArrayList<>();
+        for (IrStreamItem item : irStreamItems)
+            list.add(item.toIrpString());
+        return str.append(String.join(",", list)).toString();
     }
 
     /*private static ArrayList<Double> normalize(ArrayList<Double> list, boolean nukeLeadingZeros) {
@@ -183,7 +202,7 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("bare_irstream");
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
         element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));

@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -33,7 +35,7 @@ import org.w3c.dom.Element;
 // TODO: There are probably too many accessing functions here.
 // Clean up by eliminating and making private.
 
-public class NameEngine {
+public class NameEngine extends IrpObject {
 
     private HashMap<String, Expression> map;
 
@@ -194,6 +196,22 @@ public class NameEngine {
         return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
     }
 
+    @Override
+    public String toIrpString() {
+        if (map.isEmpty())
+            return "";
+
+        StringBuilder str = new StringBuilder();
+        List<String> list = new ArrayList<>();
+        str.append("{");
+        for (Map.Entry<String, Expression> kvp : map.entrySet())
+            list.add(kvp.getKey() + "=" + kvp.getValue().toIrpString());
+
+        str.append(list);
+        str.append("}");
+        return str.toString();
+    }
+
     /**
      * Creates consisting of parameter values that can be used as part of filenames etc.
      * Roughly, is a "pretty" variant of toString().
@@ -212,6 +230,7 @@ public class NameEngine {
         return (str.length() == 0 ? "" : str.substring(0, str.length()-1));
     }
 
+    @Override
     public Element toElement(Document document) {
         Element root = document.createElement("definitions");
         for (Map.Entry<String, Expression> definition : map.entrySet())

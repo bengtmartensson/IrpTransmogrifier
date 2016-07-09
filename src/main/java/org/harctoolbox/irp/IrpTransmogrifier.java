@@ -62,13 +62,17 @@ public class IrpTransmogrifier {
         System.exit(exitcode);
     }
 
-    private static void doList(IrpDatabase irpDatabase, CommandList commandList) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
+    private static void doList(IrpDatabase irpDatabase, CommandList commandList) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException {
         List<String> list = commandList.protocols == null ? new ArrayList<>(irpDatabase.getNames())
-                : irpDatabase.getMatchingNames(commandList.protocols);
+                : commandList.regexp ? irpDatabase.getMatchingNames(commandList.protocols)
+                : commandList.protocols;
         if (commandList.sort)
             Collections.sort(list);
 
         for (String proto : list) {
+            if (!irpDatabase.isKnown(proto))
+                throw new UnknownProtocolException(proto);
+
             System.out.println(proto);
 
             if (commandList.irp)
@@ -78,6 +82,10 @@ public class IrpTransmogrifier {
             if (commandList.stringTree) {
                 Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
                 System.out.println(protocol.toStringTree());
+            }
+            if (commandList.is) {
+                Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
+                System.out.println(protocol.toIrpString());
             }
             if (commandList.gui) {
                 IrpParser parser = new ParserDriver(irpDatabase.getIrp(proto)).getParser();
@@ -95,7 +103,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void doCode(IrpDatabase irpDatabase, CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
+    private static void doCode(IrpDatabase irpDatabase, CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException {
         for (String proto : commandCode.protocols) {
             NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
             if (commandCode.irp)
@@ -184,11 +192,17 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--irp"}, description = "List IRP")
         private boolean irp = false;
 
+        @Parameter(names = { "--is"}, description = "test toIrpString")
+        private boolean is = false;
+
         @Parameter(names = { "--documentation"}, description = "List documentation")
         private boolean documentation = false;
 
         @Parameter(names = {"-p", "--parse"}, description = "Test parse the protocol(s)")
         private boolean parse = false;
+
+        @Parameter(names = {"-r", "--regex", "--regexp"}, description = "Interpret arguments as regular expressions")
+        private boolean regexp = false;
 
         @Parameter(names = {"-s", "--sort"}, description = "Sort the output")
         private boolean sort = false;
@@ -196,7 +210,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;
 
-        @Parameter(description = "List of protocols (regexps) (default all)")
+        @Parameter(description = "List of protocols (default all)")
         private List<String> protocols;
     }
 
@@ -324,7 +338,7 @@ public class IrpTransmogrifier {
                 default:
                     assert(false);
             }
-        } catch (IOException | IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
+        } catch (UnknownProtocolException | IOException | IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }

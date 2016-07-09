@@ -20,13 +20,9 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -395,21 +391,63 @@ public class Expression extends PrimaryItem /* ??? */ {
         return element;
     }
 
-    /**
-     * show the given Tree Viewer
-     *
-     * @param tv
-     * @param title
-     * @return
-     */
-    public static int showTreeViewer(TreeViewer tv, String title) {
-        JPanel panel = new JPanel();
-        tv.setScale(2);
-        panel.add(tv);
+    @Override
+    public String toIrpString() {
+        if (parseTree == null)
+            return null;
+        
+        switch (parseTree.children.size()) {
+            case 1:
+                ParseTree child = parseTree.children.get(0);
 
-        return JOptionPane.showConfirmDialog(null, panel, title,
-                JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                try {
+                    if (child instanceof IrpParser.Primary_itemContext)
+                        return newPrimaryItem((IrpParser.Primary_itemContext) child).toIrpString();
+                    else if (child instanceof IrpParser.BitfieldContext)
+                        return BitField.newBitField((IrpParser.BitfieldContext) child).toIrpString();
+                    else
+                        return null;
+                } catch (IrpSyntaxException ex) {
+                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+
+            case 2:
+                return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
+
+            case 3:
+                return "("
+                        + new Expression(parseTree.expression(0)).toIrpString()
+                        + parseTree.children.get(1).getText()
+                        + new Expression(parseTree.expression(1)).toIrpString()
+                        + ")";
+            case 5:
+                return ")"
+                        + new Expression(parseTree.expression(0)).toIrpString() + "?"
+                        + new Expression(parseTree.expression(1)).toIrpString() + ":"
+                        + new Expression(parseTree.expression(2)).toIrpString()
+                        + ")";
+            default:
+                throw new UnsupportedOperationException("Unknown case in Expression.toElement");
+        }
+        return null;
     }
+
+//    /**
+//     * show the given Tree Viewer
+//     *
+//     * @param tv
+//     * @param title
+//     * @return
+//     */
+//    public static int showTreeViewer(TreeViewer tv, String title) {
+//        JPanel panel = new JPanel();
+//        tv.setScale(2);
+//        panel.add(tv);
+//
+//        return JOptionPane.showConfirmDialog(null, panel, title,
+//                JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+//    }
 
     private static JCommander argumentParser;
 
@@ -476,11 +514,12 @@ public class Expression extends PrimaryItem /* ??? */ {
                 System.out.println(expression.getParseTree().toStringTree(parser));
 
             if (commandLineArgs.gui) {
-                List<String> ruleNames = Arrays.asList(parser.getRuleNames());
-
-                // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
-                TreeViewer tv = new TreeViewer(ruleNames, expression.getParseTree());
-                showTreeViewer(tv, text+"="+result);
+//                List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+//
+//                // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
+//                TreeViewer tv = new TreeViewer(ruleNames, expression.getParseTree());
+//                showTreeViewer(tv, text+"="+result);
+                IrpTransmogrifier.showTreeViewer(parser, expression.getParseTree(), text+"="+result);
             }
         } catch (ParseCancellationException | IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
             System.err.println(ex);

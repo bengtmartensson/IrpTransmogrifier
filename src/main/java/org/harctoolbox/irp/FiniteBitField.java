@@ -68,13 +68,18 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
+    public String toIrpString() {
+        return (complement ? "~" : "") + data.toIrpString() + ":" + (reverse ? "-" : "") + width.toIrpString() + ":" + chop.toIrpString();
+    }
+
+    @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("finite_bitfield");
         element.setAttribute("reverse", Boolean.toString(reverse));
         element.setAttribute("compliment", Boolean.toString(complement));

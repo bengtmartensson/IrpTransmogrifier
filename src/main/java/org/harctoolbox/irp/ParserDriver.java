@@ -36,10 +36,10 @@ public class ParserDriver {
         parser.setErrorHandler(new ErrorStrategy());
     }
 
-    public static void reset() {
-        RepeatMarker.reset();
-        Extent.reset();
-    }
+//    public static void reset() {
+//        RepeatMarker.reset();
+//        Extent.reset();
+//    }
 
     public String toStringTree() {
         IrpParser.ProtocolContext protocol = parser.protocol();

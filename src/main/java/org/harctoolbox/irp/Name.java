@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class Name extends PrimaryItem {
+public class Name extends PrimaryItem implements Floatable {
     String name;
 
     public Name(IrpParser.NameContext ctx) {
@@ -39,6 +39,11 @@ public class Name extends PrimaryItem {
 
     @Override
     public String toString() {
+        return name;
+    }
+
+    @Override
+    public String toIrpString() {
         return name;
     }
 
@@ -107,5 +112,10 @@ public class Name extends PrimaryItem {
         Element element = document.createElement("name");
         element.setAttribute("name", toString());
         return element;
+    }
+
+    @Override
+    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        return (double) toNumber(nameEngine);
     }
 }

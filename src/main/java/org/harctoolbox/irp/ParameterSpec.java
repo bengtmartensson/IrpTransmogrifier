@@ -23,12 +23,12 @@ import org.w3c.dom.Element;
  *
  *
  */
-public class ParameterSpec {
+public class ParameterSpec extends IrpObject {
     private Name name;
     private Number min;
     private Number max;
     private Expression deflt;
-    private boolean memory = false;
+    private boolean memory;
 
     public String toString(IrpParser parser) {
         return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toStringTree(parser)) : "");
@@ -39,13 +39,19 @@ public class ParameterSpec {
         return toString(null);
     }
 
+    @Override
+    public String toIrpString() {
+        return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element el = document.createElement("parameter");
         el.setAttribute("name", name.toString());
         el.setAttribute("min", min.toString());
         el.setAttribute("max", max.toString());
         el.setAttribute("memory", Boolean.toString(memory));
-        if (deflt.getParseTree() != null) {
+        if (deflt != null) {
             Element def = document.createElement("default");
             el.appendChild(def);
             def.appendChild(deflt.toElement(document));
@@ -62,14 +68,16 @@ public class ParameterSpec {
     }
 
     public ParameterSpec(IrpParser.NameContext name, boolean hasMemory, IrpParser.NumberContext min, IrpParser.NumberContext max, IrpParser.ExpressionContext deflt) {
+        this.memory = false;
         this.name = new Name(name);
         this.memory = hasMemory;
         this.min = new Number(min);
         this.max = new Number(max);
-        this.deflt = new Expression(deflt);
+        this.deflt = deflt != null ? new Expression(deflt) : null;
     }
 
     public ParameterSpec(String name, boolean memory, int min, int max, Expression deflt) {
+        this.memory = false;
         this.name = new Name(name);
         this.min = new Number(min);
         this.max = new Number(max);
@@ -79,6 +87,7 @@ public class ParameterSpec {
 
     public ParameterSpec(String name, boolean memory, int min, int max) {
         this(name, memory, min, max, null);
+        this.memory = false;
     }
 
     public boolean isOK(long x) {

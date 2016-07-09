@@ -17,10 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
  *
  */
-public class FloatNumber implements Floatable {
+public class FloatNumber extends IrpObject implements Floatable {
 
     private final double data;
 
@@ -58,5 +61,17 @@ public class FloatNumber implements Floatable {
     public static double parse(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
         FloatNumber floatNumber = new FloatNumber(ctx);
         return floatNumber.toFloat();
+    }
+
+    @Override
+    public String toIrpString() {
+        return toString();
+    }
+
+    @Override
+    public Element toElement(Document document) throws IrpSyntaxException {
+        Element element = document.createElement("float");
+        element.setTextContent(toString());
+        return element;
     }
 }

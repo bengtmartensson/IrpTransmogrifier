@@ -39,7 +39,12 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public String toIrpString() {
+        return bitSpec.toIrpString() + irStream.toIrpString();
+    }
+
+    @Override
+    public Element toElement(Document document) throws IrpSyntaxException {
         Element root = document.createElement("bitspec_irstream");
         root.setAttribute("interleavingOk", Boolean.toString(interleavingOk()));
         root.appendChild(bitSpec.toElement(document));
@@ -81,5 +86,10 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     int numberOfBareDurations() {
         return irStream.numberOfBareDurations();
+    }
+
+    @Override
+    public int numberOfInfiniteRepeats() {
+        return bitSpec.numberOfInfiniteRepeats() + irStream.numberOfInfiniteRepeats();
     }
 }

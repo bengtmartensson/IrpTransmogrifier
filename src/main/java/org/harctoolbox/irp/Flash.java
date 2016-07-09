@@ -37,7 +37,7 @@ public class Flash extends Duration {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSyntaxException {
         return toElement(document, "flash");
     }
 

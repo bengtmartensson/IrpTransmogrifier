@@ -24,22 +24,22 @@ import org.w3c.dom.Element;
 /**
  * This class implements Repeatmarker as per Chapter 8.
  */
-public class RepeatMarker implements XmlExport {
+public class RepeatMarker extends IrpObject {
 
-    private static int noInfiniteRepeats = 0;
+//    private static int noInfiniteRepeats = 0;
 
     private int min;
     private int max;
 
-    private static void incrementInfiniteRepeats() throws InvalidRepeatException {
-        if (noInfiniteRepeats > 0)
-            throw new InvalidRepeatException("Multiple infinite repeats discovered");
-        noInfiniteRepeats++;
-    }
-
-    static void reset() {
-        noInfiniteRepeats = 0;
-    }
+//    private static void incrementInfiniteRepeats() throws InvalidRepeatException {
+//        if (noInfiniteRepeats > 0)
+//            throw new InvalidRepeatException("Multiple infinite repeats discovered");
+//        noInfiniteRepeats++;
+//    }
+//
+//    static void reset() {
+//        noInfiniteRepeats = 0;
+//    }
 
     public RepeatMarker(String str) throws InvalidRepeatException {
         this((new ParserDriver(str)).getParser().repeat_marker());
@@ -51,18 +51,18 @@ public class RepeatMarker implements XmlExport {
             case "*":
                 min = 0;
                 max = Integer.MAX_VALUE;
-                incrementInfiniteRepeats();
+                //incrementInfiniteRepeats();
                 break;
             case "+":
                 min = 1;
                 max = Integer.MAX_VALUE;
-                incrementInfiniteRepeats();
+                //incrementInfiniteRepeats();
                 break;
             default:
                 min = Integer.parseInt(ch);
                 if (ctx.getChildCount() > 1) {
                     max = Integer.MAX_VALUE;
-                    incrementInfiniteRepeats();
+                    //incrementInfiniteRepeats();
                 } else
                     max = min;
                 break;
@@ -80,6 +80,11 @@ public class RepeatMarker implements XmlExport {
 
     public boolean isInfinite() {
         return max == Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int numberOfInfiniteRepeats() {
+        return isInfinite() ? 1 : 0;
     }
 /*
     public boolean is(int n) {
@@ -123,6 +128,11 @@ public class RepeatMarker implements XmlExport {
                 : (min == max) ? Integer.toString(min)
                 : (max == Integer.MAX_VALUE) ? Integer.toString(min) + "+"
                 : "??";
+    }
+
+    @Override
+    public String toIrpString() {
+        return toString();
     }
 
     /**

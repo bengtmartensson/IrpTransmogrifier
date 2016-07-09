@@ -16,8 +16,10 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +29,7 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class ParameterSpecs {
+public class ParameterSpecs extends IrpObject {
 
     private LinkedHashMap<String, ParameterSpec>map;
 
@@ -81,6 +83,18 @@ public class ParameterSpecs {
         return str.toString();
     }
 
+    @Override
+    public String toIrpString() {
+        StringBuilder str = new StringBuilder("[");
+        List<String> vals = new ArrayList<>();
+        for (ParameterSpec ps : map.values())
+            vals.add(ps.toIrpString());
+        str.append(String.join(",", vals));
+        str.append("]");
+        return str.toString();
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element el = document.createElement("parameters");
         //el.appendChild(document.createComment(toString()));

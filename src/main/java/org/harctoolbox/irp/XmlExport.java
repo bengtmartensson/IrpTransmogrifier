@@ -12,6 +12,7 @@ public interface XmlExport {
      *
      * @param document
      * @return
+     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
-    public Element toElement(Document document);
+    public Element toElement(Document document) throws IrpSyntaxException;
 }

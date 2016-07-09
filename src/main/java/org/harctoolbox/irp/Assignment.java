@@ -71,6 +71,11 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
+    public String toIrpString() {
+        return name.toIrpString() + "=" + value.toIrpString();
+    }
+
+    @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         long val = value.toNumber(nameEngine);

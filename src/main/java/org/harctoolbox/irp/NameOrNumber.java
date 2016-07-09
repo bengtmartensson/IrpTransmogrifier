@@ -25,8 +25,8 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class NameOrNumber implements Floatable,XmlExport {
-    private Object thing;
+public class NameOrNumber extends IrpObject implements Floatable {
+    private Floatable thing;
 
     public NameOrNumber(String str) throws IrpSyntaxException {
         this(new ParserDriver(str).getParser().name_or_number());
@@ -34,9 +34,10 @@ public class NameOrNumber implements Floatable,XmlExport {
 
     public NameOrNumber(IrpParser.Name_or_numberContext ctx) throws IrpSyntaxException {
         ParseTree child = ctx.getChild(0);
-        thing = (child instanceof IrpParser.NameContext)
-                ? new Name((IrpParser.NameContext) child)
-                : new NumberWithDecimals((IrpParser.Number_with_decimalsContext) child);
+        if (child instanceof IrpParser.NameContext)
+            thing = new Name(ctx.name());
+        else
+            thing = new NumberWithDecimals(ctx.number_with_decimals());
     }
 
 //    @Override
@@ -65,10 +66,14 @@ public class NameOrNumber implements Floatable,XmlExport {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("name_or_number");
-        // TODO: name
-        element.appendChild(((NumberWithDecimals) thing).toElement(document));
+        element.appendChild(thing.toElement(document));
         return element;
+    }
+
+    @Override
+    public String toIrpString() {
+        return thing.toIrpString();
     }
 }

@@ -208,8 +208,10 @@ public class IrpDatabase {
         return prot == null ? null : prot.getProperty(key);
     }
 
-    public NamedProtocol getNamedProtocol(String name) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
+    public NamedProtocol getNamedProtocol(String name) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException {
         UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
+        if (prot == null)
+            throw new UnknownProtocolException(name);
         return prot.toNamedProtocol();
     }
 

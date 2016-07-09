@@ -65,4 +65,9 @@ public class Variation extends IrStreamItem {
     int numberOfBits() {
         return -999999999;
     }
+
+    @Override
+    public String toIrpString() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

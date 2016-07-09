@@ -61,6 +61,11 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
+    public String toIrpString() {
+        return (complement ? "~" : "") + data.toIrpString() + "::" + chop.toIrpString();
+    }
+
+    @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

@@ -44,6 +44,11 @@ class BitStream extends IrStreamItem {
 //            return "BitStream, length = " + length + ", data = " + dataString + "] = " + binString;
 //    }
 
+    @Override
+    public String toIrpString() {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
     BitStream() {
         data = BigInteger.ZERO;
         length = 0;

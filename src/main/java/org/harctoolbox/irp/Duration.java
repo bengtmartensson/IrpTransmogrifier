@@ -133,11 +133,16 @@ public abstract class Duration extends IrStreamItem implements Floatable {
         return evaluatedIrStream;
     }
 
-    protected Element toElement(Document document, String tagName) {
+    public Element toElement(Document document, String tagName) throws IrpSyntaxException {
         Element element = document.createElement(tagName);
         element.setAttribute("unit", unit);
         element.appendChild(nameOrNumber.toElement(document));
         return element;
+    }
+
+    @Override
+    public String toIrpString() {
+        return nameOrNumber.toIrpString();
     }
 
     @Override

@@ -37,8 +37,13 @@ public class Gap extends Duration {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSyntaxException {
         return toElement(document, "gap");
+    }
+
+    @Override
+    public String toIrpString() {
+        return "-" + super.toIrpString();
     }
 
     @Override

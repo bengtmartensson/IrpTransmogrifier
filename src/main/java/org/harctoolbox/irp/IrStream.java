@@ -109,7 +109,12 @@ public class IrStream extends BareIrStream {
 
     @Override
     public String toString() {
-        return super.toString() + (repeatMarker != null ? repeatMarker.toString() : "");
+        return "(" + super.toString() + ")" + (repeatMarker != null ? repeatMarker.toString() : "");
+    }
+
+    @Override
+    public String toIrpString() {
+        return "(" + super.toIrpString() + ")" + (repeatMarker != null ? repeatMarker.toIrpString() : "");
     }
 
     public boolean isRepeatSequence() {
@@ -117,7 +122,7 @@ public class IrStream extends BareIrStream {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("irstream");
         element.setAttribute("is_repeat", Boolean.toString(isRepeatSequence()));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
@@ -177,5 +182,11 @@ public class IrStream extends BareIrStream {
         for (IrStreamItem item : irStreamItems)
             sum += item.numberOfBits();
         return sum;
+    }
+
+    @Override
+    public int numberOfInfiniteRepeats() {
+        return super.numberOfInfiniteRepeats()
+                + (repeatMarker != null ? repeatMarker.numberOfInfiniteRepeats() : 0);
     }
 }

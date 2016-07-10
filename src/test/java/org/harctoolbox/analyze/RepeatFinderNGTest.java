@@ -4,6 +4,7 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
+import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -50,7 +51,7 @@ public class RepeatFinderNGTest {
             IrSignal reference = new IrSignal(irSignal.getIntroSequence(), irSignal.getRepeatSequence(), junk, irSignal.getFrequency(), irSignal.getDutyCycle());
             irSequence = irSequence.append(junk);
             IrSignal rep = RepeatFinder.findRepeat(irSequence);
-            assertEquals(reference.approximatelyEquals(rep, 1f, 0.01, 1f), true);
+            assertTrue(reference.approximatelyEquals(rep, 1f, 0.01, 1f));
             // Note: lasts gap is too short, should find three repetitons anyhow.
             int[] arr = new int[] { 9008, 4516, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 1717, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 552, 1717, 552, 1717, 552, 1717, 552, 38902, 9008, 2289, 552, 31080, 9008, 2289, 552, 31080, 9008, 2289, 552, 21080 };
             ModulatedIrSequence modulatedIrSequence = new ModulatedIrSequence(arr, 38400f);

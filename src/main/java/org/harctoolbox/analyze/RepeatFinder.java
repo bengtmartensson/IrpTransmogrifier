@@ -21,6 +21,7 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLenghtException;
 
 /**
  *
@@ -81,13 +82,13 @@ public class RepeatFinder {
         private double lastGap;
         private double repeatsDuration;
 
-        private RepeatFinderData() {
+        private RepeatFinderData() throws OddSequenceLenghtException {
             this(0, 0, 0, 0);
         }
 
-        public RepeatFinderData(int beginLength, int repeatLength, int numberRepeats, int endingLength) {
+        public RepeatFinderData(int beginLength, int repeatLength, int numberRepeats, int endingLength) throws OddSequenceLenghtException {
             if (beginLength % 2 != 0 || repeatLength % 2 != 0 || endingLength % 2 != 0)
-                throw new IllegalArgumentException("Lengths and start must be even");
+                throw new OddSequenceLenghtException("Lengths and start must be even");
             this.beginLength = beginLength;
             this.repeatLength = repeatLength;
             this.numberRepeats = numberRepeats;
@@ -154,7 +155,10 @@ public class RepeatFinder {
         this.relativeTolerance = relativeTolerance;
         this.minRepeatLastGap = defaultMinRepeatLastGap;
         this.irSequence = irSequence;
-        analyze();
+        try {
+            analyze();
+        } catch (OddSequenceLenghtException ex) {
+        }
     }
 
     public RepeatFinder(IrSequence irSequence) {
@@ -179,7 +183,7 @@ public class RepeatFinder {
         return findRepeatClean(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
 
-    private void analyze() {
+    private void analyze() throws OddSequenceLenghtException {
         RepeatFinderData candidate = new RepeatFinderData();
         for (int length = irSequence.getNumberBursts() / 2; length >= 2; length--) {
             for (int beginning = 0; beginning < irSequence.getNumberBursts() - length; beginning++) {
@@ -193,7 +197,7 @@ public class RepeatFinder {
         repeatFinderData = candidate;
     }
 
-    private RepeatFinderData countRepeats(int beginning, int length) {
+    private RepeatFinderData countRepeats(int beginning, int length) throws OddSequenceLenghtException {
         RepeatFinderData result = new RepeatFinderData(beginning, length, 0, 0);
         result.lastGap = Math.abs(irSequence.get(beginning + length - 1));
         if (result.lastGap < minRepeatLastGap)

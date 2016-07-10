@@ -235,6 +235,11 @@ public class ModulatedIrSequence extends IrSequence {
         return frequency < zeroModulationLimit;
     }
 
+    @Override
+    public ModulatedIrSequence addNoise(double max) {
+        return new ModulatedIrSequence(super.addNoise(max), frequency, dutyCycle);
+    }
+
     /**
      * Appends a delay to the end of the ModulatedIrSequence. Original is left untouched.
      * @param delay microseconds of silence to be appended to the IrSequence.

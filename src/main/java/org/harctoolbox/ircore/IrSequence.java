@@ -443,7 +443,7 @@ public class IrSequence implements Cloneable, Serializable {
      * @param max max amount to add/subtract, in microseconds.
      * @return new instance
      */
-    public IrSequence noisify(double max) {
+    public IrSequence addNoise(double max) {
         IrSequence clone;
         try {
             clone = clone();
@@ -726,7 +726,7 @@ public class IrSequence implements Cloneable, Serializable {
     public static void main(String[] args) {
         try {
             IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
-            IrSequence irSequence = irSignal.toModulatedIrSequence(3).noisify(10);
+            IrSequence irSequence = irSignal.toModulatedIrSequence(3).addNoise(10);
             IrSequence[] seqs = irSequence.chop(25000);
             for (IrSequence irs : seqs)
                 System.out.println(irs);

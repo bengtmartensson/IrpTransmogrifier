@@ -130,23 +130,21 @@ public class IrpTransmogrifier {
      *
      * @param tv
      * @param title
-     * @return
      */
-    public static int showTreeViewer(TreeViewer tv, String title) {
+    public static void showTreeViewer(TreeViewer tv, String title) {
         JPanel panel = new JPanel();
         //tv.setScale(2);
         panel.add(tv);
 
-        return JOptionPane.showConfirmDialog(null, panel, title,
-                JOptionPane.CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(null, panel, title, JOptionPane.PLAIN_MESSAGE);
     }
 
-    public static int showTreeViewer(IrpParser parser, ParserRuleContext parserRuleContext, String title) {
+    public static void showTreeViewer(IrpParser parser, ParserRuleContext parserRuleContext, String title) {
         List<String> ruleNames = Arrays.asList(parser.getRuleNames());
 
         // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
         TreeViewer tv = new TreeViewer(ruleNames, parserRuleContext);
-        return showTreeViewer(tv, title);
+        showTreeViewer(tv, title);
     }
 
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
@@ -186,7 +184,7 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"list"}, commandDescription = "List the protocols known")
     private static class CommandList {
 
-        @Parameter(names = { "--gui"}, description = "Display parse diagram")
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
         private boolean gui = false;
 
         @Parameter(names = { "--irp"}, description = "List IRP")

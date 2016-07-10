@@ -20,7 +20,9 @@ package org.harctoolbox.analyze;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -33,30 +35,45 @@ public class Cleaner {
 
     private int rawData[];
     private List<Integer> dumbTimingsTable;
-    private List<Integer> timingsTable;
-    private HashMap<Integer, Integer> histogram;
-    private int cookedData[];
+    private List<Integer> timings;
+    private HashMap<Integer, Integer> rawHistogram;
+    private HashMap<Integer, Integer> cleanedHistogram;
+    private int indexData[];
     private int[] sorted;
+    private int timebase;
+    //private int[] normedTimings;
     private HashMap<Integer, Integer> lookDownTable;
 
-    private Cleaner(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+    public Cleaner(IrSequence irSequence) {
+        this(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+
+    public Cleaner(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
         rawData = irSequence.toInts();
-        createHistogram();
+        createRawHistogram();
         createDumbTimingsTable(absoluteTolerance, relativeTolerance);
         improveTimingsTable(absoluteTolerance, relativeTolerance);
         createCookedData();
+        createCleanHistogram();
+        //createNormedTimings();
+        //System.out.println(toTimingsString());
     }
 
-    private Cleaner() {
-    }
-
-    private void createHistogram() {
-        histogram = new HashMap<>();
+    private void createRawHistogram() {
+        rawHistogram = new HashMap<>();
         for (int d : rawData) {
-            int old = histogram.containsKey(d) ? histogram.get(d) : 0;
-            histogram.put(d, old + 1);
+            int old = rawHistogram.containsKey(d) ? rawHistogram.get(d) : 0;
+            rawHistogram.put(d, old + 1);
         }
     }
+
+    public int[] getIndexData() {
+        return indexData;
+    }
+
+//    HashMap<Integer, Integer> getRawHistogram() {
+//        return rawHistogram;
+//    }
 
     private void createDumbTimingsTable(int absoluteTolerance, double relativeTolerance) {
         dumbTimingsTable = new ArrayList<>();
@@ -73,7 +90,7 @@ public class Cleaner {
 
     private void improveTimingsTable(int absoluteTolerance, double relativeTolerance) {
         lookDownTable = new HashMap<>();
-        timingsTable = new ArrayList<>();
+        timings = new ArrayList<>();
         int indexInSortedTimings = 0;
         for (int timingsIndex = 0; timingsIndex < dumbTimingsTable.size(); timingsIndex++) {
             int dumbTiming = dumbTimingsTable.get(timingsIndex);
@@ -86,27 +103,53 @@ public class Cleaner {
                 if (duration == lastDuration)
                     continue;
                 lastDuration = duration;
-                int noHits = histogram.get(duration);
+                int noHits = rawHistogram.get(duration);
                 sum += noHits * duration;
                 terms += noHits;
                 lookDownTable.put(duration, timingsIndex);
             }
             int average = (int) Math.round((double)sum/(double)terms);
-            timingsTable.add(average);
+            timings.add(average);
         }
     }
 
     private void createCookedData() {
-        cookedData = new int[rawData.length];
+        indexData = new int[rawData.length];
         for (int i = 0; i < rawData.length; i++)
-            cookedData[i] = lookDownTable.get(rawData[i]);
+            indexData[i] = lookDownTable.get(rawData[i]);
     }
+
+    private void createCleanHistogram() {
+        cleanedHistogram = new LinkedHashMap<>();
+        for (int duration : timings)
+            cleanedHistogram.put(duration, 0);
+        for (Map.Entry<Integer, Integer> kvp : rawHistogram.entrySet()) {
+            int index = lookDownTable.get(kvp.getKey());
+            Integer cleanedDuration = timings.get(index);
+            cleanedHistogram.put(cleanedDuration, cleanedHistogram.get(cleanedDuration) + kvp.getValue());
+        }
+    }
+
+//    private void createNormedTimings() {
+//        timebase = timings.get(0);
+//        normedTimings = new int[timings.size()];
+//        for (int i = 0; i < timings.size(); i++) {
+//            normedTimings[i] = (int) Math.round((double)timings.get(i)/(double)timebase);
+//        }
+//    }
 
     private int[] toDurations() {
         int[] data = new int[rawData.length];
         for (int i = 0; i < rawData.length; i++)
-            data[i] = timingsTable.get(cookedData[i]);
+            data[i] = timings.get(indexData[i]);
         return data;
+    }
+
+    public String toTimingsString() {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < rawData.length; i++)
+            str.append((char) ((int)'A' + indexData[i]));
+        return str.toString();
     }
 
     private IrSequence toIrSequence() {
@@ -123,16 +166,16 @@ public class Cleaner {
         return cleaner.toIrSequence();
     }
 
-    //public static IrSequence clean(IrSequence irSequence) {
-    //     return clean(irSequence, (int) IrpUtils.defaultAbsoluteTolerance, IrpUtils.defaultRelativeTolerance);
-    //}
-
-    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
-        Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
-        return new ModulatedIrSequence(cleaner.toIrSequence(), irSequence.getFrequency(), irSequence.getDutyCycle());
+    public static IrSequence clean(IrSequence irSequence) {
+        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    //public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
-    //     return clean(irSequence, (int) IrpUtils.defaultAbsoluteTolerance, IrpUtils.defaultRelativeTolerance);
-    //}
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+        return new ModulatedIrSequence(clean((IrSequence)irSequence, absoluteTolerance, relativeTolerance),
+                irSequence.getFrequency(), irSequence.getDutyCycle());
+    }
+
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
+        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
 }

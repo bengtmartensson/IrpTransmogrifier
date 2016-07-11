@@ -40,8 +40,6 @@ public class Cleaner {
     private HashMap<Integer, Integer> cleanedHistogram;
     private int indexData[];
     private int[] sorted;
-    private int timebase;
-    //private int[] normedTimings;
     private HashMap<Integer, Integer> lookDownTable;
 
     public Cleaner(IrSequence irSequence) {
@@ -130,13 +128,6 @@ public class Cleaner {
         }
     }
 
-//    private void createNormedTimings() {
-//        timebase = timings.get(0);
-//        normedTimings = new int[timings.size()];
-//        for (int i = 0; i < timings.size(); i++) {
-//            normedTimings[i] = (int) Math.round((double)timings.get(i)/(double)timebase);
-//        }
-//    }
 
     private int[] toDurations() {
         int[] data = new int[rawData.length];
@@ -177,5 +168,19 @@ public class Cleaner {
 
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
         return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+
+    /**
+     * @return the timings
+     */
+    public List<Integer> getTimings() {
+        return timings;
+    }
+
+    /**
+     * @return the cleanedHistogram
+     */
+    public HashMap<Integer, Integer> getCleanedHistogram() {
+        return cleanedHistogram;
     }
 }

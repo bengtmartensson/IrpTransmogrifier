@@ -313,9 +313,10 @@ public class Protocol extends IrpObject {
         //Element docu = document.createElement("documentation");
         //docu.appendChild(document.createCDATASection("\n" + documentation + "\n"));
         //root.appendChild(docu);
-        Element stringTree = document.createElement("stringTree");
-        stringTree.appendChild(document.createCDATASection(toStringTree()));
-        root.appendChild(stringTree);
+
+        //Element stringTree = document.createElement("stringTree");
+        //stringTree.appendChild(document.createCDATASection(toStringTree()));
+        //root.appendChild(stringTree);
 
         Element renderer = document.createElement("implementation");
         root.appendChild(renderer);

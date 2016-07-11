@@ -67,9 +67,15 @@ public class NamedProtocol extends Protocol {
     public Element toElement(Document document) throws IrpSyntaxException {
         Element root = super.toElement(document);
         root.setAttribute("name", name);
+
         Element docu = document.createElement("documentation");
         docu.appendChild(document.createCDATASection(documentation));
         root.appendChild(docu);
+
+        Element irpElement = document.createElement("irp");
+        irpElement.appendChild(document.createCDATASection(irp));
+        root.appendChild(irpElement);
+        
         return root;
     }
 

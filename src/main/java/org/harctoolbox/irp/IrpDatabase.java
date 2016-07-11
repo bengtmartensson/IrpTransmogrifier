@@ -371,17 +371,24 @@ public class IrpDatabase {
                 lineNo++;
                 String line = lineRead.trim();
                 logger.log(Level.FINEST, "Line {0}: {1}", new Object[]{lineNo, line});
+                if (line.startsWith("#"))
+                    // comment, ignore
+                    continue;
+
                 String[] kw = line.split("=", 2);
                 String keyword = kw[0].toLowerCase(Locale.US);
                 String payload = kw.length > 1 ? kw[1].trim() : null;
                 while (payload != null && payload.endsWith("\\")) {
-                    payload = payload.substring(0, payload.length()-1)/* + "\n"*/;
-                    payload += in.readLine();
+                    payload = payload.substring(0, payload.length()-1);
+                    payload = payload.trim();
+                    String continuation = in.readLine();
+                    if (continuation != null)
+                        continuation = continuation.trim();
+                    payload += continuation;
                     lineNo++;
                 }
-                if (line.startsWith("#")) {
-                    // comment, ignore
-                } else if (line.equals("[encoding]")) {
+
+                if (line.equals("[encoding]")) {
                     String fileEncoding = in.readLine();
                     if (fileEncoding == null || !fileEncoding.equalsIgnoreCase(encoding))
                         throw new WrongCharSetException(fileEncoding);
@@ -421,7 +428,10 @@ public class IrpDatabase {
                         logger.log(Level.FINER, "Ignored line: {0}", line);
                 }
             }
-            addProtocol(currentProtocol);
+            if (currentProtocol != null) {
+                currentProtocol.put(UnparsedProtocol.documentationName, documentation.toString().trim());
+                addProtocol(currentProtocol);
+            }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }

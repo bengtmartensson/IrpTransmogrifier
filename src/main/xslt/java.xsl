@@ -62,7 +62,7 @@
 
 
         <xsl:apply-templates select="bitspec_irstream/bitspec" mode="declare_funcs"/>
-        <xsl:apply-templates select="bitspec_irstream/irstream//(intro|repeat|ending)[./flash]" mode="define_setup"/>
+        <xsl:apply-templates select="bitspec_irstream/irstream/(intro|repeat|ending)[*]" mode="define_setup"/>
         <xsl:apply-templates select="parameters" mode="generate_standard_call"/>
         <xsl:apply-templates select="parameters[./parameter/default]" mode="generate_defaulted_call"/>
         <xsl:apply-templates select="parameters" mode="generate_map_call"/>
@@ -89,6 +89,10 @@
         <xsl:text>f;
             }
         </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="intro|repeat|ending">
+        <xsl:apply-templates select="*"/>
     </xsl:template>
 
     <xsl:template match="intro|repeat|ending" mode="define_setup">
@@ -189,8 +193,7 @@
             super();
         </xsl:text>
         <xsl:apply-templates select="parameter" mode="assign_fields"/>
-        <xsl:text>setup();
-            }
+        <xsl:text>}
         </xsl:text>
     </xsl:template>
 
@@ -202,9 +205,8 @@
         <xsl:text>) {
             super();
         </xsl:text>
-        <xsl:apply-templates select="parameter" mode="local_definition_use_defaults"/>
-        <xsl:text>setup();
-            }
+        <xsl:apply-templates select="parameter[not(@memory='true')]" mode="local_definition_use_defaults"/>
+        <xsl:text>}
         </xsl:text>
     </xsl:template>
 
@@ -215,8 +217,7 @@
             super();
         </xsl:text>
         <xsl:apply-templates select="parameter" mode="fields_assignment"/>
-        <xsl:text>setup();
-            }
+        <xsl:text>}
         </xsl:text>
     </xsl:template>
 
@@ -247,7 +248,7 @@
         </xsl:text>
     </xsl:template>
 
-    <xsl:template match="parameter[./default]" mode="fields_assignment">
+    <xsl:template match="parameter[./default and not(@memory='true')]" mode="fields_assignment">
         <xsl:text>this.</xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text> = parameters.containsKey("</xsl:text>
@@ -257,6 +258,18 @@
         <xsl:text>") : (</xsl:text>
         <xsl:apply-templates select="./default/expression"/>
         <xsl:text>);
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameter[@memory='true']" mode="fields_assignment">
+        <xsl:text>if (parameters.containsKey("</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>"))
+        this.</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text> = parameters.get("</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>");
         </xsl:text>
     </xsl:template>
 
@@ -272,6 +285,17 @@
         <xsl:value-of select="$parameterType"/>
         <xsl:text> </xsl:text>
         <xsl:value-of select="@name"/>
+        <xsl:text>;
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameter[@memory='true']" mode="define_fields">
+        <xsl:text>private static </xsl:text>
+        <xsl:value-of select="$parameterType"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text> = </xsl:text>
+        <xsl:apply-templates select="default"/>
         <xsl:text>;
         </xsl:text>
     </xsl:template>
@@ -321,9 +345,9 @@
     </xsl:template>
 
     <xsl:template match="irstream">
-        <xsl:apply-templates select="intro[*]" mode="call"/>
-        <xsl:apply-templates select="repeat[*]" mode="call"/>
-        <xsl:apply-templates select="ending[*]" mode="call"/>
+        <xsl:apply-templates select="intro[*]"/>
+        <xsl:apply-templates select="repeat[*]"/>
+        <xsl:apply-templates select="ending[*]"/>
     </xsl:template>
 
     <xsl:template match="intro|repeat|ending" mode="definition">
@@ -390,6 +414,14 @@
         </xsl:text>
     </xsl:template>
 
+    <xsl:template match="assignment">
+        <xsl:value-of select="name/@name"/>
+        <xsl:text> = </xsl:text>
+        <xsl:apply-templates select="expression"/>
+        <xsl:text>;
+        </xsl:text>
+    </xsl:template>
+
     <xsl:template match="name_or_number">
         <xsl:apply-templates select="*"/>
     </xsl:template>
@@ -403,7 +435,11 @@
         <xsl:apply-templates select="data"/>
         <xsl:text>, </xsl:text>
         <xsl:apply-templates select="width"/>
+        <xsl:text>, </xsl:text>
         <xsl:apply-templates select="chop"/>
+        <xsl:if test="not(chop)">
+            <xsl:text>0</xsl:text>
+        </xsl:if>
         <xsl:text>, </xsl:text>
         <xsl:value-of select="@complement"/>
         <xsl:text>, </xsl:text>

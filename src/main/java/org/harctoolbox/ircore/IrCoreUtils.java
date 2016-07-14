@@ -74,6 +74,14 @@ public class IrCoreUtils {
         return sum;
     }
 
+    public static double l1Norm(Iterable<Double> sequence) {
+        double sum = 0;
+        for (Double d : sequence)
+            sum += Math.abs(d);
+
+        return sum;
+    }
+
     public static double l1Norm(double[] sequence) {
         return l1Norm(sequence, 0, sequence.length);
     }
@@ -83,6 +91,21 @@ public class IrCoreUtils {
         for (int i = beg; i < beg + length; i++)
             sum += Math.abs(sequence[i]);
         return sum;
+    }
+
+    /**
+     * Reverses the bits, living in a width-bit wide world.
+     *
+     * @param x
+     * @param width
+     * @return bitreversed
+     */
+
+    public static long reverse(long x, int width) {
+        long y = Long.reverse(x);
+        if (width > 0)
+            y >>>= Long.SIZE - width;
+        return y;
     }
 
     /**

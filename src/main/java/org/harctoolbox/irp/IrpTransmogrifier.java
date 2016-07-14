@@ -22,7 +22,10 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +41,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * This class contains a command line main routine, allowing command line access to most things in the package.
@@ -103,17 +107,26 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void doCode(IrpDatabase irpDatabase, CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException {
+    private static void doCode(IrpDatabase irpDatabase, CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, FileNotFoundException, IOException, SAXException {
+        PrintStream out = commandCode.output != null
+                ? IrpUtils.getPrintSteam(commandCode.output)
+                : System.out;
         for (String proto : commandCode.protocols) {
             NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
             if (commandCode.irp)
-                System.out.println(protocol.getIrp());
+                out.println(protocol.getIrp());
             if (commandCode.documentation)
-                System.out.println(protocol.getDocumentation());
+                out.println(protocol.getDocumentation());
             if (commandCode.xml) {
                 Document doc = protocol.toDocument();
-                XmlUtils.printDOM(doc);
+                XmlUtils.printDOM(out, doc, commandCode.encoding, "irp documentation");
             }
+            if (commandCode.xslt != null) {
+                Document doc = protocol.toDocument();
+                CodeGenerator codeGenerator = new CodeGenerator(doc);
+                Document stylesheet = XmlUtils.openXmlFile(new File(commandCode.xslt));
+                codeGenerator.printDOM(out, stylesheet, commandCode.encoding);
+           }
         }
     }
 
@@ -221,10 +234,13 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--xslt" }, description = "Pathname to XSLT")
         private String xslt = null;
 
+        @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")
+        private String encoding = "WINDOWS-1252";
+
         @Parameter(names = { "--target" }, description = "Target for code generation")
         private String target;
 
-        @Parameter(names = { "--output" }, description = "Name of output file")
+        @Parameter(names = { "-o", "--output" }, description = "Name of output file")
         private String output = null;
 
         @Parameter(names = { "--xml"}, description = "List XML")
@@ -264,7 +280,7 @@ public class IrpTransmogrifier {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException, SAXException {
         CommandLineArgs commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(Version.appName);

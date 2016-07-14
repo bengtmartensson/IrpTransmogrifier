@@ -82,7 +82,7 @@ public class FiniteBitField extends BitField {
     public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("finite_bitfield");
         element.setAttribute("reverse", Boolean.toString(reverse));
-        element.setAttribute("compliment", Boolean.toString(complement));
+        element.setAttribute("complement", Boolean.toString(complement));
         Element dataElement = document.createElement("data");
         dataElement.appendChild(data.toElement(document));
         element.appendChild(dataElement);

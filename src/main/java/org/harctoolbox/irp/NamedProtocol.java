@@ -69,13 +69,13 @@ public class NamedProtocol extends Protocol {
         root.setAttribute("name", name);
 
         Element docu = document.createElement("documentation");
-        docu.appendChild(document.createCDATASection(documentation));
+        docu.appendChild(document.createTextNode(documentation));
         root.appendChild(docu);
 
         Element irpElement = document.createElement("irp");
-        irpElement.appendChild(document.createCDATASection(irp));
+        irpElement.appendChild(document.createTextNode(irp));
         root.appendChild(irpElement);
-        
+
         return root;
     }
 

@@ -59,65 +59,6 @@ public class IrpUtils {
     public final static String irpNotationUrl = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";
     public final static String decodeIrUrl = "http://www.hifi-remote.com/wiki/index.php?title=DecodeIR";
 
-    /**
-     * Use if no information at all available.
-     */
-    //public final static double defaultFrequency = 38000f;
-
-    //public final static double microseconds2seconds = 1E-6;
-    //public final static double seconds2microseconds = 1E6;
-
-//    /**
-//     * Joins the Strings in the second argument, starting at the first argument, separating them with the third argument.
-//     *
-//     * @param iterable Iterable over strings to be joined
-//     * @param separator
-//     * @return String
-//     */
-//
-//    public static String join(Iterable<String> iterable, String separator) {
-//        if (iterable == null)
-//            return "";
-//
-//        StringBuilder res = new StringBuilder();
-//        for (String str : iterable) {
-//            if (res.length() > 0)
-//                res.append(separator);
-//            res.append(str);
-//        }
-//
-//        return res.toString();
-//    }
-
-    /**
-     * Joins the Strings in the second argument, starting at the first argument, separating them with the third argument.
-     *
-     * @param beg Index of first argument to consider,
-     * @param s Array of strings to be joined
-     * @param separator
-     * @return String
-     */
-
-    public static String join(int beg, String[] s, String separator) {
-        if (s == null || s.length <= beg)
-            return "";
-
-        StringBuilder res = new StringBuilder();
-        res.append(s[beg]);
-        for (int i = beg+1; i < s.length; i++)
-            res.append(separator).append(s[i]);
-
-        return res.toString();
-    }
-
-    public static String join(String[] s, String separator) {
-        return join(0, s, separator);
-    }
-
-    public static String join(String[] s, char separator) {
-        return join(s, Character.toString(separator));
-    }
-
     public static String stringArray(int[] array) {
         if (array == null)
             return null;
@@ -151,15 +92,6 @@ public class IrpUtils {
         for (int i = beg; i < beg + length; i++)
             sum += Math.abs(sequence[i]);
         return sum;
-    }
-
-    public static boolean isInstance(Object o, String classname) {
-        try {
-            return Class.forName("IrpMaster." + classname).isInstance(o);
-        } catch (ClassNotFoundException ex) {
-            System.err.println(ex.getMessage());
-        }
-        return false;
     }
 
     public static String spaces(int length) {
@@ -314,22 +246,6 @@ public class IrpUtils {
 
         return prefix + map.get(name) + postfix;
     }
-
-    /*public static void main(String[] args) {
-        for (String arg : args)
-            System.out.println(arg);
-
-        int arg_i = 0;
-        String outFile = args[arg_i++];
-        String configFilename = args[arg_i++];
-        String preamble = args[arg_i++];
-        String protocolName = args[arg_i++];
-        String device = args[arg_i++];
-        String OBC = args[arg_i++];
-
-        int status = IrpMaster.makeHex(outFile, true, configFilename, preamble, protocolName, device, OBC);
-        System.out.println(status);
-    }*/
 
     private IrpUtils() {
     }

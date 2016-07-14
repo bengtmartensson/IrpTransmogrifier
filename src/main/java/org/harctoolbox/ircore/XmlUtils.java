@@ -161,13 +161,15 @@ public class XmlUtils {
         return index;
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding) {
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) {
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             if (encoding != null)
                 tr.setOutputProperty(OutputKeys.ENCODING, encoding);
             tr.setOutputProperty(OutputKeys.INDENT, "yes");
             tr.setOutputProperty(OutputKeys.METHOD, "xml");
+            if (cdataElements != null)
+                tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
             tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             tr.transform(new DOMSource(doc), new StreamResult(ostr));
         } catch (TransformerConfigurationException ex) {
@@ -179,7 +181,7 @@ public class XmlUtils {
 
     public static void printDOM(File file, Document doc, String encoding)
             throws FileNotFoundException {
-        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding);
+        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, null);
         System.err.println("File " + file + " written.");
     }
 
@@ -191,7 +193,7 @@ public class XmlUtils {
     }
 
     public static void printDOM(Document doc) {
-        printDOM(System.out, doc, null);
+        printDOM(System.out, doc, null, null);
     }
 
     private static Schema readSchemaFromFile(File schemaFile) throws SAXException {

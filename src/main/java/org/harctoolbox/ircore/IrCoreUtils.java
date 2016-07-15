@@ -142,6 +142,32 @@ public class IrCoreUtils {
         return absoluteOk || relativeOk;
     }
 
+    /**
+     * Return a number consisting of width number of 1, probably for using as bit mask.
+     * @param width > 0
+     * @return
+     */
+    public static long ones(long width) {
+        return (1L << width) - 1L;
+    }
+
+    /**
+     * Return a number consisting of width number of 1, probably for using as bit mask.
+     * @param width > 0
+     * @return
+     */
+    public static int ones(int width) {
+        return (1 << width) - 1;
+    }
+
+    public static long maskTo(long data, long width) {
+        return data & ones(width);
+    }
+
+    public static long maskTo(int data, int width) {
+        return data & ones(width);
+    }
+
     private IrCoreUtils() {
     }
 }

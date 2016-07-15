@@ -148,4 +148,67 @@ public class IrCoreUtilsNGTest {
         Assert.assertTrue(IrCoreUtils.approximatelyEquals(99, 100, 1, 0));
         Assert.assertFalse(IrCoreUtils.approximatelyEquals(99, 101, 1, 0));
     }
+
+    /**
+     * Test of reverse method, of class IrCoreUtils.
+     */
+    @Test
+    public void testReverse() {
+        System.out.println("reverse");
+        long x = 73L;
+        int width = 8;
+        long expResult = 146L;
+        long result = IrCoreUtils.reverse(x, width);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of ones method, of class IrCoreUtils.
+     */
+    @Test
+    public void testOnes_long() {
+        System.out.println("ones");
+        long width = 7L;
+        long expResult = 127L;
+        long result = IrCoreUtils.ones(width);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of ones method, of class IrCoreUtils.
+     */
+    @Test
+    public void testOnes_int() {
+        System.out.println("ones");
+        int width = 9;
+        int expResult = 511;
+        int result = IrCoreUtils.ones(width);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of maskTo method, of class IrCoreUtils.
+     */
+    @Test
+    public void testMaskTo_long_long() {
+        System.out.println("maskTo");
+        long data = 73L;
+        long width = 4L;
+        long expResult = 9L;
+        long result = IrCoreUtils.maskTo(data, width);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of maskTo method, of class IrCoreUtils.
+     */
+    @Test
+    public void testMaskTo_int_int() {
+        System.out.println("maskTo");
+        int data = 777;
+        int width = 8;
+        long expResult = 9L;
+        long result = IrCoreUtils.maskTo(data, width);
+        assertEquals(result, expResult);
+    }
 }

@@ -12,7 +12,7 @@
     <xsl:param name="parameterType" select="'long'" />
     <xsl:param name="unsignedType" select="'int'" />
 
-    <xsl:variable name="protocolName" select="/protocol/@name"/>
+    <xsl:variable name="protocolName" select="replace(/protocol/@name,'[^_0-9A-Za-z]','')"/>
     <xsl:variable name="timeUnit" select="number(/protocol/implementation/generalspec/@timeunit)"/>
     <xsl:variable name="frequency" select="number(/protocol/implementation/generalspec/@frequency)"/>
     <xsl:variable name="dutycycle" select="/protocol/implementation/generalspec/@dutycycle"/>
@@ -446,6 +446,23 @@
         <xsl:value-of select="@reverse"/>
         <xsl:text>);
         </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="finite_bitfield[..[name(.)='expression']]">
+        <xsl:text>finiteBitField(</xsl:text>
+        <xsl:apply-templates select="data"/>
+        <xsl:text>, </xsl:text>
+        <xsl:apply-templates select="width"/>
+        <xsl:text>, </xsl:text>
+        <xsl:apply-templates select="chop"/>
+        <xsl:if test="not(chop)">
+            <xsl:text>0</xsl:text>
+        </xsl:if>
+        <xsl:text>, </xsl:text>
+        <xsl:value-of select="@complement"/>
+        <xsl:text>, </xsl:text>
+        <xsl:value-of select="@reverse"/>
+        <xsl:text>)</xsl:text>
     </xsl:template>
 
     <xsl:template match="data">

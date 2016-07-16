@@ -41,6 +41,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
@@ -136,6 +137,33 @@ public class IrpTransmogrifier {
 
     private static void doRecognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static void doExpression(CommandExpression commandExpression) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
+        NameEngine nameEngine = new NameEngine(commandExpression.nameEngine);
+        for (String text : commandExpression.expressions) {
+
+            IrpParser parser = new ParserDriver(text).getParser();
+            Expression expression = new Expression(parser.expression());
+//            if (!parser.isMatchedEOF()) {
+//                System.err.println("WARNING: Did not match all input");
+//                //System.exit(IrpUtils.exitFatalProgramFailure);
+//            }
+
+            long result = expression.toNumber(nameEngine);
+            System.out.println(result);
+            if (commandExpression.stringTree)
+                System.out.println(expression.getParseTree().toStringTree(parser));
+            if (commandExpression.xml) {
+                Document doc = XmlUtils.newDocument();
+                Element root = expression.toElement(doc);
+                doc.appendChild(root);
+                XmlUtils.printDOM(doc);
+            }
+
+            if (commandExpression.gui)
+                IrpTransmogrifier.showTreeViewer(parser, expression.getParseTree(), text+"="+result);
+        }
     }
 
     /**
@@ -269,6 +297,25 @@ public class IrpTransmogrifier {
         private List<String> args;
     }
 
+    @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
+    private static class CommandExpression {
+
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use")
+        private String nameEngine = null;
+
+        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+        private boolean stringTree = false;
+
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+        private boolean gui = false;
+
+        @Parameter(names = { "--xml"}, description = "List XML")
+        private boolean xml = false;
+
+        @Parameter(description = "expression")
+        private List<String> expressions;
+    }
+
     @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
     private static class CommandRecognize {
 
@@ -280,8 +327,8 @@ public class IrpTransmogrifier {
      *
      * @param args
      */
-    public static void main(String[] args) throws FileNotFoundException, SAXException {
-        CommandLineArgs commandLineArgs = new CommandLineArgs();
+    public static void main(String[] args) {
+        commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(Version.appName);
 
@@ -296,6 +343,9 @@ public class IrpTransmogrifier {
 
         CommandRecognize commandRecognize = new CommandRecognize();
         argumentParser.addCommand(commandRecognize);
+
+        CommandExpression commandExpression = new CommandExpression();
+        argumentParser.addCommand(commandExpression);
 
         try {
             argumentParser.parse(args);
@@ -349,10 +399,16 @@ public class IrpTransmogrifier {
                 case "recognize":
                     doRecognize(irpDatabase, commandRecognize);
                     break;
+                case "expression":
+                    doExpression(commandExpression);
+                    break;
                 default:
-                    assert(false);
+                    System.err.println("Unknown command: " + command);
+                    System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (UnknownProtocolException | IOException | IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
+        } catch (UnknownProtocolException | UnassignedException ex) {
+            System.err.println(ex.getMessage());
+        } catch (SAXException | IOException| IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }

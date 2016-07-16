@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 <xsl:stylesheet
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:java="http://xml.apache.org/xalan/java"
     version="2.0">
     <xsl:output method="text" />
@@ -21,7 +21,7 @@
     <xsl:template match="/protocol">
         <xsl:text>// NOTE: This code is intened to be put through a code beautifier, like indent.
 
-// Blurbl...
+            // Blurbl...
 
             package org.harctoolbox.irpprotocoltest;
 
@@ -49,6 +49,7 @@
 
     <xsl:template match="implementation">
         <xsl:apply-templates select="parameters/parameter" mode="define_fields"/>
+        <xsl:apply-templates select=".//assignment" mode="define_fields"/>
         <xsl:apply-templates select="generalspec/@frequency" mode="define_getter"/>
         <xsl:apply-templates select="generalspec/@dutycycle" mode="define_getter"/>
         <xsl:if test="not(generalspec/@dutycycle)">
@@ -63,6 +64,8 @@
 
         <xsl:apply-templates select="bitspec_irstream/bitspec" mode="declare_funcs"/>
         <xsl:apply-templates select="bitspec_irstream/irstream/(intro|repeat|ending)[*]" mode="define_setup"/>
+        <xsl:apply-templates select="parameters" mode="generate_assign_initial_value"/>
+        <xsl:apply-templates select="definitions"/>
         <xsl:apply-templates select="parameters" mode="generate_standard_call"/>
         <xsl:apply-templates select="parameters[./parameter/default]" mode="generate_defaulted_call"/>
         <xsl:apply-templates select="parameters" mode="generate_map_call"/>
@@ -95,7 +98,7 @@
         <xsl:apply-templates select="*"/>
     </xsl:template>
 
-    <xsl:template match="intro|repeat|ending" mode="define_setup">
+    <xsl:template match="ending" mode="define_setup">
         <xsl:text>@Override
             protected </xsl:text>
         <xsl:value-of select="$protocolName"/>
@@ -110,6 +113,61 @@
         <xsl:text>IrList();
         </xsl:text>
         <xsl:apply-templates select="*"/>
+        <xsl:text>return list;
+            }
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="repeat" mode="define_setup">
+        <xsl:text>@Override
+            protected </xsl:text>
+        <xsl:value-of select="$protocolName"/>
+        <xsl:text>IrList setupRepeat() {
+            </xsl:text>
+            <xsl:value-of select="$protocolName"/>
+        <xsl:text>IrList list = new </xsl:text>
+        <xsl:value-of select="$protocolName"/>
+        <xsl:text>IrList();
+            bodyRepeat(list);
+            return list;
+            }
+
+            private void bodyRepeat(</xsl:text>
+            <xsl:value-of select="$protocolName"/>
+    <xsl:text>IrList list) {
+        </xsl:text>
+
+        <xsl:apply-templates select="*"/>
+        <xsl:text>}
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="intro" mode="define_setup">
+        <xsl:text>@Override
+            protected </xsl:text>
+        <xsl:value-of select="$protocolName"/>
+        <xsl:text>IrList setup</xsl:text>
+        <xsl:value-of select="upper-case(substring(name(.),1,1))"/>
+        <xsl:value-of select="substring(name(.),2)"/>
+        <xsl:text>() {
+        </xsl:text>
+        <xsl:value-of select="$protocolName"/>
+        <xsl:text>IrList list = new </xsl:text>
+        <xsl:value-of select="$protocolName"/>
+        <xsl:text>IrList();
+        </xsl:text>
+        <xsl:apply-templates select="*"/>
+
+        <xsl:if test="../repeat//repeat_marker/@min">
+            <xsl:text>for (</xsl:text>
+            <xsl:value-of select="$unsignedType"/>
+            <xsl:text> repeatCounter = 0; repeatCounter &lt; </xsl:text>
+            <xsl:value-of select="../repeat//repeat_marker/@min"/>
+            <xsl:text>; repeatCounter++ )
+                bodyRepeat(list);
+            </xsl:text>
+        </xsl:if>
+
         <xsl:text>return list;
             }
         </xsl:text>
@@ -169,19 +227,45 @@
 
     <xsl:template match="bitspec[count(./*)=2]">
         <xsl:text>if (chunk == 0) {
-</xsl:text>
+        </xsl:text>
         <xsl:apply-templates select="bare_irstream[1]"/>
         <xsl:text>} else {
-</xsl:text>
+        </xsl:text>
         <xsl:apply-templates select="bare_irstream[2]"/>
         <xsl:text>}
-</xsl:text>
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="definitions">
+        <xsl:apply-templates select="definition"/>
+    </xsl:template>
+
+    <xsl:template match="definition">
+        <xsl:text>private </xsl:text>
+        <xsl:value-of select="$parameterType"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="name/@name"/>
+        <xsl:text>() {
+            return </xsl:text>
+        <xsl:apply-templates select="expression"/>
+        <xsl:text>;
+            }
+        </xsl:text>
     </xsl:template>
 
     <xsl:template match="parameters">
         <xsl:text>(</xsl:text>
-    <xsl:apply-templates select="parameter"/>
-    <xsl:text>)</xsl:text>
+        <xsl:apply-templates select="parameter"/>
+        <xsl:text>)</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameters" mode="generate_assign_initial_value">
+        <xsl:text>@Override
+        protected void assignInitialValues() {
+        </xsl:text>
+        <xsl:apply-templates select="parameter" mode="generate_assign_initial_value"/>
+        <xsl:text>}
+        </xsl:text>
     </xsl:template>
 
     <xsl:template match="parameters" mode="generate_standard_call">
@@ -205,7 +289,7 @@
         <xsl:text>) {
             super();
         </xsl:text>
-        <xsl:apply-templates select="parameter[not(@memory='true')]" mode="local_definition_use_defaults"/>
+        <xsl:apply-templates select="parameter" mode="local_definition_use_defaults"/>
         <xsl:text>}
         </xsl:text>
     </xsl:template>
@@ -221,55 +305,95 @@
         </xsl:text>
     </xsl:template>
 
-    <xsl:template match="parameter" mode="local_definition_use_defaults">
-        <xsl:text>this.</xsl:text>
+    <xsl:template match="parameter" mode="generate_assign_initial_value">
+        <xsl:text>if (</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init &gt;= 0)
+        </xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text> = </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init;
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameter[not(default)]" mode="generate_assign_initial_value">
+        <xsl:value-of select="@name"/>
+        <xsl:text> = </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init;
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameter[@memory='true']" mode="generate_assign_initial_value">
+        <xsl:text>if (</xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init &gt;= 0)
+        </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text> = </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init;
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameter[not(@memory='true') and default]" mode="generate_assign_initial_value">
+        <xsl:value-of select="@name"/>
+        <xsl:text> = </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init &gt;= 0 ? </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init : (</xsl:text>
+        <xsl:apply-templates select="default"/>
+        <xsl:text>);
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameter" mode="local_definition_use_defaults">
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init = </xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>;
         </xsl:text>
     </xsl:template>
 
-    <xsl:template match="parameter[./default]" mode="local_definition_use_defaults">
-        <xsl:text>this.</xsl:text>
+    <xsl:template match="parameter[not(@memory='true') and ./default]" mode="local_definition_use_defaults">
         <xsl:value-of select="@name"/>
-        <xsl:text> = </xsl:text>
-        <xsl:apply-templates select="default/expression"/>
-        <xsl:text>;
+        <xsl:text>_init = -1;
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="parameter[@memory='true']" mode="local_definition_use_defaults">
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init = -1L;
         </xsl:text>
     </xsl:template>
 
     <xsl:template match="parameter" mode="fields_assignment">
-        <xsl:text>this.</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text> = parameters.get("</xsl:text>
+        <xsl:text>_init = parameters.get("</xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>");
         </xsl:text>
     </xsl:template>
 
     <xsl:template match="parameter[./default and not(@memory='true')]" mode="fields_assignment">
-        <xsl:text>this.</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text> = parameters.containsKey("</xsl:text>
+        <xsl:text>_init = parameters.containsKey("</xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>") ? parameters.get("</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text>") : (</xsl:text>
-        <xsl:apply-templates select="./default/expression"/>
-        <xsl:text>);
+        <xsl:text>") : -1;
         </xsl:text>
     </xsl:template>
 
     <xsl:template match="parameter[@memory='true']" mode="fields_assignment">
-        <xsl:text>if (parameters.containsKey("</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text>"))
-        this.</xsl:text>
+        <xsl:text>_init = parameters.containsKey("</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text> = parameters.get("</xsl:text>
+        <xsl:text>") ? parameters.get("</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text>");
+        <xsl:text>") : -1;
         </xsl:text>
     </xsl:template>
 
@@ -281,12 +405,29 @@
     </xsl:template>
 
     <xsl:template match="parameter" mode="define_fields">
-        <xsl:text>private final </xsl:text>
+        <xsl:text>private </xsl:text>
+        <xsl:value-of select="$parameterType"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init;
+        </xsl:text>
+        <xsl:text>private </xsl:text>
         <xsl:value-of select="$parameterType"/>
         <xsl:text> </xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>;
         </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="assignment|definition" mode="define_fields">
+        <xsl:if test="not(ancestor::implementation/parameters/parameter[@name=current()/name/@name])">
+            <xsl:text>private </xsl:text>
+            <xsl:value-of select="$parameterType"/>
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="name/@name"/>
+            <xsl:text>;
+            </xsl:text>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="parameter[@memory='true']" mode="define_fields">
@@ -297,6 +438,12 @@
         <xsl:text> = </xsl:text>
         <xsl:apply-templates select="default"/>
         <xsl:text>;
+        </xsl:text>
+        <xsl:text>private </xsl:text>
+        <xsl:value-of select="$parameterType"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="@name"/>
+        <xsl:text>_init;
         </xsl:text>
     </xsl:template>
 
@@ -328,9 +475,8 @@
     </xsl:template>
 
     <xsl:template match="parameter" mode="assign_fields">
-        <xsl:text>this.</xsl:text>
         <xsl:value-of select="@name"/>
-        <xsl:text> = </xsl:text>
+        <xsl:text>_init = </xsl:text>
         <xsl:value-of select="@name"/>
         <xsl:text>;
         </xsl:text>
@@ -348,17 +494,6 @@
         <xsl:apply-templates select="intro[*]"/>
         <xsl:apply-templates select="repeat[*]"/>
         <xsl:apply-templates select="ending[*]"/>
-    </xsl:template>
-
-    <xsl:template match="intro|repeat|ending" mode="definition">
-        <xsl:value-of select="$protocolName"/>
-        <xsl:text>Renderer::do</xsl:text>
-        <xsl:value-of select="name(.)"/>
-        <xsl:text>() {
-        </xsl:text>
-        <xsl:apply-templates select="*"/>
-        <xsl:text>};
-        </xsl:text>
     </xsl:template>
 
     <xsl:template match="flash|gap|extent">
@@ -470,6 +605,11 @@
     </xsl:template>
 
     <xsl:template match="name">
+        <xsl:value-of select="@name"/>
+        <xsl:text>()</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="name[ancestor::implementation/parameters/parameter/@name=current()/@name]|name[ancestor::implementation//assignment/name/@name=current()/@name]">
         <xsl:value-of select="@name"/>
     </xsl:template>
 

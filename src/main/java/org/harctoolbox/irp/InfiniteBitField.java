@@ -35,12 +35,12 @@ public class InfiniteBitField extends BitField {
         if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext))
             complement = true;
         data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
-        chop = PrimaryItem.newPrimaryItem(ctx.primary_item(2));
+        chop = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
     }
 
     @Override
     public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long x = data.toNumber(nameEngine) >> chop.toNumber(nameEngine);
+        long x = data.toNumber(nameEngine) >>> chop.toNumber(nameEngine);
         if (complement)
             x = ~x;
         //x &= ((1L << width.toNumber(nameEngine)) - 1L);
@@ -68,12 +68,26 @@ public class InfiniteBitField extends BitField {
     @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public Element toElement(Document document) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Element toElement(Document document) throws IrpSyntaxException {
+        Element element = document.createElement("infinite_bitfield");
+        //element.setAttribute("reverse", Boolean.toString(reverse));
+        element.setAttribute("complement", Boolean.toString(complement));
+        Element dataElement = document.createElement("data");
+        dataElement.appendChild(data.toElement(document));
+        element.appendChild(dataElement);
+        //Element widthElement = document.createElement("width");
+        //widthElement.appendChild(width.toElement(document));
+        //element.appendChild(widthElement);
+        if (!(chop instanceof Number && ((Number) chop).data == 0)) {
+            Element chopElement = document.createElement("chop");
+            chopElement.appendChild(chop.toElement(document));
+            element.appendChild(chopElement);
+        }
+        return element;
     }
 
     @Override

@@ -177,7 +177,22 @@
         <xsl:text>private static class </xsl:text>
         <xsl:value-of select="$protocolName"/>
         <xsl:text>IrList extends IrpRenderer.IrList {
-
+          private final static </xsl:text>
+        <xsl:value-of select="$unsignedType"/>
+        <xsl:text> mask = </xsl:text>
+        <xsl:value-of select="count(bare_irstream)-1"/> <!-- almost right -->
+        <xsl:text>;
+        </xsl:text>
+        <xsl:if test="number(@chunksize) &gt; 1">
+            <xsl:text>private </xsl:text>
+            <xsl:value-of select="$parameterType"/>
+            <xsl:text> pendingData = 0;
+                private </xsl:text>
+            <xsl:value-of select="$parameterType"/>
+            <xsl:text> pendingBits = 0;
+            </xsl:text>
+        </xsl:if>
+        <xsl:text>
             @Override
             void finiteBitField(</xsl:text>
         <xsl:value-of select="$parameterType"/>
@@ -185,25 +200,47 @@
         <xsl:value-of select="$parameterType"/>
         <xsl:text> width) {
         </xsl:text>
+        <xsl:value-of select="$parameterType"/>
+        <xsl:text> realData = data;
+        </xsl:text>
+        <xsl:value-of select="$parameterType"/>
+        <xsl:text> realWidth = width;
+        </xsl:text>
+        <xsl:if test="number(@chunksize) &gt; 1">
+            <xsl:text>
+            if (pendingBits &gt; 0) {
+                realData |= pendingData &lt;&lt; width;
+                realWidth += pendingBits;
+                pendingBits = 0;
+            }
+            if (realWidth % 2 != 0) {
+                pendingData = realData;
+                pendingBits = width;
+                realWidth = 0;
+            }
+            </xsl:text>
+        </xsl:if>
         <xsl:text>for (</xsl:text>
         <xsl:value-of select="$unsignedType"/>
-        <xsl:text> i = 0; i &lt; width; i += </xsl:text>
+        <xsl:text> i = 0; i &lt; realWidth; i += </xsl:text>
         <xsl:value-of select="@chunksize"/>
         <xsl:text>) {
         </xsl:text>
         <xsl:value-of select="$unsignedType"/>
-        <xsl:text> mask = </xsl:text>
-        <xsl:apply-templates select="@chunksize"/>
-        <xsl:text> &lt;&lt; </xsl:text>
+        <xsl:text> shift = </xsl:text>
         <xsl:if test="$bitdirection='msb'">
-            <xsl:text>width - 1 -</xsl:text>
+            <xsl:text>(</xsl:text>
+            <xsl:value-of select="$unsignedType"/>
+            <xsl:text>) realWidth - </xsl:text>
+            <xsl:value-of select="@chunksize"/>
+            <xsl:text> - </xsl:text>
         </xsl:if>
-        <xsl:text>i*</xsl:text>
-        <xsl:value-of select="@chunksize"/>
-        <xsl:text>;
+        <xsl:text>i;
         </xsl:text>
-        <xsl:value-of select="$parameterType"/>
-        <xsl:text> chunk = data &amp; mask;
+        <xsl:value-of select="$unsignedType"/>
+        <xsl:text> chunk = (((</xsl:text>
+        <xsl:value-of select="$unsignedType"/>
+        <xsl:text>)realData) >> shift) &amp; mask;
         </xsl:text>
         <xsl:apply-templates select="."/>
         <xsl:text>}
@@ -225,6 +262,14 @@
     </xsl:template>
 
 
+    <xsl:template match="bitspec">
+        <xsl:text>switch (chunk) {
+        </xsl:text>
+        <xsl:apply-templates select="./bare_irstream" mode="case"/>
+        <xsl:text>}
+        </xsl:text>
+    </xsl:template>
+
     <xsl:template match="bitspec[count(./*)=2]">
         <xsl:text>if (chunk == 0) {
         </xsl:text>
@@ -233,6 +278,16 @@
         </xsl:text>
         <xsl:apply-templates select="bare_irstream[2]"/>
         <xsl:text>}
+        </xsl:text>
+    </xsl:template>
+
+    <xsl:template match="bare_irstream" mode="case">
+        <xsl:text>case </xsl:text>
+        <xsl:value-of select="position()-1"/>
+        <xsl:text>:
+        </xsl:text>
+        <xsl:apply-templates select="*"/>
+        <xsl:text>break;
         </xsl:text>
     </xsl:template>
 
@@ -632,6 +687,20 @@
         <xsl:value-of select="@type"/>
         <xsl:text>(</xsl:text>
         <xsl:apply-templates select="expression[2]"/>
+        <xsl:text>)</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="unary_operator">
+        <xsl:text>(</xsl:text>
+        <xsl:value-of select="@type"/>
+        <xsl:text>(</xsl:text>
+        <xsl:apply-templates select="expression"/>
+        <xsl:text>))</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="unary_operator[@type='#']">
+        <xsl:text>Long.bitCount(</xsl:text>
+        <xsl:apply-templates select="expression"/>
         <xsl:text>)</xsl:text>
     </xsl:template>
 

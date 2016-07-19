@@ -21,8 +21,10 @@ package org.harctoolbox.irp;
 
 import com.beust.jcommander.JCommander;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
@@ -32,11 +34,18 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.xml.validation.Schema;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.XmlUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 // TODO: allow more than one file; include directive.
 
@@ -48,12 +57,18 @@ public class IrpDatabase {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
     private static JCommander argumentParser;
 
+    public static final String irpProtocolNS = "http://www.harctoolbox.org/irp-protocols";
+    public static final String irpProtocolLocation = "file:///home/bengt/harctoolbox/IrpTransmogrifier/src/main/schemas/irp-protocols.xsd";
+    public static final String irpProtocolPrefix = "irp";
+
     private static class UnparsedProtocol {
 
         public static final String unnamed = "unnamed_protocol";
         public static final String nameName = "name";
         public static final String irpName = "irp";
+        public static final String usable = "usable";
         public static final String documentationName = "documentation";
+        private static final String parameterName = "parameter";
 
         private HashMap<String, String> map;
 
@@ -89,11 +104,22 @@ public class IrpDatabase {
         }
 
         UnparsedProtocol() {
-            map = new HashMap<>();
+            map = new LinkedHashMap<>();
         }
 
         UnparsedProtocol(HashMap<String, String> map) {
             this.map = map;
+        }
+
+        UnparsedProtocol(Element element) {
+            this();
+            map.put(nameName, element.getAttribute(nameName));
+            NodeList nl = element.getElementsByTagNameNS(irpProtocolNS, irpName);
+            if (nl.getLength() > 0)
+                map.put(irpName, nl.item(0).getTextContent());
+            NodeList n = element.getElementsByTagNameNS(irpProtocolNS, documentationName);
+            if (n.getLength() > 0)
+                map.put(documentationName, n.item(0).getTextContent());
         }
 
         NamedProtocol toNamedProtocol() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
@@ -105,8 +131,6 @@ public class IrpDatabase {
             return getName() + "\t" + getIrp();
         }
     }
-
-    public static final String defaultEncoding = "WINDOWS-1252";
 
     private final static int maxRecursionDepth = 5;
     private String configFileVersion;
@@ -143,8 +167,8 @@ public class IrpDatabase {
         return protocols.containsKey(protocol.toLowerCase(Locale.US));
     }
 
-    public static boolean isKnown(String protocolsPath, String protocol) throws FileNotFoundException, IncompatibleArgumentException, WrongCharSetException, UnsupportedEncodingException, IOException {
-        return (newIrpDatabase(protocolsPath)).isKnown(protocol);
+    public static boolean isKnown(String protocolsPath, String protocol) throws FileNotFoundException, IncompatibleArgumentException, UnsupportedEncodingException, IOException, SAXException {
+        return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
 
     /**
@@ -163,14 +187,15 @@ public class IrpDatabase {
      * @param configFilename
      * @param protocolName
      * @return String with IRP representation
-     * @throws org.harctoolbox.irp.IrpDatabase.WrongCharSetException
      * @throws java.io.UnsupportedEncodingException
+     * @throws org.xml.sax.SAXException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public static String getIrp(String configFilename, String protocolName) throws WrongCharSetException, UnsupportedEncodingException, IOException {
+    public static String getIrp(String configFilename, String protocolName) throws UnsupportedEncodingException, IOException, SAXException, IncompatibleArgumentException {
         IrpDatabase irpMaster = null;
         try {
-            irpMaster = newIrpDatabase(configFilename);
-        } catch (FileNotFoundException | IncompatibleArgumentException ex) {
+            irpMaster = new IrpDatabase(configFilename);
+        } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
         return irpMaster == null ? null : irpMaster.getIrp(protocolName);
@@ -215,28 +240,10 @@ public class IrpDatabase {
         return prot.toNamedProtocol();
     }
 
-    /**
-     * Constructs a new Protocol with requested name, taken from the configuration
-     * file/data base within the current IrpMaster.
-     *
-     * @param name protocol name in the configuration file/data base
-     * @return newly parsed protocol
-     * @throws UnassignedException
-     * @throws ParseException
-     * @throws org.harctoolbox.IrpMaster.UnknownProtocolException
-     * /
-
-    public Protocol newProtocol(String name) throws UnassignedException, ParseException, UnknownProtocolException {
-        UnparsedProtocol protocol = protocols.get(name.toLowerCase(IrpUtils.dumbLocale));
-        if (protocol == null)
-            throw new UnknownProtocolException(name);
-        return new Protocol(protocol.name.toLowerCase(IrpUtils.dumbLocale), protocol.getIrp(), protocol.documentation);
-    }*/
 
     private void expand() throws IncompatibleArgumentException {
-        for (String protocol : protocols.keySet()) {
+        for (String protocol : protocols.keySet())
             expand(0, protocol);
-        }
     }
 
     private void expand(int depth, String name) throws IncompatibleArgumentException {
@@ -262,18 +269,21 @@ public class IrpDatabase {
         }
     }
 
-    private void addProtocol(HashMap<String, String> current) {
-        // if no irp or name, ignore
-        if (current == null
-                || current.get(UnparsedProtocol.irpName) == null
-                || current.get(UnparsedProtocol.nameName) == null)
+    private void addProtocol(Element current) {
+
+        if (current.getAttribute(UnparsedProtocol.usable).equals("no")
+                || current.getAttribute(UnparsedProtocol.usable).equals("false"))
             return;
 
-        String nameLower = current.get(UnparsedProtocol.nameName).toLowerCase(Locale.US);
+        UnparsedProtocol proto = new UnparsedProtocol(current);
+        if (proto.getName() == null || proto.getIrp() == null)
+            return;
+
+        String nameLower = proto.getName().toLowerCase(Locale.US);
 
         if (protocols.containsKey(nameLower))
             logger.log(Level.WARNING, "Multiple definitions of protocol `{0}''. Keeping the last.", nameLower);
-        protocols.put(nameLower, new UnparsedProtocol(current));
+        protocols.put(nameLower, proto);
     }
 
     private IrpDatabase() {
@@ -281,83 +291,74 @@ public class IrpDatabase {
         protocols = new LinkedHashMap<>();
     }
 
-    public static class WrongCharSetException extends RuntimeException {
-        WrongCharSetException(String charSet) {
-            super(charSet);
-        }
-    }
-
-    /**
-     * Like the other version, but reads from an InputStream instead, using US-ASCII.
-     *
-     * @param inputStream
-     * @throws org.harctoolbox.irp.IrpDatabase.WrongCharSetException
-     * @throws java.io.UnsupportedEncodingException
-     * @throws IncompatibleArgumentException
-     */
-//   public IrpDatabase(InputStream inputStream) throws WrongCharSetException, UnsupportedEncodingException, IncompatibleArgumentException {
-//        this(inputStream, defaultEncoding);
-//    }
-
-    /**
-     * Like the other version, but reads from an InputStream instead, using
-     * US-ASCII.
-     *
-     * @param inputStream
-     * @param charSet
-     * @throws java.io.UnsupportedEncodingException
-     * @throws org.harctoolbox.irp.IrpDatabase.WrongCharSetException
-     * @throws IncompatibleArgumentException
-     */
-//    public static IrpDatabase newIrpDatabase(InputStream inputStream) throws UnsupportedEncodingException, WrongCharSetException, IncompatibleArgumentException {
-//        return newIrpDatabase(inputStream)
-//        this(new InputStreamReader(inputStream, charSet), charSet);
-//    }
-
-    private static String determineCharSet(Reader reader) throws IOException {
-        BufferedReader in = new BufferedReader(reader);
-        String line = in.readLine();
-        if (line == null || !line.trim().equals("[encoding]"))
-            return null;
-        line = in.readLine();
-        return line != null ? line.trim() : null;
-    }
-
     /**
      * Sets up a new IrpMaster from its first argument.
      *
-     * @param datafile Configuration file for IRP protocols.
-     * @return
+     * @param reader
      * @throws FileNotFoundException
-     * @throws IncompatibleArgumentException
-     * @throws org.harctoolbox.irp.IrpDatabase.WrongCharSetException
+     * @throws org.xml.sax.SAXException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      * @throws java.io.UnsupportedEncodingException
      */
-    public static IrpDatabase newIrpDatabase(String datafile) throws IOException, WrongCharSetException, IncompatibleArgumentException {
-        String charSet;
-        try (InputStreamReader is = new InputStreamReader(IrpUtils.getInputSteam(datafile), "US-ASCII")) {
-            charSet = determineCharSet(is);
-        }
-        IrpDatabase db = new IrpDatabase(new InputStreamReader(IrpUtils.getInputSteam(datafile), charSet), charSet);
-        return db;
+
+    public IrpDatabase(Reader reader) throws IOException, SAXException, IncompatibleArgumentException {
+        this(XmlUtils.openXmlReader(reader, (Schema) null, true, true));
     }
 
-//    public IrpDatabase newIrpDatabase(Reader reader) throws IOException {
-//        String charSet = determineCharSet(reader);
-//        reader.
-//    }
+    public IrpDatabase(InputStream inputStream) throws IOException, SAXException, IncompatibleArgumentException {
+        this(XmlUtils.openXmlStream(inputStream, null, true, true));
+    }
+
+    public IrpDatabase(File file) throws IOException, SAXException, IncompatibleArgumentException {
+        this(XmlUtils.openXmlFile(file, (Schema) null, true, true));
+    }
+
+    public IrpDatabase(String file) throws IOException, SAXException, IncompatibleArgumentException {
+        this(IrpUtils.getInputSteam(file));
+    }
 
     /**
-     * Like the other version, but reads from a Reader instead.
+     *
+     * @param doc
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     */
+    public IrpDatabase(Document doc) throws IncompatibleArgumentException {
+        Element root = doc.getDocumentElement();
+        protocols = new LinkedHashMap<>();
+        NodeList nodes = root.getElementsByTagNameNS(irpProtocolNS, "protocol");
+        for (int i = 0; i < nodes.getLength(); i++)
+            addProtocol((Element)nodes.item(i));
+        expand();
+    }
+
+    /**
+     *
+     * @param datafile
+     * @return
+     * @throws IOException
+     */
+    public static Document readIni(String datafile) throws IOException {
+        try (InputStreamReader is = new InputStreamReader(IrpUtils.getInputSteam(datafile), "US-ASCII")) {
+            return readIni(is);
+        }
+    }
+
+    /**
      *
      * @param reader
-     * @param charSet
-     * @throws org.harctoolbox.irp.IrpDatabase.WrongCharSetException
-     * @throws IncompatibleArgumentException
+     * @return
      */
-    private IrpDatabase(Reader reader, String charSet) throws WrongCharSetException, IncompatibleArgumentException {
-        protocols = new LinkedHashMap<>();
-        encoding = charSet;
+    public static Document readIni(Reader reader) {
+        Document doc = XmlUtils.newDocument(true);
+        Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
+        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
+        root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
+        root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
+        doc.appendChild(root);
+        //protocols = new LinkedHashMap<>();
+        //encoding = charSet;
         BufferedReader in = new BufferedReader(reader);
         HashMap<String, String> currentProtocol = null;
         int lineNo = 0;
@@ -388,17 +389,14 @@ public class IrpDatabase {
                     lineNo++;
                 }
 
-                if (line.equals("[encoding]")) {
-                    String fileEncoding = in.readLine();
-                    if (fileEncoding == null || !fileEncoding.equalsIgnoreCase(encoding))
-                        throw new WrongCharSetException(fileEncoding);
-                } else if (line.equals("[version]")) {
-                    configFileVersion = in.readLine();
+                if (line.equals("[version]")) {
+                    String configFileVersion = in.readLine();
                     lineNo++;
+                    root.setAttribute("version", configFileVersion);
                 } else if (line.equals("[protocol]")) {
                     if (currentProtocol != null) {
                         currentProtocol.put(UnparsedProtocol.documentationName, documentation.toString().trim());
-                        addProtocol(currentProtocol);
+                        root.appendChild(toElement(doc, currentProtocol));
                     }
                     currentProtocol = new HashMap<>();
                     documentation = new StringBuilder();
@@ -417,9 +415,9 @@ public class IrpDatabase {
                 } else if (keyword.equals("irp")) {
                     if (currentProtocol != null)
                         currentProtocol.put(UnparsedProtocol.irpName, payload);
-                } else if (keyword.equals("usable")) {
-                    if (payload == null || !payload.equals("yes"))
-                        currentProtocol = null;
+                } else if (keyword.equals(UnparsedProtocol.usable)) {
+                    if (currentProtocol != null)
+                        currentProtocol.put(keyword, payload);
                 } else if (keyword.length() > 1) {
                     if (currentProtocol != null)
                         currentProtocol.put(keyword, payload);
@@ -430,12 +428,60 @@ public class IrpDatabase {
             }
             if (currentProtocol != null) {
                 currentProtocol.put(UnparsedProtocol.documentationName, documentation.toString().trim());
-                addProtocol(currentProtocol);
+                root.appendChild(toElement(doc, currentProtocol));
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        expand();
-        logger.log(Level.FINE, "{0} protocols read.", protocols.size());
+        return doc;
+    }
+
+    private static Element toElement(Document doc, HashMap<String, String> currentProtocol) {
+        Element element = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocol");
+        for (Map.Entry<String, String> kvp : currentProtocol.entrySet()) {
+            switch (kvp.getKey()) {
+                case UnparsedProtocol.nameName:
+                    element.setAttribute(UnparsedProtocol.nameName, kvp.getValue());
+                    element.setAttribute("c-name", toCName(kvp.getValue()));
+                    break;
+                case UnparsedProtocol.usable:
+                    element.setAttribute(UnparsedProtocol.usable, Boolean.toString(!kvp.getValue().equals("no")));
+                    break;
+                case UnparsedProtocol.irpName: {
+                    Element irp = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.irpName);
+                    irp.setTextContent(kvp.getValue());
+                    element.appendChild(irp);
+                }
+                break;
+                case UnparsedProtocol.documentationName: {
+                    Element docu = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.documentationName);
+                    docu.setTextContent(kvp.getValue());
+                    element.appendChild(docu);
+                }
+                break;
+                default: {
+                    Element param = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.parameterName);
+                    param.setAttribute("name", kvp.getKey());
+                    param.setTextContent(kvp.getValue());
+                    element.appendChild(param);
+                }
+            }
+        }
+        return element;
+    }
+
+    public static String toCName(String name) {
+        String newName = name.replaceAll("[^0-9A-Za-z_]", "");
+        return newName.matches("\\d.*") ? ("X" + newName) : newName;
+    }
+
+    public static void main(String[] args) {
+        try {
+            Document doc = readIni(args[0]);
+            String out = args.length >= 2 ? args[1] : "-";
+            XmlUtils.printDOM(IrpUtils.getPrintSteam(out), doc, "UTF-8", "{" + irpProtocolNS + "}irp");
+        } catch (IOException ex) {
+            Logger.getLogger(IrpDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

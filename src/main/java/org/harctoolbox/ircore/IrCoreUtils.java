@@ -144,7 +144,7 @@ public class IrCoreUtils {
 
     /**
      * Return a number consisting of width number of 1, probably for using as bit mask.
-     * @param width > 0
+     * @param width &gt; 0
      * @return
      */
     public static long ones(long width) {
@@ -153,7 +153,7 @@ public class IrCoreUtils {
 
     /**
      * Return a number consisting of width number of 1, probably for using as bit mask.
-     * @param width > 0
+     * @param width &gt; 0
      * @return
      */
     public static int ones(int width) {

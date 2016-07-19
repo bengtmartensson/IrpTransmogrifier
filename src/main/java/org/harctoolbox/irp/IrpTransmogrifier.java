@@ -140,7 +140,12 @@ public class IrpTransmogrifier {
     }
 
     private static void doExpression(CommandExpression commandExpression) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
-        NameEngine nameEngine = new NameEngine(commandExpression.nameEngine);
+        String nameEngineString = commandExpression.nameEngine;
+        if (!nameEngineString.startsWith("{"))
+            nameEngineString = "{" + nameEngineString;
+        if (!nameEngineString.endsWith("{"))
+            nameEngineString += "}";
+        NameEngine nameEngine = new NameEngine(nameEngineString);
         for (String text : commandExpression.expressions) {
 
             IrpParser parser = new ParserDriver(text).getParser();
@@ -163,6 +168,53 @@ public class IrpTransmogrifier {
 
             if (commandExpression.gui)
                 IrpTransmogrifier.showTreeViewer(parser, expression.getParseTree(), text+"="+result);
+        }
+    }
+
+    private static void doBitfield(CommandBitfield commandBitField) throws IrpSyntaxException, UsageException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
+        String nameEngineString = commandBitField.nameEngine;
+        if (!nameEngineString.startsWith("{"))
+            nameEngineString = "{" + nameEngineString;
+        if (!nameEngineString.endsWith("{"))
+            nameEngineString += "}";
+        NameEngine nameEngine = new NameEngine(nameEngineString);
+
+//        String generalSpecString = commandExpression.generalspec;
+//        if (commandExpression.msb) {
+//            if (commandExpression.generalspec != null)
+//                throw new UsageException("The options --generalspec and --msb are exclusive");
+//            generalSpecString = "{msb}";
+//        }
+//        GeneralSpec generalSpec = new GeneralSpec(generalSpecString);
+
+        for (String text : commandBitField.bitfields) {
+
+            IrpParser parser = new ParserDriver(text).getParser();
+            BitField bitfield = BitField.newBitField(parser.bitfield());
+//            if (!parser.isMatchedEOF()) {
+//                System.err.println("WARNING: Did not match all input");
+//                //System.exit(IrpUtils.exitFatalProgramFailure);
+//            }
+
+            long result = bitfield.toNumber(nameEngine);
+            System.out.print(result);
+            if (bitfield instanceof FiniteBitField) {
+                FiniteBitField fbf = (FiniteBitField) bitfield;
+                System.out.print("\t" + fbf.toBinaryString(nameEngine, commandBitField.lsb));
+            }
+            System.out.println();
+
+//            if (commandExpression.stringTree)
+//                System.out.println(bitfield.getParseTree().toStringTree(parser));
+            if (commandBitField.xml) {
+                Document doc = XmlUtils.newDocument();
+                Element root = bitfield.toElement(doc);
+                doc.appendChild(root);
+                XmlUtils.printDOM(doc);
+            }
+//
+//            if (commandExpression.gui)
+//                IrpTransmogrifier.showTreeViewer(parser, bitfield.getParseTree(), text+"="+result);
         }
     }
 
@@ -202,8 +254,11 @@ public class IrpTransmogrifier {
 
     private final static class CommandLineArgs {
 
-        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file")
-        private String configfile = "src/main/config/IrpProtocols.ini";
+        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
+        private String configFile = "src/main/config/IrpProtocols.xml";
+
+        @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
+        private String iniFile = null;//"src/main/config/IrpProtocols.ini";
 
         //@Parameter(names = {"-D", "--debug"}, description = "Debug code")
         //private int debug = 0;
@@ -263,7 +318,7 @@ public class IrpTransmogrifier {
         private String xslt = null;
 
         @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")
-        private String encoding = "WINDOWS-1252";
+        private String encoding = "UTF-8";
 
         @Parameter(names = { "--target" }, description = "Target for code generation")
         private String target;
@@ -316,6 +371,31 @@ public class IrpTransmogrifier {
         private List<String> expressions;
     }
 
+    @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield")
+    private static class CommandBitfield {
+
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use")
+        private String nameEngine = null;
+
+//        @Parameter(names = { "-g", "--generalspec" }, description = "Generalspec to use")
+//        private String generalspec = null;
+
+        @Parameter(names = { "-l", "--lsb" }, description = "Least significant bit first")
+        private boolean lsb = false;
+
+//        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+//        private boolean stringTree = false;
+//
+//        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+//        private boolean gui = false;
+
+        @Parameter(names = { "--xml"}, description = "List XML")
+        private boolean xml = false;
+
+        @Parameter(description = "bitfield")
+        private List<String> bitfields;
+    }
+
     @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
     private static class CommandRecognize {
 
@@ -347,6 +427,9 @@ public class IrpTransmogrifier {
         CommandExpression commandExpression = new CommandExpression();
         argumentParser.addCommand(commandExpression);
 
+        CommandBitfield commandBitfield = new CommandBitfield();
+        argumentParser.addCommand(commandBitfield);
+
         try {
             argumentParser.parse(args);
         } catch (ParameterException ex) {
@@ -359,11 +442,11 @@ public class IrpTransmogrifier {
 
         if (commandLineArgs.versionRequested) {
             System.out.println(Version.versionString);
-            if (commandLineArgs.configfile != null) {
+            if (commandLineArgs.configFile != null) {
                 try {
-                    IrpDatabase db = IrpDatabase.newIrpDatabase(commandLineArgs.configfile);
-                    System.out.println("Database: " + commandLineArgs.configfile + " version: "+ db.getConfigFileVersion());
-                } catch (IOException | IrpDatabase.WrongCharSetException | IncompatibleArgumentException ex) {
+                    IrpDatabase db = new IrpDatabase(commandLineArgs.configFile);
+                    System.out.println("Database: " + commandLineArgs.configFile + " version: "+ db.getConfigFileVersion());
+                } catch (IOException | SAXException | IncompatibleArgumentException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
@@ -380,7 +463,9 @@ public class IrpTransmogrifier {
         logger.setLevel(commandLineArgs.logLevel/*Level.ALL*/);
 
         try {
-            IrpDatabase irpDatabase = IrpDatabase.newIrpDatabase(commandLineArgs.configfile);
+            IrpDatabase irpDatabase = commandLineArgs.iniFile != null
+                    ? new IrpDatabase(IrpDatabase.readIni(commandLineArgs.iniFile))
+                    : new IrpDatabase(commandLineArgs.configFile);
             String command = argumentParser.getParsedCommand();
             if (command == null) {
                 usage(IrpUtils.exitUsageError);
@@ -402,14 +487,24 @@ public class IrpTransmogrifier {
                 case "expression":
                     doExpression(commandExpression);
                     break;
+                case "bitfield":
+                    doBitfield(commandBitfield);
+                    break;
                 default:
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (UnknownProtocolException | UnassignedException ex) {
+        } catch (UnknownProtocolException | UnassignedException | UsageException ex) {
             System.err.println(ex.getMessage());
         } catch (SAXException | IOException| IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
             logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private static class UsageException extends Exception {
+
+        UsageException(String message) {
+            super(message);
         }
     }
 }

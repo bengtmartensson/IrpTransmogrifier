@@ -341,7 +341,7 @@ public class Expression extends PrimaryItem /* ??? */ {
     /**
      * @return the parseTree
      */
-    public IrpParser.ExpressionContext getParseTree() {
+    IrpParser.ExpressionContext getParseTree() {
         return parseTree;
     }
 
@@ -395,7 +395,7 @@ public class Expression extends PrimaryItem /* ??? */ {
     public String toIrpString() {
         if (parseTree == null)
             return null;
-        
+
         switch (parseTree.children.size()) {
             case 1:
                 ParseTree child = parseTree.children.get(0);

@@ -117,6 +117,7 @@ irstream:
 // class BareIrStream extends IrStreamItem
 bare_irstream:
     /* Empty */
+    | expression '?' bare_irstream ':' bare_irstream
     | irstream_item (','  irstream_item)*
 ;
 

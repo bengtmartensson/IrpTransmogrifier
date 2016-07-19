@@ -57,6 +57,31 @@ public class FiniteBitField extends BitField {
         return x;
     }
 
+    public String toBinaryString(NameEngine nameEngine, boolean reverse) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        String str = toBinaryString(nameEngine);
+        return reverse ? reverse(str) : str;
+    }
+
+    private String reverse(String str) {
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < str.length(); i++)
+            s.append(str.charAt(str.length()-1-i));
+        return s.toString();
+    }
+
+    public String toBinaryString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        String str = Long.toBinaryString(toNumber(nameEngine));
+        int wid = (int) width.toNumber(nameEngine);
+        int len = str.length();
+        if (len > wid)
+            return str.substring(len - wid);
+
+        for (int i = len; i < wid; i++)
+            str = "0" + str;
+
+        return str;
+    }
+
     @Override
     public long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         return width.toNumber(nameEngine);
@@ -75,7 +100,8 @@ public class FiniteBitField extends BitField {
     @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        BitStream bitStream = new BitStream(this, nameEngine, generalSpec);
+        return bitStream.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
     }
 
     @Override

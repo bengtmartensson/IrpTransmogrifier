@@ -37,17 +37,17 @@ public abstract class IrStreamItem extends IrpObject {
         //Debug.debugIrStreamItems(this.getClass().getSimpleName() + " constructed.");
     }
 
-    public static IrStreamItem parse(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
-        ParseTree child = ctx.getChild(0);
-        return //ctx instanceof IrpParser.VariationContext ? new Variation((Va))
-                //ctx.bitfield() != null ? new BitField(ctx.bitfield())
-                //: ctx instanceof IrpParser.AssignmentContext ? new Assignment((IrpParser.AssignmentContext) ctx)
-                //: ctx instanceof IrpParser.ExtentContext ? new BitField((IrpParser.ExtentContext) ctx)
-                (child instanceof IrpParser.DurationContext) ? Duration.newDuration(((IrpParser.DurationContext) child))
-                //: ctx instanceof IrpParser.IrstreamContext ? new IrStream(ctx.irstream())
-                //: ctx instanceof IrpParser.Bitspec_irstreamContext ? new BitspecIrstream(ctx.bitspec_irstream())
-                : null;
-    }
+//    public static IrStreamItem parse(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
+//        ParseTree child = ctx.getChild(0);
+//        return //ctx instanceof IrpParser.VariationContext ? new Variation((Va))
+//                //ctx.bitfield() != null ? new BitField(ctx.bitfield())
+//                //: ctx instanceof IrpParser.AssignmentContext ? new Assignment((IrpParser.AssignmentContext) ctx)
+//                //: ctx instanceof IrpParser.ExtentContext ? new BitField((IrpParser.ExtentContext) ctx)
+//                (child instanceof IrpParser.DurationContext) ? Duration.newDuration(((IrpParser.DurationContext) child))
+//                //: ctx instanceof IrpParser.IrstreamContext ? new IrStream(ctx.irstream())
+//                //: ctx instanceof IrpParser.Bitspec_irstreamContext ? new BitspecIrstream(ctx.bitspec_irstream())
+//                : null;
+//    }
 
     public static IrStreamItem newIrStreamItem(String str) throws IrpSyntaxException, InvalidRepeatException {
         return newIrStreamItem((new ParserDriver(str)).getParser().irstream_item());
@@ -58,7 +58,7 @@ public abstract class IrStreamItem extends IrpObject {
         return (child instanceof IrpParser.VariationContext) ? new Variation(((IrpParser.VariationContext) child))
                 : (child instanceof IrpParser.BitfieldContext) ? BitField.newBitField((IrpParser.BitfieldContext) child)
                 : (child instanceof IrpParser.AssignmentContext) ? new Assignment((IrpParser.AssignmentContext) child)
-                : (child instanceof IrpParser.ExtentContext) ? new Extent((IrpParser.ExtentContext) child)
+                //: (child instanceof IrpParser.ExtentContext) ? new Extent((IrpParser.ExtentContext) child)
                 : (child instanceof IrpParser.DurationContext) ? Duration.newDuration((IrpParser.DurationContext) child)
                 : (child instanceof IrpParser.IrstreamContext) ? new IrStream((IrpParser.IrstreamContext) child)
                 : (child instanceof IrpParser.Bitspec_irstreamContext) ? new BitspecIrstream((IrpParser.Bitspec_irstreamContext) child)

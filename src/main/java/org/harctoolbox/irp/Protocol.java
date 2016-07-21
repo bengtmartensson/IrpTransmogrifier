@@ -160,9 +160,10 @@ public class Protocol extends IrpObject {
      * @throws ArithmeticException
      * @throws UnassignedException
      * @throws IrpSyntaxException
+     * @throws org.harctoolbox.irp.DomainViolationException
      */
     public IrSignal toIrSignal(NameEngine nameEngine)
-            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
         IrSequence intro  = toIrSequence(nameEngine, Pass.intro);
         IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
         IrSequence ending = toIrSequence(nameEngine, Pass.ending);
@@ -178,8 +179,9 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.UnassignedException
      * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @throws org.harctoolbox.irp.DomainViolationException
      */
-    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
         return new ModulatedIrSequence(toIrSequence(nameEngine, pass), getFrequency(), getDutyCycle());
     }
 
@@ -192,10 +194,11 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.UnassignedException
      * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @throws org.harctoolbox.irp.DomainViolationException
      */
     public IrSequence toIrSequence(NameEngine nameEngine, Pass pass)
-            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        parameterSpecs.check(nameEngine); // ??
+            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
+        parameterSpecs.check(nameEngine);
         EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(nameEngine, generalSpec, pass, 0);
         return evaluatedIrStream.toIrSequence();
     }

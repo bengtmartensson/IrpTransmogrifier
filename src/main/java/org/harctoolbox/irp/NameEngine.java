@@ -17,10 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -202,33 +200,37 @@ public class NameEngine extends IrpObject {
             return "";
 
         StringBuilder str = new StringBuilder();
-        List<String> list = new ArrayList<>();
+        //List<String> list = new ArrayList<>();
         str.append("{");
-        for (Map.Entry<String, Expression> kvp : map.entrySet())
-            list.add(kvp.getKey() + "=" + kvp.getValue().toIrpString());
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            //list.add(kvp.getKey() + "=" + kvp.getValue().toIrpString());
+            if (str.length() > 1)
+                str.append(",");
+            str.append(kvp.getKey()).append("=").append(kvp.getValue().toIrpString());
+        }
 
-        str.append(list);
+        //str.append(list);
         str.append("}");
         return str.toString();
     }
 
-    /**
-     * Creates consisting of parameter values that can be used as part of filenames etc.
-     * Roughly, is a "pretty" variant of toString().
-     *
-     * @param equals String between name and value, often "=",
-     * @param separator String between name-value pairs, often ",".
-     * @return String
-     * @throws org.harctoolbox.irp.UnassignedException
-     */
-    public String notationString(String equals, String separator) throws UnassignedException {
-        StringBuilder str = new StringBuilder();
-        for (String name : map.keySet()) {
-            if (!name.startsWith("$") && !toParseTree(name).toStringTree().startsWith("("))
-                str.append(name).append(equals).append(toParseTree(name).toStringTree()).append(separator);
-        }
-        return (str.length() == 0 ? "" : str.substring(0, str.length()-1));
-    }
+//    /**
+//     * Creates consisting of parameter values that can be used as part of filenames etc.
+//     * Roughly, is a "pretty" variant of toString().
+//     *
+//     * @param equals String between name and value, often "=",
+//     * @param separator String between name-value pairs, often ",".
+//     * @return String
+//     * @throws org.harctoolbox.irp.UnassignedException
+//     */
+//    public String notationString(String equals, String separator) throws UnassignedException {
+//        StringBuilder str = new StringBuilder();
+//        for (String name : map.keySet()) {
+//            if (!name.startsWith("$") && !toParseTree(name).toStringTree().startsWith("("))
+//                str.append(name).append(equals).append(toParseTree(name).toStringTree()).append(separator);
+//        }
+//        return (str.length() == 0 ? "" : str.substring(0, str.length()-1));
+//    }
 
     @Override
     public Element toElement(Document document) {
@@ -244,24 +246,4 @@ public class NameEngine extends IrpObject {
         element.appendChild(definition.getValue().toElement(document));
         return element;
     }
-    /*private static void usage(int code) {
-        System.err.println("Usage:");
-        System.err.println("\tNameEngine [<name>=<value>|{<name>=<expression>}]+");
-        System.exit(code);
-    }
-
-    /**
-     * Just for testing purposes.
-     *
-     * @param args the command line arguments
-     * /
-    public static void main(String[] args) {
-        try {
-            NameEngine nameEngine = new NameEngine("{answer = 42, C = F*4 + D + 3}");
-            System.out.println(nameEngine);
-        } catch (IrpSyntaxException ex) {
-            Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    */
 }

@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
@@ -29,7 +30,7 @@ import org.w3c.dom.Element;
  * Depends on its Protocol (GeneralSpec and NameEngine), except for this, it is immutable.
  */
 
-public abstract class Duration extends IrStreamItem implements Floatable {
+public abstract class Duration extends IrStreamItem implements Floatable, Evaluatable {
     protected double us = IrCoreUtils.invalid;
     protected double time_periods = IrCoreUtils.invalid;
     protected double time_units = IrCoreUtils.invalid;
@@ -46,9 +47,12 @@ public abstract class Duration extends IrStreamItem implements Floatable {
     }
 
     public static Duration newDuration(IrpParser.DurationContext d) throws IrpSyntaxException {
-        return (d.getChild(0) instanceof IrpParser.Flash_durationContext)
-                ? new Flash((IrpParser.Flash_durationContext) d.getChild(0))
-                : new Gap((IrpParser.Gap_durationContext) d.getChild(0));
+        ParseTree child = d.getChild(0);
+        return (child instanceof IrpParser.FlashContext)
+                ? new Flash((IrpParser.FlashContext) child)
+                : child instanceof IrpParser.GapContext
+                ? new Gap((IrpParser.GapContext) child)
+                : new Extent((IrpParser.ExtentContext) child);
     }
 
     public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
@@ -127,9 +131,9 @@ public abstract class Duration extends IrStreamItem implements Floatable {
     @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
+        //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
-        evaluatedIrStream.add(duration);
+        evaluatedIrStream.add(this);
         return evaluatedIrStream;
     }
 
@@ -142,7 +146,7 @@ public abstract class Duration extends IrStreamItem implements Floatable {
 
     @Override
     public String toIrpString() {
-        return nameOrNumber.toIrpString();
+        return nameOrNumber.toIrpString() + (unit.equals("1") ? "" : unit);
     }
 
     @Override

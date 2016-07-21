@@ -89,12 +89,15 @@ public class FiniteBitField extends BitField {
 
     @Override
     public String toString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        return (complement ? "~" : "") + data.toNumber(nameEngine) + ":" + (reverse ? "-" : "") + width.toNumber(nameEngine) + ":" + chop.toNumber(nameEngine);
+        long chp = chop.toNumber(nameEngine);
+        return (complement ? "~" : "") + data.toNumber(nameEngine) + ":" + (reverse ? "-" : "") + width.toNumber(nameEngine)
+                + (chp != 0 ? (":" + chop.toNumber(nameEngine)) : "");
     }
 
     @Override
     public String toIrpString() {
-        return (complement ? "~" : "") + data.toIrpString() + ":" + (reverse ? "-" : "") + width.toIrpString() + ":" + chop.toIrpString();
+        return (complement ? "~" : "") + data.toIrpString() + ":" + (reverse ? "-" : "") + width.toIrpString()
+                + (hasChop() ? (":" + chop.toIrpString()) : "");
     }
 
     @Override

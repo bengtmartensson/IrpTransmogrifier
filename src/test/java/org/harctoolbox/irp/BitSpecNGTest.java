@@ -5,6 +5,8 @@
  */
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -41,34 +43,10 @@ public class BitSpecNGTest {
 
     @BeforeMethod
     public void setUpMethod() throws Exception {
-        BitSpec.reset();
     }
 
     @AfterMethod
     public void tearDownMethod() throws Exception {
-    }
-
-
-    /**
-     * Test of getNoInstances method, of class BitSpec.
-     */
-    @Test
-    public void testGetNoInstances() {
-        try {
-            System.out.println("getNoInstances");
-            //BitSpec.reset();
-            assertEquals(BitSpec.getNoInstances(), 0);
-            new BitSpec();
-            assertEquals(BitSpec.getNoInstances(), 0);
-            new BitSpec(NEC1BitSpec);
-            assertEquals(BitSpec.getNoInstances(), 1);
-            BitSpec.reset();
-            assertEquals(BitSpec.getNoInstances(), 0);
-            // TODO review the generated test code and remove the default call to fail.
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            fail();
-        }
-
     }
 
     /**
@@ -195,4 +173,49 @@ public class BitSpecNGTest {
 
     }
 
+    /**
+     * Test of numberOfInfiniteRepeats method, of class BitSpec.
+     */
+    @Test
+    public void testNumberOfInfiniteRepeats() {
+        System.out.println("numberOfInfiniteRepeats");
+        BitSpec instance = null;
+        try {
+            instance = new BitSpec(Nokia32BitSpec);
+        } catch (IrpSyntaxException | InvalidRepeatException ex) {
+            Logger.getLogger(BitSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        int expResult = 0;
+        int result = instance.numberOfInfiniteRepeats();
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of toIrpString method, of class BitSpec.
+     */
+    @Test
+    public void testToIrpString() {
+        try {
+            System.out.println("toIrpString");
+            BitSpec instance = new BitSpec(Nokia32BitSpec);
+            String result = instance.toIrpString();
+            assertEquals(result, "<164,-276|164,-445|164,-614|164,-783>");
+        } catch (IrpSyntaxException | InvalidRepeatException ex) {
+            Logger.getLogger(BitSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Test of numberOfBitspecDurations method, of class BitSpec.
+     */
+    @Test
+    public void testNumberOfBitspecDurations() {
+        System.out.println("numberOfBitspecDurations");
+        try {
+            int result = new BitSpec(Nokia32BitSpec).numberOfBitspecDurations();
+            assertEquals(result, 2);
+        } catch (IrpSyntaxException | InvalidRepeatException ex) {
+            Logger.getLogger(BitSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

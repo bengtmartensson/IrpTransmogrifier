@@ -108,9 +108,10 @@ public class GeneralSpec extends IrpObject {
                 frequency = IrCoreUtils.khz2Hz(kHz);
             } else if (item instanceof IrpParser.Unit_itemContext) {
                 IrpParser.Unit_itemContext unitItem = (IrpParser.Unit_itemContext) item;
-                if (unitItem.getChildCount() == 1 || unitItem.getChild(1).getText().equals("u"))
+                if (unitItem.getChildCount() == 1 || unitItem.getChild(1).getText().equals("u")) {
+                    unitInPeriods = -1f;
                     unit = NumberWithDecimals.parse(unitItem.number_with_decimals());
-                else
+                } else
                     unitInPeriods = NumberWithDecimals.parse(unitItem.number_with_decimals());
             } else if (item instanceof IrpParser.Dutycycle_itemContext) {
                 dutyCycle = IrCoreUtils.percent2real(NumberWithDecimals.parse(((IrpParser.Dutycycle_itemContext) item).number_with_decimals()));
@@ -147,26 +148,13 @@ public class GeneralSpec extends IrpObject {
         System.out.println(gs);
     }
 
-    /**
-     * Just for testing and debugging.
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            evaluatePrint(args[0]);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
-            Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     @Override
     public String toIrpString() {
         return "{"
                 + getFrequency() + "k,"
                 + getUnit() + ","
                 + getBitDirection()
-                + (getDutyCycle() > 0 ? ("," + getBitDirection()) : "")
+                + (getDutyCycle() > 0 ? ("," + IrCoreUtils.real2percent(getDutyCycle()) + "%") : "")
                 + "}";
     }
 
@@ -179,5 +167,18 @@ public class GeneralSpec extends IrpObject {
         if (getDutyCycle() > 0)
             element.setAttribute("dutycycle", Long.toString(100 * Math.round(getDutyCycle())));
         return element;
+    }
+
+    /**
+     * Just for testing and debugging.
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        try {
+            evaluatePrint(args[0]);
+        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
+            Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

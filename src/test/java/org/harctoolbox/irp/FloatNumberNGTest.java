@@ -6,6 +6,7 @@
 package org.harctoolbox.irp;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -38,13 +39,30 @@ public class FloatNumberNGTest {
     }
 
     /**
-     * Test of parseFloatNumber method, of class FloatNumber.
-     * @throws java.lang.Exception
+     * Test of toString method, of class FloatNumber.
      */
     @Test
-    public void testParse() throws Exception {
-        System.out.println("parseFloatNumber");
-        assertEquals(FloatNumber.parse(".42"), 0.42, 0.0000001);
-        assertEquals(FloatNumber.parse("3.12345"), 3.12345, 0.000001);
+    public void testToString() {
+        try {
+            System.out.println("toString");
+            assertEquals(new FloatNumber(".42").toString(), "0.42");
+            assertEquals(new FloatNumber("3.12345").toString(), "3.12345");
+        } catch (IrpSyntaxException ex) {
+            fail();
+        }
+    }
+
+    /**
+     * Test of parse method, of class FloatNumber.
+     */
+    @Test
+    public void testParse_String() {
+        try {
+            System.out.println("parseFloatNumber");
+            assertEquals(FloatNumber.parse(".42"), 0.42, 0.0000001);
+            assertEquals(FloatNumber.parse("3.12345"), 3.12345, 0.000001);
+        } catch (IrpSyntaxException ex) {
+            fail();
+        }
     }
 }

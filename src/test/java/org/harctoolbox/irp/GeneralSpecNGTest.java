@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.testng.Assert;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -72,7 +73,7 @@ public class GeneralSpecNGTest {
     public void testGetBitDirection() throws IrpSyntaxException, IrpSemanticException {
         try {
             System.out.println("getBitDirection");
-            GeneralSpec instance = new GeneralSpec("{msb ,40k , 33.33333% ,10p }");
+            GeneralSpec instance = new GeneralSpec("{lsb, msb ,40k , 33.33333% ,10p }");
             BitDirection result = instance.getBitDirection();
             Assert.assertEquals(result, BitDirection.msb);
             instance = new GeneralSpec("{lsb ,40k , 33.33333% ,10p }");
@@ -113,7 +114,7 @@ public class GeneralSpecNGTest {
     public void testGetUnit() throws IrpSyntaxException, IrpSemanticException {
         try {
             System.out.println("getUnit");
-            GeneralSpec instance = new GeneralSpec("{msb ,40k , 33.33333% ,10p }"); // Do not remove the silly formatting!!
+            GeneralSpec instance = new GeneralSpec("{123u, msb ,40k , 33.33333% ,10p }"); // Do not remove the silly formatting!!
             double expResult = 250f;
             double result = instance.getUnit();
             Assert.assertEquals(result, expResult, 0.0001);
@@ -121,4 +122,63 @@ public class GeneralSpecNGTest {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    /**
+     * Test of getDutyCycle method, of class GeneralSpec.
+     */
+    @Test
+    public void testGetDutyCycle() {
+        try {
+            System.out.println("getDutyCycle");
+            GeneralSpec instance = new GeneralSpec("{123u, msb ,40k , 73% ,10p }"); // Do not remove the silly formatting!!
+            double expResult = 0.73f;
+            double result = instance.getDutyCycle();
+            Assert.assertEquals(result, expResult, 0.0001);
+        } catch (ArithmeticException | IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException ex) {
+            fail();
+        }
+    }
+
+//    /**
+//     * Test of evaluatePrint method, of class GeneralSpec.
+//     * @throws java.lang.Exception
+//     */
+//    @Test
+//    public void testEvaluatePrint() throws Exception {
+//        System.out.println("evaluatePrint");
+//        GeneralSpec instance = new GeneralSpec("{123u, msb ,40k , 73% ,10p }"); // Do not remove the silly formatting!!
+//        String str = "";
+//        instance.evaluatePrint(str);
+//    }
+
+    /**
+     * Test of toIrpString method, of class GeneralSpec.
+     */
+    @Test
+    public void testToIrpString() {
+        try {
+            System.out.println("toIrpString");
+            GeneralSpec instance = new GeneralSpec("{123u, msb ,40k , 73% ,10p }"); // Do not remove the silly formatting!!
+            String expResult = "{40000.0k,250.0,msb,73%}";
+            String result = instance.toIrpString();
+            assertEquals(result, expResult);
+        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
+            fail();
+        }
+    }
+
+//    /**
+//     * Test of toElement method, of class GeneralSpec.
+//     */
+//    @Test
+//    public void testToElement() {
+//        System.out.println("toElement");
+//        Document document = null;
+//        GeneralSpec instance = new GeneralSpec();
+//        Element expResult = null;
+//        Element result = instance.toElement(document);
+//        assertEquals(result, expResult);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 }

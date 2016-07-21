@@ -97,10 +97,6 @@ public class Name extends PrimaryItem implements Floatable {
         return ctx.getText();
     }
 
-    public String toInfixCode() {
-        return name;
-    }
-
     @Override
     public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         Expression expression = nameEngine.get(name);

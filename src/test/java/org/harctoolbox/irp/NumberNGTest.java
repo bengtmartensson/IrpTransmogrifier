@@ -20,7 +20,11 @@ import org.testng.annotations.Test;
  */
 public class NumberNGTest {
 
+    private final Number instance;
+    private final long deadbeef = 0xdeadbeefL;
+
     public NumberNGTest() {
+        instance = new Number("0xdeadbeef");
     }
 
     @BeforeClass
@@ -59,6 +63,34 @@ public class NumberNGTest {
         } catch (ParseCancellationException ex) {
             fail();
         }
+    }
 
+    /**
+     * Test of toNumber method, of class Number.
+     */
+    @Test
+    public void testToNumber_0args() {
+        System.out.println("toNumber");
+        assertEquals(instance.toNumber(), 0xdeadbeefL);
+    }
+
+    /**
+     * Test of toString method, of class Number.
+     */
+    @Test
+    public void testToString() {
+        System.out.println("toString");
+        String result = instance.toString();
+        assertEquals(result, Long.toString(deadbeef));
+    }
+
+    /**
+     * Test of toIrpString method, of class Number.
+     */
+    @Test
+    public void testToIrpString() {
+        System.out.println("toIrpString");
+        String result = instance.toIrpString();
+        assertEquals(result, "3735928559");
     }
 }

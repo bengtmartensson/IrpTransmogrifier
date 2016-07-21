@@ -38,6 +38,10 @@ public class BitspecIrstream extends IrStreamItem {
         irStream = new IrStream(ctx.irstream());
     }
 
+    public BitspecIrstream(String str) throws IrpSyntaxException, InvalidRepeatException {
+        this((new ParserDriver(str)).getParser().bitspec_irstream());
+    }
+
     @Override
     public String toIrpString() {
         return bitSpec.toIrpString() + irStream.toIrpString();

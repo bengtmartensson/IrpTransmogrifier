@@ -43,6 +43,10 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
     }
 
     public static PrimaryItem newPrimaryItem(String name) throws IrpSyntaxException {
-        return new Name(name);
+        try {
+            return new Number(Long.parseLong(name));
+        } catch (NumberFormatException ex) {
+        }
+        return name.trim().startsWith("(") ? new Expression(name) : new Name(name);
     }
 }

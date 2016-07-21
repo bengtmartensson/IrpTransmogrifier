@@ -26,7 +26,11 @@ import org.w3c.dom.Element;
  */
 public class Extent extends Duration {
 
-    Extent(IrpParser.ExtentContext ctx) throws IrpSyntaxException {
+    public Extent(String str) throws IrpSyntaxException {
+        this((new ParserDriver(str)).getParser().extent());
+    }
+
+    public Extent(IrpParser.ExtentContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
     }
 

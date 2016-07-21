@@ -16,6 +16,8 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -30,18 +32,26 @@ public class ParameterSpec extends IrpObject {
     private Expression deflt;
     private boolean memory;
 
-    public String toString(IrpParser parser) {
-        return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toStringTree(parser)) : "");
-    }
-
     @Override
     public String toString() {
-        return toString(null);
+        return toIrpString();
     }
 
     @Override
     public String toIrpString() {
         return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
+    }
+
+    public void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
+        if (!nameEngine.containsKey(name.name) && deflt == null)
+            throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+
+        long value = nameEngine.get(name.name).toNumber(nameEngine);
+        if (value == IrCoreUtils.invalid && deflt == null)
+            throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+        if (!isOk(value))
+            throw new DomainViolationException("Parameter " + name + " outside of the allowed domain: "
+                    + domainAsString());
     }
 
     @Override
@@ -90,7 +100,7 @@ public class ParameterSpec extends IrpObject {
         this.memory = false;
     }
 
-    public boolean isOK(long x) {
+    public boolean isOk(long x) {
         return min.toNumber() <= x && x <= max.toNumber();
     }
 
@@ -138,10 +148,10 @@ public class ParameterSpec extends IrpObject {
             System.out.println(dev);
             System.out.println(toggle);
             System.out.println(func);
-            System.out.println(dev.isOK(-1));
-            System.out.println(dev.isOK(0));
-            System.out.println(dev.isOK(255));
-            System.out.println(dev.isOK(256));
+            System.out.println(dev.isOk(-1));
+            System.out.println(dev.isOk(0));
+            System.out.println(dev.isOk(255));
+            System.out.println(dev.isOk(256));
         } catch (ParseException ex) {
             System.out.println(ex.getMessage());
         }*/

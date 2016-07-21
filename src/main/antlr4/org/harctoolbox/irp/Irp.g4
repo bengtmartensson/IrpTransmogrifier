@@ -27,6 +27,7 @@ protocol:
 // 2.2, simplified
 // Difference: This a simplified version; implementing exclusions is not really
 // mainstream... Some silly input is not rejected.
+// My semantics: read left-to-right, later entries overwrite.
 // class GeneralSpec
 generalspec:
     '{' generalspec_list '}'
@@ -37,11 +38,12 @@ generalspec_list:
     | generalspec_item (',' generalspec_item )*
 ;
 
+// extension: dutycycle_item
 generalspec_item:
     frequency_item
     | unit_item
     | order_item
-    | dutycycle_item // Not present by Graham
+    | dutycycle_item
 ;
 
 frequency_item:
@@ -63,18 +65,22 @@ order_item:
 
 // 3.2
 // abstract class Duration implements Numerical
+// Note: spec did not consider extent as a duration
 duration:
-    flash_duration
-    | gap_duration
+    flash
+    | gap
+    | extent
 ;
 
 // class Flash extends Duration
-flash_duration:
+// called flash_duration in spec
+flash:
     name_or_number ('m' | 'u' | 'p')?
 ;
 
 // class Gap extends Duration
-gap_duration:
+// called gap_duration in spec
+gap:
     '-' name_or_number ('m' | 'u' | 'p')?
 ;
 
@@ -87,6 +93,9 @@ name_or_number:
 
 // 4.2
 // class extent (extends Duration)
+// Semantics: An extent is a gap, with all preceeding durations in the
+// containing bare_irstream subtracted. More than one extent in one
+// bare_irstream is thus allowed.
 extent:
     '^' name_or_number ('m' | 'u' | 'p')?
 ;
@@ -103,7 +112,7 @@ bitfield:
 // abstract class PrimaryItem implements Numerical
 primary_item:
     name
-    | DOLLAR_ID
+//    | DOLLAR_ID
     | number
     | para_expression
 ;
@@ -115,6 +124,7 @@ irstream:
 ;
 
 // class BareIrStream extends IrStreamItem
+// extension: the ?: form
 bare_irstream:
     /* Empty */
     | expression '?' bare_irstream ':' bare_irstream
@@ -122,11 +132,11 @@ bare_irstream:
 ;
 
 // abstract class IrStreamItem
+// Note: extent was implicit within duration
 irstream_item:
     variation
     | bitfield  // must come before duration!
     | assignment
-    | extent
     | duration
     | irstream
     | bitspec_irstream
@@ -153,11 +163,13 @@ bitspec_irstream:
 
 // 9.2
 // class Expression implements Numerical, InfixCode
-para_expression:            // called expression in spec
+// para_expression is called expression in spec
+para_expression:
     '(' expression ')'
 ;
 
-expression:                 // called bare_expression in spec
+// called bare_expression in spec
+expression:
                     primary_item
     |               bitfield
     |               '!'             expression
@@ -263,9 +275,9 @@ ID:
     ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 ;
 
-DOLLAR_ID:
-    '$' ID
-;
+//DOLLAR_ID:
+//    '$' ID
+//;
 
 INT:
     ( '0' .. '9')+

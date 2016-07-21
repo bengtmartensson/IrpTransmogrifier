@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.harctoolbox.irp;
 
-import static org.harctoolbox.irp.Assignment.parse;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -19,7 +15,10 @@ import org.testng.annotations.Test;
  */
 public class AssignmentNGTest {
 
-    public AssignmentNGTest() {
+    private final NameEngine nameEngine;
+
+    public AssignmentNGTest() throws IrpSyntaxException {
+        nameEngine = new NameEngine("{answer=42, sheldon=73}");
     }
 
     @BeforeClass
@@ -45,8 +44,93 @@ public class AssignmentNGTest {
     @Test
     public void testParse() throws Exception {
         System.out.println("parse");
-        String str = "";
-        NameEngine nameEngine = new NameEngine("{answer=42, sheldon=73}");
-        assertEquals(parse("x = answer*sheldon", nameEngine), 42*73);
+        assertEquals(Assignment.parse("x = answer*sheldon", nameEngine), 42*73);
+    }
+
+    /**
+     * Test of toNumber method, of class Assignment.
+     */
+    @Test
+    public void testToNumber() {
+        try {
+            System.out.println("toNumber");
+            Assignment instance = new Assignment("x = answer*sheldon");
+            long result = instance.toNumber(nameEngine);
+            assertEquals(result, 42*73);
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            fail();
+        }
+    }
+
+    /**
+     * Test of getName method, of class Assignment.
+     */
+    @Test
+    public void testGetName() {
+        System.out.println("getName");
+        Assignment instance = new Assignment("x = answer*sheldon");
+        String result = instance.getName();
+        assertEquals(result, "x");
+    }
+
+    /**
+     * Test of toString method, of class Assignment.
+     */
+    @Test
+    public void testToString() {
+        System.out.println("toString");
+        Assignment instance = new Assignment("x = answer*sheldon");
+        String result = instance.toString();
+        assertEquals(result, "x=(answer*sheldon)");
+    }
+
+    /**
+     * Test of toIrpString method, of class Assignment.
+     */
+    @Test
+    public void testToIrpString() {
+        System.out.println("toIrpString");
+        Assignment instance = new Assignment("x = answer*sheldon");
+        String result = instance.toIrpString();
+        assertEquals(result, "x=(answer*sheldon)");
+    }
+
+    /**
+     * Test of evaluate method, of class Assignment.
+     */
+    @Test
+    public void testEvaluate() {
+        System.out.println("evaluate");
+//        NameEngine nameEngine = null;
+//        GeneralSpec generalSpec = null;
+//        BitSpec bitSpec = null;
+//        IrSignal.Pass pass = null;
+//        double elapsed = 0.0;
+//        Assignment instance = null;
+//        EvaluatedIrStream expResult = null;
+//        EvaluatedIrStream result = instance.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
+//        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of numberOfBits method, of class Assignment.
+     */
+    @Test
+    public void testNumberOfBits() {
+        System.out.println("numberOfBits");
+        Assignment instance = new Assignment("x = answer*sheldon");
+        int result = instance.numberOfBits();
+        assertEquals(result, 0);
+    }
+
+    /**
+     * Test of numberOfBareDurations method, of class Assignment.
+     */
+    @Test
+    public void testNumberOfBareDurations() {
+        System.out.println("numberOfBareDurations");
+        Assignment instance = new Assignment("x = answer*sheldon");
+        int result = instance.numberOfBareDurations();
+        assertEquals(result, 0);
     }
 }

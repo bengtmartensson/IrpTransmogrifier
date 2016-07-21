@@ -27,7 +27,7 @@ import org.harctoolbox.ircore.IrSignal;
  *
  */
 class EvaluatedIrStream {
-    private List<Object> elements;
+    private List<Evaluatable> elements;
     //private BitField bitField;
     private BitSpec bitSpec;
     private GeneralSpec generalSpec;
@@ -49,10 +49,10 @@ class EvaluatedIrStream {
         evaluateBitStream();
         //canonicalize();
         List<Double>times = new ArrayList<>();
-        for (Object object : elements) {
-            if (!(object instanceof Double))
+        for (Evaluatable element : elements) {
+            if (!(element instanceof Duration))
                 throw new IrpSemanticException("IrSequence cannot be (completely) evaluated");
-            times.add((Double) object);
+            times.add(((Duration) element).evaluateWithSign(nameEngine, generalSpec, 0));
         }
         return new IrSequence(times);
     }
@@ -76,9 +76,9 @@ class EvaluatedIrStream {
         updateElapsed();
     }
 
-    void add(double duration) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    void add(Evaluatable evaluatable) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         evaluateBitStream();
-        elements.add(duration);
+        elements.add(evaluatable);
         updateElapsed();
     }
 
@@ -100,11 +100,11 @@ class EvaluatedIrStream {
         return elements.size();
     }
 
-    public double get(int i) throws IrpSemanticException {
-        Object object = elements.get(i);
-        if (!(object instanceof Double))
+    public double get(int i) throws IrpSemanticException, IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        Evaluatable object = elements.get(i);
+        if (!(object instanceof Duration))
             throw new IrpSemanticException("Not numeric");
-        return (Double) object;
+        return ((Duration) object).evaluateWithSign(nameEngine, generalSpec, 0);
     }
 
     private void squeezeBitStreams(BitStream bitStream) {
@@ -115,11 +115,11 @@ class EvaluatedIrStream {
         //elements.add(newBitField);
     }
 
-    private void updateElapsed() {
+    private void updateElapsed() throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         elapsed = 0f;
-        for (Object object : elements) {
-            if (object instanceof Double)
-                elapsed += Math.abs((Double)object);
+        for (Evaluatable element : elements) {
+            if (element instanceof Floatable)
+                elapsed += ((Floatable) element).toFloat(nameEngine, generalSpec);
             else {
                 elapsed = -1f;
                 break;

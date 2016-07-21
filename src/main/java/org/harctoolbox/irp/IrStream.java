@@ -101,6 +101,10 @@ public class IrStream extends BareIrStream {
 //        this.repeatMarker = repeatMarker != null ? repeatMarker : new RepeatMarker();
 //    }
 
+    public IrStream(String str) throws IrpSyntaxException, InvalidRepeatException{
+        this(new ParserDriver(str).getParser().irstream());
+    }
+
     public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         super(ctx.bare_irstream());
         IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
@@ -109,7 +113,7 @@ public class IrStream extends BareIrStream {
 
     @Override
     public String toString() {
-        return "(" + super.toString() + ")" + (repeatMarker != null ? repeatMarker.toString() : "");
+        return toIrpString();
     }
 
     @Override

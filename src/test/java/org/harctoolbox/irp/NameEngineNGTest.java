@@ -2,6 +2,10 @@ package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.testng.Assert;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -14,7 +18,10 @@ import org.testng.annotations.Test;
  */
 public class NameEngineNGTest {
 
-    public NameEngineNGTest() {
+    private final NameEngine instance;
+
+    public NameEngineNGTest() throws IrpSyntaxException {
+        instance = new NameEngine("{A=11,B=22,C=33,D=A-B,E=A-#(C-D),F=UINT8_MAX}");
     }
 
     @BeforeClass
@@ -54,12 +61,12 @@ public class NameEngineNGTest {
         System.out.println("define valid");
         String name = "valid";
         long value = 73L;
-        NameEngine instance = new NameEngine();
+        NameEngine names = new NameEngine();
         try {
-            instance.define(name, value);
+            names.define(name, value);
             //System.out.println(instance.get(name));
-            Assert.assertTrue(instance.containsKey(name));
-            Assert.assertEquals(instance.toNumber(name), value);
+            Assert.assertTrue(names.containsKey(name));
+            Assert.assertEquals(names.toNumber(name), value);
         } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
             Assert.fail("testDefine valid failed.");
         }
@@ -73,27 +80,41 @@ public class NameEngineNGTest {
     public void testParseDefinitions_String() throws Exception {
         System.out.println("parseDefinitions");
         String str = "{answer = 42, sheldon = 73, diff = sheldon - answer}";
-        NameEngine instance = new NameEngine(str);
+        NameEngine names = new NameEngine(str);
         //instance.parseDefinitions(str);
-        Assert.assertTrue(instance.containsKey("answer"));
-        Assert.assertTrue(instance.containsKey("sheldon"));
-        Assert.assertEquals(instance.toNumber("diff"), 31);
+        Assert.assertTrue(names.containsKey("answer"));
+        Assert.assertTrue(names.containsKey("sheldon"));
+        Assert.assertEquals(names.toNumber("diff"), 31);
     }
 
-//    /**
-//     * Test of define method, of class NameEngine.
-//     */
-//    @Test
-//    public void testDefine() throws Exception {
-//        System.out.println("define");
-//        String name = "";
-//        long value = 0L;
-//        NameEngine instance = new NameEngine();
-//        instance.define(name, value);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
+    /**
+     * Test of define method, of class NameEngine.
+     */
+    @Test
+    public void testDefine() {
+        System.out.println("define");
+        String name = "X";
+        long value = 123L;
+        NameEngine names = new NameEngine();
+        try {
+            names.define(name, value);
+        } catch (IrpSyntaxException ex) {
+            fail();
+        }
+        try {
+            assertEquals(names.get(name).toNumber(), value);
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            fail();
+        }
+        try {
+            assertEquals(names.get("Z").toNumber(), value);
+            fail();
+        } catch (UnassignedException ex) {
+        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+            fail();
+        }
+    }
+
 //    /**
 //     * Test of parseDefinitions method, of class NameEngine.
 //     */
@@ -121,80 +142,53 @@ public class NameEngineNGTest {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
-//
-//    /**
-//     * Test of toNumber method, of class NameEngine.
-//     */
-//    @Test
-//    public void testToNumber() throws Exception {
-//        System.out.println("toNumber");
-//        String name = "";
-//        NameEngine instance = new NameEngine();
-//        long expResult = 0L;
-//        long result = instance.toNumber(name);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of containsKey method, of class NameEngine.
-//     */
-//    @Test
-//    public void testContainsKey() {
-//        System.out.println("containsKey");
-//        String name = "";
-//        NameEngine instance = new NameEngine();
-//        boolean expResult = false;
-//        boolean result = instance.containsKey(name);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of toString method, of class NameEngine.
-//     */
-//    @Test
-//    public void testToString() {
-//        System.out.println("toString");
-//        IrpParser parser = null;
-//        NameEngine instance = new NameEngine();
-//        String expResult = "";
-//        String result = instance.toString(parser);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of notationString method, of class NameEngine.
-//     */
-//    @Test
-//    public void testNotationString() throws Exception {
-//        System.out.println("notationString");
-//        String equals = "";
-//        String separator = "";
-//        NameEngine instance = new NameEngine();
-//        String expResult = "";
-//        String result = instance.notationString(equals, separator);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of toElement method, of class NameEngine.
-//     */
-//    @Test
-//    public void testToElement() {
-//        System.out.println("toElement");
-//        Document document = null;
-//        NameEngine instance = new NameEngine();
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+
+    /**
+     * Test of toNumber method, of class NameEngine.
+     */
+    @Test
+    public void testToNumber() {
+        System.out.println("toNumber");
+        long result;
+        try {
+            result = instance.toNumber("F");
+            assertEquals(result, 255);
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            fail();
+        }
+    }
+
+    /**
+     * Test of containsKey method, of class NameEngine.
+     */
+    @Test
+    public void testContainsKey() {
+        System.out.println("containsKey");
+        String name = "";
+        boolean result = instance.containsKey(name);
+        assertTrue(instance.containsKey("F"));
+        assertFalse(instance.containsKey("Z"));
+    }
+
+    /**
+     * Test of toString method, of class NameEngine.
+     */
+    @Test
+    public void testToString_0args() {
+        System.out.println("toString");
+        String expResult = "{A=11,B=22,C=33,D=(A-B),E=(A-(#(C-D))),F=255}";
+        String result = instance.toString();
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of toIrpString method, of class NameEngine.
+     */
+    @Test
+    public void testToIrpString() {
+        System.out.println("toIrpString");
+        String expResult = "";
+        String result = instance.toIrpString();
+        assertEquals(result, "{A=11,B=22,C=33,D=(A-B),E=(A-(#(C-D))),F=255}");
+    }
 }

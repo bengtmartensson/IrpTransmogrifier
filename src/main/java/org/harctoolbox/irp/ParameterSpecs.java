@@ -16,13 +16,10 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -73,25 +70,21 @@ public class ParameterSpecs extends IrpObject {
 
     @Override
     public String toString() {
+        if (isEmpty())
+            return "";
         StringBuilder str = new StringBuilder("[");
         for (ParameterSpec ps : map.values())
-            str.append(ps.toString()).append(", ");
+            str.append(ps.toString()).append(",");
 
         if (str.length() > 0)
-            str.deleteCharAt(str.length()-2);
+            str.deleteCharAt(str.length()-1);
         str.append("]");
         return str.toString();
     }
 
     @Override
     public String toIrpString() {
-        StringBuilder str = new StringBuilder("[");
-        List<String> vals = new ArrayList<>();
-        for (ParameterSpec ps : map.values())
-            vals.add(ps.toIrpString());
-        str.append(String.join(",", vals));
-        str.append("]");
-        return str.toString();
+        return toString();
     }
 
     @Override
@@ -103,20 +96,8 @@ public class ParameterSpecs extends IrpObject {
         return el;
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            System.out.println(new ParameterSpecs("[T@:0..1=0,D:0..31,F:0..128,S:0..255=D-255]"));
-        } catch (IrpSyntaxException ex) {
-            Logger.getLogger(ParameterSpecs.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    void check(NameEngine nameEngine) {
-//        for (ParameterSpec param : map.values()) {
-//            param.check(nameEngine);
-//        }
+    void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
+        for (ParameterSpec parameter : map.values())
+            parameter.check(nameEngine);
     }
 }

@@ -26,7 +26,11 @@ import org.w3c.dom.Element;
  */
 public class Flash extends Duration {
 
-    public Flash(IrpParser.Flash_durationContext ctx) throws IrpSyntaxException {
+    public Flash(String str) throws IrpSyntaxException {
+        this((new ParserDriver(str)).getParser().flash());
+    }
+
+    public Flash(IrpParser.FlashContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : null);
     }
 

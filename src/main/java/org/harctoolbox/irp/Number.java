@@ -25,8 +25,6 @@ import org.w3c.dom.Element;
  *
  */
 public class Number extends PrimaryItem {
-    //public final static int SIZE = Integer.MAX_VALUE;
-    //BigInteger data;
 
     public final static int SIZE = Long.SIZE;
     long data;
@@ -71,10 +69,6 @@ public class Number extends PrimaryItem {
 
     public long toNumber() {
         return data;
-    }
-
-    public String toInfixCode() {
-        return Long.toString(data);
     }
 
     @Override

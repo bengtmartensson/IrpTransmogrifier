@@ -26,7 +26,11 @@ import org.w3c.dom.Element;
  */
 public class Gap extends Duration {
 
-    Gap(IrpParser.Gap_durationContext ctx) throws IrpSyntaxException {
+    public Gap(String str) throws IrpSyntaxException {
+        this((new ParserDriver(str)).getParser().gap());
+    }
+
+    Gap(IrpParser.GapContext ctx) throws IrpSyntaxException {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
     }
 

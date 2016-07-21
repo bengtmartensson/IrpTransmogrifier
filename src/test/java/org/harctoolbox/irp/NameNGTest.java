@@ -1,8 +1,11 @@
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -72,6 +75,11 @@ public class NameNGTest {
         Assert.assertFalse(Name.validName(" 4ksdjfk "));
         Assert.assertTrue(Name.validName(" _4ksdjfk "));
         Assert.assertTrue(Name.validName("msb"));
+        Assert.assertTrue(Name.validName("lsb"));
+        Assert.assertTrue(Name.validName("k"));
+        Assert.assertTrue(Name.validName("u"));
+        Assert.assertTrue(Name.validName("p"));
+        Assert.assertTrue(Name.validName("m"));
         Assert.assertFalse(Name.validName("a@b"));
         Assert.assertFalse(Name.validName("May the force be with you"));
 
@@ -94,14 +102,43 @@ public class NameNGTest {
     }
 
     /**
-     * Test of toInfixCode method, of class Name.
+     * Test of toIrpString method, of class Name.
      */
     @Test
-    public void testToInfixCode() {
-        System.out.println("toInfixCode");
-        Name instance = new Name("zweckentfremdung");
-        String expResult = "zweckentfremdung";
-        String result = instance.toInfixCode();
-        assertEquals(result, expResult);
+    public void testToIrpString() {
+        System.out.println("toIrpString");
+        Name instance = new Name("imhotep");
+        assertEquals(instance.toIrpString(), "imhotep");
+    }
+
+    /**
+     * Test of parse method, of class Name.
+     */
+    @Test
+    public void testParse_String() {
+        System.out.println("parse");
+        String result = null;
+        try {
+            result = Name.parse("irscrutinizer");
+        } catch (IrpSyntaxException ex) {
+            Logger.getLogger(NameNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        assertEquals(result, "irscrutinizer");
+    }
+
+    /**
+     * Test of toFloat method, of class Name.
+     */
+    @Test
+    public void testToFloat() {
+        try {
+            System.out.println("toFloat");
+            NameEngine nameEngine = new NameEngine("{answer=42}");
+            GeneralSpec generalSpec = null;
+            Name instance = new Name("answer");
+            assertEquals(instance.toFloat(nameEngine, generalSpec), 42f, 0.000001);
+        } catch (IrpSyntaxException | ArithmeticException | IncompatibleArgumentException | UnassignedException ex) {
+            fail();
+        }
     }
 }

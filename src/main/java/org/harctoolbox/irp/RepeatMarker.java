@@ -16,8 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -133,24 +131,6 @@ public class RepeatMarker extends IrpObject {
     @Override
     public String toIrpString() {
         return toString();
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            //System.out.println((new RepeatMarker("")));
-            System.out.println((new RepeatMarker("*")));
-            System.out.println((new RepeatMarker('+')));
-            System.out.println((new RepeatMarker("1+")));
-            System.out.println((new RepeatMarker("0+")));
-            System.out.println((new RepeatMarker("7")));
-            System.out.println((new RepeatMarker("17+")));
-            System.out.println((new RepeatMarker("\t7+   ")));
-        } catch (InvalidRepeatException ex) {
-            Logger.getLogger(RepeatMarker.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     /**

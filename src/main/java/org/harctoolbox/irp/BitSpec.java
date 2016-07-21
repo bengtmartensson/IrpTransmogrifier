@@ -30,15 +30,15 @@ import org.w3c.dom.Element;
  *
  */
 public class BitSpec extends IrpObject {
-    private static int noInstances = 0;
-
-    public static void reset() {
-        noInstances = 0;
-    }
-
-    public static int getNoInstances() {
-        return noInstances;
-    }
+//    private static int noInstances = 0;
+//
+//    public static void reset() {
+//        noInstances = 0;
+//    }
+//
+//    public static int getNoInstances() {
+//        return noInstances;
+//    }
 
     // Number of bits encoded
     private int chunkSize;
@@ -89,7 +89,7 @@ public class BitSpec extends IrpObject {
     }
 
     private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
-        noInstances++;
+//        noInstances++;
         chunkSize = computeNoBits(list.size());
         bitCodes = new ArrayList<>(list.size());
         for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list) {

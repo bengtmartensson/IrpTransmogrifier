@@ -5,6 +5,10 @@
  */
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -17,7 +21,16 @@ import org.testng.annotations.Test;
  */
 public class NameOrNumberNGTest {
 
-    public NameOrNumberNGTest() {
+    private final GeneralSpec generalSpec;
+    private final NameEngine nameEngine;
+    private final NameOrNumber a;
+    private final NameOrNumber b;
+
+    public NameOrNumberNGTest() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
+        generalSpec = new GeneralSpec("{40k,1000u}");
+        nameEngine = new NameEngine("{A=123, B=73}");
+        a = new NameOrNumber("A");
+        b = new NameOrNumber("3.1415926");
     }
 
     @BeforeClass
@@ -37,17 +50,33 @@ public class NameOrNumberNGTest {
     }
 
     /**
-     * Test of toNumber method, of class NameOrNumber.
+     * Test of toString method, of class NameOrNumber.
+     */
+    @Test
+    public void testToString() {
+        System.out.println("toString");
+        assertEquals(a.toString(), "A");
+        assertEquals(b.toString(), "3.1415926");
+    }
+
+    /**
+     * Test of toFloat method, of class NameOrNumber.
      * @throws java.lang.Exception
      */
     @Test
-    public void testToNumber() throws Exception {
-//        System.out.println("toNumber");
-//        NameEngine nameEngine = new NameEngine("{answer=42}");
-//        assertEquals(new NameOrNumber("answer", nameEngine).toNumber(nameEngine), 42L);
-//        assertEquals(new NameOrNumber("73", nameEngine).toNumber(nameEngine), 73);
-//        assertEquals(new NameOrNumber("3.1415926", nameEngine).toNumber(nameEngine), 3.1415926, 0.0001);
+    public void testToFloat() throws Exception {
+        System.out.println("toFloat");
+        assertTrue(IrCoreUtils.approximatelyEquals(a.toFloat(nameEngine, generalSpec), 123f, 0.000001, 0));
+        assertTrue(IrCoreUtils.approximatelyEquals(b.toFloat(nameEngine, generalSpec), 3.1415926, 0.000001, 0));
     }
 
-
+    /**
+     * Test of toIrpString method, of class NameOrNumber.
+     */
+    @Test
+    public void testToIrpString() {
+        System.out.println("toIrpString");
+        assertEquals(a.toIrpString(), "A");
+        assertEquals(b.toIrpString(), "3.1415926");
+    }
 }

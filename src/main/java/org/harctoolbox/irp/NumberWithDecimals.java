@@ -39,6 +39,18 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
                 : (double) Integer.parseInt(child.getText());
     }
 
+    public NumberWithDecimals(double d) {
+        data = d;
+    }
+
+    public NumberWithDecimals(int i) {
+        data = (double) i;
+    }
+
+    public NumberWithDecimals(long n) {
+        data = (double) n;
+    }
+
     @Override
     public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) {
         return toFloat();

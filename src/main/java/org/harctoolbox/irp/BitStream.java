@@ -23,7 +23,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class BitStream extends IrStreamItem {
+class BitStream extends IrStreamItem implements Evaluatable {
 
     private long length;
     private BigInteger data;

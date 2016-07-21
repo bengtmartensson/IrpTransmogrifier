@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -27,33 +28,46 @@ import org.w3c.dom.Element;
  */
 public class Variation extends IrStreamItem {
 
-    public Variation(String str) {
+    private BareIrStream intro;
+    private BareIrStream repeat;
+    private BareIrStream ending;
+
+    public Variation(String str) throws IrpSyntaxException, InvalidRepeatException {
         this((new ParserDriver(str)).getParser().variation());
     }
 
-    public Variation(IrpParser.VariationContext variation) {
-
+    public Variation(IrpParser.VariationContext variation) throws IrpSyntaxException, InvalidRepeatException {
+        intro = new BareIrStream(variation.alternative(0).bare_irstream());
+        repeat = new BareIrStream(variation.alternative(1).bare_irstream());
+        ending = variation.alternative().size() > 2 ? new BareIrStream(variation.alternative(2).bare_irstream()) : null;
     }
 
     @Override
     public boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return intro.isEmpty(nameEngine) && repeat.isEmpty(nameEngine) && (ending == null || ending.isEmpty(nameEngine));
     }
 
     @Override
     EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return pass == Pass.intro ? intro.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed)
+                : pass == Pass.repeat ? repeat.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed)
+                : ending != null ? ending.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed)
+                : new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
     }
 
     @Override
-    public Element toElement(Document document) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Element toElement(Document document) throws IrpSyntaxException {
+        Element element = document.createElement("variation");
+        element.appendChild(intro.toElement(document));
+        element.appendChild(repeat.toElement(document));
+        element.appendChild(ending.toElement(document));
+        return element;
     }
 
     @Override
     boolean interleavingOk() {
-        return true;
+        return intro.interleavingOk() && repeat.interleavingOk() && (ending == null || ending.interleavingOk());
     }
 
     @Override
@@ -68,6 +82,16 @@ public class Variation extends IrStreamItem {
 
     @Override
     public String toIrpString() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        StringBuilder str = new StringBuilder();
+        str.append("[").append(intro.toIrpString()).append("]");
+        str.append("[").append(repeat.toIrpString()).append("]");
+        if (ending != null && !ending.isEmpty(null))
+            str.append("[").append(ending.toIrpString()).append("]");
+        return str.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toIrpString();
     }
 }

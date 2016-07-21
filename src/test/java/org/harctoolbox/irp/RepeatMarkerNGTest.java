@@ -5,7 +5,11 @@
  */
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -80,4 +84,103 @@ public class RepeatMarkerNGTest {
 //        }
     }
 
+    /**
+     * Test of isInfinite method, of class RepeatMarker.
+     */
+    @Test
+    public void testIsInfinite() {
+        System.out.println("isInfinite");
+        RepeatMarker instance;
+        try {
+            instance = new RepeatMarker("*");
+            assertTrue(instance.isInfinite());
+            instance = new RepeatMarker("33");
+            assertFalse(instance.isInfinite());
+        } catch (InvalidRepeatException ex) {
+            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }
+
+    /**
+     * Test of numberOfInfiniteRepeats method, of class RepeatMarker.
+     */
+    @Test
+    public void testNumberOfInfiniteRepeats() {
+        System.out.println("numberOfInfiniteRepeats");
+        RepeatMarker instance = new RepeatMarker();
+        int expResult = 0;
+        int result = instance.numberOfInfiniteRepeats();
+        assertEquals(result, expResult);
+
+    }
+
+    /**
+     * Test of toString method, of class RepeatMarker.
+     */
+    @Test
+    public void testToString() {
+        System.out.println("toString");
+        RepeatMarker instance = null;
+        try {
+            instance = new RepeatMarker("111+");
+        } catch (InvalidRepeatException ex) {
+            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String expResult = "111+";
+        String result = instance.toString();
+        assertEquals(result, expResult);
+
+    }
+
+    /**
+     * Test of toIrpString method, of class RepeatMarker.
+     */
+    @Test
+    public void testToIrpString() {
+        System.out.println("toIrpString");
+        RepeatMarker instance = null;
+        try {
+            instance = new RepeatMarker("3+");
+        } catch (InvalidRepeatException ex) {
+            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String expResult = "3+";
+        String result = instance.toIrpString();
+        assertEquals(result, expResult);
+
+    }
+
+    /**
+     * Test of getMin method, of class RepeatMarker.
+     */
+    @Test
+    public void testGetMin() {
+        try {
+            System.out.println("getMin");
+            RepeatMarker instance = new RepeatMarker("7*");
+            int expResult = 7;
+            int result = instance.getMin();
+            assertEquals(result, expResult);
+        } catch (InvalidRepeatException ex) {
+            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+//    /**
+//     * Test of toElement method, of class RepeatMarker.
+//     */
+//    @Test
+//    public void testToElement() {
+//        System.out.println("toElement");
+//        Document document = null;
+//        RepeatMarker instance = new RepeatMarker();
+//        Element expResult = null;
+//        Element result = instance.toElement(document);
+//        assertEquals(result, expResult);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 }

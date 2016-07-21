@@ -52,8 +52,8 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean isEmpty(NameEngine nameEngine) {
+        return true;
     }
 
     @Override

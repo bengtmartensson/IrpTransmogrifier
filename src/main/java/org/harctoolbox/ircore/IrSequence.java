@@ -480,7 +480,7 @@ public class IrSequence implements Cloneable, Serializable {
             return false;
 
         for (int i = 0; i < data.length; i++)
-            if (!IrCoreUtils.approximatelyEquals(data[i], irSequence.data[i], absoluteTolerance, relativeTolerance))
+            if (!IrCoreUtils.approximatelyEquals(Math.abs(data[i]), Math.abs(irSequence.data[i]), absoluteTolerance, relativeTolerance))
                 return false;
 
         return true;

@@ -43,8 +43,15 @@ public class ParameterSpec extends IrpObject {
     }
 
     public void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
-        if (!nameEngine.containsKey(name.name) && deflt == null)
-            throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+        if (!nameEngine.containsKey(name.name)) {
+            if (this.hasMemory())
+                return;
+            
+            if (deflt != null)
+                nameEngine.define(name, deflt);
+            else
+                throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+        }
 
         long value = nameEngine.get(name.name).toNumber(nameEngine);
         if (value == IrCoreUtils.invalid && deflt == null)

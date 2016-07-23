@@ -62,13 +62,22 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed_)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
+            BitSpec bitSpec, double elapsed_)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         for (IrStreamItem irStreamItem : irStreamItems) {
-            double elapsed = result.getElapsed();
-            EvaluatedIrStream irStream = irStreamItem.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
-            result.add(irStream);
+            IrSignal.Pass newState = irStreamItem.stateWhenEntering();
+            if (newState != null)
+                state = newState;
+            if (state == pass) {
+                double elapsed = result.getElapsed();
+                EvaluatedIrStream irStream = irStreamItem.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
+                result.add(irStream);
+            }
+            IrSignal.Pass next = irStreamItem.stateWhenExiting();
+            if (next != null)
+                state = next;
         }
         return result;
     }

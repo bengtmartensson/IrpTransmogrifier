@@ -59,20 +59,44 @@ public class IrStream extends BareIrStream {
         return repeatMarker;
     }
 
+    private int getMinRepeats() {
+        return repeatMarker == null ? 1 : repeatMarker.getMin();
+    }
+
+    private boolean isInfiniteRepeat() {
+        return repeatMarker != null && repeatMarker.isInfinite();
+    }
+
     @Override
-    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
+            BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        EvaluatedIrStream total = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        int repetitions = (pass == IrSignal.Pass.repeat && isInfiniteRepeat()) ? 1 : getMinRepeats();
+        EvaluatedIrStream result = evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed, repetitions);
+        return result;
+    }
 
-        if (pass == IrSignal.Pass.repeat && repeatMarker.isInfinite())
-            return total;
-
-        for (int i = 0; i < repeatMarker.getMin(); i++) {
-            EvaluatedIrStream irSequence = super.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
-            total.add(irSequence);
+    private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
+            BitSpec bitSpec, double elapsed, int repeats)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        for (int i = 0; i < repeats; i++) {
+            EvaluatedIrStream irSequence = super.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
+            if (irSequence.getState() != null)
+                state = irSequence.getState();
+            result.add(irSequence);
         }
+        return result;
+    }
 
-        return total;
+    @Override
+    public IrSignal.Pass stateWhenEntering() {
+        return isInfiniteRepeat() ? IrSignal.Pass.repeat : null;
+    }
+
+    @Override
+    public IrSignal.Pass stateWhenExiting() {
+        return isInfiniteRepeat() ? IrSignal.Pass.ending : null;
     }
 
     // I hate the missing default arguments in Java!!!

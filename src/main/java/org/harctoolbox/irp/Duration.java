@@ -55,6 +55,12 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
                 : new Extent((IrpParser.ExtentContext) child);
     }
 
+    protected Duration(double us) {
+        nameOrNumber = new NameOrNumber(us);
+        this.us = us;
+        unit = "u";
+    }
+
     public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
         return new Extent(e);
     }
@@ -129,7 +135,8 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
+            BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);

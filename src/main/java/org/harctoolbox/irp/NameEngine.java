@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -33,7 +34,7 @@ import org.w3c.dom.Element;
 // TODO: There are probably too many accessing functions here.
 // Clean up by eliminating and making private.
 
-public class NameEngine extends IrpObject {
+public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, Expression>> {
 
     private HashMap<String, Expression> map;
 
@@ -49,6 +50,11 @@ public class NameEngine extends IrpObject {
         }
     }
 
+    @Override
+    public Iterator<Map.Entry<String, Expression>> iterator() {
+        return map.entrySet().iterator();
+    }
+
     private void define(String name, String value) throws IrpSyntaxException {
         Expression exp = new Expression(value);
         define(name, exp.getParseTree());
@@ -61,8 +67,22 @@ public class NameEngine extends IrpObject {
         map.put(name, expression);
     }
 
+    public void define(String name, Expression expression) throws IrpSyntaxException {
+        if (!Name.validName(name))
+            throw new IrpSyntaxException("Invalid name: " + name);
+        map.put(name, expression);
+    }
+
+    public void define(Name name, Expression expression) throws IrpSyntaxException {
+        define(name.toString(), expression);
+    }
+
     public void define(String name, long value) throws IrpSyntaxException {
-        define(name, Long.toString(value));
+        define(name, new Expression(value));
+    }
+
+    public void define(Name name, long value) throws IrpSyntaxException {
+        define(name, new Expression(value));
     }
 
     /**

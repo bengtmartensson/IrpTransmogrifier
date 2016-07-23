@@ -38,7 +38,7 @@ public class RendererGenerator {
             Document doc = protocol.toDocument();
             XmlUtils.printDOM(doc);
             XmlUtils.printDOM(new File("junk.xml"), doc);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException | InvalidRepeatException | FileNotFoundException ex) {
+        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException | InvalidRepeatException | FileNotFoundException | UnassignedException ex) {
             Logger.getLogger(RendererGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

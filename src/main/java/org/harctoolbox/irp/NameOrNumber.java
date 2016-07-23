@@ -40,6 +40,10 @@ public class NameOrNumber extends IrpObject implements Floatable {
             thing = new NumberWithDecimals(ctx.number_with_decimals());
     }
 
+    public NameOrNumber(double x) {
+        thing = new NumberWithDecimals(x);
+    }
+
 //    @Override
 //    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
 //        return thing.toNumber(nameEngine);

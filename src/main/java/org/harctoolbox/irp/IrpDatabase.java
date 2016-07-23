@@ -122,7 +122,7 @@ public class IrpDatabase {
                 map.put(documentationName, n.item(0).getTextContent());
         }
 
-        NamedProtocol toNamedProtocol() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
+        NamedProtocol toNamedProtocol() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
             return new NamedProtocol(getName(), getIrp(), getDocumentation());
         }
 
@@ -233,7 +233,7 @@ public class IrpDatabase {
         return prot == null ? null : prot.getProperty(key);
     }
 
-    public NamedProtocol getNamedProtocol(String name) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException {
+    public NamedProtocol getNamedProtocol(String name) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
         UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
         if (prot == null)
             throw new UnknownProtocolException(name);

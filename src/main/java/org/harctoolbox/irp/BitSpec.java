@@ -191,7 +191,7 @@ public class BitSpec extends IrpObject {
         for (BareIrStream bitCode : bitCodes) {
             try {
                 // toIrSequence throws exception if not positive, negative
-                IrSequence irSequence = bitCode.evaluate(nameEngine, generalSpec, new BitSpec(), IrSignal.Pass.intro, 0).toIrSequence();
+                IrSequence irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec, new BitSpec(), 0).toIrSequence();
                 if (irSequence.getLength() != 2)
                     return false;
             } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
@@ -214,7 +214,7 @@ public class BitSpec extends IrpObject {
         Double a = null;
         for (BareIrStream bitCode : bitCodes) {
             try {
-                EvaluatedIrStream on = bitCode.evaluate(nameEngine, generalSpec, new BitSpec(), IrSignal.Pass.intro, 0);
+                EvaluatedIrStream on = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec, new BitSpec(), 0);
                 if (on.getLenght() != 2)
                     return false;
                 if (a == null)

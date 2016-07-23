@@ -40,10 +40,9 @@ public class NameNGTest {
     /**
      * Test of toString method, of class Name.
      *
-     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
-    public void testToString_0args() throws IrpSyntaxException {
+    public void testToString_0args() {
         System.out.println("toString");
         Name instance = new Name("godzilla");
         String expResult = "godzilla";
@@ -53,10 +52,10 @@ public class NameNGTest {
 
     /**
      * Test of parseName method, of class Name.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @throws org.harctoolbox.irp.InvalidNameException
      */
     @Test
-    public void testParseName() throws IrpSyntaxException {
+    public void testParseName() throws InvalidNameException {
         System.out.println("parseName");
         String name = "May the Schwarz be with you";
         String expResult = "May";
@@ -87,18 +86,19 @@ public class NameNGTest {
 
     /**
      * Test of toNumber method, of class Name.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     * @throws org.harctoolbox.irp.UnassignedException
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
     @Test
-    public void testToNumber_NameEngine() throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
-        System.out.println("toNumber");
-        NameEngine nameEngine = new NameEngine("{A = B * C, B = 2, C=3}");
-        Name instance = new Name("A");
-        long expResult = 6L;
-        long result = instance.toNumber(nameEngine);
-        assertEquals(result, expResult);
+    public void testToNumber_NameEngine() {
+        try {
+            System.out.println("toNumber");
+            NameEngine nameEngine = new NameEngine("{A = B * C, B = 2, C=3}");
+            Name instance = new Name("A");
+            long expResult = 6L;
+            long result = instance.toNumber(nameEngine);
+            assertEquals(result, expResult);
+        } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
+            fail();
+        }
     }
 
     /**
@@ -120,7 +120,7 @@ public class NameNGTest {
         String result = null;
         try {
             result = Name.parse("irscrutinizer");
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
             Logger.getLogger(NameNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         assertEquals(result, "irscrutinizer");

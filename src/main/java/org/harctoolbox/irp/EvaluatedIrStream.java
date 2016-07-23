@@ -34,6 +34,7 @@ class EvaluatedIrStream {
     private IrSignal.Pass pass;
     private NameEngine nameEngine;
     private double elapsed;
+    private IrSignal.Pass state;
 
     EvaluatedIrStream(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass) {
         this.nameEngine = nameEngine;
@@ -42,6 +43,7 @@ class EvaluatedIrStream {
         this.bitSpec = bitSpec;
         elements = new ArrayList<>();
         elapsed = 0f;
+        state = null;
     }
 
     IrSequence toIrSequence()
@@ -74,12 +76,20 @@ class EvaluatedIrStream {
             elements.addAll(evaluatedIrStream.elements);
         }
         updateElapsed();
+        updateState();
     }
 
     void add(Evaluatable evaluatable) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         evaluateBitStream();
         elements.add(evaluatable);
         updateElapsed();
+        updateState();
+    }
+
+    void updateState() {
+        for (Evaluatable element : elements)
+            if (element.stateWhenExiting() != null)
+                state = element.stateWhenExiting();
     }
 
     private void evaluateBitStream() throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
@@ -87,7 +97,7 @@ class EvaluatedIrStream {
         if (lastIndex >= 0 && elements.get(lastIndex) instanceof BitStream) {
             BitStream bitStream = (BitStream) elements.get(lastIndex);
             elements.remove(lastIndex);
-            EvaluatedIrStream bitFieldDurations = bitStream.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
+            EvaluatedIrStream bitFieldDurations = bitStream.evaluate(IrSignal.Pass.intro, pass, nameEngine, generalSpec, bitSpec, elapsed);
             add(bitFieldDurations);
         }
     }
@@ -129,5 +139,19 @@ class EvaluatedIrStream {
 
     double getElapsed() {
         return elapsed;
+    }
+
+    /**
+     * @return the state
+     */
+    public IrSignal.Pass getState() {
+        return state;
+    }
+
+    /**
+     * @param state the state to set
+     */
+    public void setState(IrSignal.Pass state) {
+        this.state = state;
     }
 }

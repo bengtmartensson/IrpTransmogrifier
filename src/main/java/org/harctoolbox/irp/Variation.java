@@ -48,11 +48,12 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
+            BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        return pass == Pass.intro ? intro.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed)
-                : pass == Pass.repeat ? repeat.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed)
-                : ending != null ? ending.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed)
+        return pass == Pass.intro ? intro.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
+                : pass == Pass.repeat ? repeat.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
+                : ending != null ? ending.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
                 : new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
     }
 

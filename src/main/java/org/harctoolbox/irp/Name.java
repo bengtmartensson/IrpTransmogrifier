@@ -53,17 +53,17 @@ public class Name extends PrimaryItem implements Floatable {
      * This invokes a newly constructed parser, i.e. is comparatively expensive.
      *
      * @param name Name to be checked
-     * @return true iff the name is syntactically valid.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @return true if the name is syntactically valid.
+     * @throws org.harctoolbox.irp.InvalidNameException
      */
     //  Alternatively, could check agains a regexp. But this keeps the grammar in one place.
-    public static String parse(String name) throws IrpSyntaxException {
+    public static String parse(String name) throws InvalidNameException {
         try {
             ParserDriver parserDriver = new ParserDriver(name);
             IrpParser.NameContext nam = parserDriver.getParser().name();
             return nam.getText();
         } catch (ParseCancellationException ex) {
-            throw new IrpSyntaxException("Invalid name: " + name);
+            throw new InvalidNameException(name);
         }
     }
 
@@ -83,7 +83,7 @@ public class Name extends PrimaryItem implements Floatable {
         try {
             String nam = parse(name);
             return nam.equals(name.trim());
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
             return false;
         }
     }

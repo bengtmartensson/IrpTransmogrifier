@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -26,7 +27,7 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class ParameterSpecs extends IrpObject {
+public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec> {
 
     private LinkedHashMap<String, ParameterSpec>map;
 
@@ -99,5 +100,10 @@ public class ParameterSpecs extends IrpObject {
     void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
         for (ParameterSpec parameter : map.values())
             parameter.check(nameEngine);
+    }
+
+    @Override
+    public Iterator<ParameterSpec> iterator() {
+        return map.values().iterator();
     }
 }

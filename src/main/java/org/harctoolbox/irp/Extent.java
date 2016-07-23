@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -40,6 +41,17 @@ public class Extent extends Duration {
         if (time < 0)
             throw new IncompatibleArgumentException("Argument of extent smaller than actual duration.");
         return time;
+    }
+
+    @Override
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
+            BitSpec bitSpec, double elapsed)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
+        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
+        evaluatedIrStream.add(new Gap(time));
+        return evaluatedIrStream;
     }
 
     @Override

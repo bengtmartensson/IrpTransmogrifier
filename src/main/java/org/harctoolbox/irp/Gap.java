@@ -34,6 +34,10 @@ public class Gap extends Duration {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
     }
 
+    public Gap(double us) {
+        super(us);
+    }
+
     @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {

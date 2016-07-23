@@ -133,7 +133,8 @@ class BitStream extends IrStreamItem implements Evaluatable {
 
 
     @Override
-    EvaluatedIrStream evaluate(NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec, IrSignal.Pass pass, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec,
+            double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         //debugBegin();
         if (bitSpec == null)
@@ -147,7 +148,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
         for (int n = 0; n < noChunks; n++) {
             int chunkNo = noChunks - n - 1;
             BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
-            EvaluatedIrStream evaluatedIrStream = irs.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
+            EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
             //List<IrStreamItem> items = irs.evaluate(null);
             //list.addAll(items);
             list.add(evaluatedIrStream);

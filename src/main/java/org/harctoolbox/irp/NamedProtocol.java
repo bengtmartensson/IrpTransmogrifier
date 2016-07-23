@@ -32,7 +32,7 @@ public class NamedProtocol extends Protocol {
     private String name;
     private String documentation;
 
-    public NamedProtocol(String name, String irp, String documentation) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
+    public NamedProtocol(String name, String irp, String documentation) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
         super(irp);
         this.irp = irp;
         this.name = name;
@@ -91,7 +91,7 @@ public class NamedProtocol extends Protocol {
         try {
             NamedProtocol protocol = new NamedProtocol("name", irpString, "dox");
             System.out.println(protocol);
-        } catch (ArithmeticException | IncompatibleArgumentException | InvalidRepeatException | IrpSyntaxException | IrpSemanticException ex) {
+        } catch (ArithmeticException | IncompatibleArgumentException | InvalidRepeatException | IrpSyntaxException | IrpSemanticException | UnassignedException ex) {
             Logger.getLogger(NamedProtocol.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

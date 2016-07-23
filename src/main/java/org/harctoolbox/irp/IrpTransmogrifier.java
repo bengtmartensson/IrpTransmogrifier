@@ -39,6 +39,8 @@ import javax.swing.JPanel;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -67,7 +69,7 @@ public class IrpTransmogrifier {
         System.exit(exitcode);
     }
 
-    private static void doList(IrpDatabase irpDatabase, CommandList commandList) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException {
+    private static void doList(IrpDatabase irpDatabase, CommandList commandList) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
         List<String> list = commandList.protocols == null ? new ArrayList<>(irpDatabase.getNames())
                 : commandList.regexp ? irpDatabase.getMatchingNames(commandList.protocols)
                 : commandList.protocols;
@@ -108,7 +110,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void doCode(IrpDatabase irpDatabase, CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, FileNotFoundException, IOException, SAXException {
+    private static void doCode(IrpDatabase irpDatabase, CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, FileNotFoundException, IOException, SAXException, UnassignedException {
         PrintStream out = commandCode.output != null
                 ? IrpUtils.getPrintSteam(commandCode.output)
                 : System.out;
@@ -131,8 +133,20 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void doRender(IrpDatabase irpDatabase, CommandRender commandRenderer) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private static void doRender(IrpDatabase irpDatabase, CommandRender commandRenderer) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException {
+        String nameEngineString = commandRenderer.nameEngine;
+        if (!nameEngineString.startsWith("{"))
+            nameEngineString = "{" + nameEngineString;
+        if (!nameEngineString.endsWith("{"))
+            nameEngineString += "}";
+        NameEngine nameEngine = new NameEngine(nameEngineString);
+        String proto = commandRenderer.args.get(0);
+        NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
+        IrSignal irSignal = protocol.toIrSignal(nameEngine);
+        if (commandRenderer.pronto)
+            System.out.println(Pronto.toPrintString(irSignal));
+        if (commandRenderer.raw)
+            System.out.println(irSignal);
     }
 
     private static void doRecognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) {
@@ -342,6 +356,9 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal")
     private static class CommandRender {
 
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use")
+        private String nameEngine = null;
+
         @Parameter(names = { "--pronto" }, description = "Generate Pronto hex")
         private boolean pronto = false;
 
@@ -496,7 +513,7 @@ public class IrpTransmogrifier {
             }
         } catch (UnknownProtocolException | UnassignedException | UsageException ex) {
             System.err.println(ex.getMessage());
-        } catch (SAXException | IOException| IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException ex) {
+        } catch (SAXException | IOException| IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | DomainViolationException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }

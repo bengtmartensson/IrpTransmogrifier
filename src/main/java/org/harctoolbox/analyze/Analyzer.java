@@ -17,26 +17,30 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-import java.util.List;
 import org.harctoolbox.ircore.IrSequence;
 
 /**
  *
  */
-public class Analyzer {
+public class Analyzer extends Cleaner {
 
-    private final Cleaner cleaner;
+    //private final Cleaner cleaner;
     private int timebase;
     private int[] normedTimings;
 
     public Analyzer(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
-        cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
+        super(irSequence, absoluteTolerance, relativeTolerance);
+        createNormedTimings();
+    }
+    
+    public Analyzer(IrSequence irSequence) {
+        super(irSequence);
         createNormedTimings();
     }
 
     private void createNormedTimings() {
-        List<Integer> timings = cleaner.getTimings();
-        timebase = cleaner.getTimings().get(0);
+        //List<Integer> timings = cleaner.getTimings();
+        timebase = getTimings().get(0);
         normedTimings = new int[timings.size()];
         for (int i = 0; i < timings.size(); i++) {
             normedTimings[i] = Math.round((float) timings.get(i) / (float) timebase);

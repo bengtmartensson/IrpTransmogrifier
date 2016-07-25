@@ -51,7 +51,7 @@ public class Protocol extends IrpObject {
     private BitspecIrstream bitspecIrstream;
     private IrpParser.ProtocolContext parseTree;
     private ParserDriver parseDriver;
-    private NameEngine nameEngine;
+    private NameEngine definitions;
     private NameEngine memoryVariables;
 
     // True the first time render is called, then false -- to be able to initialize.
@@ -131,9 +131,9 @@ public class Protocol extends IrpObject {
         try {
             generalSpec = new GeneralSpec(parseTree);
             bitspecIrstream = new BitspecIrstream(parseTree);
-            nameEngine = new NameEngine();
-            for (IrpParser.DefinitionsContext definitions : parseTree.definitions())
-                nameEngine.parseDefinitions(definitions);
+            definitions = new NameEngine();
+            for (IrpParser.DefinitionsContext defs : parseTree.definitions())
+                definitions.parseDefinitions(defs);
 
             //definitionss = new Defi
             parameterSpecs = new ParameterSpecs(parseTree);
@@ -145,7 +145,7 @@ public class Protocol extends IrpObject {
         for (ParameterSpec parameter : parameterSpecs) {
             if (parameter.hasMemory()) {
                 String name = parameter.getName();
-                long initVal = parameter.getDefault().toNumber(nameEngine);
+                long initVal = parameter.getDefault().toNumber(null);
                 memoryVariables.define(name, initVal);
             }
         }
@@ -176,7 +176,10 @@ public class Protocol extends IrpObject {
      */
     public IrSignal toIrSignal(NameEngine nameEngine)
             throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
+        parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
+        nameEngine.add(definitions);
+        
         IrSequence intro  = toIrSequence(nameEngine, Pass.intro);
         IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
         IrSequence ending = toIrSequence(nameEngine, Pass.ending);
@@ -228,7 +231,6 @@ public class Protocol extends IrpObject {
      */
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass)
             throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
-        parameterSpecs.check(nameEngine);
         EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(IrSignal.Pass.intro, pass, nameEngine, generalSpec, 0f);
         return evaluatedIrStream.toIrSequence();
     }
@@ -312,8 +314,13 @@ public class Protocol extends IrpObject {
     public double getDutyCycle() {
         return generalSpec.getDutyCycle();
     }
+
     public String toStringTree() throws IrpSyntaxException {
         return parseDriver != null ? parseTree.toStringTree(parseDriver.getParser()) : null;
+    }
+
+    long getMemoryVariable(String name) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        return memoryVariables.get(name).toNumber();
     }
 
     // from irpmaster.XmlExport
@@ -358,7 +365,7 @@ public class Protocol extends IrpObject {
         //renderer.appendChild(nameEngine.toElement(document));
         Element bitspecIrstreamElement = bitspecIrstream.toElement(document);
         renderer.appendChild(bitspecIrstreamElement);
-        Element definitionsElement = nameEngine.toElement(document);
+        Element definitionsElement = definitions.toElement(document);
         renderer.appendChild(definitionsElement);
         renderer.appendChild(parameterSpecs.toElement(document));
         return root;
@@ -369,7 +376,7 @@ public class Protocol extends IrpObject {
         return
                 generalSpec.toIrpString()
                 + bitspecIrstream.toIrpString()
-                + nameEngine.toIrpString()
+                + definitions.toIrpString()
                 + parameterSpecs.toIrpString();
     }
 

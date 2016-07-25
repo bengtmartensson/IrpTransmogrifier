@@ -48,6 +48,9 @@ public class Extent extends Duration {
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
+        if (pass != state)
+            return null;
+        
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
         evaluatedIrStream.add(new Gap(time));

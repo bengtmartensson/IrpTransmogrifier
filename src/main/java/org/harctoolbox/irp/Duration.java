@@ -139,6 +139,9 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
+        if (state != pass)
+            return null;
+        
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         evaluatedIrStream.add(this);
         return evaluatedIrStream;

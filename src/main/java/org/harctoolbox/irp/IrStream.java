@@ -71,9 +71,9 @@ public class IrStream extends BareIrStream {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        int repetitions = (pass == IrSignal.Pass.repeat && isInfiniteRepeat()) ? 1 : getMinRepeats();
-        EvaluatedIrStream result = evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed, repetitions);
-        return result;
+        boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
+        int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
+        return evaluate(evaluateTheRepeat ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, bitSpec, elapsed, repetitions);
     }
 
     private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,

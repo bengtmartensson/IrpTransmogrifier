@@ -104,6 +104,9 @@ public class FiniteBitField extends BitField {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        if (state != pass)
+            return null;
+        
         BitStream bitStream = new BitStream(this, nameEngine, generalSpec);
         return bitStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
     }

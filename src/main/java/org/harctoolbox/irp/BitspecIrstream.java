@@ -71,7 +71,10 @@ public class BitspecIrstream extends IrStreamItem {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        return evaluate(state, pass, nameEngine, generalSpec, elapsed);
+        EvaluatedIrStream inner = evaluate(state, pass, nameEngine, generalSpec, elapsed);
+        EvaluatedIrStream outer = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        outer.add(inner);
+        return outer;
     }
 
     @Override

@@ -38,8 +38,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.harctoolbox.analyze.Analyzer;
+import org.harctoolbox.analyze.Cleaner;
+import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
@@ -147,6 +153,35 @@ public class IrpTransmogrifier {
             System.out.println(Pronto.toPrintString(irSignal));
         if (commandRenderer.raw)
             System.out.println(irSignal);
+    }
+
+    private static void doAnalyze(CommandAnalyze commandAnalyze) throws OddSequenceLenghtException {
+        int[] data = new int[commandAnalyze.args.size()];
+        for (int i = 0; i < commandAnalyze.args.size(); i++)
+            data[i] = Integer.parseInt(commandAnalyze.args.get(i));
+        
+        IrSequence irSequence = new ModulatedIrSequence(data, (double) commandAnalyze.frequency);
+        
+        if (commandAnalyze.cleaner) {
+            Cleaner cleaner = new Cleaner(irSequence);
+            irSequence = cleaner.toIrSequence();
+        }    
+        
+        if (commandAnalyze.repeatFinder) {
+            RepeatFinder repeatFinder = new RepeatFinder(irSequence);
+            RepeatFinder.RepeatFinderData repeatFinderData = repeatFinder.getRepeatFinderData();
+            System.out.println(repeatFinderData);
+            IrSignal irSignal = repeatFinder.toIrSignal(irSequence, (double) commandAnalyze.frequency);
+            System.out.println(irSignal);
+        }
+            
+        Analyzer analyzer = new Analyzer(irSequence);
+        for (int i = 0; i < analyzer.getTimings().size(); i++) {
+            int timing = analyzer.getTimings().get(i);
+            System.out.println((char) ((int) 'A' + i) + ": " + timing + "    \t" + analyzer.getCleanedHistogram().get(timing));
+        }
+        System.out.println(analyzer.toTimingsString());
+        
     }
 
     private static void doRecognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) {
@@ -420,6 +455,22 @@ public class IrpTransmogrifier {
         private List<String> args;
     }
 
+    @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
+    private static class CommandAnalyze {
+        
+        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
+        private int frequency = (int) ModulatedIrSequence.defaultFrequency;
+        
+        @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder")
+        private boolean repeatFinder = false;
+        
+        @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
+        private boolean cleaner = false;
+
+        @Parameter(description = "durations, or pronto hex")
+        private List<String> args;
+    }
+
     /**
      *
      * @param args
@@ -446,6 +497,9 @@ public class IrpTransmogrifier {
 
         CommandBitfield commandBitfield = new CommandBitfield();
         argumentParser.addCommand(commandBitfield);
+        
+        CommandAnalyze commandAnalyze = new CommandAnalyze();
+        argumentParser.addCommand(commandAnalyze);
 
         try {
             argumentParser.parse(args);
@@ -506,6 +560,9 @@ public class IrpTransmogrifier {
                     break;
                 case "bitfield":
                     doBitfield(commandBitfield);
+                    break;
+                case "analyze":
+                    doAnalyze(commandAnalyze);
                     break;
                 default:
                     System.err.println("Unknown command: " + command);

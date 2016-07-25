@@ -79,6 +79,16 @@ public class ModulatedIrSequence extends IrSequence {
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
     }
+    
+    /**
+     * Constructs a ModulatedIrSequence from its arguments.
+     *
+     * @param irSequence irSequence to be copied from
+     * @param frequency
+     */
+    public ModulatedIrSequence(IrSequence irSequence, double frequency) {
+        this(irSequence, frequency, unknownDutyCycle);
+    }
 
     /**
      * Constructs a ModulatedIrSequence from its arguments.

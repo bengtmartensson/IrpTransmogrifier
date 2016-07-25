@@ -79,9 +79,12 @@ public class Assignment extends IrStreamItem implements Numerical {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        long val = value.toNumber(nameEngine);
-        nameEngine.define(name, val);
-        return new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        if (state == pass) {
+            long val = value.toNumber(nameEngine);
+            nameEngine.define(name, val);
+        }
+
+        return null;
     }
 
     @Override

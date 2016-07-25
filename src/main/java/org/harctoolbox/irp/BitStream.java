@@ -141,17 +141,20 @@ class BitStream extends IrStreamItem implements Evaluatable {
             throw new UnassignedException("BitStream " + toString() + " has no associated BitSpec, cannot compute IrStream");
 
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
-        if (length % bitSpec.getChunkSize() != 0)
-            throw new IncompatibleArgumentException("chunksize (= " + bitSpec.getChunkSize() + ") does not divide bitstream length (= " + length + ").");
-
-        int noChunks = ((int)length)/bitSpec.getChunkSize();
-        for (int n = 0; n < noChunks; n++) {
-            int chunkNo = noChunks - n - 1;
-            BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
-            EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
-            //List<IrStreamItem> items = irs.evaluate(null);
-            //list.addAll(items);
-            list.add(evaluatedIrStream);
+        
+        if (length % bitSpec.getChunkSize() != 0) {
+            list.add(this);
+            //throw new IncompatibleArgumentException("chunksize (= " + bitSpec.getChunkSize() + ") does not divide bitstream length (= " + length + ").");
+        } else {
+            int noChunks = ((int) length) / bitSpec.getChunkSize();
+            for (int n = 0; n < noChunks; n++) {
+                int chunkNo = noChunks - n - 1;
+                BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
+                EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
+                //List<IrStreamItem> items = irs.evaluate(null);
+                //list.addAll(items);
+                list.add(evaluatedIrStream);
+            }
         }
         //Debug.debugBitStream(toString());
         //debugEnd(list);

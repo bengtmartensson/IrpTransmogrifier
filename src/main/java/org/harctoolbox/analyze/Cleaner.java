@@ -35,7 +35,7 @@ public class Cleaner {
 
     private int rawData[];
     private List<Integer> dumbTimingsTable;
-    private List<Integer> timings;
+    protected List<Integer> timings;
     private HashMap<Integer, Integer> rawHistogram;
     private HashMap<Integer, Integer> cleanedHistogram;
     private int indexData[];
@@ -143,7 +143,7 @@ public class Cleaner {
         return str.toString();
     }
 
-    private IrSequence toIrSequence() {
+    public IrSequence toIrSequence() {
         try {
             return new IrSequence(toDurations());
         } catch (OddSequenceLenghtException ex) {

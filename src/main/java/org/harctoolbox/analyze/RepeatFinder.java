@@ -243,6 +243,15 @@ public class RepeatFinder {
 
     /**
      * @param irSequence
+     * @param frequency
+     * @return the irSignal
+     */
+    public IrSignal toIrSignal(IrSequence irSequence, double frequency) {
+        return repeatFinderData.chopIrSequence(new ModulatedIrSequence(irSequence, frequency));
+    }
+    
+    /**
+     * @param irSequence
      * @return the irSignal
      */
     public IrSignal toIrSignal(ModulatedIrSequence irSequence) {

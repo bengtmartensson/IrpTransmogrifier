@@ -196,6 +196,10 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         }
         return result;
     }*/
+    
+    void add(NameEngine definitions) {
+        map.putAll(definitions.map);
+    }
 
     public String toString(IrpParser parser) {
         StringBuilder str = new StringBuilder();

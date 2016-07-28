@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -26,6 +27,9 @@ import org.w3c.dom.Element;
  *
  */
 public class FiniteBitField extends BitField {
+
+    private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
+
     private PrimaryItem width;
     private boolean reverse;
 
@@ -88,10 +92,32 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public String toString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        long chp = chop.toNumber(nameEngine);
-        return (complement ? "~" : "") + data.toNumber(nameEngine) + ":" + (reverse ? "-" : "") + width.toNumber(nameEngine)
-                + (chp != 0 ? (":" + chop.toNumber(nameEngine)) : "");
+    public String toString(NameEngine nameEngine) {
+        String chopString = "";
+        if (hasChop()) {
+            try {
+                chopString =Long.toString(chop.toNumber(nameEngine));
+            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+                chopString = chop.toIrpString();
+            }
+            chopString = ":" + chopString;
+        }
+
+        String dataString;
+        try {
+            dataString = Long.toString(data.toNumber(nameEngine));
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            dataString = data.toIrpString();
+        }
+
+        String widthString;
+        try {
+            widthString = Long.toString(width.toNumber(nameEngine));
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            widthString = width.toIrpString();
+        }
+
+        return (complement ? "~" : "") + dataString + ":" + (reverse ? "-" : "") + widthString + chopString;
     }
 
     @Override
@@ -106,9 +132,20 @@ public class FiniteBitField extends BitField {
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         if (state != pass)
             return null;
-        
+
+        IrpUtils.entering(logger, "evaluate", this.toString());
         BitStream bitStream = new BitStream(this, nameEngine, generalSpec);
-        return bitStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
+        EvaluatedIrStream result = (bitSpec != null)
+                ? bitStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
+                : toEvaluatedIrStream(bitStream, pass, nameEngine, generalSpec);
+        IrpUtils.exiting(logger, "evaluate", result);
+        return result;
+    }
+
+    private EvaluatedIrStream toEvaluatedIrStream(BitStream bitStream, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, null, pass);
+        result.add(bitStream);
+        return result;
     }
 
     @Override

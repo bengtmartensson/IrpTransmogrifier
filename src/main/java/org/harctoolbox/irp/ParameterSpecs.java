@@ -101,6 +101,23 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         for (ParameterSpec parameter : map.values())
             parameter.check(nameEngine);
     }
+    
+    public NameEngine random() throws IrpSyntaxException {
+        NameEngine nameEngine = new NameEngine();
+        for (ParameterSpec parameter : map.values())
+            nameEngine.define(parameter.getName(), parameter.random());
+        
+        return nameEngine;
+    }
+    
+    public NameEngine randomUsingDefaults() throws IrpSyntaxException {
+        NameEngine nameEngine = new NameEngine();
+        for (ParameterSpec parameter : map.values())
+            if (parameter.getDefault() == null)
+                nameEngine.define(parameter.getName(), parameter.random());
+        
+        return nameEngine;
+    }
 
     @Override
     public Iterator<ParameterSpec> iterator() {

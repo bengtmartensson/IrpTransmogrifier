@@ -1,5 +1,8 @@
 package org.harctoolbox.irp;
 
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
@@ -11,6 +14,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -190,5 +195,26 @@ public class NameEngineNGTest {
         String expResult = "";
         String result = instance.toIrpString();
         assertEquals(result, "{A=11,B=22,C=33,D=(A-B),E=(A-(#(C-D))),F=255}");
+    }
+
+    /**
+     * Test of parseLoose method, of class NameEngine.
+     */
+    @Test
+    public void testParseLoose() {
+        try {
+            System.out.println("parseLoose");
+            String str = "{D=12 ; ,F=64 S=34 ,X=78}";
+            NameEngine expResult = new NameEngine("{D=12 ,F=64, S=34 ,X=78}");
+            NameEngine result = NameEngine.parseLoose(str);
+            assertEquals(result.toString(), expResult.toString());
+            
+            result = NameEngine.parseLoose("");
+            assertEquals(result.toString(), "{}");
+            result = NameEngine.parseLoose(null);
+            assertEquals(result.toString(), "{}");
+        } catch (IrpSyntaxException ex) {
+            Logger.getLogger(NameEngineNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

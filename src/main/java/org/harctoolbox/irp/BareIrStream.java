@@ -18,6 +18,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -30,9 +31,12 @@ import org.w3c.dom.Element;
  */
 public class BareIrStream extends IrStreamItem {
 
+    private static final Logger logger = Logger.getLogger(BareIrStream.class.getName());
+
     protected List<IrStreamItem> irStreamItems = null;
     //protected BitSpec bitSpec;
     //private int noAlternatives = 0;
+
 
 //@Override
 //    boolean stringOk(String s) {
@@ -65,6 +69,7 @@ public class BareIrStream extends IrStreamItem {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed_)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        IrpUtils.entering(logger, "evaluate", this.toString() + "," + bitSpec);
         IrSignal.Pass actualState = state;
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         for (IrStreamItem irStreamItem : irStreamItems) {
@@ -80,6 +85,7 @@ public class BareIrStream extends IrStreamItem {
             if (next != null)
                 actualState = next;
         }
+        IrpUtils.entering(logger, "evaluate", result);
         return result;
     }
 

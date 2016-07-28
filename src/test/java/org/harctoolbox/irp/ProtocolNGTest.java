@@ -99,7 +99,7 @@ public class ProtocolNGTest {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
- 
+
     @Test
     public void testToIrSignalRc5() {
         System.out.println("toIrSignalRc5");
@@ -135,7 +135,7 @@ public class ProtocolNGTest {
             fail();
         }
     }
-    
+
     @Test
     public void testToIrSignalRc6() {
         System.out.println("toIrSignalRc6");
@@ -148,7 +148,7 @@ public class ProtocolNGTest {
             fail();
         }
     }
-    
+
     @Test
     public void testToIrSignalNokia32() {
         System.out.println("toIrSignalNokia32");
@@ -161,7 +161,7 @@ public class ProtocolNGTest {
             fail();
         }
     }
-    
+
     @Test
     public void testToIrSignalAmino() {
         System.out.println("toIrSignalAmino");
@@ -175,6 +175,23 @@ public class ProtocolNGTest {
             fail();
         }
     }
+/*
+    @Test
+    public void testToIrSignalArctech() {
+        System.out.println("toIrSignalArchtech");
+        try {
+            Protocol arctech = new Protocol("{0k,388}<1,-3|3,-1> (<0:2|2:2>((D-1):4,(S-1):4),40:7,F:1,0:1,-10.2m)+ [D:1..16,S:1..16,F:0..1]");
+            IrSignal irSignal = Pronto.parse("0100 000A 0000 0019 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 1267");
+            IrSignal result = arctech.toIrSignal(new NameEngine("{D=12,S=9,F=0}"));
+            System.out.println(result);
+            assertTrue(result.approximatelyEquals(irSignal));
+        } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+            ex.printStackTrace();
+            fail();
+        } catch (InvalidRepeatException ex) {
+            fail();
+        }
+    }*/
 
     @Test
     public void testToIrSignalXmp() {
@@ -231,6 +248,6 @@ public class ProtocolNGTest {
     public void testToIrpString() {
         System.out.println("toIrpString");
         String result = rc5.toIrpString();
-        assertEquals(result, "{36000.0k,889.0,msb}<1,-1|-1,1>((1:1,~F:1:6,T:1,D:5,F:6,^114m)*,T=(1-T))[D:0..31,F:0..127,T@:0..1=0]");
+        assertEquals(result, "{36000.0k,889.0,msb}<1,-1|-1,1>((1:1,~F:1:6,T:1,D:5,F:6,^114m)*,T=(1-T)){}[D:0..31,F:0..127,T@:0..1=0]");
     }
 }

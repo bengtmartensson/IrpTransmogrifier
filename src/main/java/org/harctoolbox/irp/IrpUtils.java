@@ -27,6 +27,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class is a collection of useful utilities as static functions and constants.
@@ -58,6 +60,8 @@ public class IrpUtils {
     public final static String jp1WikiUrl = "http://www.hifi-remote.com/wiki/index.php?title=Main_Page";
     public final static String irpNotationUrl = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";
     public final static String decodeIrUrl = "http://www.hifi-remote.com/wiki/index.php?title=DecodeIR";
+    
+    private final static Level enteringExitingLevel = Level.FINER;
 
     public static String stringArray(int[] array) {
         if (array == null)
@@ -234,8 +238,7 @@ public class IrpUtils {
                 + formatVariable(params, "F", "Function: ", "")
                 + formatVariable(params, "T", ", Toggle: ", "");
 
-        for (String var : map.keySet())
-            result += formatVariable(params, var, ", " + var + "=", "");
+        result = map.keySet().stream().map((var) -> formatVariable(params, var, ", " + var + "=", "")).reduce(result, String::concat);
 
         return result;
     }
@@ -245,6 +248,22 @@ public class IrpUtils {
             return "";
 
         return prefix + map.get(name) + postfix;
+    }
+    
+    public static void entering(Logger logger, String member, Object arg) {
+        logger.logp(enteringExitingLevel, logger.getName(), member, String.format("->(%0$s)", arg.toString()));
+    }
+    
+    public static void exiting(Logger logger, String member, Object arg) {
+        logger.logp(enteringExitingLevel, logger.getName(), member, String.format("<-%0$s", arg.toString()));
+    }
+    
+    public static void entering(Logger logger, String member) {
+        logger.logp(enteringExitingLevel, logger.getName(), member, "->");
+    }
+    
+    public static void exiting(Logger logger, String member) {
+        logger.logp(enteringExitingLevel, logger.getName(), member, "<-");
     }
 
     private IrpUtils() {

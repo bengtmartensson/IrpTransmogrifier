@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.math.BigInteger;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -25,12 +26,14 @@ import org.w3c.dom.Element;
 
 class BitStream extends IrStreamItem implements Evaluatable {
 
+    private static final Logger logger = Logger.getLogger(BitStream.class.getName());
+
     private long length;
     private BigInteger data;
 
     @Override
     public String toString() {
-        return "BitStream, length = " + length + ", data = " + data + " = 0x" + data.toString(16) + " = 0b" + data.toString(2);
+        return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
     }
 
 //        else {
@@ -137,12 +140,14 @@ class BitStream extends IrStreamItem implements Evaluatable {
             double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         //debugBegin();
-        if (bitSpec == null)
-            throw new UnassignedException("BitStream " + toString() + " has no associated BitSpec, cannot compute IrStream");
+        //if (bitSpec == null)
+        //    throw new UnassignedException("BitStream " + toString() + " has no associated BitSpec, cannot compute IrStream");
 
-        EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
-        
-        if (length % bitSpec.getChunkSize() != 0) {
+        IrpUtils.entering(logger, "evaluate", this);
+
+        EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, null, pass);
+
+        if (bitSpec == null || length % bitSpec.getChunkSize() != 0) {
             list.add(this);
             //throw new IncompatibleArgumentException("chunksize (= " + bitSpec.getChunkSize() + ") does not divide bitstream length (= " + length + ").");
         } else {
@@ -150,7 +155,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
             for (int n = 0; n < noChunks; n++) {
                 int chunkNo = noChunks - n - 1;
                 BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
-                EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
+                EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec, null, elapsed);
                 //List<IrStreamItem> items = irs.evaluate(null);
                 //list.addAll(items);
                 list.add(evaluatedIrStream);
@@ -158,6 +163,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
         }
         //Debug.debugBitStream(toString());
         //debugEnd(list);
+        IrpUtils.exiting(logger, "evaluate", list);
         return list;
     }
 

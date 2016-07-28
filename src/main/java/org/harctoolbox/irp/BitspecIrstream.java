@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -26,6 +27,8 @@ import org.w3c.dom.Element;
  *
  */
 public class BitspecIrstream extends IrStreamItem {
+    private static final Logger logger = Logger.getLogger(BitspecIrstream.class.getName());
+    
     private BitSpec bitSpec;
     private IrStream irStream;
 
@@ -46,6 +49,11 @@ public class BitspecIrstream extends IrStreamItem {
     public String toIrpString() {
         return bitSpec.toIrpString() + irStream.toIrpString();
     }
+    
+    @Override
+    public String toString() {
+        return toIrpString();
+    }
 
     @Override
     public Element toElement(Document document) throws IrpSyntaxException {
@@ -64,16 +72,23 @@ public class BitspecIrstream extends IrStreamItem {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        return irStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
+        IrpUtils.entering(logger, "evaluate(5args)", this);
+        EvaluatedIrStream evaluatedIrStream = irStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
+        IrpUtils.exiting(logger, "evaluate(5args)", evaluatedIrStream);
+        return evaluatedIrStream;
     }
 
     @Override
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        IrpUtils.entering(logger, "evaluate(6args)", this);
         EvaluatedIrStream inner = evaluate(state, pass, nameEngine, generalSpec, elapsed);
+        logger.finest("inner = " + inner);
         EvaluatedIrStream outer = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         outer.add(inner);
+        logger.finest("outer = " + outer);
+        logger.exiting(BitspecIrstream.class.getName(), "evaluate(6args)");
         return outer;
     }
 

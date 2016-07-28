@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
@@ -41,6 +43,10 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
     public NameEngine() {
         map = new LinkedHashMap<>();
     }
+    
+    private NameEngine(HashMap<String, Expression> map) {
+        this.map = map;
+    }
 
     public NameEngine(String str) throws IrpSyntaxException {
         this();
@@ -48,6 +54,29 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
             ParserDriver parserDriver = new ParserDriver(str);
             parseDefinitions(parserDriver.getParser().definitions());
         }
+    }
+    
+    public static NameEngine parseLoose(String str) throws IrpSyntaxException {
+        NameEngine nameEngine = new NameEngine();
+        if (str == null || str.trim().isEmpty())
+            return nameEngine;
+        
+        String payload = str.trim().replaceFirst("^\\{", "").replaceFirst("\\}$", "");
+        String[] definitions = payload.split("[\\s,;]+");
+        for (String definition : definitions) {
+            ParserDriver parserDriver = new ParserDriver(definition);
+            nameEngine.parseDefinition(parserDriver.getParser().definition());
+        }
+        return nameEngine;
+    }
+    
+    /**
+     * Creates a shallow copy of the NameEngine.
+     * @return Shallow copy. 
+     */
+    @Override
+    public NameEngine clone() {
+        return new NameEngine((HashMap<String,Expression>) map.clone());
     }
 
     @Override
@@ -211,17 +240,18 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder();
-        for (String name : map.keySet()) {
-            str.append(name).append("=").append(map.get(name).toString()).append(",");
-        }
-        return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
+//        StringBuilder str = new StringBuilder();
+//        for (String name : map.keySet()) {
+//            str.append(name).append("=").append(map.get(name).toString()).append(",");
+//        }
+//        return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
+        return toIrpString();
     }
 
     @Override
     public String toIrpString() {
-        if (map.isEmpty())
-            return "";
+        //if (map.isEmpty())
+        //    return "";
 
         StringBuilder str = new StringBuilder();
         //List<String> list = new ArrayList<>();
@@ -269,5 +299,13 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         element.appendChild(new Name(definition.getKey()).toElement(document));
         element.appendChild(definition.getValue().toElement(document));
         return element;
+    }
+
+    public HashMap<String, Long> getMap() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        HashMap<String, Long> result = new HashMap<>();
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            result.put(kvp.getKey(), kvp.getValue().toNumber(this));
+        }
+        return result;
     }
 }

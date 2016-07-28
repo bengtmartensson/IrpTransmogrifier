@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -27,6 +28,9 @@ import org.w3c.dom.Element;
  * @author Bengt Martensson
  */
 public class IrStream extends BareIrStream {
+
+    private static final Logger logger = Logger.getLogger(IrStream.class.getName());
+
     private RepeatMarker repeatMarker;
 
     //private ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems() {
@@ -71,15 +75,18 @@ public class IrStream extends BareIrStream {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        IrpUtils.entering(logger, "evaluate", this);
         boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
         int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
-        return evaluate(evaluateTheRepeat ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, bitSpec, elapsed, repetitions);
+        EvaluatedIrStream result = evaluate(evaluateTheRepeat ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, bitSpec, elapsed, repetitions);
+        IrpUtils.exiting(logger, "evaluate", result);
+        return result;
     }
 
     private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec, double elapsed, int repeats)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, null, pass);
         for (int i = 0; i < repeats; i++) {
             EvaluatedIrStream irSequence = super.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
             if (irSequence.getState() != null)

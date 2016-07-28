@@ -62,7 +62,7 @@ public class Protocol extends IrpObject {
 //    private Document doc = null;
 //    private Element root = null;
 //    private Element currentElement = null;
-
+    
     /**
      *
      * @param generalSpec
@@ -176,6 +176,7 @@ public class Protocol extends IrpObject {
      */
     public IrSignal toIrSignal(NameEngine nameEngine)
             throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
+        IrpUtils.entering(logger, "toIrSignal");
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
         nameEngine.add(definitions);
@@ -184,6 +185,7 @@ public class Protocol extends IrpObject {
         IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
         IrSequence ending = toIrSequence(nameEngine, Pass.ending);
         saveMemoryVariables(nameEngine);
+        IrpUtils.entering(logger, "toIrSignal");
         return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
     }
 
@@ -231,8 +233,11 @@ public class Protocol extends IrpObject {
      */
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass)
             throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
+        IrpUtils.entering(logger, "toIrSequence", pass);
         EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(IrSignal.Pass.intro, pass, nameEngine, generalSpec, 0f);
-        return evaluatedIrStream.toIrSequence();
+        IrSequence irSequence = evaluatedIrStream.toIrSequence();
+        IrpUtils.exiting(logger, "toIrSequence", pass);
+        return irSequence;
     }
 
     @Override
@@ -383,6 +388,10 @@ public class Protocol extends IrpObject {
     @Override
     public String toString() {
         return toIrpString();
+    }
+    
+    public NameEngine randomParameters() throws IrpSyntaxException {
+        return parameterSpecs.random();
     }
 
     /*

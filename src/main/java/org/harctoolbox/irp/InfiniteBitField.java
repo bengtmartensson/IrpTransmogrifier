@@ -56,8 +56,22 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public String toString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        return (complement ? "~" : "") + data.toNumber(nameEngine) + "::" + chop.toNumber(nameEngine);
+    public String toString(NameEngine nameEngine) {
+        String chopString;
+        try {
+            chopString = Long.toString(chop.toNumber(nameEngine));
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            chopString = chop.toIrpString();
+        }
+
+        String dataString;
+        try {
+            dataString = Long.toString(data.toNumber(nameEngine));
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            dataString = data.toIrpString();
+        }
+
+        return (complement ? "~" : "") + dataString + "::" + chopString;
     }
 
     @Override

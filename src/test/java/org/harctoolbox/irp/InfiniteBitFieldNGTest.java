@@ -75,13 +75,9 @@ public class InfiniteBitFieldNGTest {
      */
     @Test
     public void testToString() {
-        try {
-            System.out.println("toString");
-            String result = instance.toString(nameEngine);
-            assertEquals(result, "~4::2");
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
-            Logger.getLogger(InfiniteBitFieldNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("toString");
+        String result = instance.toString(nameEngine);
+        assertEquals(result, "~4::2");
     }
 
     /**

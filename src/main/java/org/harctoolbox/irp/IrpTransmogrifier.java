@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -44,6 +43,7 @@ import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrpMasterUtils;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.Pronto;
@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
  * This class contains a command line main routine, allowing command line access to most things in the package.
  */
 public class IrpTransmogrifier {
-    private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
+    private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
     private static CommandLineArgs commandLineArgs = new CommandLineArgs();
 
@@ -139,34 +139,62 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void doRender(IrpDatabase irpDatabase, CommandRender commandRenderer) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException {
-        String nameEngineString = commandRenderer.nameEngine;
-        if (!nameEngineString.startsWith("{"))
-            nameEngineString = "{" + nameEngineString;
-        if (!nameEngineString.endsWith("{"))
-            nameEngineString += "}";
-        NameEngine nameEngine = new NameEngine(nameEngineString);
-        String proto = commandRenderer.args.get(0);
-        NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
-        IrSignal irSignal = protocol.toIrSignal(nameEngine);
-        if (commandRenderer.pronto)
-            System.out.println(Pronto.toPrintString(irSignal));
-        if (commandRenderer.raw)
-            System.out.println(irSignal);
+    private static void doRender(IrpDatabase irpDatabase, CommandRender commandRenderer) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException, UsageException, FileNotFoundException, org.harctoolbox.IrpMaster.IrpMasterException {
+        if (commandRenderer.random && commandRenderer.nameEngine != null)
+            throw new UsageException("Cannot use both --nameengine and --random");
+
+        for (String prt : commandRenderer.protocols) {
+
+            List<String> list;
+            if (commandRenderer.regex)
+                list = irpDatabase.getMatchingNames(prt);
+            else {
+                list = new ArrayList<>();
+                list.add(prt);
+            }
+        //if (commandList.sort)
+            Collections.sort(list);
+
+            for (String proto : list) {
+                logger.log(Level.FINE, proto);
+                System.out.println(proto);
+                NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
+                NameEngine nameEngine = commandRenderer.nameEngine != null ? commandRenderer.nameEngine
+                        : commandRenderer.random ? protocol.randomParameters()
+                                : new NameEngine();
+                if (commandRenderer.random)
+                    logger.log(Level.INFO, nameEngine.toString());
+
+                IrSignal irSignal = protocol.toIrSignal(nameEngine.clone());
+                if (commandRenderer.pronto)
+                    System.out.println(Pronto.toPrintString(irSignal));
+
+                if (commandRenderer.raw)
+                    System.out.println(irSignal);
+
+                if (commandRenderer.test) {
+                    IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(proto, nameEngine);
+                    if (!irSignal.approximatelyEquals(irpMasterSignal)) {
+                        System.err.println(Pronto.toPrintString(irpMasterSignal));
+                        System.err.println("Error");
+                    }
+                }
+            }
+        }
     }
 
     private static void doAnalyze(CommandAnalyze commandAnalyze) throws OddSequenceLenghtException {
         int[] data = new int[commandAnalyze.args.size()];
         for (int i = 0; i < commandAnalyze.args.size(); i++)
             data[i] = Integer.parseInt(commandAnalyze.args.get(i));
-        
+
         IrSequence irSequence = new ModulatedIrSequence(data, (double) commandAnalyze.frequency);
-        
+
         if (commandAnalyze.cleaner) {
             Cleaner cleaner = new Cleaner(irSequence);
             irSequence = cleaner.toIrSequence();
-        }    
-        
+        }
+
         if (commandAnalyze.repeatFinder) {
             RepeatFinder repeatFinder = new RepeatFinder(irSequence);
             RepeatFinder.RepeatFinderData repeatFinderData = repeatFinder.getRepeatFinderData();
@@ -174,14 +202,14 @@ public class IrpTransmogrifier {
             IrSignal irSignal = repeatFinder.toIrSignal(irSequence, (double) commandAnalyze.frequency);
             System.out.println(irSignal);
         }
-            
+
         Analyzer analyzer = new Analyzer(irSequence);
         for (int i = 0; i < analyzer.getTimings().size(); i++) {
             int timing = analyzer.getTimings().get(i);
             System.out.println((char) ((int) 'A' + i) + ": " + timing + "    \t" + analyzer.getCleanedHistogram().get(timing));
         }
         System.out.println(analyzer.toTimingsString());
-        
+
     }
 
     private static void doRecognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) {
@@ -189,12 +217,7 @@ public class IrpTransmogrifier {
     }
 
     private static void doExpression(CommandExpression commandExpression) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
-        String nameEngineString = commandExpression.nameEngine;
-        if (!nameEngineString.startsWith("{"))
-            nameEngineString = "{" + nameEngineString;
-        if (!nameEngineString.endsWith("{"))
-            nameEngineString += "}";
-        NameEngine nameEngine = new NameEngine(nameEngineString);
+        NameEngine nameEngine = commandExpression.nameEngine;
         for (String text : commandExpression.expressions) {
 
             IrpParser parser = new ParserDriver(text).getParser();
@@ -221,12 +244,7 @@ public class IrpTransmogrifier {
     }
 
     private static void doBitfield(CommandBitfield commandBitField) throws IrpSyntaxException, UsageException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
-        String nameEngineString = commandBitField.nameEngine;
-        if (!nameEngineString.startsWith("{"))
-            nameEngineString = "{" + nameEngineString;
-        if (!nameEngineString.endsWith("{"))
-            nameEngineString += "}";
-        NameEngine nameEngine = new NameEngine(nameEngineString);
+        NameEngine nameEngine = commandBitField.nameEngine;
 
 //        String generalSpecString = commandExpression.generalspec;
 //        if (commandExpression.msb) {
@@ -301,6 +319,18 @@ public class IrpTransmogrifier {
         }
     }
 
+    public static class NameEngineParser implements IStringConverter<NameEngine> { // MUST be public
+
+        @Override
+        public NameEngine convert(String value) {
+            try {
+                return NameEngine.parseLoose(value);
+            } catch (IllegalArgumentException | IrpSyntaxException ex) {
+                throw new ParameterException(ex);
+            }
+        }
+    }
+
     private final static class CommandLineArgs {
 
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
@@ -321,6 +351,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {"-v", "--version"}, description = "Report version")
         private boolean versionRequested = false;
+
+        @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation")
+        private Long seed = null;
 
         //@Parameter(description = "protocols")
         //private List<String> protocols = new ArrayList<>();
@@ -391,24 +424,36 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal")
     private static class CommandRender {
 
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use")
-        private String nameEngine = null;
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        private NameEngine nameEngine = null;
 
-        @Parameter(names = { "--pronto" }, description = "Generate Pronto hex")
+        @Parameter(names = { "-p", "--pronto" }, description = "Generate Pronto hex")
         private boolean pronto = false;
 
-        @Parameter(names = { "--raw" }, description = "Generate raw form")
+        @Parameter(names = { "-r", "--raw" }, description = "Generate raw form")
         private boolean raw = false;
 
-        @Parameter(description = "protocol, [paramater assignments]*")
-        private List<String> args;
+        @Parameter(names = { "--random" }, description = "Generate random paraneters")
+        private boolean random = false;
+
+        @Parameter(names = { "--regex", "--regexp" }, description = "Generate random paraneters")
+        private boolean regex = false;
+
+        @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
+        private boolean test = false;
+
+        @Parameter(names = { "--irpmaster" }, description = "Config for IrpMaster")
+        private String irpMasterConfig = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
+
+        @Parameter(description = "protocol(s) or pattern", required = true)
+        private List<String> protocols;
     }
 
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
     private static class CommandExpression {
 
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use")
-        private String nameEngine = null;
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        private NameEngine nameEngine = null;
 
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;
@@ -426,8 +471,8 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield")
     private static class CommandBitfield {
 
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use")
-        private String nameEngine = null;
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        private NameEngine nameEngine = null;
 
 //        @Parameter(names = { "-g", "--generalspec" }, description = "Generalspec to use")
 //        private String generalspec = null;
@@ -457,13 +502,13 @@ public class IrpTransmogrifier {
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
     private static class CommandAnalyze {
-        
+
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
         private int frequency = (int) ModulatedIrSequence.defaultFrequency;
-        
+
         @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder")
         private boolean repeatFinder = false;
-        
+
         @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
         private boolean cleaner = false;
 
@@ -497,7 +542,7 @@ public class IrpTransmogrifier {
 
         CommandBitfield commandBitfield = new CommandBitfield();
         argumentParser.addCommand(commandBitfield);
-        
+
         CommandAnalyze commandAnalyze = new CommandAnalyze();
         argumentParser.addCommand(commandAnalyze);
 
@@ -527,11 +572,21 @@ public class IrpTransmogrifier {
             System.exit(IrpUtils.exitSuccess);
         }
 
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setLevel(commandLineArgs.logLevel);
-        logger.addHandler(handler);
-        logger.setUseParentHandlers(false);
-        logger.setLevel(commandLineArgs.logLevel/*Level.ALL*/);
+        Logger topLevelLogger = Logger.getLogger("");
+        System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", "%4$s(%2$s): %5$s%n");
+        //SimpleFormatter formatter = new SimpleFormatter();
+        //formatter.
+        //ConsoleHandler handler = new ConsoleHandler();
+        //handler.setLevel(commandLineArgs.logLevel);
+        //topLevelLogger.addHandler(handler);
+        topLevelLogger.getHandlers()[0].setLevel(commandLineArgs.logLevel);
+        topLevelLogger.setLevel(commandLineArgs.logLevel);
+        //logger.removeHandler(logger.getHandlers()[0]);
+        //logger.setLevel(commandLineArgs.logLevel/*Level.ALL*/);
+        //Logger.getLogger(Protocol.class.getName()).setLevel(Level.INFO);
+
+        if (commandLineArgs.seed != null)
+            ParameterSpec.initRandom(commandLineArgs.seed);
 
         try {
             IrpDatabase irpDatabase = commandLineArgs.iniFile != null
@@ -568,10 +623,10 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (UnknownProtocolException | UnassignedException | UsageException ex) {
-            System.err.println(ex.getMessage());
-        } catch (SAXException | IOException| IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | DomainViolationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, ex.getMessage());
+            if (commandLineArgs.logLevel.intValue() < Level.WARNING.intValue())
+                ex.printStackTrace();
         }
     }
 

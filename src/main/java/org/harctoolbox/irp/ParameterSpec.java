@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.Random;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
@@ -31,6 +32,16 @@ public class ParameterSpec extends IrpObject {
     private Number max;
     private Expression deflt;
     private boolean memory;
+    
+    private static Random random;
+    
+    public static void initRandom(long seed) {
+        random = new Random(seed);
+    }
+    
+    static {
+        random = new Random();
+    }
 
     @Override
     public String toString() {
@@ -133,6 +144,14 @@ public class ParameterSpec extends IrpObject {
 
     public boolean hasMemory() {
         return memory;
+    }
+    
+    public long random() {
+        long bound = getMax() - getMin() + 1;
+        if (bound > Integer.MAX_VALUE)
+            throw new UnsupportedOperationException("Not implemented");
+        long rnd = (long) random.nextInt((int) bound) + getMin();
+        return rnd;
     }
 
     /**

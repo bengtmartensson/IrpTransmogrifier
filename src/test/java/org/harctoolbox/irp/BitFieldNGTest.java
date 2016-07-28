@@ -71,7 +71,7 @@ public class BitFieldNGTest {
     public void testToString_0args() throws IrpSyntaxException {
         System.out.println("toString");
         BitField instance = BitField.newBitField("~D:-6:2");
-        assertEquals(instance.toString(), "");
+        assertEquals(instance.toString(), "~D:-6:2");
     }
 
     /**

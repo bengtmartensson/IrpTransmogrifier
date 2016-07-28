@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Logger;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -31,6 +32,9 @@ import org.w3c.dom.Element;
  */
 
 public abstract class Duration extends IrStreamItem implements Floatable, Evaluatable {
+    
+    private static final Logger logger = Logger.getLogger(Duration.class.getName());
+    
     protected double us = IrCoreUtils.invalid;
     protected double time_periods = IrCoreUtils.invalid;
     protected double time_units = IrCoreUtils.invalid;
@@ -144,6 +148,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
         evaluatedIrStream.add(this);
+        IrpUtils.exiting(logger, "duration", evaluatedIrStream);
         return evaluatedIrStream;
     }
 
@@ -157,6 +162,11 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     public String toIrpString() {
         return nameOrNumber.toIrpString() + (unit.equals("1") ? "" : unit);
+    }
+    
+    @Override
+    public String toString() {
+        return toIrpString();
     }
 
     @Override

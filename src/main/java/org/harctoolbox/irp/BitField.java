@@ -98,14 +98,10 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     @Override
     public final String toString() {
-        try {
             return toString(new NameEngine());
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
-            return "";
-        }
     }
 
-    public abstract String toString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
+    public abstract String toString(NameEngine nameEngine);
 
 
 //    public String evaluateAsString() {

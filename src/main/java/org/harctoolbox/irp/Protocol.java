@@ -62,7 +62,7 @@ public class Protocol extends IrpObject {
 //    private Document doc = null;
 //    private Element root = null;
 //    private Element currentElement = null;
-    
+
     /**
      *
      * @param generalSpec
@@ -151,7 +151,7 @@ public class Protocol extends IrpObject {
         }
 
         if (numberOfInfiniteRepeats() > 1) {
-            throw new InvalidRepeatException("More than one infinite repeat found.");
+            throw new InvalidRepeatException("More than one infinite repeat found. The program does not handle this.");
         }
 
         if (parameterSpecs.isEmpty()) {
@@ -180,7 +180,7 @@ public class Protocol extends IrpObject {
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
         nameEngine.add(definitions);
-        
+
         IrSequence intro  = toIrSequence(nameEngine, Pass.intro);
         IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
         IrSequence ending = toIrSequence(nameEngine, Pass.ending);
@@ -234,7 +234,7 @@ public class Protocol extends IrpObject {
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass)
             throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
         IrpUtils.entering(logger, "toIrSequence", pass);
-        EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(IrSignal.Pass.intro, pass, nameEngine, generalSpec, 0f);
+        EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(IrSignal.Pass.intro, pass, nameEngine, generalSpec);
         IrSequence irSequence = evaluatedIrStream.toIrSequence();
         IrpUtils.exiting(logger, "toIrSequence", pass);
         return irSequence;
@@ -389,7 +389,7 @@ public class Protocol extends IrpObject {
     public String toString() {
         return toIrpString();
     }
-    
+
     public NameEngine randomParameters() throws IrpSyntaxException {
         return parameterSpecs.random();
     }

@@ -42,7 +42,8 @@ public class IrSignal {
     public enum Pass {
         intro,
         repeat,
-        ending
+        ending,
+        cancel
     }
 
     /** Intro sequence, always sent once. Can be empty, but not null. */

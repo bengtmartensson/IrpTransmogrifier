@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
-import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -43,19 +42,19 @@ public class Extent extends Duration {
         return time;
     }
 
-    @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
-        if (pass != state)
-            return null;
-        
-        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
-        double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
-        evaluatedIrStream.add(new Gap(time));
-        return evaluatedIrStream;
-    }
+//    @Override
+//    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
+//            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+//        //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
+//        if (pass != state)
+//            return null;
+//
+//        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, pass);
+//        //double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
+//        //evaluatedIrStream.add(new Gap(time));
+//        evaluatedIrStream.add(this);
+//        return evaluatedIrStream;
+//    }
 
     @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {

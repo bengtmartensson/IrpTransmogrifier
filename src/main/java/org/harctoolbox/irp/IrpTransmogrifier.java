@@ -156,8 +156,7 @@ public class IrpTransmogrifier {
             Collections.sort(list);
 
             for (String proto : list) {
-                logger.log(Level.FINE, proto);
-                System.out.println(proto);
+                logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
                 NameEngine nameEngine = commandRenderer.nameEngine != null ? commandRenderer.nameEngine
                         : commandRenderer.random ? protocol.randomParameters()
@@ -175,8 +174,9 @@ public class IrpTransmogrifier {
                 if (commandRenderer.test) {
                     IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(proto, nameEngine);
                     if (!irSignal.approximatelyEquals(irpMasterSignal)) {
-                        System.err.println(Pronto.toPrintString(irpMasterSignal));
-                        System.err.println("Error");
+                        System.out.println(Pronto.toPrintString(irpMasterSignal));
+                        System.out.println("Error in " + proto);
+                        //System.exit(1);
                     }
                 }
             }

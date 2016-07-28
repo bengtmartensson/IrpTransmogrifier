@@ -65,13 +65,13 @@ public abstract class IrStreamItem extends IrpObject {
                 : null;
     }
 
-    /**
-     * To be overridden in Variation
-     * @return noAlternatives
-     */
-    public int numberOfAlternatives() {
-        return noAlternatives;
-    }
+//    /**
+//     * To be overridden in Variation
+//     * @return noAlternatives
+//     */
+//    public int numberOfAlternatives() {
+//        return noAlternatives;
+//    }
 
 //    protected void debugBegin() {
 //
@@ -85,8 +85,7 @@ public abstract class IrStreamItem extends IrpObject {
 //
 //    }
 
-    abstract EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed)
+    abstract EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
 
     int numberOfBitSpecs() {
@@ -99,11 +98,11 @@ public abstract class IrStreamItem extends IrpObject {
 
     abstract int numberOfBareDurations();
 
-    public IrSignal.Pass stateWhenEntering() {
+    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
         return null;
     }
 
-    public IrSignal.Pass stateWhenExiting() {
+    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
         return null;
     }
 }

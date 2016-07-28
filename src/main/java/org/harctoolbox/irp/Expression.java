@@ -142,6 +142,7 @@ public class Expression extends PrimaryItem /* ??? */ {
                 : operator.equals("==") ? cBoolean(left == right)
                 : operator.equals("!=") ? cBoolean(left != right)
                 : operator.equals("&")  ? left & right
+                : operator.equals("^")  ? left ^ right
                 : operator.equals("|")  ? left | right
                 : operator.equals("&&") ? (left != 0 ? right : 0L)
                 : operator.equals("||") ? (left != 0 ? left : right)

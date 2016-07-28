@@ -52,10 +52,10 @@ public class BareIrStream extends IrStreamItem {
         return irStreamItems.isEmpty();
     }
 
-    @Override
-    public int numberOfAlternatives() {
-        return noAlternatives;
-    }
+//    @Override
+//    public int numberOfAlternatives() {
+//        return noAlternatives;
+//    }
 
     @Override
     public int numberOfInfiniteRepeats() {
@@ -66,25 +66,28 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed_)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        IrpUtils.entering(logger, "evaluate", this.toString() + "," + bitSpec);
+        IrpUtils.entering(logger, "evaluate", this);
         IrSignal.Pass actualState = state;
-        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         for (IrStreamItem irStreamItem : irStreamItems) {
-            IrSignal.Pass newState = irStreamItem.stateWhenEntering();
-            if (pass == IrSignal.Pass.repeat && newState != null)
+            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
+            if (/*pass == IrSignal.Pass.repeat &&*/ newState != null)
                 actualState = newState;
             if (actualState.compareTo(pass) <= 0) {
-                double elapsed = result.getElapsed();
-                EvaluatedIrStream irStream = irStreamItem.evaluate(actualState, pass, nameEngine, generalSpec, bitSpec, elapsed);
+                //double elapsed = result.getElapsed();
+                EvaluatedIrStream irStream = irStreamItem.evaluate(actualState, pass, nameEngine, generalSpec);
+                if (irStream == null)
+                    break;
+
                 result.add(irStream);
             }
-            IrSignal.Pass next = irStreamItem.stateWhenExiting();
+            IrSignal.Pass next = irStreamItem.stateWhenExiting(actualState);
             if (next != null)
                 actualState = next;
         }
+        result.setState(actualState);
         IrpUtils.entering(logger, "evaluate", result);
         return result;
     }

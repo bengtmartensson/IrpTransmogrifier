@@ -130,14 +130,24 @@ class BitStream extends IrStreamItem implements Evaluatable {
         //if (((n+1)*chunksize-1)/Long.SIZE != (n*chunksize)/Long.SIZE)
         //    throw new RuntimeException("Case not implemented");
         //int chunk = (int)(data[n*chunksize/Long.SIZE] >> n*chunksize) & ((1 << chunksize)- 1);
-        int mask = (1 << chunksize)- 1;
-        return data.shiftRight(n*chunksize).intValueExact() & mask;
+        long mask = (1L << chunksize) - 1L;
+        return data.shiftRight(n*chunksize).and(BigInteger.valueOf(mask)).intValueExact();
     }
 
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec,
-            double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
+            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+        IrpUtils.entering(logger, "evaluate", this);
+
+        EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);
+
+        list.add(this);
+        IrpUtils.exiting(logger, "evaluate", list);
+        return list;
+    }
+
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         //debugBegin();
         //if (bitSpec == null)
@@ -145,7 +155,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
 
         IrpUtils.entering(logger, "evaluate", this);
 
-        EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, null, pass);
+        EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);
 
         if (bitSpec == null || length % bitSpec.getChunkSize() != 0) {
             list.add(this);
@@ -155,7 +165,8 @@ class BitStream extends IrStreamItem implements Evaluatable {
             for (int n = 0; n < noChunks; n++) {
                 int chunkNo = noChunks - n - 1;
                 BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
-                EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec, null, elapsed);
+                EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec);
+                //evaluatedIrStream.reduce(bitSpec);
                 //List<IrStreamItem> items = irs.evaluate(null);
                 //list.addAll(items);
                 list.add(evaluatedIrStream);

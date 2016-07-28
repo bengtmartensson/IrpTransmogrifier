@@ -48,13 +48,33 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        return pass == Pass.intro ? intro.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
-                : pass == Pass.repeat ? repeat.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
-                : ending != null ? ending.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
-                : new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
+        BareIrStream actual = pass == Pass.intro ? intro
+                : pass == Pass.repeat ? repeat : ending;
+        return actual != null ? actual.evaluate(state, pass, nameEngine, generalSpec) : null;
+//        return pass == Pass.intro ? intro.evaluate(state, pass, nameEngine, generalSpec)
+//                : pass == Pass.repeat ? repeat.evaluate(state, pass, nameEngine, generalSpec)
+//                : ending != null ? ending.evaluate(state, pass, nameEngine, generalSpec)
+//                : new EvaluatedIrStream(nameEngine, generalSpec, pass);
+    }
+
+    @Override
+    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
+        return pass;
+    }
+
+    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
+        return pass;
+    }
+
+    private static int numberOfInfiniteRepeats(BareIrStream bareIrStream) {
+        return bareIrStream == null ? 0 : bareIrStream.numberOfInfiniteRepeats();
+    }
+
+    @Override
+    public int numberOfInfiniteRepeats() {
+        return Math.max(numberOfInfiniteRepeats(intro), Math.max(numberOfInfiniteRepeats(repeat), numberOfInfiniteRepeats(ending)));
     }
 
     @Override

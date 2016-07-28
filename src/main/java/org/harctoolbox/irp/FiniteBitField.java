@@ -127,24 +127,24 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        if (state != pass)
-            return null;
-
         IrpUtils.entering(logger, "evaluate", this.toString());
-        BitStream bitStream = new BitStream(this, nameEngine, generalSpec);
-        EvaluatedIrStream result = (bitSpec != null)
-                ? bitStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
-                : toEvaluatedIrStream(bitStream, pass, nameEngine, generalSpec);
-        IrpUtils.exiting(logger, "evaluate", result);
-        return result;
-    }
+        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
+        if (state == pass) {
+            BitStream bitStream = new BitStream(this, nameEngine, generalSpec);
+//        EvaluatedIrStream result = (bitSpec != null)
+//                ? bitStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
+//                : toEvaluatedIrStream(bitStream, pass, nameEngine, generalSpec);
+//        IrpUtils.exiting(logger, "evaluate", result);
+//        return result;
+//    }
+//
+//    private EvaluatedIrStream toEvaluatedIrStream(BitStream bitStream, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
 
-    private EvaluatedIrStream toEvaluatedIrStream(BitStream bitStream, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, null, pass);
-        result.add(bitStream);
+            result.add(bitStream);
+        }
+        IrpUtils.exiting(logger, "evaluate", result);
         return result;
     }
 

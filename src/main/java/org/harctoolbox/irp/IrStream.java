@@ -72,37 +72,38 @@ public class IrStream extends BareIrStream {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "evaluate", this);
         boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
         int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
-        EvaluatedIrStream result = evaluate(evaluateTheRepeat ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, bitSpec, elapsed, repetitions);
+        EvaluatedIrStream result = evaluate(evaluateTheRepeat ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, repetitions);
         IrpUtils.exiting(logger, "evaluate", result);
         return result;
     }
 
-    private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed, int repeats)
+    private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, int repeats)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, null, pass);
+        IrSignal.Pass actualState = state;
+        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         for (int i = 0; i < repeats; i++) {
-            EvaluatedIrStream irSequence = super.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed);
-            if (irSequence.getState() != null)
-                state = irSequence.getState();
+            EvaluatedIrStream irSequence = super.evaluate(actualState, pass, nameEngine, generalSpec);
+            if (irSequence.getState() != null) {
+                actualState = irSequence.getState();
+                result.setState(actualState);
+            }
             result.add(irSequence);
         }
         return result;
     }
 
     @Override
-    public IrSignal.Pass stateWhenEntering() {
-        return isInfiniteRepeat() ? IrSignal.Pass.repeat : null;
+    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
+        return (pass == IrSignal.Pass.repeat && isInfiniteRepeat()) ? IrSignal.Pass.repeat : null;
     }
 
     @Override
-    public IrSignal.Pass stateWhenExiting() {
+    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
         return isInfiniteRepeat() ? IrSignal.Pass.ending : null;
     }
 
@@ -221,7 +222,9 @@ public class IrStream extends BareIrStream {
 
     @Override
     public int numberOfInfiniteRepeats() {
-        return super.numberOfInfiniteRepeats()
-                + (repeatMarker != null ? repeatMarker.numberOfInfiniteRepeats() : 0);
+        int noir = super.numberOfInfiniteRepeats();
+        return repeatMarker == null ? noir
+                : repeatMarker.isInfinite() ? noir + 1
+                : repeatMarker.getMin() * noir;
     }
 }

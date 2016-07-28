@@ -175,7 +175,7 @@ public class ProtocolNGTest {
             fail();
         }
     }
-/*
+
     @Test
     public void testToIrSignalArctech() {
         System.out.println("toIrSignalArchtech");
@@ -191,7 +191,7 @@ public class ProtocolNGTest {
         } catch (InvalidRepeatException ex) {
             fail();
         }
-    }*/
+    }
 
     @Test
     public void testToIrSignalXmp() {

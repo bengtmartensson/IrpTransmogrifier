@@ -32,9 +32,9 @@ import org.w3c.dom.Element;
  */
 
 public abstract class Duration extends IrStreamItem implements Floatable, Evaluatable {
-    
+
     private static final Logger logger = Logger.getLogger(Duration.class.getName());
-    
+
     protected double us = IrCoreUtils.invalid;
     protected double time_periods = IrCoreUtils.invalid;
     protected double time_units = IrCoreUtils.invalid;
@@ -72,8 +72,8 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     private void compute(NameEngine nameEngine, GeneralSpec generalSpec)
             throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         double time = nameOrNumber.toFloat(nameEngine, generalSpec);
-        if (time == 0f)
-            throw new IncompatibleArgumentException("Duration of 0 not sensible");
+        //if (time == 0f)
+        //    throw new IncompatibleArgumentException("Duration of 0 not sensible");
 
         switch (unit) {
             case "p":
@@ -139,15 +139,14 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec, double elapsed)
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
-        if (state != pass)
-            return null;
-        
-        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, bitSpec, pass);
-        evaluatedIrStream.add(this);
+        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, pass);
+
+        if (state == pass)
+            evaluatedIrStream.add(this);
+
         IrpUtils.exiting(logger, "duration", evaluatedIrStream);
         return evaluatedIrStream;
     }
@@ -163,7 +162,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     public String toIrpString() {
         return nameOrNumber.toIrpString() + (unit.equals("1") ? "" : unit);
     }
-    
+
     @Override
     public String toString() {
         return toIrpString();

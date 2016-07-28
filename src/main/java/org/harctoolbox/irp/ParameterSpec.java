@@ -32,13 +32,13 @@ public class ParameterSpec extends IrpObject {
     private Number max;
     private Expression deflt;
     private boolean memory;
-    
+
     private static Random random;
-    
+
     public static void initRandom(long seed) {
         random = new Random(seed);
     }
-    
+
     static {
         random = new Random();
     }
@@ -57,7 +57,7 @@ public class ParameterSpec extends IrpObject {
         if (!nameEngine.containsKey(name.name)) {
             if (this.hasMemory())
                 return;
-            
+
             if (deflt != null)
                 nameEngine.define(name, deflt);
             else
@@ -145,13 +145,13 @@ public class ParameterSpec extends IrpObject {
     public boolean hasMemory() {
         return memory;
     }
-    
+
     public long random() {
         long bound = getMax() - getMin() + 1;
-        if (bound > Integer.MAX_VALUE)
-            throw new UnsupportedOperationException("Not implemented");
-        long rnd = (long) random.nextInt((int) bound) + getMin();
-        return rnd;
+        if (bound > Integer.MAX_VALUE) {
+            return random.nextInt(Integer.MAX_VALUE); // FIXME
+        } else
+            return (long) random.nextInt((int) bound) + getMin();
     }
 
     /**

@@ -177,7 +177,7 @@ public class IrpDatabase {
      * @return String with IRP representation
      */
     public final String getIrp(String name) {
-        UnparsedProtocol prot = protocols.get(name);
+        UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
         return prot == null ? null : prot.getIrp();
     }
 

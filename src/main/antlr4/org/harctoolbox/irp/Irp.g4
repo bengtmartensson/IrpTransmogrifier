@@ -95,7 +95,7 @@ name_or_number:
 // class extent (extends Duration)
 // Semantics: An extent is a gap, with all preceeding durations in the
 // containing bare_irstream subtracted. More than one extent in one
-// bare_irstream is thus allowed.
+// bare_irstream are thus allowed. The "counting" starts anew after each extent.
 extent:
     '^' name_or_number ('m' | 'u' | 'p')?
 ;
@@ -150,6 +150,7 @@ bitspec:
 
 // 8.2
 // class RepeatMarker
+// NOTE: Semantically, at most infinite repeat in a protocol makes sense.
 repeat_marker:
     '*'
     | '+'
@@ -210,6 +211,7 @@ assignment:
 ;
 
 // 12.2
+// Variations are only allowed within infinite repeats.
 variation:
     alternative alternative alternative?
 ;

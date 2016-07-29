@@ -54,7 +54,11 @@ public class FiniteBitFieldNGTest {
     public void testToNumber() {
         System.out.println("toNumber");
         try {
-            assertEquals(instance.toNumber(nameEngine), 31);
+
+//            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
+//            assertEquals(instance.toNumber(nameEngine), 31L);
+            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
+            assertEquals(instance.toNumber(nameEngine), 31L);
         } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
             fail();
         }
@@ -75,8 +79,10 @@ public class FiniteBitFieldNGTest {
     @Test
     public void testToBinaryString_NameEngine_boolean() throws Exception {
         System.out.println("toBinaryString");
-        String result = instance.toBinaryString(nameEngine, false);
-        assertEquals(result, "011111");
+        //String result = instance.toBinaryString(nameEngine, false);
+        //assertEquals(result, "011111");
+        //((FiniteBitField fbf = new FiniteBitField("~D:-6:2");
+        assertEquals(new FiniteBitField("~D:-6:2").toBinaryString(nameEngine, false), "011111");
     }
 
     /**

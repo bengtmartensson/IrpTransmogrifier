@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
@@ -43,7 +41,7 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
     public NameEngine() {
         map = new LinkedHashMap<>();
     }
-    
+
     private NameEngine(HashMap<String, Expression> map) {
         this.map = map;
     }
@@ -55,12 +53,12 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
             parseDefinitions(parserDriver.getParser().definitions());
         }
     }
-    
+
     public static NameEngine parseLoose(String str) throws IrpSyntaxException {
         NameEngine nameEngine = new NameEngine();
         if (str == null || str.trim().isEmpty())
             return nameEngine;
-        
+
         String payload = str.trim().replaceFirst("^\\{", "").replaceFirst("\\}$", "");
         String[] definitions = payload.split("[\\s,;]+");
         for (String definition : definitions) {
@@ -69,10 +67,10 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         }
         return nameEngine;
     }
-    
+
     /**
      * Creates a shallow copy of the NameEngine.
-     * @return Shallow copy. 
+     * @return Shallow copy.
      */
     @Override
     public NameEngine clone() {
@@ -225,7 +223,7 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         }
         return result;
     }*/
-    
+
     void add(NameEngine definitions) {
         map.putAll(definitions.map);
     }
@@ -307,5 +305,9 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
             result.put(kvp.getKey(), kvp.getValue().toNumber(this));
         }
         return result;
+    }
+
+    public boolean isEmpty() {
+        return map.isEmpty();
     }
 }

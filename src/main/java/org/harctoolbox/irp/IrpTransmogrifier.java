@@ -140,7 +140,7 @@ public class IrpTransmogrifier {
     }
 
     private static void doRender(IrpDatabase irpDatabase, CommandRender commandRenderer) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException, UsageException, FileNotFoundException, org.harctoolbox.IrpMaster.IrpMasterException {
-        if (commandRenderer.random && commandRenderer.nameEngine != null)
+        if (commandRenderer.random && !commandRenderer.nameEngine.isEmpty())
             throw new UsageException("Cannot use both --nameengine and --random");
 
         for (String prt : commandRenderer.protocols) {
@@ -158,7 +158,7 @@ public class IrpTransmogrifier {
             for (String proto : list) {
                 logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
-                NameEngine nameEngine = commandRenderer.nameEngine != null ? commandRenderer.nameEngine
+                NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
                         : commandRenderer.random ? protocol.randomParameters()
                                 : new NameEngine();
                 if (commandRenderer.random)
@@ -425,7 +425,7 @@ public class IrpTransmogrifier {
     private static class CommandRender {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
-        private NameEngine nameEngine = null;
+        private NameEngine nameEngine = new NameEngine();
 
         @Parameter(names = { "-p", "--pronto" }, description = "Generate Pronto hex")
         private boolean pronto = false;
@@ -453,7 +453,7 @@ public class IrpTransmogrifier {
     private static class CommandExpression {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
-        private NameEngine nameEngine = null;
+        private NameEngine nameEngine = new NameEngine();
 
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;
@@ -472,7 +472,7 @@ public class IrpTransmogrifier {
     private static class CommandBitfield {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
-        private NameEngine nameEngine = null;
+        private NameEngine nameEngine = new NameEngine();
 
 //        @Parameter(names = { "-g", "--generalspec" }, description = "Generalspec to use")
 //        private String generalspec = null;
@@ -489,7 +489,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--xml"}, description = "List XML")
         private boolean xml = false;
 
-        @Parameter(description = "bitfield")
+        @Parameter(description = "bitfield", required = true)
         private List<String> bitfields;
     }
 
@@ -625,7 +625,7 @@ public class IrpTransmogrifier {
             }
         } catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage());
-            if (commandLineArgs.logLevel.intValue() < Level.WARNING.intValue())
+            if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
         }
     }

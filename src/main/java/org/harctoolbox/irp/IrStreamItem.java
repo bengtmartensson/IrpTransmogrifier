@@ -27,18 +27,7 @@ import org.harctoolbox.ircore.IrSignal;
  * @author Bengt Martensson
  */
 public abstract class IrStreamItem extends IrpObject {
-
-    //protected Protocol environment;
-    protected int noAlternatives = 0;
-
-    public abstract boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
-
-    protected IrStreamItem() {
-        //environment = env;
-        //Debug.debugIrStreamItems(this.getClass().getSimpleName() + " constructed.");
-    }
-
-//    public static IrStreamItem parse(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
+    //    public static IrStreamItem parse(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
 //        ParseTree child = ctx.getChild(0);
 //        return //ctx instanceof IrpParser.VariationContext ? new Variation((Va))
 //                //ctx.bitfield() != null ? new BitField(ctx.bitfield())
@@ -53,7 +42,6 @@ public abstract class IrStreamItem extends IrpObject {
     public static IrStreamItem newIrStreamItem(String str) throws IrpSyntaxException, InvalidRepeatException {
         return newIrStreamItem((new ParserDriver(str)).getParser().irstream_item());
     }
-
     public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         ParseTree child = ctx.getChild(0);
         return (child instanceof IrpParser.VariationContext) ? new Variation(((IrpParser.VariationContext) child))
@@ -65,6 +53,17 @@ public abstract class IrStreamItem extends IrpObject {
                 : (child instanceof IrpParser.Bitspec_irstreamContext) ? new BitspecIrstream((IrpParser.Bitspec_irstreamContext) child)
                 : null;
     }
+
+    //protected Protocol environment;
+    //protected int noAlternatives = 0;
+
+
+    protected IrStreamItem() {
+        //environment = env;
+        //Debug.debugIrStreamItems(this.getClass().getSimpleName() + " constructed.");
+    }
+    public abstract boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+
 
 //    /**
 //     * To be overridden in Variation

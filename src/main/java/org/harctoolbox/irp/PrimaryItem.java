@@ -35,9 +35,6 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
                 : new Name(child.getText());
     }
 
-    protected PrimaryItem() {
-    }
-
     public static PrimaryItem newPrimaryItem(long n) {
         return new Number(n);
     }
@@ -48,5 +45,7 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
         } catch (NumberFormatException ex) {
         }
         return name.trim().startsWith("(") ? new Expression(name) : new Name(name);
+    }
+    protected PrimaryItem() {
     }
 }

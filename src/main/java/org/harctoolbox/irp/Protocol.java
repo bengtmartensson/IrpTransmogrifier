@@ -41,6 +41,19 @@ import org.w3c.dom.Element;
 public class Protocol extends IrpObject {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
+    // from irpmaster.XmlExport
+    public static Document newDocument() {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(false);
+        Document doc = null;
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            doc = builder.newDocument();
+        } catch (ParserConfigurationException e) {
+        }
+        return doc;
+    }
 
     //private String name;
     //private String documentation;
@@ -82,9 +95,6 @@ public class Protocol extends IrpObject {
         this.generalSpec = new GeneralSpec();
     }
 
-    public IrpParser.ProtocolContext getParseTree() {
-        return parseTree;
-    }
 
 //    public final String getIrp() {
 //        return irp;
@@ -124,6 +134,9 @@ public class Protocol extends IrpObject {
 
     public Protocol(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         setup(parseTree);
+    }
+    public IrpParser.ProtocolContext getParseTree() {
+        return parseTree;
     }
 
     private void setup(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
@@ -328,19 +341,6 @@ public class Protocol extends IrpObject {
         return memoryVariables.get(name).toNumber();
     }
 
-    // from irpmaster.XmlExport
-    public static Document newDocument() {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-        factory.setNamespaceAware(false);
-        Document doc = null;
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            doc = builder.newDocument();
-        } catch (ParserConfigurationException e) {
-        }
-        return doc;
-    }
 
 //    public Document toDocument() throws IrpSyntaxException {
 //        Document document = newDocument();

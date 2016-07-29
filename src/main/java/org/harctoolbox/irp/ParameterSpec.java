@@ -27,65 +27,47 @@ import org.w3c.dom.Element;
  *
  */
 public class ParameterSpec extends IrpObject {
+    private static Random random;
+    static {
+        random = new Random();
+    }
+    public static void initRandom(long seed) {
+        random = new Random(seed);
+    }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        /*        ParameterSpec dev = null;
+        ParameterSpec toggle = null;
+        ParameterSpec func = null;
+        try {
+        dev = new ParameterSpec("d", 0, 255, false, "255-s");
+        toggle = new ParameterSpec("t", 0, 1, true, 0);
+        func = new ParameterSpec("F", 0, 1, false, 0);
+        System.out.println(new ParameterSpec("Fx", 0, 1, false, 0));
+        System.out.println(new ParameterSpec("Fx", 0, 1, false));
+        System.out.println(new ParameterSpec("Fx", 0, 1));
+        System.out.println(new ParameterSpec("D:0..31"));
+        System.out.println(new ParameterSpec("D@:0..31=42"));
+        System.out.println(new ParameterSpec("D:0..31=42*3+33"));
+        System.out.println(dev);
+        System.out.println(toggle);
+        System.out.println(func);
+        System.out.println(dev.isOk(-1));
+        System.out.println(dev.isOk(0));
+        System.out.println(dev.isOk(255));
+        System.out.println(dev.isOk(256));
+        } catch (ParseException ex) {
+        System.out.println(ex.getMessage());
+        }*/
+    }
     private Name name;
     private Number min;
     private Number max;
     private Expression deflt;
     private boolean memory;
 
-    private static Random random;
-
-    public static void initRandom(long seed) {
-        random = new Random(seed);
-    }
-
-    static {
-        random = new Random();
-    }
-
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
-
-    @Override
-    public String toIrpString() {
-        return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
-    }
-
-    public void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
-        if (!nameEngine.containsKey(name.name)) {
-            if (this.hasMemory())
-                return;
-
-            if (deflt != null)
-                nameEngine.define(name, deflt);
-            else
-                throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
-        }
-
-        long value = nameEngine.get(name.name).toNumber(nameEngine);
-        if (value == IrCoreUtils.invalid && deflt == null)
-            throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
-        if (!isOk(value))
-            throw new DomainViolationException("Parameter " + name + " outside of the allowed domain: "
-                    + domainAsString());
-    }
-
-    @Override
-    public Element toElement(Document document) {
-        Element el = document.createElement("parameter");
-        el.setAttribute("name", name.toString());
-        el.setAttribute("min", min.toString());
-        el.setAttribute("max", max.toString());
-        el.setAttribute("memory", Boolean.toString(memory));
-        if (deflt != null) {
-            Element def = document.createElement("default");
-            el.appendChild(def);
-            def.appendChild(deflt.toElement(document));
-        }
-        return el;
-    }
 
     public ParameterSpec(String str) {
         this(new ParserDriver(str).getParser().parameter_spec());
@@ -116,6 +98,46 @@ public class ParameterSpec extends IrpObject {
     public ParameterSpec(String name, boolean memory, int min, int max) {
         this(name, memory, min, max, null);
         this.memory = false;
+    }
+    @Override
+    public String toString() {
+        return toIrpString();
+    }
+    @Override
+    public String toIrpString() {
+        return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
+    }
+    public void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
+        if (!nameEngine.containsKey(name.getName())) {
+            if (this.hasMemory())
+                return;
+
+            if (deflt != null)
+                nameEngine.define(name, deflt);
+            else
+                throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+        }
+
+        long value = nameEngine.get(name.getName()).toNumber(nameEngine);
+        if (value == IrCoreUtils.invalid && deflt == null)
+            throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+        if (!isOk(value))
+            throw new DomainViolationException("Parameter " + name + " outside of the allowed domain: "
+                    + domainAsString());
+    }
+    @Override
+    public Element toElement(Document document) {
+        Element el = document.createElement("parameter");
+        el.setAttribute("name", name.toString());
+        el.setAttribute("min", min.toString());
+        el.setAttribute("max", max.toString());
+        el.setAttribute("memory", Boolean.toString(memory));
+        if (deflt != null) {
+            Element def = document.createElement("default");
+            el.appendChild(def);
+            def.appendChild(deflt.toElement(document));
+        }
+        return el;
     }
 
     public boolean isOk(long x) {
@@ -151,35 +173,7 @@ public class ParameterSpec extends IrpObject {
         if (bound > Integer.MAX_VALUE) {
             return random.nextInt(Integer.MAX_VALUE); // FIXME
         } else
-            return (long) random.nextInt((int) bound) + getMin();
+            return random.nextInt((int) bound) + getMin();
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-/*        ParameterSpec dev = null;
-        ParameterSpec toggle = null;
-        ParameterSpec func = null;
-        try {
-            dev = new ParameterSpec("d", 0, 255, false, "255-s");
-            toggle = new ParameterSpec("t", 0, 1, true, 0);
-            func = new ParameterSpec("F", 0, 1, false, 0);
-            System.out.println(new ParameterSpec("Fx", 0, 1, false, 0));
-            System.out.println(new ParameterSpec("Fx", 0, 1, false));
-            System.out.println(new ParameterSpec("Fx", 0, 1));
-            System.out.println(new ParameterSpec("D:0..31"));
-            System.out.println(new ParameterSpec("D@:0..31=42"));
-            System.out.println(new ParameterSpec("D:0..31=42*3+33"));
-            System.out.println(dev);
-            System.out.println(toggle);
-            System.out.println(func);
-            System.out.println(dev.isOk(-1));
-            System.out.println(dev.isOk(0));
-            System.out.println(dev.isOk(255));
-            System.out.println(dev.isOk(256));
-        } catch (ParseException ex) {
-            System.out.println(ex.getMessage());
-        }*/
-    }
 }

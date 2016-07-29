@@ -28,6 +28,9 @@ import org.w3c.dom.Element;
  *
  */
 public class Variation extends IrStreamItem {
+    private static int numberOfInfiniteRepeats(BareIrStream bareIrStream) {
+        return bareIrStream == null ? 0 : bareIrStream.numberOfInfiniteRepeats();
+    }
 
     private BareIrStream intro;
     private BareIrStream repeat;
@@ -72,9 +75,6 @@ public class Variation extends IrStreamItem {
         return pass;
     }
 
-    private static int numberOfInfiniteRepeats(BareIrStream bareIrStream) {
-        return bareIrStream == null ? 0 : bareIrStream.numberOfInfiniteRepeats();
-    }
 
     @Override
     public int numberOfInfiniteRepeats() {
@@ -107,7 +107,7 @@ public class Variation extends IrStreamItem {
 
     @Override
     public String toIrpString() {
-        StringBuilder str = new StringBuilder();
+        StringBuilder str = new StringBuilder(50);
         str.append("[").append(intro.toIrpString()).append("]");
         str.append("[").append(repeat.toIrpString()).append("]");
         if (ending != null && !ending.isEmpty(null))

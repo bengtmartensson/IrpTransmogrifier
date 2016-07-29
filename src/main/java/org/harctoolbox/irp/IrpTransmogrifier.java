@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.harctoolbox.IrpMaster.IrpMasterException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Cleaner;
 import org.harctoolbox.analyze.RepeatFinder;
@@ -61,7 +62,7 @@ public class IrpTransmogrifier {
     private static CommandLineArgs commandLineArgs = new CommandLineArgs();
 
     private static void usage(int exitcode) {
-        StringBuilder str = new StringBuilder();
+        StringBuilder str = new StringBuilder(1000);
         argumentParser.usage(str);
 
         //str.append("\n"
@@ -108,7 +109,8 @@ public class IrpTransmogrifier {
             }
             if (commandList.parse)
                 try {
-                    new Protocol(irpDatabase.getIrp(proto));
+                    Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
+                    System.out.println(protocol);
                     System.out.println("Parsing succeeded");
                 } catch (IrpSyntaxException ex) {
                     logger.log(Level.WARNING, "Unparsable protocol {0}", proto);
@@ -139,7 +141,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void doRender(IrpDatabase irpDatabase, CommandRender commandRenderer) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException, UsageException, FileNotFoundException, org.harctoolbox.IrpMaster.IrpMasterException {
+    private static void doRender(IrpDatabase irpDatabase, CommandRender commandRenderer) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException, UsageException, FileNotFoundException, org.harctoolbox.IrpMaster.IrpMasterException, CloneNotSupportedException {
         if (commandRenderer.random && !commandRenderer.nameEngine.isEmpty())
             throw new UsageException("Cannot use both --nameengine and --random");
 
@@ -149,7 +151,7 @@ public class IrpTransmogrifier {
             if (commandRenderer.regex)
                 list = irpDatabase.getMatchingNames(prt);
             else {
-                list = new ArrayList<>();
+                list = new ArrayList<>(10);
                 list.add(prt);
             }
         //if (commandList.sort)
@@ -164,7 +166,8 @@ public class IrpTransmogrifier {
                 if (commandRenderer.random)
                     logger.log(Level.INFO, nameEngine.toString());
 
-                IrSignal irSignal = protocol.toIrSignal(nameEngine.clone());
+                IrSignal irSignal;
+                irSignal = protocol.toIrSignal(nameEngine.clone());
                 if (commandRenderer.pronto)
                     System.out.println(Pronto.toPrintString(irSignal));
 
@@ -188,7 +191,7 @@ public class IrpTransmogrifier {
         for (int i = 0; i < commandAnalyze.args.size(); i++)
             data[i] = Integer.parseInt(commandAnalyze.args.get(i));
 
-        IrSequence irSequence = new ModulatedIrSequence(data, (double) commandAnalyze.frequency);
+        IrSequence irSequence = new ModulatedIrSequence(data, commandAnalyze.frequency);
 
         if (commandAnalyze.cleaner) {
             Cleaner cleaner = new Cleaner(irSequence);
@@ -199,14 +202,14 @@ public class IrpTransmogrifier {
             RepeatFinder repeatFinder = new RepeatFinder(irSequence);
             RepeatFinder.RepeatFinderData repeatFinderData = repeatFinder.getRepeatFinderData();
             System.out.println(repeatFinderData);
-            IrSignal irSignal = repeatFinder.toIrSignal(irSequence, (double) commandAnalyze.frequency);
+            IrSignal irSignal = repeatFinder.toIrSignal(irSequence, commandAnalyze.frequency);
             System.out.println(irSignal);
         }
 
         Analyzer analyzer = new Analyzer(irSequence);
         for (int i = 0; i < analyzer.getTimings().size(); i++) {
             int timing = analyzer.getTimings().get(i);
-            System.out.println((char) ((int) 'A' + i) + ": " + timing + "    \t" + analyzer.getCleanedHistogram().get(timing));
+            System.out.println((char) ('A' + i) + ": " + timing + "    \t" + analyzer.getCleanedHistogram().get(timing));
         }
         System.out.println(analyzer.toTimingsString());
 
@@ -311,216 +314,6 @@ public class IrpTransmogrifier {
         TreeViewer tv = new TreeViewer(ruleNames, parserRuleContext);
         showTreeViewer(tv, title);
     }
-
-    public static class LevelParser implements IStringConverter<Level> { // MUST be public
-
-        @Override
-        public Level convert(String value) {
-            try {
-                return Level.parse(value.toUpperCase(Locale.US));
-            } catch (IllegalArgumentException ex) {
-                throw new ParameterException(ex);
-            }
-        }
-    }
-
-    public static class NameEngineParser implements IStringConverter<NameEngine> { // MUST be public
-
-        @Override
-        public NameEngine convert(String value) {
-            try {
-                return NameEngine.parseLoose(value);
-            } catch (IllegalArgumentException | IrpSyntaxException ex) {
-                throw new ParameterException(ex);
-            }
-        }
-    }
-
-    private final static class CommandLineArgs {
-
-        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
-        private String configFile = "src/main/config/IrpProtocols.xml";
-
-        @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
-        private String iniFile = null;//"src/main/config/IrpProtocols.ini";
-
-        //@Parameter(names = {"-D", "--debug"}, description = "Debug code")
-        //private int debug = 0;
-
-        @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message")
-        private boolean helpRequested = false;
-
-        @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
-                description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
-        private Level logLevel = Level.INFO;
-
-        @Parameter(names = {"-v", "--version"}, description = "Report version")
-        private boolean versionRequested = false;
-
-        @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation")
-        private Long seed = null;
-
-        //@Parameter(description = "protocols")
-        //private List<String> protocols = new ArrayList<>();
-    }
-
-    @Parameters(commandNames = {"list"}, commandDescription = "List the protocols known")
-    private static class CommandList {
-
-        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
-        private boolean gui = false;
-
-        @Parameter(names = { "--irp"}, description = "List IRP")
-        private boolean irp = false;
-
-        @Parameter(names = { "--is"}, description = "test toIrpString")
-        private boolean is = false;
-
-        @Parameter(names = { "--documentation"}, description = "List documentation")
-        private boolean documentation = false;
-
-        @Parameter(names = {"-p", "--parse"}, description = "Test parse the protocol(s)")
-        private boolean parse = false;
-
-        @Parameter(names = {"-r", "--regex", "--regexp"}, description = "Interpret arguments as regular expressions")
-        private boolean regexp = false;
-
-        @Parameter(names = {"-s", "--sort"}, description = "Sort the output")
-        private boolean sort = false;
-
-        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
-        private boolean stringTree = false;
-
-        @Parameter(description = "List of protocols (default all)")
-        private List<String> protocols;
-    }
-
-    @Parameters(commandNames = {"code"}, commandDescription = "Generate code")
-    private static class CommandCode {
-
-        @Parameter(names = { "--render" }, description = "Generate code for rendering, otherwise for decoding")
-        private boolean render = false;
-
-        @Parameter(names = { "--xslt" }, description = "Pathname to XSLT")
-        private String xslt = null;
-
-        @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")
-        private String encoding = "UTF-8";
-
-        @Parameter(names = { "--target" }, description = "Target for code generation")
-        private String target;
-
-        @Parameter(names = { "-o", "--output" }, description = "Name of output file")
-        private String output = null;
-
-        @Parameter(names = { "--xml"}, description = "List XML")
-        private boolean xml = false;
-
-        @Parameter(names = { "--documentation"}, description = "List documentation")
-        private boolean documentation = false;
-
-        @Parameter(names = {"-i", "--irp"}, description = "List irp")
-        private boolean irp = false;
-
-        @Parameter(description = "List of protocols (default all)")
-        private List<String> protocols;
-    }
-
-    @Parameters(commandNames = {"render"}, commandDescription = "Render signal")
-    private static class CommandRender {
-
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
-        private NameEngine nameEngine = new NameEngine();
-
-        @Parameter(names = { "-p", "--pronto" }, description = "Generate Pronto hex")
-        private boolean pronto = false;
-
-        @Parameter(names = { "-r", "--raw" }, description = "Generate raw form")
-        private boolean raw = false;
-
-        @Parameter(names = { "--random" }, description = "Generate random paraneters")
-        private boolean random = false;
-
-        @Parameter(names = { "--regex", "--regexp" }, description = "Generate random paraneters")
-        private boolean regex = false;
-
-        @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
-        private boolean test = false;
-
-        @Parameter(names = { "--irpmaster" }, description = "Config for IrpMaster")
-        private String irpMasterConfig = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
-
-        @Parameter(description = "protocol(s) or pattern", required = true)
-        private List<String> protocols;
-    }
-
-    @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
-    private static class CommandExpression {
-
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
-        private NameEngine nameEngine = new NameEngine();
-
-        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
-        private boolean stringTree = false;
-
-        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
-        private boolean gui = false;
-
-        @Parameter(names = { "--xml"}, description = "List XML")
-        private boolean xml = false;
-
-        @Parameter(description = "expression")
-        private List<String> expressions;
-    }
-
-    @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield")
-    private static class CommandBitfield {
-
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
-        private NameEngine nameEngine = new NameEngine();
-
-//        @Parameter(names = { "-g", "--generalspec" }, description = "Generalspec to use")
-//        private String generalspec = null;
-
-        @Parameter(names = { "-l", "--lsb" }, description = "Least significant bit first")
-        private boolean lsb = false;
-
-//        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
-//        private boolean stringTree = false;
-//
-        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
-        private boolean gui = false;
-
-        @Parameter(names = { "--xml"}, description = "List XML")
-        private boolean xml = false;
-
-        @Parameter(description = "bitfield", required = true)
-        private List<String> bitfields;
-    }
-
-    @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
-    private static class CommandRecognize {
-
-        @Parameter(description = "durations, or pronto hex")
-        private List<String> args;
-    }
-
-    @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
-    private static class CommandAnalyze {
-
-        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
-        private int frequency = (int) ModulatedIrSequence.defaultFrequency;
-
-        @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder")
-        private boolean repeatFinder = false;
-
-        @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
-        private boolean cleaner = false;
-
-        @Parameter(description = "durations, or pronto hex")
-        private List<String> args;
-    }
-
     /**
      *
      * @param args
@@ -628,12 +421,222 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (Exception ex) {
+        } catch (CloneNotSupportedException | IOException | IncompatibleArgumentException | SAXException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnknownProtocolException | UnassignedException | DomainViolationException | UsageException | IrpMasterException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
         }
     }
+
+    public static class LevelParser implements IStringConverter<Level> { // MUST be public
+
+        @Override
+        public Level convert(String value) {
+            try {
+                return Level.parse(value.toUpperCase(Locale.US));
+            } catch (IllegalArgumentException ex) {
+                throw new ParameterException(ex);
+            }
+        }
+    }
+
+    public static class NameEngineParser implements IStringConverter<NameEngine> { // MUST be public
+
+        @Override
+        public NameEngine convert(String value) {
+            try {
+                return NameEngine.parseLoose(value);
+            } catch (IllegalArgumentException | IrpSyntaxException ex) {
+                throw new ParameterException(ex);
+            }
+        }
+    }
+
+    private final static class CommandLineArgs {
+
+        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
+        private String configFile = "src/main/config/IrpProtocols.xml";
+
+        @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
+        private String iniFile = null;//"src/main/config/IrpProtocols.ini";
+
+        //@Parameter(names = {"-D", "--debug"}, description = "Debug code")
+        //private int debug = 0;
+
+        @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message")
+        private boolean helpRequested = false;
+
+        @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
+                description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
+        private Level logLevel = Level.INFO;
+
+        @Parameter(names = {"-v", "--version"}, description = "Report version")
+        private boolean versionRequested = false;
+
+        @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation")
+        private Long seed = null;
+
+        //@Parameter(description = "protocols")
+        //private List<String> protocols = new ArrayList<>();
+    }
+
+    @Parameters(commandNames = {"list"}, commandDescription = "List the protocols known")
+    private static class CommandList {
+
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+        private boolean gui = false;
+
+        @Parameter(names = { "--irp"}, description = "List IRP")
+        private boolean irp = false;
+
+        @Parameter(names = { "--is"}, description = "test toIrpString")
+        private boolean is = false;
+
+        @Parameter(names = { "--documentation"}, description = "List documentation")
+        private boolean documentation = false;
+
+        @Parameter(names = {"-p", "--parse"}, description = "Test parse the protocol(s)")
+        private boolean parse = false;
+
+        @Parameter(names = {"-r", "--regex", "--regexp"}, description = "Interpret arguments as regular expressions")
+        private boolean regexp = false;
+
+        @Parameter(names = {"-s", "--sort"}, description = "Sort the output")
+        private boolean sort = false;
+
+        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+        private boolean stringTree = false;
+
+        @Parameter(description = "List of protocols (default all)")
+        private List<String> protocols;
+    }
+
+    @Parameters(commandNames = {"code"}, commandDescription = "Generate code")
+    private static class CommandCode {
+
+        //@Parameter(names = { "--render" }, description = "Generate code for rendering, otherwise for decoding")
+        //private boolean render = false;
+
+        @Parameter(names = { "--xslt" }, description = "Pathname to XSLT")
+        private String xslt = null;
+
+        @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")
+        private String encoding = "UTF-8";
+
+        @Parameter(names = { "--target" }, description = "Target for code generation")
+        private String target;
+
+        @Parameter(names = { "-o", "--output" }, description = "Name of output file")
+        private String output = null;
+
+        @Parameter(names = { "--xml"}, description = "List XML")
+        private boolean xml = false;
+
+        @Parameter(names = { "--documentation"}, description = "List documentation")
+        private boolean documentation = false;
+
+        @Parameter(names = {"-i", "--irp"}, description = "List irp")
+        private boolean irp = false;
+
+        @Parameter(description = "List of protocols (default all)")
+        private List<String> protocols;
+    }
+
+    @Parameters(commandNames = {"render"}, commandDescription = "Render signal")
+    private static class CommandRender {
+
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        private NameEngine nameEngine = new NameEngine();
+
+        @Parameter(names = { "-p", "--pronto" }, description = "Generate Pronto hex")
+        private boolean pronto = false;
+
+        @Parameter(names = { "-r", "--raw" }, description = "Generate raw form")
+        private boolean raw = false;
+
+        @Parameter(names = { "--random" }, description = "Generate random paraneters")
+        private boolean random = false;
+
+        @Parameter(names = { "--regex", "--regexp" }, description = "Generate random paraneters")
+        private boolean regex = false;
+
+        @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
+        private boolean test = false;
+
+        //@Parameter(names = { "--irpmaster" }, description = "Config for IrpMaster")
+        //private String irpMasterConfig = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
+
+        @Parameter(description = "protocol(s) or pattern", required = true)
+        private List<String> protocols;
+    }
+
+    @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
+    private static class CommandExpression {
+
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        private NameEngine nameEngine = new NameEngine();
+
+        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+        private boolean stringTree = false;
+
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+        private boolean gui = false;
+
+        @Parameter(names = { "--xml"}, description = "List XML")
+        private boolean xml = false;
+
+        @Parameter(description = "expression")
+        private List<String> expressions;
+    }
+
+    @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield")
+    private static class CommandBitfield {
+
+        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        private NameEngine nameEngine = new NameEngine();
+
+//        @Parameter(names = { "-g", "--generalspec" }, description = "Generalspec to use")
+//        private String generalspec = null;
+
+        @Parameter(names = { "-l", "--lsb" }, description = "Least significant bit first")
+        private boolean lsb = false;
+
+//        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+//        private boolean stringTree = false;
+//
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+        private boolean gui = false;
+
+        @Parameter(names = { "--xml"}, description = "List XML")
+        private boolean xml = false;
+
+        @Parameter(description = "bitfield", required = true)
+        private List<String> bitfields;
+    }
+
+    @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
+    private static class CommandRecognize {
+
+        @Parameter(description = "durations, or pronto hex")
+        private List<String> args;
+    }
+
+    @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
+    private static class CommandAnalyze {
+
+        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
+        private int frequency = (int) ModulatedIrSequence.defaultFrequency;
+
+        @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder")
+        private boolean repeatFinder = false;
+
+        @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
+        private boolean cleaner = false;
+
+        @Parameter(description = "durations, or pronto hex", required = true)
+        private List<String> args;
+    }
+
 
     private static class UsageException extends Exception {
 

@@ -21,6 +21,12 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class InfiniteBitFieldNGTest {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
     private NameEngine nameEngine = null;
     private final InfiniteBitField instance;
 
@@ -29,13 +35,6 @@ public class InfiniteBitFieldNGTest {
         instance = new InfiniteBitField("~D::2");
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @BeforeMethod
     public void setUpMethod() throws Exception {

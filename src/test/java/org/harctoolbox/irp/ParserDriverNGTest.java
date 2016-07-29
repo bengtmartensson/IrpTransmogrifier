@@ -16,8 +16,6 @@ import org.testng.annotations.BeforeMethod;
  */
 public class ParserDriverNGTest {
 
-    public ParserDriverNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -25,6 +23,8 @@ public class ParserDriverNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public ParserDriverNGTest() {
     }
 
     @BeforeMethod

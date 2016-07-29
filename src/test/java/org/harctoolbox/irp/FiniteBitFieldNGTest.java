@@ -21,6 +21,12 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class FiniteBitFieldNGTest {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
 
     private NameEngine nameEngine = null;
     private final FiniteBitField instance;
@@ -30,13 +36,6 @@ public class FiniteBitFieldNGTest {
         instance = new FiniteBitField("~D:-6:2");
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @BeforeMethod
     public void setUpMethod() throws Exception {
@@ -48,7 +47,6 @@ public class FiniteBitFieldNGTest {
 
     /**
      * Test of toNumber method, of class FiniteBitField.
-     * @throws java.lang.Exception
      */
     @Test
     public void testToNumber() {
@@ -57,7 +55,7 @@ public class FiniteBitFieldNGTest {
 
 //            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
 //            assertEquals(instance.toNumber(nameEngine), 31L);
-            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
+//            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
             assertEquals(instance.toNumber(nameEngine), 31L);
         } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
             fail();

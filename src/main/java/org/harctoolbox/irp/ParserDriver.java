@@ -27,7 +27,7 @@ public class ParserDriver {
 
     private final IrpLexer lexer;
     private final CommonTokenStream tokens;
-    private IrpParser parser;
+    private final IrpParser parser;
 
     public ParserDriver(String irpString) {
         lexer = new IrpLexer(new ANTLRInputStream(irpString));

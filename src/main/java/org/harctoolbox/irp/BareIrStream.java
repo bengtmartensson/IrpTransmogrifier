@@ -38,6 +38,47 @@ public class BareIrStream extends IrStreamItem {
     //protected BitSpec bitSpec;
     //private int noAlternatives = 0;
     private IrpParser.Bare_irstreamContext parseTree = null;
+    /*
+    private static ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems(Protocol environment, ArrayList<IrStreamItem> irstreamItems) {
+    ArrayList<PrimaryIrStreamItem> primaryItems = new ArrayList<PrimaryIrStreamItem>();
+    for (IrStreamItem item : irstreamItems) {
+    BitStream bitStream = null;
+    String type = item.getClass().getSimpleName();
+    if (type.equals("Bitfield")) {
+    if (bitStream == null)
+    bitStream = new BitStream(environment);
+
+    bitStream.add((BitField)item, environment.getBitDirection());
+    } else if (type.equals("Duration") || type.equals("Extent") || type.equals("IRStream")) {
+    if (bitStream != null) {
+    primaryItems.add(bitStream);
+    bitStream = null;
+    }
+    primaryItems.add((PrimaryIrStreamItem)item);
+    } else {
+    throw new RuntimeException("This-cannot-happen-item found: " + type);
+    //assert false;
+    }
+    if (bitStream != null) {
+    primaryItems.add(bitStream);
+    bitStream = null;
+    }
+    }
+    return primaryItems;
+    }*/
+
+    public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+        this(ctx.irstream_item());
+        parseTree = ctx;
+        //this(toList(ctx, env), env);
+    }
+    public BareIrStream(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException, InvalidRepeatException {
+        irStreamItems = new ArrayList<>(list.size());
+        for (IrpParser.Irstream_itemContext item : list) {
+            IrStreamItem irStreamItem = newIrStreamItem(item);
+            irStreamItems.add(irStreamItem);
+        }
+    }
 
 
 //@Override
@@ -62,8 +103,7 @@ public class BareIrStream extends IrStreamItem {
     @Override
     public int numberOfInfiniteRepeats() {
         int sum = 0;
-        for (IrStreamItem item : irStreamItems)
-            sum += item.numberOfInfiniteRepeats();
+        sum = irStreamItems.stream().map((item) -> item.numberOfInfiniteRepeats()).reduce(sum, Integer::sum);
         return sum;
     }
 
@@ -94,48 +134,6 @@ public class BareIrStream extends IrStreamItem {
         return result;
     }
 
-    /*
-    private static ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems(Protocol environment, ArrayList<IrStreamItem> irstreamItems) {
-        ArrayList<PrimaryIrStreamItem> primaryItems = new ArrayList<PrimaryIrStreamItem>();
-        for (IrStreamItem item : irstreamItems) {
-            BitStream bitStream = null;
-            String type = item.getClass().getSimpleName();
-            if (type.equals("Bitfield")) {
-                if (bitStream == null)
-                    bitStream = new BitStream(environment);
-
-                bitStream.add((BitField)item, environment.getBitDirection());
-            } else if (type.equals("Duration") || type.equals("Extent") || type.equals("IRStream")) {
-                if (bitStream != null) {
-                    primaryItems.add(bitStream);
-                    bitStream = null;
-                }
-                primaryItems.add((PrimaryIrStreamItem)item);
-            } else {
-                throw new RuntimeException("This-cannot-happen-item found: " + type);
-                //assert false;
-            }
-            if (bitStream != null) {
-                    primaryItems.add(bitStream);
-                    bitStream = null;
-            }
-        }
-        return primaryItems;
-    }*/
-
-    public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
-        this(ctx.irstream_item());
-        parseTree = ctx;
-        //this(toList(ctx, env), env);
-    }
-
-    public BareIrStream(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException, InvalidRepeatException {
-        irStreamItems = new ArrayList<>();
-        for (IrpParser.Irstream_itemContext item : list) {
-            IrStreamItem irStreamItem = newIrStreamItem(item);
-            irStreamItems.add(irStreamItem);
-        }
-    }
 
 
 /*
@@ -164,10 +162,11 @@ public class BareIrStream extends IrStreamItem {
 
     @Override
     public String toIrpString() {
-        StringBuilder str = new StringBuilder();
-        List<String> list = new ArrayList<>();
-        for (IrStreamItem item : irStreamItems)
+        StringBuilder str = new StringBuilder(irStreamItems.size()*20);
+        List<String> list = new ArrayList<>(irStreamItems.size());
+        irStreamItems.stream().forEach((item) -> {
             list.add(item.toIrpString());
+        });
         return str.append(String.join(",", list)).toString();
     }
 
@@ -218,8 +217,7 @@ public class BareIrStream extends IrStreamItem {
     @Override
     int numberOfBitSpecs() {
         int sum = 0;
-        for (IrStreamItem item : irStreamItems)
-            sum += item.numberOfBitSpecs();
+        sum = irStreamItems.stream().map((item) -> item.numberOfBitSpecs()).reduce(sum, Integer::sum);
         return sum;
     }
 
@@ -236,16 +234,14 @@ public class BareIrStream extends IrStreamItem {
     @Override
     int numberOfBareDurations() {
         int sum = 0;
-        for (IrStreamItem item : irStreamItems)
-            sum += item.numberOfBareDurations();
+        sum = irStreamItems.stream().map((item) -> item.numberOfBareDurations()).reduce(sum, Integer::sum);
         return sum;
     }
 
     @Override
     int numberOfBits() {
         int sum = 0;
-        for (IrStreamItem item : irStreamItems)
-            sum += item.numberOfBits();
+        sum = irStreamItems.stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
         return sum;
     }
 

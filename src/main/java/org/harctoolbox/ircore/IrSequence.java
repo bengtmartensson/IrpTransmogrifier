@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.ircore;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,79 +41,72 @@ import java.util.logging.Logger;
  * @see ModulatedIrSequence
  *
  */
-public class IrSequence implements Cloneable, Serializable {
+public class IrSequence implements Cloneable {
+    private static final double epsilon = 0.001;
+    private static final int dummySpaceDuration = 50; // should not translate to 0000 in Pronto
+    /**
+     * Concatenates the elements in the argument.
+     * @param sequences
+     * @return new IrSequence
+     */
+    public static IrSequence concatenate(Collection<IrSequence> sequences) {
+        IrSequence s = new IrSequence();
+        for (IrSequence seq : sequences) {
+            s = s.append(seq);
+        }
+        return s;
+    }
+    private static List<Double> normalize(List<Double> list, boolean nukeLeadingZeros) {
+        if (list == null || list.isEmpty())
+            return list;
+
+        // Nuke leading gaps
+        while (nukeLeadingZeros && list.size() > 1 && list.get(0) <= 0)
+            list.remove(0);
+
+        for (int i = 0; i < list.size(); i++) {
+            while (i + 1 < list.size() && equalSign(list.get(i), list.get(i+1))) {
+                double val = list.get(i) + list.get(i+1);
+                list.remove(i);
+                list.remove(i);
+                list.add(i, val);
+            }
+        }
+        return list;
+    }
+    private static boolean equalSign(double x, double y) {
+        return x <= 0 && y <= 0 || x >= 0 && y >= 0;
+    }
+    /**
+     * Just for testing.
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        try {
+            IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
+            IrSequence irSequence = irSignal.toModulatedIrSequence(3).addNoise(10);
+            IrSequence[] seqs = irSequence.chop(25000);
+            for (IrSequence irs : seqs)
+                System.out.println(irs);
+        } catch (IncompatibleArgumentException ex) {
+            Logger.getLogger(IrSequence.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        double[] d = {1, 2, 3, -4};
+        String raw = " +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +1266 -7096 +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270  +422 -1270 +1266 -7096   ";
+        try {
+            IrSequence irs = new IrSequence(d);
+            System.out.println(irs);
+            irs = new IrSequence(raw);
+            System.out.println(irs);
+            System.out.println(new IrSequence());
+        } catch (OddSequenceLenghtException e) {
+        }
+    }
+
     /**
      * Duration data, possibly with signs, which are ignored (by this class).
      */
     protected double[] data;
-    private static final double epsilon = 0.001;
-    private static final int dummySpaceDuration = 50; // should not translate to 0000 in Pronto
-
-    /**
-     * Returns the i'th value, a duration in micro seconds.
-     * If i is even, it is a flash (light on), if i is odd, a gal (light off).
-     * @param i index
-     * @return duration in microseconds, possibly with sign,
-     */
-    public final double get(int i) {
-        return data[i];
-    }
-
-    /**
-     * Returns the i'th value, the duration in micro seconds, rounded to integer.
-     * @param i index
-     * @return duration in microseconds, possibly with sign.
-     */
-    public final int iget(int i) {
-        return (int) Math.round(Math.abs(data[i]));
-    }
-
-    /**
-     * Returns an array of integers of durations.
-     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
-     * @return integer array of durations in micro seconds, all positive.
-     */
-    public final int[] toInts() {
-        return toInts(false);
-    }
-
-    /**
-     * Returns an array of integers of durations.
-     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
-     * @param alternatingSigns if true, all the durations with odd index are negative, otherwise, all are positive.
-     * @return integer array of durations in micro seconds.
-     */
-    public final int[] toInts(boolean alternatingSigns) {
-        int[] array = new int[data.length];
-        for (int i = 0; i < data.length; i++) {
-            int duration = (int) Math.round(Math.abs(data[i]));
-            array[i] = (alternatingSigns && (i % 2 != 0)) ? -duration : duration;
-        }
-
-        return array;
-    }
-
-    /**
-     * Returns an array of doubles of durations.
-     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
-     * @return double array of durations in micro seconds.
-     */
-    public final double[] toDoubles() {
-        return data.clone();
-    }
-
-    /**
-     * For the frequency given as argument, computes an array of durations in number of periods in the given frequency.
-     * @param frequency Frequency in Hz.
-     * @return integer array of durations in periods of frequency.
-     */
-    public final int[] toPulses(double frequency) {
-        int[] array = new int[data.length];
-        for (int i = 0; i < data.length; i++)
-            array[i] = (int) Math.round(Math.abs(frequency*data[i]/1000000.0));
-
-        return array;
-    }
 
     /**
      * Constructs an empty IrSequence,
@@ -160,7 +152,7 @@ public class IrSequence implements Cloneable, Serializable {
 
         data = new double[length];
         for (int i = 0; i < length; i++) {
-            data[i] = (double) idata[i];
+            data[i] = idata[i];
         }
     }
 
@@ -209,7 +201,7 @@ public class IrSequence implements Cloneable, Serializable {
             }
             data = new double[index+1];
             for (int i = 0; i < index+1; i++)
-                data[i] = (double) tmplist[i];
+                data[i] = tmplist[i];
         }
     }
 
@@ -223,9 +215,6 @@ public class IrSequence implements Cloneable, Serializable {
         this(str, false);
     }
 
-    private boolean sameSign(int x, int y) {
-        return (x < 0) == (y < 0);
-    }
 
     /**
      * Constructs an IrSequence from the parameter data.
@@ -244,7 +233,7 @@ public class IrSequence implements Cloneable, Serializable {
 
         data = new double[length];
         for (int i = 0; i < length; i++)
-            data[i] = (double) idata[i+offset];
+            data[i] = idata[i+offset];
     }
 
     /**
@@ -271,18 +260,68 @@ public class IrSequence implements Cloneable, Serializable {
     public IrSequence(IrSequence src) {
         data = src.data.clone();
     }
-
     /**
-     * Concatenates the elements in the argument.
-     * @param sequences
-     * @return new IrSequence
+     * Returns the i'th value, a duration in micro seconds.
+     * If i is even, it is a flash (light on), if i is odd, a gal (light off).
+     * @param i index
+     * @return duration in microseconds, possibly with sign,
      */
-    public static IrSequence concatenate(Collection<IrSequence> sequences) {
-        IrSequence s = new IrSequence();
-        for (IrSequence seq : sequences) {
-            s = s.append(seq);
+    public final double get(int i) {
+        return data[i];
+    }
+    /**
+     * Returns the i'th value, the duration in micro seconds, rounded to integer.
+     * @param i index
+     * @return duration in microseconds, possibly with sign.
+     */
+    public final int iget(int i) {
+        return (int) Math.round(Math.abs(data[i]));
+    }
+    /**
+     * Returns an array of integers of durations.
+     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
+     * @return integer array of durations in micro seconds, all positive.
+     */
+    public final int[] toInts() {
+        return toInts(false);
+    }
+    /**
+     * Returns an array of integers of durations.
+     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
+     * @param alternatingSigns if true, all the durations with odd index are negative, otherwise, all are positive.
+     * @return integer array of durations in micro seconds.
+     */
+    public final int[] toInts(boolean alternatingSigns) {
+        int[] array = new int[data.length];
+        for (int i = 0; i < data.length; i++) {
+            int duration = (int) Math.round(Math.abs(data[i]));
+            array[i] = (alternatingSigns && (i % 2 != 0)) ? -duration : duration;
         }
-        return s;
+
+        return array;
+    }
+    /**
+     * Returns an array of doubles of durations.
+     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
+     * @return double array of durations in micro seconds.
+     */
+    public final double[] toDoubles() {
+        return data.clone();
+    }
+    /**
+     * For the frequency given as argument, computes an array of durations in number of periods in the given frequency.
+     * @param frequency Frequency in Hz.
+     * @return integer array of durations in periods of frequency.
+     */
+    public final int[] toPulses(double frequency) {
+        int[] array = new int[data.length];
+        for (int i = 0; i < data.length; i++)
+            array[i] = (int) Math.round(Math.abs(frequency*data[i]/1000000.0));
+
+        return array;
+    }
+    private boolean sameSign(int x, int y) {
+        return (x < 0) == (y < 0);
     }
 
     /**
@@ -369,7 +408,7 @@ public class IrSequence implements Cloneable, Serializable {
      * @return Array of IrSequences
      */
     public IrSequence[] chop(double threshold) {
-        ArrayList<IrSequence> arrayList = new ArrayList<>();
+        ArrayList<IrSequence> arrayList = new ArrayList<>(30);
         int beg = 0;
         for (int i = 1; i < data.length; i += 2) {
             if (data[i] >= threshold || i == data.length - 1) {
@@ -527,28 +566,6 @@ public class IrSequence implements Cloneable, Serializable {
         return IrSequence.this.approximatelyEquals(beginning, compareStart, length, absoluteTolerance, relativeTolerance, 0f);
     }
 
-    private static List<Double> normalize(List<Double> list, boolean nukeLeadingZeros) {
-        if (list == null || list.isEmpty())
-            return list;
-
-        // Nuke leading gaps
-        while (nukeLeadingZeros && list.size() > 1 && list.get(0) <= 0)
-            list.remove(0);
-
-        for (int i = 0; i < list.size(); i++) {
-            while (i + 1 < list.size() && equalSign(list.get(i), list.get(i+1))) {
-                double val = list.get(i) + list.get(i+1);
-                list.remove(i);
-                list.remove(i);
-                list.add(i, val);
-            }
-        }
-        return list;
-    }
-
-    private static boolean equalSign(double x, double y) {
-        return x <= 0 && y <= 0 || x >= 0 && y >= 0;
-    }
 
     /**
      * Returns the number of gaps and flashes. Always even.
@@ -640,7 +657,7 @@ public class IrSequence implements Cloneable, Serializable {
      * @return Printable string.
      */
     public String toPrintString(boolean alternatingSigns, boolean noSigns, String separator) {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder(data.length * 6);
         if (alternatingSigns) {
             for (int i = 0; i < data.length; i++) {
                 int x = (int) Math.abs(Math.round(data[i]));
@@ -694,7 +711,7 @@ public class IrSequence implements Cloneable, Serializable {
     public String toString() {
         if (data.length == 0)
             return "[]";
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(data.length * 6);
         result.append("[").append(Math.round(data[0]));
         for (int i = 1; i < data.length; i++)
             result.append(",").append(Math.round(data[i]));
@@ -711,7 +728,7 @@ public class IrSequence implements Cloneable, Serializable {
     public String toString(boolean alternatingSigns) {
         if (data.length == 0)
             return "[]";
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(data.length * 6);
         result.append("[").append(Math.round(Math.abs(data[0])));
         for (int i = 1; i < data.length; i++)
             result.append(",").append((alternatingSigns && (i % 2 != 0) ? "-" : "")).append(Math.round(Math.abs(data[i])));
@@ -719,29 +736,4 @@ public class IrSequence implements Cloneable, Serializable {
         return result.append("]").toString();
     }
 
-    /**
-     * Just for testing.
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
-            IrSequence irSequence = irSignal.toModulatedIrSequence(3).addNoise(10);
-            IrSequence[] seqs = irSequence.chop(25000);
-            for (IrSequence irs : seqs)
-                System.out.println(irs);
-        } catch (IncompatibleArgumentException ex) {
-            Logger.getLogger(IrSequence.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        double[] d = {1, 2, 3, -4};
-        String raw = " +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +1266 -7096 +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270  +422 -1270 +1266 -7096   ";
-        try {
-            IrSequence irs = new IrSequence(d);
-            System.out.println(irs);
-            irs = new IrSequence(raw);
-            System.out.println(irs);
-            System.out.println(new IrSequence());
-        } catch (OddSequenceLenghtException e) {
-        }
-    }
 }

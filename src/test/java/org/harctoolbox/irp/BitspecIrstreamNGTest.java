@@ -19,11 +19,6 @@ import org.testng.annotations.Test;
  */
 public class BitspecIrstreamNGTest {
 
-    private final BitspecIrstream instance;
-
-    public BitspecIrstreamNGTest() throws IrpSyntaxException, InvalidRepeatException {
-        instance = new BitspecIrstream("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -31,6 +26,10 @@ public class BitspecIrstreamNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private final BitspecIrstream instance;
+    public BitspecIrstreamNGTest() throws IrpSyntaxException, InvalidRepeatException {
+        instance = new BitspecIrstream("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
     }
 
     @BeforeMethod
@@ -83,6 +82,7 @@ public class BitspecIrstreamNGTest {
 
     /**
      * Test of evaluate method, of class BitspecIrstream.
+     * @throws java.lang.Exception
      */
     @Test
     public void testEvaluate_4args() throws Exception {
@@ -100,6 +100,7 @@ public class BitspecIrstreamNGTest {
 
     /**
      * Test of evaluate method, of class BitspecIrstream.
+     * @throws java.lang.Exception
      */
     @Test
     public void testEvaluate_5args() throws Exception {

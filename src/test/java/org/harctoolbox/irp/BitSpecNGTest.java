@@ -30,8 +30,6 @@ public class BitSpecNGTest {
     private static final String Nokia32BitSpec = "<164,-276|164,-445|164,-614|164,-783>";
     private static final String NEC1GeneralSpec = "{38.4k,564}";
 
-    public BitSpecNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -39,6 +37,8 @@ public class BitSpecNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public BitSpecNGTest() {
     }
 
     @BeforeMethod
@@ -179,15 +179,14 @@ public class BitSpecNGTest {
     @Test
     public void testNumberOfInfiniteRepeats() {
         System.out.println("numberOfInfiniteRepeats");
-        BitSpec instance = null;
         try {
-            instance = new BitSpec(Nokia32BitSpec);
+            BitSpec instance = new BitSpec(Nokia32BitSpec);
+            int expResult = 0;
+            int result = instance.numberOfInfiniteRepeats();
+            assertEquals(result, expResult);
         } catch (IrpSyntaxException | InvalidRepeatException ex) {
             Logger.getLogger(BitSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        int expResult = 0;
-        int result = instance.numberOfInfiniteRepeats();
-        assertEquals(result, expResult);
     }
 
     /**

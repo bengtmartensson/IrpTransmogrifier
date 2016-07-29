@@ -27,6 +27,10 @@ import org.w3c.dom.Element;
  * This class models assignments as defined in Chapter 11.
  */
 public class Assignment extends IrStreamItem implements Numerical {
+    public static long parse(String str, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        Assignment assignment = new Assignment(str);
+        return assignment.toNumber(nameEngine);
+    }
     private Name name;
     private Expression value;
     private IrpParser.AssignmentContext parseTree = null;
@@ -49,10 +53,6 @@ public class Assignment extends IrStreamItem implements Numerical {
         this.value = expression;
     }
 
-    public static long parse(String str, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        Assignment assignment = new Assignment(str);
-        return assignment.toNumber(nameEngine);
-    }
 
     @Override
     public boolean isEmpty(NameEngine nameEngine) {

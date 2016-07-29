@@ -37,9 +37,6 @@ public class IrpMasterUtils {
 
     private static final String configFile = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
     private static IrpMaster irpMaster = null;
-    
-    private IrpMasterUtils() {
-    }
 
     static {
         try {
@@ -72,10 +69,12 @@ public class IrpMasterUtils {
     public static IrSignal renderIrSignal(String protocolName, NameEngine parameters) throws IrpMasterException, UnassignedException, IrpSyntaxException, org.harctoolbox.ircore.IncompatibleArgumentException {
         return renderIrSignal(protocolName, parameters.getMap());
     }
-    
+
     public static IrSignal renderIrSignal(String protocolName, HashMap<String, Long> parameters) throws IrpMasterException {
         Protocol irpMasterProtol = irpMaster.newProtocol(protocolName);
         org.harctoolbox.IrpMaster.IrSignal irSignal = irpMasterProtol.renderIrSignal(parameters);
         return toIrSignal(irSignal);
+    }
+    private IrpMasterUtils() {
     }
 }

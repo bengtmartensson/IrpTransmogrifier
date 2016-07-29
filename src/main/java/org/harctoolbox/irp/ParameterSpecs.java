@@ -31,24 +31,8 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
 
     private LinkedHashMap<String, ParameterSpec>map;
 
-    public boolean isEmpty() {
-        return map.isEmpty();
-    }
-
-    public Set<String> getNames() {
-        return map.keySet();
-    }
-
-    public Collection<ParameterSpec> getParams() {
-        return map.values();
-    }
-
-    public ParameterSpec getParameterSpec(String name) {
-        return map.get(name);
-    }
-
     public ParameterSpecs() {
-        map = new LinkedHashMap<>();
+        map = new LinkedHashMap<>(3);
     }
 
     public ParameterSpecs(String parameter_specs) throws IrpSyntaxException {
@@ -62,11 +46,22 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     public ParameterSpecs(IrpParser.Parameter_specsContext t) {
         this();
         if (t != null) {
-            for (IrpParser.Parameter_specContext parameterSpec : t.parameter_spec()) {
-                ParameterSpec ps = new ParameterSpec(parameterSpec);
+            t.parameter_spec().stream().map((parameterSpec) -> new ParameterSpec(parameterSpec)).forEach((ps) -> {
                 map.put(ps.getName(), ps);
-            }
+            });
         }
+    }
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+    public Set<String> getNames() {
+        return map.keySet();
+    }
+    public Collection<ParameterSpec> getParams() {
+        return map.values();
+    }
+    public ParameterSpec getParameterSpec(String name) {
+        return map.get(name);
     }
 
     @Override
@@ -74,8 +69,9 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         if (isEmpty())
             return "";
         StringBuilder str = new StringBuilder("[");
-        for (ParameterSpec ps : map.values())
+        map.values().stream().forEach((ps) -> {
             str.append(ps.toString()).append(",");
+        });
 
         if (str.length() > 0)
             str.deleteCharAt(str.length()-1);
@@ -101,21 +97,21 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         for (ParameterSpec parameter : map.values())
             parameter.check(nameEngine);
     }
-    
+
     public NameEngine random() throws IrpSyntaxException {
         NameEngine nameEngine = new NameEngine();
         for (ParameterSpec parameter : map.values())
             nameEngine.define(parameter.getName(), parameter.random());
-        
+
         return nameEngine;
     }
-    
+
     public NameEngine randomUsingDefaults() throws IrpSyntaxException {
         NameEngine nameEngine = new NameEngine();
         for (ParameterSpec parameter : map.values())
             if (parameter.getDefault() == null)
                 nameEngine.define(parameter.getName(), parameter.random());
-        
+
         return nameEngine;
     }
 

@@ -26,6 +26,14 @@ import org.w3c.dom.Element;
  *
  */
 public class NumberWithDecimals extends IrpObject implements Floatable {
+    public static double parse(String str) throws IrpSyntaxException {
+        NumberWithDecimals numberWithDecimals = new NumberWithDecimals(str);
+        return numberWithDecimals.toFloat();
+    }
+    public static double parse(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
+        NumberWithDecimals numberWithDecimals = new NumberWithDecimals(ctx);
+        return numberWithDecimals.toFloat();
+    }
     private double data;
 
     public NumberWithDecimals(String str) throws IrpSyntaxException {
@@ -36,7 +44,7 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
         ParseTree child = ctx.getChild(0);
         data = (child instanceof IrpParser.Float_numberContext)
                 ? FloatNumber.parse((IrpParser.Float_numberContext) child)
-                : (double) Integer.parseInt(child.getText());
+                : Integer.parseInt(child.getText());
     }
 
     public NumberWithDecimals(double d) {
@@ -44,11 +52,11 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
     }
 
     public NumberWithDecimals(int i) {
-        data = (double) i;
+        data = i;
     }
 
     public NumberWithDecimals(long n) {
-        data = (double) n;
+        data = n;
     }
 
     @Override
@@ -62,7 +70,7 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
 
     @Override
     public String toString() {
-        return (IrCoreUtils.approximatelyEquals(data, (double)(long)data, 0, 0.000001)
+        return (IrCoreUtils.approximatelyEquals(data, (long)data, 0, 0.000001)
                 ? Long.toString((long)data)
                 : Double.toString(data));
     }
@@ -72,15 +80,6 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
         return toString();
     }
 
-    public static double parse(String str) throws IrpSyntaxException {
-        NumberWithDecimals numberWithDecimals = new NumberWithDecimals(str);
-        return numberWithDecimals.toFloat();
-    }
-
-    public static double parse(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
-        NumberWithDecimals numberWithDecimals = new NumberWithDecimals(ctx);
-        return numberWithDecimals.toFloat();
-    }
 
     @Override
     public Element toElement(Document document) {

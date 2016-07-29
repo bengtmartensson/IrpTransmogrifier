@@ -16,8 +16,6 @@ import org.testng.annotations.Test;
 
 public class GeneralSpecNGTest {
 
-    public GeneralSpecNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -25,6 +23,8 @@ public class GeneralSpecNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public GeneralSpecNGTest() {
     }
 
     @BeforeMethod

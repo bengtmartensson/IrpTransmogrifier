@@ -22,8 +22,6 @@ import org.testng.annotations.Test;
  */
 public class ParameterSpecNGTest {
 
-    public ParameterSpecNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -31,6 +29,8 @@ public class ParameterSpecNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public ParameterSpecNGTest() {
     }
 
     @BeforeMethod

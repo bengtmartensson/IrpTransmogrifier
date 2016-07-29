@@ -67,7 +67,7 @@ public class FiniteBitField extends BitField {
     }
 
     private String reverse(String str) {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder(str.length());
         for (int i = 0; i < str.length(); i++)
             s.append(str.charAt(str.length()-1-i));
         return s.toString();
@@ -159,7 +159,7 @@ public class FiniteBitField extends BitField {
         Element widthElement = document.createElement("width");
         widthElement.appendChild(width.toElement(document));
         element.appendChild(widthElement);
-        if (!(chop instanceof Number && ((Number) chop).data == 0)) {
+        if (!(chop instanceof Number && ((Number) chop).toNumber() == 0)) {
             Element chopElement = document.createElement("chop");
             chopElement.appendChild(chop.toElement(document));
             element.appendChild(chopElement);

@@ -23,18 +23,16 @@ import org.testng.annotations.Test;
  */
 public class ExpressionNGTest {
 
-    private final NameEngine nameEngine;
-
-    public ExpressionNGTest() throws IrpSyntaxException {
-        nameEngine = new NameEngine("{A=12,B=3,C=2}");
-    }
-
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private final NameEngine nameEngine;
+    public ExpressionNGTest() throws IrpSyntaxException {
+        nameEngine = new NameEngine("{A=12,B=3,C=2}");
     }
 
     @BeforeMethod
@@ -122,19 +120,18 @@ public class ExpressionNGTest {
     @Test
     public void testToNumber_0args() {
         System.out.println("toNumber");
-        Expression instance = null;
         try {
-            instance = new Expression("A+2*B*C");
-        } catch (IrpSyntaxException ex) {
-            fail();
-            Logger.getLogger(ExpressionNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            long result = instance.toNumber();
+            Expression instance = new Expression("A+2*B*C");
+            try {
+            instance.toNumber();
             fail();
         } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
             fail();
         } catch (UnassignedException ex) {
+        }
+        } catch (IrpSyntaxException ex) {
+            fail();
+            Logger.getLogger(ExpressionNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

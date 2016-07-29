@@ -1,6 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -14,8 +13,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  *
@@ -23,18 +20,16 @@ import org.w3c.dom.Element;
  */
 public class NameEngineNGTest {
 
-    private final NameEngine instance;
-
-    public NameEngineNGTest() throws IrpSyntaxException {
-        instance = new NameEngine("{A=11,B=22,C=33,D=A-B,E=A-#(C-D),F=UINT8_MAX}");
-    }
-
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private final NameEngine instance;
+    public NameEngineNGTest() throws IrpSyntaxException {
+        instance = new NameEngine("{A=11,B=22,C=33,D=A-B,E=A-#(C-D),F=UINT8_MAX}");
     }
 
     @BeforeMethod
@@ -171,6 +166,7 @@ public class NameEngineNGTest {
         System.out.println("containsKey");
         String name = "";
         boolean result = instance.containsKey(name);
+        assertFalse(result);
         assertTrue(instance.containsKey("F"));
         assertFalse(instance.containsKey("Z"));
     }
@@ -208,7 +204,7 @@ public class NameEngineNGTest {
             NameEngine expResult = new NameEngine("{D=12 ,F=64, S=34 ,X=78}");
             NameEngine result = NameEngine.parseLoose(str);
             assertEquals(result.toString(), expResult.toString());
-            
+
             result = NameEngine.parseLoose("");
             assertEquals(result.toString(), "{}");
             result = NameEngine.parseLoose(null);

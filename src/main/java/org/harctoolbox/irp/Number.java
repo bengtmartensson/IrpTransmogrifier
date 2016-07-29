@@ -27,7 +27,14 @@ import org.w3c.dom.Element;
 public class Number extends PrimaryItem {
 
     public final static int SIZE = Long.SIZE;
-    long data;
+    static long parse(String str) {
+        return parse(new ParserDriver(str).getParser().number());
+    }
+    static long parse(IrpParser.NumberContext ctx) {
+        Number number = new Number(ctx);
+        return number.toNumber();
+    }
+    private long data;
 
     public Number(long n) {
         data = n;
@@ -51,15 +58,6 @@ public class Number extends PrimaryItem {
                 : str.length() >= 3 && str.substring(0, 2).equals("0b") ? Long.parseLong(str.substring(2), 2)
                 : str.length() >= 1 && str.substring(0, 1).equals("0")  ? Long.parseLong(str, 8)
                 : Long.parseLong(str);
-    }
-
-    static long parse(String str) {
-        return parse(new ParserDriver(str).getParser().number());
-    }
-
-    static long parse(IrpParser.NumberContext ctx) {
-        Number number = new Number(ctx);
-        return number.toNumber();
     }
 
     @Override

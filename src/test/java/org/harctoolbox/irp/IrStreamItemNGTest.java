@@ -20,8 +20,6 @@ import org.testng.annotations.Test;
  */
 public class IrStreamItemNGTest {
 
-    public IrStreamItemNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -29,6 +27,8 @@ public class IrStreamItemNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public IrStreamItemNGTest() {
     }
 
     @BeforeMethod

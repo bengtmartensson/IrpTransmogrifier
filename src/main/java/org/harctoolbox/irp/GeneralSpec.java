@@ -17,8 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -31,6 +29,13 @@ import org.w3c.dom.Element;
  * This class is immutable; can only be build by the constructor, and not altered.
  */
 public class GeneralSpec extends IrpObject {
+    public final static double defaultDutyCycle = ModulatedIrSequence.unknownDutyCycle;
+    public final static BitDirection defaultBitDirection = BitDirection.lsb;
+    public final static double defaultUnit = 1;
+    static void evaluatePrint(String str) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
+        GeneralSpec gs = new GeneralSpec(str);
+        System.out.println(gs);
+    }
 
     /** Carrier frequency in Hz */
     private double frequency = ModulatedIrSequence.defaultFrequency;
@@ -38,23 +43,14 @@ public class GeneralSpec extends IrpObject {
     /** Duty cycle in percent. IrpUtils.invalid (-1) is defined to denote "don't care". */
     private double dutyCycle = defaultDutyCycle;
 
-    public final static double defaultDutyCycle = ModulatedIrSequence.unknownDutyCycle;
 
     /** BitDirection */
     private BitDirection bitDirection = defaultBitDirection;
 
-    public final static BitDirection defaultBitDirection = BitDirection.lsb;
 
     /** Timing unit in us */
     private double unit = defaultUnit;
 
-    public final static double defaultUnit = 1;
-
-    @Override
-    public String toString() {
-        return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection
-                + (dutyCycle > 0 ? (", Duty cycle = " + IrCoreUtils.real2percent(dutyCycle) + "%.") : ", Duty cycle: -.");
-    }
 
     /**
      * This constructor is intended for debugging and testing only.
@@ -116,7 +112,7 @@ public class GeneralSpec extends IrpObject {
             } else if (item instanceof IrpParser.Dutycycle_itemContext) {
                 dutyCycle = IrCoreUtils.percent2real(NumberWithDecimals.parse(((IrpParser.Dutycycle_itemContext) item).number_with_decimals()));
             } else if (item instanceof IrpParser.Order_itemContext) {
-                bitDirection = ((IrpParser.Order_itemContext) item).getText().equals("lsb")
+                bitDirection = item.getText().equals("lsb")
                         ? BitDirection.lsb : BitDirection.msb;
             }
         }
@@ -125,6 +121,11 @@ public class GeneralSpec extends IrpObject {
                 throw new IrpSemanticException("Units in p and frequency == 0 do not go together.");
             unit = IrCoreUtils.seconds2microseconds(unitInPeriods / frequency);
         }
+    }
+    @Override
+    public String toString() {
+        return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection
+                + (dutyCycle > 0 ? (", Duty cycle = " + IrCoreUtils.real2percent(dutyCycle) + "%.") : ", Duty cycle: -.");
     }
 
     public final BitDirection getBitDirection() {
@@ -143,10 +144,6 @@ public class GeneralSpec extends IrpObject {
         return dutyCycle;
     }
 
-    static void evaluatePrint(String str) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
-        GeneralSpec gs = new GeneralSpec(str);
-        System.out.println(gs);
-    }
 
     @Override
     public String toIrpString() {
@@ -169,16 +166,4 @@ public class GeneralSpec extends IrpObject {
         return element;
     }
 
-    /**
-     * Just for testing and debugging.
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            evaluatePrint(args[0]);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {
-            Logger.getLogger(GeneralSpec.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

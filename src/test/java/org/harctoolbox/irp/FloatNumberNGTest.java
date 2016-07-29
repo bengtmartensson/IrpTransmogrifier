@@ -19,8 +19,6 @@ import org.testng.annotations.Test;
  */
 public class FloatNumberNGTest {
 
-    public FloatNumberNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -28,6 +26,8 @@ public class FloatNumberNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public FloatNumberNGTest() {
     }
 
     @BeforeMethod

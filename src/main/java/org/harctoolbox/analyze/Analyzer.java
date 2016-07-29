@@ -32,7 +32,7 @@ public class Analyzer extends Cleaner {
         super(irSequence, absoluteTolerance, relativeTolerance);
         createNormedTimings();
     }
-    
+
     public Analyzer(IrSequence irSequence) {
         super(irSequence);
         createNormedTimings();
@@ -43,7 +43,7 @@ public class Analyzer extends Cleaner {
         timebase = getTimings().get(0);
         normedTimings = new int[timings.size()];
         for (int i = 0; i < timings.size(); i++) {
-            normedTimings[i] = Math.round((float) timings.get(i) / (float) timebase);
+            normedTimings[i] = Math.round(timings.get(i) / (float) timebase);
         }
     }
 

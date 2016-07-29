@@ -54,6 +54,7 @@ public class BitFieldNGTest {
 
     /**
      * Test of newBitField method, of class BitField.
+     * @throws java.lang.Exception
      */
     @Test
     public void testNewBitField_String() throws Exception {
@@ -66,6 +67,7 @@ public class BitFieldNGTest {
 
     /**
      * Test of toString method, of class BitField.
+     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
     public void testToString_0args() throws IrpSyntaxException {
@@ -76,6 +78,7 @@ public class BitFieldNGTest {
 
     /**
      * Test of toString method, of class BitField.
+     * @throws java.lang.Exception
      */
     @Test
     public void testToString_NameEngine() throws Exception {
@@ -87,6 +90,7 @@ public class BitFieldNGTest {
 
     /**
      * Test of getWidth method, of class BitField.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGetWidth() throws Exception {
@@ -99,6 +103,7 @@ public class BitFieldNGTest {
 
     /**
      * Test of isEmpty method, of class BitField.
+     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
     public void testIsEmpty() throws IrpSyntaxException {
@@ -111,6 +116,7 @@ public class BitFieldNGTest {
 
     /**
      * Test of interleavingOk method, of class BitField.
+     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
     public void testInterleavingOk() throws IrpSyntaxException {

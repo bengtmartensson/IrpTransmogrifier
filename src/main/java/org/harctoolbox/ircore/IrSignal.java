@@ -39,12 +39,6 @@ import java.util.EnumMap;
  */
 public class IrSignal {
 
-    public enum Pass {
-        intro,
-        repeat,
-        ending,
-        cancel
-    }
 
     /** Intro sequence, always sent once. Can be empty, but not null. */
     protected IrSequence introSequence;
@@ -64,6 +58,111 @@ public class IrSignal {
 
     /** Duty cycle of the modulation. Between 0 and 1. Use -1 for not assigned. */
     protected double dutyCycle = ModulatedIrSequence.unknownDutyCycle;
+    /**
+     * Constructs an IrSignal from its arguments.
+     * @param frequency
+     * @param dutyCycle
+     * @param introSequence
+     * @param repeatSequence
+     * @param endingSequence
+     */
+    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, double frequency, double dutyCycle) {
+        this.frequency = frequency;
+        this.dutyCycle = dutyCycle;
+        // If the given intro sequence is identical to the repeat sequence, reject it.
+        this.introSequence = ((introSequence != null) && !introSequence.approximatelyEquals(repeatSequence)) ? introSequence : new IrSequence();
+        this.repeatSequence = repeatSequence != null ? repeatSequence : new IrSequence();
+        this.endingSequence = ((endingSequence != null) && !endingSequence.approximatelyEquals(repeatSequence)) ? endingSequence : new IrSequence();
+
+        map = new EnumMap<>(Pass.class);
+
+        map.put(Pass.intro, introSequence);
+        map.put(Pass.repeat, repeatSequence);
+        map.put(Pass.ending, endingSequence);
+    }
+    /**
+     * Constructs an IrSignal from its arguments.
+     *
+     * @param durations
+     * @param noIntroBursts
+     * @param noRepeatBursts
+     * @param frequency
+     * @throws IncompatibleArgumentException
+     */
+    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) throws IncompatibleArgumentException {
+        this(durations, noIntroBursts, noRepeatBursts, frequency, ModulatedIrSequence.unknownDutyCycle);
+    }
+    /**
+     * Constructs an IrSignal from its arguments.
+     *
+     * @param frequency
+     * @param dutyCycle
+     * @param introSequence
+     * @param repeatSequence
+     * @param endingSequence
+     * @throws OddSequenceLenghtException
+     */
+    public IrSignal(String introSequence, String repeatSequence,
+            String endingSequence, double frequency, double dutyCycle) throws OddSequenceLenghtException {
+        this(new IrSequence(introSequence), new IrSequence(repeatSequence),
+                new IrSequence(endingSequence), frequency, dutyCycle);
+    }
+    /**
+     * Constructs an IrSignal from its arguments.
+     *
+     * The first 2*noIntroBursts durations belong to the Intro signal,
+     * the next 2*noRepeatBursts to the repetition part, and the remaining to the ending sequence.
+     *
+     * @param durations Integer array of durations. Signs of the entries are ignored,
+     * @param noIntroBursts Number of bursts (half the number of entries) belonging to the intro sequence.
+     * @param noRepeatBursts Number of bursts (half the number of entries) belonging to the intro sequence.
+     * @param frequency Modulation frequency in Hz.
+     * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
+     */
+    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, double frequency, double dutyCycle) {
+        this(new IrSequence(durations, 0, 2 * noIntroBursts),
+                new IrSequence(durations, 2 * noIntroBursts, 2 * noRepeatBursts),
+                new IrSequence(durations, 2 * (noIntroBursts + noRepeatBursts), durations.length - 2 * (noIntroBursts + noRepeatBursts)),
+                frequency, dutyCycle);
+    }
+    /**
+     * Constructs an IrSignal of zero length.
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     */
+    public IrSignal() throws IncompatibleArgumentException {
+        this(new int[0], 0, 0, (int) ModulatedIrSequence.defaultFrequency);
+    }
+    /**
+     * Creates an IrSignal from a CCF string. Also some "short formats" of CCF are recognized.
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @see Pronto
+     *
+     * @param ccf String supposed to represent a valid CCF signal.
+     */
+    public IrSignal(String ccf) throws IncompatibleArgumentException {
+        copyFrom(Pronto.parse(ccf));
+    }
+    /**
+     * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @see Pronto
+     *
+     * @param ccf Integer array supposed to represent a valid CCF signal.
+     */
+    public IrSignal(int[] ccf) throws IncompatibleArgumentException {
+        copyFrom(Pronto.parse(ccf));
+    }
+    /**
+     * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
+     * @param begin starting index
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @see Pronto
+     *
+     * @param ccf String array supposed to represent a valid CCF signal.
+     */
+    public IrSignal(String[] ccf, int begin) throws IncompatibleArgumentException {
+        copyFrom(Pronto.parse(ccf, begin));
+    }
 
     public final double getFrequency() {
         return frequency;
@@ -311,7 +410,7 @@ public class IrSignal {
     public final void replaceZeros(int replacement) {
         replaceZeros(frequency > 0
                 ? IrCoreUtils.seconds2microseconds(replacement / frequency)
-                : (double) replacement);
+                : replacement);
     }
 
     /**
@@ -322,84 +421,6 @@ public class IrSignal {
         return Math.max(introSequence.getGap(), repeatSequence.getGap());
     }
 
-    /**
-     * Constructs an IrSignal from its arguments.
-     * @param frequency
-     * @param dutyCycle
-     * @param introSequence
-     * @param repeatSequence
-     * @param endingSequence
-     */
-    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, double frequency, double dutyCycle) {
-        this.frequency = frequency;
-        this.dutyCycle = dutyCycle;
-        // If the given intro sequence is identical to the repeat sequence, reject it.
-        this.introSequence = ((introSequence != null) && !introSequence.approximatelyEquals(repeatSequence)) ? introSequence : new IrSequence();
-        this.repeatSequence = repeatSequence != null ? repeatSequence : new IrSequence();
-        this.endingSequence = ((endingSequence != null) && !endingSequence.approximatelyEquals(repeatSequence)) ? endingSequence : new IrSequence();
-
-        map = new EnumMap<>(Pass.class);
-
-        map.put(Pass.intro, introSequence);
-        map.put(Pass.repeat, repeatSequence);
-        map.put(Pass.ending, endingSequence);
-    }
-
-    /**
-     * Constructs an IrSignal from its arguments.
-     *
-     * @param durations
-     * @param noIntroBursts
-     * @param noRepeatBursts
-     * @param frequency
-     * @throws IncompatibleArgumentException
-     */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) throws IncompatibleArgumentException {
-        this(durations, noIntroBursts, noRepeatBursts, frequency, ModulatedIrSequence.unknownDutyCycle);
-    }
-
-    /**
-     * Constructs an IrSignal from its arguments.
-     *
-     * @param frequency
-     * @param dutyCycle
-     * @param introSequence
-     * @param repeatSequence
-     * @param endingSequence
-     * @throws OddSequenceLenghtException
-     */
-    public IrSignal(String introSequence, String repeatSequence,
-            String endingSequence, double frequency, double dutyCycle) throws OddSequenceLenghtException {
-        this(new IrSequence(introSequence), new IrSequence(repeatSequence),
-                new IrSequence(endingSequence), frequency, dutyCycle);
-    }
-
-    /**
-     * Constructs an IrSignal from its arguments.
-     *
-     * The first 2*noIntroBursts durations belong to the Intro signal,
-     * the next 2*noRepeatBursts to the repetition part, and the remaining to the ending sequence.
-     *
-     * @param durations Integer array of durations. Signs of the entries are ignored,
-     * @param noIntroBursts Number of bursts (half the number of entries) belonging to the intro sequence.
-     * @param noRepeatBursts Number of bursts (half the number of entries) belonging to the intro sequence.
-     * @param frequency Modulation frequency in Hz.
-     * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
-     */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, double frequency, double dutyCycle) {
-        this(new IrSequence(durations, 0, 2 * noIntroBursts),
-                new IrSequence(durations, 2 * noIntroBursts, 2 * noRepeatBursts),
-                new IrSequence(durations, 2 * (noIntroBursts + noRepeatBursts), durations.length - 2 * (noIntroBursts + noRepeatBursts)),
-                frequency, dutyCycle);
-    }
-
-    /**
-     * Constructs an IrSignal of zero length.
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
-     */
-    public IrSignal() throws IncompatibleArgumentException {
-        this(new int[0], 0, 0, (int) ModulatedIrSequence.defaultFrequency);
-    }
 
     // Plunders the victim. Therefore private, othewise would violate immutability.
     private void copyFrom(IrSignal victim) {
@@ -411,39 +432,6 @@ public class IrSignal {
         map = victim.map;
     }
 
-    /**
-     * Creates an IrSignal from a CCF string. Also some "short formats" of CCF are recognized.
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
-     * @see Pronto
-     *
-     * @param ccf String supposed to represent a valid CCF signal.
-     */
-    public IrSignal(String ccf) throws IncompatibleArgumentException {
-        copyFrom(Pronto.parse(ccf));
-    }
-
-    /**
-     * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
-     * @see Pronto
-     *
-     * @param ccf Integer array supposed to represent a valid CCF signal.
-     */
-    public IrSignal(int[] ccf) throws IncompatibleArgumentException {
-        copyFrom(Pronto.parse(ccf));
-    }
-
-    /**
-     * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
-     * @param begin starting index
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
-     * @see Pronto
-     *
-     * @param ccf String array supposed to represent a valid CCF signal.
-     */
-    public IrSignal(String[] ccf, int begin) throws IncompatibleArgumentException {
-        copyFrom(Pronto.parse(ccf, begin));
-    }
 
     /**
      * Intended to construct an IrSignal from the args of a main-routine,
@@ -661,6 +649,12 @@ public class IrSignal {
      */
     public final String ccfString() throws OddSequenceLenghtException {
         return Pronto.toPrintString(this);
+    }
+    public enum Pass {
+        intro,
+        repeat,
+        ending,
+        cancel
     }
 
     /**

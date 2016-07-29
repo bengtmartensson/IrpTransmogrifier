@@ -15,11 +15,6 @@ import org.testng.annotations.Test;
  */
 public class AssignmentNGTest {
 
-    private final NameEngine nameEngine;
-
-    public AssignmentNGTest() throws IrpSyntaxException {
-        nameEngine = new NameEngine("{answer=42, sheldon=73}");
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -27,6 +22,10 @@ public class AssignmentNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private final NameEngine nameEngine;
+    public AssignmentNGTest() throws IrpSyntaxException {
+        nameEngine = new NameEngine("{answer=42, sheldon=73}");
     }
 
     @BeforeMethod

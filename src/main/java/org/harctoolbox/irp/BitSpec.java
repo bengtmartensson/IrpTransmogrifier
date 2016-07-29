@@ -30,6 +30,17 @@ import org.w3c.dom.Element;
  *
  */
 public class BitSpec extends IrpObject {
+    // Computes the upper integer part of the 2-logarithm of the integer n.
+    // Treat n = 1 differently, since coding on a one-letter alphaber is ... special.
+    private static int computeNoBits(int n) {
+        if (n == 1)
+            return 1;
+        int x = n-1;
+        int m;
+        for (m = 0; x != 0; m++)
+            x >>= 1;
+        return m;
+    }
 //    private static int noInstances = 0;
 //
 //    public static void reset() {
@@ -44,41 +55,6 @@ public class BitSpec extends IrpObject {
     private int chunkSize;
 
     private List<BareIrStream> bitCodes;
-
-    // Computes the upper integer part of the 2-logarithm of the integer n.
-    // Treat n = 1 differently, since coding on a one-letter alphaber is ... special.
-    private static int computeNoBits(int n) {
-        if (n == 1)
-            return 1;
-        int x = n-1;
-        int m;
-        for (m = 0; x != 0; m++)
-            x >>= 1;
-        return m;
-    }
-
-    @Override
-    public int numberOfInfiniteRepeats() {
-        int sum = 0;
-        for (BareIrStream code : bitCodes)
-            sum += code.numberOfInfiniteRepeats();
-        return sum;
-    }
-/*
-    public BitSpec(List<BareIrStream> s, Protocol env) {
-        super(env);
-        bitCodes = s;
-        chunkSize = computeNoBits(s.size());
-    }
-
-    //public BitSpec(Protocol env, List<PrimaryIrStream> list) {
-    //    this(env, list.toArray(new PrimaryIrStream[list.size()]));
-    //}
-
-    //public BitSpec(IrpParser.BitspecContext ctx, Protocol env) {
-    //    this(toList(ctx, env), env);
-    //}
-    */
 
     public BitSpec(String str) throws IrpSyntaxException, InvalidRepeatException {
         this(new ParserDriver(str).getParser().bitspec());
@@ -100,8 +76,29 @@ public class BitSpec extends IrpObject {
 
     BitSpec() {
         chunkSize = 0;
-        bitCodes = new ArrayList<>();
+        bitCodes = new ArrayList<>(2);
     }
+    @Override
+    public int numberOfInfiniteRepeats() {
+        int sum = 0;
+        sum = bitCodes.stream().map((code) -> code.numberOfInfiniteRepeats()).reduce(sum, Integer::sum);
+        return sum;
+    }
+    /*
+    public BitSpec(List<BareIrStream> s, Protocol env) {
+    super(env);
+    bitCodes = s;
+    chunkSize = computeNoBits(s.size());
+    }
+
+    //public BitSpec(Protocol env, List<PrimaryIrStream> list) {
+    //    this(env, list.toArray(new PrimaryIrStream[list.size()]));
+    //}
+
+    //public BitSpec(IrpParser.BitspecContext ctx, Protocol env) {
+    //    this(toList(ctx, env), env);
+    //}
+    */
 
     /*
     private static List<PrimaryIrStream> toList(IrpParser.BitspecContext ctx, Protocol env) {
@@ -136,7 +133,7 @@ public class BitSpec extends IrpObject {
         if (bitCodes.isEmpty())
             return "<null>";
 
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder(bitCodes.size()*10);
         s.append("<").append(bitCodes.get(0));
         for (int i = 1; i < bitCodes.size(); i++) {
             //s += (i > 0 ? "; " : "") + "bitCodes[" + i + "]=" + bitCodes[i];
@@ -147,11 +144,12 @@ public class BitSpec extends IrpObject {
 
     @Override
     public String toIrpString() {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder(bitCodes.size()*10);
         s.append("<");
-        List<String> list = new ArrayList<>();
-        for (BareIrStream bitCode : bitCodes)
-           list.add(bitCode.toIrpString());
+        List<String> list = new ArrayList<>(bitCodes.size() * 20);
+        bitCodes.stream().forEach((bitCode) -> {
+            list.add(bitCode.toIrpString());
+        });
 
         return s.append(String.join("|", list)).append(">").toString();
     }

@@ -35,14 +35,6 @@ import org.w3c.dom.Element;
 public abstract class Duration extends IrStreamItem implements Floatable, Evaluatable {
 
     private static final Logger logger = Logger.getLogger(Duration.class.getName());
-
-    protected double us = IrCoreUtils.invalid;
-    protected double time_periods = IrCoreUtils.invalid;
-    protected double time_units = IrCoreUtils.invalid;
-    protected NameOrNumber nameOrNumber = null;
-    protected String unit = null;
-    protected ParserRuleContext parseTree = null;
-
     public static Duration newDuration(String str) throws IrpSyntaxException {
         IrpParser parser = new ParserDriver(str).getParser();
         try {
@@ -51,7 +43,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
             return newDuration(parser.extent());
         }
     }
-
     public static Duration newDuration(IrpParser.DurationContext d) throws IrpSyntaxException {
         ParseTree child = d.getChild(0);
         Duration instance = (child instanceof IrpParser.FlashContext)
@@ -62,15 +53,27 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         instance.parseTree = (ParserRuleContext) child;
         return instance;
     }
+    public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
+        return new Extent(e);
+    }
+
+    protected double us = IrCoreUtils.invalid;
+    protected double time_periods = IrCoreUtils.invalid;
+    protected double time_units = IrCoreUtils.invalid;
+    protected NameOrNumber nameOrNumber = null;
+    protected String unit = null;
+    protected ParserRuleContext parseTree = null;
+
 
     protected Duration(double us) {
         nameOrNumber = new NameOrNumber(us);
         this.us = us;
         unit = "u";
     }
-
-    public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
-        return new Extent(e);
+    protected Duration(IrpParser.Name_or_numberContext ctx, String unit) throws IrpSyntaxException {
+        super();
+        nameOrNumber = new NameOrNumber(ctx);
+        this.unit = unit != null ? unit : "1";
     }
 
     private void compute(NameEngine nameEngine, GeneralSpec generalSpec)
@@ -95,11 +98,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         }
     }
 
-    protected Duration(IrpParser.Name_or_numberContext ctx, String unit) throws IrpSyntaxException {
-        super();
-        nameOrNumber = new NameOrNumber(ctx);
-        this.unit = unit != null ? unit : "1";
-    }
 
     public abstract double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;

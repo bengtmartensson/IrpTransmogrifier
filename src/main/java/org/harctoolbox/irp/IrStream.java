@@ -32,6 +32,40 @@ public class IrStream extends BareIrStream {
     private static final Logger logger = Logger.getLogger(IrStream.class.getName());
 
     private RepeatMarker repeatMarker;
+    // I hate the missing default arguments in Java!!!
+//    public IrStream(Protocol env) {
+//        this(env, null);
+//    }
+
+//    public IrStream(Protocol env, ArrayList<IrStreamItem>items) {
+//        this(env, items, null, null);
+//    }
+//
+//    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker) {
+//        this(env, items, repeatMarker, null);
+//    }
+
+    //public IrStream(Protocol env, BareIrStream bareIrStream, RepeatMarker repeatMarker, BitSpec bitSpec) {
+    //this(env, bareIrStream != null ? bareIrStream.irStreamItems : null, repeatMarker, bitSpec);
+    //}
+
+    //public IrStream(Protocol env, IrStream src, BitSpec bitSpec) {
+    //    this(env, src, src != null ? src.repeatMarker : null, bitSpec);
+    //}
+
+//    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker, BitSpec bitSpec) {
+//        super(env, items, bitSpec, 0);
+//        this.repeatMarker = repeatMarker != null ? repeatMarker : new RepeatMarker();
+//    }
+
+    public IrStream(String str) throws IrpSyntaxException, InvalidRepeatException{
+        this(new ParserDriver(str).getParser().irstream());
+    }
+    public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+        super(ctx.bare_irstream());
+        IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
+        repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : null;
+    }
 
     //private ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems() {
     //    return toPrimaryIrStreamItems(environment, irStreamItems);
@@ -107,41 +141,6 @@ public class IrStream extends BareIrStream {
         return isInfiniteRepeat() ? IrSignal.Pass.ending : null;
     }
 
-    // I hate the missing default arguments in Java!!!
-//    public IrStream(Protocol env) {
-//        this(env, null);
-//    }
-
-//    public IrStream(Protocol env, ArrayList<IrStreamItem>items) {
-//        this(env, items, null, null);
-//    }
-//
-//    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker) {
-//        this(env, items, repeatMarker, null);
-//    }
-
-    //public IrStream(Protocol env, BareIrStream bareIrStream, RepeatMarker repeatMarker, BitSpec bitSpec) {
-        //this(env, bareIrStream != null ? bareIrStream.irStreamItems : null, repeatMarker, bitSpec);
-    //}
-
-    //public IrStream(Protocol env, IrStream src, BitSpec bitSpec) {
-    //    this(env, src, src != null ? src.repeatMarker : null, bitSpec);
-    //}
-
-//    public IrStream(Protocol env, ArrayList<IrStreamItem>items, RepeatMarker repeatMarker, BitSpec bitSpec) {
-//        super(env, items, bitSpec, 0);
-//        this.repeatMarker = repeatMarker != null ? repeatMarker : new RepeatMarker();
-//    }
-
-    public IrStream(String str) throws IrpSyntaxException, InvalidRepeatException{
-        this(new ParserDriver(str).getParser().irstream());
-    }
-
-    public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
-        super(ctx.bare_irstream());
-        IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
-        repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : null;
-    }
 
     @Override
     public String toString() {
@@ -207,16 +206,14 @@ public class IrStream extends BareIrStream {
     @Override
     int numberOfBareDurations() {
         int sum = 0;
-        for (IrStreamItem item : irStreamItems)
-            sum += item.numberOfBareDurations();
+        sum = irStreamItems.stream().map((item) -> item.numberOfBareDurations()).reduce(sum, Integer::sum);
         return sum;
     }
 
     @Override
     int numberOfBits() {
         int sum = 0;
-        for (IrStreamItem item : irStreamItems)
-            sum += item.numberOfBits();
+        sum = irStreamItems.stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
         return sum;
     }
 

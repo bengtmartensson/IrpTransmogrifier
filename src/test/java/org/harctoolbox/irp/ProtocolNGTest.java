@@ -15,6 +15,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class ProtocolNGTest {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
     private final Protocol nec1;
     private final Protocol rc5;
     private final Protocol rc6;
@@ -31,13 +37,6 @@ public class ProtocolNGTest {
         amino = new Protocol("{37.3k,268,msb}<-1,1|1,-1>(T=1,(7,-6,3,D:4,1:1,T:1,1:2,0:8,F:8,15:4,C:4,-79m,T=0)+){C =(D:4+4*T+9+F:4+F:4:4+15)&15} [D:0..15,F:0..255]");
  }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @BeforeMethod
     public void setUpMethod() throws Exception {
@@ -131,7 +130,6 @@ public class ProtocolNGTest {
             assertEquals(rc5.getMemoryVariable("T"), 1L);
             assertTrue(result.approximatelyEquals(rc5D12F56T0));
         } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
-            ex.printStackTrace();
             fail();
         }
     }
@@ -143,8 +141,7 @@ public class ProtocolNGTest {
             IrSignal rc6D12F34 = Pronto.parse("0000 0073 0000 0013 0060 0020 0010 0020 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0020 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0020 0020 0010 0BCD");
             IrSignal result = rc6.toIrSignal(new NameEngine("{D=12,F=34}"));
             assertTrue(result.approximatelyEquals(rc6D12F34));
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (IncompatibleArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
             fail();
         }
     }
@@ -171,7 +168,6 @@ public class ProtocolNGTest {
             System.out.println(result);
             assertTrue(result.approximatelyEquals(aminoD12F34));
         } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
-            ex.printStackTrace();
             fail();
         }
     }
@@ -185,10 +181,7 @@ public class ProtocolNGTest {
             IrSignal result = arctech.toIrSignal(new NameEngine("{D=12,S=9,F=0}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(irSignal));
-        } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
-            ex.printStackTrace();
-            fail();
-        } catch (InvalidRepeatException ex) {
+        } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | InvalidRepeatException ex) {
             fail();
         }
     }
@@ -202,7 +195,6 @@ public class ProtocolNGTest {
             System.out.println(result);
             assertTrue(result.approximatelyEquals(xmpD12S56F34));
         } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
-            ex.printStackTrace();
             fail();
         }
     }

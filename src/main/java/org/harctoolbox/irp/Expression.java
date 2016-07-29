@@ -347,7 +347,7 @@ public class Expression extends PrimaryItem /* ??? */ {
     @Override
     public Element toElement(Document document) {
         Element element = document.createElement("expression");
-        Element op = null;
+        Element op;
         switch (parseTree.children.size()) {
             case 1:
                 ParseTree child = parseTree.children.get(0);

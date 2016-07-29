@@ -19,21 +19,20 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class NumberNGTest {
+    private final static long deadbeef = 0xdeadbeefL;
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
 
     private final Number instance;
-    private final long deadbeef = 0xdeadbeefL;
 
     public NumberNGTest() {
         instance = new Number("0xdeadbeef");
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @BeforeMethod
     public void setUpMethod() throws Exception {

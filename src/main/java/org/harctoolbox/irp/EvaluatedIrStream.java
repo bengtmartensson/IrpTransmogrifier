@@ -45,7 +45,7 @@ class EvaluatedIrStream {
         this.generalSpec = generalSpec;
         this.pass = pass;
         //this.bitSpec = bitSpec;
-        elements = new ArrayList<>();
+        elements = new ArrayList<>(10);
         //elapsed = 0f;
         state = null;
     }
@@ -55,7 +55,7 @@ class EvaluatedIrStream {
         //evaluateBitStream();
         //canonicalize();
         IrpUtils.entering(logger, "toIrSequence", this);
-        List<Double>times = new ArrayList<>();
+        List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
         for (Evaluatable element : elements) {
             if (!(element instanceof Duration))
@@ -79,7 +79,7 @@ class EvaluatedIrStream {
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder();
+        StringBuilder str = new StringBuilder(elements.size()*10);
         elements.stream().forEach((element) -> {
             if (str.length() > 0)
                 str.append(";");

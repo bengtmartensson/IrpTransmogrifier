@@ -32,19 +32,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
      * Max length of a BitField in this implementation.
      */
     public static final int maxWidth = Long.SIZE - 1; // = 63
-    private IrpParser.BitfieldContext parseTree;
-
-    protected boolean complement;
-    //protected boolean reverse;
-    //boolean infinite;
-    //long data;
-    //int width = maxWidth;
-    //int skip = 0;
-    //long value;
-    protected PrimaryItem data;
-    //protected PrimaryItem width;
-    protected PrimaryItem chop;
-
     //private long evaluatePrimaryItem(String s, long deflt) {
     //    return (s == null || s.isEmpty()) ? deflt : Long.parseLong(s);
     //}
@@ -61,7 +48,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     public static BitField newBitField(String str) throws IrpSyntaxException {
         return newBitField(new ParserDriver(str).getParser().bitfield());
     }
-
     public static BitField newBitField(IrpParser.BitfieldContext ctx) throws IrpSyntaxException {
         BitField instance = (ctx instanceof IrpParser.Finite_bitfieldContext)
                 ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
@@ -69,36 +55,44 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         instance.parseTree = ctx;
         return instance;
     }
-
-
-
-
-
-/*
+    /*
     public void init(boolean complement, boolean reverse, boolean infinite, long data, long width, long skip) throws DomainViolationException {
-        if (width > maxWidth)
-            throw new DomainViolationException("Max width of bitfields (= " + maxWidth + ") exceeded.");
-        if (width < 0)
-            throw new DomainViolationException("Width of bitfield must be nonnegative.");
-        if (skip > maxWidth)
-            throw new DomainViolationException("Max skip value in bitfields (= " + maxWidth + ") exceeded.");
-        if (skip < 0)
-            throw new DomainViolationException("Skip value of bitfield must be nonnegative.");
+    if (width > maxWidth)
+    throw new DomainViolationException("Max width of bitfields (= " + maxWidth + ") exceeded.");
+    if (width < 0)
+    throw new DomainViolationException("Width of bitfield must be nonnegative.");
+    if (skip > maxWidth)
+    throw new DomainViolationException("Max skip value in bitfields (= " + maxWidth + ") exceeded.");
+    if (skip < 0)
+    throw new DomainViolationException("Skip value of bitfield must be nonnegative.");
 
-        this.complement = complement;
-        this.reverse = reverse;
-        this.infinite = infinite;
-        this.data = data;
-        this.width = infinite ? maxWidth : (int) width;
-        this.skip = (int) skip;
-        compute();
-        //Debug.debugBitFields("new Bitfield: " + toString() + " = " + toLong());
+    this.complement = complement;
+    this.reverse = reverse;
+    this.infinite = infinite;
+    this.data = data;
+    this.width = infinite ? maxWidth : (int) width;
+    this.skip = (int) skip;
+    compute();
+    //Debug.debugBitFields("new Bitfield: " + toString() + " = " + toLong());
     }*/
 
     public static long parse(String str, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
         BitField bitField = newBitField(str);
         return bitField.toNumber(nameEngine);
     }
+    private IrpParser.BitfieldContext parseTree;
+
+    protected boolean complement;
+    //protected boolean reverse;
+    //boolean infinite;
+    //long data;
+    //int width = maxWidth;
+    //int skip = 0;
+    //long value;
+    protected PrimaryItem data;
+    //protected PrimaryItem width;
+    protected PrimaryItem chop;
+
 
     @Override
     public final String toString() {
@@ -167,7 +161,12 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     }
 
     public boolean hasChop() {
-        return !(chop instanceof Number && ((Number) chop).toNumber(null) == 0);
+        try {
+            //return !(chop instanceof Number && ((Number) chop).toNumber(null) == 0);
+            return chop.toNumber(null) != 0;
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            return true;
+        }
     }
 
     @Override

@@ -60,7 +60,7 @@ public class IrpUtils {
     public final static String jp1WikiUrl = "http://www.hifi-remote.com/wiki/index.php?title=Main_Page";
     public final static String irpNotationUrl = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";
     public final static String decodeIrUrl = "http://www.hifi-remote.com/wiki/index.php?title=DecodeIR";
-    
+
     private final static Level enteringExitingLevel = Level.FINER;
 
     public static String stringArray(int[] array) {
@@ -69,7 +69,7 @@ public class IrpUtils {
         if (array.length == 0)
             return "[]";
 
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(array.length*6);
         result.append("[").append(array[0]);
         for (int i = 1; i < array.length; i++)
             result.append(", ").append(array[i]);
@@ -249,19 +249,19 @@ public class IrpUtils {
 
         return prefix + map.get(name) + postfix;
     }
-    
+
     public static void entering(Logger logger, String member, Object arg) {
         logger.logp(enteringExitingLevel, logger.getName(), member, String.format("->(%0$s)", arg.toString()));
     }
-    
+
     public static void exiting(Logger logger, String member, Object arg) {
         logger.logp(enteringExitingLevel, logger.getName(), member, String.format("<-%0$s", arg.toString()));
     }
-    
+
     public static void entering(Logger logger, String member) {
         logger.logp(enteringExitingLevel, logger.getName(), member, "->");
     }
-    
+
     public static void exiting(Logger logger, String member) {
         logger.logp(enteringExitingLevel, logger.getName(), member, "<-");
     }

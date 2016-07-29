@@ -34,12 +34,31 @@ import org.w3c.dom.Element;
 // TODO: There are probably too many accessing functions here.
 // Clean up by eliminating and making private.
 
-public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, Expression>> {
+public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Entry<String, Expression>> {
+    public static NameEngine parseLoose(String str) throws IrpSyntaxException {
+        NameEngine nameEngine = new NameEngine();
+        if (str == null || str.trim().isEmpty())
+            return nameEngine;
+
+        String payload = str.trim().replaceFirst("^\\{", "").replaceFirst("\\}$", "");
+        String[] definitions = payload.split("[\\s,;]+");
+        for (String definition : definitions) {
+            ParserDriver parserDriver = new ParserDriver(definition);
+            nameEngine.parseDefinition(parserDriver.getParser().definition());
+        }
+        return nameEngine;
+    }
+    private static Element mkElement(Document document, Map.Entry<String, Expression> definition) {
+        Element element = document.createElement("definition");
+        element.appendChild(new Name(definition.getKey()).toElement(document));
+        element.appendChild(definition.getValue().toElement(document));
+        return element;
+    }
 
     private HashMap<String, Expression> map;
 
     public NameEngine() {
-        map = new LinkedHashMap<>();
+        map = new LinkedHashMap<>(3);
     }
 
     private NameEngine(HashMap<String, Expression> map) {
@@ -54,27 +73,17 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         }
     }
 
-    public static NameEngine parseLoose(String str) throws IrpSyntaxException {
-        NameEngine nameEngine = new NameEngine();
-        if (str == null || str.trim().isEmpty())
-            return nameEngine;
-
-        String payload = str.trim().replaceFirst("^\\{", "").replaceFirst("\\}$", "");
-        String[] definitions = payload.split("[\\s,;]+");
-        for (String definition : definitions) {
-            ParserDriver parserDriver = new ParserDriver(definition);
-            nameEngine.parseDefinition(parserDriver.getParser().definition());
-        }
-        return nameEngine;
-    }
 
     /**
      * Creates a shallow copy of the NameEngine.
      * @return Shallow copy.
+     * @throws java.lang.CloneNotSupportedException
      */
     @Override
-    public NameEngine clone() {
-        return new NameEngine((HashMap<String,Expression>) map.clone());
+    @SuppressWarnings("unchecked")
+    public NameEngine clone() throws CloneNotSupportedException {
+        super.clone();
+        return new NameEngine((HashMap<String, Expression>) map.clone());
     }
 
     @Override
@@ -82,7 +91,7 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         return map.entrySet().iterator();
     }
 
-    private void define(String name, String value) throws IrpSyntaxException {
+    public void define(String name, String value) throws IrpSyntaxException {
         Expression exp = new Expression(value);
         define(name, exp.getParseTree());
     }
@@ -189,7 +198,7 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         return expression.toNumber(this);
     }
 
-    private ParseTree toParseTree(String name) throws UnassignedException {
+    public ParseTree toParseTree(String name) throws UnassignedException {
         return get(name).getParseTree();
     }
 
@@ -229,10 +238,10 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
     }
 
     public String toString(IrpParser parser) {
-        StringBuilder str = new StringBuilder();
-        for (String name : map.keySet()) {
+        StringBuilder str = new StringBuilder(map.size()*10);
+        map.keySet().stream().forEach((name) -> {
             str.append(name).append("=").append(map.get(name).getParseTree().toStringTree(parser)).append(",");
-        }
+        });
         return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
     }
 
@@ -251,15 +260,15 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         //if (map.isEmpty())
         //    return "";
 
-        StringBuilder str = new StringBuilder();
+        StringBuilder str = new StringBuilder(map.size()*10);
         //List<String> list = new ArrayList<>();
         str.append("{");
-        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+        map.entrySet().stream().forEach((kvp) -> {
             //list.add(kvp.getKey() + "=" + kvp.getValue().toIrpString());
             if (str.length() > 1)
                 str.append(",");
             str.append(kvp.getKey()).append("=").append(kvp.getValue().toIrpString());
-        }
+        });
 
         //str.append(list);
         str.append("}");
@@ -292,19 +301,10 @@ public class NameEngine extends IrpObject implements Iterable<Map.Entry<String, 
         return root;
     }
 
-    private static Element mkElement(Document document, Map.Entry<String, Expression> definition) {
-        Element element = document.createElement("definition");
-        element.appendChild(new Name(definition.getKey()).toElement(document));
-        element.appendChild(definition.getValue().toElement(document));
-        return element;
-    }
 
+    @SuppressWarnings("unchecked")
     public HashMap<String, Long> getMap() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        HashMap<String, Long> result = new HashMap<>();
-        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
-            result.put(kvp.getKey(), kvp.getValue().toNumber(this));
-        }
-        return result;
+        return (HashMap<String, Long>) map.clone();
     }
 
     public boolean isEmpty() {

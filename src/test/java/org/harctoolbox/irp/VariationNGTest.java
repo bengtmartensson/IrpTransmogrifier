@@ -19,8 +19,6 @@ import org.testng.annotations.Test;
  */
 public class VariationNGTest {
 
-    public VariationNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -28,6 +26,8 @@ public class VariationNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public VariationNGTest() {
     }
 
     @BeforeMethod

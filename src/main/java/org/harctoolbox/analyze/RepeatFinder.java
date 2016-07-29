@@ -74,6 +74,126 @@ public class RepeatFinder {
         defaultAbsoluteTolerance = aDefaultAbsoluteTolerance;
     }
 
+    public static IrSignal findRepeat(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+        RepeatFinder repeatFinder = new RepeatFinder(irSequence, absoluteTolerance, relativeTolerance);
+        return repeatFinder.toIrSignal(irSequence);
+    }
+    public static IrSignal findRepeat(ModulatedIrSequence irSequence) {
+        return findRepeat(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
+    }
+    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+        RepeatFinder repeatFinder = new RepeatFinder(irSequence, absoluteTolerance, relativeTolerance);
+        return repeatFinder.toIrSignalClean(irSequence);
+    }
+    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence) {
+        return findRepeatClean(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
+    }
+
+    private double relativeTolerance;
+    private double absoluteTolerance;
+    private double minRepeatLastGap;
+    private IrSequence irSequence;
+    private RepeatFinderData repeatFinderData;
+
+    public RepeatFinder(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+        this.absoluteTolerance = absoluteTolerance;
+        this.relativeTolerance = relativeTolerance;
+        this.minRepeatLastGap = defaultMinRepeatLastGap;
+        this.irSequence = irSequence;
+        try {
+            analyze();
+        } catch (OddSequenceLenghtException ex) {
+        }
+    }
+
+    public RepeatFinder(IrSequence irSequence) {
+        this(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
+    }
+
+
+    private void analyze() throws OddSequenceLenghtException {
+        RepeatFinderData candidate = new RepeatFinderData();
+        for (int length = irSequence.getNumberBursts() / 2; length >= 2; length--) {
+            for (int beginning = 0; beginning < irSequence.getNumberBursts() - length; beginning++) {
+                RepeatFinderData newCandidate = countRepeats(2*beginning, 2*length);
+                if (newCandidate.numberRepeats > 1
+                        && newCandidate.lastGap > minRepeatLastGap
+                        && newCandidate.repeatsDuration > candidate.repeatsDuration - 0.1)
+                    candidate = newCandidate;
+            }
+        }
+        repeatFinderData = candidate;
+    }
+
+    private RepeatFinderData countRepeats(int beginning, int length) throws OddSequenceLenghtException {
+        RepeatFinderData result = new RepeatFinderData(beginning, length, 0, 0);
+        result.lastGap = Math.abs(irSequence.get(beginning + length - 1));
+        if (result.lastGap < minRepeatLastGap)
+            return result; // will be rejected anyhow, save some computations
+        for (int hits = 1;; hits++) {
+            boolean hit = compareSubSequences(beginning, beginning + hits*length, length);
+            if (!hit) {
+                result.numberRepeats = hits;
+                result.endingLength = irSequence.getLength() - beginning - hits*length;
+                result.repeatsDuration = irSequence.getDuration(beginning, hits*length);
+                return result;
+            }
+        }
+    }
+
+    private boolean compareSubSequences(int beginning, int compareStart, int length) {
+        if (compareStart + length > irSequence.getLength())
+            return false;
+
+        return irSequence.approximatelyEquals(beginning, compareStart, length, absoluteTolerance, relativeTolerance, minRepeatLastGap);
+    }
+
+    /**
+     * @return the relativeTolerance
+     */
+    public double getRelativeTolerance() {
+        return relativeTolerance;
+    }
+
+    /**
+     * @return the absoluteTolerance
+     */
+    public double getAbsoluteTolerance() {
+        return absoluteTolerance;
+    }
+
+    /**
+     * @return the irSequence
+     */
+    public IrSequence getIrSequence() {
+        return irSequence;
+    }
+
+    /**
+     * @param irSequence
+     * @param frequency
+     * @return the irSignal
+     */
+    public IrSignal toIrSignal(IrSequence irSequence, double frequency) {
+        return repeatFinderData.chopIrSequence(new ModulatedIrSequence(irSequence, frequency));
+    }
+
+    /**
+     * @param irSequence
+     * @return the irSignal
+     */
+    public IrSignal toIrSignal(ModulatedIrSequence irSequence) {
+        return repeatFinderData.chopIrSequence(irSequence);
+    }
+
+    public IrSignal toIrSignalClean(ModulatedIrSequence irSequence) {
+        return repeatFinderData.chopIrSequence(Cleaner.clean(irSequence, (int) absoluteTolerance, relativeTolerance));
+    }
+
+    public RepeatFinderData getRepeatFinderData() {
+        return repeatFinderData;
+    }
+
     public static class RepeatFinderData {
         private int beginLength;
         private int repeatLength;
@@ -142,127 +262,5 @@ public class RepeatFinder {
                 return null;
             }
         }
-    }
-
-    private double relativeTolerance;
-    private double absoluteTolerance;
-    private double minRepeatLastGap;
-    private IrSequence irSequence;
-    private RepeatFinderData repeatFinderData;
-
-    public RepeatFinder(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
-        this.absoluteTolerance = absoluteTolerance;
-        this.relativeTolerance = relativeTolerance;
-        this.minRepeatLastGap = defaultMinRepeatLastGap;
-        this.irSequence = irSequence;
-        try {
-            analyze();
-        } catch (OddSequenceLenghtException ex) {
-        }
-    }
-
-    public RepeatFinder(IrSequence irSequence) {
-        this(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
-    }
-
-    public static IrSignal findRepeat(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
-        RepeatFinder repeatFinder = new RepeatFinder(irSequence, absoluteTolerance, relativeTolerance);
-        return repeatFinder.toIrSignal(irSequence);
-    }
-
-    public static IrSignal findRepeat(ModulatedIrSequence irSequence) {
-        return findRepeat(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
-    }
-
-    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
-        RepeatFinder repeatFinder = new RepeatFinder(irSequence, absoluteTolerance, relativeTolerance);
-        return repeatFinder.toIrSignalClean(irSequence);
-    }
-
-    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence) {
-        return findRepeatClean(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
-    }
-
-    private void analyze() throws OddSequenceLenghtException {
-        RepeatFinderData candidate = new RepeatFinderData();
-        for (int length = irSequence.getNumberBursts() / 2; length >= 2; length--) {
-            for (int beginning = 0; beginning < irSequence.getNumberBursts() - length; beginning++) {
-                RepeatFinderData newCandidate = countRepeats(2*beginning, 2*length);
-                if (newCandidate.numberRepeats > 1
-                        && newCandidate.lastGap > minRepeatLastGap
-                        && newCandidate.repeatsDuration > candidate.repeatsDuration - 0.1)
-                    candidate = newCandidate;
-            }
-        }
-        repeatFinderData = candidate;
-    }
-
-    private RepeatFinderData countRepeats(int beginning, int length) throws OddSequenceLenghtException {
-        RepeatFinderData result = new RepeatFinderData(beginning, length, 0, 0);
-        result.lastGap = Math.abs(irSequence.get(beginning + length - 1));
-        if (result.lastGap < minRepeatLastGap)
-            return result; // will be rejected anyhow, save some computations
-        for (int hits = 1;; hits++) {
-            boolean hit = compareSubSequences(beginning, beginning + hits*length, length);
-            if (!hit) {
-                result.numberRepeats = hits;
-                result.endingLength = irSequence.getLength() - beginning - hits*length;
-                result.repeatsDuration = irSequence.getDuration(beginning, hits*length);
-                return result;
-            }
-        }
-    }
-
-    private boolean compareSubSequences(int beginning, int compareStart, int length) {
-        if (compareStart + length > irSequence.getLength())
-            return false;
-
-        return irSequence.approximatelyEquals(beginning, compareStart, length, absoluteTolerance, relativeTolerance, minRepeatLastGap);
-    }
-
-    /**
-     * @return the relativeTolerance
-     */
-    public double getRelativeTolerance() {
-        return relativeTolerance;
-    }
-
-    /**
-     * @return the absoluteTolerance
-     */
-    public double getAbsoluteTolerance() {
-        return absoluteTolerance;
-    }
-
-    /**
-     * @return the irSequence
-     */
-    public IrSequence getIrSequence() {
-        return irSequence;
-    }
-
-    /**
-     * @param irSequence
-     * @param frequency
-     * @return the irSignal
-     */
-    public IrSignal toIrSignal(IrSequence irSequence, double frequency) {
-        return repeatFinderData.chopIrSequence(new ModulatedIrSequence(irSequence, frequency));
-    }
-    
-    /**
-     * @param irSequence
-     * @return the irSignal
-     */
-    public IrSignal toIrSignal(ModulatedIrSequence irSequence) {
-        return repeatFinderData.chopIrSequence(irSequence);
-    }
-
-    public IrSignal toIrSignalClean(ModulatedIrSequence irSequence) {
-        return repeatFinderData.chopIrSequence(Cleaner.clean(irSequence, (int) absoluteTolerance, relativeTolerance));
-    }
-
-    public RepeatFinderData getRepeatFinderData() {
-        return repeatFinderData;
     }
 }

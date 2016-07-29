@@ -47,12 +47,10 @@ import org.xml.sax.SAXParseException;
  */
 public class XmlUtils {
 
-    private XmlUtils() {}
 
     public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
         final String fname = file.getCanonicalPath();
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
-        Document docu = null;
 
         builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
             @Override
@@ -73,8 +71,7 @@ public class XmlUtils {
             }
         });
 
-        docu = builder.parse(file);
-        return docu;
+        return builder.parse(file);
     }
 
     public static Document openXmlFile(File file, File schemaFile, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
@@ -93,7 +90,6 @@ public class XmlUtils {
 
     public static Document openXmlStream(InputStream stream, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
-        Document docu = null;
 
         builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
             @Override
@@ -111,9 +107,7 @@ public class XmlUtils {
                 System.err.println("Parse Warning: " + exception.getMessage() + exception.getLineNumber());
             }
         });
-        docu = builder.parse(stream);
-
-        return docu;
+        return builder.parse(stream);
     }
 
     private static DocumentBuilder newDocumentBuilder(Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {
@@ -150,7 +144,7 @@ public class XmlUtils {
     }
 
     public static HashMap<String, Element> createIndex(Element root, String tagName, String idName) {
-        HashMap<String, Element> index = new HashMap<>();
+        HashMap<String, Element> index = new HashMap<>(20);
         NodeList nodes = root.getElementsByTagName(tagName);
         for (int i = 0; i < nodes.getLength(); i++) {
             Element el = (Element) nodes.item(i);
@@ -201,7 +195,7 @@ public class XmlUtils {
     }
 
     public static HashMap<String, Element> buildIndex(Element element, String tagName, String idName) {
-        HashMap<String, Element> index = new HashMap<>();
+        HashMap<String, Element> index = new HashMap<>(20);
         NodeList nl = element.getElementsByTagName(tagName);
         for (int i = 0; i < nl.getLength(); i++) {
             Element el = (Element) nl.item(i);
@@ -225,4 +219,5 @@ public class XmlUtils {
             System.err.println(ex.getMessage());
         }
     }
+    private XmlUtils() {}
 }

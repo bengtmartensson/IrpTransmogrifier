@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -88,10 +89,10 @@ public class BitspecIrstream extends IrStreamItem {
         IrpUtils.entering(logger, "evaluate(5args)", this);
         EvaluatedIrStream inner = evaluate(state, pass, nameEngine, generalSpec);
         inner.reduce(bitSpec);
-        logger.finest("inner = " + inner);
+        logger.log(Level.FINEST, "inner = {0}", inner);
         EvaluatedIrStream outer = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         outer.add(inner);
-        logger.finest("outer = " + outer);
+        logger.log(Level.FINEST, "outer = {0}", outer);
         logger.exiting(BitspecIrstream.class.getName(), "evaluate(5args)");
         return outer;
     }

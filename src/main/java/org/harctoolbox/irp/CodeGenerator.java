@@ -39,7 +39,7 @@ public class CodeGenerator {
      * Name space for XLST (1.0 and 2.0)
      */
     static final String xsltNamespace = "http://www.w3.org/1999/XSL/Transform";
-    private Document document;
+    private final Document document;
 
     public CodeGenerator(Document document) {
         this.document = document;

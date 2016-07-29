@@ -24,6 +24,14 @@ import org.w3c.dom.Element;
  *
  */
 public class FloatNumber extends IrpObject implements Floatable {
+    public static double parse(String str) throws IrpSyntaxException {
+        FloatNumber floatNumber = new FloatNumber(str);
+        return floatNumber.toFloat();
+    }
+    public static double parse(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
+        FloatNumber floatNumber = new FloatNumber(ctx);
+        return floatNumber.toFloat();
+    }
 
     private final double data;
 
@@ -53,15 +61,6 @@ public class FloatNumber extends IrpObject implements Floatable {
         return Double.toString(data);
     }
 
-    public static double parse(String str) throws IrpSyntaxException {
-        FloatNumber floatNumber = new FloatNumber(str);
-        return floatNumber.toFloat();
-    }
-
-    public static double parse(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
-        FloatNumber floatNumber = new FloatNumber(ctx);
-        return floatNumber.toFloat();
-    }
 
     @Override
     public String toIrpString() {

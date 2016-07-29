@@ -18,8 +18,6 @@ import org.testng.annotations.Test;
  */
 public class RepeatFinderNGTest {
 
-    public RepeatFinderNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -27,6 +25,8 @@ public class RepeatFinderNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public RepeatFinderNGTest() {
     }
 
     @BeforeMethod

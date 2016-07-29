@@ -23,8 +23,6 @@ import org.testng.annotations.Test;
  */
 public class RepeatMarkerNGTest {
 
-    public RepeatMarkerNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -32,6 +30,8 @@ public class RepeatMarkerNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public RepeatMarkerNGTest() {
     }
 
     @BeforeMethod
@@ -122,16 +122,14 @@ public class RepeatMarkerNGTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        RepeatMarker instance = null;
         try {
-            instance = new RepeatMarker("111+");
+            RepeatMarker instance = new RepeatMarker("111+");
+            String expResult = "111+";
+            String result = instance.toString();
+            assertEquals(result, expResult);
         } catch (InvalidRepeatException ex) {
             Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String expResult = "111+";
-        String result = instance.toString();
-        assertEquals(result, expResult);
-
     }
 
     /**
@@ -140,16 +138,14 @@ public class RepeatMarkerNGTest {
     @Test
     public void testToIrpString() {
         System.out.println("toIrpString");
-        RepeatMarker instance = null;
         try {
-            instance = new RepeatMarker("3+");
+            RepeatMarker instance = new RepeatMarker("3+");
+            String expResult = "3+";
+            String result = instance.toIrpString();
+            assertEquals(result, expResult);
         } catch (InvalidRepeatException ex) {
             Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String expResult = "3+";
-        String result = instance.toIrpString();
-        assertEquals(result, expResult);
-
     }
 
     /**

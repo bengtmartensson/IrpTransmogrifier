@@ -15,8 +15,6 @@ import org.testng.annotations.Test;
  */
 public class DurationNGTest {
 
-    public DurationNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -24,6 +22,8 @@ public class DurationNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public DurationNGTest() {
     }
 
     @BeforeMethod

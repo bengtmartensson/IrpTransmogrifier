@@ -10,8 +10,6 @@ import org.testng.annotations.Test;
 
 public class IrCoreUtilsNGTest {
 
-    public IrCoreUtilsNGTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -19,6 +17,8 @@ public class IrCoreUtilsNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public IrCoreUtilsNGTest() {
     }
 
     @BeforeMethod

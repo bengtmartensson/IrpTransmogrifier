@@ -26,26 +26,6 @@ import org.w3c.dom.Element;
  *
  */
 public class Name extends PrimaryItem implements Floatable {
-    String name;
-
-    public Name(IrpParser.NameContext ctx) {
-        name = ctx.getText();
-    }
-
-    public Name(String name) {
-        //parse(name); // just to check validity
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    @Override
-    public String toIrpString() {
-        return name;
-    }
 
     /**
      * Check the syntactical correctness of the name.
@@ -96,10 +76,28 @@ public class Name extends PrimaryItem implements Floatable {
     public static String toString(IrpParser.NameContext ctx) {
         return ctx.getText();
     }
+    private final String name;
+    public Name(IrpParser.NameContext ctx) {
+        name = ctx.getText();
+    }
+    public Name(String name) {
+        //parse(name); // just to check validity
+        this.name = name;
+    }
+    @Override
+    public String toString() {
+        return getName();
+    }
+    @Override
+    public String toIrpString() {
+        return getName();
+    }
 
     @Override
     public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        Expression expression = nameEngine.get(name);
+        if (nameEngine == null)
+            throw new UnassignedException(name);
+        Expression expression = nameEngine.get(getName());
         return expression.toNumber(nameEngine);
     }
 
@@ -112,6 +110,13 @@ public class Name extends PrimaryItem implements Floatable {
 
     @Override
     public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        return (double) toNumber(nameEngine);
+        return toNumber(nameEngine);
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
 }

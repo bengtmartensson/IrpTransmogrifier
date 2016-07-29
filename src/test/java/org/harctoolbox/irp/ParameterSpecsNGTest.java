@@ -19,6 +19,12 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class ParameterSpecsNGTest {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
 
     private final ParameterSpecs rc5;
     private final ParameterSpecs nec1;
@@ -28,13 +34,6 @@ public class ParameterSpecsNGTest {
         nec1 = new ParameterSpecs("[D:0..255,S:0..255=255-D,F:0..255]");
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @BeforeMethod
     public void setUpMethod() throws Exception {

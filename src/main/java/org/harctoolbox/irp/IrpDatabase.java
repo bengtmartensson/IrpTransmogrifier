@@ -61,126 +61,11 @@ public class IrpDatabase {
     public static final String irpProtocolLocation = "file:///home/bengt/harctoolbox/IrpTransmogrifier/src/main/schemas/irp-protocols.xsd";
     public static final String irpProtocolPrefix = "irp";
 
-    private static class UnparsedProtocol {
-
-        public static final String unnamed = "unnamed_protocol";
-        public static final String nameName = "name";
-        public static final String irpName = "irp";
-        public static final String usable = "usable";
-        public static final String documentationName = "documentation";
-        private static final String parameterName = "parameter";
-
-        private HashMap<String, String> map;
-
-        String getProperty(String key) {
-            return map.get(key);
-        }
-
-        void setProperty(String key, String value) {
-            map.put(key, value);
-        }
-
-        String getName() {
-            return map.get(nameName);
-        }
-
-        String getIrp() {
-            return map.get(irpName);
-        }
-
-        String getDocumentation() {
-            return map.get(documentationName);
-        }
-
-        UnparsedProtocol(String irp) {
-            this(unnamed, irp, null);
-        }
-
-        UnparsedProtocol(String name, String irp, String documentation) {
-            this();
-            map.put(nameName, name);
-            map.put(irpName, irp);
-            map.put(documentationName, documentation);
-        }
-
-        UnparsedProtocol() {
-            map = new LinkedHashMap<>();
-        }
-
-        UnparsedProtocol(HashMap<String, String> map) {
-            this.map = map;
-        }
-
-        UnparsedProtocol(Element element) {
-            this();
-            map.put(nameName, element.getAttribute(nameName));
-            NodeList nl = element.getElementsByTagNameNS(irpProtocolNS, irpName);
-            if (nl.getLength() > 0)
-                map.put(irpName, nl.item(0).getTextContent());
-            NodeList n = element.getElementsByTagNameNS(irpProtocolNS, documentationName);
-            if (n.getLength() > 0)
-                map.put(documentationName, n.item(0).getTextContent());
-        }
-
-        NamedProtocol toNamedProtocol() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
-            return new NamedProtocol(getName(), getIrp(), getDocumentation());
-        }
-
-        @Override
-        public String toString() {
-            return getName() + "\t" + getIrp();
-        }
-    }
 
     private final static int maxRecursionDepth = 5;
-    private String configFileVersion;
-    private String encoding;
-
-    /**
-     * @return the configFileVersion
-     */
-    public final String getConfigFileVersion() {
-        return configFileVersion;
-    }
-
-    // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
-    private LinkedHashMap<String, UnparsedProtocol> protocols;
-
-    private void dump(PrintStream ps, String name) {
-        ps.println(protocols.get(name));
-    }
-
-    private void dump(PrintStream ps) {
-        for (String s : protocols.keySet())
-            dump(ps, s);
-    }
-
-    public void dump(String filename) throws FileNotFoundException {
-        dump(IrpUtils.getPrintSteam(filename));
-    }
-
-    public void dump(String filename, String name) throws FileNotFoundException {
-        dump(IrpUtils.getPrintSteam(filename), name);
-    }
-
-    public final boolean isKnown(String protocol) {
-        return protocols.containsKey(protocol.toLowerCase(Locale.US));
-    }
-
     public static boolean isKnown(String protocolsPath, String protocol) throws FileNotFoundException, IncompatibleArgumentException, UnsupportedEncodingException, IOException, SAXException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
-
-    /**
-     *
-     * @param name
-     * @return String with IRP representation
-     */
-    public final String getIrp(String name) {
-        UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
-        return prot == null ? null : prot.getIrp();
-    }
-
     /**
      * Static version of getIrp.
      *
@@ -200,6 +85,240 @@ public class IrpDatabase {
         }
         return irpMaster == null ? null : irpMaster.getIrp(protocolName);
     }
+    /**
+     *
+     * @param datafile
+     * @return
+     * @throws IOException
+     */
+    public static Document readIni(String datafile) throws IOException {
+        try (InputStreamReader is = new InputStreamReader(IrpUtils.getInputSteam(datafile), "US-ASCII")) {
+            return readIni(is);
+        }
+    }
+    /**
+     *
+     * @param reader
+     * @return
+     */
+    public static Document readIni(Reader reader) {
+        Document doc = XmlUtils.newDocument(true);
+        Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
+        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
+        root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
+        root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
+        doc.appendChild(root);
+        //protocols = new LinkedHashMap<>();
+        //encoding = charSet;
+        BufferedReader in = new BufferedReader(reader);
+        HashMap<String, String> currentProtocol = null;
+        int lineNo = 0;
+        try {
+            boolean isDocumentation = false;
+            StringBuilder documentation = new StringBuilder(1000);
+            while (true) {
+                String lineRead = in.readLine();
+                if (lineRead == null)
+                    break;
+                lineNo++;
+                String line = lineRead.trim();
+                logger.log(Level.FINEST, "Line {0}: {1}", new Object[]{lineNo, line});
+                if (line.startsWith("#"))
+                    // comment, ignore
+                    continue;
+
+                String[] kw = line.split("=", 2);
+                String keyword = kw[0].toLowerCase(Locale.US);
+                String payload = kw.length > 1 ? kw[1].trim() : null;
+                while (payload != null && payload.endsWith("\\")) {
+                    payload = payload.substring(0, payload.length()-1);
+                    payload = payload.trim();
+                    String continuation = in.readLine();
+                    if (continuation != null)
+                        continuation = continuation.trim();
+                    payload += continuation;
+                    lineNo++;
+                }
+
+                if (line.equals("[version]")) {
+                    String configFileVersion = in.readLine();
+                    lineNo++;
+                    root.setAttribute("version", configFileVersion);
+                } else if (line.equals("[protocol]")) {
+                    if (currentProtocol != null) {
+                        currentProtocol.put(UnparsedProtocol.documentationName, documentation.toString().trim());
+                        root.appendChild(toElement(doc, currentProtocol));
+                    }
+                    currentProtocol = new HashMap<>(3);
+                    documentation = new StringBuilder(1000);
+                    isDocumentation = false;
+                } else if (isDocumentation && currentProtocol != null) {
+                    // Everything is added to the documentation
+                    documentation.append(line).append(" ");
+                    if (line.isEmpty())
+                        documentation.append("\n\n");
+                } else if (line.equals("[documentation]")) {
+                    if (currentProtocol != null)
+                        isDocumentation = true;
+                } else if (keyword.equals("name")) {
+                    if (currentProtocol != null)
+                        currentProtocol.put(UnparsedProtocol.nameName, payload);
+                } else if (keyword.equals("irp")) {
+                    if (currentProtocol != null)
+                        currentProtocol.put(UnparsedProtocol.irpName, payload);
+                } else if (keyword.equals(UnparsedProtocol.usable)) {
+                    if (currentProtocol != null)
+                        currentProtocol.put(keyword, payload);
+                } else if (keyword.length() > 1) {
+                    if (currentProtocol != null)
+                        currentProtocol.put(keyword, payload);
+                } else {
+                    if (!line.isEmpty())
+                        logger.log(Level.FINER, "Ignored line: {0}", line);
+                }
+            }
+            if (currentProtocol != null) {
+                currentProtocol.put(UnparsedProtocol.documentationName, documentation.toString().trim());
+                root.appendChild(toElement(doc, currentProtocol));
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        return doc;
+    }
+    private static Element toElement(Document doc, HashMap<String, String> currentProtocol) {
+        Element element = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocol");
+        for (Map.Entry<String, String> kvp : currentProtocol.entrySet()) {
+            switch (kvp.getKey()) {
+                case UnparsedProtocol.nameName:
+                    element.setAttribute(UnparsedProtocol.nameName, kvp.getValue());
+                    element.setAttribute("c-name", toCName(kvp.getValue()));
+                    break;
+                case UnparsedProtocol.usable:
+                    element.setAttribute(UnparsedProtocol.usable, Boolean.toString(!kvp.getValue().equals("no")));
+                    break;
+                case UnparsedProtocol.irpName: {
+                    Element irp = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.irpName);
+                    irp.setTextContent(kvp.getValue());
+                    element.appendChild(irp);
+                }
+                break;
+                case UnparsedProtocol.documentationName: {
+                    Element docu = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.documentationName);
+                    docu.setTextContent(kvp.getValue());
+                    element.appendChild(docu);
+                }
+                break;
+                default: {
+                    Element param = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.parameterName);
+                    param.setAttribute("name", kvp.getKey());
+                    param.setTextContent(kvp.getValue());
+                    element.appendChild(param);
+                }
+            }
+        }
+        return element;
+    }
+    public static String toCName(String name) {
+        String newName = name.replaceAll("[^0-9A-Za-z_]", "");
+        return newName.matches("\\d.*") ? ("X" + newName) : newName;
+    }
+    public static void main(String[] args) {
+        try {
+            Document doc = readIni(args[0]);
+            String out = args.length >= 2 ? args[1] : "-";
+            XmlUtils.printDOM(IrpUtils.getPrintSteam(out), doc, "UTF-8", "{" + irpProtocolNS + "}irp");
+        } catch (IOException ex) {
+            Logger.getLogger(IrpDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private String configFileVersion;
+    private String encoding;
+
+
+    // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
+    private LinkedHashMap<String, UnparsedProtocol> protocols;
+    private IrpDatabase() {
+        this.configFileVersion = "";
+        protocols = new LinkedHashMap<>(200);
+    }
+    /**
+     * Sets up a new IrpMaster from its first argument.
+     *
+     * @param reader
+     * @throws FileNotFoundException
+     * @throws org.xml.sax.SAXException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws java.io.UnsupportedEncodingException
+     */
+
+    public IrpDatabase(Reader reader) throws IOException, SAXException, IncompatibleArgumentException {
+        this(XmlUtils.openXmlReader(reader, (Schema) null, true, true));
+    }
+    public IrpDatabase(InputStream inputStream) throws IOException, SAXException, IncompatibleArgumentException {
+        this(XmlUtils.openXmlStream(inputStream, null, true, true));
+    }
+    public IrpDatabase(File file) throws IOException, SAXException, IncompatibleArgumentException {
+        this(XmlUtils.openXmlFile(file, (Schema) null, true, true));
+    }
+    public IrpDatabase(String file) throws IOException, SAXException, IncompatibleArgumentException {
+        this(IrpUtils.getInputSteam(file));
+    }
+    /**
+     *
+     * @param doc
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     */
+    public IrpDatabase(Document doc) throws IncompatibleArgumentException {
+        Element root = doc.getDocumentElement();
+        protocols = new LinkedHashMap<>(150);
+        NodeList nodes = root.getElementsByTagNameNS(irpProtocolNS, "protocol");
+        for (int i = 0; i < nodes.getLength(); i++)
+            addProtocol((Element)nodes.item(i));
+        expand();
+    }
+    /**
+     * @return the configFileVersion
+     */
+    public final String getConfigFileVersion() {
+        return configFileVersion;
+    }
+
+    private void dump(PrintStream ps, String name) {
+        ps.println(protocols.get(name));
+    }
+
+    private void dump(PrintStream ps) {
+        protocols.keySet().stream().forEach((s) -> {
+            dump(ps, s);
+        });
+    }
+
+    public void dump(String filename) throws FileNotFoundException {
+        dump(IrpUtils.getPrintSteam(filename));
+    }
+
+    public void dump(String filename, String name) throws FileNotFoundException {
+        dump(IrpUtils.getPrintSteam(filename), name);
+    }
+
+    public final boolean isKnown(String protocol) {
+        return protocols.containsKey(protocol.toLowerCase(Locale.US));
+    }
+
+
+    /**
+     *
+     * @param name
+     * @return String with IRP representation
+     */
+    public final String getIrp(String name) {
+        UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
+        return prot == null ? null : prot.getIrp();
+    }
+
 
     public final Set<String> getNames() {
         return protocols.keySet();
@@ -207,16 +326,15 @@ public class IrpDatabase {
 
     public List<String> getMatchingNames(String regexp) {
         Pattern pattern = Pattern.compile(regexp.toLowerCase(Locale.US));
-        List<String> result = new ArrayList<>();
-        for (String candidate : protocols.keySet()) {
-            if (pattern.matcher(candidate).matches())
-                result.add(candidate);
-        }
+        List<String> result = new ArrayList<>(10);
+        protocols.keySet().stream().filter((candidate) -> (pattern.matcher(candidate).matches())).forEach((candidate) -> {
+            result.add(candidate);
+        });
         return result;
     }
 
     public List<String> getMatchingNames(Iterable<String> iterable) {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>(10);
         for (String s : iterable) {
             result.addAll(getMatchingNames(s));
         }
@@ -286,202 +404,69 @@ public class IrpDatabase {
         protocols.put(nameLower, proto);
     }
 
-    private IrpDatabase() {
-        this.configFileVersion = "";
-        protocols = new LinkedHashMap<>();
-    }
+    private static class UnparsedProtocol {
 
-    /**
-     * Sets up a new IrpMaster from its first argument.
-     *
-     * @param reader
-     * @throws FileNotFoundException
-     * @throws org.xml.sax.SAXException
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
-     * @throws java.io.UnsupportedEncodingException
-     */
+        public static final String unnamed = "unnamed_protocol";
+        public static final String nameName = "name";
+        public static final String irpName = "irp";
+        public static final String usable = "usable";
+        public static final String documentationName = "documentation";
+        private static final String parameterName = "parameter";
 
-    public IrpDatabase(Reader reader) throws IOException, SAXException, IncompatibleArgumentException {
-        this(XmlUtils.openXmlReader(reader, (Schema) null, true, true));
-    }
+        private HashMap<String, String> map;
 
-    public IrpDatabase(InputStream inputStream) throws IOException, SAXException, IncompatibleArgumentException {
-        this(XmlUtils.openXmlStream(inputStream, null, true, true));
-    }
-
-    public IrpDatabase(File file) throws IOException, SAXException, IncompatibleArgumentException {
-        this(XmlUtils.openXmlFile(file, (Schema) null, true, true));
-    }
-
-    public IrpDatabase(String file) throws IOException, SAXException, IncompatibleArgumentException {
-        this(IrpUtils.getInputSteam(file));
-    }
-
-    /**
-     *
-     * @param doc
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
-     */
-    public IrpDatabase(Document doc) throws IncompatibleArgumentException {
-        Element root = doc.getDocumentElement();
-        protocols = new LinkedHashMap<>();
-        NodeList nodes = root.getElementsByTagNameNS(irpProtocolNS, "protocol");
-        for (int i = 0; i < nodes.getLength(); i++)
-            addProtocol((Element)nodes.item(i));
-        expand();
-    }
-
-    /**
-     *
-     * @param datafile
-     * @return
-     * @throws IOException
-     */
-    public static Document readIni(String datafile) throws IOException {
-        try (InputStreamReader is = new InputStreamReader(IrpUtils.getInputSteam(datafile), "US-ASCII")) {
-            return readIni(is);
+        UnparsedProtocol(String irp) {
+            this(unnamed, irp, null);
         }
-    }
 
-    /**
-     *
-     * @param reader
-     * @return
-     */
-    public static Document readIni(Reader reader) {
-        Document doc = XmlUtils.newDocument(true);
-        Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
-        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
-        root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
-        root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
-        doc.appendChild(root);
-        //protocols = new LinkedHashMap<>();
-        //encoding = charSet;
-        BufferedReader in = new BufferedReader(reader);
-        HashMap<String, String> currentProtocol = null;
-        int lineNo = 0;
-        try {
-            boolean isDocumentation = false;
-            StringBuilder documentation = new StringBuilder();
-            while (true) {
-                String lineRead = in.readLine();
-                if (lineRead == null)
-                    break;
-                lineNo++;
-                String line = lineRead.trim();
-                logger.log(Level.FINEST, "Line {0}: {1}", new Object[]{lineNo, line});
-                if (line.startsWith("#"))
-                    // comment, ignore
-                    continue;
-
-                String[] kw = line.split("=", 2);
-                String keyword = kw[0].toLowerCase(Locale.US);
-                String payload = kw.length > 1 ? kw[1].trim() : null;
-                while (payload != null && payload.endsWith("\\")) {
-                    payload = payload.substring(0, payload.length()-1);
-                    payload = payload.trim();
-                    String continuation = in.readLine();
-                    if (continuation != null)
-                        continuation = continuation.trim();
-                    payload += continuation;
-                    lineNo++;
-                }
-
-                if (line.equals("[version]")) {
-                    String configFileVersion = in.readLine();
-                    lineNo++;
-                    root.setAttribute("version", configFileVersion);
-                } else if (line.equals("[protocol]")) {
-                    if (currentProtocol != null) {
-                        currentProtocol.put(UnparsedProtocol.documentationName, documentation.toString().trim());
-                        root.appendChild(toElement(doc, currentProtocol));
-                    }
-                    currentProtocol = new HashMap<>();
-                    documentation = new StringBuilder();
-                    isDocumentation = false;
-                } else if (isDocumentation && currentProtocol != null) {
-                    // Everything is added to the documentation
-                    documentation.append(line).append(" ");
-                    if (line.isEmpty())
-                        documentation.append("\n\n");
-                } else if (line.equals("[documentation]")) {
-                    if (currentProtocol != null)
-                        isDocumentation = true;
-                } else if (keyword.equals("name")) {
-                    if (currentProtocol != null)
-                        currentProtocol.put(UnparsedProtocol.nameName, payload);
-                } else if (keyword.equals("irp")) {
-                    if (currentProtocol != null)
-                        currentProtocol.put(UnparsedProtocol.irpName, payload);
-                } else if (keyword.equals(UnparsedProtocol.usable)) {
-                    if (currentProtocol != null)
-                        currentProtocol.put(keyword, payload);
-                } else if (keyword.length() > 1) {
-                    if (currentProtocol != null)
-                        currentProtocol.put(keyword, payload);
-                } else {
-                    if (!line.isEmpty())
-                        logger.log(Level.FINER, "Ignored line: {0}", line);
-                }
-            }
-            if (currentProtocol != null) {
-                currentProtocol.put(UnparsedProtocol.documentationName, documentation.toString().trim());
-                root.appendChild(toElement(doc, currentProtocol));
-            }
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+        UnparsedProtocol(String name, String irp, String documentation) {
+            this();
+            map.put(nameName, name);
+            map.put(irpName, irp);
+            map.put(documentationName, documentation);
         }
-        return doc;
-    }
 
-    private static Element toElement(Document doc, HashMap<String, String> currentProtocol) {
-        Element element = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocol");
-        for (Map.Entry<String, String> kvp : currentProtocol.entrySet()) {
-            switch (kvp.getKey()) {
-                case UnparsedProtocol.nameName:
-                    element.setAttribute(UnparsedProtocol.nameName, kvp.getValue());
-                    element.setAttribute("c-name", toCName(kvp.getValue()));
-                    break;
-                case UnparsedProtocol.usable:
-                    element.setAttribute(UnparsedProtocol.usable, Boolean.toString(!kvp.getValue().equals("no")));
-                    break;
-                case UnparsedProtocol.irpName: {
-                    Element irp = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.irpName);
-                    irp.setTextContent(kvp.getValue());
-                    element.appendChild(irp);
-                }
-                break;
-                case UnparsedProtocol.documentationName: {
-                    Element docu = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.documentationName);
-                    docu.setTextContent(kvp.getValue());
-                    element.appendChild(docu);
-                }
-                break;
-                default: {
-                    Element param = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.parameterName);
-                    param.setAttribute("name", kvp.getKey());
-                    param.setTextContent(kvp.getValue());
-                    element.appendChild(param);
-                }
-            }
+        UnparsedProtocol() {
+            map = new LinkedHashMap<>(4);
         }
-        return element;
-    }
 
-    public static String toCName(String name) {
-        String newName = name.replaceAll("[^0-9A-Za-z_]", "");
-        return newName.matches("\\d.*") ? ("X" + newName) : newName;
-    }
+        UnparsedProtocol(HashMap<String, String> map) {
+            this.map = map;
+        }
 
-    public static void main(String[] args) {
-        try {
-            Document doc = readIni(args[0]);
-            String out = args.length >= 2 ? args[1] : "-";
-            XmlUtils.printDOM(IrpUtils.getPrintSteam(out), doc, "UTF-8", "{" + irpProtocolNS + "}irp");
-        } catch (IOException ex) {
-            Logger.getLogger(IrpDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        UnparsedProtocol(Element element) {
+            this();
+            map.put(nameName, element.getAttribute(nameName));
+            NodeList nl = element.getElementsByTagNameNS(irpProtocolNS, irpName);
+            if (nl.getLength() > 0)
+                map.put(irpName, nl.item(0).getTextContent());
+            NodeList n = element.getElementsByTagNameNS(irpProtocolNS, documentationName);
+            if (n.getLength() > 0)
+                map.put(documentationName, n.item(0).getTextContent());
+        }
+        String getProperty(String key) {
+            return map.get(key);
+        }
+        void setProperty(String key, String value) {
+            map.put(key, value);
+        }
+        String getName() {
+            return map.get(nameName);
+        }
+        String getIrp() {
+            return map.get(irpName);
+        }
+        String getDocumentation() {
+            return map.get(documentationName);
+        }
+
+        NamedProtocol toNamedProtocol() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
+            return new NamedProtocol(getName(), getIrp(), getDocumentation());
+        }
+
+        @Override
+        public String toString() {
+            return getName() + "\t" + getIrp();
         }
     }
 }

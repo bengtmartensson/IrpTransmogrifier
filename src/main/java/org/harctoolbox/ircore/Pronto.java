@@ -53,8 +53,6 @@ public class Pronto {
 
     private static final Logger logger = Logger.getLogger(Pronto.class.getName());
 
-    private Pronto() {
-    }
 
     /**
      * Constructor from IrSignal.
@@ -96,7 +94,7 @@ public class Pronto {
     public static double getFrequency(int code) {
         return code == 0
                 ? ModulatedIrSequence.unknownFrequency // Invalid value
-                : 1000000.0 / ((double) code * prontoConstant);
+                : 1000000.0 / (code * prontoConstant);
     }
 
     /**
@@ -407,10 +405,12 @@ public class Pronto {
      * @return CCF string.
      */
     public static String toPrintString(int[] array) {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder(array.length*5);
         for (int i = 0; i < array.length; i++)
             s.append(String.format((i > 0 ? " " : "") + formattingCode, array[i]));
         return s.toString();
+    }
+    private Pronto() {
     }
 
     /**

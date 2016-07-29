@@ -18,11 +18,6 @@ import org.testng.annotations.Test;
  */
 public class PrimaryItemNGTest {
 
-    private final NameEngine nameEngine;
-
-    public PrimaryItemNGTest() throws IrpSyntaxException {
-        nameEngine = new NameEngine("{A = 7, F=244, D=4}");
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -30,6 +25,10 @@ public class PrimaryItemNGTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private final NameEngine nameEngine;
+    public PrimaryItemNGTest() throws IrpSyntaxException {
+        nameEngine = new NameEngine("{A = 7, F=244, D=4}");
     }
 
     @BeforeMethod

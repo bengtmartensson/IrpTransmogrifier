@@ -10,24 +10,23 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class IrStreamNGTest {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
 
-    private final NameEngine nameEngine;
+    //private final NameEngine nameEngine;
     private final IrStream instance;
     private final IrStream repeat;
 
     public IrStreamNGTest() throws IrpSyntaxException, InvalidRepeatException {
-        nameEngine = new NameEngine("{D=12, S=34, F= 56}");
+        //nameEngine = new NameEngine("{D=12, S=34, F= 56}");
         instance = new IrStream("(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
         repeat = new IrStream("(16,-4,1,^108m)*");
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @BeforeMethod
     public void setUpMethod() throws Exception {
@@ -44,7 +43,7 @@ public class IrStreamNGTest {
     public void testGetRepeatMarker() {
         System.out.println("getRepeatMarker");
         RepeatMarker result = instance.getRepeatMarker();
-        assertEquals(result, null);
+        assertTrue(result == null);
         result = repeat.getRepeatMarker();
         assertEquals(result.getMin(), 0L);
         assertTrue(result.isInfinite());

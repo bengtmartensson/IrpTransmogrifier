@@ -32,26 +32,6 @@ class BitStream extends IrStreamItem implements Evaluatable {
     private long length;
     private BigInteger data;
 
-    @Override
-    public String toString() {
-        return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
-    }
-
-//        else {
-//            StringBuilder dataString = new StringBuilder();
-//            dataString.append("[ ");
-//            StringBuilder binString = new StringBuilder();
-//            for (int i = data.length - 1; i >= 0; i--) {
-//                dataString.append(Long.toString(data[i])).append(" ");
-//                binString.append(Long.toBinaryString(data[i])).append(" ");
-//            }
-//            return "BitStream, length = " + length + ", data = " + dataString + "] = " + binString;
-//    }
-
-    @Override
-    public String toIrpString() {
-        throw new UnsupportedOperationException("Not supported.");
-    }
 
     BitStream() {
         data = BigInteger.ZERO;
@@ -68,6 +48,25 @@ class BitStream extends IrStreamItem implements Evaluatable {
                     : IrpUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine)));
         length = bitField.getWidth(nameEngine);
 
+    }
+    @Override
+    public String toString() {
+        return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
+    }
+    //        else {
+//            StringBuilder dataString = new StringBuilder();
+//            dataString.append("[ ");
+//            StringBuilder binString = new StringBuilder();
+//            for (int i = data.length - 1; i >= 0; i--) {
+//                dataString.append(Long.toString(data[i])).append(" ");
+//                binString.append(Long.toBinaryString(data[i])).append(" ");
+//            }
+//            return "BitStream, length = " + length + ", data = " + dataString + "] = " + binString;
+//    }
+
+    @Override
+    public String toIrpString() {
+        throw new UnsupportedOperationException("Not supported.");
     }
 
 //    public BitStream(Protocol env) {

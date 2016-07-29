@@ -138,7 +138,7 @@ public class IrCoreUtils {
         int absDiff = Math.abs(x - y);
         boolean absoluteOk = absDiff <= absoluteTolerance;
         int max = Math.max(Math.abs(x), Math.abs(y));
-        boolean relativeOk = max > 0 && (double) absDiff / (double) max <= relativeTolerance;
+        boolean relativeOk = max > 0 && absDiff / (double) max <= relativeTolerance;
         return absoluteOk || relativeOk;
     }
 

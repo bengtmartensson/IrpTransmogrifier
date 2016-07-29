@@ -62,7 +62,8 @@ public class NameOrNumber extends IrpObject implements Floatable {
     @Override
     public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec)
             throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        return (thing instanceof Name) ? ((Name) thing).toNumber(nameEngine) : ((NumberWithDecimals) thing).toFloat();
+        //return (thing instanceof Name) ? ((Name) thing).toNumber(nameEngine) : ((NumberWithDecimals) thing).toFloat();
+        return thing.toFloat(nameEngine, generalSpec);
     }
 
     Object toNumber(NameEngine nameEngine) {

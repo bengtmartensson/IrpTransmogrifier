@@ -30,6 +30,9 @@ public class ModulatedIrSequence extends IrSequence {
     public static final double unknownDutyCycle = -1.0;
     public static final double unknownPulseTime = -1.0;
     public static final double defaultFrequency = 38000.0;
+    public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
+        return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
+    }
 
 
     /**
@@ -43,26 +46,6 @@ public class ModulatedIrSequence extends IrSequence {
      */
     protected double dutyCycle = unknownDutyCycle;
 
-    /**
-     *
-     * @return modulation frequency in Hz.
-     */
-    public final double getFrequency() {
-        return frequency;
-    }
-
-    /**
-     *
-     * @return Duty cycle.
-     */
-    public final double getDutyCycle() {
-        return dutyCycle;
-    }
-
-    @Override
-    public String toString() {
-        return "{" + Integer.toString((int)Math.round(frequency)) + "," + super.toString() + "}";
-    }
 
     private ModulatedIrSequence() {
     }
@@ -79,7 +62,7 @@ public class ModulatedIrSequence extends IrSequence {
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
     }
-    
+
     /**
      * Constructs a ModulatedIrSequence from its arguments.
      *
@@ -140,6 +123,24 @@ public class ModulatedIrSequence extends IrSequence {
             System.arraycopy(seq.data, 0, data, beginIndex, seq.data.length);
             beginIndex += seq.data.length;
         }
+    }
+    /**
+     *
+     * @return modulation frequency in Hz.
+     */
+    public final double getFrequency() {
+        return frequency;
+    }
+    /**
+     *
+     * @return Duty cycle.
+     */
+    public final double getDutyCycle() {
+        return dutyCycle;
+    }
+    @Override
+    public String toString() {
+        return "{" + Integer.toString((int)Math.round(frequency)) + "," + super.toString() + "}";
     }
 
     /**
@@ -258,7 +259,7 @@ public class ModulatedIrSequence extends IrSequence {
      */
     @Override
     public ModulatedIrSequence append(double delay) throws IncompatibleArgumentException {
-        IrSequence irSequence = ((IrSequence) this).append(delay);
+        IrSequence irSequence = super.append(delay);
         return new ModulatedIrSequence(irSequence, frequency, dutyCycle);
     }
 
@@ -266,13 +267,10 @@ public class ModulatedIrSequence extends IrSequence {
         if (isZeroModulated() ? (! tail.isZeroModulated())
             : (Math.abs(frequency - tail.getFrequency())/frequency > allowedFrequencyDeviation))
             throw new IncompatibleArgumentException("concationation not possible; modulation frequencies differ");
-        IrSequence irSequence = ((IrSequence) this).append(tail);
+        IrSequence irSequence = super.append(tail);
         return new ModulatedIrSequence(irSequence, frequency, dutyCycle);
     }
 
-    public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
-        return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
-    }
 
     @Override
     public final ModulatedIrSequence[] chop(double amount) {
@@ -281,5 +279,10 @@ public class ModulatedIrSequence extends IrSequence {
         for (int i = 0; i < irSequences.length; i++)
             mods[i] = new ModulatedIrSequence(irSequences[i], frequency, dutyCycle);
         return mods;
+    }
+
+    @Override
+    public IrSequence clone() throws CloneNotSupportedException {
+        return super.clone(); //To change body of generated methods, choose Tools | Templates.
     }
 }

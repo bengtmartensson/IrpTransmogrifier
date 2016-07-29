@@ -17,8 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
@@ -28,9 +26,10 @@ import org.w3c.dom.Element;
  *
  */
 public class NamedProtocol extends Protocol {
-    private String irp;
-    private String name;
-    private String documentation;
+
+    private final String irp;
+    private final String name;
+    private final String documentation;
 
     public NamedProtocol(String name, String irp, String documentation) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
         super(irp);
@@ -79,20 +78,4 @@ public class NamedProtocol extends Protocol {
         return root;
     }
 
-    /**
-     * Testing only.
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        String irpString
-                = //"{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
-                "{38.4k,22p,33%,msb}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
-        try {
-            NamedProtocol protocol = new NamedProtocol("name", irpString, "dox");
-            System.out.println(protocol);
-        } catch (ArithmeticException | IncompatibleArgumentException | InvalidRepeatException | IrpSyntaxException | IrpSemanticException | UnassignedException ex) {
-            Logger.getLogger(NamedProtocol.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

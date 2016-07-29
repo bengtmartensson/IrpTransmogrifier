@@ -17,26 +17,25 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class NumberWithDecimalsNGTest {
-
-    private final NumberWithDecimals pi;
-    private final NumberWithDecimals e;
-    private final NumberWithDecimals answer;
-    private final NumberWithDecimals sheldon;
-
-    public NumberWithDecimalsNGTest() throws IrpSyntaxException {
-        pi = new NumberWithDecimals("3.1415926");
-        e = new NumberWithDecimals(2.71);
-        answer = new NumberWithDecimals(42);
-        sheldon = new NumberWithDecimals(73);
-    }
-
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
-
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
+
+    private final NumberWithDecimals pi;
+    //private final NumberWithDecimals e;
+    //private final NumberWithDecimals answer;
+    private final NumberWithDecimals sheldon;
+
+    public NumberWithDecimalsNGTest() throws IrpSyntaxException {
+        pi = new NumberWithDecimals("13.1415926");
+        //e = new NumberWithDecimals(2.71);
+        //answer = new NumberWithDecimals(42);
+        sheldon = new NumberWithDecimals(73);
+    }
+
 
     @BeforeMethod
     public void setUpMethod() throws Exception {
@@ -64,7 +63,7 @@ public class NumberWithDecimalsNGTest {
     @Test
     public void testToFloat_0args() {
         System.out.println("toFloat");
-        assertEquals(pi.toFloat(), 3.1415926);
+        assertEquals(pi.toFloat(), 13.1415926);
     }
 
     /**
@@ -83,6 +82,6 @@ public class NumberWithDecimalsNGTest {
     public void testToIrpString() {
         System.out.println("toIrpString");
         assertEquals(sheldon.toIrpString(), "73");
-        assertEquals(pi.toIrpString(), "3.1415926");
+        assertEquals(pi.toIrpString(), "13.1415926");
     }
 }

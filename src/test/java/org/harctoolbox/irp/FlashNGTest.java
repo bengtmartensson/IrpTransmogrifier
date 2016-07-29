@@ -17,6 +17,12 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class FlashNGTest {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
 
     private GeneralSpec generalSpec;
     private NameEngine nameEngine;
@@ -24,13 +30,6 @@ public class FlashNGTest {
     public FlashNGTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     @BeforeMethod
     public void setUpMethod() throws Exception {
@@ -44,6 +43,7 @@ public class FlashNGTest {
 
     /**
      * Test of evaluateWithSign method, of class Flash.
+     * @throws java.lang.Exception
      */
     @Test
     public void testEvaluateWithSign() throws Exception {

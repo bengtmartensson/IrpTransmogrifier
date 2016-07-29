@@ -96,7 +96,7 @@ public class InfiniteBitField extends BitField {
         //Element widthElement = document.createElement("width");
         //widthElement.appendChild(width.toElement(document));
         //element.appendChild(widthElement);
-        if (!(chop instanceof Number && ((Number) chop).data == 0)) {
+        if (!(chop instanceof Number && ((Number) chop).toNumber() == 0)) {
             Element chopElement = document.createElement("chop");
             chopElement.appendChild(chop.toElement(document));
             element.appendChild(chopElement);

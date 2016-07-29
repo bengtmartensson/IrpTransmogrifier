@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -32,6 +31,21 @@ import org.harctoolbox.ircore.OddSequenceLenghtException;
  *
  */
 public class Cleaner {
+    private final static int numberOfTimingsCapacity = 20;
+    public static IrSequence clean(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+        Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
+        return cleaner.toIrSequence();
+    }
+    public static IrSequence clean(IrSequence irSequence) {
+        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+        return new ModulatedIrSequence(clean((IrSequence)irSequence, absoluteTolerance, relativeTolerance),
+                irSequence.getFrequency(), irSequence.getDutyCycle());
+    }
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
+        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
 
     private int rawData[];
     private List<Integer> dumbTimingsTable;
@@ -58,7 +72,7 @@ public class Cleaner {
     }
 
     private void createRawHistogram() {
-        rawHistogram = new HashMap<>();
+        rawHistogram = new HashMap<>(numberOfTimingsCapacity);
         for (int d : rawData) {
             int old = rawHistogram.containsKey(d) ? rawHistogram.get(d) : 0;
             rawHistogram.put(d, old + 1);
@@ -74,7 +88,7 @@ public class Cleaner {
 //    }
 
     private void createDumbTimingsTable(int absoluteTolerance, double relativeTolerance) {
-        dumbTimingsTable = new ArrayList<>();
+        dumbTimingsTable = new ArrayList<>(rawData.length);
         sorted = rawData.clone();
         Arrays.sort(sorted);
         int last = Integer.MIN_VALUE;
@@ -87,8 +101,8 @@ public class Cleaner {
     }
 
     private void improveTimingsTable(int absoluteTolerance, double relativeTolerance) {
-        lookDownTable = new HashMap<>();
-        timings = new ArrayList<>();
+        lookDownTable = new HashMap<>(numberOfTimingsCapacity);
+        timings = new ArrayList<>(numberOfTimingsCapacity);
         int indexInSortedTimings = 0;
         for (int timingsIndex = 0; timingsIndex < dumbTimingsTable.size(); timingsIndex++) {
             int dumbTiming = dumbTimingsTable.get(timingsIndex);
@@ -106,7 +120,7 @@ public class Cleaner {
                 terms += noHits;
                 lookDownTable.put(duration, timingsIndex);
             }
-            int average = (int) Math.round((double)sum/(double)terms);
+            int average = (int) Math.round(sum/(double)terms);
             timings.add(average);
         }
     }
@@ -118,14 +132,15 @@ public class Cleaner {
     }
 
     private void createCleanHistogram() {
-        cleanedHistogram = new LinkedHashMap<>();
-        for (int duration : timings)
+        cleanedHistogram = new LinkedHashMap<>(numberOfTimingsCapacity);
+        timings.stream().forEach((duration) -> {
             cleanedHistogram.put(duration, 0);
-        for (Map.Entry<Integer, Integer> kvp : rawHistogram.entrySet()) {
+        });
+        rawHistogram.entrySet().stream().forEach((kvp) -> {
             int index = lookDownTable.get(kvp.getKey());
             Integer cleanedDuration = timings.get(index);
             cleanedHistogram.put(cleanedDuration, cleanedHistogram.get(cleanedDuration) + kvp.getValue());
-        }
+        });
     }
 
 
@@ -137,9 +152,9 @@ public class Cleaner {
     }
 
     public String toTimingsString() {
-        StringBuilder str = new StringBuilder();
+        StringBuilder str = new StringBuilder(16);
         for (int i = 0; i < rawData.length; i++)
-            str.append((char) ((int)'A' + indexData[i]));
+            str.append((char) ('A' + indexData[i]));
         return str.toString();
     }
 
@@ -152,23 +167,6 @@ public class Cleaner {
         }
     }
 
-    public static IrSequence clean(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
-        Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
-        return cleaner.toIrSequence();
-    }
-
-    public static IrSequence clean(IrSequence irSequence) {
-        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
-    }
-
-    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
-        return new ModulatedIrSequence(clean((IrSequence)irSequence, absoluteTolerance, relativeTolerance),
-                irSequence.getFrequency(), irSequence.getDutyCycle());
-    }
-
-    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
-        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
-    }
 
     /**
      * @return the timings

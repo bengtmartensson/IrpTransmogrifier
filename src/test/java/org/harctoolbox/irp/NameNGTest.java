@@ -18,15 +18,14 @@ import org.testng.annotations.Test;
  */
 public class NameNGTest {
 
-    public NameNGTest() {
-    }
-
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    public NameNGTest() {
     }
 
     @BeforeMethod

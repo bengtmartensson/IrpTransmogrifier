@@ -17,17 +17,19 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- *
+ * This class models assignments as defined in Chapter 11.
  */
 public class Assignment extends IrStreamItem implements Numerical {
     private Name name;
     private Expression value;
+    private IrpParser.AssignmentContext parseTree = null;
 
     public Assignment(String str) {
         this((new ParserDriver(str)).getParser().assignment());
@@ -35,6 +37,7 @@ public class Assignment extends IrStreamItem implements Numerical {
 
     public Assignment(IrpParser.AssignmentContext assignment) {
         this(assignment.name(), assignment.expression());
+        parseTree = assignment;
     }
 
     public Assignment(IrpParser.NameContext name, IrpParser.ExpressionContext be) {
@@ -107,5 +110,10 @@ public class Assignment extends IrStreamItem implements Numerical {
     @Override
     int numberOfBareDurations() {
         return 0;
+    }
+
+    @Override
+    ParserRuleContext getParseTree() {
+        return parseTree;
     }
 }

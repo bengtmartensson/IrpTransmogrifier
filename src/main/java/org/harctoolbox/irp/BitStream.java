@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.math.BigInteger;
 import java.util.logging.Logger;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -201,5 +202,10 @@ class BitStream extends IrStreamItem implements Evaluatable {
     @Override
     int numberOfBareDurations() {
         return (int) length;
+    }
+
+    @Override
+    ParserRuleContext getParseTree() {
+        return null;
     }
 }

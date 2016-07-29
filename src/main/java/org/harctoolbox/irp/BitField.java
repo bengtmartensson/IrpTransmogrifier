@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 /**
@@ -31,6 +32,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
      * Max length of a BitField in this implementation.
      */
     public static final int maxWidth = Long.SIZE - 1; // = 63
+    private IrpParser.BitfieldContext parseTree;
 
     protected boolean complement;
     //protected boolean reverse;
@@ -61,9 +63,11 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     }
 
     public static BitField newBitField(IrpParser.BitfieldContext ctx) throws IrpSyntaxException {
-        return (ctx instanceof IrpParser.Finite_bitfieldContext)
-            ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
+        BitField instance = (ctx instanceof IrpParser.Finite_bitfieldContext)
+                ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
                 : new InfiniteBitField((IrpParser.Infinite_bitfieldContext) ctx);
+        instance.parseTree = ctx;
+        return instance;
     }
 
 
@@ -164,5 +168,10 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     public boolean hasChop() {
         return !(chop instanceof Number && ((Number) chop).toNumber(null) == 0);
+    }
+
+    @Override
+    ParserRuleContext getParseTree() {
+        return parseTree;
     }
 }

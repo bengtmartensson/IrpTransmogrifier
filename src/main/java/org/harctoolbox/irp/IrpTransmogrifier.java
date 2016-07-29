@@ -282,6 +282,11 @@ public class IrpTransmogrifier {
 //
 //            if (commandExpression.gui)
 //                IrpTransmogrifier.showTreeViewer(parser, bitfield.getParseTree(), text+"="+result);
+            if (commandBitField.gui)
+                IrpTransmogrifier.showTreeViewer(parser, bitfield.getParseTree(),
+                        text + "=" + (bitfield instanceof FiniteBitField
+                                ? ((FiniteBitField) bitfield).toBinaryString(nameEngine, commandBitField.lsb)
+                                : bitfield.toString(nameEngine)));
         }
     }
 
@@ -483,8 +488,8 @@ public class IrpTransmogrifier {
 //        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
 //        private boolean stringTree = false;
 //
-//        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
-//        private boolean gui = false;
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+        private boolean gui = false;
 
         @Parameter(names = { "--xml"}, description = "List XML")
         private boolean xml = false;

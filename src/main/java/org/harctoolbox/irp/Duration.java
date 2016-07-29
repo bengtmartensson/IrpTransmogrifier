@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.logging.Logger;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -40,6 +41,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     protected double time_units = IrCoreUtils.invalid;
     protected NameOrNumber nameOrNumber = null;
     protected String unit = null;
+    protected ParserRuleContext parseTree = null;
 
     public static Duration newDuration(String str) throws IrpSyntaxException {
         IrpParser parser = new ParserDriver(str).getParser();
@@ -52,11 +54,13 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
 
     public static Duration newDuration(IrpParser.DurationContext d) throws IrpSyntaxException {
         ParseTree child = d.getChild(0);
-        return (child instanceof IrpParser.FlashContext)
+        Duration instance = (child instanceof IrpParser.FlashContext)
                 ? new Flash((IrpParser.FlashContext) child)
                 : child instanceof IrpParser.GapContext
                 ? new Gap((IrpParser.GapContext) child)
                 : new Extent((IrpParser.ExtentContext) child);
+        instance.parseTree = (ParserRuleContext) child;
+        return instance;
     }
 
     protected Duration(double us) {
@@ -176,5 +180,10 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     int numberOfBits() {
         return 0;
+    }
+
+    @Override
+    ParserRuleContext getParseTree() {
+        return parseTree;
     }
 }

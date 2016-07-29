@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.logging.Logger;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -30,13 +31,15 @@ public class BitspecIrstream extends IrStreamItem {
     private static final Logger logger = Logger.getLogger(BitspecIrstream.class.getName());
 
     private BitSpec bitSpec;
-    private IrStream irStream;
+    private IrStream irStream = null;
+    private final IrpParser.Bitspec_irstreamContext parseTree;
 
     public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         this(ctx.bitspec_irstream());
     }
 
     public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+        parseTree = ctx;
         bitSpec = new BitSpec(ctx.bitspec());
         irStream = new IrStream(ctx.irstream());
     }
@@ -116,5 +119,10 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     public int numberOfInfiniteRepeats() {
         return bitSpec.numberOfInfiniteRepeats() + irStream.numberOfInfiniteRepeats();
+    }
+
+    @Override
+    ParserRuleContext getParseTree() {
+        return parseTree;
     }
 }

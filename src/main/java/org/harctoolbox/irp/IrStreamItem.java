@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -105,4 +106,6 @@ public abstract class IrStreamItem extends IrpObject {
     public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
         return null;
     }
+
+    abstract ParserRuleContext getParseTree();
 }

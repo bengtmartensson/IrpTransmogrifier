@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
@@ -31,12 +32,14 @@ public class Variation extends IrStreamItem {
     private BareIrStream intro;
     private BareIrStream repeat;
     private BareIrStream ending;
+    private final IrpParser.VariationContext parseTree;
 
     public Variation(String str) throws IrpSyntaxException, InvalidRepeatException {
         this((new ParserDriver(str)).getParser().variation());
     }
 
     public Variation(IrpParser.VariationContext variation) throws IrpSyntaxException, InvalidRepeatException {
+        parseTree = variation;
         intro = new BareIrStream(variation.alternative(0).bare_irstream());
         repeat = new BareIrStream(variation.alternative(1).bare_irstream());
         ending = variation.alternative().size() > 2 ? new BareIrStream(variation.alternative(2).bare_irstream()) : null;
@@ -64,6 +67,7 @@ public class Variation extends IrStreamItem {
         return pass;
     }
 
+    @Override
     public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
         return pass;
     }
@@ -114,5 +118,10 @@ public class Variation extends IrStreamItem {
     @Override
     public String toString() {
         return toIrpString();
+    }
+
+    @Override
+    public ParserRuleContext getParseTree() {
+        return parseTree;
     }
 }

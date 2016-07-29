@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -36,6 +37,7 @@ public class BareIrStream extends IrStreamItem {
     protected List<IrStreamItem> irStreamItems = null;
     //protected BitSpec bitSpec;
     //private int noAlternatives = 0;
+    private IrpParser.Bare_irstreamContext parseTree = null;
 
 
 //@Override
@@ -123,6 +125,7 @@ public class BareIrStream extends IrStreamItem {
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         this(ctx.irstream_item());
+        parseTree = ctx;
         //this(toList(ctx, env), env);
     }
 
@@ -244,5 +247,10 @@ public class BareIrStream extends IrStreamItem {
         for (IrStreamItem item : irStreamItems)
             sum += item.numberOfBits();
         return sum;
+    }
+
+    @Override
+    ParserRuleContext getParseTree() {
+        return parseTree;
     }
 }

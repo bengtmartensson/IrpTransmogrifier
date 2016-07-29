@@ -118,7 +118,8 @@ public class Expression extends PrimaryItem /* ??? */ {
         return operator.equals("!") ? (operand == 0L ? 1L : 0L)
                 : operator.equals("#") ? Long.bitCount(operand)
                 : operator.equals("-") ? - operand
-                : throwNewRuntimeException();
+                : operator.equals("~") ? ~ operand
+                : throwNewRuntimeException("Unknown operator: " + operator);
     }
 
     private long toNumberBinary(IrpParser.ExpressionContext expressionContext, String operator,
@@ -146,7 +147,7 @@ public class Expression extends PrimaryItem /* ??? */ {
                 : operator.equals("|")  ? left | right
                 : operator.equals("&&") ? (left != 0 ? right : 0L)
                 : operator.equals("||") ? (left != 0 ? left : right)
-                : throwNewRuntimeException();
+                : throwNewRuntimeException("Unknown operator: " + operator);
     }
 
     private long toNumberTernary(IrpParser.ExpressionContext expressionContext, IrpParser.ExpressionContext trueExpContext,
@@ -158,6 +159,10 @@ public class Expression extends PrimaryItem /* ??? */ {
 
     private long throwNewRuntimeException() {
         throw new RuntimeException("This cannot happen");
+    }
+
+    private long throwNewRuntimeException(String msg) {
+        throw new RuntimeException(msg);
     }
 
 //    private long cBinary(long x) {

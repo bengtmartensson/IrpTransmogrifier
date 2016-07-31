@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -125,5 +126,16 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     ParserRuleContext getParseTree() {
         return parseTree;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData initData, IrSignal.Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
+        IrpUtils.entering(logger, "recognize", this);
+        ArrayList<BitSpec> stack = new ArrayList<>(bitSpecs);
+        stack.add(bitSpec);
+        RecognizeData recognizeData = irStream.recognize(initData, pass, generalSpec, stack);
+        IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.toString() : "");
+        return recognizeData;
     }
 }

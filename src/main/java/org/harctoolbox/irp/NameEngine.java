@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
@@ -73,17 +76,46 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         }
     }
 
+    public boolean numbericallyEquals(Object object) {
+        if (object == this)
+            return true;
+        if (!(object instanceof NameEngine))
+            return false;
+
+        NameEngine other = (NameEngine) object;
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            try {
+                String name = kvp.getKey();
+                long value = kvp.getValue().toNumber(this);
+                Expression expr = other.get(name);
+                if (expr == null)
+                    return false;
+                if (value != expr.toNumber(other))
+                    return false;
+            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
-     * Creates a shallow copy of the NameEngine.
+     * Creates a copy of the NameEngine. The bindings are copied, the expressions not.
      * @return Shallow copy.
-     * @throws java.lang.CloneNotSupportedException
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public NameEngine clone() throws CloneNotSupportedException {
-        super.clone();
-        return new NameEngine((HashMap<String, Expression>) map.clone());
+    @SuppressWarnings("CloneDeclaresCloneNotSupported")
+    public NameEngine clone() {
+        NameEngine result = null;
+        try {
+            result = (NameEngine) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new InternalError(ex);
+        }
+        result.map = new LinkedHashMap<>(map.size());
+        result.map.putAll(map);
+        return result;
     }
 
     @Override
@@ -104,7 +136,7 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
     }
 
     public void define(String name, Expression expression) throws IrpSyntaxException {
-        if (!Name.validName(name))
+        if (!Name.validName(name)) // ????
             throw new IrpSyntaxException("Invalid name: " + name);
         map.put(name, expression);
     }
@@ -119,6 +151,12 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     public void define(Name name, long value) throws IrpSyntaxException {
         define(name, new Expression(value));
+    }
+
+    public void define(PrimaryItem data, long value) throws IrpSyntaxException {
+        Name name = data.toName();
+        if (name != null)
+            define(name, value);
     }
 
     /**
@@ -309,5 +347,32 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     public boolean isEmpty() {
         return map.isEmpty();
+    }
+
+    void addBarfByConflicts(NameEngine nameEngine) throws NameConflictException {
+        for (Map.Entry<String, Expression> kvp : nameEngine.map.entrySet()) {
+            String name = kvp.getKey();
+            Expression val = kvp.getValue();
+            if (map.containsKey(name)) {
+                try {
+                    // FIXME
+                    if (map.get(name).toNumber(this) != val.toNumber(nameEngine))
+                        throw new NameConflictException(name);
+                } catch (UnassignedException ex) {
+
+                } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+                    Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else
+                map.put(name, val);
+        }
+    }
+
+    void reduce(ParameterSpecs parameterSpecs) {
+        Set<String> names = map.keySet();
+        for (String name : names) {
+            if (!parameterSpecs.contains(name))
+                map.remove(name);
+        }
     }
 }

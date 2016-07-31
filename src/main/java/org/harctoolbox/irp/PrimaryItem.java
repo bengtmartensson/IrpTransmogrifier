@@ -48,4 +48,6 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
     }
     protected PrimaryItem() {
     }
+
+    public abstract Name toName() throws IrpSyntaxException;
 }

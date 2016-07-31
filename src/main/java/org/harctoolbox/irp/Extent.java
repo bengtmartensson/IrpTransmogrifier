@@ -16,7 +16,10 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -74,5 +77,17 @@ public class Extent extends Duration {
     @Override
     boolean interleavingOk() {
         return true;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        double expectedDuration = recognizeData.getIrSequence().get(recognizeData.getStart())
+                + recognizeData.getIrSequence().getDuration(0, recognizeData.getStart() - 1);
+        double actualDuration = toFloat(recognizeData.getNameEngine(), generalSpec);
+        return IrCoreUtils.approximatelyEquals(expectedDuration, actualDuration)
+                ? new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), 1, recognizeData.getState(), recognizeData.getNameEngine())
+                : null;
     }
 }

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -123,5 +124,12 @@ public class Variation extends IrStreamItem {
     @Override
     public ParserRuleContext getParseTree() {
         return parseTree;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData recognizeData, Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

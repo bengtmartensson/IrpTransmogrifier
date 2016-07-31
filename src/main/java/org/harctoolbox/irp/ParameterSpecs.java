@@ -119,4 +119,8 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     public Iterator<ParameterSpec> iterator() {
         return map.values().iterator();
     }
+
+    boolean contains(String name) {
+        return map.containsKey(name);
+    }
 }

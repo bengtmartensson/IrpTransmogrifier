@@ -242,4 +242,20 @@ public class ProtocolNGTest {
         String result = rc5.toIrpString();
         assertEquals(result, "{36000.0k,889.0,msb}<1,-1|-1,1>((1:1,~F:1:6,T:1,D:5,F:6,^114m)*,T=(1-T)){}[D:0..31,F:0..127,T@:0..1=0]");
     }
+
+    /**
+     * Test of recognize method, of class Protocol.
+     */
+    @Test
+    public void testRecognize_IrSignal() {
+        System.out.println("recognize");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
+            NameEngine nameEngine = new NameEngine("{D=12,S=34,F=56}");
+            NameEngine recognizeData = nec1.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

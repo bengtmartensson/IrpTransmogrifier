@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -107,4 +108,8 @@ public abstract class IrStreamItem extends IrpObject {
     }
 
     abstract ParserRuleContext getParseTree();
+
+    public abstract RecognizeData recognize(RecognizeData recognizeData,
+            IrSignal.Pass pass, GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+    throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
 }

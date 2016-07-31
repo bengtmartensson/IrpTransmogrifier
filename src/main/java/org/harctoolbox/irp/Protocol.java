@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -392,6 +393,49 @@ public class Protocol extends IrpObject {
 
     public NameEngine randomParameters() throws IrpSyntaxException {
         return parameterSpecs.random();
+    }
+
+    public NameEngine recognize(IrSignal irSignal) {
+        NameEngine nameEngine = definitions.clone();
+
+        boolean success
+                = process(nameEngine, irSignal.getIntroSequence(), IrSignal.Pass.intro)
+                && process(nameEngine, irSignal.getRepeatSequence(), IrSignal.Pass.repeat)
+                && process(nameEngine, irSignal.getEndingSequence(), IrSignal.Pass.ending);
+        if (!success)
+            return null;
+
+        nameEngine.reduce(parameterSpecs);
+
+        return nameEngine;
+    }
+
+    private boolean process(NameEngine nameEngine, IrSequence irSequence, IrSignal.Pass pass) {
+        RecognizeData inData = new RecognizeData(irSequence, nameEngine.clone());
+        RecognizeData recognizeData = recognize(inData, pass);
+        if (recognizeData == null)
+            return false;
+
+        try {
+            nameEngine.addBarfByConflicts(recognizeData.getNameEngine());
+        } catch (NameConflictException ex) {
+            logger.warning(ex.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public RecognizeData recognize(RecognizeData inData, IrSignal.Pass pass) {
+        IrpUtils.entering(logger, "recognize", pass);
+        RecognizeData recognizeData;
+        try {
+            recognizeData = bitspecIrstream.recognize(inData, pass, generalSpec, new ArrayList<>(0));
+        } catch (NameConflictException | ArithmeticException ex) {
+            recognizeData = null;
+            logger.log(Level.INFO, null, ex);
+        }
+        IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.getNameEngine().toString() : "null");
+        return recognizeData;
     }
 
     /*

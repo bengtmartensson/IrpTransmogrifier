@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -206,5 +207,11 @@ class BitStream extends IrStreamItem implements Evaluatable {
     @Override
     ParserRuleContext getParseTree() {
         return null;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs) throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -223,5 +224,45 @@ public class IrStream extends BareIrStream {
         return repeatMarker == null ? noir
                 : repeatMarker.isInfinite() ? noir + 1
                 : repeatMarker.getMin() * noir;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData initData, IrSignal.Pass pass, GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
+        //IrSignal.Pass actualState = state;
+        IrpUtils.entering(logger, "recognize", this);
+        boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
+        int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
+        RecognizeData actualData = initData.clone();
+        if (evaluateTheRepeat)
+            actualData.setState(IrSignal.Pass.repeat);
+        RecognizeData recognizeData = recognize(actualData, pass, generalSpec, bitSpecs, repetitions);
+        IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.toString() : "null");
+        return recognizeData;
+    }
+
+    private RecognizeData recognize(RecognizeData initData, IrSignal.Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpec, int repeats) throws NameConflictException {
+        IrSignal.Pass state = initData.getState();
+        int position = initData.getStart();
+        NameEngine nameEngine = initData.getNameEngine();
+        //EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
+        for (int i = 0; i < repeats; i++) {
+//            RecognizeData data = initData.clone();
+//            data.setStart(position);
+//            data.setState(state);
+//            data.set
+            RecognizeData data = new RecognizeData(initData.getIrSequence(), position, 0, state, nameEngine);
+            RecognizeData recognizeData = super.recognize(data, pass, generalSpec, bitSpec);
+            if (recognizeData == null)
+                return null;
+            nameEngine.addBarfByConflicts(recognizeData.getNameEngine());
+            position += recognizeData.getLength();
+            //if (irSequence.getState() != null) {
+            //    actualState = irSequence.getState();
+            //    result.setState(actualState);
+            //}
+            //result.add(irSequence);
+        }
+        return new RecognizeData(initData.getIrSequence(), initData.getStart(), position - initData.getStart(), state, nameEngine);
     }
 }

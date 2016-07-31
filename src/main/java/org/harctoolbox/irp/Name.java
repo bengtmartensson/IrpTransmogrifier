@@ -119,4 +119,9 @@ public class Name extends PrimaryItem implements Floatable {
     public String getName() {
         return name;
     }
+
+    @Override
+    public Name toName() {
+        return this;
+    }
 }

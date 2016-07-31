@@ -85,4 +85,9 @@ public class Number extends PrimaryItem {
         element.setTextContent(toString());
         return element;
     }
+
+    @Override
+    public Name toName() {
+        return null;
+    }
 }

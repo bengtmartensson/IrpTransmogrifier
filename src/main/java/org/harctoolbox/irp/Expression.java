@@ -78,6 +78,11 @@ public class Expression extends PrimaryItem /* ??? */ {
     public String toStringTree() {
         return parseTree.toStringTree();
     }
+    @Override
+    public Name toName() throws IrpSyntaxException {
+        PrimaryItem pi = newPrimaryItem(parseTree.primary_item());
+        return pi.toName();
+    }
 
     public long toNumber() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         return toNumber(parseTree, new NameEngine());
@@ -432,5 +437,5 @@ public class Expression extends PrimaryItem /* ??? */ {
         return null;
     }
 
-    // NOTE: this class can be invoked from the command line by IrpTsransmogrifier.main().
+    // NOTE: this class can be invoked from the command line by IrpTransmogrifier.main().
 }

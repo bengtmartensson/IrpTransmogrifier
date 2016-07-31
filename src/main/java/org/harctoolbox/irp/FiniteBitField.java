@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -179,5 +181,45 @@ public class FiniteBitField extends BitField {
     @Override
     int numberOfBareDurations() {
         return 0;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        // first the simplest case: bitSpecs
+        BitSpec bitSpec = bitSpecs.get(0);
+        int irSequencePostion = recognizeData.getStart();
+        assert(bitSpec.getChunkSize() == 1);
+        int noBits = (int) width.toNumber(recognizeData.getNameEngine());
+        long payload = 0L;
+        RecognizeData result = null;
+        int consumedDurations = 0;
+        for (int bit = 0; bit < noBits; bit++) {
+            int bareIrStreamNo;
+            RecognizeData inData = recognizeData.clone();
+            inData.setStart(irSequencePostion);
+            //new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
+            //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
+            for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
+                result = bitSpec.get(bareIrStreamNo).recognize(inData, pass, generalSpec, null);
+                if (result != null)
+                    break;
+            }
+
+            if (bareIrStreamNo == bitSpec.size())
+                return null;
+            irSequencePostion += result.getLength();
+            consumedDurations += result.getLength();
+            payload = (payload << bitSpec.getChunkSize()) | bareIrStreamNo;
+        }
+        if (this.complement)
+            payload = ~payload;
+        if (this.reverse ^ generalSpec.getBitDirection() == BitDirection.lsb)
+            payload = IrCoreUtils.reverse(payload, noBits);
+        recognizeData.getNameEngine().define(data, payload);
+        recognizeData.setLength(consumedDurations);
+        return recognizeData;
+        //return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), consumedDurations, recognizeData.getState(), recognizeData.getNameEngine());
     }
 }

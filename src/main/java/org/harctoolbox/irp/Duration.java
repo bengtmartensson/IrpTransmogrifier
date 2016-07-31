@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -183,5 +184,21 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     ParserRuleContext getParseTree() {
         return parseTree;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+//        if (recognizeData.getState() != pass)
+//            return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), 0, recognizeData.getState(), recognizeData.getNameEngine());
+
+        double physical = recognizeData.getIrSequence().get(recognizeData.getStart());
+        double theoretical = toFloat(recognizeData.getNameEngine(), generalSpec);
+        if (IrCoreUtils.approximatelyEquals(physical, theoretical)) {
+            recognizeData.setLength(1);
+            return recognizeData;
+        } else
+            return null;
     }
 }

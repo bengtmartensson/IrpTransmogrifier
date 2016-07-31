@@ -78,6 +78,11 @@ public class BitSpec extends IrpObject {
         chunkSize = 0;
         bitCodes = new ArrayList<>(2);
     }
+
+    public int size() {
+        return bitCodes.size();
+    }
+
     @Override
     public int numberOfInfiniteRepeats() {
         int sum = 0;

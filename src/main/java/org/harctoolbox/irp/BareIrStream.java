@@ -18,6 +18,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -248,5 +249,50 @@ public class BareIrStream extends IrStreamItem {
     @Override
     ParserRuleContext getParseTree() {
         return parseTree;
+    }
+
+    @Override
+    public RecognizeData recognize(RecognizeData initialData, IrSignal.Pass pass,
+            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpec) throws NameConflictException {
+        IrpUtils.entering(logger, "recognize", this);
+        IrSignal.Pass state = initialData.getState();
+        int position = initialData.getStart();
+        NameEngine nameEngine = initialData.getNameEngine().clone();
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
+            if (/*pass == IrSignal.Pass.repeat &&*/ newState != null)
+                state = newState;
+            if (state != pass)
+                continue;
+
+            if (state == pass) {
+                //double elapsed = result.getElapsed();
+                RecognizeData inData = new RecognizeData(initialData.getIrSequence(), position, 0, state, nameEngine.clone());
+                RecognizeData data;
+                try {
+                    data = irStreamItem.recognize(inData, pass, generalSpec, bitSpec);
+                } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
+                    Logger.getLogger(BareIrStream.class.getName()).log(Level.SEVERE, null, ex);
+                    data = null;
+                }
+                if (data == null) {
+                    IrpUtils.entering(logger, "recognize", "null");
+                    return null;
+                }
+
+                nameEngine.addBarfByConflicts(data.getNameEngine());
+                position += data.getLength();
+            }
+            IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
+            if (next != null)
+                state = next;
+        }
+        //result.setState(actualState);
+        RecognizeData recognizeData = initialData.clone();
+        recognizeData.setLength(position - initialData.getStart());
+        recognizeData.setNameEngine(nameEngine);
+        //new RecognizeData(initialData.getIrSequence(), initialData.getStart(), position - initialData.getStart(), state, nameEngine);
+        IrpUtils.exiting(logger, "recognize", recognizeData);
+        return recognizeData;
     }
 }

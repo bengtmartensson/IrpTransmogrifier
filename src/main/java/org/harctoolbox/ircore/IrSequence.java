@@ -368,12 +368,18 @@ public class IrSequence implements Cloneable {
     /**
      * Creates and returns a copy of this object.
      * @return A copy of this IrSequence.
-     * @throws java.lang.CloneNotSupportedException
      */
     @Override
-    public IrSequence clone() throws CloneNotSupportedException {
-        super.clone();
-        return new IrSequence(this);
+    @SuppressWarnings("CloneDeclaresCloneNotSupported")
+    public IrSequence clone() {
+        IrSequence result;
+        try {
+            result = (IrSequence) super.clone();
+            result.data = this.data.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new InternalError(ex);
+        }
+        return result;
     }
 
     /**
@@ -432,15 +438,11 @@ public class IrSequence implements Cloneable {
      * @return New instance
      */
     public IrSequence addToFlashes(double amount) {
-        IrSequence clone;
-        try {
-            clone = clone();
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
-        for (int i = 0; i < data.length; i += 2) {
+        IrSequence clone = clone();
+
+        for (int i = 0; i < data.length; i += 2)
             clone.data[i] += clone.data[i] > 0 ? amount : -amount;
-        }
+
         return clone;
     }
 
@@ -452,15 +454,11 @@ public class IrSequence implements Cloneable {
      * @return new instance
      */
     public IrSequence addToGaps(double amount) {
-        IrSequence clone;
-        try {
-            clone = clone();
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
-        for (int i = 1; i < data.length; i += 2) {
+        IrSequence clone = clone();
+
+        for (int i = 1; i < data.length; i += 2)
             clone.data[i] += clone.data[i] > 0 ? amount : -amount;
-        }
+
         return clone;
     }
 
@@ -483,12 +481,8 @@ public class IrSequence implements Cloneable {
      * @return new instance
      */
     public IrSequence addNoise(double max) {
-        IrSequence clone;
-        try {
-            clone = clone();
-        } catch (CloneNotSupportedException ex) {
-            return null;
-        }
+        IrSequence clone = clone();
+
         for (int i = 0; i < data.length; i += 2) {
             double t = max * (2 * Math.random() - 1);
             clone.data[i] += t;

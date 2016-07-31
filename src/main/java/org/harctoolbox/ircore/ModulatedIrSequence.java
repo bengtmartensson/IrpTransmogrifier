@@ -282,7 +282,9 @@ public class ModulatedIrSequence extends IrSequence {
     }
 
     @Override
-    public IrSequence clone() throws CloneNotSupportedException {
-        return super.clone(); //To change body of generated methods, choose Tools | Templates.
+    @SuppressWarnings("CloneDeclaresCloneNotSupported")
+    public IrSequence clone() {
+        ModulatedIrSequence result = (ModulatedIrSequence) super.clone();
+        return result;
     }
 }

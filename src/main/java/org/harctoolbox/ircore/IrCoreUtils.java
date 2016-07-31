@@ -125,6 +125,10 @@ public class IrCoreUtils {
         return absoluteOk || relativeOk;
     }
 
+    public static boolean approximatelyEquals(double x, double y) {
+        return approximatelyEquals(x, y, defaultAbsoluteTolerance, defaultRelativeTolerance);
+    }
+
     /**
      * Tests for approximate equality.
      *

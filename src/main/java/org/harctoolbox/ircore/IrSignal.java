@@ -37,7 +37,7 @@ import java.util.EnumMap;
  * @see IrSequence
  *
  */
-public class IrSignal {
+public class IrSignal implements Cloneable {
 
 
     /** Intro sequence, always sent once. Can be empty, but not null. */
@@ -170,6 +170,21 @@ public class IrSignal {
 
     public final double getDutyCycle() {
         return dutyCycle;
+    }
+
+    @Override
+    @SuppressWarnings("CloneDeclaresCloneNotSupported")
+    public IrSignal clone() {
+        IrSignal result = null;
+        try {
+            result = (IrSignal) super.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new InternalError(ex);
+        }
+        result.introSequence = introSequence.clone();
+        result.repeatSequence = repeatSequence.clone();
+        result.endingSequence = endingSequence.clone();
+        return result;
     }
 
     /**

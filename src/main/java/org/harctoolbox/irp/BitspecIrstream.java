@@ -129,13 +129,13 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public RecognizeData recognize(RecognizeData initData, IrSignal.Pass pass,
-            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+            ArrayList<BitSpec> bitSpecs) throws NameConflictException {
         IrpUtils.entering(logger, "recognize", this);
         ArrayList<BitSpec> stack = new ArrayList<>(bitSpecs);
         stack.add(bitSpec);
-        RecognizeData recognizeData = irStream.recognize(initData, pass, generalSpec, stack);
-        IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.toString() : "");
-        return recognizeData;
+        boolean status = irStream.recognize(recognizeData, pass, stack);
+        IrpUtils.exiting(logger, "recognize", status ? recognizeData.toString() : "");
+        return status;
     }
 }

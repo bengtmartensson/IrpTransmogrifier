@@ -252,47 +252,47 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public RecognizeData recognize(RecognizeData initialData, IrSignal.Pass pass,
-            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpec) throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+            ArrayList<BitSpec> bitSpec) throws NameConflictException {
         IrpUtils.entering(logger, "recognize", this);
-        IrSignal.Pass state = initialData.getState();
-        int position = initialData.getStart();
-        NameEngine nameEngine = initialData.getNameEngine().clone();
+        //IrSignal.Pass state = recognizeData.getState();
+        //int position = recognizeData.getStart();
+        //NameEngine nameEngine = recognizeData.getNameEngine().clone();
         for (IrStreamItem irStreamItem : irStreamItems) {
             IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
             if (/*pass == IrSignal.Pass.repeat &&*/ newState != null)
-                state = newState;
-            if (state != pass)
+                recognizeData.setState(newState);
+            if (recognizeData.getState() != pass)
                 continue;
 
-            if (state == pass) {
+            if (recognizeData.getState() == pass) {
                 //double elapsed = result.getElapsed();
-                RecognizeData inData = new RecognizeData(initialData.getIrSequence(), position, 0, state, nameEngine.clone());
-                RecognizeData data;
+                //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), position, 0, state, nameEngine.clone());
+                //RecognizeData data;
+                boolean success = false;
                 try {
-                    data = irStreamItem.recognize(inData, pass, generalSpec, bitSpec);
+                    success = irStreamItem.recognize(recognizeData, pass, bitSpec);
                 } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
                     Logger.getLogger(BareIrStream.class.getName()).log(Level.SEVERE, null, ex);
-                    data = null;
                 }
-                if (data == null) {
-                    IrpUtils.entering(logger, "recognize", "null");
-                    return null;
+                if (!success) {
+                    IrpUtils.exiting(logger, "recognize", "null");
+                    return false;
                 }
 
-                nameEngine.addBarfByConflicts(data.getNameEngine());
-                position += data.getLength();
+                //nameEngine.addBarfByConflicts(data.getNameEngine());
+                //position += data.getLength();
             }
-            IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
+            IrSignal.Pass next = irStreamItem.stateWhenExiting(recognizeData.getState());
             if (next != null)
-                state = next;
+                recognizeData.setState(next);
         }
         //result.setState(actualState);
-        RecognizeData recognizeData = initialData.clone();
-        recognizeData.setLength(position - initialData.getStart());
-        recognizeData.setNameEngine(nameEngine);
+        //RecognizeData recognizeData = recognizeData.clone();
+        //recognizeData.setLength(position - recognizeData.getStart());
+        //recognizeData.setNameEngine(nameEngine);
         //new RecognizeData(initialData.getIrSequence(), initialData.getStart(), position - initialData.getStart(), state, nameEngine);
         IrpUtils.exiting(logger, "recognize", recognizeData);
-        return recognizeData;
+        return true;
     }
 }

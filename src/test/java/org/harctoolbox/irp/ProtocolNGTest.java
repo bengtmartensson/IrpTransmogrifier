@@ -27,6 +27,7 @@ public class ProtocolNGTest {
     private final Protocol nokia32;
     private final Protocol xmp;
     private final Protocol amino;
+    private final Protocol denonK;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -35,7 +36,8 @@ public class ProtocolNGTest {
         nokia32 = new Protocol("{36k,msb}<164,-276|164,-445|164,-614|164,-783>(412,-276,D:8,S:8,T:1,X:7,F:8,164,^100m)* [D:0..255,S:0..255,F:0..255,T:0..1,X:0..127]");
         xmp = new Protocol("{38k,136,msb}<210u,-760u> ( <0:1|0:1,-1|0:1,-2|0:1,-3|0:1,-4|0:1,-5|0:1,-6|0:1,-7|0:1,-8|0:1,-9|0:1,-10|0:1,-11|0:1,-12|0:1,-13|0:1,-14|0:1,-15>   (T=0,      (S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,FF:16,210u,-80.4m,T=8)+   ) ) { C1=-(S+S::4+15+OEM+OEM::4+D+D::4),   C2=-(S+S::4+T+FF+FF::4+FF::8+FF::12) } {FF=F}[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]");
         amino = new Protocol("{37.3k,268,msb}<-1,1|1,-1>(T=1,(7,-6,3,D:4,1:1,T:1,1:2,0:8,F:8,15:4,C:4,-79m,T=0)+){C =(D:4+4*T+9+F:4+F:4:4+15)&15} [D:0..15,F:0..255]");
- }
+        denonK = new Protocol("{37k,432}<1,-1|1,-3>(8,-4,84:8,50:8,0:4,D:4,S:4,F:12,((D*16)^S^(F*16)^(F:8:4)):8,1,-173)* [D:0..15,S:0..15,F:0..4095]");
+    }
 
 
     @BeforeMethod
@@ -247,12 +249,44 @@ public class ProtocolNGTest {
      * Test of recognize method, of class Protocol.
      */
     @Test
-    public void testRecognize_IrSignal() {
+    public void testRecognize_IrSignal_nec1() {
         System.out.println("recognize");
         try {
             IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
             NameEngine nameEngine = new NameEngine("{D=12,S=34,F=56}");
             NameEngine recognizeData = nec1.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Test of recognize method, of class Protocol.
+     * /
+    @Test
+    public void testRecognize_IrSignal_rc5() {
+        System.out.println("recognize");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 0073 0000 000B 0020 0020 0040 0020 0020 0040 0020 0020 0040 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0CC8");
+            NameEngine nameEngine = new NameEngine("{D=12,F=56,T=0}");
+            NameEngine recognizeData = rc5.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }*/
+
+    /**
+     * Test of recognize method, of class Protocol.
+     */
+    @Test
+    public void testRecognize_IrSignal_denon_k() {
+        System.out.println("recognize");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 0070 0000 0032 0080 0040 0010 0010 0010 0010 0010 0030 0010 0010 0010 0030 0010 0010 0010 0030 0010 0010 0010 0010 0010 0030 0010 0010 0010 0010 0010 0030 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0030 0010 0030 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0030 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0010 0010 0ACD");
+            NameEngine nameEngine = new NameEngine("{D=12,S=3,F=56}");
+            NameEngine recognizeData = denonK.recognize(irSignal);
             assertTrue(nameEngine.numbericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);

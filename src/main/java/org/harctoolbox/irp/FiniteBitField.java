@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -184,42 +185,64 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public RecognizeData recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, IrpSyntaxException, UnassignedException {
         // first the simplest case: bitSpecs
         BitSpec bitSpec = bitSpecs.get(0);
-        int irSequencePostion = recognizeData.getStart();
+        int irSequencePostion = recognizeData.getPosition();
         assert(bitSpec.getChunkSize() == 1);
-        int noBits = (int) width.toNumber(recognizeData.getNameEngine());
+        int noBits = (int) width.toNumber(/*recognizeData.getNameEngine()*/null);
         long payload = 0L;
-        RecognizeData result = null;
-        int consumedDurations = 0;
+        //RecognizeData result = null;
+        //int consumedDurations = 0;
+        RecognizeData inData = null;
         for (int bit = 0; bit < noBits; bit++) {
             int bareIrStreamNo;
-            RecognizeData inData = recognizeData.clone();
-            inData.setStart(irSequencePostion);
+
             //new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
             //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
             for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
-                result = bitSpec.get(bareIrStreamNo).recognize(inData, pass, generalSpec, null);
-                if (result != null)
+                inData = recognizeData.clone();
+                inData.setPosition(irSequencePostion);
+                boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, null);
+                if (success)
                     break;
             }
 
-            if (bareIrStreamNo == bitSpec.size())
-                return null;
-            irSequencePostion += result.getLength();
-            consumedDurations += result.getLength();
+            if (bareIrStreamNo == bitSpec.size()) {
+                inData.setSuccess(false);
+                return false;
+            }
+            irSequencePostion = inData.getPosition();
+            //consumedDurations += inData.getLength();
             payload = (payload << bitSpec.getChunkSize()) | bareIrStreamNo;
         }
         if (this.complement)
             payload = ~payload;
-        if (this.reverse ^ generalSpec.getBitDirection() == BitDirection.lsb)
+        if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
             payload = IrCoreUtils.reverse(payload, noBits);
-        recognizeData.getNameEngine().define(data, payload);
-        recognizeData.setLength(consumedDurations);
-        return recognizeData;
+        long bitmask = IrCoreUtils.ones(noBits) << (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        Name name = data.toName();
+        if (name != null)
+            recognizeData.getParameterCollector().add(name.toString(), payload, bitmask);
+        else {
+            try {
+                long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
+                if (expected != payload)
+                    return false;
+            } catch (UnassignedException ex) {
+                logger.log(Level.WARNING, ex.getMessage());
+            }
+        }
+
+//            if (data.toNumber(null) != null) {
+//
+//        } else
+//            logger.warning("No match");
+
+
+        recognizeData.setPosition(inData.getPosition());
+        return true;//recognizeData;
         //return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), consumedDurations, recognizeData.getState(), recognizeData.getNameEngine());
     }
 }

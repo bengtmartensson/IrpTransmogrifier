@@ -187,18 +187,25 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    public RecognizeData recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+            ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
 //        if (recognizeData.getState() != pass)
 //            return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), 0, recognizeData.getState(), recognizeData.getNameEngine());
 
-        double physical = recognizeData.getIrSequence().get(recognizeData.getStart());
-        double theoretical = toFloat(recognizeData.getNameEngine(), generalSpec);
-        if (IrCoreUtils.approximatelyEquals(physical, theoretical)) {
-            recognizeData.setLength(1);
-            return recognizeData;
-        } else
-            return null;
+        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
+            return false;
+
+        double physical = recognizeData.getIrSequence().get(recognizeData.getPosition());
+        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
+        return recognize(recognizeData, physical, theoretical);
+    }
+
+    protected boolean recognize(RecognizeData recognizeData, double physical, double theoretical) {
+        boolean success = IrCoreUtils.approximatelyEquals(physical, theoretical);
+        recognizeData.setSuccess(success);
+        if (success)
+            recognizeData.incrementPosition(1);
+        return success;
     }
 }

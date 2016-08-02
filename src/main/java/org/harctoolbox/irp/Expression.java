@@ -37,7 +37,7 @@ public class Expression extends PrimaryItem /* ??? */ {
      * @param value
      * @throws IrpSyntaxException
      */
-    public Expression(long value) throws IrpSyntaxException {
+    public Expression(long value) throws IrpSyntaxException { // FIXME: insanely inefficient
         this(new ParserDriver(Long.toString(value)));
     }
 
@@ -80,8 +80,9 @@ public class Expression extends PrimaryItem /* ??? */ {
     }
     @Override
     public Name toName() throws IrpSyntaxException {
-        PrimaryItem pi = newPrimaryItem(parseTree.primary_item());
-        return pi.toName();
+//        PrimaryItem pi = newPrimaryItem(parseTree.primary_item());
+//        return pi.toName();
+        return null;
     }
 
     public long toNumber() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {

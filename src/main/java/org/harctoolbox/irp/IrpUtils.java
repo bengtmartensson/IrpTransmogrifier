@@ -105,6 +105,15 @@ public class IrpUtils {
         return new String(buf, Charset.forName("US-ASCII"));
     }
 
+    public static long ones(int n) {
+        if (n < 0 || n > Long.SIZE)
+            throw new IllegalArgumentException("Argument must be non-negative and <= " + Long.SIZE);
+        long result = 0L;
+        for (int i = 0; i < n; i++)
+            result = (result << 1) | 1L;
+        return result;
+    }
+
     /**
      * Either opens a file (optionally for appending (if beginning with +)) or returns stdout.
      *

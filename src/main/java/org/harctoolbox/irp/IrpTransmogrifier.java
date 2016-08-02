@@ -216,8 +216,16 @@ public class IrpTransmogrifier {
 
     }
 
-    private static void doRecognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private static void doRecognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) throws IncompatibleArgumentException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
+        if (commandRecognize.protocol == null)
+            throw new UnsupportedOperationException("Not implemented yet");
+        NamedProtocol protocol = irpDatabase.getNamedProtocol(commandRecognize.protocol);
+        IrSignal irSignal = Pronto.parse(commandRecognize.args);
+        NameEngine data = protocol.recognize(irSignal);
+        if (data != null)
+            System.out.println(data);
+        else
+            System.out.println("no decode");
     }
 
     private static void doExpression(CommandExpression commandExpression) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
@@ -422,7 +430,7 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (ParseCancellationException | CloneNotSupportedException | IOException | IncompatibleArgumentException | SAXException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnknownProtocolException | UnassignedException | DomainViolationException | UsageException | IrpMasterException ex) {
+        } catch (UnsupportedOperationException | ParseCancellationException | CloneNotSupportedException | IOException | IncompatibleArgumentException | SAXException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnknownProtocolException | UnassignedException | DomainViolationException | UsageException | IrpMasterException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
@@ -617,6 +625,9 @@ public class IrpTransmogrifier {
 
     @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
     private static class CommandRecognize {
+
+        @Parameter(names = { "-p", "--protocol"}, description = "Protocol to decode against (default all)")
+        private String protocol = null;
 
         @Parameter(description = "durations, or pronto hex")
         private List<String> args;

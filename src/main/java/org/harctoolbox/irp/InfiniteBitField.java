@@ -116,8 +116,7 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public RecognizeData recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet.");
     }

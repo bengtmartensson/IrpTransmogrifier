@@ -119,13 +119,15 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public RecognizeData recognize(RecognizeData inData, IrSignal.Pass pass, GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
-            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        NameEngine nameEngine = inData.getNameEngine().clone();
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
+        //NameEngine nameEngine = inData.getNameEngine().clone();
 
-        if (inData.getState() == pass)
-            nameEngine.define(name, value.toNumber(nameEngine));
+        if (recognizeData.getState() == pass)
 
-        return new RecognizeData(inData.getIrSequence(), inData.getStart(), 0, inData.getState(), nameEngine);
+            //nameEngine.define(name, value.toNumber(nameEngine));
+            recognizeData.getParameterCollector().add(name.toString(), value.toNumber(/*nameEngine*/));// ???
+
+        return true;//new RecognizeData(inData.getIrSequence(), inData.getStart(), 0, inData.getState(), nameEngine);
     }
 }

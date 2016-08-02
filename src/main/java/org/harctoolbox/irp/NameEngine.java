@@ -38,6 +38,9 @@ import org.w3c.dom.Element;
 // Clean up by eliminating and making private.
 
 public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Entry<String, Expression>> {
+
+    private final static Logger logger = Logger.getLogger(NameEngine.class.getName());
+
     public static NameEngine parseLoose(String str) throws IrpSyntaxException {
         NameEngine nameEngine = new NameEngine();
         if (str == null || str.trim().isEmpty())
@@ -356,8 +359,10 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
             if (map.containsKey(name)) {
                 try {
                     // FIXME
-                    if (map.get(name).toNumber(this) != val.toNumber(nameEngine))
+                    if (map.get(name).toNumber(this) != val.toNumber(nameEngine)) {
+                        logger.log(Level.FINER, "Name conflict {0}", name);
                         throw new NameConflictException(name);
+                    }
                 } catch (UnassignedException ex) {
 
                 } catch (IrpSyntaxException | IncompatibleArgumentException ex) {

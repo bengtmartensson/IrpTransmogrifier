@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.ircore;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -278,6 +279,25 @@ public class Pronto {
     }
 
     /**
+     * Creates a new IrSignals by interpreting its argument as CCF string.
+     * @param list Strings representing hexadecimal numbers
+     * @return IrSignal
+     * @throws IncompatibleArgumentException
+     */
+    public static IrSignal parse(List<String> list) throws IncompatibleArgumentException {
+        int[] ccf;
+        try {
+            ccf = parseAsInts(list);
+        } catch (NumberFormatException ex) {
+            throw new IncompatibleArgumentException("Non-parseable CCF strings");
+        }
+        if (ccf == null)
+            throw new IncompatibleArgumentException("Invalid CCF strings");
+
+        return parse(ccf);
+    }
+
+    /**
      * Tries to parse the string as argument.
      * Can be used to test "Proto-ness" of an unknown string.
      *
@@ -285,7 +305,7 @@ public class Pronto {
      * @return Integer array of numbers if successful, null if unsuccessful.
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public static int[] parseAsInts(String ccfString) throws IncompatibleArgumentException {
+    static int[] parseAsInts(String ccfString) throws IncompatibleArgumentException {
         String[] array = ccfString.trim().split("\\s+");
         return parseAsInts(array, 0);
     }
@@ -299,7 +319,7 @@ public class Pronto {
      * @return Integer array of numbers if successful, null if unsuccessful (e.g. by NumberFormatException).
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
      */
-    public static int[] parseAsInts(String[] array, int begin) throws IncompatibleArgumentException {
+    static int[] parseAsInts(String[] array, int begin) throws IncompatibleArgumentException {
         int[] ccf = new int[array.length];
 
         for (int i = begin; i < array.length; i++) {
@@ -312,6 +332,11 @@ public class Pronto {
             }
         }
         return ccf;
+    }
+
+    static int[] parseAsInts(List<String> list) throws IncompatibleArgumentException {
+        String[] x = list.toArray(new String[list.size()]);
+        return parseAsInts(x, 0);
     }
 
     /**

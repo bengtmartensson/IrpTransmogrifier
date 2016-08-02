@@ -411,31 +411,40 @@ public class Protocol extends IrpObject {
     }
 
     private boolean process(NameEngine nameEngine, IrSequence irSequence, IrSignal.Pass pass) {
-        RecognizeData inData = new RecognizeData(irSequence, nameEngine.clone());
-        RecognizeData recognizeData = recognize(inData, pass);
-        if (recognizeData == null)
+        //RecognizeData inData = new RecognizeData(irSequence);
+        RecognizeData recognizeData = new RecognizeData(generalSpec, irSequence);
+        boolean status = recognize(recognizeData, pass);
+        if (!status)
             return false;
 
         try {
-            nameEngine.addBarfByConflicts(recognizeData.getNameEngine());
+            recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
         } catch (NameConflictException ex) {
             logger.warning(ex.getMessage());
             return false;
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return true;
+        try {
+            recognizeData.getParameterCollector().addToNameEngine(nameEngine);
+        } catch (IrpSyntaxException | NameConflictException ex) {
+            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return recognizeData.isSuccess();
     }
 
-    public RecognizeData recognize(RecognizeData inData, IrSignal.Pass pass) {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass) {
         IrpUtils.entering(logger, "recognize", pass);
-        RecognizeData recognizeData;
+        //RecognizeData recognizeData;
+        boolean success = false;
         try {
-            recognizeData = bitspecIrstream.recognize(inData, pass, generalSpec, new ArrayList<>(0));
+            success = bitspecIrstream.recognize(recognizeData, pass, new ArrayList<>(0));
         } catch (NameConflictException | ArithmeticException ex) {
-            recognizeData = null;
+            //recognizeData = null;
             logger.log(Level.INFO, null, ex);
         }
-        IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.getNameEngine().toString() : "null");
-        return recognizeData;
+        IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.getParameterCollector().toString() : "null");
+        return success;
     }
 
     /*

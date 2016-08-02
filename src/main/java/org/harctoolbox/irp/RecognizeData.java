@@ -22,32 +22,54 @@ import org.harctoolbox.ircore.IrSignal;
 
 public class RecognizeData implements Cloneable {
 
-    private static final int ALL = -1;
+    private static int ALL = -1;
 
-    private int start;
-    private int length;
+    /**
+     * @return the ALL
+     */
+    public static int getALL() {
+        return ALL;
+    }
+
+    /**
+     * @param aALL the ALL to set
+     */
+    public static void setALL(int aALL) {
+        ALL = aALL;
+    }
+
+    //private int start;
+    //private int length;
+    private boolean success;
+    private int position;
     private IrSignal.Pass state;
-    private NameEngine nameEngine;
+    //private NameEngine nameEngine;
+    private ParameterCollector parameterCollector;
     private final IrSequence irSequence;
+    private final GeneralSpec generalSpec;
 
 //    public RecognizeData(NameEngine nameEngine) {
 //        this(0, ALL, null, nameEngine);
 //    }
 
-    public RecognizeData(IrSequence irSequence) {
-        this(irSequence, 0, 0, IrSignal.Pass.intro, new NameEngine());
+    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence) {
+        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector());
     }
 
-    public RecognizeData(IrSequence irSequence, int start, int length, IrSignal.Pass state, NameEngine nameEngine) {
-        this.start = start;
-        this.length = length;
-        this.state = state;
-        this.nameEngine = nameEngine;
+    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state, ParameterCollector parameterCollector) {
+        //this.start = start;
+        //this.length = length;
+        success = true;
+        this.generalSpec = generalSpec;
+        this.position = position;
         this.irSequence = irSequence;
+        this.state = state;
+        this.parameterCollector = parameterCollector;
+
     }
 
-    RecognizeData(IrSequence irSequence, NameEngine nameEngine) {
-        this(irSequence, 0, 0, IrSignal.Pass.intro, nameEngine);
+    RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, ParameterCollector nameEngine) {
+        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, nameEngine);
     }
 
 //    public RecognizeData(IrSequence irSequence, int position) {
@@ -71,30 +93,30 @@ public class RecognizeData implements Cloneable {
         } catch (CloneNotSupportedException ex) {
             throw new InternalError(ex);
         }
-        result.nameEngine = nameEngine.clone();
+        result.setParameterCollector(getParameterCollector().clone());
         return result;
     }
 
-    /**
-     * @return the start
-     */
-    public int getStart() {
-        return start;
-    }
-
-    /**
-     * @return the length
-     */
-    public int getLength() {
-        return length;
-    }
-
-    /**
-     * @return the data
-     */
-    public NameEngine getNameEngine() {
-        return nameEngine;
-    }
+//    /**
+//     * @return the start
+//     */
+//    public int getStart() {
+//        return start;
+//    }
+//
+//    /**
+//     * @return the length
+//     */
+//    public int getLength() {
+//        return length;
+//    }
+//
+//    /**
+//     * @return the data
+//     */
+//    public NameEngine getNameEngine() {
+//        return nameEngine;
+//    }
 
     /**
      * @return the state
@@ -110,19 +132,19 @@ public class RecognizeData implements Cloneable {
         return irSequence;
     }
 
-    /**
-     * @param start the start to set
-     */
-    public void setStart(int start) {
-        this.start = start;
-    }
-
-    /**
-     * @param length the length to set
-     */
-    public void setLength(int length) {
-        this.length = length;
-    }
+//    /**
+//     * @param start the start to set
+//     */
+//    public void setStart(int start) {
+//        this.start = start;
+//    }
+//
+//    /**
+//     * @param length the length to set
+//     */
+//    public void setLength(int length) {
+//        this.length = length;
+//    }
 
     /**
      * @param state the state to set
@@ -131,7 +153,60 @@ public class RecognizeData implements Cloneable {
         this.state = state;
     }
 
-    void setNameEngine(NameEngine nameEngine) {
-        this.nameEngine = nameEngine;
+//    void setNameEngine(NameEngine nameEngine) {
+//        this.nameEngine = nameEngine;
+//    }
+
+    /**
+     * @return the position
+     */
+    public int getPosition() {
+        return position;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    /**
+     * @return the parameterCollector
+     */
+    public ParameterCollector getParameterCollector() {
+        return parameterCollector;
+    }
+
+    /**
+     * @param parameterCollector the parameterCollector to set
+     */
+    public void setParameterCollector(ParameterCollector parameterCollector) {
+        this.parameterCollector = parameterCollector;
+    }
+
+    /**
+     * @return the success
+     */
+    public boolean isSuccess() {
+        return success;
+    }
+
+    /**
+     * @param success the success to set
+     */
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    /**
+     * @return the generalSpec
+     */
+    public GeneralSpec getGeneralSpec() {
+        return generalSpec;
+    }
+
+    void incrementPosition(int i) {
+        position += i;
     }
 }

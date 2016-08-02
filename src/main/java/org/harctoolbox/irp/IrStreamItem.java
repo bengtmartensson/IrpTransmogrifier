@@ -109,7 +109,7 @@ public abstract class IrStreamItem extends IrpObject {
 
     abstract ParserRuleContext getParseTree();
 
-    public abstract RecognizeData recognize(RecognizeData recognizeData,
-            IrSignal.Pass pass, GeneralSpec generalSpec, ArrayList<BitSpec> bitSpecs)
+    public abstract boolean recognize(RecognizeData recognizeData,
+            IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
     throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
 }

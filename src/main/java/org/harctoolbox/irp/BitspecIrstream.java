@@ -63,7 +63,7 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     public Element toElement(Document document) throws IrpSyntaxException {
         Element root = document.createElement("bitspec_irstream");
-        root.setAttribute("interleavingOk", Boolean.toString(interleavingOk()));
+        root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null)));
         root.appendChild(bitSpec.toElement(document));
         root.appendChild(irStream.toElement(document));
         return root;
@@ -104,11 +104,6 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    boolean interleavingOk() {
-        return bitSpec.isStandardPWM(new NameEngine(), new GeneralSpec()) && irStream.interleavingOk();
-    }
-
-    @Override
     int numberOfBits() {
         return irStream.numberOfBits();
     }
@@ -137,5 +132,39 @@ public class BitspecIrstream extends IrStreamItem {
         boolean status = irStream.recognize(recognizeData, pass, stack);
         IrpUtils.exiting(logger, "recognize", status ? recognizeData.toString() : "");
         return status;
+    }
+
+    @Override
+    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return bitSpec.interleaveOk(nameEngine, generalSpec)
+                && irStream.interleavingOk(nameEngine, generalSpec);
+    }
+
+    boolean isStandardPWM(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return bitSpec.isStandardPWM(nameEngine, generalSpec);
+    }
+
+    boolean isPWM4(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return bitSpec.isPWM4(nameEngine, generalSpec);
+    }
+
+    boolean isBiphase(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return bitSpec.isStandardBiPhase(nameEngine, generalSpec);
+    }
+
+    boolean isTrivial(NameEngine definitions, GeneralSpec generalSpec, boolean inverted) {
+        return bitSpec.isTrivial(definitions, generalSpec, inverted);
+    }
+
+    boolean isRPlus() {
+        return irStream.isRPlus();
+    }
+
+    boolean startsWithDuration() {
+        return irStream.startsWithDuration();
+    }
+
+    boolean hasVariation(boolean recursive) {
+        return irStream.hasVariation(recursive);
     }
 }

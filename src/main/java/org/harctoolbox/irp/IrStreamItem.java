@@ -93,7 +93,7 @@ public abstract class IrStreamItem extends IrpObject {
         return 0;
     }
 
-    abstract boolean interleavingOk();
+    abstract boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec);
 
     abstract int numberOfBits();
 

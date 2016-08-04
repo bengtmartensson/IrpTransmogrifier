@@ -204,6 +204,28 @@ public class BitSpec extends IrpObject {
         return true;
     }
 
+   /**
+     * Checks if the BitSpec is of type &lt;a,-b|c,-d|e,-f|g,-h&gt;, for a,b,c,d,e,f,g,h &gt; 0.
+     * @param nameEngine
+     * @param generalSpec
+     * @return
+     */
+    public boolean isPWM4(NameEngine nameEngine, GeneralSpec generalSpec) {
+        if (bitCodes.size() != 4)
+            return false;
+        for (BareIrStream bitCode : bitCodes) {
+            try {
+                // toIrSequence throws exception if not positive, negative
+                IrSequence irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec).toIrSequence();
+                if (irSequence.getLength() != 2)
+                    return false;
+            } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Checks if the BitSpec is of type &lt;a,-a|-a,a&gt; (a != 0)
      * @param nameEngine
@@ -232,6 +254,29 @@ public class BitSpec extends IrpObject {
         return true;
     }
 
+    /**
+     * Checks if the BitSpec is of type &lt;a|-a&gt; (a != 0)
+     * @param nameEngine
+     * @param generalSpec
+     * @param inverted
+     * @return
+     */
+    public boolean isTrivial(NameEngine nameEngine, GeneralSpec generalSpec, boolean inverted) {
+        if (bitCodes.size() != 2)
+            return false;
+        try {
+            EvaluatedIrStream off = bitCodes.get(0).evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec);
+            EvaluatedIrStream on = bitCodes.get(1).evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec);
+            if (on.getLenght() != 1 || off.getLenght() != 1)
+                return false;
+
+            boolean sign = off.get(0) > 0;
+            return IrCoreUtils.approximatelyEquals(on.get(0), -off.get(0)) && (sign == inverted);
+        } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
+            return false;
+        }
+    }
+
     @Override
     public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("bitspec");
@@ -248,4 +293,16 @@ public class BitSpec extends IrpObject {
 //    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
 //        throw new UnsupportedOperationException("Not supported yet.");
 //    }
+
+    boolean interleaveOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+        if (isStandardPWM(nameEngine, generalSpec)
+                || isPWM4(nameEngine, generalSpec))
+            return true;
+
+        for (BareIrStream bareIrStream : bitCodes)
+            if (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec))
+                return false;
+
+        return true;
+    }
 }

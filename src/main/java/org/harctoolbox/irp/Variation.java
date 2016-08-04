@@ -92,8 +92,10 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    boolean interleavingOk() {
-        return intro.interleavingOk() && repeat.interleavingOk() && (ending == null || ending.interleavingOk());
+    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return intro.interleavingOk(nameEngine, generalSpec)
+                && repeat.interleavingOk(nameEngine, generalSpec)
+                && (ending == null || ending.interleavingOk(nameEngine, generalSpec));
     }
 
     @Override

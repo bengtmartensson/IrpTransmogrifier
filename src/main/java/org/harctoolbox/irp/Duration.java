@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -187,25 +186,20 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            ArrayList<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-//        if (recognizeData.getState() != pass)
-//            return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), 0, recognizeData.getState(), recognizeData.getNameEngine());
-
-        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
-            return false;
-
-        double physical = recognizeData.getIrSequence().get(recognizeData.getPosition());
-        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-        return recognize(recognizeData, physical, theoretical);
+    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return true;
     }
 
     protected boolean recognize(RecognizeData recognizeData, double physical, double theoretical) {
-        boolean success = IrCoreUtils.approximatelyEquals(physical, theoretical);
-        recognizeData.setSuccess(success);
-        if (success)
+        boolean equals = IrCoreUtils.approximatelyEquals(physical, theoretical);
+        if (equals) {
             recognizeData.incrementPosition(1);
-        return success;
+            //recognizeData.clearRest();
+//        } else if (IrCoreUtils.approximatelyEquals(physical, 2*theoretical)) {
+//            recognizeData.incrementPosition(1);
+//            recognizeData.setRest(physical - theoretical, this instanceof Flash);
+        } else
+            recognizeData.setSuccess(false);
+        return recognizeData.isSuccess();
     }
 }

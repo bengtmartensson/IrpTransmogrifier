@@ -21,10 +21,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.IrpMaster.IncompatibleArgumentException;
-import org.harctoolbox.IrpMaster.IrpMaster;
-import org.harctoolbox.IrpMaster.IrpMasterException;
-import org.harctoolbox.IrpMaster.Protocol;
 import org.harctoolbox.irp.IrpSyntaxException;
 import org.harctoolbox.irp.NameEngine;
 import org.harctoolbox.irp.UnassignedException;
@@ -36,12 +32,12 @@ import org.harctoolbox.irp.UnassignedException;
 public class IrpMasterUtils {
 
     private static final String configFile = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
-    private static IrpMaster irpMaster = null;
+    private static org.harctoolbox.IrpMaster.IrpMaster irpMaster = null;
 
     static {
         try {
-            irpMaster = new IrpMaster(configFile);
-        } catch (FileNotFoundException | IncompatibleArgumentException ex) {
+            irpMaster = new org.harctoolbox.IrpMaster.IrpMaster(configFile);
+        } catch (FileNotFoundException | org.harctoolbox.IrpMaster.IncompatibleArgumentException ex) {
             Logger.getLogger(IrpMasterUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -66,12 +62,12 @@ public class IrpMasterUtils {
         }
     }
 
-    public static IrSignal renderIrSignal(String protocolName, NameEngine parameters) throws IrpMasterException, UnassignedException, IrpSyntaxException, org.harctoolbox.ircore.IncompatibleArgumentException {
-        return renderIrSignal(protocolName, parameters.getMap());
+    public static IrSignal renderIrSignal(String protocolName, NameEngine parameters) throws org.harctoolbox.IrpMaster.IrpMasterException, UnassignedException, IrpSyntaxException, org.harctoolbox.ircore.IncompatibleArgumentException {
+        return renderIrSignal(protocolName, parameters.toMap());
     }
 
-    public static IrSignal renderIrSignal(String protocolName, HashMap<String, Long> parameters) throws IrpMasterException {
-        Protocol irpMasterProtol = irpMaster.newProtocol(protocolName);
+    public static IrSignal renderIrSignal(String protocolName, HashMap<String, Long> parameters) throws org.harctoolbox.IrpMaster.IrpMasterException {
+        org.harctoolbox.IrpMaster.Protocol irpMasterProtol = irpMaster.newProtocol(protocolName);
         org.harctoolbox.IrpMaster.IrSignal irSignal = irpMasterProtol.renderIrSignal(parameters);
         return toIrSignal(irSignal);
     }

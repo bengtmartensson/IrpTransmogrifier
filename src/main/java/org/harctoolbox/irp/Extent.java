@@ -74,17 +74,34 @@ public class Extent extends Duration {
     }
 
     @Override
-    boolean interleavingOk() {
-        return true;
-    }
-
-    @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
             ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        double physical = recognizeData.getIrSequence().get(recognizeData.getPosition())
+        double physical = Math.abs(recognizeData.getIrSequence().get(recognizeData.getPosition()))
                 + recognizeData.getIrSequence().getDuration(0, recognizeData.getPosition() - 1);
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-        return recognize(recognizeData, physical, theoretical);
+    return recognize(recognizeData, physical, theoretical);
     }
+
+
+
+
+
+//    @Override
+//    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
+//            ArrayList<BitSpec> bitSpecs)
+//            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+//         if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
+//            return false;
+//         if (recognizeData.getPosition() % 2 == 0)
+//            return false;
+//
+//        if (recognizeData.hasRestFlash())
+//            return false;
+//        double physical = recognizeData.getIrSequence().get(recognizeData.getPosition())
+//                + recognizeData.getRest()
+//                + recognizeData.getIrSequence().getDuration(0, recognizeData.getPosition() - 1);
+//        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
+//        return recognize(recognizeData, physical, theoretical);
+//    }
 }

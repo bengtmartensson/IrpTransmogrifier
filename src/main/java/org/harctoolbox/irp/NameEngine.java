@@ -343,9 +343,11 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
     }
 
 
-    @SuppressWarnings("unchecked")
-    public HashMap<String, Long> getMap() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        return (HashMap<String, Long>) map.clone();
+    public HashMap<String, Long> toMap() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        HashMap<String, Long> result = new HashMap<>(map.size());
+        for (Map.Entry<String, Expression> kvp : map.entrySet())
+            result.put(kvp.getKey(), kvp.getValue().toNumber(this));
+        return result;
     }
 
     public boolean isEmpty() {

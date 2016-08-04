@@ -135,7 +135,31 @@ public class BareIrStream extends IrStreamItem {
         return result;
     }
 
+    public boolean startsWithDuration() {
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            if (irStreamItem instanceof Duration)
+                return true;
+            if (irStreamItem instanceof BitField)
+                return false;
+            if (irStreamItem instanceof BitspecIrstream)
+                return ((BitspecIrstream) irStreamItem).startsWithDuration();
+            if (irStreamItem instanceof BareIrStream)
+                return ((BareIrStream) irStreamItem).startsWithDuration();
+        }
+        return false; // give up
+    }
 
+    public boolean hasVariation(boolean recursive) {
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            if (irStreamItem instanceof Variation)
+                return true;
+            if (recursive && irStreamItem instanceof BitspecIrstream)
+                return ((BitspecIrstream) irStreamItem).hasVariation(recursive);
+            if (recursive && irStreamItem instanceof BareIrStream)
+                return ((BareIrStream) irStreamItem).hasVariation(recursive);
+        }
+        return false; // give up
+    }
 
 /*
     private static List<IrStreamItem> toList(IrpParser.Bare_irstreamContext ctx, Protocol env) {
@@ -191,7 +215,7 @@ public class BareIrStream extends IrStreamItem {
     }*/
 
     @Override
-    boolean interleavingOk() {
+    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
         boolean ok = true;
         boolean lastWasGap = true;
         for (IrStreamItem item : this.irStreamItems) {
@@ -209,7 +233,7 @@ public class BareIrStream extends IrStreamItem {
                 if (!lastWasGap)
                     return false;
             }
-            if (!item.interleavingOk())
+            if (!item.interleavingOk(nameEngine, generalSpec))
                 return false;
         }
         return true;

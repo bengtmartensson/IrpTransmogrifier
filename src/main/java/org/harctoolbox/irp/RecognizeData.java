@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 
@@ -42,6 +43,8 @@ public class RecognizeData implements Cloneable {
     //private int length;
     private boolean success;
     private int position;
+    private double rest; // microseconds
+    private boolean restIsFlash;
     private IrSignal.Pass state;
     //private NameEngine nameEngine;
     private ParameterCollector parameterCollector;
@@ -62,6 +65,8 @@ public class RecognizeData implements Cloneable {
         success = true;
         this.generalSpec = generalSpec;
         this.position = position;
+        this.rest = 0.0;
+        this.restIsFlash = false;
         this.irSequence = irSequence;
         this.state = state;
         this.parameterCollector = parameterCollector;
@@ -208,5 +213,58 @@ public class RecognizeData implements Cloneable {
 
     void incrementPosition(int i) {
         position += i;
+    }
+
+    public boolean hasRest() {
+        return ! IrCoreUtils.approximatelyEquals(rest, 0.0);
+    }
+
+    /**
+     * @return the rest
+     */
+    public double getRest() {
+        return rest;
+    }
+
+    /**
+     * @param rest the rest to set
+     * @param isFlash
+     */
+    public void setRest(double rest, boolean isFlash) {
+        this.rest = rest;
+        this.restIsFlash = isFlash;
+    }
+
+    /**
+     * @param rest the rest to set
+     */
+    public void setRestFlash(double rest) {
+        setRest(rest, true);
+    }
+
+    /**
+     * @param rest the rest to set
+     */
+    public void setRestGap(double rest) {
+        setRest(rest, false);
+    }
+
+    /**
+     * @return the restIsFlash
+     */
+    public boolean isRestIsFlash() {
+        return restIsFlash;
+    }
+
+    public boolean hasRestGap() {
+        return hasRest() && ! restIsFlash;
+    }
+
+    public boolean hasRestFlash() {
+        return hasRest() && restIsFlash;
+    }
+
+    public void clearRest() {
+        rest = 0.0f;
     }
 }

@@ -50,10 +50,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.harctoolbox.irp.Expression</mainClass>
+                            <mainClass>org.harctoolbox.irp.IrpTransmogrifier</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -67,7 +68,9 @@
                     <execution>
                         <id>exec-bin</id>
                         <phase>package</phase>
-                        <goals> <goal>single</goal> </goals>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                    </executions>
             </plugin>
@@ -159,7 +162,7 @@
             <artifactId>Saxon-HE</artifactId>
             <version>9.7.0-6</version>
         </dependency>
-        
+
         <!-- Only for testing! Might be removed in the future -->
         <dependency>
             <groupId>org.harctoolbox</groupId>

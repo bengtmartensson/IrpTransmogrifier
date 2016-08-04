@@ -156,7 +156,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 //    }
 
     @Override
-    boolean interleavingOk() {
+    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
         return true;
     }
 

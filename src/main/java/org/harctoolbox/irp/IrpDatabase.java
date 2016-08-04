@@ -44,6 +44,7 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -156,9 +157,13 @@ public class IrpDatabase {
                     isDocumentation = false;
                 } else if (isDocumentation && currentProtocol != null) {
                     // Everything is added to the documentation
-                    documentation.append(line).append(" ");
                     if (line.isEmpty())
                         documentation.append("\n\n");
+                    else {
+                        if (documentation.length() > 0 && !documentation.substring(documentation.length()-1).equals("\n"))
+                            documentation.append(" ");
+                        documentation.append(line);
+                    }
                 } else if (line.equals("[documentation]")) {
                     if (currentProtocol != null)
                         isDocumentation = true;
@@ -168,7 +173,7 @@ public class IrpDatabase {
                 } else if (keyword.equals("irp")) {
                     if (currentProtocol != null)
                         currentProtocol.put(UnparsedProtocol.irpName, payload);
-                } else if (keyword.equals(UnparsedProtocol.usable)) {
+                } else if (keyword.equals(UnparsedProtocol.usableName)) {
                     if (currentProtocol != null)
                         currentProtocol.put(keyword, payload);
                 } else if (keyword.length() > 1) {
@@ -188,6 +193,7 @@ public class IrpDatabase {
         }
         return doc;
     }
+
     private static Element toElement(Document doc, HashMap<String, String> currentProtocol) {
         Element element = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocol");
         for (Map.Entry<String, String> kvp : currentProtocol.entrySet()) {
@@ -196,8 +202,8 @@ public class IrpDatabase {
                     element.setAttribute(UnparsedProtocol.nameName, kvp.getValue());
                     element.setAttribute("c-name", toCName(kvp.getValue()));
                     break;
-                case UnparsedProtocol.usable:
-                    element.setAttribute(UnparsedProtocol.usable, Boolean.toString(!kvp.getValue().equals("no")));
+                case UnparsedProtocol.usableName:
+                    element.setAttribute(UnparsedProtocol.usableName, Boolean.toString(!kvp.getValue().equals("no")));
                     break;
                 case UnparsedProtocol.irpName: {
                     Element irp = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.irpName);
@@ -225,15 +231,26 @@ public class IrpDatabase {
         String newName = name.replaceAll("[^0-9A-Za-z_]", "");
         return newName.matches("\\d.*") ? ("X" + newName) : newName;
     }
-    public static void main(String[] args) {
-        try {
-            Document doc = readIni(args[0]);
-            String out = args.length >= 2 ? args[1] : "-";
-            XmlUtils.printDOM(IrpUtils.getPrintSteam(out), doc, "UTF-8", "{" + irpProtocolNS + "}irp");
-        } catch (IOException ex) {
-            Logger.getLogger(IrpDatabase.class.getName()).log(Level.SEVERE, null, ex);
+
+    Document toDocument() {
+        Document doc = XmlUtils.newDocument(true);
+        Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
+        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
+        root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
+        root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
+        root.setAttribute("version", configFileVersion);
+        doc.appendChild(root);
+
+        for (UnparsedProtocol protocol : this.protocols.values()) {
+            Element element = toElement(doc, protocol.map);
+            root.appendChild(element);
         }
+
+        return doc;
     }
+
     private String configFileVersion;
     private String encoding;
 
@@ -273,12 +290,15 @@ public class IrpDatabase {
      */
     public IrpDatabase(Document doc) throws IncompatibleArgumentException {
         Element root = doc.getDocumentElement();
-        protocols = new LinkedHashMap<>(150);
+        configFileVersion = root.getAttribute("version");
         NodeList nodes = root.getElementsByTagNameNS(irpProtocolNS, "protocol");
+        protocols = new LinkedHashMap<>(nodes.getLength());
         for (int i = 0; i < nodes.getLength(); i++)
             addProtocol((Element)nodes.item(i));
-        expand();
+        // FIXME
+        //expand();
     }
+
     /**
      * @return the configFileVersion
      */
@@ -359,7 +379,7 @@ public class IrpDatabase {
     }
 
 
-    private void expand() throws IncompatibleArgumentException {
+    public void expand() throws IncompatibleArgumentException {
         for (String protocol : protocols.keySet())
             expand(0, protocol);
     }
@@ -389,8 +409,8 @@ public class IrpDatabase {
 
     private void addProtocol(Element current) {
 
-        if (current.getAttribute(UnparsedProtocol.usable).equals("no")
-                || current.getAttribute(UnparsedProtocol.usable).equals("false"))
+        if (current.getAttribute(UnparsedProtocol.usableName).equals("no")
+                || current.getAttribute(UnparsedProtocol.usableName).equals("false"))
             return;
 
         UnparsedProtocol proto = new UnparsedProtocol(current);
@@ -409,7 +429,7 @@ public class IrpDatabase {
         public static final String unnamed = "unnamed_protocol";
         public static final String nameName = "name";
         public static final String irpName = "irp";
-        public static final String usable = "usable";
+        public static final String usableName = "usable";
         public static final String documentationName = "documentation";
         private static final String parameterName = "parameter";
 
@@ -437,12 +457,26 @@ public class IrpDatabase {
         UnparsedProtocol(Element element) {
             this();
             map.put(nameName, element.getAttribute(nameName));
-            NodeList nl = element.getElementsByTagNameNS(irpProtocolNS, irpName);
-            if (nl.getLength() > 0)
-                map.put(irpName, nl.item(0).getTextContent());
-            NodeList n = element.getElementsByTagNameNS(irpProtocolNS, documentationName);
-            if (n.getLength() > 0)
-                map.put(documentationName, n.item(0).getTextContent());
+            NodeList nodeList = element.getChildNodes();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                if (node.getNodeType() != Node.ELEMENT_NODE)
+                    continue;
+                Element e = (Element) node;
+                switch (e.getLocalName()) {
+                    case irpName:
+                        map.put(irpName, e.getTextContent());
+                        break;
+                    case documentationName:
+                        map.put(documentationName, e.getTextContent());
+                        break;
+                    case parameterName:
+                        map.put(e.getAttribute("name"), e.getTextContent());
+                        break;
+                    default:
+                        throw new InternalError("unknown tag: " + e.getTagName());
+                }
+            }
         }
         String getProperty(String key) {
             return map.get(key);

@@ -203,7 +203,7 @@ public class FiniteBitField extends BitField {
             //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
             for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
                 inData = recognizeData.clone();
-                inData.setPosition(irSequencePostion);
+                //inData.setPosition(irSequencePostion);
                 boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, null);
                 if (success)
                     break;
@@ -213,15 +213,19 @@ public class FiniteBitField extends BitField {
                 inData.setSuccess(false);
                 return false;
             }
-            irSequencePostion = inData.getPosition();
+            recognizeData.setPosition(inData.getPosition());
+            recognizeData.setRest(inData.getRest(), inData.isRestIsFlash());
+            //irSequencePostion = inData.getPosition();
             //consumedDurations += inData.getLength();
             payload = (payload << bitSpec.getChunkSize()) | bareIrStreamNo;
         }
+        payload <<= (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
         if (this.complement)
             payload = ~payload;
         if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
             payload = IrCoreUtils.reverse(payload, noBits);
         long bitmask = IrCoreUtils.ones(noBits) << (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        payload &= bitmask;
         Name name = data.toName();
         if (name != null)
             recognizeData.getParameterCollector().add(name.toString(), payload, bitmask);
@@ -241,7 +245,7 @@ public class FiniteBitField extends BitField {
 //            logger.warning("No match");
 
 
-        recognizeData.setPosition(inData.getPosition());
+        //recognizeData.setPosition(inData.getPosition());
         return true;//recognizeData;
         //return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), consumedDurations, recognizeData.getState(), recognizeData.getNameEngine());
     }

@@ -16,7 +16,9 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -46,7 +48,53 @@ public class Flash extends Duration {
     }
 
     @Override
-    boolean interleavingOk() {
-        return true;
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
+            return false;
+        if (recognizeData.getPosition() % 2 != 0)
+            return false;
+        //if (recognizeData.hasRestFlash())
+        //    return false;
+
+        double physical = recognizeData.getIrSequence().get(recognizeData.getPosition()) + recognizeData.getRest();
+        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
+        return recognize(recognizeData, physical, theoretical);
     }
+    /*
+    @Override
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+//        if (recognizeData.getState() != pass)
+//            return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), 0, recognizeData.getState(), recognizeData.getNameEngine());
+
+        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
+            return false;
+        if (recognizeData.hasRestGap())
+            return false;
+        double physical;
+        if (recognizeData.getPosition() % 2 != 0) {
+            if (recognizeData.hasRestFlash()) {
+                physical = recognizeData.getRest();
+
+            } else
+                return false;
+        } else {
+            physical = recognizeData.getIrSequence().get(recognizeData.getPosition()) + recognizeData.getRest();
+            recognizeData.incrementPosition(1);
+        }
+        recognizeData.clearRest();
+
+        double theoretical = toFloat(/*recognizeData.getNameEngine()* /null, recognizeData.getGeneralSpec());
+
+        boolean equals = IrCoreUtils.approximatelyEquals(physical, theoretical);
+        if (equals) {
+            recognizeData.clearRest();
+        } else if (IrCoreUtils.approximatelyEquals(physical, 2 * theoretical)) {
+            recognizeData.setRest(physical - theoretical, this instanceof Flash);
+        } else
+            recognizeData.setSuccess(false);
+
+        return recognizeData.isSuccess();
+    }*/
 }

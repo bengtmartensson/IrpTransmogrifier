@@ -134,7 +134,9 @@ public class IrStream extends BareIrStream {
 
     @Override
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
-        return (pass == IrSignal.Pass.repeat && isInfiniteRepeat()) ? IrSignal.Pass.repeat : null;
+        return hasVariation(false) ? pass
+                : (pass == IrSignal.Pass.repeat && isInfiniteRepeat()) ? IrSignal.Pass.repeat
+                : null;
     }
 
     @Override
@@ -264,5 +266,9 @@ public class IrStream extends BareIrStream {
             //result.add(irSequence);
         }
         return true;//new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), position - recognizeData.getStart(), state, nameEngine);
+    }
+
+    boolean isRPlus() {
+        return repeatMarker != null && repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true);
     }
 }

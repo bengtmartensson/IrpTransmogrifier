@@ -342,6 +342,37 @@ public class Protocol extends IrpObject {
         return memoryVariables.get(name).toNumber();
     }
 
+    boolean hasMemoryVariable(String name) {
+        return memoryVariables.containsKey(name);
+    }
+
+    public boolean isStandardPWM() {
+        return bitspecIrstream.isStandardPWM(definitions, generalSpec);
+    }
+
+    public boolean isPWM4() {
+        return bitspecIrstream.isPWM4(definitions, generalSpec);
+    }
+
+    public boolean isBiphase() {
+        return bitspecIrstream.isBiphase(definitions, generalSpec);
+    }
+
+    public boolean isTrivial(boolean inverted) {
+        return bitspecIrstream.isTrivial(definitions, generalSpec, inverted);
+    }
+
+    public boolean interleavingOk() {
+        return bitspecIrstream.interleavingOk(definitions, generalSpec);
+    }
+
+    public boolean isRPlus() {
+        return bitspecIrstream.isRPlus();
+    }
+
+    public boolean startsWithDuration() {
+        return bitspecIrstream.startsWithDuration();
+    }
 
 //    public Document toDocument() throws IrpSyntaxException {
 //        Document document = newDocument();

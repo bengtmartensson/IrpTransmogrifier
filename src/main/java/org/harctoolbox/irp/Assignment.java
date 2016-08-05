@@ -99,7 +99,7 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
         return true;
     }
 
@@ -129,5 +129,10 @@ public class Assignment extends IrStreamItem implements Numerical {
             recognizeData.getParameterCollector().add(name.toString(), value.toNumber(/*nameEngine*/));// ???
 
         return true;//new RecognizeData(inData.getIrSequence(), inData.getStart(), 0, inData.getState(), nameEngine);
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        return lastWasGap;
     }
 }

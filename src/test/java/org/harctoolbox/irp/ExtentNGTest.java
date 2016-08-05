@@ -73,8 +73,10 @@ public class ExtentNGTest {
     public void testInterleavingOk() throws IrpSyntaxException {
         System.out.println("interleavingOk");
         Extent instance = new Extent("^Z");
-        boolean result = instance.interleavingOk(null, null);
+        boolean result = instance.interleavingOk(null, null, false);
         Assert.assertTrue(result);
+        result = instance.interleavingOk(null, null, true);
+        Assert.assertFalse(result);
     }
 
     @Test

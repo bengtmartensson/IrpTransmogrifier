@@ -300,7 +300,7 @@ public class BitSpec extends IrpObject {
             return true;
 
         for (BareIrStream bareIrStream : bitCodes)
-            if (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec))
+            if (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec, true))
                 return false;
 
         return true;

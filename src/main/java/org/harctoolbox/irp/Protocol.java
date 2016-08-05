@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
@@ -363,7 +364,7 @@ public class Protocol extends IrpObject {
     }
 
     public boolean interleavingOk() {
-        return bitspecIrstream.interleavingOk(definitions, generalSpec);
+        return bitspecIrstream.interleavingOk(definitions, generalSpec, true);
     }
 
     public boolean isRPlus() {
@@ -372,6 +373,10 @@ public class Protocol extends IrpObject {
 
     public boolean startsWithDuration() {
         return bitspecIrstream.startsWithDuration();
+    }
+
+    public boolean hasVariation() {
+        return bitspecIrstream.hasVariation(true);
     }
 
 //    public Document toDocument() throws IrpSyntaxException {
@@ -427,17 +432,27 @@ public class Protocol extends IrpObject {
     }
 
     public NameEngine recognize(IrSignal irSignal) {
+        return recognize(irSignal, true, IrCoreUtils.defaultFrequencyTolerance);
+    }
+
+    public NameEngine recognize(IrSignal irSignal, boolean checkFrequency, double frequencyTolerance) {
+        IrpUtils.entering(logger, "recognize", this);
         NameEngine nameEngine = definitions.clone();
 
-        boolean success
-                = process(nameEngine, irSignal.getIntroSequence(), IrSignal.Pass.intro)
-                && process(nameEngine, irSignal.getRepeatSequence(), IrSignal.Pass.repeat)
-                && process(nameEngine, irSignal.getEndingSequence(), IrSignal.Pass.ending);
-        if (!success)
+        boolean success = (!checkFrequency || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
+        if (success)
+            success = process(nameEngine, irSignal.getIntroSequence(), IrSignal.Pass.intro);
+        if (success)
+            success = process(nameEngine, irSignal.getRepeatSequence(), IrSignal.Pass.repeat);
+        if (success)
+            success = process(nameEngine, irSignal.getEndingSequence(), IrSignal.Pass.ending);
+        if (!success) {
+            IrpUtils.entering(logger, "recognize", "null");
             return null;
+        }
 
         nameEngine.reduce(parameterSpecs);
-
+        IrpUtils.entering(logger, "recognize", nameEngine);
         return nameEngine;
     }
 
@@ -458,7 +473,7 @@ public class Protocol extends IrpObject {
         }
         try {
             recognizeData.getParameterCollector().addToNameEngine(nameEngine);
-        } catch (IrpSyntaxException | NameConflictException ex) {
+        } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) { // FIXME
             Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
         return recognizeData.isSuccess();
@@ -474,7 +489,8 @@ public class Protocol extends IrpObject {
             //recognizeData = null;
             logger.log(Level.INFO, null, ex);
         }
-        IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.getParameterCollector().toString() : "null");
+        //IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.getParameterCollector().toString() : "null");
+        IrpUtils.exiting(logger, "recognize", success);
         return success;
     }
 

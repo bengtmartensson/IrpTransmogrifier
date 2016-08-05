@@ -76,7 +76,7 @@ public class FlashNGTest {
     public void testInterleavingOk() throws IrpSyntaxException {
         System.out.println("interleavingOk");
         Flash instance = new Flash("Z");
-        boolean result = instance.interleavingOk(null, null);
+        boolean result = instance.interleavingOk(null, null, true);
         Assert.assertTrue(result);
     }
 

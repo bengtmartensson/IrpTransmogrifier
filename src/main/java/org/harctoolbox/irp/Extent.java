@@ -74,13 +74,13 @@ public class Extent extends Duration {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            ArrayList<BitSpec> bitSpecs)
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         double physical = Math.abs(recognizeData.getIrSequence().get(recognizeData.getPosition()))
-                + recognizeData.getIrSequence().getDuration(0, recognizeData.getPosition() - 1);
+                + recognizeData.getIrSequence().getDuration(recognizeData.getExtentStart(), recognizeData.getPosition() - recognizeData.getExtentStart() - 1);
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-    return recognize(recognizeData, physical, theoretical);
+        recognizeData.markExtentStart();
+        return recognize(recognizeData, physical, theoretical);
     }
 
 
@@ -104,4 +104,14 @@ public class Extent extends Duration {
 //        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
 //        return recognize(recognizeData, physical, theoretical);
 //    }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
+        return !lastWasGap;
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        return true;
+    }
 }

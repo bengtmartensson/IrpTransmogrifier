@@ -61,6 +61,17 @@ public class Flash extends Duration {
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
         return recognize(recognizeData, physical, theoretical);
     }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
+        return lastWasGap;
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        return false;
+    }
+
     /*
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)

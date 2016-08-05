@@ -63,7 +63,7 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     public Element toElement(Document document) throws IrpSyntaxException {
         Element root = document.createElement("bitspec_irstream");
-        root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null)));
+        root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null, true)));
         root.appendChild(bitSpec.toElement(document));
         root.appendChild(irStream.toElement(document));
         return root;
@@ -135,9 +135,18 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
         return bitSpec.interleaveOk(nameEngine, generalSpec)
-                && irStream.interleavingOk(nameEngine, generalSpec);
+                && irStream.interleavingOk(nameEngine, generalSpec, lastWasGap);
+    }
+
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return interleavingOk(nameEngine, generalSpec, true);
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        return irStream.endsWithGap(lastWasGap);
     }
 
     boolean isStandardPWM(NameEngine nameEngine, GeneralSpec generalSpec) {

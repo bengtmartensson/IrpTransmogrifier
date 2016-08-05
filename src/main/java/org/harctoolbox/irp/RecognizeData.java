@@ -50,6 +50,7 @@ public class RecognizeData implements Cloneable {
     private ParameterCollector parameterCollector;
     private final IrSequence irSequence;
     private final GeneralSpec generalSpec;
+    private int extentStart;
 
 //    public RecognizeData(NameEngine nameEngine) {
 //        this(0, ALL, null, nameEngine);
@@ -70,7 +71,7 @@ public class RecognizeData implements Cloneable {
         this.irSequence = irSequence;
         this.state = state;
         this.parameterCollector = parameterCollector;
-
+        this.extentStart = 0;
     }
 
     RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, ParameterCollector nameEngine) {
@@ -267,4 +268,19 @@ public class RecognizeData implements Cloneable {
     public void clearRest() {
         rest = 0.0f;
     }
+
+    /**
+     * @return the extentStart
+     */
+    public int getExtentStart() {
+        return extentStart;
+    }
+
+    /**
+     * @param extentStart the extentStart to set
+     */
+    public void markExtentStart() {
+        extentStart = position + 1;
+    }
+
 }

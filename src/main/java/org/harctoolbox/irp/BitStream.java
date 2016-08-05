@@ -190,7 +190,12 @@ class BitStream extends IrStreamItem implements Evaluatable {
     }
 
     @Override
-    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean endsWithGap) {
+        return true;
+    }
+
+    @Override
+    public boolean endsWithGap(boolean endsWithGap) {
         return true;
     }
 

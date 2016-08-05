@@ -189,14 +189,14 @@ public class FiniteBitField extends BitField {
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, IrpSyntaxException, UnassignedException {
         // first the simplest case: bitSpecs
         BitSpec bitSpec = bitSpecs.get(0);
-        int irSequencePostion = recognizeData.getPosition();
-        assert(bitSpec.getChunkSize() == 1);
-        int noBits = (int) width.toNumber(/*recognizeData.getNameEngine()*/null);
+        //int irSequencePostion = recognizeData.getPosition();
+        int chunkSize = bitSpec.getChunkSize();
+        int noChunks = (int) width.toNumber(/*recognizeData.getNameEngine()*/null)/chunkSize;
         long payload = 0L;
         //RecognizeData result = null;
         //int consumedDurations = 0;
         RecognizeData inData = null;
-        for (int bit = 0; bit < noBits; bit++) {
+        for (int chunk = 0; chunk < noChunks; chunk++) {
             int bareIrStreamNo;
 
             //new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
@@ -217,14 +217,14 @@ public class FiniteBitField extends BitField {
             recognizeData.setRest(inData.getRest(), inData.isRestIsFlash());
             //irSequencePostion = inData.getPosition();
             //consumedDurations += inData.getLength();
-            payload = (payload << bitSpec.getChunkSize()) | bareIrStreamNo;
+            payload = (payload << chunkSize) | bareIrStreamNo;
         }
-        payload <<= (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
+            payload = IrCoreUtils.reverse(payload, noChunks);
         if (this.complement)
             payload = ~payload;
-        if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
-            payload = IrCoreUtils.reverse(payload, noBits);
-        long bitmask = IrCoreUtils.ones(noBits) << (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        payload <<= (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        long bitmask = IrCoreUtils.ones(noChunks*chunkSize) << (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
         payload &= bitmask;
         Name name = data.toName();
         if (name != null)
@@ -248,5 +248,15 @@ public class FiniteBitField extends BitField {
         //recognizeData.setPosition(inData.getPosition());
         return true;//recognizeData;
         //return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), consumedDurations, recognizeData.getState(), recognizeData.getNameEngine());
+    }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
+        return true;
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        return true; // Heuristic...
     }
 }

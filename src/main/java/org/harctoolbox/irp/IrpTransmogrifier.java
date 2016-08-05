@@ -122,6 +122,7 @@ public class IrpTransmogrifier {
                 out.print("\t");
                 out.print(protocol.interleavingOk() ? "interleaving\t" : "\t");
                 out.print(protocol.startsWithDuration() ? "SWD\t" : "\t");
+                out.print(protocol.hasVariation() ? "variation\t" : "\t");
                 out.print(protocol.isRPlus() ? "R+" : "");
 
                 out.println();
@@ -239,23 +240,30 @@ public class IrpTransmogrifier {
     }
 
     private static void recognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize) throws IncompatibleArgumentException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidRepeatException, UnknownProtocolException, UnassignedException, UsageException, DomainViolationException {
-        if (commandRecognize.protocol == null)
-            throw new UnsupportedOperationException("Not implemented yet");
+        List<String> list = commandRecognize.protocol == null ? new ArrayList<>(irpDatabase.getNames())
+                : commandRecognize.regexp ? irpDatabase.getMatchingNames(commandRecognize.protocol)
+                : new ArrayList<>( Arrays.asList(commandRecognize.protocol) );
+        if (commandRecognize.sort)
+            Collections.sort(list);
+        for (String proto : list) {
+            recognize(irpDatabase, commandRecognize, proto);
+        }
+    }
 
+    private static void recognize(IrpDatabase irpDatabase, CommandRecognize commandRecognize, String protocolName) throws IncompatibleArgumentException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidRepeatException, UnknownProtocolException, UnassignedException, UsageException, DomainViolationException {
         if (commandRecognize.test != (commandRecognize.args == null))
             throw new UsageException("Must either use --test or have parameters, but not both.");
 
         if (commandRecognize.random == (!commandRecognize.nameEngine.isEmpty()))
             throw new UsageException("Must either use --random or --nameengine, but not both.");
 
-        NamedProtocol protocol = irpDatabase.getNamedProtocol(commandRecognize.protocol);
+        NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
         NameEngine testNameEngine = null;
         IrSignal irSignal;
         NameEngine nameEngine;
         if (commandRecognize.test) {
             testNameEngine = commandRecognize.random ? protocol.randomParameters() : commandRecognize.nameEngine;
-            irSignal = protocol.toIrSignal(testNameEngine);
-            out.println(testNameEngine);
+            irSignal = protocol.toIrSignal(testNameEngine.clone());
         } else {
             irSignal = Pronto.parse(commandRecognize.args);
         }
@@ -263,11 +271,9 @@ public class IrpTransmogrifier {
         nameEngine = protocol.recognize(irSignal);
 
         if (commandRecognize.test) {
-            if (nameEngine != null && nameEngine.numbericallyEquals(testNameEngine))
-                out.println("hit");
-            else
-                out.println("miss");
-
+            out.print(protocolName + "\t");
+            out.print(testNameEngine + "\t");
+            out.println((nameEngine != null && nameEngine.numbericallyEquals(testNameEngine)) ? "success" : "fail");
         } else if (nameEngine != null)
             out.println(nameEngine);
         else
@@ -524,6 +530,8 @@ public class IrpTransmogrifier {
         public NameEngine convert(String value) {
             try {
                 return NameEngine.parseLoose(value);
+            } catch (ParseCancellationException ex) {
+                throw new ParameterException("Parse error as name engine: \"" + value + "\"");
             } catch (IllegalArgumentException | IrpSyntaxException ex) {
                 throw new ParameterException(ex);
             }
@@ -695,6 +703,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "--regex", "--regexp"}, description = "Interpret arguments as regular expressions")
         private boolean regexp = false;
+
+        @Parameter(names = { "-s", "--sort"}, description = "Sort the protocols")
+        private boolean sort = false;
 
         @Parameter(names = { "-t", "--test"}, description = "Generate a test signal and try to decode it")
         private boolean test = false;

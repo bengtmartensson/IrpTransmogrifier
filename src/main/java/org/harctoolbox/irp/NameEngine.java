@@ -17,11 +17,11 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -79,6 +79,10 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         }
     }
 
+    public int size() {
+        return map.size();
+    }
+
     public boolean numbericallyEquals(Object object) {
         if (object == this)
             return true;
@@ -86,6 +90,9 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
             return false;
 
         NameEngine other = (NameEngine) object;
+        if (other.size() != this.size())
+            return false;
+
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             try {
                 String name = kvp.getKey();
@@ -93,8 +100,10 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
                 Expression expr = other.get(name);
                 if (expr == null)
                     return false;
-                if (value != expr.toNumber(other))
+                if (value != expr.toNumber(other)) {
+                    logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
                     return false;
+                }
             } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
                 Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
@@ -376,10 +385,9 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
     }
 
     void reduce(ParameterSpecs parameterSpecs) {
-        Set<String> names = map.keySet();
-        for (String name : names) {
+        ArrayList<String> names = new ArrayList<>(map.keySet());
+        for (String name : names)
             if (!parameterSpecs.contains(name))
                 map.remove(name);
-        }
     }
 }

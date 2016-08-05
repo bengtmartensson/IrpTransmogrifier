@@ -120,4 +120,14 @@ public class InfiniteBitField extends BitField {
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 }

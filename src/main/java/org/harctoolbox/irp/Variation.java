@@ -57,13 +57,18 @@ public class Variation extends IrStreamItem {
     @Override
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        BareIrStream actual = pass == Pass.intro ? intro
-                : pass == Pass.repeat ? repeat : ending;
+        BareIrStream actual = select(pass);
         return actual != null ? actual.evaluate(state, pass, nameEngine, generalSpec) : null;
 //        return pass == Pass.intro ? intro.evaluate(state, pass, nameEngine, generalSpec)
 //                : pass == Pass.repeat ? repeat.evaluate(state, pass, nameEngine, generalSpec)
 //                : ending != null ? ending.evaluate(state, pass, nameEngine, generalSpec)
 //                : new EvaluatedIrStream(nameEngine, generalSpec, pass);
+    }
+
+    private BareIrStream select(IrSignal.Pass pass) {
+        return pass == Pass.intro ? intro
+                : pass == Pass.repeat ? repeat
+                : ending;
     }
 
     @Override
@@ -92,10 +97,17 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return intro.interleavingOk(nameEngine, generalSpec)
-                && repeat.interleavingOk(nameEngine, generalSpec)
-                && (ending == null || ending.interleavingOk(nameEngine, generalSpec));
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
+        return (intro == null || intro.interleavingOk(nameEngine, generalSpec, lastWasGap))
+                && (repeat == null || repeat.interleavingOk(nameEngine, generalSpec, lastWasGap))
+                && (ending == null || ending.interleavingOk(nameEngine, generalSpec, lastWasGap));
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        return (intro == null || intro.endsWithGap(lastWasGap))
+                && (repeat == null || repeat.endsWithGap(lastWasGap))
+                && (ending == null || ending.endsWithGap(lastWasGap));
     }
 
     @Override
@@ -129,8 +141,7 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, Pass pass, ArrayList<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean recognize(RecognizeData recognizeData, Pass pass, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
+        return select(pass).recognize(recognizeData, pass, bitSpecs);
     }
 }

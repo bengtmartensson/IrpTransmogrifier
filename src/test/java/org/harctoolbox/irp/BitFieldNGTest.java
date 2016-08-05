@@ -122,7 +122,7 @@ public class BitFieldNGTest {
     public void testInterleavingOk() throws IrpSyntaxException {
         System.out.println("interleavingOk");
         BitField instance = BitField.newBitField("~D:-6:2");
-        boolean result = instance.interleavingOk(null, null);
+        boolean result = instance.interleavingOk(null, null, true);
         assertTrue(result);
     }
 }

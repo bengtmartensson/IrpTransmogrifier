@@ -185,11 +185,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         return parseTree;
     }
 
-    @Override
-    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return true;
-    }
-
     protected boolean recognize(RecognizeData recognizeData, double physical, double theoretical) {
         boolean equals = IrCoreUtils.approximatelyEquals(physical, theoretical);
         if (equals) {

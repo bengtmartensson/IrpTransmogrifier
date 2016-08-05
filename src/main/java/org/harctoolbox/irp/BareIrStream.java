@@ -215,28 +215,23 @@ public class BareIrStream extends IrStreamItem {
     }*/
 
     @Override
-    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
-        boolean ok = true;
-        boolean lastWasGap = true;
-        for (IrStreamItem item : this.irStreamItems) {
-            if (item instanceof Gap || item instanceof Extent) {
-                if (lastWasGap)
-                    return false;
-                else
-                    lastWasGap = true;
-            } else if (item instanceof Flash) {
-                if (lastWasGap)
-                    lastWasGap = false;
-                else
-                    return false;
-            } else if (item instanceof BitField) {
-                if (!lastWasGap)
-                    return false;
-            }
-            if (!item.interleavingOk(nameEngine, generalSpec))
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
+        boolean lastGap = lastWasGap;
+        for (IrStreamItem item : irStreamItems) {
+            if (!item.interleavingOk(nameEngine, generalSpec, lastGap))
                 return false;
+            lastGap = item.endsWithGap(lastGap);
         }
         return true;
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        boolean status = lastWasGap;
+        for (IrStreamItem item : irStreamItems)
+            status = item.endsWithGap(status);
+
+        return status;
     }
 
     @Override

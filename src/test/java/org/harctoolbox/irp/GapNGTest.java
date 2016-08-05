@@ -71,8 +71,10 @@ public class GapNGTest {
     public void testInterleavingOk() throws IrpSyntaxException {
         System.out.println("interleavingOk");
         Gap instance = new Gap("-Z");
-        boolean result = instance.interleavingOk(null, null);
+        boolean result = instance.interleavingOk(null, null, false);
         Assert.assertTrue(result);
+        result = instance.interleavingOk(null, null, true);
+        Assert.assertFalse(result);
     }
 
 }

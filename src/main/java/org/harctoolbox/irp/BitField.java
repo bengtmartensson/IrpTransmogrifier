@@ -155,11 +155,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
 
-    @Override
-    boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return true;
-    }
-
     public boolean hasChop() {
         try {
             //return !(chop instanceof Number && ((Number) chop).toNumber(null) == 0);

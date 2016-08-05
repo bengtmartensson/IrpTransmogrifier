@@ -106,5 +106,15 @@ public class Gap extends Duration {
 
         return recognizeData.isSuccess();
     }*/
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
+        return !lastWasGap;
+    }
+
+    @Override
+    public boolean endsWithGap(boolean lastWasGap) {
+        return true;
+    }
 }
 

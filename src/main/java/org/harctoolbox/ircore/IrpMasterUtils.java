@@ -31,7 +31,7 @@ import org.harctoolbox.irp.UnassignedException;
  */
 public class IrpMasterUtils {
 
-    private static final String configFile = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
+    private static final String configFile = "../harctoolboxbundle/IrpMaster/src/main/config/IrpProtocols.ini"; // FIXME
     private static org.harctoolbox.IrpMaster.IrpMaster irpMaster = null;
 
     static {

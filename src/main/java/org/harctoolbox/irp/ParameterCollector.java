@@ -89,7 +89,7 @@ public class ParameterCollector implements Cloneable {
     public void addToNameEngine(NameEngine nameEngine) throws IrpSyntaxException, NameConflictException, UnassignedException, IncompatibleArgumentException {
         for (Map.Entry<String, Parameter> kvp : map.entrySet()) {
 //            String name = kvp.getKey();
-//            if (nameEngine.containsKey(name)) {
+            if (!nameEngine.containsKey(kvp.getKey()))
 //                if (nameEngine.get(name).toNumber(nameEngine) != kvp.getValue().value)
 //                    throw new NameConflictException(name);
 //            } else

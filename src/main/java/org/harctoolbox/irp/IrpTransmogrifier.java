@@ -169,43 +169,39 @@ public class IrpTransmogrifier {
     }
 
     private static void render(IrpDatabase irpDatabase, CommandRender commandRenderer) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException, UsageException, FileNotFoundException, org.harctoolbox.IrpMaster.IrpMasterException, CloneNotSupportedException {
+      List<String> list = commandRenderer.protocols == null ? new ArrayList<>(irpDatabase.getNames())
+                : commandRenderer.regex ? irpDatabase.getMatchingNames(commandRenderer.protocols)
+                : commandRenderer.protocols;
+        if (commandRenderer.sort)
+            Collections.sort(list);
+        for (String proto : list) {
+            render(irpDatabase, commandRenderer, proto);
+        }
+    }
+
+    private static void render(IrpDatabase irpDatabase, CommandRender commandRenderer, String proto) throws IrpSyntaxException, UnknownProtocolException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException, DomainViolationException, UsageException, FileNotFoundException, org.harctoolbox.IrpMaster.IrpMasterException, CloneNotSupportedException {
         if (commandRenderer.random != commandRenderer.nameEngine.isEmpty())
             throw new UsageException("Must give exactly one of --nameengine and --random");
 
-        for (String prt : commandRenderer.protocols) {
+        logger.info(proto);
+        NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
+        NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
+                : commandRenderer.random ? protocol.randomParameters()
+                        : new NameEngine();
+        if (commandRenderer.random)
+            logger.log(Level.INFO, nameEngine.toString());
 
-            List<String> list;
-            if (commandRenderer.regex)
-                list = irpDatabase.getMatchingNames(prt);
-            else {
-                list = new ArrayList<>(10);
-                list.add(prt);
-            }
-            //if (commandList.sort)
-            Collections.sort(list);
+        IrSignal irSignal;
+        irSignal = protocol.toIrSignal(nameEngine.clone());
+        if (commandRenderer.pronto)
+            System.out.println(Pronto.toPrintString(irSignal));
 
-            for (String proto : list) {
-                logger.info(proto);
-                NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
-                NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
-                        : commandRenderer.random ? protocol.randomParameters()
-                                : new NameEngine();
-                if (commandRenderer.random)
-                    logger.log(Level.INFO, nameEngine.toString());
-
-                IrSignal irSignal;
-                irSignal = protocol.toIrSignal(nameEngine.clone());
-                if (commandRenderer.pronto)
-                    System.out.println(Pronto.toPrintString(irSignal));
-
-                if (commandRenderer.test) {
-                    IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(proto, nameEngine);
-                    if (!irSignal.approximatelyEquals(irpMasterSignal)) {
-                        out.println(Pronto.toPrintString(irpMasterSignal));
-                        out.println("Error in " + proto);
-                        //System.exit(1);
-                    }
-                }
+        if (commandRenderer.test) {
+            IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(proto, nameEngine);
+            if (!irSignal.approximatelyEquals(irpMasterSignal)) {
+                out.println(Pronto.toPrintString(irpMasterSignal));
+                out.println("Error in " + proto);
+                //System.exit(1);
             }
         }
     }

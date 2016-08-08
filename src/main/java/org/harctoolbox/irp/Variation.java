@@ -97,20 +97,6 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
-        return (intro == null || intro.interleavingOk(nameEngine, generalSpec, lastWasGap))
-                && (repeat == null || repeat.interleavingOk(nameEngine, generalSpec, lastWasGap))
-                && (ending == null || ending.interleavingOk(nameEngine, generalSpec, lastWasGap));
-    }
-
-    @Override
-    public boolean endsWithGap(boolean lastWasGap) {
-        return (intro == null || intro.endsWithGap(lastWasGap))
-                && (repeat == null || repeat.endsWithGap(lastWasGap))
-                && (ending == null || ending.endsWithGap(lastWasGap));
-    }
-
-    @Override
     int numberOfBareDurations() {
         return -999999999;
     }
@@ -143,5 +129,26 @@ public class Variation extends IrStreamItem {
     @Override
     public boolean recognize(RecognizeData recognizeData, Pass pass, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
         return select(pass).recognize(recognizeData, pass, bitSpecs);
+    }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        return BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last)
+                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last)
+                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last);
+    }
+
+    @Override
+    public DurationType endingDurationType(DurationType last) {
+        return BareIrStream.endingDurationType(intro, last)
+                .combine(BareIrStream.endingDurationType(repeat, last))
+                .combine(BareIrStream.endingDurationType(ending, last));
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last) {
+        return BareIrStream.startingDurationType(intro, last)
+                .combine(BareIrStream.startingDurationType(repeat, last))
+                .combine(BareIrStream.startingDurationType(ending, last));
     }
 }

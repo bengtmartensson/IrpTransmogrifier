@@ -203,6 +203,8 @@ public class FiniteBitField extends BitField {
             //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
             for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
                 inData = recognizeData.clone();
+                  if (chunk < noChunks - 1)
+                    inData.setLookAheadItem(null);
                 //inData.setPosition(irSequencePostion);
                 boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, null);
                 if (success)
@@ -251,12 +253,17 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
-        return true;
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        return true; // ????
     }
 
     @Override
-    public boolean endsWithGap(boolean lastWasGap) {
-        return true; // Heuristic...
+    public DurationType endingDurationType(DurationType last) {
+        return DurationType.gap; // ???
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last) {
+        return DurationType.flash; // ???
     }
 }

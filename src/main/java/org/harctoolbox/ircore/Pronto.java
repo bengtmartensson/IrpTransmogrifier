@@ -118,7 +118,7 @@ public class Pronto {
      * @return number of pulses
      */
     public static int pulses(double us, double frequency) {
-        return (int)Math.round(Math.abs(us) * (frequency > 0 ? frequency : dummyFrequency)/1000000.0);
+        return Math.min((int)Math.round(Math.abs(us) * (frequency > 0 ? frequency : dummyFrequency)/1000000.0), 0xFFFF);
     }
 
     /**

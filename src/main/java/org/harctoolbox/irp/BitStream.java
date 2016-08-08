@@ -190,16 +190,6 @@ class BitStream extends IrStreamItem implements Evaluatable {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean endsWithGap) {
-        return true;
-    }
-
-    @Override
-    public boolean endsWithGap(boolean endsWithGap) {
-        return true;
-    }
-
-    @Override
     int numberOfBits() {
         return 0;
     }
@@ -218,5 +208,20 @@ class BitStream extends IrStreamItem implements Evaluatable {
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        return true;
+    }
+
+    @Override
+    public DurationType endingDurationType(DurationType last) {
+        return DurationType.gap;
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last) {
+        return DurationType.flash;
     }
 }

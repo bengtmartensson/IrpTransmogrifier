@@ -99,11 +99,6 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
-        return true;
-    }
-
-    @Override
     int numberOfBits() {
         return 0;
     }
@@ -132,7 +127,17 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public boolean endsWithGap(boolean lastWasGap) {
-        return lastWasGap;
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        return true;
+    }
+
+    @Override
+    public DurationType endingDurationType(DurationType last) {
+        return null;
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last) {
+        return null;
     }
 }

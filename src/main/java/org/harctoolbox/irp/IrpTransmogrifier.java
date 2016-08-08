@@ -193,8 +193,10 @@ public class IrpTransmogrifier {
 
         IrSignal irSignal;
         irSignal = protocol.toIrSignal(nameEngine.clone());
+        if (commandRenderer.raw)
+            System.out.println(irSignal.toPrintString(true));
         if (commandRenderer.pronto)
-            System.out.println(Pronto.toPrintString(irSignal));
+            System.out.println(irSignal.ccfString());
 
         if (commandRenderer.test) {
             IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(proto, nameEngine);
@@ -250,8 +252,8 @@ public class IrpTransmogrifier {
         if (commandRecognize.test != (commandRecognize.args == null))
             throw new UsageException("Must either use --test or have parameters, but not both.");
 
-        if (commandRecognize.random == (!commandRecognize.nameEngine.isEmpty()))
-            throw new UsageException("Must either use --random or --nameengine, but not both.");
+        if (commandRecognize.test && commandRecognize.random == (!commandRecognize.nameEngine.isEmpty()))
+            throw new UsageException("If using --test, must either use --random or --nameengine, but not both.");
 
         NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
         NameEngine testNameEngine = null;

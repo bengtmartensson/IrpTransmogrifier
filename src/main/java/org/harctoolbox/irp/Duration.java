@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -185,6 +186,18 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         return parseTree;
     }
 
+    @Override
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
+            return false;
+        if (isOn(recognizeData.getPosition()) != isOn())
+            return false;
+        double physical = Math.abs(recognizeData.getIrSequence().get(recognizeData.getPosition())) + recognizeData.getRest();
+        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
+        return recognize(recognizeData, physical, theoretical);
+    }
+
     protected boolean recognize(RecognizeData recognizeData, double physical, double theoretical) {
         boolean equals = IrCoreUtils.approximatelyEquals(physical, theoretical);
         if (equals) {
@@ -196,5 +209,26 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         } else
             recognizeData.setSuccess(false);
         return recognizeData.isSuccess();
+    }
+
+    public static boolean isOn(int index) {
+        return index % 2 == 0;
+    }
+
+    protected abstract boolean isOn();
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        return last == DurationType.none || last == DurationType.newDurationType(!isOn());
+    }
+
+    @Override
+    public DurationType endingDurationType(DurationType last) {
+        return DurationType.newDurationType(isOn());
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last) {
+        return DurationType.newDurationType(isOn());
     }
 }

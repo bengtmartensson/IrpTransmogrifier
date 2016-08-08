@@ -51,6 +51,7 @@ public class RecognizeData implements Cloneable {
     private final IrSequence irSequence;
     private final GeneralSpec generalSpec;
     private int extentStart;
+    private IrStreamItem lookAheadItem;
 
 //    public RecognizeData(NameEngine nameEngine) {
 //        this(0, ALL, null, nameEngine);
@@ -72,6 +73,7 @@ public class RecognizeData implements Cloneable {
         this.state = state;
         this.parameterCollector = parameterCollector;
         this.extentStart = 0;
+        this.lookAheadItem = null;
     }
 
     RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, ParameterCollector nameEngine) {
@@ -277,10 +279,23 @@ public class RecognizeData implements Cloneable {
     }
 
     /**
-     * @param extentStart the extentStart to set
      */
     public void markExtentStart() {
         extentStart = position + 1;
+    }
+
+    /**
+     * @return the lookAheadItem
+     */
+    public IrStreamItem getLookAheadItem() {
+        return lookAheadItem;
+    }
+
+    /**
+     * @param lookAheadItem the lookAheadItem to set
+     */
+    public void setLookAheadItem(IrStreamItem lookAheadItem) {
+        this.lookAheadItem = lookAheadItem;
     }
 
 }

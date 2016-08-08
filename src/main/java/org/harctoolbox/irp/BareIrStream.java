@@ -35,6 +35,18 @@ public class BareIrStream extends IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(BareIrStream.class.getName());
 
+    static DurationType startingDurationType(BareIrStream bareIrStream, DurationType last) {
+        return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last);
+    }
+
+    static DurationType endingDurationType(BareIrStream bareIrStream, DurationType last) {
+        return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last);
+    }
+
+    static boolean interleavingOk(BareIrStream bareIrStream, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last);
+    }
+
     protected List<IrStreamItem> irStreamItems = null;
     //protected BitSpec bitSpec;
     //private int noAlternatives = 0;
@@ -215,26 +227,6 @@ public class BareIrStream extends IrStreamItem {
     }*/
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
-        boolean lastGap = lastWasGap;
-        for (IrStreamItem item : irStreamItems) {
-            if (!item.interleavingOk(nameEngine, generalSpec, lastGap))
-                return false;
-            lastGap = item.endsWithGap(lastGap);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean endsWithGap(boolean lastWasGap) {
-        boolean status = lastWasGap;
-        for (IrStreamItem item : irStreamItems)
-            status = item.endsWithGap(status);
-
-        return status;
-    }
-
-    @Override
     int numberOfBitSpecs() {
         int sum = 0;
         sum = irStreamItems.stream().map((item) -> item.numberOfBitSpecs()).reduce(sum, Integer::sum);
@@ -274,10 +266,16 @@ public class BareIrStream extends IrStreamItem {
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
             ArrayList<BitSpec> bitSpec) throws NameConflictException {
         IrpUtils.entering(logger, "recognize", this);
+        IrStreamItem callersLookAheadItem = recognizeData.getLookAheadItem();
         //IrSignal.Pass state = recognizeData.getState();
         //int position = recognizeData.getStart();
         //NameEngine nameEngine = recognizeData.getNameEngine().clone();
-        for (IrStreamItem irStreamItem : irStreamItems) {
+        for (int itemNr = 0; itemNr < irStreamItems.size(); itemNr++) {
+            IrStreamItem irStreamItem = irStreamItems.get(itemNr);
+            IrStreamItem lookAheadItem = itemNr < irStreamItems.size() - 1 ? irStreamItems.get(itemNr + 1)
+                    : (itemNr == irStreamItems.size() - 1) ? callersLookAheadItem
+                    : null;
+            recognizeData.setLookAheadItem(lookAheadItem);
             IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
             if (/*pass == IrSignal.Pass.repeat &&*/ newState != null)
                 recognizeData.setState(newState);
@@ -292,7 +290,7 @@ public class BareIrStream extends IrStreamItem {
                 try {
                     success = irStreamItem.recognize(recognizeData, pass, bitSpec);
                 } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
-                    Logger.getLogger(BareIrStream.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
                 if (!success) {
                     IrpUtils.exiting(logger, "recognize", "null");
@@ -312,6 +310,31 @@ public class BareIrStream extends IrStreamItem {
         //recognizeData.setNameEngine(nameEngine);
         //new RecognizeData(initialData.getIrSequence(), initialData.getStart(), position - initialData.getStart(), state, nameEngine);
         IrpUtils.exiting(logger, "recognize", recognizeData);
+        return true;
+    }
+
+    @Override
+    public DurationType endingDurationType(DurationType last) {
+        DurationType current = last;
+        for (IrStreamItem item : irStreamItems)
+            current = item.endingDurationType(last);
+
+        return current;
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last) {
+        return irStreamItems.get(0).startingDuratingType(last);
+    }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        DurationType current = last;
+        for (IrStreamItem item : irStreamItems) {
+            if (!item.interleavingOk(nameEngine, generalSpec, current))
+                return false;
+            current = item.endingDurationType(last);
+        }
         return true;
     }
 }

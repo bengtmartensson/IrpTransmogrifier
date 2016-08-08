@@ -364,7 +364,7 @@ public class Protocol extends IrpObject {
     }
 
     public boolean interleavingOk() {
-        return bitspecIrstream.interleavingOk(definitions, generalSpec, true);
+        return bitspecIrstream.interleavingOk(definitions, generalSpec, DurationType.gap);
     }
 
     public boolean isRPlus() {

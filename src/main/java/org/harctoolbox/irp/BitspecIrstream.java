@@ -63,7 +63,7 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     public Element toElement(Document document) throws IrpSyntaxException {
         Element root = document.createElement("bitspec_irstream");
-        root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null, true)));
+        root.setAttribute("interleavingOk", Boolean.toString(interleavingOk()));
         root.appendChild(bitSpec.toElement(document));
         root.appendChild(irStream.toElement(document));
         return root;
@@ -135,18 +135,27 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
-        return bitSpec.interleaveOk(nameEngine, generalSpec)
-                && irStream.interleavingOk(nameEngine, generalSpec, lastWasGap);
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        return bitSpec.interleaveOk(nameEngine, generalSpec, last)
+                && irStream.interleavingOk(nameEngine, generalSpec, last);
     }
 
     public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return interleavingOk(nameEngine, generalSpec, true);
+        return interleavingOk(nameEngine, generalSpec, DurationType.gap);
+    }
+
+    private boolean interleavingOk() {
+        return interleavingOk(null, null);
     }
 
     @Override
-    public boolean endsWithGap(boolean lastWasGap) {
-        return irStream.endsWithGap(lastWasGap);
+    public DurationType endingDurationType(DurationType last) {
+        return irStream.endingDurationType(last);
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last) {
+        return irStream.startingDuratingType(last);
     }
 
     boolean isStandardPWM(NameEngine nameEngine, GeneralSpec generalSpec) {
@@ -169,11 +178,15 @@ public class BitspecIrstream extends IrStreamItem {
         return irStream.isRPlus();
     }
 
-    boolean startsWithDuration() {
-        return irStream.startsWithDuration();
+    public DurationType startingDurationType() {
+        return irStream.startingDuratingType(DurationType.gap);
     }
 
     boolean hasVariation(boolean recursive) {
         return irStream.hasVariation(recursive);
+    }
+
+    boolean startsWithDuration() {
+        return irStream.startsWithDuration();
     }
 }

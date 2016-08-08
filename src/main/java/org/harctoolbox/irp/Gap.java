@@ -16,9 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
-import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -56,20 +54,6 @@ public class Gap extends Duration {
         return "-" + super.toIrpString();
     }
 
-    @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
-            return false;
-        if (recognizeData.getPosition() % 2 == 0)
-            return false;
-//        if (recognizeData.hasRestFlash())
-//            return false;
-
-        double physical = Math.abs(recognizeData.getIrSequence().get(recognizeData.getPosition())) + recognizeData.getRest();
-        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-        return recognize(recognizeData, physical, theoretical);
-    }
 /*
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
@@ -108,13 +92,8 @@ public class Gap extends Duration {
     }*/
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, boolean lastWasGap) {
-        return !lastWasGap;
-    }
-
-    @Override
-    public boolean endsWithGap(boolean lastWasGap) {
-        return true;
+    protected boolean isOn() {
+        return false;
     }
 }
 

@@ -95,8 +95,8 @@ public class CleanerNGTest {
     @Test
     public void testClean_3args_1() {
         System.out.println("clean");
-        int absoluteTolerance = 0;
-        double relativeTolerance = 0.0;
+        int absoluteTolerance = 60;
+        double relativeTolerance = 0.2;
         IrSequence expResult = null;
         IrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
         Assert.assertTrue(result.approximatelyEquals(irSequence));
@@ -108,8 +108,8 @@ public class CleanerNGTest {
     @Test
     public void testClean_3args_2() {
         System.out.println("clean");
-        int absoluteTolerance = 0;
-        double relativeTolerance = 0.0;
+        int absoluteTolerance = 60;
+        double relativeTolerance = 0.2;
         ModulatedIrSequence expResult = null;
         ModulatedIrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
         Assert.assertTrue(result.approximatelyEquals(irSequence));

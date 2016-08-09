@@ -232,7 +232,7 @@ public class IrpDatabase {
         return newName.matches("\\d.*") ? ("X" + newName) : newName;
     }
 
-    Document toDocument() {
+    public Document toDocument() {
         Document doc = XmlUtils.newDocument(true);
         Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
         root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");

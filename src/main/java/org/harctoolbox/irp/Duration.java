@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
 public abstract class Duration extends IrStreamItem implements Floatable, Evaluatable {
 
     private static final Logger logger = Logger.getLogger(Duration.class.getName());
+    private static final double DUMMYTIMEUNIT = 999;
+
     public static Duration newDuration(String str) throws IrpSyntaxException {
         IrpParser parser = new ParserDriver(str).getParser();
         try {
@@ -56,6 +58,9 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
     public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
         return new Extent(e);
+    }
+    public static boolean isOn(int index) {
+        return index % 2 == 0;
     }
 
     protected double us = IrCoreUtils.invalid;
@@ -107,12 +112,16 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
             throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         compute(nameEngine, generalSpec);
         if (time_periods != IrCoreUtils.invalid) {
-            if (generalSpec.getFrequency() > 0)
+            if (generalSpec == null)
+                return DUMMYTIMEUNIT;
+            else if (generalSpec.getFrequency() > 0)
                 return IrCoreUtils.seconds2microseconds(time_periods/generalSpec.getFrequency());
             else
                 throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
 
         } else if (time_units != IrCoreUtils.invalid) {
+            if (generalSpec == null)
+                return time_units * DUMMYTIMEUNIT;
             if (generalSpec.getUnit() > 0)
                 return time_units * generalSpec.getUnit();
             else
@@ -222,9 +231,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         return recognizeData.isSuccess();
     }
 
-    public static boolean isOn(int index) {
-        return index % 2 == 0;
-    }
 
     protected abstract boolean isOn();
 

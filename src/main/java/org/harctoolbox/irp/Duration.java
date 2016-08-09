@@ -189,25 +189,36 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
+//        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
+//            return false;
+        if (!recognizeData.check(isOn()))
             return false;
-        if (isOn(recognizeData.getPosition()) != isOn())
-            return false;
-        double physical = Math.abs(recognizeData.getIrSequence().get(recognizeData.getPosition())) + recognizeData.getRest();
-        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-        return recognize(recognizeData, physical, theoretical);
+        double actual = recognizeData.get();
+        double wanted = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
+        return recognize(recognizeData, actual, wanted);
     }
 
-    protected boolean recognize(RecognizeData recognizeData, double physical, double theoretical) {
-        boolean equals = IrCoreUtils.approximatelyEquals(physical, theoretical);
-        if (equals) {
-            recognizeData.incrementPosition(1);
-            //recognizeData.clearRest();
-//        } else if (IrCoreUtils.approximatelyEquals(physical, 2*theoretical)) {
-//            recognizeData.incrementPosition(1);
-//            recognizeData.setRest(physical - theoretical, this instanceof Flash);
-        } else
-            recognizeData.setSuccess(false);
+    protected boolean recognize(RecognizeData recognizeData, double actual, double wanted) {
+//        if (recognizeData.isInterleaving()) {
+//            boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted);
+//            if (equals) {
+//                recognizeData.incrementPosition(1);
+//                //recognizeData.clearRest();
+////        } else if (IrCoreUtils.approximatelyEquals(physical, 2*theoretical)) {
+////            recognizeData.incrementPosition(1);
+////            recognizeData.setRest(physical - theoretical, this instanceof Flash);
+//            } else
+//                recognizeData.setSuccess(false);
+//
+//        } else {
+            boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted);
+            if (equals) {
+                recognizeData.consume();
+            } else if (actual > wanted && recognizeData.allowChopping()) {
+                recognizeData.consume(wanted);
+            } else
+                recognizeData.setSuccess(false);
+//        }
         return recognizeData.isSuccess();
     }
 
@@ -218,17 +229,17 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     protected abstract boolean isOn();
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
         return last == DurationType.none || last == DurationType.newDurationType(!isOn());
     }
 
     @Override
-    public DurationType endingDurationType(DurationType last) {
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         return DurationType.newDurationType(isOn());
     }
 
     @Override
-    public DurationType startingDuratingType(DurationType last) {
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
         return DurationType.newDurationType(isOn());
     }
 }

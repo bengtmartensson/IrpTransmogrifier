@@ -216,7 +216,7 @@ public class FiniteBitField extends BitField {
                 return false;
             }
             recognizeData.setPosition(inData.getPosition());
-            recognizeData.setRest(inData.getRest(), inData.isRestIsFlash());
+            recognizeData.setHasConsumed(inData.getHasConsumed());
             //irSequencePostion = inData.getPosition();
             //consumedDurations += inData.getLength();
             payload = (payload << chunkSize) | bareIrStreamNo;
@@ -238,6 +238,7 @@ public class FiniteBitField extends BitField {
                     return false;
             } catch (UnassignedException ex) {
                 logger.log(Level.WARNING, ex.getMessage());
+                return false;
             }
         }
 
@@ -253,17 +254,17 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
         return true; // ????
     }
 
     @Override
-    public DurationType endingDurationType(DurationType last) {
-        return DurationType.gap; // ???
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
+        return gapFlashBitSpecs ? DurationType.flash : DurationType.gap;
     }
 
     @Override
-    public DurationType startingDuratingType(DurationType last) {
-        return DurationType.flash; // ???
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
+        return gapFlashBitSpecs ? DurationType.gap : DurationType.flash;
     }
 }

@@ -76,8 +76,7 @@ public class Extent extends Duration {
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        double physical = Math.abs(recognizeData.getIrSequence().get(recognizeData.getPosition()))
-                + recognizeData.getIrSequence().getDuration(recognizeData.getExtentStart(), recognizeData.getPosition() - recognizeData.getExtentStart() - 1);
+        double physical = recognizeData.getExtentDuration();
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
         recognizeData.markExtentStart();
         return recognize(recognizeData, physical, theoretical);

@@ -30,7 +30,7 @@ public class IrCoreUtils {
     /**
      * Default relative tolerance as a number between 0 and 1.
      */
-    public static final double defaultRelativeTolerance = 0.2;
+    public static final double defaultRelativeTolerance = 0.1;
 
     /**
      * Default absolute tolerance for frequency comparison.

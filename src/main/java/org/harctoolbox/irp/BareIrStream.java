@@ -35,16 +35,16 @@ public class BareIrStream extends IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(BareIrStream.class.getName());
 
-    static DurationType startingDurationType(BareIrStream bareIrStream, DurationType last) {
-        return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last);
+    static DurationType startingDurationType(BareIrStream bareIrStream, DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last, gapFlashBitSpecs);
     }
 
-    static DurationType endingDurationType(BareIrStream bareIrStream, DurationType last) {
-        return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last);
+    static DurationType endingDurationType(BareIrStream bareIrStream, DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last, gapFlashBitSpecs);
     }
 
-    static boolean interleavingOk(BareIrStream bareIrStream, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
-        return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last);
+    static boolean interleavingOk(BareIrStream bareIrStream, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitspecs) {
+        return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
     }
 
     protected List<IrStreamItem> irStreamItems = null;
@@ -314,26 +314,26 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public DurationType endingDurationType(DurationType last) {
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems)
-            current = item.endingDurationType(last);
+            current = item.endingDurationType(last, gapFlashBitSpecs);
 
         return current;
     }
 
     @Override
-    public DurationType startingDuratingType(DurationType last) {
-        return irStreamItems.get(0).startingDuratingType(last);
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
+        return irStreamItems.get(0).startingDuratingType(last, gapFlashBitSpecs);
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems) {
-            if (!item.interleavingOk(nameEngine, generalSpec, current))
+            if (!item.interleavingOk(nameEngine, generalSpec, current, gapFlashBitSpecs))
                 return false;
-            current = item.endingDurationType(last);
+            current = item.endingDurationType(last, gapFlashBitSpecs);
         }
         return true;
     }

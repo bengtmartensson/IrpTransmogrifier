@@ -456,7 +456,11 @@ public class IrpTransmogrifier {
             IrpDatabase irpDatabase = commandLineArgs.iniFile  != null
                     ? new IrpDatabase(IrpDatabase.readIni(commandLineArgs.iniFile))
                     : new IrpDatabase(configFilename);
-            if (!argumentParser.getParsedCommand().equals("writeconfig"))
+            String command = argumentParser.getParsedCommand();
+            if (command == null)
+                usage(IrpUtils.exitUsageError);
+
+            if (!command.equals("writeconfig"))
                 irpDatabase.expand(); // FIXME
 
             if (commandLineArgs.versionRequested) {
@@ -464,10 +468,6 @@ public class IrpTransmogrifier {
                 System.exit(IrpUtils.exitSuccess);
             }
 
-            String command = argumentParser.getParsedCommand();
-            if (command == null) {
-                usage(IrpUtils.exitUsageError);
-            }
             switch (command) {
                 case "analyze":
                     analyze(commandAnalyze);

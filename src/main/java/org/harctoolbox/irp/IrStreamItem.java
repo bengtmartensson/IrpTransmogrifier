@@ -93,11 +93,11 @@ public abstract class IrStreamItem extends IrpObject {
         return 0;
     }
 
-    public abstract boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last);
+    public abstract boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs);
 
-    public abstract DurationType endingDurationType(DurationType last);
+    public abstract DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs);
 
-    public abstract DurationType startingDuratingType(DurationType last);
+    public abstract DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs);
 
     abstract int numberOfBits();
 

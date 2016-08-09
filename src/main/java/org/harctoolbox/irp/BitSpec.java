@@ -294,13 +294,13 @@ public class BitSpec extends IrpObject {
 //        throw new UnsupportedOperationException("Not supported yet.");
 //    }
 
-    boolean interleaveOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
-        if (isStandardPWM(nameEngine, generalSpec)
-                || isPWM4(nameEngine, generalSpec))
+    boolean interleaveOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        if (!gapFlashBitSpecs && (isStandardPWM(nameEngine, generalSpec)
+                || isPWM4(nameEngine, generalSpec)))
             return true;
 
         for (BareIrStream bareIrStream : bitCodes)
-            if (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec, last))
+            if (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitSpecs))
                 return false;
 
         return true;

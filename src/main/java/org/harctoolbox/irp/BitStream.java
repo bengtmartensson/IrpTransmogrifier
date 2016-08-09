@@ -211,17 +211,17 @@ class BitStream extends IrStreamItem implements Evaluatable {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
         return true;
     }
 
     @Override
-    public DurationType endingDurationType(DurationType last) {
-        return DurationType.gap;
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
+        return DurationType.newDurationType(gapFlashBitSpecs);
     }
 
     @Override
-    public DurationType startingDuratingType(DurationType last) {
-        return DurationType.flash;
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
+        return DurationType.newDurationType(!gapFlashBitSpecs);
     }
 }

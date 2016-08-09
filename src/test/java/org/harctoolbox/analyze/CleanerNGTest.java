@@ -71,7 +71,7 @@ public class CleanerNGTest {
     @Test
     public void testGetIndexData() {
         System.out.println("getIndexData");
-        Cleaner instance = new Cleaner(noisy);
+        Cleaner instance = new Cleaner(noisy, 60, 0.2);
         int[] expResult = new int[] { 4,3,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,1,0,1,0,5,4,2,0,6,4,2,0,6,4,2,0,6,4,2,0,6};
         int[] result = instance.getIndexData();
         assertEquals(result, expResult);
@@ -83,7 +83,7 @@ public class CleanerNGTest {
     @Test
     public void testToTimingsString() {
         System.out.println("toTimingsString");
-        Cleaner instance = new Cleaner(noisy);
+        Cleaner instance = new Cleaner(noisy, 60, 0.2);
         String expResult = "EDAAAAABABAAAAAAAAAAABAAAAAAABAAAAAAAAAAABABABAAAAABABABAAAAAAABABAFECAGECAGECAGECAG";
         String result = instance.toTimingsString();
         assertEquals(result, expResult);

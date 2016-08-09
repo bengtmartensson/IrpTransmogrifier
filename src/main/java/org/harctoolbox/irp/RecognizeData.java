@@ -17,34 +17,18 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 
 public class RecognizeData implements Cloneable {
 
-    private static int ALL = -1;
-
-    /**
-     * @return the ALL
-     */
-    public static int getALL() {
-        return ALL;
-    }
-
-    /**
-     * @param aALL the ALL to set
-     */
-    public static void setALL(int aALL) {
-        ALL = aALL;
-    }
-
     //private int start;
     //private int length;
     private boolean success;
     private int position;
-    private double rest; // microseconds
-    private boolean restIsFlash;
+    private double hasConsumed;
+    //private double rest; // microseconds
+    //private boolean restIsFlash;
     private IrSignal.Pass state;
     //private NameEngine nameEngine;
     private ParameterCollector parameterCollector;
@@ -52,32 +36,30 @@ public class RecognizeData implements Cloneable {
     private final GeneralSpec generalSpec;
     private int extentStart;
     private IrStreamItem lookAheadItem;
+    private boolean interleaving;
 
-//    public RecognizeData(NameEngine nameEngine) {
-//        this(0, ALL, null, nameEngine);
-//    }
-
-    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence) {
-        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector());
+    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, boolean interleaving) {
+        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(), interleaving);
     }
 
-    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state, ParameterCollector parameterCollector) {
+    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state, ParameterCollector parameterCollector, boolean interleaving) {
         //this.start = start;
         //this.length = length;
         success = true;
         this.generalSpec = generalSpec;
         this.position = position;
-        this.rest = 0.0;
-        this.restIsFlash = false;
+        this.hasConsumed = 0.0;
+        //this.restIsFlash = false;
         this.irSequence = irSequence;
         this.state = state;
         this.parameterCollector = parameterCollector;
         this.extentStart = 0;
         this.lookAheadItem = null;
+        this.interleaving = interleaving;
     }
 
-    RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, ParameterCollector nameEngine) {
-        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, nameEngine);
+    RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, ParameterCollector nameEngine, boolean interleaving) {
+        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, nameEngine, interleaving);
     }
 
 //    public RecognizeData(IrSequence irSequence, int position) {
@@ -218,57 +200,50 @@ public class RecognizeData implements Cloneable {
         position += i;
     }
 
-    public boolean hasRest() {
-        return ! IrCoreUtils.approximatelyEquals(rest, 0.0);
+//    public boolean hasRest() {
+//        return ! IrCoreUtils.approximatelyEquals(rest, 0.0);
+//    }
+//
+//    /**
+//     * @return the rest
+//     */
+//    public double getRest() {
+//        return rest;
+//    }
+//
+//    /**
+//     * @param rest the rest to set
+//     */
+//    public void setRest(double rest) {
+//        this.rest = rest;
+//    }
+//
+//    /**
+//     * @return the restIsFlash
+//     */
+//    public boolean isRestIsFlash() {
+//        return !Duration.isOn(position);
+//    }
+//
+//    public void clearRest() {
+//        rest = 0.0f;
+//    }
+
+    public boolean isOn() {
+        return Duration.isOn(position);
     }
 
-    /**
-     * @return the rest
-     */
-    public double getRest() {
-        return rest;
+    public double get() {
+        return  Math.abs(irSequence.get(position)) - getHasConsumed();
     }
 
-    /**
-     * @param rest the rest to set
-     * @param isFlash
-     */
-    public void setRest(double rest, boolean isFlash) {
-        this.rest = rest;
-        this.restIsFlash = isFlash;
+    public void consume() {
+        position++;
+        setHasConsumed(0);
     }
 
-    /**
-     * @param rest the rest to set
-     */
-    public void setRestFlash(double rest) {
-        setRest(rest, true);
-    }
-
-    /**
-     * @param rest the rest to set
-     */
-    public void setRestGap(double rest) {
-        setRest(rest, false);
-    }
-
-    /**
-     * @return the restIsFlash
-     */
-    public boolean isRestIsFlash() {
-        return restIsFlash;
-    }
-
-    public boolean hasRestGap() {
-        return hasRest() && ! restIsFlash;
-    }
-
-    public boolean hasRestFlash() {
-        return hasRest() && restIsFlash;
-    }
-
-    public void clearRest() {
-        rest = 0.0f;
+    public void consume(double amount) {
+        setHasConsumed(amount);
     }
 
     /**
@@ -298,4 +273,44 @@ public class RecognizeData implements Cloneable {
         this.lookAheadItem = lookAheadItem;
     }
 
+    /**
+     * @return the interleaving
+     */
+    public boolean isInterleaving() {
+        return interleaving;
+    }
+
+    /**
+     * @return the hasConsumed
+     */
+    public double getHasConsumed() {
+        return hasConsumed;
+    }
+
+    /**
+     * @param hasConsumed the hasConsumed to set
+     */
+    public void setHasConsumed(double hasConsumed) {
+        this.hasConsumed = hasConsumed;
+    }
+
+    public boolean check(boolean on) {
+        return isOn() == on
+                && position < irSequence.getLength();
+    }
+
+    public double getExtentDuration() {
+        int endPosition = position + 1;//IrCoreUtils.approximatelyEquals(hasConsumed, 0.0) ? position : position + 1;
+        return irSequence.getDuration(extentStart, endPosition - extentStart);
+    }
+
+    boolean allowChopping() {
+        DurationType current = DurationType.newDurationType(isOn());
+        return lookAheadItem != null
+                && (current == lookAheadItem.startingDuratingType(current, false));
+    }
+
+    boolean allowChopping(double wanted) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

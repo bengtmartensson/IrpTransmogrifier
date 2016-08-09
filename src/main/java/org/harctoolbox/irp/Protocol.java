@@ -364,7 +364,7 @@ public class Protocol extends IrpObject {
     }
 
     public boolean interleavingOk() {
-        return bitspecIrstream.interleavingOk(definitions, generalSpec, DurationType.gap);
+        return bitspecIrstream.interleavingOk(definitions, generalSpec);
     }
 
     public boolean isRPlus() {
@@ -458,18 +458,19 @@ public class Protocol extends IrpObject {
 
     private boolean process(NameEngine nameEngine, IrSequence irSequence, IrSignal.Pass pass) {
         //RecognizeData inData = new RecognizeData(irSequence);
-        RecognizeData recognizeData = new RecognizeData(generalSpec, irSequence);
+        RecognizeData recognizeData = new RecognizeData(generalSpec, irSequence, interleavingOk());
         boolean status = recognize(recognizeData, pass);
         if (!status)
             return false;
 
         try {
             recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
-        } catch (NameConflictException ex) {
+        } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
             logger.warning(ex.getMessage());
             return false;
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnassignedException ex) {
+            logger.log(Level.WARNING, "Equation solving not implemented: {0}", ex.getMessage());
+            return false;
         }
         try {
             recognizeData.getParameterCollector().addToNameEngine(nameEngine);

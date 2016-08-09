@@ -132,23 +132,23 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
-        return BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last)
-                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last)
-                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last);
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        return BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last, gapFlashBitSpecs);
     }
 
     @Override
-    public DurationType endingDurationType(DurationType last) {
-        return BareIrStream.endingDurationType(intro, last)
-                .combine(BareIrStream.endingDurationType(repeat, last))
-                .combine(BareIrStream.endingDurationType(ending, last));
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
+        return BareIrStream.endingDurationType(intro, last, gapFlashBitSpecs)
+                .combine(BareIrStream.endingDurationType(repeat, last, gapFlashBitSpecs))
+                .combine(BareIrStream.endingDurationType(ending, last, gapFlashBitSpecs));
     }
 
     @Override
-    public DurationType startingDuratingType(DurationType last) {
-        return BareIrStream.startingDurationType(intro, last)
-                .combine(BareIrStream.startingDurationType(repeat, last))
-                .combine(BareIrStream.startingDurationType(ending, last));
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
+        return BareIrStream.startingDurationType(intro, last, gapFlashBitSpecs)
+                .combine(BareIrStream.startingDurationType(repeat, last, gapFlashBitSpecs))
+                .combine(BareIrStream.startingDurationType(ending, last, gapFlashBitSpecs));
     }
 }

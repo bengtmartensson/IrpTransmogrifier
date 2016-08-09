@@ -122,17 +122,17 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public DurationType endingDurationType(DurationType last) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public DurationType startingDuratingType(DurationType last) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 }

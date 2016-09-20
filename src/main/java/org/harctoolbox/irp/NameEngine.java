@@ -386,8 +386,8 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     void reduce(ParameterSpecs parameterSpecs) {
         ArrayList<String> names = new ArrayList<>(map.keySet());
-        for (String name : names)
-            if (!parameterSpecs.contains(name))
-                map.remove(name);
+        names.stream().filter((name) -> (!parameterSpecs.contains(name))).forEach((name) -> {
+            map.remove(name);
+        });
     }
 }

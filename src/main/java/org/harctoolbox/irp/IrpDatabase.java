@@ -232,28 +232,8 @@ public class IrpDatabase {
         return newName.matches("\\d.*") ? ("X" + newName) : newName;
     }
 
-    public Document toDocument() {
-        Document doc = XmlUtils.newDocument(true);
-        Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
-        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
-        root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
-        root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
-        root.setAttribute("version", configFileVersion);
-        doc.appendChild(root);
-
-        for (UnparsedProtocol protocol : this.protocols.values()) {
-            Element element = toElement(doc, protocol.map);
-            root.appendChild(element);
-        }
-
-        return doc;
-    }
-
     private String configFileVersion;
     private String encoding;
-
 
     // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
     private LinkedHashMap<String, UnparsedProtocol> protocols;
@@ -297,6 +277,25 @@ public class IrpDatabase {
             addProtocol((Element)nodes.item(i));
         // FIXME
         //expand();
+    }
+
+    public Document toDocument() {
+        Document doc = XmlUtils.newDocument(true);
+        Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
+        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
+        root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
+        root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
+        root.setAttribute("version", configFileVersion);
+        doc.appendChild(root);
+
+        for (UnparsedProtocol protocol : this.protocols.values()) {
+            Element element = toElement(doc, protocol.map);
+            root.appendChild(element);
+        }
+
+        return doc;
     }
 
     /**

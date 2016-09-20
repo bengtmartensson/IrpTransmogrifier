@@ -19,11 +19,84 @@
     <url>http://www.harctoolbox.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.nameLowercase>irptransmogrifier</project.nameLowercase>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
-        <plugins>
+        <plugins><!-- Generate Version.java from Version.xml using mkVersion.xsl. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <transformationSets>
+                        <transformationSet>
+                            <dir>src/main/xml</dir>
+                            <outputDir>${project.build.directory}/generated-sources/xml/org/harctoolbox/irp</outputDir>
+                            <includes>
+                                <include>Version.xml</include>
+                            </includes>
+                            <stylesheet>${project.build.directory}/../../harctoolboxbundle/tools/mkVersion.xsl</stylesheet>
+                            <parameters>
+                                <parameter>
+                                    <name>version</name>
+                                    <value>${project.version}</value>
+                                </parameter>
+                                <parameter>
+                                    <name>url</name>
+                                    <value>${project.url}</value>
+                                </parameter>
+                                <parameter>
+                                    <name>appName</name>
+                                    <value>${project.artifactId}</value>
+                                </parameter>
+                            </parameters>
+                            <fileMappers>
+                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.java</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet>
+                        <!--transformationSet>
+                            <dir>src/main/xdocs</dir>
+                            <outputDir>
+                                ${project.build.directory}/generated-documents
+                            </outputDir>
+                            <includes>
+                                <include>Girr.xml</include>
+                            </includes>
+                            <stylesheet>../tools/xdoc2html.xsl</stylesheet>
+                            <fileMappers>
+                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.html</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet-->
+                    </transformationSets>
+                    <catalogs>
+                        <catalog>../harctoolboxbundle/schemas/catalog.xml</catalog>
+                    </catalogs>
+                </configuration>
+
+                <!-- Use Saxon for xslt 2 -->
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.saxon</groupId>
+                        <artifactId>saxon</artifactId>
+                        <version>8.7</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
             <!-- Generate target/generated-sources/antlr4/org/harctoolbox/IrpMaster/TODO[Parser,Lexer].java from
             src/main/antrlr4/Irp.g4 -->
             <plugin>
@@ -74,11 +147,11 @@
                     </execution>
                    </executions>
             </plugin>
-
+            
             <plugin>
-                <!-- Copy resources directly to target dir. -->
+                <!-- Copy resources  in src/main/config to target dir. -->
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
@@ -94,6 +167,46 @@
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <id>make-wrapper-executable</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>chmod</executable> <!-- not portable, sorry -->
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <arguments>
+                                <argument>+x</argument>
+                                <argument>${project.nameLowercase}.sh</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/xml</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
@@ -163,11 +276,12 @@
             <version>9.7.0-6</version>
         </dependency>
 
-        <!-- May only be used for testing! Might be removed in the future -->
+        <!-- Should only be used for testing! Might be removed in the future -->
         <dependency>
             <groupId>org.harctoolbox</groupId>
             <artifactId>IrpMaster</artifactId>
             <version>1.3</version>
+            <!--scope>test</scope-->
         </dependency>
 
     </dependencies>

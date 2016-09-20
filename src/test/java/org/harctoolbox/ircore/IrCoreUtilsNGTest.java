@@ -18,6 +18,7 @@ public class IrCoreUtilsNGTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
+
     public IrCoreUtilsNGTest() {
     }
 

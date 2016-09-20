@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -211,13 +213,10 @@ public class XmlUtils {
             Schema schema = args.length > 1 ? readSchemaFromFile(new File(args[1])) : null;
             Document doc = openXmlFile(new File(args[0]), schema, true, true);
             System.out.println(doc);
-        } catch (IOException ex) {
-            System.err.println(ex.getMessage());
-        } catch (SAXParseException ex) {
-            System.err.println(ex.getMessage());
-        } catch (SAXException ex) {
-            System.err.println(ex.getMessage());
+        } catch (SAXException | IOException ex) {
+            Logger.getLogger(XmlUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     private XmlUtils() {}
 }

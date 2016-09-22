@@ -71,11 +71,15 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     protected ParserRuleContext parseTree = null;
 
 
-    protected Duration(double us) {
-        nameOrNumber = new NameOrNumber(us);
-        this.us = us;
-        unit = "u";
+    protected Duration(double d, String unit) {
+        nameOrNumber = new NameOrNumber(d);
+        this.unit = unit != null ? unit : "1";
     }
+
+    protected Duration(double us) {
+        this(us, "u");
+    }
+
     protected Duration(IrpParser.Name_or_numberContext ctx, String unit) throws IrpSyntaxException {
         super();
         nameOrNumber = new NameOrNumber(ctx);

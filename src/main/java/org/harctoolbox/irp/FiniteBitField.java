@@ -40,6 +40,14 @@ public class FiniteBitField extends BitField {
         this((IrpParser.Finite_bitfieldContext) new ParserDriver(str).getParser().bitfield());
     }
 
+    public FiniteBitField(String name, int width) {
+        this.complement = false;
+        data = new Name(name);
+        this.width = new Number(width);
+        this.chop = new Number(0);
+        this.reverse = false;
+    }
+
     public FiniteBitField(IrpParser.Finite_bitfieldContext ctx) throws IrpSyntaxException {
         int index = 0;
         if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext)) {

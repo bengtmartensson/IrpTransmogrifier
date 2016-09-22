@@ -36,6 +36,10 @@ public class Extent extends Duration {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
     }
 
+    public Extent(double d, String unit) {
+        super(d, unit);
+    }
+
     @Override
     public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;

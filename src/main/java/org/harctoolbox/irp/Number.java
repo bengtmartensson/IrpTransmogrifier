@@ -79,6 +79,10 @@ public class Number extends PrimaryItem {
         return Long.toString(data);
     }
 
+    public String toIrpString(int radix) {
+        return Long.toString(data, radix);
+    }
+
     @Override
     public Element toElement(Document document) {
         Element element = document.createElement("number");

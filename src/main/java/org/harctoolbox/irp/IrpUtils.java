@@ -98,6 +98,17 @@ public class IrpUtils {
         return sum;
     }
 
+    public static int l1Norm(int[] sequence, int beg, int length) {
+        int sum = 0;
+        for (int i = beg; i < beg + length; i++)
+            sum += Math.abs(sequence[i]);
+        return sum;
+    }
+
+    public static int l1Norm(int[] sequence) {
+        return l1Norm(sequence, 0, sequence.length);
+    }
+
     public static String spaces(int length) {
         byte[] buf = new byte[length];
         for (int i = 0; i < length; i++)
@@ -178,6 +189,13 @@ public class IrpUtils {
         if (width > 0)
             y >>>= Long.SIZE - width;
         return y;
+    }
+
+    public static String radixPrefix(int radix) {
+        return radix == 2 ? "0b"
+                : radix == 8 ? "0"
+                : radix == 16 ? "0x"
+                : "";
     }
 
     /**

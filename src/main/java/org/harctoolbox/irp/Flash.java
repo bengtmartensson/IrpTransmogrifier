@@ -34,6 +34,10 @@ public class Flash extends Duration {
         super(ctx.name_or_number(), ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : null);
     }
 
+    public Flash(double d, String unit) {
+        super(d, unit);
+    }
+
     @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {

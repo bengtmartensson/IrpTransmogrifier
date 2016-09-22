@@ -29,7 +29,7 @@ complete solution, down to specification holes._
  Probably trying a number of different pre-rendered IRP parse trees, possibly a two-stage strategy,
  using IRP ["Meta protocols"](http://www.harctoolbox.org/IrpMaster.html#Preprocessing+and+inheritance).
 
-_Ambition level: should grok (almost) all of the existing protocols in IrpProtocols, but not necessarily be "complete".
+_Ambition level: should grok (almost?) all of the existing protocols in IrpProtocols, but not necessarily be "complete".
 Status: Most protocols work._
 
 3. Code generation for rendering. For a particular protocol, generate target code (C, C++, Java, Python,...) that can render signals

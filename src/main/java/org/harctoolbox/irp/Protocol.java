@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -78,29 +77,26 @@ public class Protocol extends IrpObject {
 //    private Element root = null;
 //    private Element currentElement = null;
 
+    public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
+            IrpParser.ProtocolContext parseTree) {
+        this.parseTree = parseTree;
+        this.generalSpec = generalSpec;
+        this.bitspecIrstream = bitspecIrstream;
+        this.definitions = definitions;
+        this.parameterSpecs = parameterSpecs;
+    }
+
     /**
      *
      * @param generalSpec
      */
     public Protocol(GeneralSpec generalSpec) {
-        this();
-        this.generalSpec = generalSpec;
+        this(generalSpec, null, null, null, null);
     }
 
     public Protocol() {
-        //this.parseDriver = null;
-        this.parseTree = null;
-        this.bitspecIrstream = null;
-        this.parameterSpecs = null;
-        //this.irp = null;
-        //this.nameEngine = new NameEngine();
-        this.generalSpec = new GeneralSpec();
+        this(new GeneralSpec());
     }
-
-
-//    public final String getIrp() {
-//        return irp;
-//    }
 
     /**
      * Main constructor.
@@ -112,13 +108,17 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.InvalidRepeatException
      * @throws org.harctoolbox.irp.UnassignedException
      */
-    public Protocol(String irpString) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
+    public Protocol(String irpString)
+            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
         this(new ParserDriver(irpString));
     }
 
-    public Protocol(ParserDriver parserDriver) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
+    public Protocol(ParserDriver parserDriver)
+            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
+        this(parserDriver.getParser().protocol());
         this.parseDriver = parserDriver;
-        setup(parserDriver.getParser().protocol());
+//        setup(parserDriver.getParser().protocol());
+
     }
 
 //    public Protocol(/*String name,*/ String irpString/*, String documentation*/) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException {
@@ -134,27 +134,26 @@ public class Protocol extends IrpObject {
 //            parseTree = parseDriver.getParser().protocol();
 //    }
 
-    public Protocol(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
-        setup(parseTree);
-    }
-    public IrpParser.ProtocolContext getParseTree() {
-        return parseTree;
-    }
+    public Protocol(IrpParser.ProtocolContext parseTree)
+            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
+        this(new GeneralSpec(parseTree), new BitspecIrstream(parseTree), new NameEngine(), new ParameterSpecs(parseTree), parseTree);
+//        setup(parseTree);
+//    }
+//
+//    private void setup(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
+//        this.parseTree = parseTree;
+//        try {
+//            generalSpec = new GeneralSpec(parseTree);
+//            bitspecIrstream = new BitspecIrstream(parseTree);
+//            definitions = new NameEngine();
+        for (IrpParser.DefinitionsContext defs : parseTree.definitions())
+            definitions.parseDefinitions(defs);
 
-    private void setup(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
-        this.parseTree = parseTree;
-        try {
-            generalSpec = new GeneralSpec(parseTree);
-            bitspecIrstream = new BitspecIrstream(parseTree);
-            definitions = new NameEngine();
-            for (IrpParser.DefinitionsContext defs : parseTree.definitions())
-                definitions.parseDefinitions(defs);
-
-            //definitionss = new Defi
-            parameterSpecs = new ParameterSpecs(parseTree);
-        } catch (ParseCancellationException ex) {
-            throw new IrpSyntaxException(ex);
-        }
+        //definitionss = new Defi
+        parameterSpecs = new ParameterSpecs(parseTree);
+//        } catch (ParseCancellationException ex) {
+//            throw new IrpSyntaxException(ex);
+//        }
 
         memoryVariables = new NameEngine();
         for (ParameterSpec parameter : parameterSpecs) {
@@ -165,6 +164,10 @@ public class Protocol extends IrpObject {
             }
         }
 
+        checkSanity();
+    }
+
+    private void checkSanity() throws InvalidRepeatException, IrpSemanticException {
         if (numberOfInfiniteRepeats() > 1) {
             throw new InvalidRepeatException("More than one infinite repeat found. The program does not handle this.");
         }
@@ -176,6 +179,10 @@ public class Protocol extends IrpObject {
         if (generalSpec == null) {
             throw new IrpSemanticException("GeneralSpec missing from protocol");
         }
+    }
+
+    public IrpParser.ProtocolContext getParseTree() {
+        return parseTree;
     }
 
     /**
@@ -418,8 +425,16 @@ public class Protocol extends IrpObject {
         return
                 generalSpec.toIrpString()
                 + bitspecIrstream.toIrpString()
-                + definitions.toIrpString()
-                + parameterSpecs.toIrpString();
+                + (definitions != null ? definitions.toIrpString() : "")
+                + (parameterSpecs != null ? parameterSpecs.toIrpString() : "");
+    }
+
+    public String toIrpString(int radix) {
+        return
+                generalSpec.toIrpString()
+                + bitspecIrstream.toIrpString()
+                + (definitions != null ? definitions.toIrpString(radix) : "")
+                + (parameterSpecs != null ? parameterSpecs.toIrpString() : "");
     }
 
     @Override

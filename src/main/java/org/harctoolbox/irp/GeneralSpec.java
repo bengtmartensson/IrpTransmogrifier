@@ -67,6 +67,10 @@ public class GeneralSpec extends IrpObject {
         this.dutyCycle = dutyCycle;
     }
 
+    public GeneralSpec(BitDirection bitDirection, double unit, double frequency) {
+        this(bitDirection, unit, frequency, ModulatedIrSequence.unknownDutyCycle);
+    }
+
     /**
      * Copy constructor.
      * @param src
@@ -148,8 +152,8 @@ public class GeneralSpec extends IrpObject {
     @Override
     public String toIrpString() {
         return "{"
-                + getFrequency() + "k,"
-                + getUnit() + ","
+                + getFrequency()/1000f + "k,"
+                + Math.round(getUnit()) + ","
                 + getBitDirection()
                 + (getDutyCycle() > 0 ? ("," + IrCoreUtils.real2percent(getDutyCycle()) + "%") : "")
                 + "}";

@@ -231,13 +231,35 @@ public class IrpTransmogrifier {
             out.println(irSignal);
         }
 
-        Analyzer analyzer = new Analyzer(irSequence);
-        for (int i = 0; i < analyzer.getTimings().size(); i++) {
-            int timing = analyzer.getTimings().get(i);
-            out.println((char) ('A' + i) + ": " + timing + "    \t" + analyzer.getCleanedHistogram().get(timing));
-        }
-        out.println(analyzer.toTimingsString());
+        Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.frequency, commandAnalyze.repeatFinder);
+        out.println("Spaces:");
+        for (int d : analyzer.getDistinctSpaces())
+            out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberSpaces(d));
 
+        out.println("Marks:");
+        for (int d : analyzer.getDistinctMarks())
+            out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberMarks(d));
+
+
+        out.println("Pairs:");
+        for (Analyzer.MarkSpace pair : analyzer.getPairs()) {
+            out.println(analyzer.getName(pair) + ":\t" + analyzer.getNumberPairs(pair));
+        }
+//        for (int mark : analyzer.getDistinctMarks())
+//            for (int space : analyzer.getDistinctSpaces()) {
+//                int n = analyzer.getNumberPairs(mark, space);
+//                if (n > 0)
+//                    out.println(analyzer.getName(mark) + analyzer.getName(space) + ":\t" + n);
+//            }
+        out.println(analyzer.toTimingsString());
+        //out.println(analyzer.getGeneralSpec(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb).toIrpString());
+        try {
+            //out.println(analyzer.getGeneralSpec().toString());
+            Protocol protocol = analyzer.process(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent);
+            out.println(protocol.toIrpString(commandAnalyze.radix));
+        } catch (IrpSyntaxException | InvalidRepeatException ex) {
+            Logger.getLogger(IrpTransmogrifier.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
@@ -559,16 +581,25 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
     private static class CommandAnalyze {
 
+        @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
+        private boolean cleaner = false;
+
+        @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
+        private boolean extent = false;
+
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
         private int frequency = (int) ModulatedIrSequence.defaultFrequency;
+
+        @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the analyzer")
+        private boolean lsb = false;
 
         @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder")
         private boolean repeatFinder = false;
 
-        @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
-        private boolean cleaner = false;
+        @Parameter(names = {"--radix" }, description = "Radix of parameter output")
+        private int radix = 16;
 
-        @Parameter(description = "durations, or pronto hex", required = true)
+        @Parameter(description = "durations in microseconds, (pronto hex currently not supported)", required = true)
         private List<String> args;
     }
 

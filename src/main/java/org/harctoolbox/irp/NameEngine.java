@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -307,22 +308,19 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     @Override
     public String toIrpString() {
-        //if (map.isEmpty())
-        //    return "";
-
-        StringBuilder str = new StringBuilder(map.size()*10);
-        //List<String> list = new ArrayList<>();
-        str.append("{");
+        StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
         map.entrySet().stream().forEach((kvp) -> {
-            //list.add(kvp.getKey() + "=" + kvp.getValue().toIrpString());
-            if (str.length() > 1)
-                str.append(",");
-            str.append(kvp.getKey()).append("=").append(kvp.getValue().toIrpString());
+            stringJoiner.add(kvp.getKey() + "=" + kvp.getValue().toIrpString());
         });
+        return stringJoiner.toString();
+    }
 
-        //str.append(list);
-        str.append("}");
-        return str.toString();
+    public String toIrpString(int radix) {
+        StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
+        map.entrySet().stream().forEach((kvp) -> {
+            stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + kvp.getValue().toIrpString(radix));
+        });
+        return stringJoiner.toString();
     }
 
 //    /**

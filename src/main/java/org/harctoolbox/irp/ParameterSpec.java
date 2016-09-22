@@ -99,14 +99,17 @@ public class ParameterSpec extends IrpObject {
         this(name, memory, min, max, null);
         this.memory = false;
     }
+
     @Override
     public String toString() {
         return toIrpString();
     }
+
     @Override
     public String toIrpString() {
         return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
     }
+
     public void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
         if (!nameEngine.containsKey(name.getName())) {
             if (this.hasMemory())

@@ -50,9 +50,9 @@ public class Cleaner {
     private int rawData[];
     private List<Integer> dumbTimingsTable;
     protected List<Integer> timings;
-    private HashMap<Integer, Integer> rawHistogram;
-    private HashMap<Integer, Integer> cleanedHistogram;
-    private int indexData[];
+    private HashMap<Integer, HistoPair> rawHistogram;
+    private HashMap<Integer, HistoPair> cleanedHistogram;
+    protected int indexData[];
     private int[] sorted;
     private HashMap<Integer, Integer> lookDownTable;
 
@@ -73,10 +73,17 @@ public class Cleaner {
 
     private void createRawHistogram() {
         rawHistogram = new HashMap<>(numberOfTimingsCapacity);
-        for (int d : rawData) {
-            int old = rawHistogram.containsKey(d) ? rawHistogram.get(d) : 0;
-            rawHistogram.put(d, old + 1);
+        for (int i = 0; i < rawData.length; i++) {
+            boolean isMark = i % 2 == 0;
+            int duration = rawData[i];
+            if (!rawHistogram.containsKey(duration))
+                rawHistogram.put(duration, new HistoPair());
+            rawHistogram.get(duration).increment(isMark);
         }
+//        for (int d : rawData) {
+//            int old = rawHistogram.containsKey(d) ? rawHistogram.get(d) : 0;
+//            rawHistogram.put(d, old + 1);
+//        }
     }
 
     public int[] getIndexData() {
@@ -115,7 +122,7 @@ public class Cleaner {
                 if (duration == lastDuration)
                     continue;
                 lastDuration = duration;
-                int noHits = rawHistogram.get(duration);
+                int noHits = rawHistogram.get(duration).total();
                 sum += noHits * duration;
                 terms += noHits;
                 lookDownTable.put(duration, timingsIndex);
@@ -134,12 +141,12 @@ public class Cleaner {
     private void createCleanHistogram() {
         cleanedHistogram = new LinkedHashMap<>(numberOfTimingsCapacity);
         timings.stream().forEach((duration) -> {
-            cleanedHistogram.put(duration, 0);
+            cleanedHistogram.put(duration, new HistoPair());
         });
         rawHistogram.entrySet().stream().forEach((kvp) -> {
             int index = lookDownTable.get(kvp.getKey());
             Integer cleanedDuration = timings.get(index);
-            cleanedHistogram.put(cleanedDuration, cleanedHistogram.get(cleanedDuration) + kvp.getValue());
+            cleanedHistogram.get(cleanedDuration).add(kvp.getValue());
         });
     }
 
@@ -167,6 +174,12 @@ public class Cleaner {
         }
     }
 
+    protected int getTotalDuration(int beg, int length) {
+        int sum = 0;
+        for (int i = beg; i < beg + length; i++)
+            sum += timings.get(indexData[i]);
+        return sum;
+    }
 
     /**
      * @return the timings
@@ -175,10 +188,90 @@ public class Cleaner {
         return timings;
     }
 
+    public Integer getIndex(int duration) {
+        return lookDownTable.get(duration);
+    }
+
+    private List<Integer> getMarksOrSpaces(boolean isSpace) {
+        List<Integer> list = new ArrayList<>(timings.size());
+        for (int d : timings) {
+            if (cleanedHistogram.get(d).get(isSpace) > 0)
+                list.add(d);
+        }
+        return list;
+    }
+
+    public List<Integer> getDistinctSpaces() {
+        return getMarksOrSpaces(false);
+    }
+
+    public List<Integer> getDistinctMarks() {
+        return getMarksOrSpaces(true);
+    }
+
     /**
      * @return the cleanedHistogram
      */
     public HashMap<Integer, Integer> getCleanedHistogram() {
-        return cleanedHistogram;
+        HashMap<Integer, Integer> result = new LinkedHashMap<>(cleanedHistogram.size());
+        cleanedHistogram.entrySet().stream().forEach((kvp) -> {
+            result.put(kvp.getKey(), kvp.getValue().total());
+        });
+        return result;
+    }
+
+    public int getNumberSpaces(int duration) {
+        return cleanedHistogram.get(duration).numberSpaces;
+    }
+
+    public int getNumberMarks(int duration) {
+        return cleanedHistogram.get(duration).numberMarks;
+    }
+
+    public int getNumberPairs(int mark, int space) {
+        int ispace = getIndex(space);
+        int imark = getIndex(mark);
+        int result = 0;
+        for (int i = 0; i < indexData.length - 1; i += 2)
+            if (indexData[i] == imark && indexData[i + 1] == ispace)
+                result++;
+
+        return result;
+    }
+
+    private static class HistoPair {
+
+        int numberSpaces;
+        int numberMarks;
+
+        HistoPair() {
+            numberSpaces = 0;
+            numberMarks = 0;
+        }
+
+        int get(boolean isMark) {
+            return isMark ? numberMarks : numberSpaces;
+        }
+
+        void increment(boolean isMark) {
+            if (isMark)
+                numberMarks++;
+            else
+                numberSpaces++;
+        }
+
+        int total() {
+            return numberMarks + numberSpaces;
+        }
+
+        @Override
+        public String toString() {
+            return total() + "=" + numberSpaces + "+" + numberMarks;
+        }
+
+        private void add(HistoPair op) {
+            numberSpaces += op.numberSpaces;
+            numberMarks += op.numberMarks;
+        }
     }
 }

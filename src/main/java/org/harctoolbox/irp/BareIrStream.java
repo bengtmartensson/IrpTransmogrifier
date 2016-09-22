@@ -46,6 +46,22 @@ public class BareIrStream extends IrStreamItem {
     static boolean interleavingOk(BareIrStream bareIrStream, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitspecs) {
         return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
     }
+    //    private BareIrStream(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException, InvalidRepeatException {
+//        irStreamItems = new ArrayList<>(list.size());
+//        for (IrpParser.Irstream_itemContext item : list) {
+//            IrStreamItem irStreamItem = newIrStreamItem(item);
+//            irStreamItems.add(irStreamItem);
+//        }
+//    }
+
+    private static List<IrStreamItem> parse(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException, InvalidRepeatException {
+        List<IrStreamItem> irStreamItems = new ArrayList<>(list.size());
+        for (IrpParser.Irstream_itemContext item : list) {
+            IrStreamItem irStreamItem = newIrStreamItem(item);
+            irStreamItems.add(irStreamItem);
+        }
+        return irStreamItems;
+    }
 
     protected List<IrStreamItem> irStreamItems = null;
     //protected BitSpec bitSpec;
@@ -81,18 +97,18 @@ public class BareIrStream extends IrStreamItem {
     }*/
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
-        this(ctx.irstream_item());
+        this(parse(ctx.irstream_item()));
         parseTree = ctx;
         //this(toList(ctx, env), env);
     }
-    public BareIrStream(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException, InvalidRepeatException {
-        irStreamItems = new ArrayList<>(list.size());
-        for (IrpParser.Irstream_itemContext item : list) {
-            IrStreamItem irStreamItem = newIrStreamItem(item);
-            irStreamItems.add(irStreamItem);
-        }
+
+    private BareIrStream() {
+        irStreamItems = null;
     }
 
+    public BareIrStream(List<IrStreamItem> list) {
+        this.irStreamItems = list;
+    }
 
 //@Override
 //    boolean stringOk(String s) {

@@ -76,18 +76,23 @@ public class Name extends PrimaryItem implements Floatable {
     public static String toString(IrpParser.NameContext ctx) {
         return ctx.getText();
     }
+
     private final String name;
+
     public Name(IrpParser.NameContext ctx) {
         name = ctx.getText();
     }
+
     public Name(String name) {
         //parse(name); // just to check validity
         this.name = name;
     }
+
     @Override
     public String toString() {
         return getName();
     }
+
     @Override
     public String toIrpString() {
         return getName();

@@ -33,17 +33,25 @@ public class BitspecIrstream extends IrStreamItem {
     private static final Logger logger = Logger.getLogger(BitspecIrstream.class.getName());
 
     private BitSpec bitSpec;
-    private IrStream irStream = null;
+    private IrStream irStream;
     private final IrpParser.Bitspec_irstreamContext parseTree;
 
     public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         this(ctx.bitspec_irstream());
     }
 
-    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+    public BitspecIrstream(BitSpec bitSpec, IrStream irStream, IrpParser.Bitspec_irstreamContext ctx) {
         parseTree = ctx;
-        bitSpec = new BitSpec(ctx.bitspec());
-        irStream = new IrStream(ctx.irstream());
+        this.bitSpec = bitSpec;
+        this.irStream = irStream;
+    }
+
+    public BitspecIrstream(BitSpec bitSpec, IrStream irStream) {
+        this(bitSpec, irStream, null);
+    }
+
+    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+        this(new BitSpec(ctx.bitspec()), new IrStream(ctx.irstream()), ctx);
     }
 
     public BitspecIrstream(String str) throws IrpSyntaxException, InvalidRepeatException {

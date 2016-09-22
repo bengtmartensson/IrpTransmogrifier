@@ -438,5 +438,22 @@ public class Expression extends PrimaryItem /* ??? */ {
         return null;
     }
 
+    /**
+     * Formats the expression with prescribed radix.
+     * Handles only the simple case of the expression being a number.
+     * @param radix
+     * @return
+     */
+    String toIrpString(int radix) {
+        if (parseTree == null)
+            return null;
+
+        if (parseTree.children.size() != 1)
+            throw new UnsupportedOperationException("Unsupported case");
+
+        IrpParser.Primary_itemContext pi = (IrpParser.Primary_itemContext) parseTree.children.get(0);
+        return new Number(pi.number()).toIrpString(radix);
+    }
+
     // NOTE: this class can be invoked from the command line by IrpTransmogrifier.main().
 }

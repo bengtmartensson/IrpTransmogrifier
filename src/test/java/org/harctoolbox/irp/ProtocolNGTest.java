@@ -242,7 +242,7 @@ public class ProtocolNGTest {
     public void testToIrpString() {
         System.out.println("toIrpString");
         String result = rc5.toIrpString();
-        assertEquals(result, "{36000.0k,889.0,msb}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=(1-T)){}[D:0..31,F:0..127,T@:0..1=0]");
+        assertEquals(result, "{36.0k,889,msb}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=(1-T)){}[D:0..31,F:0..127,T@:0..1=0]");
     }
 
     /**

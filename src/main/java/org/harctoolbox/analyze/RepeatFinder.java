@@ -206,6 +206,10 @@ public class RepeatFinder {
             this(0, 0, 0, 0);
         }
 
+        public RepeatFinderData(int length) throws OddSequenceLenghtException {
+            this(length, 0, 0, 0);
+        }
+
         public RepeatFinderData(int beginLength, int repeatLength, int numberRepeats, int endingLength) throws OddSequenceLenghtException {
             if (beginLength % 2 != 0 || repeatLength % 2 != 0 || endingLength % 2 != 0)
                 throw new OddSequenceLenghtException("Lengths and start must be even");
@@ -223,6 +227,7 @@ public class RepeatFinder {
                     + "; repeatLength = " + repeatLength
                     + "; numberRepeats = " + numberRepeats
                     + "; endingLength = " + endingLength
+                    + "; totalLength = " + totalLength()
                     + "; repeatsDuration = " + repeatsDuration;
         }
 
@@ -249,6 +254,10 @@ public class RepeatFinder {
 
         public int getEndingLength() {
             return endingLength;
+        }
+
+        private int totalLength() {
+            return beginLength + numberRepeats*repeatLength + endingLength;
         }
 
         public IrSignal chopIrSequence(ModulatedIrSequence irSequence) {

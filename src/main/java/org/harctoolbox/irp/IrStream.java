@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -62,10 +63,20 @@ public class IrStream extends BareIrStream {
     public IrStream(String str) throws IrpSyntaxException, InvalidRepeatException{
         this(new ParserDriver(str).getParser().irstream());
     }
+
     public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         super(ctx.bare_irstream());
         IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
         repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : null;
+    }
+
+    public IrStream(List<IrStreamItem> irStreamItems, RepeatMarker repeatMarker) {
+        super(irStreamItems);
+        this.repeatMarker = repeatMarker;
+    }
+
+    public IrStream(List<IrStreamItem> irStreamItems) {
+        this(irStreamItems, new RepeatMarker());
     }
 
     //private ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems() {

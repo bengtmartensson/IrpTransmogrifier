@@ -50,6 +50,23 @@ public class BitSpec extends IrpObject {
 //    public static int getNoInstances() {
 //        return noInstances;
 //    }
+    //    private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
+////        noInstances++;
+//        chunkSize = computeNoBits(list.size());
+//        bitCodes = new ArrayList<>(list.size());
+//        for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list) {
+//            BareIrStream bareIrStream = new BareIrStream(bareIrStreamCtx);
+//            bitCodes.add(bareIrStream);
+//        }
+//    }
+
+    private static List<BareIrStream> parse(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
+        List<BareIrStream> result = new ArrayList<>(list.size());
+        for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list)
+            result.add(new BareIrStream(bareIrStreamCtx));
+
+        return result;
+    }
 
     // Number of bits encoded
     private int chunkSize;
@@ -61,17 +78,13 @@ public class BitSpec extends IrpObject {
     }
 
     public BitSpec(IrpParser.BitspecContext ctx) throws IrpSyntaxException, InvalidRepeatException {
-        this(ctx.bare_irstream());
+        this(parse(ctx.bare_irstream()));
     }
 
-    private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
-//        noInstances++;
+
+    public BitSpec(List<BareIrStream> list) throws IrpSyntaxException, InvalidRepeatException {
         chunkSize = computeNoBits(list.size());
-        bitCodes = new ArrayList<>(list.size());
-        for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list) {
-            BareIrStream bareIrStream = new BareIrStream(bareIrStreamCtx);
-            bitCodes.add(bareIrStream);
-        }
+        bitCodes = list;
     }
 
     BitSpec() {

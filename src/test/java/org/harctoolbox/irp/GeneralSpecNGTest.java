@@ -159,7 +159,7 @@ public class GeneralSpecNGTest {
         try {
             System.out.println("toIrpString");
             GeneralSpec instance = new GeneralSpec("{123u, msb ,40k , 73% ,10p }"); // Do not remove the silly formatting!!
-            String expResult = "{40000.0k,250.0,msb,73%}";
+            String expResult = "{40.0k,250,msb,73%}";
             String result = instance.toIrpString();
             assertEquals(result, expResult);
         } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException ex) {

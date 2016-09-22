@@ -38,6 +38,10 @@ public class Gap extends Duration {
         super(us);
     }
 
+    public Gap(double d, String unit) {
+        super(d, unit);
+    }
+
     @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {

@@ -61,7 +61,6 @@ public class FloatNumber extends IrpObject implements Floatable {
         return Double.toString(data);
     }
 
-
     @Override
     public String toIrpString() {
         return toString();

@@ -67,9 +67,17 @@ public class RepeatMarker extends IrpObject {
         }
     }
 
+    public RepeatMarker(int min, int max) {
+        this.min = min;
+        this.max = max;
+    }
+
+    public RepeatMarker(int n) {
+        this(n, n);
+    }
+
     public RepeatMarker() {
-        min = 1;
-        max = 1;
+        this(1, 1);
     }
 
     public RepeatMarker(char ch) throws InvalidRepeatException {
@@ -123,6 +131,7 @@ public class RepeatMarker extends IrpObject {
                 //(min == 1 && max == 1) ? ""
                   (min == 0 && max == Integer.MAX_VALUE) ? "*"
                 : (min == 1 && max == Integer.MAX_VALUE) ? "+"
+                : (min == 1 && max == 1) ? ""
                 : (min == max) ? Integer.toString(min)
                 : (max == Integer.MAX_VALUE) ? Integer.toString(min) + "+"
                 : "??";

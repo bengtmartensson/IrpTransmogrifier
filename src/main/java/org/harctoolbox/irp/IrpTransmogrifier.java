@@ -242,7 +242,7 @@ public class IrpTransmogrifier {
 
 
         out.println("Pairs:");
-        for (Analyzer.MarkSpace pair : analyzer.getPairs()) {
+        for (Burst pair : analyzer.getPairs()) {
             out.println(analyzer.getName(pair) + ":\t" + analyzer.getNumberPairs(pair));
         }
 //        for (int mark : analyzer.getDistinctMarks())
@@ -252,14 +252,20 @@ public class IrpTransmogrifier {
 //                    out.println(analyzer.getName(mark) + analyzer.getName(space) + ":\t" + n);
 //            }
         out.println(analyzer.toTimingsString());
-        //out.println(analyzer.getGeneralSpec(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb).toIrpString());
         try {
-            //out.println(analyzer.getGeneralSpec().toString());
-            Protocol protocol = analyzer.process(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent);
-            out.println(protocol.toIrpString(commandAnalyze.radix));
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            Logger.getLogger(IrpTransmogrifier.class.getName()).log(Level.SEVERE, null, ex);
+            Protocol pwm = analyzer.processPWM(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
+            out.println(pwm.toIrpString(commandAnalyze.radix));
+        } catch (DecodeException ex) {
+            logger.log(Level.FINE, ex.getMessage());
         }
+
+        try {
+            Protocol biphase = analyzer.processBiPhase(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
+            out.println(biphase.toIrpString(commandAnalyze.radix));
+        } catch (DecodeException ex) {
+            logger.log(Level.FINE, ex.getMessage());
+        }
+
     }
 
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
@@ -590,8 +596,14 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
         private int frequency = (int) ModulatedIrSequence.defaultFrequency;
 
+        @Parameter(names = { "-i", "--invert"}, description = "Invert order in bitspec")
+        private boolean invert = false;
+
         @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the analyzer")
         private boolean lsb = false;
+
+        @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths")
+        private List<Integer> parameterWidths = new ArrayList<>(4);
 
         @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder")
         private boolean repeatFinder = false;

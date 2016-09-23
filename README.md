@@ -9,7 +9,7 @@ It consists of an API library that is also callable from the command line as a c
 The Irp parser [IrpMaster](http://www.harctoolbox.org/IrpMaster,html)
 is based upon a [ANTLR3 grammar](http://www.antlr.org). The "new version"
 ANTLR4 is really not a new version, but a completely different tool, fixing most of the quirks that irritated me
-in IrpMaster (like the "ugliness" of embedding actions withing the grammar, no left recursion, and much more).
+in IrpMaster (like the "ugliness" of embedding actions within the grammar, no left recursion, and much more).
 Unfortunately, this means that using version 4 instead of version 3 is not like updating a compiler or such,
 but "necessitates" a complete rewrite of the actions.
 
@@ -54,7 +54,7 @@ IrpMaster). Some work remaining (< 50%)._
 
 ## Protocol Data Base
 The "ini"-file `IrpProtocols.ini` has been replaced by an XML file, per default called `IrpProtocols.xml`. The XML format
-is defined by the schema [irp-protocols](http://www,harctoolbox.org/schemas/irp-protocols.xsd), and has the name space 
+is defined by the schema [irp-protocols](http://www.harctoolbox.org/schemas/irp-protocols.xsd), and has the name space 
 `http://www.harctoolbox.org/irp-protocols`. This format has many advantages in 
 comparison with the previous, more primitive, format.
 

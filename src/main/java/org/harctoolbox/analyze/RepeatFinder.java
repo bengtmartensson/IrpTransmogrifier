@@ -112,7 +112,7 @@ public class RepeatFinder {
 
 
     private void analyze() throws OddSequenceLenghtException {
-        RepeatFinderData candidate = new RepeatFinderData();
+        RepeatFinderData candidate = new RepeatFinderData(irSequence.getLength());
         for (int length = irSequence.getNumberBursts() / 2; length >= 2; length--) {
             for (int beginning = 0; beginning < irSequence.getNumberBursts() - length; beginning++) {
                 RepeatFinderData newCandidate = countRepeats(2*beginning, 2*length);
@@ -254,6 +254,10 @@ public class RepeatFinder {
 
         public int getEndingLength() {
             return endingLength;
+        }
+
+        public int getEndingStart() {
+            return beginLength + numberRepeats*repeatLength;
         }
 
         private int totalLength() {

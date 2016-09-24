@@ -27,6 +27,10 @@ public abstract class IrCoreException extends Exception {
         super(string);
     }
 
+    public IrCoreException() {
+        super();
+    }
+
     public IrCoreException(Throwable ex) {
         super(ex);
     }

@@ -26,6 +26,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 
 /**
  *
@@ -129,6 +130,7 @@ public class Cleaner {
             }
             int average = (int) Math.round(sum/(double)terms);
             timings.add(average);
+            lookDownTable.put(average, timingsIndex);
         }
     }
 
@@ -232,8 +234,8 @@ public class Cleaner {
         Integer ispace = getIndex(space);
         Integer imark = getIndex(mark);
         if (ispace == null || imark == null)
-            return 0;
-        
+            throw new ThisCannotHappenException();
+
         int result = 0;
         for (int i = 0; i < indexData.length - 1; i += 2)
             if (indexData[i] == imark && indexData[i + 1] == ispace)

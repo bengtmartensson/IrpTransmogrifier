@@ -25,4 +25,8 @@ public class DecodeException extends IrCoreException {
         super("Decode failed at token " + Integer.toString(i));
     }
 
+    public DecodeException() {
+        super();
+    }
+
 }

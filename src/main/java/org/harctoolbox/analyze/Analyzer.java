@@ -157,6 +157,8 @@ public class Analyzer extends Cleaner {
     }
 
     public Protocol processPWM4(BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) throws DecodeException {
+        if (timings.size() < 6)
+            throw new DecodeException();
         Pwm4Decoder pwm4Decoder = new Pwm4Decoder(this, 27.77777, timings.get(0), timings.get(1), timings.get(3), timings.get(4), timings.get(5));
         return pwm4Decoder.process(bitDirection, useExtents, parameterWidths);
     }

@@ -19,6 +19,7 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
@@ -32,8 +33,8 @@ import org.harctoolbox.irp.Protocol;
 public class Analyzer extends Cleaner {
     private final static boolean biPhaseInvert = false; // RC5: invertBiPhase = true
 
-    public static String mkName(int n) {
-        return new String(new char[]{ (char) ('A' + n) });
+    public static String mkName(Integer n) {
+        return n == null ? "?" : new String(new char[]{ (char) ('A' + n) });
     }
 
 //    private static String toIrpString(Map<String, Long> map, int radix) {
@@ -50,19 +51,21 @@ public class Analyzer extends Cleaner {
     private List<Burst> pairs;
     private RepeatFinder.RepeatFinderData repeatfinderData;
 
-    public Analyzer(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+    public Analyzer(IrSequence irSequence, double frequency, boolean invokeRepeatFinder, int absoluteTolerance, double relativeTolerance) throws OddSequenceLenghtException {
         super(irSequence, absoluteTolerance, relativeTolerance);
-        createNormedTimings();
-        createPairs();
-    }
-
-    public Analyzer(IrSequence irSequence, double frequency, boolean invokeRepeatFinder) throws OddSequenceLenghtException {
-        super(irSequence);
         repeatfinderData = invokeRepeatFinder ? new RepeatFinder(toIrSequence()).getRepeatFinderData()
                 : new RepeatFinder.RepeatFinderData(irSequence.getLength());
         this.frequency = frequency;
         createNormedTimings();
         createPairs();
+    }
+
+    public Analyzer(IrSequence irSequence, double frequency, boolean invokeRepeatFinder) throws OddSequenceLenghtException {
+        this(irSequence, frequency, invokeRepeatFinder, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+
+    public Analyzer(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) throws OddSequenceLenghtException {
+        this(irSequence, ModulatedIrSequence.defaultFrequency, false, absoluteTolerance, relativeTolerance);
     }
 
     public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) throws OddSequenceLenghtException {
@@ -87,13 +90,18 @@ public class Analyzer extends Cleaner {
         }
     }
 
+    public GeneralSpec getGeneralSpec(BitDirection bitDirection, double timebase) {
+         return new GeneralSpec(bitDirection, timebase, getFrequency());
+    }
+
     public GeneralSpec getGeneralSpec(BitDirection bitDirection) {
-        return new GeneralSpec(bitDirection, getTimebase(), getFrequency());
+        return getGeneralSpec(bitDirection, getTimebase());
     }
 
     public GeneralSpec getGeneralSpec() {
         return getGeneralSpec(BitDirection.msb);
     }
+
 
     private void createPairs() {
         pairs = new ArrayList<>(16);
@@ -146,6 +154,11 @@ public class Analyzer extends Cleaner {
     public Protocol processPWM(BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) throws DecodeException {
         PwmDecoder pwmDecoder = new PwmDecoder(this, timebase, timings.get(0), timings.get(1));
         return pwmDecoder.process(bitDirection, useExtents, parameterWidths);
+    }
+
+    public Protocol processPWM4(BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) throws DecodeException {
+        Pwm4Decoder pwm4Decoder = new Pwm4Decoder(this, 27.77777, timings.get(0), timings.get(1), timings.get(3), timings.get(4), timings.get(5));
+        return pwm4Decoder.process(bitDirection, useExtents, parameterWidths);
     }
 
     public Protocol processBiPhase(BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) throws DecodeException {

@@ -22,29 +22,32 @@ import java.util.List;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.IrStreamItem;
 
-public class PwmDecoder extends AbstractDecoder {
+public class Pwm4Decoder extends AbstractDecoder {
+
+    private final static int chunkSize = 2;
 
     private final Burst zero;
     private final Burst one;
+    private final Burst two;
+    private final Burst three;
 
-    public PwmDecoder(Analyzer analyzer, int timebase, Burst zero, Burst one) {
-        super(analyzer, timebase, mkBitSpec(zero, one, timebase));
+
+    public Pwm4Decoder(Analyzer analyzer, double timebase, Burst zero, Burst one, Burst two, Burst three) {
+        super(analyzer, timebase, mkBitSpec(zero, one, two, three, timebase));
         this.zero = zero;
         this.one = one;
+        this.two = two;
+        this.three = three;
     }
 
-    public PwmDecoder(Analyzer analyzer, int timebase, int zeroFlash, int zeroGap, int oneFlash, int oneGap) {
-        this(analyzer, timebase, new Burst(zeroFlash, zeroGap), new Burst(oneFlash, oneGap));
-    }
-
-    public PwmDecoder(Analyzer analyzer, int timebase, int a, int b) {
-        this(analyzer, timebase, a, a, a, b);
+    public Pwm4Decoder(Analyzer analyzer, double timebase, int flash, int zeroGap, int oneGap, int twoGap, int threeGap) {
+        this(analyzer, timebase, new Burst(flash, zeroGap), new Burst(flash, oneGap), new Burst(flash, twoGap), new Burst(flash, threeGap));
     }
 
     @Override
     protected List<IrStreamItem> process(int beg, int length, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) {
         List<IrStreamItem> items = new ArrayList<>(16);
-        ParameterData data = new ParameterData();
+        ParameterData data = new ParameterData(chunkSize);
         for (int i = beg; i < beg + length - 1; i += 2) {
             int noBitsLimit = getNoBitsLimit(parameterWidths);
             int mark = analyzer.getCleanedTime(i);
@@ -54,6 +57,10 @@ public class PwmDecoder extends AbstractDecoder {
                 data.update(0);
             } else if (burst.equals(one)) {
                 data.update(1);
+            } else if (burst.equals(two)) {
+                data.update(2);
+            } else if (burst.equals(three)) {
+                data.update(3);
             } else {
                 if (!data.isEmpty()) {
                     saveParameter(data, items, bitDirection);
@@ -69,7 +76,7 @@ public class PwmDecoder extends AbstractDecoder {
 
             if (data.getNoBits() >= noBitsLimit) {
                 saveParameter(data, items, bitDirection);
-                data = new ParameterData();
+                data = new ParameterData(chunkSize);
             }
         }
         if (!data.isEmpty())

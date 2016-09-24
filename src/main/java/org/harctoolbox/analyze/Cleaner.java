@@ -229,8 +229,11 @@ public class Cleaner {
     }
 
     public int getNumberPairs(int mark, int space) {
-        int ispace = getIndex(space);
-        int imark = getIndex(mark);
+        Integer ispace = getIndex(space);
+        Integer imark = getIndex(mark);
+        if (ispace == null || imark == null)
+            return 0;
+        
         int result = 0;
         for (int i = 0; i < indexData.length - 1; i += 2)
             if (indexData[i] == imark && indexData[i + 1] == ispace)

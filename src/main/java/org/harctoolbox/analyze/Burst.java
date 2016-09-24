@@ -1,3 +1,20 @@
+/*
+Copyright (C) 2016 Bengt Martensson.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/.
+*/
+
 package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
@@ -11,7 +28,7 @@ import org.harctoolbox.irp.IrStreamItem;
 
 public class Burst {
     private static final double maxRoundingError = 0.3f;
-    private static final double maxUnits = 20f;
+    private static final double maxUnits = 30f;
     private static final double maxUs = 10000f;
 
     private static Duration newFlashOrGap(boolean isFlash, int us, double timebase) {
@@ -49,9 +66,9 @@ public class Burst {
     private final int gapDuration;
     private final int flashDuration;
 
-    Burst(int mark, int space) {
-        gapDuration = space;
-        flashDuration = mark;
+    Burst(int flash, int gap) {
+        gapDuration = gap;
+        flashDuration = flash;
     }
 
     /**

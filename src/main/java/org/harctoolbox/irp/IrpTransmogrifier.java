@@ -231,7 +231,8 @@ public class IrpTransmogrifier {
             out.println(irSignal);
         }
 
-        Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.frequency, commandAnalyze.repeatFinder);
+        Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.frequency, commandAnalyze.repeatFinder,
+                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         out.println("Spaces:");
         for (int d : analyzer.getDistinctSpaces())
             out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberSpaces(d));
@@ -255,6 +256,13 @@ public class IrpTransmogrifier {
         try {
             Protocol pwm = analyzer.processPWM(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
             out.println(pwm.toIrpString(commandAnalyze.radix));
+        } catch (DecodeException ex) {
+            logger.log(Level.FINE, ex.getMessage());
+        }
+
+        try {
+            Protocol pwm4 = analyzer.processPWM4(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
+            out.println(pwm4.toIrpString(commandAnalyze.radix));
         } catch (DecodeException ex) {
             logger.log(Level.FINE, ex.getMessage());
         }
@@ -561,6 +569,9 @@ public class IrpTransmogrifier {
 
     private final static class CommandLineArgs {
 
+        @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
+        private int absoluteTolerance = 50;
+
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
         private String configFile = null;
 
@@ -576,6 +587,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-o", "--output" }, description = "Name of output file")
         private String output = null;
+
+        @Parameter(names = {"-r", "--relativetolerance"}, description = "Relative tolerance as a number < 1")
+        private double relativeTolerance = 0.1;
 
         @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random)")
         private Long seed = null;

@@ -1,3 +1,20 @@
+/*
+Copyright (C) 2016 Bengt Martensson.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/.
+*/
+
 package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
@@ -22,10 +39,7 @@ import org.harctoolbox.irp.RepeatMarker;
 
 public abstract class AbstractDecoder {
 
-    protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
-        List<BareIrStream> list = new ArrayList<>(2);
-        list.add(zero.toBareIrStream(timebase));
-        list.add(one.toBareIrStream(timebase));
+    private static BitSpec mkBitSpec(List<BareIrStream> list, double timebase) {
         try {
             return new BitSpec(list);
         } catch (IrpSyntaxException | InvalidRepeatException ex) {
@@ -33,13 +47,29 @@ public abstract class AbstractDecoder {
         }
     }
 
+    protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
+        List<BareIrStream> list = new ArrayList<>(2);
+        list.add(zero.toBareIrStream(timebase));
+        list.add(one.toBareIrStream(timebase));
+        return mkBitSpec(list, timebase);
+    }
+
+    protected static BitSpec mkBitSpec(Burst zero, Burst one, Burst two, Burst three, double timebase) {
+        List<BareIrStream> list = new ArrayList<>(4);
+        list.add(zero.toBareIrStream(timebase));
+        list.add(one.toBareIrStream(timebase));
+        list.add(two.toBareIrStream(timebase));
+        list.add(three.toBareIrStream(timebase));
+        return mkBitSpec(list, timebase);
+    }
+
     protected NameEngine nameEngine;
     protected int noPayload;
-    protected final int timebase;
+    protected final double timebase;
     protected final Analyzer analyzer;
     protected final BitSpec bitSpec;
 
-    public AbstractDecoder(Analyzer analyzer, int timebase, BitSpec bitSpec) {
+    public AbstractDecoder(Analyzer analyzer, double timebase, BitSpec bitSpec) {
         this.nameEngine = null;
         this.analyzer = analyzer;
         this.timebase = timebase;
@@ -65,7 +95,7 @@ public abstract class AbstractDecoder {
             irStream = new IrStream(items);
         }
         BitspecIrstream bitspecIrstream = new BitspecIrstream(bitSpec, irStream);
-        Protocol protocol = new Protocol(analyzer.getGeneralSpec(), bitspecIrstream, nameEngine, null, null);
+        Protocol protocol = new Protocol(analyzer.getGeneralSpec(bitDirection, timebase), bitspecIrstream, nameEngine, null, null);
         return protocol;
     }
 
@@ -106,10 +136,16 @@ public abstract class AbstractDecoder {
 
         private long data;
         private int noBits;
+        private final int chunkSize;
 
-        ParameterData() {
+        ParameterData(int chunkSize) {
             data = 0L;
             noBits = 0;
+            this.chunkSize = chunkSize;
+        }
+
+        ParameterData() {
+            this(1);
         }
 
         @Override
@@ -118,9 +154,9 @@ public abstract class AbstractDecoder {
         }
 
         public void update(int amount) {
-            data *= 2;
+            data <<= chunkSize;
             data += amount;
-            noBits++;
+            noBits += chunkSize;
         }
 
         private void fixBitDirection(BitDirection bitDirection) {

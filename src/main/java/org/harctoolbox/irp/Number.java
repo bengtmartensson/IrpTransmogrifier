@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
  *
  */
 public class Number extends PrimaryItem {
+    private final static int WEIGHT = 1;
 
     public final static int SIZE = Long.SIZE;
     static long parse(String str) {
@@ -93,5 +94,10 @@ public class Number extends PrimaryItem {
     @Override
     public Name toName() {
         return null;
+    }
+
+    @Override
+    public int weight() {
+        return WEIGHT;
     }
 }

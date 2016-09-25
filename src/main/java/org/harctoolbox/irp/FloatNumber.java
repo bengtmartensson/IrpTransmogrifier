@@ -24,6 +24,8 @@ import org.w3c.dom.Element;
  *
  */
 public class FloatNumber extends IrpObject implements Floatable {
+    private static final int WEIGHT = 1;
+
     public static double parse(String str) throws IrpSyntaxException {
         FloatNumber floatNumber = new FloatNumber(str);
         return floatNumber.toFloat();
@@ -71,5 +73,10 @@ public class FloatNumber extends IrpObject implements Floatable {
         Element element = document.createElement("float");
         element.setTextContent(toString());
         return element;
+    }
+
+    @Override
+    public int weight() {
+        return WEIGHT;
     }
 }

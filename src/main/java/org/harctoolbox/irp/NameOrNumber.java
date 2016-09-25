@@ -26,6 +26,8 @@ import org.w3c.dom.Element;
  *
  */
 public class NameOrNumber extends IrpObject implements Floatable {
+    private static final int WEIGHT = 1;
+
     private Floatable thing;
 
     public NameOrNumber(String str) throws IrpSyntaxException {
@@ -56,7 +58,7 @@ public class NameOrNumber extends IrpObject implements Floatable {
 
     @Override
     public String toString() {
-        return thing.toString();
+        return toIrpString();
     }
 
     @Override
@@ -80,5 +82,10 @@ public class NameOrNumber extends IrpObject implements Floatable {
     @Override
     public String toIrpString() {
         return thing.toIrpString();
+    }
+
+    @Override
+    public int weight() {
+        return WEIGHT;
     }
 }

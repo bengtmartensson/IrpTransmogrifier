@@ -26,6 +26,8 @@ import org.w3c.dom.Element;
  *
  */
 public class NumberWithDecimals extends IrpObject implements Floatable {
+    private static final int WEIGHT = 1;
+
     public static double parse(String str) throws IrpSyntaxException {
         NumberWithDecimals numberWithDecimals = new NumberWithDecimals(str);
         return numberWithDecimals.toFloat();
@@ -86,5 +88,10 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
         Element element = document.createElement("number_with_decimals");
         element.setTextContent(toString());
         return element;
+    }
+
+    @Override
+    public int weight() {
+        return WEIGHT;
     }
 }

@@ -27,7 +27,9 @@ import org.w3c.dom.Element;
  *
  */
 public class ParameterSpec extends IrpObject {
+    private static final int WEIGHT = 1;
     private static Random random;
+
     static {
         random = new Random();
     }
@@ -179,4 +181,8 @@ public class ParameterSpec extends IrpObject {
             return random.nextInt((int) bound) + getMin();
     }
 
+    @Override
+    public int weight() {
+        return WEIGHT;
+    }
 }

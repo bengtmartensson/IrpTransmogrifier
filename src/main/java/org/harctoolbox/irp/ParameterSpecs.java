@@ -123,4 +123,11 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     boolean contains(String name) {
         return map.containsKey(name);
     }
+
+    @Override
+    public int weight() {
+        int weight = 0;
+        weight = map.values().stream().map((parameterSpec) -> parameterSpec.weight()).reduce(weight, Integer::sum);
+        return weight;
+    }
 }

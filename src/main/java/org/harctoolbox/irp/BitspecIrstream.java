@@ -208,4 +208,9 @@ public class BitspecIrstream extends IrStreamItem {
     boolean startsWithDuration() {
         return irStream.startsWithDuration();
     }
+
+    @Override
+    public int weight() {
+        return bitSpec.weight() + irStream.weight();
+    }
 }

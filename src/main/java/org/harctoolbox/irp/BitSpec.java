@@ -318,4 +318,11 @@ public class BitSpec extends IrpObject {
 
         return true;
     }
+
+    @Override
+    public int weight() {
+        int weight = 0;
+        weight = bitCodes.stream().map((bitCode) -> bitCode.weight()).reduce(weight, Integer::sum);
+        return weight;
+    }
 }

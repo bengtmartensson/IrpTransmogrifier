@@ -282,4 +282,9 @@ public class IrStream extends BareIrStream {
     boolean isRPlus() {
         return repeatMarker != null && repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true);
     }
+
+    @Override
+    public int weight() {
+        return super.weight() + (repeatMarker == null ? 0 : repeatMarker.weight());
+    }
 }

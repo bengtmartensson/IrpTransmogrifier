@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
  * This class is immutable; can only be build by the constructor, and not altered.
  */
 public class GeneralSpec extends IrpObject {
+    private final static int WEIGHT = 0;
     public final static double defaultDutyCycle = ModulatedIrSequence.unknownDutyCycle;
     public final static BitDirection defaultBitDirection = BitDirection.lsb;
     public final static double defaultUnit = 1;
@@ -170,4 +171,8 @@ public class GeneralSpec extends IrpObject {
         return element;
     }
 
+    @Override
+    public int weight() {
+        return WEIGHT;
+    }
 }

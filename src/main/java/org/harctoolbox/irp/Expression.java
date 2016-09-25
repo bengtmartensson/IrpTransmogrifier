@@ -456,4 +456,11 @@ public class Expression extends PrimaryItem /* ??? */ {
     }
 
     // NOTE: this class can be invoked from the command line by IrpTransmogrifier.main().
+
+    @Override
+    public int weight() {
+        int weight = 0;
+        weight = parseTree.children.stream().filter((child) -> (child instanceof IrpObject)).map((child) -> ((IrpObject) child).weight()).reduce(weight, Integer::sum);
+        return weight;
+    }
 }

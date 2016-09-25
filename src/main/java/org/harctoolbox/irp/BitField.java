@@ -168,4 +168,9 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     ParserRuleContext getParseTree() {
         return parseTree;
     }
+
+    @Override
+    public int weight() {
+        return data.weight() + chop.weight();
+    }
 }

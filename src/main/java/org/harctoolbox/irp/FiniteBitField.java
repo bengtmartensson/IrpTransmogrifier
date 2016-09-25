@@ -275,4 +275,9 @@ public class FiniteBitField extends BitField {
     public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
         return gapFlashBitSpecs ? DurationType.gap : DurationType.flash;
     }
+
+    @Override
+    public int weight() {
+        return super.weight() + width.weight();
+    }
 }

@@ -137,6 +137,15 @@ public class IrpTransmogrifier {
 
                 out.println();
             }
+            if (commandList.weight) {
+                try {
+                    Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
+                    int weight = protocol.weight();
+                    out.println("Weight: " + weight);
+                } catch (IrpSyntaxException ex) {
+                    logger.log(Level.WARNING, "Unparsable protocol {0}", proto);
+                }
+            }
         }
     }
 
@@ -255,25 +264,29 @@ public class IrpTransmogrifier {
         out.println(analyzer.toTimingsString());
         try {
             Protocol pwm = analyzer.processPWM(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
-            out.println(pwm.toIrpString(commandAnalyze.radix));
+            printAnalyzedProtocol(pwm, commandAnalyze.radix);
         } catch (DecodeException ex) {
             logger.log(Level.FINE, ex.getMessage());
         }
 
         try {
             Protocol pwm4 = analyzer.processPWM4(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
-            out.println(pwm4.toIrpString(commandAnalyze.radix));
+            printAnalyzedProtocol(pwm4, commandAnalyze.radix);
         } catch (DecodeException ex) {
             logger.log(Level.FINE, ex.getMessage());
         }
 
         try {
             Protocol biphase = analyzer.processBiPhase(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
-            out.println(biphase.toIrpString(commandAnalyze.radix));
+            printAnalyzedProtocol(biphase, commandAnalyze.radix);
         } catch (DecodeException ex) {
             logger.log(Level.FINE, ex.getMessage());
         }
 
+    }
+
+    private static void printAnalyzedProtocol(Protocol protocol, int radix) {
+    out.println(protocol.toIrpString(radix) + " \tweight = " + protocol.weight());
     }
 
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
@@ -740,6 +753,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;
+
+        @Parameter(names = { "-w", "--weight" }, description = "Compute weight")
+        private boolean weight = false;
 
         @Parameter(description = "List of protocols (default all)")
         private List<String> protocols;

@@ -118,12 +118,12 @@ public class Analyzer extends Cleaner {
         return timebase;
     }
 
-    /**
-     * @return the normedTimings
-     */
-    public int[] getNormedTimings() {
-        return normedTimings;
-    }
+//    /**
+//     * @return the normedTimings
+//     */
+//    public int[] getNormedTimings() {
+//        return normedTimings;
+//    }
 
     /**
      * @return the frequency

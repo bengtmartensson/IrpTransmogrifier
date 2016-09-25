@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 // Clean up by eliminating and making private.
 
 public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Entry<String, Expression>> {
+    private final static int WEIGHT = 0;
 
     private final static Logger logger = Logger.getLogger(NameEngine.class.getName());
 
@@ -387,5 +388,10 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         names.stream().filter((name) -> (!parameterSpecs.contains(name))).forEach((name) -> {
             map.remove(name);
         });
+    }
+
+    @Override
+    public int weight() {
+        return WEIGHT;
     }
 }

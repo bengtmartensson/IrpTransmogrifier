@@ -28,4 +28,10 @@ public abstract class IrpObject implements XmlExport {
         return 0;
     }
 
+    /**
+     * Somewhat arbitrary measure of the complexity of the object. Can be used
+     * for determining if a decode is "simpler" than another decode.
+     * @return non-negative integer.
+     */
+    public abstract int weight();
 }

@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
  *
  */
 public class Name extends PrimaryItem implements Floatable {
+    private static final int WEIGHT = 1;
 
     /**
      * Check the syntactical correctness of the name.
@@ -128,5 +129,10 @@ public class Name extends PrimaryItem implements Floatable {
     @Override
     public Name toName() {
         return this;
+    }
+
+    @Override
+    public int weight() {
+        return WEIGHT;
     }
 }

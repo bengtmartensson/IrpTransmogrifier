@@ -166,4 +166,9 @@ public class RepeatMarker extends IrpObject {
         element.setTextContent(toString());
         return element;
     }
+
+    @Override
+    public int weight() {
+        return (min == 1 && max == 1) ? 0 : 1;
+    }
 }

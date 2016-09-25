@@ -353,4 +353,11 @@ public class BareIrStream extends IrStreamItem {
         }
         return true;
     }
+
+    @Override
+    public int weight() {
+        int weight = 0;
+        weight = irStreamItems.stream().map((item) -> item.weight()).reduce(weight, Integer::sum);
+        return weight;
+    }
 }

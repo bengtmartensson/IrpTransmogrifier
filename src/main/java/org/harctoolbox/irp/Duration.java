@@ -252,4 +252,9 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
         return DurationType.newDurationType(isOn());
     }
+
+    @Override
+    public int weight() {
+        return nameOrNumber.weight();
+    }
 }

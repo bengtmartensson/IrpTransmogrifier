@@ -29,10 +29,10 @@ import org.w3c.dom.Element;
 class BitStream extends IrStreamItem implements Evaluatable {
 
     private static final Logger logger = Logger.getLogger(BitStream.class.getName());
+    private static final int WEIGHT = 2;
 
     private long length;
     private BigInteger data;
-
 
     BitStream() {
         data = BigInteger.ZERO;
@@ -223,5 +223,10 @@ class BitStream extends IrStreamItem implements Evaluatable {
     @Override
     public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
         return DurationType.newDurationType(!gapFlashBitSpecs);
+    }
+
+    @Override
+    public int weight() {
+        return WEIGHT;
     }
 }

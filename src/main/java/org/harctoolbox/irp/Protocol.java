@@ -510,6 +510,13 @@ public class Protocol extends IrpObject {
         return success;
     }
 
+    @Override
+    public int weight() {
+        return generalSpec.weight() + bitspecIrstream.weight()
+                + (definitions == null ? 0 : definitions.weight())
+                + (parameterSpecs == null ? 0 : parameterSpecs.weight());
+    }
+
     /*
     public long getParameterMin(String name) throws UnassignedException {
         ParameterSpec ps = parameterSpecs.getParameterSpec(name);

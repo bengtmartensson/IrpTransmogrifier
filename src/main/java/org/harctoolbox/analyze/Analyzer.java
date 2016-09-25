@@ -33,10 +33,6 @@ import org.harctoolbox.irp.Protocol;
 public class Analyzer extends Cleaner {
     private final static boolean biPhaseInvert = false; // RC5: invertBiPhase = true
 
-    public static String mkName(Integer n) {
-        return n == null ? "?" : new String(new char[]{ (char) ('A' + n) });
-    }
-
 //    private static String toIrpString(Map<String, Long> map, int radix) {
 //        StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
 //        map.entrySet().stream().forEach((kvp) -> {
@@ -74,11 +70,6 @@ public class Analyzer extends Cleaner {
 
     public Analyzer(IrSequence irSequence) throws OddSequenceLenghtException {
         this(irSequence, ModulatedIrSequence.defaultFrequency, true);
-    }
-
-
-    public String getName(int duration) {
-        return mkName(getIndex(duration));
     }
 
     private void createNormedTimings() {

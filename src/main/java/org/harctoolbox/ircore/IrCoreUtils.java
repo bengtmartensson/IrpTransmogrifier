@@ -44,7 +44,7 @@ public class IrCoreUtils {
 
     /**
      * Convert its argument from seconds to microseconds.
-     * @param secs
+     * @param secs seconds
      * @return Argument converted to microseconds.
      */
     public static double seconds2microseconds(double secs) {
@@ -96,8 +96,8 @@ public class IrCoreUtils {
     /**
      * Reverses the bits, living in a width-bit wide world.
      *
-     * @param x
-     * @param width
+     * @param x data
+     * @param width width in bits
      * @return bitreversed
      */
 

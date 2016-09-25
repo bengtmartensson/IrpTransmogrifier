@@ -242,26 +242,23 @@ public class IrpTransmogrifier {
 
         Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.frequency, commandAnalyze.repeatFinder,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-        out.println("Spaces:");
-        for (int d : analyzer.getDistinctSpaces())
-            out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberSpaces(d));
 
-        out.println("Marks:");
-        for (int d : analyzer.getDistinctMarks())
-            out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberMarks(d));
+        if (commandAnalyze.statistics) {
+            out.println("Spaces:");
+            for (int d : analyzer.getDistinctSpaces())
+                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberSpaces(d));
 
+            out.println("Marks:");
+            for (int d : analyzer.getDistinctMarks())
+                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberMarks(d));
 
-        out.println("Pairs:");
-        for (Burst pair : analyzer.getPairs()) {
-            out.println(analyzer.getName(pair) + ":\t" + analyzer.getNumberPairs(pair));
+            out.println("Pairs:");
+            for (Burst pair : analyzer.getPairs()) {
+                out.println(analyzer.getName(pair) + ":\t" + analyzer.getNumberPairs(pair));
+            }
+            out.println(analyzer.toTimingsString());
         }
-//        for (int mark : analyzer.getDistinctMarks())
-//            for (int space : analyzer.getDistinctSpaces()) {
-//                int n = analyzer.getNumberPairs(mark, space);
-//                if (n > 0)
-//                    out.println(analyzer.getName(mark) + analyzer.getName(space) + ":\t" + n);
-//            }
-        out.println(analyzer.toTimingsString());
+
         try {
             Protocol pwm = analyzer.processPWM(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
             printAnalyzedProtocol(pwm, commandAnalyze.radix);
@@ -637,6 +634,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {"--radix" }, description = "Radix of parameter output")
         private int radix = 16;
+
+        @Parameter(names = {"-s", "--statistics"}, description = "Print some statistics on the analyzed signal")
+        private boolean statistics = false;
 
         @Parameter(description = "durations in microseconds, (pronto hex currently not supported)", required = true)
         private List<String> args;

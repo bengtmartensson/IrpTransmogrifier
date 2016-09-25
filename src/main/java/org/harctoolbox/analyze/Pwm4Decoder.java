@@ -24,13 +24,12 @@ import org.harctoolbox.irp.IrStreamItem;
 
 public class Pwm4Decoder extends AbstractDecoder {
 
-    private final static int chunkSize = 2;
+    public final static int CHUNKSIZE = 2;
 
     private final Burst zero;
     private final Burst one;
     private final Burst two;
     private final Burst three;
-
 
     public Pwm4Decoder(Analyzer analyzer, double timebase, Burst zero, Burst one, Burst two, Burst three) {
         super(analyzer, timebase, mkBitSpec(zero, one, two, three, timebase));
@@ -47,7 +46,7 @@ public class Pwm4Decoder extends AbstractDecoder {
     @Override
     protected List<IrStreamItem> process(int beg, int length, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) {
         List<IrStreamItem> items = new ArrayList<>(16);
-        ParameterData data = new ParameterData(chunkSize);
+        ParameterData data = new ParameterData(CHUNKSIZE);
         for (int i = beg; i < beg + length - 1; i += 2) {
             int noBitsLimit = getNoBitsLimit(parameterWidths);
             int mark = analyzer.getCleanedTime(i);
@@ -76,7 +75,7 @@ public class Pwm4Decoder extends AbstractDecoder {
 
             if (data.getNoBits() >= noBitsLimit) {
                 saveParameter(data, items, bitDirection);
-                data = new ParameterData(chunkSize);
+                data = new ParameterData(CHUNKSIZE);
             }
         }
         if (!data.isEmpty())

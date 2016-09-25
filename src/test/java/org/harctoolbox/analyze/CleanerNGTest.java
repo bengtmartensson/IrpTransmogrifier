@@ -84,7 +84,7 @@ public class CleanerNGTest {
     public void testToTimingsString() {
         System.out.println("toTimingsString");
         Cleaner instance = new Cleaner(noisy, 60, 0.2);
-        String expResult = "EDAAAAABABAAAAAAAAAAABAAAAAAABAAAAAAAAAAABABABAAAAABABABAAAAAAABABAFECAGECAGECAGECAG";
+        String expResult = "ED AA AA AB AB AA AA AA AA AA AB AA AA AA AB AA AA AA AA AA AB AB AB AA AA AB AB AB AA AA AA AB AB AF EC AG EC AG EC AG EC AG";
         String result = instance.toTimingsString();
         assertEquals(result, expResult);
     }

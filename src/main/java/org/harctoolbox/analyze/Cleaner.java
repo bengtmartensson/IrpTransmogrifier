@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.StringJoiner;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -46,6 +47,10 @@ public class Cleaner {
     }
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
         return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+
+    public static String mkName(Integer n) {
+        return n == null ? "?" : new String(new char[]{(char) ('A' + n)});
     }
 
     private int rawData[];
@@ -152,6 +157,9 @@ public class Cleaner {
         });
     }
 
+    public String getName(int duration) {
+        return mkName(getIndex(duration));
+    }
 
     private int[] toDurations() {
         int[] data = new int[rawData.length];
@@ -161,9 +169,13 @@ public class Cleaner {
     }
 
     public String toTimingsString() {
-        StringBuilder str = new StringBuilder(16);
-        for (int i = 0; i < rawData.length; i++)
-            str.append((char) ('A' + indexData[i]));
+        StringJoiner str = new StringJoiner(" ");
+        for (int i = 0; i < rawData.length; i += 2) {
+            StringBuilder s = new StringBuilder(2);
+            s.append(mkName(indexData[i]));
+            s.append(mkName(indexData[i+1]));
+            str.add(s);
+        }
         return str.toString();
     }
 

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -127,6 +128,29 @@ public class GeneralSpec extends IrpObject {
             unit = IrCoreUtils.seconds2microseconds(unitInPeriods / frequency);
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof GeneralSpec))
+            return false;
+
+        GeneralSpec other = (GeneralSpec) obj;
+        return IrCoreUtils.approximatelyEquals(frequency, other.getFrequency())
+                && IrCoreUtils.approximatelyEquals(dutyCycle, other.getDutyCycle())
+                && IrCoreUtils.approximatelyEquals(unit, other.getUnit())
+                && bitDirection == other.getBitDirection();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + (int) (Double.doubleToLongBits(this.frequency) ^ (Double.doubleToLongBits(this.frequency) >>> 32));
+        hash = 67 * hash + (int) (Double.doubleToLongBits(this.dutyCycle) ^ (Double.doubleToLongBits(this.dutyCycle) >>> 32));
+        hash = 67 * hash + Objects.hashCode(this.bitDirection);
+        hash = 67 * hash + (int) (Double.doubleToLongBits(this.unit) ^ (Double.doubleToLongBits(this.unit) >>> 32));
+        return hash;
+    }
+
     @Override
     public String toString() {
         return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection

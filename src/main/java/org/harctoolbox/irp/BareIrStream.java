@@ -18,6 +18,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -108,6 +109,29 @@ public class BareIrStream extends IrStreamItem {
 
     public BareIrStream(List<IrStreamItem> list) {
         this.irStreamItems = list;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BareIrStream))
+            return false;
+
+        BareIrStream other = (BareIrStream) obj;
+        if (irStreamItems.size() != other.irStreamItems.size())
+            return false;
+
+        for (int i = 0; i < irStreamItems.size(); i++)
+            if (!irStreamItems.get(i).equals(other.irStreamItems.get(i)))
+                return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + Objects.hashCode(this.irStreamItems);
+        return hash;
     }
 
 //@Override

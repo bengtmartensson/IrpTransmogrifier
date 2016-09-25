@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,6 +80,31 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
             ParserDriver parserDriver = new ParserDriver(str);
             parseDefinitions(parserDriver.getParser().definitions());
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.map);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof NameEngine))
+            return false;
+
+        NameEngine other = (NameEngine) obj;
+        if (map.size() != other.map.size())
+            return false;
+
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            String key = kvp.getKey();
+            if (!kvp.getValue().equals(other.map.get(key)))
+                return false;
+        }
+
+        return true;
     }
 
     public int size() {

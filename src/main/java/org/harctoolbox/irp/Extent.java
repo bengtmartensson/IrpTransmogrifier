@@ -41,6 +41,14 @@ public class Extent extends Duration {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Extent))
+            return false;
+
+        return super.equals(obj);
+    }
+
+    @Override
     public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
         if (time < 0)
@@ -111,5 +119,11 @@ public class Extent extends Duration {
     @Override
     protected boolean isOn() {
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash + 31*super.hashCode();
     }
 }

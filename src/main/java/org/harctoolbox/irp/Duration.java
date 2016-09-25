@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -46,6 +47,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
             return newDuration(parser.extent());
         }
     }
+
     public static Duration newDuration(IrpParser.DurationContext d) throws IrpSyntaxException {
         ParseTree child = d.getChild(0);
         Duration instance = (child instanceof IrpParser.FlashContext)
@@ -56,9 +58,11 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         instance.parseTree = (ParserRuleContext) child;
         return instance;
     }
+
     public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
         return new Extent(e);
     }
+
     public static boolean isOn(int index) {
         return index % 2 == 0;
     }
@@ -70,10 +74,9 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     protected String unit = null;
     protected ParserRuleContext parseTree = null;
 
-
     protected Duration(double d, String unit) {
         nameOrNumber = new NameOrNumber(d);
-        this.unit = unit != null ? unit : "1";
+        this.unit = unit != null ? unit : "";
     }
 
     protected Duration(double us) {
@@ -83,7 +86,30 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     protected Duration(IrpParser.Name_or_numberContext ctx, String unit) throws IrpSyntaxException {
         super();
         nameOrNumber = new NameOrNumber(ctx);
-        this.unit = unit != null ? unit : "1";
+        this.unit = unit != null ? unit : "";
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 43 * hash + (int) (Double.doubleToLongBits(this.us) ^ (Double.doubleToLongBits(this.us) >>> 32));
+        hash = 43 * hash + (int) (Double.doubleToLongBits(this.time_periods) ^ (Double.doubleToLongBits(this.time_periods) >>> 32));
+        hash = 43 * hash + (int) (Double.doubleToLongBits(this.time_units) ^ (Double.doubleToLongBits(this.time_units) >>> 32));
+        hash = 43 * hash + Objects.hashCode(this.nameOrNumber);
+        hash = 43 * hash + Objects.hashCode(this.unit);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Duration))
+            return false;
+
+        Duration other = (Duration) obj;
+        return unit.equals(other.unit)
+                && IrCoreUtils.approximatelyEquals(us, other.us)
+                && IrCoreUtils.approximatelyEquals(time_periods, other.time_periods)
+                && IrCoreUtils.approximatelyEquals(time_units, other.time_units);
     }
 
     private void compute(NameEngine nameEngine, GeneralSpec generalSpec)
@@ -176,7 +202,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
 
     @Override
     public String toIrpString() {
-        return nameOrNumber.toIrpString() + (unit.equals("1") ? "" : unit);
+        return nameOrNumber.toIrpString() + unit;
     }
 
     @Override

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
@@ -87,6 +88,21 @@ public class Name extends PrimaryItem implements Floatable {
     public Name(String name) {
         //parse(name); // just to check validity
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Name))
+            return false;
+
+        return name.equals(((Name) obj).name);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 61 * hash + Objects.hashCode(this.name);
+        return hash;
     }
 
     @Override

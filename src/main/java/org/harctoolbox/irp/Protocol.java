@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -83,7 +84,7 @@ public class Protocol extends IrpObject {
         this.generalSpec = generalSpec;
         this.bitspecIrstream = bitspecIrstream;
         this.definitions = definitions;
-        this.parameterSpecs = parameterSpecs;
+        this.parameterSpecs = parameterSpecs != null ? parameterSpecs : new ParameterSpecs() ;
     }
 
     /**
@@ -165,6 +166,28 @@ public class Protocol extends IrpObject {
         }
 
         checkSanity();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Protocol))
+            return false;
+        Protocol other = (Protocol) obj;
+        return
+                generalSpec.equals(other.generalSpec)
+                && bitspecIrstream.equals(other.bitspecIrstream)
+                && parameterSpecs.equals(other.parameterSpecs)
+                && definitions.equals(other.definitions);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + Objects.hashCode(this.generalSpec);
+        hash = 31 * hash + Objects.hashCode(this.parameterSpecs);
+        hash = 31 * hash + Objects.hashCode(this.bitspecIrstream);
+        hash = 31 * hash + Objects.hashCode(this.definitions);
+        return hash;
     }
 
     private void checkSanity() throws InvalidRepeatException, IrpSemanticException {
@@ -425,16 +448,16 @@ public class Protocol extends IrpObject {
         return
                 generalSpec.toIrpString()
                 + bitspecIrstream.toIrpString()
-                + (definitions != null ? definitions.toIrpString() : "")
-                + (parameterSpecs != null ? parameterSpecs.toIrpString() : "");
+                + definitions.toIrpString()
+                + parameterSpecs.toIrpString();
     }
 
     public String toIrpString(int radix) {
         return
                 generalSpec.toIrpString()
                 + bitspecIrstream.toIrpString()
-                + (definitions != null ? definitions.toIrpString(radix) : "")
-                + (parameterSpecs != null ? parameterSpecs.toIrpString() : "");
+                + definitions.toIrpString(radix)
+                + parameterSpecs.toIrpString();
     }
 
     @Override
@@ -513,8 +536,7 @@ public class Protocol extends IrpObject {
     @Override
     public int weight() {
         return generalSpec.weight() + bitspecIrstream.weight()
-                + (definitions == null ? 0 : definitions.weight())
-                + (parameterSpecs == null ? 0 : parameterSpecs.weight());
+                + definitions.weight() + parameterSpecs.weight();
     }
 
     /*

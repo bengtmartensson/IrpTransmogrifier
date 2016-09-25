@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -58,6 +59,23 @@ public class FiniteBitField extends BitField {
         width = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
         chop = ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0);
         reverse = ! (ctx.getChild(index+2) instanceof IrpParser.Primary_itemContext);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof FiniteBitField))
+            return false;
+
+        FiniteBitField other = (FiniteBitField) obj;
+        return super.equals(obj) && (reverse == other.reverse) && width.equals(other.width);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.width);
+        hash = 97 * hash + (this.reverse ? 1 : 0);
+        return hash;
     }
 
     @Override

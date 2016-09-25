@@ -18,6 +18,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -33,7 +34,7 @@ public class IrStream extends BareIrStream {
 
     private static final Logger logger = Logger.getLogger(IrStream.class.getName());
 
-    private RepeatMarker repeatMarker;
+    private RepeatMarker repeatMarker; // must not be null!
     // I hate the missing default arguments in Java!!!
 //    public IrStream(Protocol env) {
 //        this(env, null);
@@ -67,7 +68,7 @@ public class IrStream extends BareIrStream {
     public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
         super(ctx.bare_irstream());
         IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
-        repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : null;
+        repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : new RepeatMarker();
     }
 
     public IrStream(List<IrStreamItem> irStreamItems, RepeatMarker repeatMarker) {
@@ -77,6 +78,23 @@ public class IrStream extends BareIrStream {
 
     public IrStream(List<IrStreamItem> irStreamItems) {
         this(irStreamItems, new RepeatMarker());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IrStream))
+            return false;
+
+        IrStream other = (IrStream) obj;
+
+        return super.equals(obj) && repeatMarker.equals(other.repeatMarker);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + Objects.hashCode(this.repeatMarker);
+        return hash;
     }
 
     //private ArrayList<PrimaryIrStreamItem> toPrimaryIrStreamItems() {
@@ -110,11 +128,11 @@ public class IrStream extends BareIrStream {
     }
 
     private int getMinRepeats() {
-        return repeatMarker == null ? 1 : repeatMarker.getMin();
+        return repeatMarker.getMin();
     }
 
     private boolean isInfiniteRepeat() {
-        return repeatMarker != null && repeatMarker.isInfinite();
+        return repeatMarker.isInfinite();
     }
 
     @Override
@@ -163,11 +181,11 @@ public class IrStream extends BareIrStream {
 
     @Override
     public String toIrpString() {
-        return "(" + super.toIrpString() + ")" + (repeatMarker != null ? repeatMarker.toIrpString() : "");
+        return "(" + super.toIrpString() + ")" + repeatMarker.toIrpString();
     }
 
     public boolean isRepeatSequence() {
-        return repeatMarker != null && repeatMarker.isInfinite();
+        return repeatMarker.isInfinite();
     }
 
     @Override
@@ -212,8 +230,7 @@ public class IrStream extends BareIrStream {
                 repeat.appendChild(item.toElement(document));
         }
 
-        if (repeatMarker != null)
-            element.appendChild(repeatMarker.toElement(document));
+        element.appendChild(repeatMarker.toElement(document));
         return element;
     }
 
@@ -234,8 +251,7 @@ public class IrStream extends BareIrStream {
     @Override
     public int numberOfInfiniteRepeats() {
         int noir = super.numberOfInfiniteRepeats();
-        return repeatMarker == null ? noir
-                : repeatMarker.isInfinite() ? noir + 1
+        return repeatMarker.isInfinite() ? noir + 1
                 : repeatMarker.getMin() * noir;
     }
 
@@ -280,11 +296,11 @@ public class IrStream extends BareIrStream {
     }
 
     boolean isRPlus() {
-        return repeatMarker != null && repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true);
+        return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true);
     }
 
     @Override
     public int weight() {
-        return super.weight() + (repeatMarker == null ? 0 : repeatMarker.weight());
+        return super.weight() + repeatMarker.weight();
     }
 }

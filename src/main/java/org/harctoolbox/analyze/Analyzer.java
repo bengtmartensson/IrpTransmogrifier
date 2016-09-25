@@ -68,6 +68,10 @@ public class Analyzer extends Cleaner {
         this(irSequence, ModulatedIrSequence.defaultFrequency, invokeRepeatFinder);
     }
 
+    public Analyzer(IrSequence irSequence, double frequency) throws OddSequenceLenghtException {
+        this(irSequence, frequency, false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+
     public Analyzer(IrSequence irSequence) throws OddSequenceLenghtException {
         this(irSequence, ModulatedIrSequence.defaultFrequency, true);
     }

@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -56,6 +57,24 @@ public class BitspecIrstream extends IrStreamItem {
 
     public BitspecIrstream(String str) throws IrpSyntaxException, InvalidRepeatException {
         this((new ParserDriver(str)).getParser().bitspec_irstream());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BitspecIrstream))
+            return false;
+
+        BitspecIrstream other = (BitspecIrstream) obj;
+        return bitSpec.equals(other.bitSpec)
+                && irStream.equals(other.irStream);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.bitSpec);
+        hash = 97 * hash + Objects.hashCode(this.irStream);
+        return hash;
     }
 
     @Override

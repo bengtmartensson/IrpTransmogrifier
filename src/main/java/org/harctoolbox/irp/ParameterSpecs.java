@@ -19,6 +19,8 @@ package org.harctoolbox.irp;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
@@ -51,6 +53,31 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
             });
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ParameterSpecs))
+            return false;
+
+        ParameterSpecs other = (ParameterSpecs) obj;
+        if (map.size() != other.map.size())
+            return false;
+
+        for (Map.Entry<String, ParameterSpec> kvp : map.entrySet()) {
+            String key = kvp.getKey();
+            if (!kvp.getValue().equals(other.map.get(key)))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + Objects.hashCode(this.map);
+        return hash;
+    }
+
     public boolean isEmpty() {
         return map.isEmpty();
     }

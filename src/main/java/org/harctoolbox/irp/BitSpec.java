@@ -18,6 +18,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -90,6 +91,33 @@ public class BitSpec extends IrpObject {
     BitSpec() {
         chunkSize = 0;
         bitCodes = new ArrayList<>(2);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BitSpec))
+            return false;
+
+        BitSpec other = (BitSpec) obj;
+        if (chunkSize != other.getChunkSize())
+            return false;
+
+        if (bitCodes.size() != other.bitCodes.size())
+            return false;
+
+        for (int i = 0; i < bitCodes.size(); i++)
+            if (!bitCodes.get(i).equals(other.bitCodes.get(i)))
+                return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + this.chunkSize;
+        hash = 53 * hash + Objects.hashCode(this.bitCodes);
+        return hash;
     }
 
     public int size() {

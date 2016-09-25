@@ -129,7 +129,7 @@ public abstract class AbstractDecoder {
             throws DecodeException;
 
     protected int getNoBitsLimit(List<Integer> parameterWidths) {
-        return noPayload >= parameterWidths.size() ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
+        return (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
     }
 
     protected static class ParameterData {

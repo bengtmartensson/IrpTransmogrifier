@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
@@ -93,6 +94,25 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     //protected PrimaryItem width;
     protected PrimaryItem chop;
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BitField))
+            return false;
+
+        BitField other = (BitField) obj;
+
+        return complement == other.complement
+                && data.equals(other.data)
+                && chop.equals(other.chop);
+    }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 53 * hash + (this.complement ? 1 : 0);
+        hash = 53 * hash + Objects.hashCode(this.data);
+        hash = 53 * hash + Objects.hashCode(this.chop);
+        return hash;
+    }
 
     @Override
     public final String toString() {

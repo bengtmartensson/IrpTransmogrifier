@@ -43,6 +43,14 @@ public class Gap extends Duration {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Gap))
+            return false;
+
+        return super.equals(obj);
+    }
+
+    @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         return -evaluate(nameEngine, generalSpec, elapsed);
@@ -98,6 +106,12 @@ public class Gap extends Duration {
     @Override
     protected boolean isOn() {
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash + 31*super.hashCode();
     }
 }
 

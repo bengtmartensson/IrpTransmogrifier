@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -67,6 +68,32 @@ public class Expression extends PrimaryItem /* ??? */ {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.parseTree);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Expression))
+            return false;
+
+        Expression other = (Expression) obj;
+
+        return toIrpString().equals(other.toIrpString());
+//        for (int i = 0; i < parseTree.children.size(); i++) {
+//            ParseTree mychild = parseTree.children.get(i);
+//            ParseTree theirChild = other.parseTree.children.get(i);
+//
+//            if (!parseTree.children.get(i).equals(other.parseTree.children.get(i)))
+//                return false;
+//        }
+//
+//        return true;
+    }
+
+    @Override
     public String toString() {
         return toIrpString();
     }
@@ -78,6 +105,7 @@ public class Expression extends PrimaryItem /* ??? */ {
     public String toStringTree() {
         return parseTree.toStringTree();
     }
+
     @Override
     public Name toName() throws IrpSyntaxException {
 //        PrimaryItem pi = newPrimaryItem(parseTree.primary_item());

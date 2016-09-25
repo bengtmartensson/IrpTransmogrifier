@@ -62,6 +62,21 @@ public class Number extends PrimaryItem {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Number))
+            return false;
+
+        return this.data == ((Number) obj).data;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + (int) (this.data ^ (this.data >>> 32));
+        return hash;
+    }
+
+    @Override
     public long toNumber(NameEngine nameEngine) {
         return data;
     }

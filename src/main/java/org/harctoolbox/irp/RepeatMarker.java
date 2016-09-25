@@ -84,6 +84,24 @@ public class RepeatMarker extends IrpObject {
         this(Character.toString(ch));
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof RepeatMarker))
+            return false;
+
+        RepeatMarker other = (RepeatMarker) obj;
+        return min == other.min
+                && max == other.max;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 89 * hash + this.min;
+        hash = 89 * hash + this.max;
+        return hash;
+    }
+
     public boolean isInfinite() {
         return max == Integer.MAX_VALUE;
     }

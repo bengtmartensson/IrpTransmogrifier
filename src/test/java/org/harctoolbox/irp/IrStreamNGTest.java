@@ -43,7 +43,8 @@ public class IrStreamNGTest {
     public void testGetRepeatMarker() {
         System.out.println("getRepeatMarker");
         RepeatMarker result = instance.getRepeatMarker();
-        assertTrue(result == null);
+        assertEquals(result.getMin(), 1);
+        assertEquals(result.getMax(), 1);
         result = repeat.getRepeatMarker();
         assertEquals(result.getMin(), 0L);
         assertTrue(result.isInfinite());

@@ -1,6 +1,6 @@
 package org.harctoolbox.ircore;
 
-import org.junit.Assert;
+import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;

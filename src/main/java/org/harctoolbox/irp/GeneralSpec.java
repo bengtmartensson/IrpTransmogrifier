@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -154,7 +155,7 @@ public class GeneralSpec extends IrpObject {
     @Override
     public String toString() {
         return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection
-                + (dutyCycle > 0 ? (", Duty cycle = " + IrCoreUtils.real2percent(dutyCycle) + "%.") : ", Duty cycle: -.");
+                + (dutyCycle > 0 ? (", Duty cycle = " + Math.round(IrCoreUtils.real2percent(dutyCycle)) + "%.") : ", Duty cycle: -.");
     }
 
     public final BitDirection getBitDirection() {
@@ -173,15 +174,21 @@ public class GeneralSpec extends IrpObject {
         return dutyCycle;
     }
 
-
     @Override
     public String toIrpString() {
-        return "{"
-                + getFrequency()/1000f + "k,"
-                + Math.round(getUnit()) + ","
-                + getBitDirection()
-                + (getDutyCycle() > 0 ? ("," + IrCoreUtils.real2percent(getDutyCycle()) + "%") : "")
-                + "}";
+        return toIrpString(false);
+    }
+
+    public String toIrpString(boolean usePeriods) {
+        StringJoiner joiner = new StringJoiner(",", "{", "}");
+        joiner.add(IrCoreUtils.hz2khz(getFrequency()) + "k");
+        joiner.add(usePeriods
+                ? (Math.round(IrCoreUtils.us2Periods(unit, getFrequency())) + "p")
+                : Long.toString(Math.round(getUnit())));
+        joiner.add(getBitDirection().toString());
+        if (getDutyCycle() > 0)
+            joiner.add(Math.round(IrCoreUtils.real2percent(getDutyCycle())) + "%");
+        return joiner.toString();
     }
 
     @Override

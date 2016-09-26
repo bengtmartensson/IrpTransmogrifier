@@ -19,6 +19,7 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,6 +62,8 @@ public class Cleaner {
     protected int indexData[];
     private int[] sorted;
     private HashMap<Integer, Integer> lookDownTable;
+    private List<Integer> sortedGaps;
+    private List<Integer> sortedFlashes;
 
     public Cleaner(IrSequence irSequence) {
         this(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
@@ -73,6 +76,7 @@ public class Cleaner {
         improveTimingsTable(absoluteTolerance, relativeTolerance);
         createCookedData();
         createCleanHistogram();
+        createSortedGapsAndFlashes();
         //createNormedTimings();
         //System.out.println(toTimingsString());
     }
@@ -80,11 +84,11 @@ public class Cleaner {
     private void createRawHistogram() {
         rawHistogram = new HashMap<>(numberOfTimingsCapacity);
         for (int i = 0; i < rawData.length; i++) {
-            boolean isMark = i % 2 == 0;
+            boolean isFlash = i % 2 == 0;
             int duration = rawData[i];
             if (!rawHistogram.containsKey(duration))
                 rawHistogram.put(duration, new HistoPair());
-            rawHistogram.get(duration).increment(isMark);
+            rawHistogram.get(duration).increment(isFlash);
         }
 //        for (int d : rawData) {
 //            int old = rawHistogram.containsKey(d) ? rawHistogram.get(d) : 0;
@@ -206,21 +210,20 @@ public class Cleaner {
         return lookDownTable.get(duration);
     }
 
-    private List<Integer> getMarksOrSpaces(boolean isSpace) {
+    private List<Integer> getFalshesOrGaps(boolean isFlash) {
         List<Integer> list = new ArrayList<>(timings.size());
-        for (int d : timings) {
-            if (cleanedHistogram.get(d).get(isSpace) > 0)
-                list.add(d);
-        }
+        timings.stream().filter((d) -> (cleanedHistogram.get(d).get(isFlash) > 0)).forEach((d) -> {
+            list.add(d);
+        });
         return list;
     }
 
-    public List<Integer> getDistinctSpaces() {
-        return getMarksOrSpaces(false);
+    public List<Integer> getDistinctGaps() {
+        return getFalshesOrGaps(false);
     }
 
-    public List<Integer> getDistinctMarks() {
-        return getMarksOrSpaces(true);
+    public List<Integer> getDistinctFlashes() {
+        return getFalshesOrGaps(true);
     }
 
     /**
@@ -234,61 +237,84 @@ public class Cleaner {
         return result;
     }
 
-    public int getNumberSpaces(int duration) {
-        return cleanedHistogram.get(duration).numberSpaces;
+    public int getNumberGaps(int duration) {
+        return cleanedHistogram.get(duration).numberGaps;
     }
 
-    public int getNumberMarks(int duration) {
-        return cleanedHistogram.get(duration).numberMarks;
+    public int getNumberFlashes(int duration) {
+        return cleanedHistogram.get(duration).numberFlashes;
     }
 
-    public int getNumberPairs(int mark, int space) {
-        Integer ispace = getIndex(space);
-        Integer imark = getIndex(mark);
-        if (ispace == null || imark == null)
+    public int getNumberPairs(int flash, int gap) {
+        Integer igap = getIndex(gap);
+        Integer iflash = getIndex(flash);
+        if (igap == null || iflash == null)
             throw new ThisCannotHappenException();
 
         int result = 0;
         for (int i = 0; i < indexData.length - 1; i += 2)
-            if (indexData[i] == imark && indexData[i + 1] == ispace)
+            if (indexData[i] == iflash && indexData[i + 1] == igap)
                 result++;
 
         return result;
     }
 
+    private void createSortedGapsAndFlashes() {
+        sortedGaps = getFalshesOrGaps(false);
+        Collections.sort(sortedGaps,    (a, b) -> cleanedHistogram.get(b).numberGaps    - cleanedHistogram.get(a).numberGaps);
+        sortedFlashes = getFalshesOrGaps(true);
+        Collections.sort(sortedFlashes, (a, b) -> cleanedHistogram.get(b).numberFlashes - cleanedHistogram.get(a).numberFlashes);
+    }
+
+    public int getSortedGaps(int i) {
+        return sortedGaps.get(i);
+    }
+
+    public int getSortedFlashes(int i) {
+        return sortedFlashes.get(i);
+    }
+
+    public int getNumberOfGaps() {
+        return sortedGaps.size();
+    }
+
+    public int getNumberOfFlashes() {
+        return sortedFlashes.size();
+    }
+
     private static class HistoPair {
 
-        int numberSpaces;
-        int numberMarks;
+        int numberGaps;
+        int numberFlashes;
 
         HistoPair() {
-            numberSpaces = 0;
-            numberMarks = 0;
+            numberGaps = 0;
+            numberFlashes = 0;
         }
 
-        int get(boolean isMark) {
-            return isMark ? numberMarks : numberSpaces;
+        int get(boolean isFlash) {
+            return isFlash ? numberFlashes : numberGaps;
         }
 
-        void increment(boolean isMark) {
-            if (isMark)
-                numberMarks++;
+        void increment(boolean isFlash) {
+            if (isFlash)
+                numberFlashes++;
             else
-                numberSpaces++;
+                numberGaps++;
         }
 
         int total() {
-            return numberMarks + numberSpaces;
+            return numberFlashes + numberGaps;
         }
 
         @Override
         public String toString() {
-            return total() + "=" + numberSpaces + "+" + numberMarks;
+            return total() + "=" + numberGaps + "+" + numberFlashes;
         }
 
         private void add(HistoPair op) {
-            numberSpaces += op.numberSpaces;
-            numberMarks += op.numberMarks;
+            numberGaps += op.numberGaps;
+            numberFlashes += op.numberFlashes;
         }
     }
 }

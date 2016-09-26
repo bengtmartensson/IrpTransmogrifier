@@ -19,6 +19,7 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.irp.BareIrStream;
 import org.harctoolbox.irp.Duration;
 import org.harctoolbox.irp.Extent;
@@ -31,14 +32,14 @@ public class Burst {
     private static final double maxUnits = 30f;
     private static final double maxUs = 10000f;
 
-    private static Duration newFlashOrGap(boolean isFlash, int us, double timebase) {
+    private static Duration newFlashOrGap(boolean isFlash, double us, double timebase) {
         double units = us/timebase;
         double roundingError = Math.round(units) - units;
         String unit = (units < maxUnits && Math.abs(roundingError) < maxRoundingError) ? ""
                 : us < maxUs ? "u"
                 : "m";
         double duration = unit.isEmpty() ? Math.round(units)
-                : unit.equals("m") ? Math.round(us/1000f)
+                : unit.equals("m") ? Math.round(IrCoreUtils.microseconds2milliseconds(us))
                 : us;
         return isFlash ? new Flash(duration, unit) : new Gap(duration, unit);
     }
@@ -55,11 +56,11 @@ public class Burst {
         return new Extent(duration, unit);
     }
 
-    public static Flash newFlash(int duration, double timebase) {
+    public static Flash newFlash(double duration, double timebase) {
         return (Flash) newFlashOrGap(true, duration, timebase);
     }
 
-    public static Gap newGap(int duration, double timebase) {
+    public static Gap newGap(double duration, double timebase) {
         return (Gap) newFlashOrGap(false, duration, timebase);
     }
 

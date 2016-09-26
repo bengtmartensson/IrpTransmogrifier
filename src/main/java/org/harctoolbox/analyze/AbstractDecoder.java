@@ -63,26 +63,59 @@ public abstract class AbstractDecoder {
         return mkBitSpec(list, timebase);
     }
 
+    protected static BitSpec mkBitSpec(double timebase) {
+        List<BareIrStream> list = new ArrayList<>(0);
+        return mkBitSpec(list, timebase);
+    }
+
+    private static BitSpec mkBitSpec(double timebase, boolean invert) {
+        Flash on = Burst.newFlash(timebase, timebase);
+        Gap off = Burst.newGap(timebase, timebase);
+        List<IrStreamItem> listOffOn = new ArrayList<>(2);
+        listOffOn.add(off);
+        listOffOn.add(on);
+
+        List<IrStreamItem> listOnOff = new ArrayList<>(2);
+        listOnOff.add(on);
+        listOnOff.add(off);
+
+        List<BareIrStream> list = new ArrayList<>(2);
+        if (invert) {
+            list.add(new BareIrStream(listOnOff));
+            list.add(new BareIrStream(listOffOn));
+        } else {
+            list.add(new BareIrStream(listOffOn));
+            list.add(new BareIrStream(listOnOff));
+        }
+        try {
+            return new BitSpec(list);
+        } catch (IrpSyntaxException | InvalidRepeatException ex) {
+            throw new ThisCannotHappenException();
+        }
+    }
+
     protected NameEngine nameEngine;
     protected int noPayload;
     protected final double timebase;
     protected final Analyzer analyzer;
-    protected final BitSpec bitSpec;
+    protected BitSpec bitSpec;
+    protected final Analyzer.AnalyzerParams params;
 
-    public AbstractDecoder(Analyzer analyzer, double timebase, BitSpec bitSpec) {
+    public AbstractDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
         this.nameEngine = null;
         this.analyzer = analyzer;
-        this.timebase = timebase;
-        this.bitSpec = bitSpec;
+        this.params = params;
+        this.timebase = params.getTimebase() > 0 ? params.getTimebase() : analyzer.getTimings().get(0);
+        this.bitSpec = new BitSpec();
     }
 
-    public Protocol process(BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) throws DecodeException {
+    public Protocol process() throws DecodeException {
         nameEngine = new NameEngine();
         noPayload = 0;
         RepeatFinder.RepeatFinderData repeatfinderData = analyzer.getRepeatFinderData();
-        List<IrStreamItem> items = process(0, repeatfinderData.getBeginLength(), bitDirection, useExtents, parameterWidths);
-        List<IrStreamItem> repeatItems = process(repeatfinderData.getBeginLength(), repeatfinderData.getRepeatLength(), bitDirection, useExtents, parameterWidths);
-        List<IrStreamItem> endingItems = process(repeatfinderData.getEndingStart(), repeatfinderData.getEndingLength(), bitDirection, useExtents, parameterWidths);
+        List<IrStreamItem> items = process(0, repeatfinderData.getBeginLength());
+        List<IrStreamItem> repeatItems = process(repeatfinderData.getBeginLength(), repeatfinderData.getRepeatLength());
+        List<IrStreamItem> endingItems = process(repeatfinderData.getEndingStart(), repeatfinderData.getEndingLength());
         IrStream irStream;
         RepeatMarker repeatMarker = new RepeatMarker(repeatfinderData.getNumberRepeats());
         if (repeatfinderData.getBeginLength() == 0 && repeatfinderData.getEndingLength() == 0) {
@@ -95,7 +128,7 @@ public abstract class AbstractDecoder {
             irStream = new IrStream(items);
         }
         BitspecIrstream bitspecIrstream = new BitspecIrstream(bitSpec, irStream);
-        Protocol protocol = new Protocol(analyzer.getGeneralSpec(bitDirection, timebase), bitspecIrstream, nameEngine, null, null);
+        Protocol protocol = new Protocol(params.getGeneralSpec(timebase), bitspecIrstream, nameEngine, null, null);
         return protocol;
     }
 
@@ -125,11 +158,23 @@ public abstract class AbstractDecoder {
         items.add(new FiniteBitField(name, parameterData.getNoBits()));
     }
 
-    protected abstract List<IrStreamItem> process(int beginStart, int beginLength, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths)
+    protected abstract List<IrStreamItem> process(int beginStart, int beginLength)
             throws DecodeException;
 
     protected int getNoBitsLimit(List<Integer> parameterWidths) {
         return (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
+    }
+
+    protected final void setBitSpec(Burst zero, Burst one) {
+        bitSpec = mkBitSpec(zero, one, timebase);
+    }
+
+    protected final void setBitSpec(Burst zero, Burst one, Burst two, Burst three) {
+        bitSpec = mkBitSpec(zero, one, two, three, timebase);
+    }
+
+    protected final void setBitSpec(double timebase) {
+        bitSpec = mkBitSpec(timebase, params.isInvert());
     }
 
     protected static class ParameterData {

@@ -445,16 +445,12 @@ public class Protocol extends IrpObject {
 
     @Override
     public String toIrpString() {
-        return
-                generalSpec.toIrpString()
-                + bitspecIrstream.toIrpString()
-                + definitions.toIrpString()
-                + parameterSpecs.toIrpString();
+        return toIrpString(10, false);
     }
 
-    public String toIrpString(int radix) {
+    public String toIrpString(int radix, boolean usePeriods) {
         return
-                generalSpec.toIrpString()
+                generalSpec.toIrpString(usePeriods)
                 + bitspecIrstream.toIrpString()
                 + definitions.toIrpString(radix)
                 + parameterSpecs.toIrpString();

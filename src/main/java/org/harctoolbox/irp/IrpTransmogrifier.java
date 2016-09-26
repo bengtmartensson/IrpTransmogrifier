@@ -240,17 +240,17 @@ public class IrpTransmogrifier {
             out.println(irSignal);
         }
 
-        Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.frequency, commandAnalyze.repeatFinder,
+        Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.repeatFinder,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
         if (commandAnalyze.statistics) {
             out.println("Spaces:");
-            for (int d : analyzer.getDistinctSpaces())
-                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberSpaces(d));
+            for (int d : analyzer.getDistinctGaps())
+                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberGaps(d));
 
             out.println("Marks:");
-            for (int d : analyzer.getDistinctMarks())
-                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberMarks(d));
+            for (int d : analyzer.getDistinctFlashes())
+                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberFlashes(d));
 
             out.println("Pairs:");
             for (Burst pair : analyzer.getPairs()) {
@@ -259,31 +259,16 @@ public class IrpTransmogrifier {
             out.println(analyzer.toTimingsString());
         }
 
-        try {
-            Protocol pwm = analyzer.processPWM(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
-            printAnalyzedProtocol(pwm, commandAnalyze.radix);
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-        }
+        Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(commandAnalyze.frequency, commandAnalyze.timeBase,
+                commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
+                commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
 
-        try {
-            Protocol pwm4 = analyzer.processPWM4(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths);
-            printAnalyzedProtocol(pwm4, commandAnalyze.radix);
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-        }
-
-        try {
-            Protocol biphase = analyzer.processBiPhase(commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb, commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
-            printAnalyzedProtocol(biphase, commandAnalyze.radix);
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-        }
-
+        Protocol protocol = analyzer.searchProtocol(params);
+        printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
     }
 
-    private static void printAnalyzedProtocol(Protocol protocol, int radix) {
-    out.println(protocol.toIrpString(radix) + " \tweight = " + protocol.weight());
+    private static void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
+        out.println(protocol.toIrpString(radix, usePeriods) + " \tweight = " + protocol.weight());
     }
 
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
@@ -618,7 +603,7 @@ public class IrpTransmogrifier {
         private boolean extent = false;
 
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
-        private int frequency = (int) ModulatedIrSequence.defaultFrequency;
+        private double frequency = ModulatedIrSequence.defaultFrequency;
 
         @Parameter(names = { "-i", "--invert"}, description = "Invert order in bitspec")
         private boolean invert = false;
@@ -637,6 +622,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {"-s", "--statistics"}, description = "Print some statistics on the analyzed signal")
         private boolean statistics = false;
+
+        @Parameter(names = {"-t", "--timebase"}, description = "Timebase in microseconds, or alternatively, in periods (with ending \"p\")")
+        private String timeBase = null;
 
         @Parameter(description = "durations in microseconds, (pronto hex currently not supported)", required = true)
         private List<String> args;

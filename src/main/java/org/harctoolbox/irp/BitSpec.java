@@ -31,9 +31,12 @@ import org.w3c.dom.Element;
  *
  */
 public class BitSpec extends IrpObject {
+
     // Computes the upper integer part of the 2-logarithm of the integer n.
-    // Treat n = 1 differently, since coding on a one-letter alphaber is ... special.
+    // Treat n = 0 and n = 1 differently, since coding on a zero or one-letter alphaber is ... special.
     private static int computeNoBits(int n) {
+        if (n == 0)
+            return 0;
         if (n == 1)
             return 1;
         int x = n-1;
@@ -88,7 +91,7 @@ public class BitSpec extends IrpObject {
         bitCodes = list;
     }
 
-    BitSpec() {
+    public BitSpec() {
         chunkSize = 0;
         bitCodes = new ArrayList<>(2);
     }

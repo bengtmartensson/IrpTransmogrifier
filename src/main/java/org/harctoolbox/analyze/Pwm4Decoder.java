@@ -18,8 +18,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.IrStreamItem;
 
 public class Pwm4Decoder extends AbstractDecoder {
@@ -31,24 +31,42 @@ public class Pwm4Decoder extends AbstractDecoder {
     private final Burst two;
     private final Burst three;
 
-    public Pwm4Decoder(Analyzer analyzer, double timebase, Burst zero, Burst one, Burst two, Burst three) {
-        super(analyzer, timebase, mkBitSpec(zero, one, two, three, timebase));
+    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one, Burst two, Burst three) {
+        super(analyzer, params);
+        setBitSpec(zero, one, two, three);
         this.zero = zero;
         this.one = one;
         this.two = two;
         this.three = three;
     }
 
-    public Pwm4Decoder(Analyzer analyzer, double timebase, int flash, int zeroGap, int oneGap, int twoGap, int threeGap) {
-        this(analyzer, timebase, new Burst(flash, zeroGap), new Burst(flash, oneGap), new Burst(flash, twoGap), new Burst(flash, threeGap));
+    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int flash, int zeroGap, int oneGap, int twoGap, int threeGap) {
+        this(analyzer, params, new Burst(flash, zeroGap), new Burst(flash, oneGap), new Burst(flash, twoGap), new Burst(flash, threeGap));
+    }
+
+    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) throws DecodeException {
+        super(analyzer, params);//, new Burst(flash, zeroGap), new Burst(flash, oneGap), new Burst(flash, twoGap), new Burst(flash, threeGap));
+        if (analyzer.getNumberOfGaps() < 4)
+            throw new DecodeException();
+        List<Integer> gaps = new ArrayList<>(4);
+        gaps.add(analyzer.getSortedGaps(0));
+        gaps.add(analyzer.getSortedGaps(1));
+        gaps.add(analyzer.getSortedGaps(2));
+        gaps.add(analyzer.getSortedGaps(3));
+        Collections.sort(gaps);
+        zero = new Burst(analyzer.getSortedFlashes(0), gaps.get(0));
+        one  = new Burst(analyzer.getSortedFlashes(0), gaps.get(1));
+        two  = new Burst(analyzer.getSortedFlashes(0), gaps.get(2));
+        three= new Burst(analyzer.getSortedFlashes(0), gaps.get(3));
+        setBitSpec(zero, one, two, three);
     }
 
     @Override
-    protected List<IrStreamItem> process(int beg, int length, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) {
+    protected List<IrStreamItem> process(int beg, int length) {
         List<IrStreamItem> items = new ArrayList<>(16);
         ParameterData data = new ParameterData(CHUNKSIZE);
         for (int i = beg; i < beg + length - 1; i += 2) {
-            int noBitsLimit = getNoBitsLimit(parameterWidths);
+            int noBitsLimit = params.getNoBitsLimit(noPayload);
             int mark = analyzer.getCleanedTime(i);
             int space = analyzer.getCleanedTime(i + 1);
             Burst burst = new Burst(mark, space);
@@ -62,24 +80,24 @@ public class Pwm4Decoder extends AbstractDecoder {
                 data.update(3);
             } else {
                 if (!data.isEmpty()) {
-                    saveParameter(data, items, bitDirection);
+                    saveParameter(data, items, params.getBitDirection());
                     data = new ParameterData();
                 }
 
                 items.add(newFlash(mark));
-                if (i == beg + length - 2 && useExtents)
+                if (i == beg + length - 2 && params.isUseExtents())
                     items.add(newExtent(analyzer.getTotalDuration(beg, length)));
                 else
                     items.add(newGap(space));
             }
 
             if (data.getNoBits() >= noBitsLimit) {
-                saveParameter(data, items, bitDirection);
+                saveParameter(data, items, params.getBitDirection());
                 data = new ParameterData(CHUNKSIZE);
             }
         }
         if (!data.isEmpty())
-            saveParameter(data, items, bitDirection);
+            saveParameter(data, items, params.getBitDirection());
 
         return items;
     }

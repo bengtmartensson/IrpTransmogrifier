@@ -84,10 +84,10 @@ public class IrCoreUtilsNGTest {
     @Test
     public void testReal2percent() {
         System.out.println("real2percent");
-        double x = 0.73;
-        long expResult = 73L;
-        long result = IrCoreUtils.real2percent(x);
-        assertEquals(result, expResult);
+        double x = 0.7342;
+        double expResult = 73.42;
+        double result = IrCoreUtils.real2percent(x);
+        assertEquals(result, expResult, 0.000001);
     }
 
     /**
@@ -212,4 +212,70 @@ public class IrCoreUtilsNGTest {
         long result = IrCoreUtils.maskTo(data, width);
         assertEquals(result, expResult);
     }
+
+    /**
+     * Test of microseconds2milliseconds method, of class IrCoreUtils.
+     */
+    @Test
+    public void testMicroseconds2milliseconds() {
+        System.out.println("microseconds2milliseconds");
+        double us = 1234;
+        double expResult = 1.234;
+        double result = IrCoreUtils.microseconds2milliseconds(us);
+        assertEquals(result, expResult, 0.0);
+    }
+
+    /**
+     * Test of hz2khz method, of class IrCoreUtils.
+     */
+    @Test
+    public void testHz2khz() {
+        System.out.println("hz2khz");
+        double frequency = 45678;
+        double expResult = 45.678;
+        double result = IrCoreUtils.hz2khz(frequency);
+        assertEquals(result, expResult, 0.0);
+    }
+
+    /**
+     * Test of us2Periods method, of class IrCoreUtils.
+     */
+    @Test
+    public void testUs2Periods() {
+        System.out.println("us2Periods");
+        double us = 1050.0;
+        double frequency = 40000;
+        double expResult = 42;
+        double result = IrCoreUtils.us2Periods(us, frequency);
+        assertEquals(result, expResult, 0.0);
+    }
+//
+//    /**
+//     * Test of l1Norm method, of class IrCoreUtils.
+//     */
+//    @Test
+//    public void testL1Norm_Iterable() {
+//        System.out.println("l1Norm");
+//        Iterable<Double> sequence = null;
+//        double expResult = 0.0;
+//        double result = IrCoreUtils.l1Norm(sequence);
+//        assertEquals(result, expResult, 0.0);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
+//
+//    /**
+//     * Test of approximatelyEquals method, of class IrCoreUtils.
+//     */
+//    @Test
+//    public void testApproximatelyEquals_double_double() {
+//        System.out.println("approximatelyEquals");
+//        double x = 0.0;
+//        double y = 0.0;
+//        boolean expResult = false;
+//        boolean result = IrCoreUtils.approximatelyEquals(x, y);
+//        assertEquals(result, expResult);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 }

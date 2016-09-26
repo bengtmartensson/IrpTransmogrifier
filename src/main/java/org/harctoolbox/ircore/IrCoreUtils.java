@@ -55,16 +55,32 @@ public class IrCoreUtils {
         return 1000f * ms;
     }
 
+    public static double microseconds2milliseconds(double us) {
+        return 0.001 * us;
+    }
+
+    private static double microseconds2seconds(double us) {
+        return 0.000001 * us;
+    }
+
     public static double khz2Hz(double khz) {
         return 1000f * khz;
+    }
+
+    public static double hz2khz(double frequency) {
+        return frequency/1000f;
+    }
+
+    public static double us2Periods(double us, double frequency) {
+        return microseconds2seconds(us) * frequency;
     }
 
     public static double percent2real(double percent) {
         return 0.01f * percent;
     }
 
-    public static long real2percent(double x) {
-        return Math.round(100f * x);
+    public static double real2percent(double x) {
+        return 100f * x;
     }
 
     public static double l1Norm(Double[] sequence) {

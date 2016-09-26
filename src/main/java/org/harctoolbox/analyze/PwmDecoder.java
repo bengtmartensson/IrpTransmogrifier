@@ -19,7 +19,6 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.IrStreamItem;
 
 public class PwmDecoder extends AbstractDecoder {
@@ -27,26 +26,32 @@ public class PwmDecoder extends AbstractDecoder {
     private final Burst zero;
     private final Burst one;
 
-    public PwmDecoder(Analyzer analyzer, int timebase, Burst zero, Burst one) {
-        super(analyzer, timebase, mkBitSpec(zero, one, timebase));
+    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
+        super(analyzer, params);//, mkBitSpec(zero, one, params.getTimebase()));
+        setBitSpec(zero, one);
         this.zero = zero;
         this.one = one;
     }
 
-    public PwmDecoder(Analyzer analyzer, int timebase, int zeroFlash, int zeroGap, int oneFlash, int oneGap) {
-        this(analyzer, timebase, new Burst(zeroFlash, zeroGap), new Burst(oneFlash, oneGap));
+    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int zeroFlash, int zeroGap, int oneFlash, int oneGap) {
+        this(analyzer, params, new Burst(zeroFlash, zeroGap), new Burst(oneFlash, oneGap));
     }
 
-    public PwmDecoder(Analyzer analyzer, int timebase, int a, int b) {
-        this(analyzer, timebase, a, a, a, b);
+    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int a, int b) {
+        this(analyzer, params, a, a, a, b);
+    }
+
+    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+        this(analyzer, params, analyzer.getTimings().get(0), analyzer.getTimings().get(1));
     }
 
     @Override
-    protected List<IrStreamItem> process(int beg, int length, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths) {
+    protected List<IrStreamItem> process(int beg, int length) {
         List<IrStreamItem> items = new ArrayList<>(16);
         ParameterData data = new ParameterData();
         for (int i = beg; i < beg + length - 1; i += 2) {
-            int noBitsLimit = getNoBitsLimit(parameterWidths);
+            int noBitsLimit = params.getNoBitsLimit(noPayload);
+            //getNoBitsLimit(parameterWidths);
             int mark = analyzer.getCleanedTime(i);
             int space = analyzer.getCleanedTime(i + 1);
             Burst burst = new Burst(mark, space);
@@ -56,24 +61,24 @@ public class PwmDecoder extends AbstractDecoder {
                 data.update(1);
             } else {
                 if (!data.isEmpty()) {
-                    saveParameter(data, items, bitDirection);
+                    saveParameter(data, items, params.getBitDirection());
                     data = new ParameterData();
                 }
 
                 items.add(newFlash(mark));
-                if (i == beg + length - 2 && useExtents)
+                if (i == beg + length - 2 && params.isUseExtents())
                     items.add(newExtent(analyzer.getTotalDuration(beg, length)));
                 else
                     items.add(newGap(space));
             }
 
             if (data.getNoBits() >= noBitsLimit) {
-                saveParameter(data, items, bitDirection);
+                saveParameter(data, items, params.getBitDirection());
                 data = new ParameterData();
             }
         }
         if (!data.isEmpty())
-            saveParameter(data, items, bitDirection);
+            saveParameter(data, items, params.getBitDirection());
 
         return items;
     }

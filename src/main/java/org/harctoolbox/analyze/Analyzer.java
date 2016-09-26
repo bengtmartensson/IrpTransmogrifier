@@ -154,43 +154,29 @@ public class Analyzer extends Cleaner {
     }
 
     public Protocol searchProtocol(AnalyzerParams params) {
+        List<AbstractDecoder> decoders = new ArrayList<>(4);
+        decoders.add(new TrivialDecoder(this, params));
+        decoders.add(new PwmDecoder(this, params));
+        try {
+            decoders.add(new Pwm4Decoder(this, params));
+        } catch (DecodeException ex) {
+            logger.log(Level.FINE, ex.getMessage());
+        }
+        decoders.add(new BiphaseDecoder(this, params));
+
         Protocol best = null;
         int weight = Integer.MAX_VALUE;
 
-        Protocol protocol = processTrivial(params);
-        if (protocol.weight() < weight) {
-            best = protocol;
-            weight = protocol.weight();
-        }
-
-        try {
-            protocol = processPWM(params);
-            if (protocol.weight() < weight) {
-                best = protocol;
-                weight = protocol.weight();
+        for (AbstractDecoder decoder : decoders) {
+            try {
+                Protocol protocol = decoder.process();
+                if (protocol.weight() < weight) {
+                    best = protocol;
+                    weight = protocol.weight();
+                }
+            } catch (DecodeException ex) {
+                logger.log(Level.FINE, ex.getMessage());
             }
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-        }
-
-        try {
-            protocol = processPWM4(params);
-            if (protocol.weight() < weight) {
-                best = protocol;
-                weight = protocol.weight();
-            }
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-        }
-
-        try {
-            protocol = processBiPhase(params);
-            if (protocol.weight() < weight) {
-                best = protocol;
-                weight = protocol.weight();
-            }
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
         }
         return best;
     }

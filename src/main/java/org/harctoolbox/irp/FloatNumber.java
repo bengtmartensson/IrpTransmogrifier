@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -78,5 +79,21 @@ public class FloatNumber extends IrpObject implements Floatable {
     @Override
     public int weight() {
         return WEIGHT;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof FloatNumber))
+            return false;
+
+        FloatNumber other = (FloatNumber) obj;
+        return IrCoreUtils.approximatelyEquals(data, other.data);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + (int) (Double.doubleToLongBits(this.data) ^ (Double.doubleToLongBits(this.data) >>> 32));
+        return hash;
     }
 }

@@ -94,4 +94,20 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
     public int weight() {
         return WEIGHT;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof NumberWithDecimals))
+            return false;
+
+        NumberWithDecimals other = (NumberWithDecimals) obj;
+        return IrCoreUtils.approximatelyEquals(data, other.data);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.data) ^ (Double.doubleToLongBits(this.data) >>> 32));
+        return hash;
+    }
 }

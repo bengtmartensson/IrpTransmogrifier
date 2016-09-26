@@ -24,6 +24,9 @@ public abstract class IrpObject implements XmlExport {
 
     public abstract String toIrpString();
 
+    @Override
+    public abstract boolean equals(Object obj);
+
     public int numberOfInfiniteRepeats() {
         return 0;
     }
@@ -34,4 +37,7 @@ public abstract class IrpObject implements XmlExport {
      * @return non-negative integer.
      */
     public abstract int weight();
+
+    @Override
+    public abstract int hashCode();
 }

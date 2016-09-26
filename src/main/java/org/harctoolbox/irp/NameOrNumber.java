@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.w3c.dom.Document;
@@ -87,5 +88,21 @@ public class NameOrNumber extends IrpObject implements Floatable {
     @Override
     public int weight() {
         return WEIGHT;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof NameOrNumber))
+            return false;
+
+        NameOrNumber other = (NameOrNumber) obj;
+        return thing.equals(other.thing);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.thing);
+        return hash;
     }
 }

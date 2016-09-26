@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -228,5 +229,22 @@ class BitStream extends IrStreamItem implements Evaluatable {
     @Override
     public int weight() {
         return WEIGHT;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BitStream))
+            return false;
+
+        BitStream other = (BitStream) obj;
+        return length == other.length && data.equals(other.data);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (int) (this.length ^ (this.length >>> 32));
+        hash = 53 * hash + Objects.hashCode(this.data);
+        return hash;
     }
 }

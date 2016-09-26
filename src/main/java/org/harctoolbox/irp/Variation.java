@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -155,5 +156,25 @@ public class Variation extends IrStreamItem {
     @Override
     public int weight() {
         return intro.weight() + repeat.weight() + ending.weight();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Variation))
+            return false;
+
+        Variation other = (Variation) obj;
+        return intro.equals(other.intro)
+                && repeat.equals(other.repeat)
+                && ending.equals(other.ending);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 61 * hash + Objects.hashCode(this.intro);
+        hash = 61 * hash + Objects.hashCode(this.repeat);
+        hash = 61 * hash + Objects.hashCode(this.ending);
+        return hash;
     }
 }

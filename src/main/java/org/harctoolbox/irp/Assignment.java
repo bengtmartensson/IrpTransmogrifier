@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -54,6 +55,22 @@ public class Assignment extends IrStreamItem implements Numerical {
         this.value = expression;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + Objects.hashCode(this.name);
+        hash = 43 * hash + Objects.hashCode(this.value);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Assignment))
+            return false;
+
+        Assignment other = (Assignment) obj;
+        return name.equals(other.name) && value.equals(other.value);
+    }
 
     @Override
     public boolean isEmpty(NameEngine nameEngine) {

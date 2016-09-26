@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
@@ -36,6 +37,27 @@ public class NamedProtocol extends Protocol {
         this.irp = irp;
         this.name = name;
         this.documentation = documentation;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + Objects.hashCode(this.irp);
+        hash = 41 * hash + Objects.hashCode(this.name);
+        hash = 41 * hash + Objects.hashCode(this.documentation);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof NamedProtocol))
+            return false;
+
+        NamedProtocol other = (NamedProtocol) obj;
+        return super.equals(obj)
+                && irp.equals(other.irp)
+                && name.equals(other.name)
+                && documentation.equals(other.documentation);
     }
 
     /**

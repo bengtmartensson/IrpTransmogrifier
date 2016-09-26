@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import java.util.Random;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -184,5 +185,29 @@ public class ParameterSpec extends IrpObject {
     @Override
     public int weight() {
         return WEIGHT;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ParameterSpec))
+            return false;
+
+        ParameterSpec other = (ParameterSpec) obj;
+        return memory == other.memory
+                && min == other.min
+                && max == other.max
+                && name.equals(other.name)
+                && deflt.equals(other.deflt);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 61 * hash + Objects.hashCode(this.name);
+        hash = 61 * hash + Objects.hashCode(this.min);
+        hash = 61 * hash + Objects.hashCode(this.max);
+        hash = 61 * hash + Objects.hashCode(this.deflt);
+        hash = 61 * hash + (this.memory ? 1 : 0);
+        return hash;
     }
 }

@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -189,7 +190,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         if (state == pass)
             evaluatedIrStream.add(this);
 
-        IrpUtils.exiting(logger, "duration", evaluatedIrStream);
+        IrpUtils.exiting(logger, "evaluate", evaluatedIrStream);
         return evaluatedIrStream;
     }
 
@@ -230,11 +231,16 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
 //        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
 //            return false;
-        if (!recognizeData.check(isOn()))
+        IrpUtils.entering(logger, Level.FINEST, "recognize", this);
+        if (!recognizeData.check(isOn())) {
+            IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
             return false;
+        }
         double actual = recognizeData.get();
         double wanted = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-        return recognize(recognizeData, actual, wanted);
+        boolean result = recognize(recognizeData, actual, wanted);
+        IrpUtils.exiting(logger, Level.FINEST, "recognize", result);
+        return result;
     }
 
     protected boolean recognize(RecognizeData recognizeData, double actual, double wanted) {

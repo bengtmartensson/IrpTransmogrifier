@@ -213,6 +213,7 @@ public class FiniteBitField extends BitField {
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, IrpSyntaxException, UnassignedException {
+        IrpUtils.entering(logger, "recognize", this);
         // first the simplest case: bitSpecs
         BitSpec bitSpec = bitSpecs.get(0);
         //int irSequencePostion = recognizeData.getPosition();
@@ -229,7 +230,7 @@ public class FiniteBitField extends BitField {
             //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
             for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
                 inData = recognizeData.clone();
-                  if (chunk < noChunks - 1)
+                if (chunk < noChunks - 1)
                     inData.setLookAheadItem(null);
                 //inData.setPosition(irSequencePostion);
                 boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, null);
@@ -275,6 +276,7 @@ public class FiniteBitField extends BitField {
 
 
         //recognizeData.setPosition(inData.getPosition());
+        IrpUtils.exiting(logger, "recognize", payload);
         return true;//recognizeData;
         //return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), consumedDurations, recognizeData.getState(), recognizeData.getNameEngine());
     }

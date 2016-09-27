@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -27,6 +29,8 @@ import org.w3c.dom.Element;
  *
  */
 public class Extent extends Duration {
+
+    private static final Logger logger = Logger.getLogger(Extent.class.getName());
 
     public Extent(String str) throws IrpSyntaxException {
         this((new ParserDriver(str)).getParser().extent());
@@ -88,10 +92,13 @@ public class Extent extends Duration {
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+        IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         double physical = recognizeData.getExtentDuration();
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
         recognizeData.markExtentStart();
-        return recognize(recognizeData, physical, theoretical);
+        boolean result = recognize(recognizeData, physical, theoretical);
+        IrpUtils.exiting(logger, Level.FINEST, "recognize", result);
+        return result;
     }
 
 

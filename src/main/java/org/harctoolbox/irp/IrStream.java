@@ -258,14 +258,14 @@ public class IrStream extends BareIrStream {
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
         //IrSignal.Pass actualState = state;
-        IrpUtils.entering(logger, "recognize", this);
+        IrpUtils.entering(logger, "recognize " + pass, this);
         boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
         int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
         //RecognizeData actualData = initData.clone();
         if (evaluateTheRepeat)
             recognizeData.setState(IrSignal.Pass.repeat);
         boolean status = recognize(recognizeData, pass, bitSpecs, repetitions);
-        IrpUtils.exiting(logger, "recognize", status ? recognizeData.toString() : "null");
+        IrpUtils.exiting(logger, "recognize " + pass, status /*? recognizeData.toString() : "null"*/);
         return status;
     }
 

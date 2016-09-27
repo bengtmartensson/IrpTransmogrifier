@@ -470,7 +470,7 @@ public class Protocol extends IrpObject {
     }
 
     public NameEngine recognize(IrSignal irSignal, boolean checkFrequency, double frequencyTolerance) {
-        IrpUtils.entering(logger, "recognize", this);
+        IrpUtils.entering(logger, Level.FINE, "recognize", this);
         NameEngine nameEngine = definitions.clone();
 
         boolean success = (!checkFrequency || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
@@ -486,7 +486,7 @@ public class Protocol extends IrpObject {
         }
 
         nameEngine.reduce(parameterSpecs);
-        IrpUtils.entering(logger, "recognize", nameEngine);
+        IrpUtils.entering(logger, Level.FINE, "recognize", nameEngine);
         return nameEngine;
     }
 
@@ -509,13 +509,13 @@ public class Protocol extends IrpObject {
         try {
             recognizeData.getParameterCollector().addToNameEngine(nameEngine);
         } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) { // FIXME
-            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return recognizeData.isSuccess();
     }
 
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass) {
-        IrpUtils.entering(logger, "recognize", pass);
+        IrpUtils.entering(logger, "recognize " + pass, this);
         //RecognizeData recognizeData;
         boolean success = false;
         try {
@@ -525,7 +525,7 @@ public class Protocol extends IrpObject {
             logger.log(Level.INFO, null, ex);
         }
         //IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.getParameterCollector().toString() : "null");
-        IrpUtils.exiting(logger, "recognize", success);
+        IrpUtils.exiting(logger, "recognize " + pass, success);
         return success;
     }
 

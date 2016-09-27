@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSequence;
@@ -79,13 +80,11 @@ class EvaluatedIrStream {
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder(elements.size()*10);
+        StringJoiner joiner = new StringJoiner(",", "(", ")");
         elements.stream().forEach((element) -> {
-            if (str.length() > 0)
-                str.append(";");
-            str.append(element.toString());
+            joiner.add(element.toString());
         });
-        return "(" + str.append(")").toString();
+        return joiner.toString();
     }
 
     void add(EvaluatedIrStream evaluatedIrStream) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {

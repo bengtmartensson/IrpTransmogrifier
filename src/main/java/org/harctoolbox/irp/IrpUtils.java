@@ -277,20 +277,28 @@ public class IrpUtils {
         return prefix + map.get(name) + postfix;
     }
 
-    public static void entering(Logger logger, String member, Object arg) {
-        logger.logp(enteringExitingLevel, logger.getName(), member, String.format("->(%0$s)", arg.toString()));
+    public static void entering(Logger logger, Level level, String member, Object arg) {
+        logger.logp(level, logger.getName(), member, String.format("->(%0$s)", arg.toString()));
     }
 
-    public static void exiting(Logger logger, String member, Object arg) {
-        logger.logp(enteringExitingLevel, logger.getName(), member, String.format("<-%0$s", arg.toString()));
+    public static void entering(Logger logger, String member, Object arg) {
+        entering(logger, enteringExitingLevel, member, arg);
     }
 
     public static void entering(Logger logger, String member) {
-        logger.logp(enteringExitingLevel, logger.getName(), member, "->");
+        entering(logger, member, "->");
+    }
+
+    public static void exiting(Logger logger, Level level, String member, Object arg) {
+        logger.logp(level, logger.getName(), member, String.format("<-%0$s", arg.toString()));
+    }
+    
+    public static void exiting(Logger logger, String member, Object arg) {
+        exiting(logger, enteringExitingLevel, member, arg);
     }
 
     public static void exiting(Logger logger, String member) {
-        logger.logp(enteringExitingLevel, logger.getName(), member, "<-");
+        exiting(logger, member, "<-");
     }
 
     private IrpUtils() {

@@ -81,7 +81,12 @@ public class IrpTransmogrifier {
     }
 
     private static List<String> evaluateProtocols(String in, boolean sort, boolean regexp) {
-        return evaluateProtocols(Arrays.asList(in), sort, regexp);
+        if (in == null)
+            return new ArrayList<>(0);
+
+        List<String> list = new ArrayList<>(1);
+        list.add(in);
+        return evaluateProtocols(list, sort, regexp);
     }
 
     private static void list(CommandList commandList) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
@@ -273,6 +278,9 @@ public class IrpTransmogrifier {
 
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
         List<String> list = evaluateProtocols(commandRecognize.protocol, commandRecognize.sort, commandRecognize.regexp);
+        if (list.isEmpty())
+            logger.log(Level.WARNING, "No protocol given.");
+
         for (String protocolName : list) {
             if (commandRecognize.test != (commandRecognize.args == null))
                 throw new UsageException("Must either use --test or have parameters, but not both.");
@@ -623,7 +631,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-s", "--statistics"}, description = "Print some statistics on the analyzed signal")
         private boolean statistics = false;
 
-        @Parameter(names = {"-t", "--timebase"}, description = "Timebase in microseconds, or alternatively, in periods (with ending \"p\")")
+        @Parameter(names = {"-t", "--timebase"}, description = "Force timebase, in microseconds, or in periods (with ending \"p\")")
         private String timeBase = null;
 
         @Parameter(description = "durations in microseconds, (pronto hex currently not supported)", required = true)

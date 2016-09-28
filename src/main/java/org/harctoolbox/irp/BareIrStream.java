@@ -306,16 +306,16 @@ public class BareIrStream extends IrStreamItem {
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
             ArrayList<BitSpec> bitSpec) throws NameConflictException {
         IrpUtils.entering(logger, "recognize " + pass, this);
-        IrStreamItem callersLookAheadItem = recognizeData.getLookAheadItem();
+        ////IrStreamItem callersLookAheadItem = recognizeData.getLookAheadItem();
         //IrSignal.Pass state = recognizeData.getState();
         //int position = recognizeData.getStart();
         //NameEngine nameEngine = recognizeData.getNameEngine().clone();
         for (int itemNr = 0; itemNr < irStreamItems.size(); itemNr++) {
             IrStreamItem irStreamItem = irStreamItems.get(itemNr);
-            IrStreamItem lookAheadItem = itemNr < irStreamItems.size() - 1 ? irStreamItems.get(itemNr + 1)
-                    : (itemNr == irStreamItems.size() - 1) ? callersLookAheadItem
-                    : null;
-            recognizeData.setLookAheadItem(lookAheadItem);
+            ////IrStreamItem lookAheadItem = itemNr < irStreamItems.size() - 1 ? irStreamItems.get(itemNr + 1)
+            ////        : (itemNr == irStreamItems.size() - 1) ? callersLookAheadItem
+            ////        : null;
+            ////recognizeData.setLookAheadItem(lookAheadItem);
             IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
             if (/*pass == IrSignal.Pass.repeat &&*/ newState != null)
                 recognizeData.setState(newState);

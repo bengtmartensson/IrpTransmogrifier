@@ -96,9 +96,9 @@ public class Cleaner {
 //        }
     }
 
-    public int[] getIndexData() {
-        return indexData;
-    }
+//    public int[] getIndexData() {
+//        return indexData;
+//    }
 
 //    HashMap<Integer, Integer> getRawHistogram() {
 //        return rawHistogram;
@@ -199,11 +199,15 @@ public class Cleaner {
         return sum;
     }
 
-    /**
-     * @return the timings
-     */
-    public List<Integer> getTimings() {
-        return timings;
+//    /**
+//     * @return the timings
+//     */
+//    public List<Integer> getTimings() {
+//        return timings;
+//    }
+
+    public int getTiming(int index) {
+        return  timings.get(index);
     }
 
     public Integer getIndex(int duration) {

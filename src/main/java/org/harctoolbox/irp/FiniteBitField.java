@@ -230,8 +230,8 @@ public class FiniteBitField extends BitField {
             //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
             for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
                 inData = recognizeData.clone();
-                if (chunk < noChunks - 1)
-                    inData.setLookAheadItem(null);
+                ////if (chunk < noChunks - 1)
+                ////    inData.setLookAheadItem(null);
                 //inData.setPosition(irSequencePostion);
                 boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, null);
                 if (success)

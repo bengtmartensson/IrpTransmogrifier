@@ -193,34 +193,49 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void render(CommandRender commandRenderer) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IrpMasterException {
-        if (commandRenderer.random != commandRenderer.nameEngine.isEmpty())
-            throw new UsageException("Must give exactly one of --nameengine and --random");
+    private static void render(Protocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
+        NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
+                : commandRenderer.random ? protocol.randomParameters()
+                        : new NameEngine();
+        if (commandRenderer.random)
+            logger.log(Level.INFO, nameEngine.toString());
 
-        List<String> list = evaluateProtocols(commandRenderer.protocols, commandRenderer.sort, commandRenderer.regexp);
-        for (String proto : list) {
-            logger.info(proto);
-            NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
-            NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
-                    : commandRenderer.random ? protocol.randomParameters()
-                            : new NameEngine();
-            if (commandRenderer.random)
-                logger.log(Level.INFO, nameEngine.toString());
+        IrSignal irSignal = protocol.toIrSignal(nameEngine.clone());
+        if (commandRenderer.raw)
+            System.out.println(irSignal.toPrintString(true));
+        if (commandRenderer.pronto)
+            System.out.println(irSignal.ccfString());
 
-            IrSignal irSignal;
-            irSignal = protocol.toIrSignal(nameEngine.clone());
-            if (commandRenderer.raw)
-                System.out.println(irSignal.toPrintString(true));
-            if (commandRenderer.pronto)
-                System.out.println(irSignal.ccfString());
-
-            if (commandRenderer.test) {
-                IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(proto, nameEngine);
+        if (commandRenderer.test) {
+            String protocolName = ((NamedProtocol) protocol).getName();
+                IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(protocolName, nameEngine);
                 if (!irSignal.approximatelyEquals(irpMasterSignal)) {
                     out.println(Pronto.toPrintString(irpMasterSignal));
-                    out.println("Error in " + proto);
+                    out.println("Error in " + protocolName);
                     //System.exit(1);
                 }
+            }
+    }
+
+    private static void render(CommandRender commandRenderer) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IrpMasterException {
+        if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
+            throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
+
+
+        if (commandRenderer.irp != null) {
+            if (!commandRenderer.protocols.isEmpty())
+                throw new UsageException("Cannot not use --irp together with named protocols");
+            if (commandRenderer.test)
+                throw new UsageException("Cannot not use --irp together with --test");
+
+            Protocol protocol = new Protocol(commandRenderer.irp);
+            render(protocol, commandRenderer);
+        } else {
+            List<String> list = evaluateProtocols(commandRenderer.protocols, commandRenderer.sort, commandRenderer.regexp);
+            for (String proto : list) {
+                logger.info(proto);
+                NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
+                render(protocol, commandRenderer);
             }
         }
     }
@@ -544,6 +559,10 @@ public class IrpTransmogrifier {
         }
     }
 
+//    private static IrSignal parseProntoOrRaw(List<String> args) {
+//        Pronto.parse(args);
+//    }
+
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
 
         @Override
@@ -785,6 +804,9 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal")
     private static class CommandRender {
 
+        @Parameter(names = { "-i", "--irp" }, description = "IRP string to use as protocol definition")
+        private String irp = null;
+
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
 
@@ -810,7 +832,7 @@ public class IrpTransmogrifier {
         //private String irpMasterConfig = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
 
         @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
-        private List<String> protocols;
+        private List<String> protocols = new ArrayList<>(0);
     }
 
     @Parameters(commandNames = {"version"}, commandDescription = "Report version")

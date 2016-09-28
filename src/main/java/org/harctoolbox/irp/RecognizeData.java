@@ -35,7 +35,7 @@ public class RecognizeData implements Cloneable {
     private final IrSequence irSequence;
     private final GeneralSpec generalSpec;
     private int extentStart;
-    private IrStreamItem lookAheadItem;
+    ////private IrStreamItem lookAheadItem;
     private boolean interleaving;
 
     public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, boolean interleaving) {
@@ -54,7 +54,7 @@ public class RecognizeData implements Cloneable {
         this.state = state;
         this.parameterCollector = parameterCollector;
         this.extentStart = 0;
-        this.lookAheadItem = null;
+        ////this.lookAheadItem = null;
         this.interleaving = interleaving;
     }
 
@@ -259,19 +259,19 @@ public class RecognizeData implements Cloneable {
         extentStart = position + 1;
     }
 
-    /**
-     * @return the lookAheadItem
-     */
-    public IrStreamItem getLookAheadItem() {
-        return lookAheadItem;
-    }
+//    /**
+//     * @return the lookAheadItem
+//     */
+//    public IrStreamItem getLookAheadItem() {
+//        return lookAheadItem;
+//    }
 
-    /**
-     * @param lookAheadItem the lookAheadItem to set
-     */
-    public void setLookAheadItem(IrStreamItem lookAheadItem) {
-        this.lookAheadItem = lookAheadItem;
-    }
+//    /**
+//     * @param lookAheadItem the lookAheadItem to set
+//     */
+//    public void setLookAheadItem(IrStreamItem lookAheadItem) {
+//        this.lookAheadItem = lookAheadItem;
+//    }
 
     /**
      * @return the interleaving
@@ -304,13 +304,14 @@ public class RecognizeData implements Cloneable {
         return irSequence.getDuration(extentStart, endPosition - extentStart);
     }
 
-    boolean allowChopping() {
-        DurationType current = DurationType.newDurationType(isOn());
-        return lookAheadItem != null
-                && (current == lookAheadItem.startingDuratingType(current, false));
+    public boolean allowChopping() {
+        return ! interleaving;
+////        DurationType current = DurationType.newDurationType(isOn());
+////        return lookAheadItem != null
+////                && (current == lookAheadItem.startingDuratingType(current, false));
     }
 
-    boolean allowChopping(double wanted) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+////    boolean allowChopping(double wanted) {
+////        throw new UnsupportedOperationException("Not supported yet.");
+////    }
 }

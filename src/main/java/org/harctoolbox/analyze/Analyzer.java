@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.GeneralSpec;
 import org.harctoolbox.irp.Protocol;
@@ -71,9 +70,13 @@ public class Analyzer extends Cleaner {
         this(irSequence, false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
+    public Analyzer(int[] data) throws OddSequenceLenghtException {
+        this(new IrSequence(data), false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+
     private void createNormedTimings() {
         //List<Integer> timings = cleaner.getTimings();
-        timebase = getTimings().get(0);
+        timebase = getTiming(0);
         normedTimings = new int[timings.size()];
         for (int i = 0; i < timings.size(); i++) {
             normedTimings[i] = Math.round(timings.get(i) / (float) getTimebase());
@@ -95,10 +98,11 @@ public class Analyzer extends Cleaner {
 
     private void createPairs() {
         pairs = new ArrayList<>(16);
-        for (int mark : getDistinctFlashes())
-            for (int space : getDistinctGaps())
-                if (getNumberPairs(mark, space) > 0)
-                    getPairs().add(new Burst(mark, space));
+        getDistinctFlashes().stream().forEach((mark) -> {
+            getDistinctGaps().stream().filter((space) -> (getNumberPairs(mark, space) > 0)).forEach((space) -> {
+                getPairs().add(new Burst(mark, space));
+            });
+        });
     }
 
     /**
@@ -127,31 +131,31 @@ public class Analyzer extends Cleaner {
 //        return (int) Math.round(((double) x)/timebase);
 //    }
 
-    public Protocol processTrivial(AnalyzerParams params) {
-        TrivialDecoder trivialDecoder = new TrivialDecoder(this, params);
-        try {
-            return trivialDecoder.process();
-        } catch (DecodeException ex) {
-            throw new ThisCannotHappenException();
-        }
-    }
-
-    public Protocol processPWM(AnalyzerParams params) throws DecodeException {
-        PwmDecoder pwmDecoder = new PwmDecoder(this, params);
-        return pwmDecoder.process();
-    }
-
-    public Protocol processPWM4(AnalyzerParams params) throws DecodeException {
-//        if (timings.size() < 6)
-//            throw new DecodeException();
-        Pwm4Decoder pwm4Decoder = new Pwm4Decoder(this, params);//, timings.get(0), timings.get(1), timings.get(3), timings.get(4), timings.get(5));
-        return pwm4Decoder.process();
-    }
-
-    public Protocol processBiPhase(AnalyzerParams params) throws DecodeException {
-        BiphaseDecoder biphaseDecoder = new BiphaseDecoder(this, params);
-        return biphaseDecoder.process();
-    }
+//    public Protocol processTrivial(AnalyzerParams params) {
+//        TrivialDecoder trivialDecoder = new TrivialDecoder(this, params);
+//        try {
+//            return trivialDecoder.process();
+//        } catch (DecodeException ex) {
+//            throw new ThisCannotHappenException();
+//        }
+//    }
+//
+//    public Protocol processPWM(AnalyzerParams params) throws DecodeException {
+//        PwmDecoder pwmDecoder = new PwmDecoder(this, params);
+//        return pwmDecoder.process();
+//    }
+//
+//    public Protocol processPWM4(AnalyzerParams params) throws DecodeException {
+////        if (timings.size() < 6)
+////            throw new DecodeException();
+//        Pwm4Decoder pwm4Decoder = new Pwm4Decoder(this, params);//, timings.get(0), timings.get(1), timings.get(3), timings.get(4), timings.get(5));
+//        return pwm4Decoder.process();
+//    }
+//
+//    public Protocol processBiPhase(AnalyzerParams params) throws DecodeException {
+//        BiphaseDecoder biphaseDecoder = new BiphaseDecoder(this, params);
+//        return biphaseDecoder.process();
+//    }
 
     public Protocol searchProtocol(AnalyzerParams params) {
         List<AbstractDecoder> decoders = new ArrayList<>(4);
@@ -170,12 +174,13 @@ public class Analyzer extends Cleaner {
         for (AbstractDecoder decoder : decoders) {
             try {
                 Protocol protocol = decoder.process();
+                logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(), protocol.weight()});
                 if (protocol.weight() < weight) {
                     best = protocol;
                     weight = protocol.weight();
                 }
             } catch (DecodeException ex) {
-                logger.log(Level.FINE, ex.getMessage());
+                logger.log(Level.FINE, "{0}: {1}", new Object[]{decoder.name(), ex.getMessage()});
             }
         }
         return best;

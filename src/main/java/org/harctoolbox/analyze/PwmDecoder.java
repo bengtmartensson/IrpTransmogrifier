@@ -42,7 +42,7 @@ public class PwmDecoder extends AbstractDecoder {
     }
 
     public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
-        this(analyzer, params, analyzer.getTimings().get(0), analyzer.getTimings().get(1));
+        this(analyzer, params, analyzer.getTiming(0), analyzer.getTiming(1));
     }
 
     @Override

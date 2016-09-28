@@ -105,7 +105,7 @@ public abstract class AbstractDecoder {
         this.nameEngine = null;
         this.analyzer = analyzer;
         this.params = params;
-        this.timebase = params.getTimebase() > 0 ? params.getTimebase() : analyzer.getTimings().get(0);
+        this.timebase = params.getTimebase() > 0 ? params.getTimebase() : analyzer.getTiming(0);
         this.bitSpec = new BitSpec();
     }
 
@@ -177,6 +177,10 @@ public abstract class AbstractDecoder {
         bitSpec = mkBitSpec(timebase, params.isInvert());
     }
 
+    public String name() {
+        return getClass().getSimpleName();
+    }
+
     protected static class ParameterData {
 
         private long data;
@@ -202,6 +206,10 @@ public abstract class AbstractDecoder {
             data <<= chunkSize;
             data += amount;
             noBits += chunkSize;
+        }
+
+        public void update(boolean invert) {
+            update(invert ? 1 : 0);
         }
 
         private void fixBitDirection(BitDirection bitDirection) {

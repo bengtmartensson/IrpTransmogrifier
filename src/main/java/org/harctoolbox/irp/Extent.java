@@ -16,7 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -90,7 +90,7 @@ public class Extent extends Duration {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         double physical = recognizeData.getExtentDuration();

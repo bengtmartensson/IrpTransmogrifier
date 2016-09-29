@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -128,7 +128,7 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, Pass pass, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) throws NameConflictException {
         return select(pass).recognize(recognizeData, pass, bitSpecs);
     }
 

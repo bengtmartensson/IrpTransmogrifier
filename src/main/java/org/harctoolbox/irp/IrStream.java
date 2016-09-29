@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -256,7 +255,8 @@ public class IrStream extends BareIrStream {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs) throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
+            throws NameConflictException {
         //IrSignal.Pass actualState = state;
         IrpUtils.entering(logger, "recognize " + pass, this);
         boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
@@ -269,8 +269,8 @@ public class IrStream extends BareIrStream {
         return status;
     }
 
-    private boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            ArrayList<BitSpec> bitSpecs, int repeats) throws NameConflictException {
+    private boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs, int repeats)
+            throws NameConflictException {
         //IrSignal.Pass state = initData.getState();
         //int position = initData.getStart();
         //NameEngine nameEngine = initData.getNameEngine();

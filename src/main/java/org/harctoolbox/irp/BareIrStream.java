@@ -303,8 +303,8 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            ArrayList<BitSpec> bitSpec) throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack)
+            throws NameConflictException {
         IrpUtils.entering(logger, "recognize " + pass, this);
         ////IrStreamItem callersLookAheadItem = recognizeData.getLookAheadItem();
         //IrSignal.Pass state = recognizeData.getState();
@@ -328,7 +328,7 @@ public class BareIrStream extends IrStreamItem {
                 //RecognizeData data;
                 boolean success = false;
                 try {
-                    success = irStreamItem.recognize(recognizeData, pass, bitSpec);
+                    success = irStreamItem.recognize(recognizeData, pass, bitSpecStack);
                 } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }

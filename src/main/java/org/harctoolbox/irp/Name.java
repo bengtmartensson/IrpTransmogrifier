@@ -151,4 +151,9 @@ public class Name extends PrimaryItem implements Floatable {
     public int weight() {
         return WEIGHT;
     }
+
+    @Override
+    public long invert(long rhs) {
+        return rhs;
+    }
 }

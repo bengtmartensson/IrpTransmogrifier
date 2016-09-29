@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
+import java.util.List;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -116,7 +116,7 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet.");
     }

@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -151,10 +152,10 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-            ArrayList<BitSpec> bitSpecs) throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs)
+            throws NameConflictException {
         IrpUtils.entering(logger, "recognize " + pass, this);
-        ArrayList<BitSpec> stack = new ArrayList<>(bitSpecs);
+        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         boolean status = irStream.recognize(recognizeData, pass, stack);
         IrpUtils.exiting(logger, "recognize " + pass, status /*? recognizeData.toString() : ""*/);

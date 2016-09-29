@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -131,7 +131,7 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
             throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
         //NameEngine nameEngine = inData.getNameEngine().clone();
 

@@ -18,13 +18,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 /**
  *
  */
 public abstract class PrimaryItem extends IrpObject implements Numerical {
 
-    public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) throws IrpSyntaxException {
+    public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) {
         ParseTree child = ctx.getChild(0);
         return (child instanceof IrpParser.NameContext)
                 ? new Name((IrpParser.NameContext) child)
@@ -49,5 +50,7 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
     protected PrimaryItem() {
     }
 
-    public abstract Name toName() throws IrpSyntaxException;
+    public abstract Name toName();
+
+    public abstract long invert(long rhs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
 }

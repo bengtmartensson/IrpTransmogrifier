@@ -28,6 +28,8 @@ public class ProtocolNGTest {
     private final Protocol xmp;
     private final Protocol amino;
     private final Protocol denonK;
+    private final Protocol arctechsimplified;
+    private final Protocol arctech;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -37,6 +39,8 @@ public class ProtocolNGTest {
         xmp = new Protocol("{38k,136,msb}<210u,-760u> ( <0:1|0:1,-1|0:1,-2|0:1,-3|0:1,-4|0:1,-5|0:1,-6|0:1,-7|0:1,-8|0:1,-9|0:1,-10|0:1,-11|0:1,-12|0:1,-13|0:1,-14|0:1,-15>   (T=0,      (S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,FF:16,210u,-80.4m,T=8)+   ) ) { C1=-(S+S::4+15+OEM+OEM::4+D+D::4),   C2=-(S+S::4+T+FF+FF::4+FF::8+FF::12) } {FF=F}[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]");
         amino = new Protocol("{37.3k,268,msb}<-1,1|1,-1>(T=1,(7,-6,3,D:4,1:1,T:1,1:2,0:8,F:8,15:4,C:4,-79m,T=0)+){C =(D:4+4*T+9+F:4+F:4:4+15)&15} [D:0..15,F:0..255]");
         denonK = new Protocol("{37k,432}<1,-1|1,-3>(8,-4,84:8,50:8,0:4,D:4,S:4,F:12,((D*16)^S^(F*16)^(F:8:4)):8,1,-173)* [D:0..15,S:0..15,F:0..4095]");
+        arctechsimplified = new Protocol("{0k,388}<1,-3|3,-1>(<0:2|2:2>(D:4,S:4),40:7,F:1,0:1,-10.2m)*[D:0..15,S:0..15,F:0..1]");
+        arctech = new Protocol("{0k,388}<1,-3|3,-1> (<0:2|2:2>((D-1):4,(S-1):4),40:7,F:1,0:1,-10.2m)*[D:1..16,S:1..16,F:0..1]");
     }
 
 
@@ -166,6 +170,7 @@ public class ProtocolNGTest {
         System.out.println("toIrSignalAmino");
         try {
             IrSignal aminoD12F34 = Pronto.parse("0000 006F 001C 001C 0046 003C 0028 000A 000A 0014 000A 000A 0014 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 0B83 0046 003C 0028 000A 000A 0014 000A 000A 0014 0014 000A 000A 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 000A 000A 0B83");
+                                               //0000 006F 001C 001C 0046 003C 0028 000A 000A 0014 000A 000A 0014 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 0B83 0046 003C 0028 000A 000A 0014 000A 000A 0014 0014 000A 000A 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 000A 000A 0B83
             IrSignal result = amino.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(aminoD12F34));
@@ -173,6 +178,19 @@ public class ProtocolNGTest {
             fail();
         }
     }
+
+//    @Test
+//    public void testRecognizeAmino() {
+//        System.out.println("recognizeAmino");
+//        try {
+//            IrSignal aminoD12F34 = Pronto.parse("0000 006F 001C 001C 0046 003C 0028 000A 000A 0014 000A 000A 0014 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 0B83 0046 003C 0028 000A 000A 0014 000A 000A 0014 0014 000A 000A 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 000A 000A 0B83");
+//            NameEngine nameEngine = new NameEngine("{D=12,F=34}");
+//            NameEngine recognizeData = amino.recognize(aminoD12F34);
+//            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+//        } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
+//            fail();
+//        }
+//    }
 
     @Test
     public void testToIrSignalArctech() {
@@ -308,18 +326,45 @@ public class ProtocolNGTest {
         }
     }
 
-    /*@Test
+    @Test
     public void testRecognizeRc6() {
         System.out.println("recognizeRc6");
         try {
-            Protocol adnotam = new Protocol("{35.7k,895,msb}<1,-1|-1,1>(1,-2,1,D:6,F:6,^114m)*[D:0..63,F:0..63]");
             IrSignal irSignal = Pronto.parse("0000 0073 0000 0013 0060 0020 0010 0020 0010 0010 0010 0010 0030 0030 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0020 0010 0BCD");
             NameEngine nameEngine = new NameEngine("{D=31,F=30,T=1}");
             NameEngine recognizeData = rc6.recognize(irSignal);
             assertTrue(nameEngine.numbericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnassignedException ex) {
+        } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }
-    }*/
+    }
+
+    @Test
+    public void testRecognizeArcTechSimplified() {
+        System.out.println("recognizeArcTechSimplified");
+        try {
+            IrSignal irSignal = Pronto.parse("0100 000A 0000 0019 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 1267");
+            NameEngine nameEngine = new NameEngine("{D=11,S=4,F=0}");
+            NameEngine recognizeData = arctechsimplified.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    @Test
+    public void testRecognizeArcTech() {
+        System.out.println("recognizeArcTech");
+        try {
+            IrSignal irSignal = Pronto.parse("0100 000A 0000 0019 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 1267");
+            NameEngine nameEngine = new NameEngine("{D=12,S=5,F=0}");
+            NameEngine recognizeData = arctech.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
 }

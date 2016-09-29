@@ -115,4 +115,9 @@ public class Number extends PrimaryItem {
     public int weight() {
         return WEIGHT;
     }
+
+    @Override
+    public long invert(long rhs) {
+        return rhs;
+    }
 }

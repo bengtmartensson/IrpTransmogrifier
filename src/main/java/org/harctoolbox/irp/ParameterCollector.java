@@ -39,6 +39,7 @@ public class ParameterCollector implements Cloneable {
     public void add(String name, long value, long bitmask) throws NameConflictException {
         Parameter parameter = new Parameter(value, bitmask);
         Parameter oldParameter = map.get(name);
+        logger.log(Level.FINER, "Assigning {0} = {1}&{2}", new Object[]{name, value, bitmask});
         if (oldParameter != null) {
             if (!oldParameter.isConsistent(parameter)) {
                 logger.log(Level.FINE, "Name conflict: {0}", name);

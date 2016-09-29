@@ -107,10 +107,76 @@ public class Expression extends PrimaryItem /* ??? */ {
     }
 
     @Override
-    public Name toName() throws IrpSyntaxException {
-//        PrimaryItem pi = newPrimaryItem(parseTree.primary_item());
-//        return pi.toName();
-        return null;
+    public long invert(long rhs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+
+        int noChilden = parseTree.getChildCount();
+        long solution;
+        String operator;
+
+        switch (noChilden) {
+            case 1:
+                return rhs;
+            case 2:
+                operator = parseTree.getChild(0).getText();
+                solution = operator.equals("~") ? ~rhs
+                        : operator.equals("-") ? -rhs
+                        : throwNewRuntimeException("Not implemented");
+                break;
+            case 3:
+                // Solve the equation
+                // exp1 op exp2 = rhs
+                // for op: "+", "-", "*", and "/"
+                operator = parseTree.getChild(1).getText();
+                Expression operand = new Expression(parseTree.expression(1));
+                long exp2 = operand.toNumber();
+                solution
+                        = operator.equals("+") ? rhs - exp2
+                        : operator.equals("-") ? rhs + exp2
+                        : operator.equals("*") ? rhs / exp2
+                        : operator.equals("/") ? rhs * exp2
+                        : throwNewRuntimeException("Not implemented");
+                break;
+            default:
+                throw new UnsupportedOperationException("Not implemented");
+        }
+
+        Expression exp1 = new Expression(parseTree.expression(0)); // contains exactly one name
+        return exp1.invert(solution);
+    }
+
+    public int numberNames() {
+        if (parseTree.primary_item() != null)
+            return newPrimaryItem(parseTree.primary_item()).toName() != null ? 1 : 0;
+
+        int number = 0;
+        for (IrpParser.ExpressionContext expression : parseTree.expression()) {
+            number += new Expression(expression).numberNames();
+        }
+
+        return number;
+    }
+
+    @Override
+    public Name toName() {
+        if (parseTree.primary_item() != null)
+            return newPrimaryItem(parseTree.primary_item()).toName();
+
+        int number = numberNames();
+        return (number == 1 && parseTree.expression(0) != null)
+                ? new Expression(parseTree.expression(0)).toName()
+                : null;
+//
+//            parseTree.primary_item()
+//        if (parseTree.children.size() == 3) {
+//            ParseTree x = parseTree.children.get(0);
+//            IrpParser.ExpressionContext exp = (IrpParser.ExpressionContext) x;
+//            ParseTree y = parseTree.children.get(1);
+//            ParseTree z = parseTree.children.get(2);
+//
+//        //PrimaryItem pi = newPrimaryItem(parseTree.primary_item());
+//        }
+//        //return pi.toName();
+//        return null;
     }
 
     public long toNumber() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {

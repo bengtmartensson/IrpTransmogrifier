@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -211,11 +212,11 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, IrpSyntaxException, UnassignedException {
         IrpUtils.entering(logger, "recognize", this);
         // first the simplest case: bitSpecs
-        BitSpec bitSpec = bitSpecs.get(0);
+        BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
         //int irSequencePostion = recognizeData.getPosition();
         int chunkSize = bitSpec.getChunkSize();
         int noChunks = (int) width.toNumber(/*recognizeData.getNameEngine()*/null)/chunkSize;
@@ -233,7 +234,10 @@ public class FiniteBitField extends BitField {
                 ////if (chunk < noChunks - 1)
                 ////    inData.setLookAheadItem(null);
                 //inData.setPosition(irSequencePostion);
-                boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, null);
+                List<BitSpec> poppedStack = new ArrayList<>(bitSpecStack);
+                poppedStack.remove(poppedStack.size()-1);
+
+                boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, poppedStack);
                 if (success)
                     break;
             }
@@ -256,9 +260,10 @@ public class FiniteBitField extends BitField {
         long bitmask = IrCoreUtils.ones(noChunks*chunkSize) << (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
         payload &= bitmask;
         Name name = data.toName();
-        if (name != null)
-            recognizeData.getParameterCollector().add(name.toString(), payload, bitmask);
-        else {
+        if (name != null) {
+            logger.log(Level.FINE, "Assignment: {0} = {1}", new Object[]{data.toIrpString(), payload});
+            recognizeData.getParameterCollector().add(name.toString(), data.invert(payload), bitmask);
+        } else {
             try {
                 long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
                 if (expected != payload)

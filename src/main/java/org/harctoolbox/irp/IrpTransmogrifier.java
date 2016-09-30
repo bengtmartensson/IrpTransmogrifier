@@ -89,41 +89,60 @@ public class IrpTransmogrifier {
         return evaluateProtocols(list, sort, regexp);
     }
 
+    private static final String separator = "\t";
+
     private static void list(CommandList commandList) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
-        List<String> list = evaluateProtocols(commandList.protocols, commandList.regexp, commandList.sort);
+        List<String> list = evaluateProtocols(commandList.protocols, commandList.sort, commandList.regexp);
 
         for (String proto : list) {
             if (!irpDatabase.isKnown(proto))
                 throw new UnknownProtocolException(proto);
 
+            out.print(proto);
+
             if (commandList.irp)
-                out.println(irpDatabase.getIrp(proto));
+                out.print(separator + irpDatabase.getIrp(proto));
+
             if (commandList.documentation)
-                out.println(irpDatabase.getDocumentation(proto));
+                out.print(separator + irpDatabase.getDocumentation(proto));
+
             if (commandList.stringTree) {
                 Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
-                out.println(protocol.toStringTree());
+                out.print(separator + protocol.toStringTree());
             }
+
             if (commandList.is) {
                 Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
-                out.println(protocol.toIrpString());
+                out.print(separator + protocol.toIrpString());
             }
+
             if (commandList.gui) {
                 IrpParser parser = new ParserDriver(irpDatabase.getIrp(proto)).getParser();
                 //parser = new ParserDriver(irpDatabase.getIrp(proto)).getParser();
                 Protocol protocol = new Protocol(parser.protocol());
                 showTreeViewer(parser, protocol.getParseTree(), "Parse tree for " + proto);
             }
-            if (commandList.parse)
+
+            if (commandList.weight) {
                 try {
                     Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
-                    out.println(protocol);
-                    out.println("Parsing succeeded");
+                    int weight = protocol.weight();
+                    out.print(separator + "Weight: " + weight);
                 } catch (IrpSyntaxException ex) {
                     logger.log(Level.WARNING, "Unparsable protocol {0}", proto);
                 }
+            }
+
+            if (commandList.parse)
+                try {
+                    Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
+                    out.print(separator + protocol);
+                    out.println(separator + "Parsing succeeded");
+                } catch (IrpSyntaxException ex) {
+                    logger.log(Level.WARNING, "Unparsable protocol {0}", proto);
+                }
+
             if (commandList.classify) {
-                out.print(proto);
                 Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
                 out.print("\t");
                 out.print((int) protocol.getFrequency());
@@ -139,18 +158,9 @@ public class IrpTransmogrifier {
                 out.print(protocol.startsWithDuration() ? "SWD\t" : "\t");
                 out.print(protocol.hasVariation() ? "variation\t" : "\t");
                 out.print(protocol.isRPlus() ? "R+" : "");
+            }
 
-                out.println();
-            }
-            if (commandList.weight) {
-                try {
-                    Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
-                    int weight = protocol.weight();
-                    out.println("Weight: " + weight);
-                } catch (IrpSyntaxException ex) {
-                    logger.log(Level.WARNING, "Unparsable protocol {0}", proto);
-                }
-            }
+            out.println();
         }
     }
 

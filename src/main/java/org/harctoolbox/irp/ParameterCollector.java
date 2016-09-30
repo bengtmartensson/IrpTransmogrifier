@@ -46,6 +46,10 @@ public class ParameterCollector implements Cloneable {
         map = new LinkedHashMap<>(10);
     }
 
+    public boolean needsFinalParameterCheck() {
+        return map.values().stream().anyMatch((parameter) -> (parameter.isNeedsFinalChecking()));
+    }
+
     public void add(String name, long value, long bitmask) throws NameConflictException, UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         Parameter parameter = new Parameter(value, bitmask);
         Parameter oldParameter = map.get(name);
@@ -153,6 +157,8 @@ public class ParameterCollector implements Cloneable {
          */
         long bitmask;
 
+        private boolean needsFinalChecking;
+
         Parameter(long value) {
             this(value, ALLBITS, null);
         }
@@ -169,13 +175,20 @@ public class ParameterCollector implements Cloneable {
             this.value = value;
             this.bitmask = bitmask;
             this.expression = expression;
+            this.needsFinalChecking = false;
         }
 
-        boolean isConsistent(Parameter parameter, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        boolean isConsistent(Parameter parameter, NameEngine nameEngine) throws IrpSyntaxException, IncompatibleArgumentException {
             if (expression != null) {
-                long expr = expression.toNumber(nameEngine);
-                if (((expr ^ parameter.value) & parameter.bitmask) != 0L)
+                long expr;
+                try {
+                    expr = expression.toNumber(nameEngine);
+                    if (((expr ^ parameter.value) & parameter.bitmask) != 0L)
                     return false;
+                } catch (UnassignedException ex) {
+                    needsFinalChecking = true;
+                }
+
             }
             return ((value ^ parameter.value) & bitmask & parameter.bitmask) == 0L;
         }
@@ -203,6 +216,13 @@ public class ParameterCollector implements Cloneable {
             } catch (CloneNotSupportedException ex) {
                 throw new InternalError(ex);
             }
+        }
+
+        /**
+         * @return the needsFinalChecking
+         */
+        public boolean isNeedsFinalChecking() {
+            return needsFinalChecking;
         }
     }
 }

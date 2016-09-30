@@ -542,7 +542,7 @@ public class Expression extends PrimaryItem /* ??? */ {
         if (parseTree == null)
             return null;
 
-        return (parseTree.children.size() == 1)
+        return (parseTree.children.size() == 1 && (parseTree.children.get(0) instanceof IrpParser.Primary_itemContext))
                 ? new Number(((IrpParser.Primary_itemContext) parseTree.children.get(0)).number()).toIrpString(radix)
                 : toIrpString();
     }

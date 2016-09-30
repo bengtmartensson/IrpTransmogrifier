@@ -314,4 +314,11 @@ public class RecognizeData implements Cloneable {
 ////    boolean allowChopping(double wanted) {
 ////        throw new UnsupportedOperationException("Not supported yet.");
 ////    }
+
+    /**
+     * @return the needsFinalParameterCheck
+     */
+    public boolean needsFinalParameterCheck() {
+        return parameterCollector.needsFinalParameterCheck();
+    }
 }

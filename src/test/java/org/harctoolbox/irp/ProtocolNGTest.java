@@ -30,6 +30,8 @@ public class ProtocolNGTest {
     private final Protocol denonK;
     private final Protocol arctechsimplified;
     private final Protocol arctech;
+    private final Protocol apple;
+    private final Protocol anthem;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -41,6 +43,8 @@ public class ProtocolNGTest {
         denonK = new Protocol("{37k,432}<1,-1|1,-3>(8,-4,84:8,50:8,0:4,D:4,S:4,F:12,((D*16)^S^(F*16)^(F:8:4)):8,1,-173)* [D:0..15,S:0..15,F:0..4095]");
         arctechsimplified = new Protocol("{0k,388}<1,-3|3,-1>(<0:2|2:2>(D:4,S:4),40:7,F:1,0:1,-10.2m)*[D:0..15,S:0..15,F:0..1]");
         arctech = new Protocol("{0k,388}<1,-3|3,-1> (<0:2|2:2>((D-1):4,(S-1):4),40:7,F:1,0:1,-10.2m)*[D:1..16,S:1..16,F:0..1]");
+        apple = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,C:1,F:7,PairID:8,1,^108m,(16,-4,1,^108m)*){C=1-(#F+#PairID)%2,S=135}[D:0..255=238,F:0..127,PairID:0..255]");
+        anthem = new Protocol("{38.0k,605}<1,-1|1,-3>((8000u,-4000u,D:8,S:8,F:8,C:8,1,-25m)3, -75m)* { C=~(D+S+F+255):8} [D:0..255,S:0..255,F:0..255]");
     }
 
 
@@ -161,6 +165,25 @@ public class ProtocolNGTest {
             System.out.println(result);
             assertTrue(result.approximatelyEquals(nokia32D12S56F34T0X78));
         } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+            fail();
+        }
+    }
+
+    @Test(enabled = false)
+    public void testRecognizeNokia32() {
+        System.out.println("recognizeNokia32");
+        try {
+            IrSignal signal = Pronto.parse("0000 0073 0000 0012"
+                    + " 000F 000A"
+                    + " 0006 000A 0006 000A 0006 001B 0006 000A"
+                    + " 0006 000A 0006 001B 0006 0015 0006 000A"
+                    + " 0006 001B 0006 000A 0006 0015 0006 0010"
+                    + " 0006 000A 0006 0015 0006 000A 0006 0015"
+                    + " 0006 0C90");
+            NameEngine nameEngine = new NameEngine("{D=12,S=56,F=34,T=1,X=73}");
+            NameEngine recognizeData = nokia32.recognize(signal);
+            assertEquals(recognizeData, nameEngine);
+        } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             fail();
         }
     }
@@ -376,6 +399,78 @@ public class ProtocolNGTest {
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
+        }
+    }
+
+    @Test
+    public void testRecognizeApple() {
+        System.out.println("recognizeApple");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 006C 0022 0002"
+                    + " 015B 00AD"
+                    + " 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016"
+                    + " 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041"
+                    + " 0016 0041 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016"
+                    + " 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016"
+                    + " 0016 0622"
+                    + " 015B 0057 0016 0E6C");
+            NameEngine nameEngine = new NameEngine("{D=12,F=34,PairID=123}");
+            NameEngine recognizeData = apple.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    @Test
+    public void testRecognizeAppleErr() {
+        System.out.println("recognizeAppleErr");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 006C 0022 0002"
+                    + " 015B 00AD"
+                    + " 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016"
+                    + " 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041"
+    /* ---> */      + " 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016"
+                    + " 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016"
+                    + " 0016 0622"
+                    + " 015B 0057 0016 0E6C");
+            NameEngine recognizeData = apple.recognize(irSignal);
+            assertTrue(recognizeData == null);
+        } catch (IncompatibleArgumentException | ArithmeticException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    @Test(enabled = false)
+    public void testRecognizeAnthem() {
+        try {
+            System.out.println("recognizeAnthem");
+            IrSignal irSignal = Pronto.parse("0000 006D 0000 0066"
+                    + " 0130 0098"
+                    + " 0017 0017 0017 0017 0017 0045 0017 0045 0017 0017 0017 0017 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0017 0017 0017 0017 0045 0017 0045 0017 0045 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0045 0017 0017 0017 0017 0017 0017 0017 0045 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0045 0017 0017 0017 0045 0017 0045 0017 0017 0017 0017 0017 0045"
+                    + " 0017 03B6"
+                    + " 0130 0098"
+                    + " 0017 0017 0017 0017 0017 0045 0017 0045 0017 0017 0017 0017 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0017 0017 0017 0017 0045 0017 0045 0017 0045 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0045 0017 0017 0017 0017 0017 0017 0017 0045 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0045 0017 0017 0017 0045 0017 0045 0017 0017 0017 0017 0017 0045"
+                    + " 0017 03B6"
+                    + " 0130 0098"
+                    + " 0017 0017 0017 0017 0017 0045 0017 0045 0017 0017 0017 0017 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0017 0017 0017 0017 0045 0017 0045 0017 0045 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0045 0017 0017 0017 0017 0017 0017 0017 0045 0017 0017 0017 0017"
+                    + " 0017 0017 0017 0045 0017 0017 0017 0045 0017 0045 0017 0017 0017 0017 0017 0045"
+                    + " 0017 0ED8");
+            NameEngine nameEngine = new NameEngine("{D=12,F=34,S=56}");
+            NameEngine recognizeData = anthem.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

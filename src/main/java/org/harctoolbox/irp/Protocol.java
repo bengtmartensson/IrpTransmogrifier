@@ -497,15 +497,17 @@ public class Protocol extends IrpObject {
         if (!status)
             return false;
 
-//        try {
-//            recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
-//        } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
-//            logger.warning(ex.getMessage());
-//            return false;
-//        } catch (UnassignedException ex) {
-//            logger.log(Level.WARNING, "Equation solving not implemented: {0}", ex.getMessage());
-//            return false;
-//        }
+        if (recognizeData.needsFinalParameterCheck())
+            try {
+                recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
+            } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
+                logger.warning(ex.getMessage());
+                return false;
+            } catch (UnassignedException ex) {
+                logger.log(Level.SEVERE, "Equation solving not implemented: {0}", ex.getMessage());
+                return false;
+            }
+
         try {
             recognizeData.getParameterCollector().addToNameEngine(nameEngine);
         } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) { // FIXME

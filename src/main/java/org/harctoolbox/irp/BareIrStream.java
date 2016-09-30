@@ -330,7 +330,7 @@ public class BareIrStream extends IrStreamItem {
                 try {
                     success = irStreamItem.recognize(recognizeData, pass, bitSpecStack);
                 } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, ex.getMessage());
                 }
                 if (!success) {
                     IrpUtils.exiting(logger, "recognize", "null");

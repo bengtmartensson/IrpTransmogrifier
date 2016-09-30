@@ -28,20 +28,30 @@ public class ParameterCollector implements Cloneable {
 
     private final static Logger logger = Logger.getLogger(ParameterCollector.class.getName());
     private final static long ALLBITS = -1L;
+    private final static long NOBITS = 0L;
     public final static long INVALID = -1L;
 
     private HashMap<String, Parameter> map;
+
+    public ParameterCollector(NameEngine nameEngine) {
+        this();
+
+        for (Map.Entry<String, Expression> kvp : nameEngine) {
+            Parameter parameter = new Parameter(kvp.getValue());
+            map.put(kvp.getKey(), parameter);
+        }
+    }
 
     public ParameterCollector() {
         map = new LinkedHashMap<>(10);
     }
 
-    public void add(String name, long value, long bitmask) throws NameConflictException {
+    public void add(String name, long value, long bitmask) throws NameConflictException, UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         Parameter parameter = new Parameter(value, bitmask);
         Parameter oldParameter = map.get(name);
         logger.log(Level.FINER, "Assigning {0} = {1}&{2}", new Object[]{name, value, bitmask});
         if (oldParameter != null) {
-            if (!oldParameter.isConsistent(parameter)) {
+            if (!oldParameter.isConsistent(parameter, toNameEngine())) {
                 logger.log(Level.FINE, "Name conflict: {0}", name);
                 throw new NameConflictException(name);
             }
@@ -51,8 +61,14 @@ public class ParameterCollector implements Cloneable {
         }
     }
 
-    public void add(String name, long value) throws NameConflictException {
+    public void add(String name, long value) throws NameConflictException, UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         add(name, value, ALLBITS);
+    }
+
+    public void overwrite(String name, long value) {
+        Parameter parameter = new Parameter(value, ALLBITS);
+        logger.log(Level.FINER, "Overwriting {0} = {1}", new Object[]{name, value});
+        map.put(name, parameter);
     }
 
     public long get(String name) {
@@ -127,6 +143,9 @@ public class ParameterCollector implements Cloneable {
     }
 
     private static class Parameter implements Cloneable {
+
+        private Expression expression;
+
         long value;
 
         /**
@@ -135,15 +154,29 @@ public class ParameterCollector implements Cloneable {
         long bitmask;
 
         Parameter(long value) {
-            this(value, ALLBITS);
+            this(value, ALLBITS, null);
+        }
+
+        Parameter(Expression expression) {
+            this(0L, NOBITS, expression);
         }
 
         Parameter(long value, long bitmask) {
-            this.value = value;
-            this.bitmask = bitmask;
+            this(value, bitmask, null);
         }
 
-        boolean isConsistent(Parameter parameter) {
+        Parameter(long value, long bitmask, Expression expression) {
+            this.value = value;
+            this.bitmask = bitmask;
+            this.expression = expression;
+        }
+
+        boolean isConsistent(Parameter parameter, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+            if (expression != null) {
+                long expr = expression.toNumber(nameEngine);
+                if (((expr ^ parameter.value) & parameter.bitmask) != 0L)
+                    return false;
+            }
             return ((value ^ parameter.value) & bitmask & parameter.bitmask) == 0L;
         }
 
@@ -158,7 +191,8 @@ public class ParameterCollector implements Cloneable {
 
         @Override
         public String toString() {
-            return Long.toString(value) + "&" + Long.toBinaryString(bitmask);
+            return Long.toString(value) + "&" + Long.toBinaryString(bitmask)
+                    + (expression != null ? ( " " + expression.toIrpString()) : "");
         }
 
         @Override

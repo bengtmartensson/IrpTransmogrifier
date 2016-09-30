@@ -5,8 +5,12 @@
  */
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -33,10 +37,11 @@ public class ParameterCollectorNGTest {
 
     public ParameterCollectorNGTest() {
         try {
+            //NameEngine nameEngine = new NameEngine("{X=Y+Z}");
             parameterCollector = new ParameterCollector();
             parameterCollector.add("answer", 42);
             parameterCollector.add("F", 5, IrpUtils.ones(5));
-        } catch (NameConflictException ex) {
+        } catch (NameConflictException | UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
             fail();
         }
     }
@@ -62,11 +67,15 @@ public class ParameterCollectorNGTest {
             assertEquals(parameterCollector.get("F"), 1024|5);
         } catch (NameConflictException ex) {
             fail();
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             parameterCollector.add("F", 0L, 1L);
             fail();
         } catch (NameConflictException ex) {
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -80,6 +89,8 @@ public class ParameterCollectorNGTest {
             parameterCollector.add("sheldon", 73);
         } catch (NameConflictException ex) {
             fail();
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         assertEquals(parameterCollector.get("sheldon"), 73);
         assertEquals(parameterCollector.get("penny"), ParameterCollector.INVALID);
@@ -87,6 +98,8 @@ public class ParameterCollectorNGTest {
             parameterCollector.add("sheldon", 43);
             fail();
         } catch (NameConflictException ex) {
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -114,6 +127,8 @@ public class ParameterCollectorNGTest {
             result.add("F", 2048L, 2048L);
         } catch (NameConflictException ex) {
             fail();
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         assertEquals(parameterCollector.toString(), str);
         assertFalse(result.toString().equals(str));
@@ -126,5 +141,110 @@ public class ParameterCollectorNGTest {
     public void testToString() { // FIXME
         System.out.println("toString");
         assertEquals(parameterCollector.toString(), "{answer=42&1111111111111111111111111111111111111111111111111111111111111111;F=1029&10000011111;sheldon=73&1111111111111111111111111111111111111111111111111111111111111111}");
+    }
+
+    /**
+     * Test of overwrite method, of class ParameterCollector.
+     */
+    @Test
+    public void testOverwrite() {
+        System.out.println("overwrite");
+
+        String name = "junk";
+        long value = 123L;
+        long anotherValue = 456L;
+        ParameterCollector instance = parameterCollector.clone();
+        try {
+            instance.add(name, value);
+        } catch (NameConflictException | UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            instance.add(name, anotherValue);
+            fail();
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NameConflictException ex) {
+            // should go here
+        }
+        assertEquals(instance.get(name), value);
+        instance.overwrite(name, anotherValue);
+        assertEquals(instance.get(name), anotherValue);
+    }
+
+    /**
+     * Test of checkConsistencyWith method, of class ParameterCollector.
+     * @throws org.harctoolbox.irp.UnassignedException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     */
+    @Test
+    public void testCheckConsistencyWith() throws UnassignedException, IncompatibleArgumentException, IrpSyntaxException {
+        System.out.println("checkConsistencyWith");
+        NameEngine nameEngine;
+        NameEngine nameEngine1;
+
+        nameEngine = new NameEngine("{answer=42}");
+        nameEngine1 = new NameEngine("{answer=43}");
+
+        try {
+            parameterCollector.checkConsistencyWith(nameEngine);
+        } catch (NameConflictException ex) {
+            fail();
+        }
+        try {
+            parameterCollector.checkConsistencyWith(nameEngine1);
+            fail();
+        } catch (NameConflictException ex) {
+
+        }
+    }
+
+//    /**
+//     * Test of toNameEngine method, of class ParameterCollector.
+//     */
+//    @Test
+//    public void testToNameEngine() {
+//        try {
+//            System.out.println("toNameEngine");
+//            NameEngine expResult = new NameEngine("{answer=42, F=5}");
+//            //ParameterCollector instance = new ParameterCollector(expResult);
+//            NameEngine result = parameterCollector.toNameEngine();
+//            assertEquals(result, expResult);
+//        } catch (IrpSyntaxException ex) {
+//            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
+
+//    /**
+//     * Test of toHashMap method, of class ParameterCollector.
+//     */
+//    @Test
+//    public void testToHashMap() {
+//        System.out.println("toHashMap");
+//        //ParameterCollector instance = new ParameterCollector();
+//        HashMap<String, Long> expResult = new HashMap<>(2);
+//        expResult.put("answer", 42L);
+//        expResult.put("F", 5L);
+//        HashMap result = parameterCollector.toHashMap();
+//        assertEquals(result, expResult);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
+
+    /**
+     * Test of addToNameEngine method, of class ParameterCollector.
+     */
+    @Test
+    public void testAddToNameEngine() {
+        try {
+            System.out.println("addToNameEngine");
+            NameEngine nameEngine = new NameEngine("{xxx=123}");
+            parameterCollector.addToNameEngine(nameEngine);
+            assertTrue(nameEngine.get("answer").toNumber() == 42L);
+        } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
     }
 }

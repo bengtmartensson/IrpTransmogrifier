@@ -538,18 +538,14 @@ public class Expression extends PrimaryItem /* ??? */ {
      * @param radix
      * @return
      */
-    String toIrpString(int radix) {
+    public String toIrpString(int radix) {
         if (parseTree == null)
             return null;
 
-        if (parseTree.children.size() != 1)
-            throw new UnsupportedOperationException("Unsupported case");
-
-        IrpParser.Primary_itemContext pi = (IrpParser.Primary_itemContext) parseTree.children.get(0);
-        return new Number(pi.number()).toIrpString(radix);
+        return (parseTree.children.size() == 1)
+                ? new Number(((IrpParser.Primary_itemContext) parseTree.children.get(0)).number()).toIrpString(radix)
+                : toIrpString();
     }
-
-    // NOTE: this class can be invoked from the command line by IrpTransmogrifier.main().
 
     @Override
     public int weight() {

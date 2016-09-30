@@ -108,12 +108,12 @@ public class IrpUtilsNGTest {
         assertEquals(IrpUtils.ones(0), 0L);
         assertEquals(IrpUtils.ones(64), -1L);
         try {
-            result = IrpUtils.ones(-1);
+            IrpUtils.ones(-1);
             fail();
         } catch (IllegalArgumentException ex) {
         }
         try {
-            result = IrpUtils.ones(65);
+            IrpUtils.ones(65);
             fail();
         } catch (IllegalArgumentException ex) {
         }

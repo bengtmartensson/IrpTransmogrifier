@@ -492,20 +492,20 @@ public class Protocol extends IrpObject {
 
     private boolean process(NameEngine nameEngine, IrSequence irSequence, IrSignal.Pass pass) {
         //RecognizeData inData = new RecognizeData(irSequence);
-        RecognizeData recognizeData = new RecognizeData(generalSpec, irSequence, interleavingOk());
+        RecognizeData recognizeData = new RecognizeData(generalSpec, irSequence, interleavingOk(), nameEngine);
         boolean status = recognize(recognizeData, pass);
         if (!status)
             return false;
 
-        try {
-            recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
-        } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
-            logger.warning(ex.getMessage());
-            return false;
-        } catch (UnassignedException ex) {
-            logger.log(Level.WARNING, "Equation solving not implemented: {0}", ex.getMessage());
-            return false;
-        }
+//        try {
+//            recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
+//        } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
+//            logger.warning(ex.getMessage());
+//            return false;
+//        } catch (UnassignedException ex) {
+//            logger.log(Level.WARNING, "Equation solving not implemented: {0}", ex.getMessage());
+//            return false;
+//        }
         try {
             recognizeData.getParameterCollector().addToNameEngine(nameEngine);
         } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) { // FIXME

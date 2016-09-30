@@ -223,8 +223,9 @@ public class FiniteBitField extends BitField {
         long payload = 0L;
         //RecognizeData result = null;
         //int consumedDurations = 0;
-        RecognizeData inData = null;
+
         for (int chunk = 0; chunk < noChunks; chunk++) {
+            RecognizeData inData = null;
             int bareIrStreamNo;
 
             //new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
@@ -241,6 +242,7 @@ public class FiniteBitField extends BitField {
                 if (success)
                     break;
             }
+            assert(inData != null);
 
             if (bareIrStreamNo == bitSpec.size()) {
                 inData.setSuccess(false);
@@ -261,7 +263,7 @@ public class FiniteBitField extends BitField {
         payload &= bitmask;
         Name name = data.toName();
         if (name != null) {
-            logger.log(Level.FINE, "Assignment: {0} = {1}", new Object[]{data.toIrpString(), payload});
+            logger.log(Level.FINE, "FiniteBitfield Assignment: {0} = {1}", new Object[]{data.toIrpString(), payload});
             recognizeData.getParameterCollector().add(name.toString(), data.invert(payload), bitmask);
         } else {
             try {

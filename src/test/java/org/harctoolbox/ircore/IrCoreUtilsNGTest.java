@@ -94,7 +94,7 @@ public class IrCoreUtilsNGTest {
      * Test of l1Norm method, of class IrCoreUtils.
      */
     @Test
-    public void testL1Norm_DoubleArr() {
+    public void testL1Norm_DoubleObjectArr() {
         System.out.println("l1Norm");
         Double[] sequence = new Double[] { Double.valueOf(1f), Double.valueOf(2f), Double.valueOf(3f), Double.valueOf(4f) };
         double expResult = 10.0;

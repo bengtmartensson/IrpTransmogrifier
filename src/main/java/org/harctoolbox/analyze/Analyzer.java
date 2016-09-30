@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,8 +53,7 @@ public class Analyzer extends Cleaner {
 
     public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder, int absoluteTolerance, double relativeTolerance) throws OddSequenceLenghtException {
         super(irSequence, absoluteTolerance, relativeTolerance);
-        repeatfinderData = invokeRepeatFinder ? new RepeatFinder(toIrSequence()).getRepeatFinderData()
-                : new RepeatFinder.RepeatFinderData(irSequence.getLength());
+        repeatfinderData = getRepeatFinderData(invokeRepeatFinder, irSequence.getLength());
         createNormedTimings();
         createPairs();
     }
@@ -72,6 +72,11 @@ public class Analyzer extends Cleaner {
 
     public Analyzer(int[] data) throws OddSequenceLenghtException {
         this(new IrSequence(data), false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+
+    private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int length) throws OddSequenceLenghtException {
+        return invokeRepeatFinder ? new RepeatFinder(toIrSequence()).getRepeatFinderData()
+                : new RepeatFinder.RepeatFinderData(length);
     }
 
     private void createNormedTimings() {
@@ -100,7 +105,7 @@ public class Analyzer extends Cleaner {
         pairs = new ArrayList<>(16);
         getDistinctFlashes().stream().forEach((mark) -> {
             getDistinctGaps().stream().filter((space) -> (getNumberPairs(mark, space) > 0)).forEach((space) -> {
-                getPairs().add(new Burst(mark, space));
+                pairs.add(new Burst(mark, space));
             });
         });
     }
@@ -116,7 +121,7 @@ public class Analyzer extends Cleaner {
      * @return the pairs
      */
     public List<Burst> getPairs() {
-        return pairs;
+        return Collections.unmodifiableList(pairs);
     }
 
     public String getName(Burst pair) {

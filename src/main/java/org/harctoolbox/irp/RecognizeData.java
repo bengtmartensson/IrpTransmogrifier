@@ -38,8 +38,8 @@ public class RecognizeData implements Cloneable {
     ////private IrStreamItem lookAheadItem;
     private boolean interleaving;
 
-    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, boolean interleaving) {
-        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(), interleaving);
+    public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, boolean interleaving, NameEngine nameEngine) {
+        this(generalSpec, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(nameEngine), interleaving);
     }
 
     public RecognizeData(GeneralSpec generalSpec, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state, ParameterCollector parameterCollector, boolean interleaving) {

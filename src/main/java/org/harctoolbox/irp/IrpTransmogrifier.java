@@ -509,6 +509,7 @@ public class IrpTransmogrifier {
             if (command == null)
                 usage(IrpUtils.exitUsageError);
 
+            assert(command != null);
             if (!command.equals("writeconfig"))
                 irpDatabase.expand(); // FIXME
 
@@ -685,8 +686,8 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"code"}, commandDescription = "Generate code")
     private static class CommandCode {
 
-        @Parameter(names = { "--decode" }, description = "Generate code for decoding, otherwise for rendering. Target dependent.")
-        private boolean decode = false;
+//        @Parameter(names = { "--decode" }, description = "Generate code for decoding, otherwise for rendering. Target dependent.")
+//        private boolean decode = false;
 
         @Parameter(names = { "--documentation"}, description = "List documentation")
         private boolean documentation = false;
@@ -703,8 +704,8 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-s", "--sort"}, description = "Sort the output")
         private boolean sort = false;
 
-        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
-        private String target = null;
+//        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
+//        private String target = null;
 
         @Parameter(names = { "--xml"}, description = "List XML")
         private boolean xml = false;

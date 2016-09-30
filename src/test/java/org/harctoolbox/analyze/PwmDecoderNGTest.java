@@ -70,11 +70,12 @@ public class PwmDecoderNGTest {
     @Test
     public void testProcess() {
         System.out.println("process");
-        Protocol result = null;
+        Protocol result;
         try {
             result = pwm.process();
         } catch (DecodeException ex) {
             fail();
+            return;
         }
         System.out.println(result.toIrpString(16, false));
         try {

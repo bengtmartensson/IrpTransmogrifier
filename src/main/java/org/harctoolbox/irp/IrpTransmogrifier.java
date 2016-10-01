@@ -55,6 +55,7 @@ public class IrpTransmogrifier {
     private static CommandLineArgs commandLineArgs = new CommandLineArgs();
     private static PrintStream out;
     private static IrpDatabase irpDatabase;
+    private static final String separator = "\t";
 
     private static void usage() {
         StringBuilder str = new StringBuilder(1000);
@@ -89,7 +90,6 @@ public class IrpTransmogrifier {
         return evaluateProtocols(list, sort, regexp);
     }
 
-    private static final String separator = "\t";
 
     private static void list(CommandList commandList) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         List<String> list = evaluateProtocols(commandList.protocols, commandList.sort, commandList.regexp);
@@ -311,7 +311,7 @@ public class IrpTransmogrifier {
     }
 
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
-        List<String> list = evaluateProtocols(commandRecognize.protocol, true, true);
+        List<String> list = evaluateProtocols(commandRecognize.protocol, commandRecognize.sort, commandRecognize.regexp);
         if (list.isEmpty())
             throw new UsageException("No protocol given or matched.");
 
@@ -805,11 +805,11 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-r", "--random"}, description = "Generate a random parameter signal to test")
         private boolean random = false;
 
-//        @Parameter(names = { "--regex", "--regexp"}, description = "Interpret protocol arguments as regular expressions")
-//        private boolean regexp = false;
+        @Parameter(names = { "--regex", "--regexp"}, description = "Interpret protocol arguments as regular expressions")
+        private boolean regexp = false;
 
-//        @Parameter(names = { "-s", "--sort"}, description = "Sort the protocols")
-//        private boolean sort = false;
+        @Parameter(names = { "-s", "--sort"}, description = "Sort the protocols")
+        private boolean sort = false;
 
 //        @Parameter(names = { "-t", "--test"}, description = "Generate a test signal and try to decode it")
 //        private boolean test = false;

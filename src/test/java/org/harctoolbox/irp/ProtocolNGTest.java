@@ -33,6 +33,7 @@ public class ProtocolNGTest {
     private final Protocol apple;
     private final Protocol anthem;
     private final Protocol directv;
+    private final Protocol rc6M56;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -47,6 +48,7 @@ public class ProtocolNGTest {
         apple = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,C:1,F:7,PairID:8,1,^108m,(16,-4,1,^108m)*){C=1-(#F+#PairID)%2,S=135}[D:0..255=238,F:0..127,PairID:0..255]");
         anthem = new Protocol("{38.0k,605}<1,-1|1,-3>((8000u,-4000u,D:8,S:8,F:8,C:8,1,-25m)3, -75m)* { C=~(D+S+F+255):8} [D:0..255,S:0..255,F:0..255]");
         directv = new Protocol("{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]");
+        rc6M56 = new Protocol("{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,M:3,<-2,2|2,-2>(T:1),C:56,-131.0m)*[M:0..7,T@:0..1=0,C:0..72057594037927935]");
     }
 
 
@@ -496,6 +498,21 @@ public class ProtocolNGTest {
                     + " 0017 0ED8");
             NameEngine nameEngine = new NameEngine("{D=12,F=34,S=56}");
             NameEngine recognizeData = anthem.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = true)
+    public void testRecognizeRc6M56() {
+        try {
+            System.out.println("recognizeRc6M56");
+            IrSignal irSignal = Pronto.parse("0000 0073 0000 0039"
+                    + " 0060 0020 0010 0010"
+                    + " 0010 0020 0020 0010 0020 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0020 0010 0010 0010 0010 0020 0010 0010 0020 0010 0010 0010 0010 0010 126C");
+            NameEngine nameEngine = new NameEngine("{M=5, C=806354200, T=1}");
+            NameEngine recognizeData = rc6M56.recognize(irSignal);
             assertTrue(nameEngine.numbericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);

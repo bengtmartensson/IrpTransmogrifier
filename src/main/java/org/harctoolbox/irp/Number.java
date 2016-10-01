@@ -95,6 +95,7 @@ public class Number extends PrimaryItem {
         return Long.toString(data);
     }
 
+    @Override
     public String toIrpString(int radix) {
         return Long.toString(data, radix);
     }

@@ -252,14 +252,14 @@ public class FiniteBitField extends BitField {
             recognizeData.setHasConsumed(inData.getHasConsumed());
             //irSequencePostion = inData.getPosition();
             //consumedDurations += inData.getLength();
-            payload = (payload << chunkSize) | bareIrStreamNo;
+            payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
         }
         if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
             payload = IrCoreUtils.reverse(payload, noChunks);
         if (this.complement)
             payload = ~payload;
         payload <<= (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
-        long bitmask = IrCoreUtils.ones(noChunks*chunkSize) << (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        long bitmask = IrCoreUtils.ones((long) noChunks*chunkSize) << (long) chop.toNumber(/*recognizeData.getNameEngine()*/null);
         payload &= bitmask;
         Name name = data.toName();
         if (name != null) {

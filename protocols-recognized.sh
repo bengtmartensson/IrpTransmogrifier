@@ -1,6 +1,6 @@
 #!/bin/sh
 
-RUN="target/irptransmogrifier.sh recog -r -t -p"
+RUN="target/irptransmogrifier.sh recog -r -p"
 
 ${RUN} 48-nec1
 ${RUN} 48-nec2
@@ -77,15 +77,15 @@ ${RUN} pid-0083
 ${RUN} pioneer
 ${RUN} proton
 ${RUN} rc5
-#${RUN} rc5-7f
+${RUN} rc5-7f
 ${RUN} rc5-7f-57
-#${RUN} rc5x
+# error for D=28 S=106 F=15 T=0 ${RUN} rc5x
 #${RUN} rc6
 #${RUN} rc6-6-20
-#${RUN} 'rca(old)'
+${RUN} 'rca(old)'
 ${RUN} rca
 ${RUN} rca-38
-#${RUN} 'rca-38(old)'
+${RUN} 'rca-38(old)'
 ${RUN} recs80
 ${RUN} recs80-0045
 ${RUN} recs80-0068
@@ -93,7 +93,7 @@ ${RUN} recs80-0090
 ${RUN} replay
 ${RUN} revox
 ${RUN} samsung20
-#${RUN} samsung36
+#the -68u gap is a bitch when recognizing. ${RUN} samsung36
 ${RUN} sampo
 ${RUN} scatl-6
 ${RUN} sharp
@@ -101,7 +101,7 @@ ${RUN} sharp{1}
 ${RUN} sharp{2}
 ${RUN} sharpdvd
 ${RUN} sim2
-#${RUN} solidtek16
+# EVIL ${RUN} solidtek16
 ${RUN} somfy
 ${RUN} sony8
 ${RUN} sony12
@@ -117,7 +117,7 @@ ${RUN} thomson
 ${RUN} thomson7
 ${RUN} tivo
 ${RUN} velleman
-#${RUN} velodyne
+# XMP ${RUN} velodyne
 ${RUN} viewstar
 ${RUN} x10
 ${RUN} x10.n
@@ -129,16 +129,16 @@ ${RUN} x10.n
 #${RUN} xmpff
 #${RUN} xmpff-1
 #${RUN} xmpff-2
-#${RUN} zaptor-36
-#${RUN} zaptor-56
-#${RUN} zenith
+# WORK ${RUN} zaptor-36
+# WORK ${RUN} zaptor-56
+# FUNNY ${RUN} zenith
 ${RUN} canon
 ${RUN} arctech
 ${RUN} arctech-38
-#${RUN} rs200
-#${RUN} gwts
-#${RUN} rc6-m-56
-#${RUN} entone
+# ??? ${RUN} rs200
+# TODO ${RUN} gwts
+${RUN} rc6-m-56
+# Requires heavy equation solving ${RUN} entone
 ${RUN} pioneer-mix
 # Solving systems of equations.... #${RUN} fujitsu_aircon
 ${RUN} roku-official

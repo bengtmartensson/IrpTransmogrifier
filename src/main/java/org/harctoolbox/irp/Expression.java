@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -532,7 +533,7 @@ public class Expression extends PrimaryItem /* ??? */ {
                         + new Expression(parseTree.expression(2)).toIrpString(radix)
                         + ")";
             default:
-                throw new UnsupportedOperationException("Unknown case in Expression.toElement");
+                throw new ThisCannotHappenException("Unknown case in Expression.toElement");
         }
         return null;
     }

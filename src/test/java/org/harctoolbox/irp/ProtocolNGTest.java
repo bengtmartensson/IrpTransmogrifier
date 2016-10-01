@@ -32,6 +32,7 @@ public class ProtocolNGTest {
     private final Protocol arctech;
     private final Protocol apple;
     private final Protocol anthem;
+    private final Protocol directv;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -45,6 +46,7 @@ public class ProtocolNGTest {
         arctech = new Protocol("{0k,388}<1,-3|3,-1> (<0:2|2:2>((D-1):4,(S-1):4),40:7,F:1,0:1,-10.2m)*[D:1..16,S:1..16,F:0..1]");
         apple = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,C:1,F:7,PairID:8,1,^108m,(16,-4,1,^108m)*){C=1-(#F+#PairID)%2,S=135}[D:0..255=238,F:0..127,PairID:0..255]");
         anthem = new Protocol("{38.0k,605}<1,-1|1,-3>((8000u,-4000u,D:8,S:8,F:8,C:8,1,-25m)3, -75m)* { C=~(D+S+F+255):8} [D:0..255,S:0..255,F:0..255]");
+        directv = new Protocol("{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]");
     }
 
 
@@ -250,6 +252,32 @@ public class ProtocolNGTest {
             assertTrue(result.approximatelyEquals(xmpD12S56F34));
         } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
             fail();
+        }
+    }
+
+    @Test(enabled = true)
+    public void testToIrSignalDirectv() {
+        System.out.println("toIrSignalDirectv");
+        try {
+            IrSignal directvD12F34 = Pronto.parse("0000 006D 000A 000A 00E4 002E 002E 002E 0017 0017 0017 0017 002E 0017 0017 0017 002E 0017 002E 002E 0017 0017 0017 0474 0072 002E 002E 002E 0017 0017 0017 0017 002E 0017 0017 0017 002E 0017 002E 002E 0017 0017 0017 0474");
+            IrSignal result = directv.toIrSignal(new NameEngine("{D=12,F=34}"));
+            System.out.println(result);
+            assertTrue(result.approximatelyEquals(directvD12F34));
+        } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+            fail();
+        }
+    }
+
+    @Test(enabled = true)
+    public void testRecognizeDirecttv() {
+        System.out.println("recognizeDirectv");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 006D 000A 000A 00E4 002E 002E 002E 0017 0017 0017 0017 002E 0017 0017 0017 002E 0017 002E 002E 0017 0017 0017 0474 0072 002E 002E 002E 0017 0017 0017 0017 002E 0017 0017 0017 002E 0017 002E 002E 0017 0017 0017 0474");
+            NameEngine nameEngine = new NameEngine("{D=12,F=34}");
+            NameEngine recognizeData = directv.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

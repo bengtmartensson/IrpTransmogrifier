@@ -481,7 +481,7 @@ public class Protocol extends IrpObject {
         if (success)
             success = process(nameEngine, irSignal.getEndingSequence(), IrSignal.Pass.ending);
         if (!success) {
-            IrpUtils.entering(logger, "recognize", "null");
+            IrpUtils.exiting(logger, "recognize", "fail");
             return null;
         }
 
@@ -524,10 +524,10 @@ public class Protocol extends IrpObject {
             success = bitspecIrstream.recognize(recognizeData, pass, new ArrayList<>(0));
         } catch (NameConflictException | ArithmeticException ex) {
             //recognizeData = null;
-            logger.log(Level.INFO, null, ex);
+            logger.log(Level.INFO, ex.getMessage());
         }
         //IrpUtils.exiting(logger, "recognize", recognizeData != null ? recognizeData.getParameterCollector().toString() : "null");
-        IrpUtils.exiting(logger, "recognize " + pass, success);
+        IrpUtils.exiting(logger, "recognize " + pass, success ? "pass" : "fail");
         return success;
     }
 

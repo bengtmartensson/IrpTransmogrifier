@@ -278,7 +278,7 @@ public class IrpUtils {
     }
 
     public static void entering(Logger logger, Level level, String member, Object arg) {
-        logger.logp(level, logger.getName(), member, String.format("->(%0$s)", arg.toString()));
+        logger.logp(level, logger.getName(), member, String.format("-> %0$s", arg.toString()));
     }
 
     public static void entering(Logger logger, String member, Object arg) {
@@ -289,12 +289,24 @@ public class IrpUtils {
         entering(logger, member, "->");
     }
 
-    public static void exiting(Logger logger, Level level, String member, Object arg) {
-        logger.logp(level, logger.getName(), member, String.format("<-%0$s", arg.toString()));
+    public static void exiting(Logger logger, Level level, String member, String message) {
+        logger.logp(level, logger.getName(), member, message);
     }
-    
+
+    public static void exiting(Logger logger, Level level, String member, Object arg) {
+        logger.logp(level, logger.getName(), member, String.format("<- %0$s", arg.toString()));
+    }
+
     public static void exiting(Logger logger, String member, Object arg) {
         exiting(logger, enteringExitingLevel, member, arg);
+    }
+
+    public static void exiting(Logger logger, String member, String format, Object... args) {
+        exiting(logger, enteringExitingLevel, member, String.format(format, args));
+    }
+
+    public static void exiting(Logger logger, Level level, String member, String format, Object... args) {
+        exiting(logger, level, member, String.format(format, args));
     }
 
     public static void exiting(Logger logger, String member) {

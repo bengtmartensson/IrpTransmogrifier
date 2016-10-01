@@ -158,7 +158,7 @@ public class BitspecIrstream extends IrStreamItem {
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         boolean status = irStream.recognize(recognizeData, pass, stack);
-        IrpUtils.exiting(logger, "recognize " + pass, status /*? recognizeData.toString() : ""*/);
+        IrpUtils.exiting(logger, "recognize " + pass, status ? "pass" : "fail"/*? recognizeData.toString() : ""*/);
         return status;
     }
 

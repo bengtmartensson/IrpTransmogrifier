@@ -265,7 +265,7 @@ public class IrStream extends BareIrStream {
         if (evaluateTheRepeat)
             recognizeData.setState(IrSignal.Pass.repeat);
         boolean status = recognize(recognizeData, pass, bitSpecs, repetitions);
-        IrpUtils.exiting(logger, "recognize " + pass, status /*? recognizeData.toString() : "null"*/);
+        IrpUtils.exiting(logger, "recognize " + pass, status ? "pass" : "fail"/*? recognizeData.toString() : "null"*/);
         return status;
     }
 

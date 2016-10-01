@@ -5,12 +5,12 @@ RUN="target/irptransmogrifier.sh recog -r -t -p"
 ${RUN} 48-nec1
 ${RUN} 48-nec2
 ${RUN} adnotam
-#${RUN} airasync
+# Silly ... ${RUN} airasync
 ${RUN} aiwa
 ${RUN} akai
 ${RUN} amino-56
 ${RUN} amino
-#${RUN} anthem
+# Repetitions causing non-interlacing ${RUN} anthem
 ${RUN} apple
 ${RUN} archer
 ${RUN} barco
@@ -22,7 +22,7 @@ ${RUN} canalsatld
 ${RUN} denon
 ${RUN} denon-k
 ${RUN} dgtec
-#${RUN} directv
+${RUN} directv
 ${RUN} dishplayer
 ${RUN} dish_network
 ${RUN} elan
@@ -34,10 +34,10 @@ ${RUN} fujitsu-56
 ${RUN} g.i.cable
 ${RUN} g.i.4dtv
 ${RUN} 'gi rg'
-#${RUN} grundig16
-#${RUN} grundig16-30
+# hard... ${RUN} grundig16
+# hard... ${RUN} grundig16-30
 ${RUN} gxb
-#${RUN} 'humax 4phase'
+# hard... ${RUN} 'humax 4phase'
 ${RUN} iodatan
 ${RUN} jerrold
 ${RUN} jvc
@@ -50,7 +50,7 @@ ${RUN} konka
 ${RUN} logitech
 ${RUN} lumagen
 ${RUN} matsui
-#${RUN} mce
+# todo ${RUN} mce
 ${RUN} metz19
 ${RUN} mitsubishi
 ${RUN} mitsubishi-k
@@ -62,14 +62,14 @@ ${RUN} necx1
 ${RUN} necx2
 ${RUN} nokia
 ${RUN} nokia12
-#${RUN} nokia32
+# todo ${RUN} nokia32
 ${RUN} nrc17
 ${RUN} ortekmce
 ${RUN} pacemss
 ${RUN} panasonic
 ${RUN} panasonic2
 ${RUN} panasonic_old
-#${RUN} pctv
+# non-interlacing ${RUN} pctv
 ${RUN} pid-0001
 ${RUN} pid-0003
 ${RUN} pid-0004
@@ -140,5 +140,5 @@ ${RUN} arctech-38
 #${RUN} rc6-m-56
 #${RUN} entone
 ${RUN} pioneer-mix
-#${RUN} fujitsu_aircon
+# Solving systems of equations.... #${RUN} fujitsu_aircon
 ${RUN} roku-official

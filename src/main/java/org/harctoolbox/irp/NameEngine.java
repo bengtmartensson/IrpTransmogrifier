@@ -347,9 +347,12 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     public String toIrpString(int radix) {
         StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
-        map.entrySet().stream().forEach((kvp) -> {
+//        map.entrySet().stream().forEach((kvp) -> {
+//            stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + kvp.getValue().toIrpString(radix));
+//        });
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + kvp.getValue().toIrpString(radix));
-        });
+        }
         return stringJoiner.toString();
     }
 

@@ -238,9 +238,10 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         }
         double actual = recognizeData.get();
         double wanted = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-        boolean result = recognize(recognizeData, actual, wanted);
-        IrpUtils.exiting(logger, Level.FINEST, "recognize", result);
-        return result;
+        boolean success = recognize(recognizeData, actual, wanted);
+        IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", wanted, actual);
+        //IrpUtils.exiting(logger, Level.FINEST, "recognize", result);
+        return success;
     }
 
     protected boolean recognize(RecognizeData recognizeData, double actual, double wanted) {

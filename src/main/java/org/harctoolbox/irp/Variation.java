@@ -47,7 +47,7 @@ public class Variation extends IrStreamItem {
         parseTree = variation;
         intro = new BareIrStream(variation.alternative(0).bare_irstream());
         repeat = new BareIrStream(variation.alternative(1).bare_irstream());
-        ending = variation.alternative().size() > 2 ? new BareIrStream(variation.alternative(2).bare_irstream()) : null;
+        ending = variation.alternative().size() > 2 ? new BareIrStream(variation.alternative(2).bare_irstream()) : new BareIrStream();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Variation extends IrStreamItem {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         BareIrStream actual = select(pass);
-        return actual != null ? actual.evaluate(state, pass, nameEngine, generalSpec) : null;
+        return actual.isEmpty(nameEngine) ? null : actual.evaluate(state, pass, nameEngine, generalSpec);
 //        return pass == Pass.intro ? intro.evaluate(state, pass, nameEngine, generalSpec)
 //                : pass == Pass.repeat ? repeat.evaluate(state, pass, nameEngine, generalSpec)
 //                : ending != null ? ending.evaluate(state, pass, nameEngine, generalSpec)
@@ -79,7 +79,8 @@ public class Variation extends IrStreamItem {
 
     @Override
     public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
-        return pass;
+        BareIrStream irStream = select(pass);
+        return irStream.isEmpty() ? Pass.finish : pass;
     }
 
 

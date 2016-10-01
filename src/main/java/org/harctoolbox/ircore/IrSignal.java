@@ -709,12 +709,13 @@ public class IrSignal implements Cloneable {
     public final String ccfString() throws OddSequenceLenghtException {
         return Pronto.toPrintString(this);
     }
-    
+
     public enum Pass {
         intro,
         repeat,
         ending,
-        cancel
+        finish
+        //cancel
     }
 
 }

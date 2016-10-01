@@ -86,6 +86,18 @@ public abstract class IrStreamItem extends IrpObject {
 //
 //    }
 
+    /**
+     *
+     * @param state
+     * @param pass
+     * @param nameEngine
+     * @param generalSpec
+     * @return EvaluatedIrStream or null if termination requested.
+     * @throws IncompatibleArgumentException
+     * @throws ArithmeticException
+     * @throws UnassignedException
+     * @throws IrpSyntaxException
+     */
     abstract EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
 

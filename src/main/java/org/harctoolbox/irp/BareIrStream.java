@@ -103,8 +103,9 @@ public class BareIrStream extends IrStreamItem {
         //this(toList(ctx, env), env);
     }
 
-    private BareIrStream() {
-        irStreamItems = null;
+    public BareIrStream() {
+        irStreamItems = new ArrayList<>(0);
+        parseTree = null;
     }
 
     public BareIrStream(List<IrStreamItem> list) {
@@ -145,6 +146,10 @@ public class BareIrStream extends IrStreamItem {
 
     @Override
     public boolean isEmpty(NameEngine nameEngine) {
+        return isEmpty();
+    }
+
+    public boolean isEmpty() {
         return irStreamItems.isEmpty();
     }
 
@@ -333,7 +338,7 @@ public class BareIrStream extends IrStreamItem {
                     logger.log(Level.SEVERE, ex.getMessage());
                 }
                 if (!success) {
-                    IrpUtils.exiting(logger, "recognize", "null");
+                    IrpUtils.exiting(logger, "recognize", "fail");
                     return false;
                 }
 
@@ -343,13 +348,16 @@ public class BareIrStream extends IrStreamItem {
             IrSignal.Pass next = irStreamItem.stateWhenExiting(recognizeData.getState());
             if (next != null)
                 recognizeData.setState(next);
+
+            if (next == IrSignal.Pass.finish)
+                break;
         }
         //result.setState(actualState);
         //RecognizeData recognizeData = recognizeData.clone();
         //recognizeData.setLength(position - recognizeData.getStart());
         //recognizeData.setNameEngine(nameEngine);
         //new RecognizeData(initialData.getIrSequence(), initialData.getStart(), position - initialData.getStart(), state, nameEngine);
-        IrpUtils.exiting(logger, "recognize " + pass, true);
+        IrpUtils.exiting(logger, "recognize " + pass, "pass");
         return true;
     }
 
@@ -364,7 +372,7 @@ public class BareIrStream extends IrStreamItem {
 
     @Override
     public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
-        return irStreamItems.get(0).startingDuratingType(last, gapFlashBitSpecs);
+        return irStreamItems.isEmpty() ? DurationType.none : irStreamItems.get(0).startingDuratingType(last, gapFlashBitSpecs);
     }
 
     @Override

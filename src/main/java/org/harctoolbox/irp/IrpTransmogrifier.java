@@ -301,23 +301,29 @@ public class IrpTransmogrifier {
         out.println(protocol.toIrpString(radix, usePeriods) + " \tweight = " + protocol.weight());
     }
 
+    private static int numberTrue(Boolean... bool) {
+        int result = 0;
+        for (boolean b : bool) {
+            if (b)
+                result++;
+        }
+        return result;
+    }
+
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
-        List<String> list = evaluateProtocols(commandRecognize.protocol, commandRecognize.sort, commandRecognize.regexp);
+        List<String> list = evaluateProtocols(commandRecognize.protocol, true, true);
         if (list.isEmpty())
-            logger.log(Level.WARNING, "No protocol given.");
+            throw new UsageException("No protocol given or matched.");
 
         for (String protocolName : list) {
-            if (commandRecognize.test != (commandRecognize.args == null))
-                throw new UsageException("Must either use --test or have parameters, but not both.");
-
-            if (commandRecognize.test && commandRecognize.random == (!commandRecognize.nameEngine.isEmpty()))
-                throw new UsageException("If using --test, must either use --random or --nameengine, but not both.");
+            if (numberTrue(commandRecognize.random, !commandRecognize.nameEngine.isEmpty(), !commandRecognize.args.isEmpty()) != 1)
+                throw new UsageException("Must either use --random or --nameengine, or have arguments.");
 
             NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
             NameEngine testNameEngine = null;
             IrSignal irSignal;
             NameEngine nameEngine;
-            if (commandRecognize.test) {
+            if (commandRecognize.args.isEmpty()) {
                 testNameEngine = commandRecognize.random ? protocol.randomParameters() : commandRecognize.nameEngine;
                 irSignal = protocol.toIrSignal(testNameEngine.clone());
             } else {
@@ -326,7 +332,7 @@ public class IrpTransmogrifier {
 
             nameEngine = protocol.recognize(irSignal);
 
-            if (commandRecognize.test) {
+            if (commandRecognize.args.isEmpty()) {
                 out.print(protocolName + "\t");
                 out.print(testNameEngine + "\t");
                 out.println((nameEngine != null && nameEngine.numbericallyEquals(testNameEngine)) ? "success" : "fail");
@@ -759,7 +765,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
         private boolean gui = false;
 
-        @Parameter(names = { "--irp"}, description = "List IRP")
+        @Parameter(names = { "-i", "--irp"}, description = "List IRP")
         private boolean irp = false;
 
         @Parameter(names = { "--is"}, description = "test toIrpString")
@@ -784,7 +790,7 @@ public class IrpTransmogrifier {
         private boolean weight = false;
 
         @Parameter(description = "List of protocols (default all)")
-        private List<String> protocols;
+        private List<String> protocols = new ArrayList<>(8);
     }
 
     @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
@@ -799,17 +805,17 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-r", "--random"}, description = "Generate a random parameter signal to test")
         private boolean random = false;
 
-        @Parameter(names = { "--regex", "--regexp"}, description = "Interpret arguments as regular expressions")
-        private boolean regexp = false;
+//        @Parameter(names = { "--regex", "--regexp"}, description = "Interpret protocol arguments as regular expressions")
+//        private boolean regexp = false;
 
-        @Parameter(names = { "-s", "--sort"}, description = "Sort the protocols")
-        private boolean sort = false;
+//        @Parameter(names = { "-s", "--sort"}, description = "Sort the protocols")
+//        private boolean sort = false;
 
-        @Parameter(names = { "-t", "--test"}, description = "Generate a test signal and try to decode it")
-        private boolean test = false;
+//        @Parameter(names = { "-t", "--test"}, description = "Generate a test signal and try to decode it")
+//        private boolean test = false;
 
         @Parameter(description = "durations, or pronto hex")
-        private List<String> args;
+        private List<String> args = new ArrayList<>(16);
     }
 
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal")

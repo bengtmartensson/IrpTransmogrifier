@@ -96,9 +96,9 @@ public class Extent extends Duration {
         double physical = recognizeData.getExtentDuration();
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
         recognizeData.markExtentStart();
-        boolean result = recognize(recognizeData, physical, theoretical);
-        IrpUtils.exiting(logger, Level.FINEST, "recognize", result);
-        return result;
+        boolean success = recognize(recognizeData, physical, theoretical);
+        IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", theoretical, physical);
+        return success;
     }
 
 

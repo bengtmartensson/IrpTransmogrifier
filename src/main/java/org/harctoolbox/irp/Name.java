@@ -116,6 +116,11 @@ public class Name extends PrimaryItem implements Floatable {
     }
 
     @Override
+    public String toIrpString(int radix) {
+        return toIrpString();
+    }
+
+    @Override
     public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         if (nameEngine == null)
             throw new UnassignedException(name);

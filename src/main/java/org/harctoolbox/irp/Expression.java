@@ -492,6 +492,11 @@ public class Expression extends PrimaryItem /* ??? */ {
 
     @Override
     public String toIrpString() {
+        return toIrpString(10);
+    }
+
+    @Override
+    public String toIrpString(int radix) {
         if (parseTree == null)
             return null;
 
@@ -501,7 +506,7 @@ public class Expression extends PrimaryItem /* ??? */ {
 
                 try {
                     if (child instanceof IrpParser.Primary_itemContext)
-                        return newPrimaryItem((IrpParser.Primary_itemContext) child).toIrpString();
+                        return newPrimaryItem((IrpParser.Primary_itemContext) child).toIrpString(radix);
                     else if (child instanceof IrpParser.BitfieldContext)
                         return BitField.newBitField((IrpParser.BitfieldContext) child).toIrpString();
                     else
@@ -516,35 +521,20 @@ public class Expression extends PrimaryItem /* ??? */ {
 
             case 3:
                 return "("
-                        + new Expression(parseTree.expression(0)).toIrpString()
+                        + new Expression(parseTree.expression(0)).toIrpString(radix)
                         + parseTree.children.get(1).getText()
-                        + new Expression(parseTree.expression(1)).toIrpString()
+                        + new Expression(parseTree.expression(1)).toIrpString(radix)
                         + ")";
             case 5:
                 return "("
-                        + new Expression(parseTree.expression(0)).toIrpString() + "?"
-                        + new Expression(parseTree.expression(1)).toIrpString() + ":"
-                        + new Expression(parseTree.expression(2)).toIrpString()
+                        + new Expression(parseTree.expression(0)).toIrpString(radix) + "?"
+                        + new Expression(parseTree.expression(1)).toIrpString(radix) + ":"
+                        + new Expression(parseTree.expression(2)).toIrpString(radix)
                         + ")";
             default:
                 throw new UnsupportedOperationException("Unknown case in Expression.toElement");
         }
         return null;
-    }
-
-    /**
-     * Formats the expression with prescribed radix.
-     * Handles only the simple case of the expression being a number.
-     * @param radix
-     * @return
-     */
-    public String toIrpString(int radix) {
-        if (parseTree == null)
-            return null;
-
-        return (parseTree.children.size() == 1 && (parseTree.children.get(0) instanceof IrpParser.Primary_itemContext))
-                ? new Number(((IrpParser.Primary_itemContext) parseTree.children.get(0)).number()).toIrpString(radix)
-                : toIrpString();
     }
 
     @Override

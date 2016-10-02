@@ -5,7 +5,6 @@ RUN="target/irptransmogrifier.sh recog -r -p"
 ${RUN} 48-nec1
 ${RUN} 48-nec2
 ${RUN} adnotam
-# Silly ... ${RUN} airasync
 ${RUN} aiwa
 ${RUN} akai
 ${RUN} amino-56
@@ -62,14 +61,14 @@ ${RUN} necx1
 ${RUN} necx2
 ${RUN} nokia
 ${RUN} nokia12
-# todo ${RUN} nokia32
+# chinksize does not divide... ${RUN} nokia32
 ${RUN} nrc17
 ${RUN} ortekmce
 ${RUN} pacemss
 ${RUN} panasonic
 ${RUN} panasonic2
 ${RUN} panasonic_old
-# non-interlacing ${RUN} pctv
+${RUN} pctv
 ${RUN} pid-0001
 ${RUN} pid-0003
 ${RUN} pid-0004
@@ -135,8 +134,8 @@ ${RUN} x10.n
 ${RUN} canon
 ${RUN} arctech
 ${RUN} arctech-38
-# ??? ${RUN} rs200
-# TODO ${RUN} gwts
+${RUN} rs200
+${RUN} gwts
 ${RUN} rc6-m-56
 # Requires heavy equation solving ${RUN} entone
 ${RUN} pioneer-mix

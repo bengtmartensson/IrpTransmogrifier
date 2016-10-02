@@ -464,7 +464,7 @@ public class IrpDatabase {
                 Element e = (Element) node;
                 switch (e.getLocalName()) {
                     case irpName:
-                        map.put(irpName, e.getTextContent());
+                        map.put(irpName, e.getTextContent().replaceAll("\\s+", ""));
                         break;
                     case documentationName:
                         map.put(documentationName, e.getTextContent());

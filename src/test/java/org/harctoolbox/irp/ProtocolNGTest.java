@@ -38,6 +38,8 @@ public class ProtocolNGTest {
     private final Protocol rc6M56;
     private final Protocol mce;
     private final Protocol rc5x;
+    private final Protocol rs200;
+    private final Protocol solidtek16;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -56,6 +58,9 @@ public class ProtocolNGTest {
         //mce = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,OEM2:8,T:1,D:7,F:8,^107m)*,T=1-T) {OEM1=128,OEM2=S}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
         mce = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T) {OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
         rc5x = new Protocol("{36k,msb,889}<1,-1|-1,1>((1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T) [D:0..31,S:0..127,F:0..63,T@:0..1=0]");
+        rs200 = new Protocol("{35.7k,msb}<50p,-120p|21p,-120p>( 25:6,(H4-1):2,(H3-1):2,(H2-1):2,(H1-1):2,P:1,(D-1):3,F:2,0:2,sum:4,-1160p)*"
+                + "{P=~(#(D-1)+#F):1, sum=9+((H4-1)*4+(H3-1)) + ((H2-1)*4+(H1-1)) + (P*8+(D-1)) + F*4} [H1:1..4, H2:1..4, H3:1..4, H4:1..4, D:1..6, F:0..2]");
+        solidtek16 = new Protocol("{38k}<-624,468|468,-624>(S=0,(1820,-590,0:1,D:4,F:7,S:1,C:4,1:1,-143m,S=1)3) {C= F:4:0 + F:3:4 + 8*S } [D:0..15, F:0..127]");
     }
 
     @BeforeMethod
@@ -545,6 +550,32 @@ public class ProtocolNGTest {
             IrSignal irSignal = Pronto.parse("0000 0073 0000 000F 0040 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 00C0 0040 0040 0040 0040 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0AA8");
             NameEngine nameEngine = new NameEngine("{D=28, S=106, F=15, T=0}");
             NameEngine recognizeData = rc5x.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = true)
+    public void testRecognizeRs200() {
+        try {
+            System.out.println("recognizeRs200");
+            IrSignal irSignal = Pronto.parse("0000 0074 0000 001A 0032 0078 0015 0078 0015 0078 0032 0078 0032 0078 0015 0078 0015 0078 0015 0078 0015 0078 0032 0078 0032 0078 0015 0078 0032 0078 0032 0078 0015 0078 0032 0078 0015 0078 0032 0078 0015 0078 0032 0078 0032 0078 0032 0078 0015 0078 0015 0078 0032 0078 0015 0500");
+            NameEngine nameEngine = new NameEngine("{D=3, F=2, H1=1, H2=2, H3=3, H4=4}");
+            NameEngine recognizeData = rs200.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = false)
+    public void testRecognizeSolidtek16() {
+        try {
+            System.out.println("recognizeSolidtek16");
+            IrSignal irSignal = Pronto.parse("0000 006D 002E 0000 0045 002E 0012 0018 0012 0018 0024 0018 0012 0018 0012 0018 0012 0018 0012 002F 0024 002F 0012 0018 0012 0018 0012 0018 0012 0018 0012 0018 0024 0018 0012 1552 0045 002E 0012 0018 0012 0018 0024 0018 0012 0018 0012 0018 0012 0018 0012 002F 0024 002F 0012 0018 0024 002F 0012 0018 0012 0018 0012 0018 0024 1552 0045 002E 0012 0018 0012 0018 0024 0018 0012 0018 0012 0018 0012 0018 0012 002F 0024 002F 0012 0018 0024 002F 0012 0018 0012 0018 0012 0018 0024 1552");
+            NameEngine nameEngine = new NameEngine("{D=12, F=23}");
+            NameEngine recognizeData = solidtek16.recognize(irSignal);
             assertTrue(nameEngine.numbericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);

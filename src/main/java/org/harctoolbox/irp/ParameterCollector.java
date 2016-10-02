@@ -184,7 +184,7 @@ public class ParameterCollector implements Cloneable {
                 try {
                     expr = expression.toNumber(nameEngine);
                     if (((expr ^ parameter.value) & parameter.bitmask) != 0L)
-                    return false;
+                        return false;
                 } catch (UnassignedException ex) {
                     needsFinalChecking = true;
                 }

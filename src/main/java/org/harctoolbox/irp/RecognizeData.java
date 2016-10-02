@@ -239,11 +239,11 @@ public class RecognizeData implements Cloneable {
 
     public void consume() {
         position++;
-        setHasConsumed(0);
+        hasConsumed = 0;
     }
 
     public void consume(double amount) {
-        setHasConsumed(amount);
+        hasConsumed += amount;
     }
 
     /**

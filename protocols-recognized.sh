@@ -37,7 +37,7 @@ ${RUN} 'gi rg'
 # hard... ${RUN} grundig16
 # hard... ${RUN} grundig16-30
 ${RUN} gxb
-# hard... ${RUN} 'humax 4phase'
+# chunksize does divide... ${RUN} 'humax 4phase'
 ${RUN} iodatan
 ${RUN} jerrold
 ${RUN} jvc
@@ -50,7 +50,7 @@ ${RUN} konka
 ${RUN} logitech
 ${RUN} lumagen
 ${RUN} matsui
-# todo ${RUN} mce
+${RUN} mce
 ${RUN} metz19
 ${RUN} mitsubishi
 ${RUN} mitsubishi-k
@@ -79,9 +79,9 @@ ${RUN} proton
 ${RUN} rc5
 ${RUN} rc5-7f
 ${RUN} rc5-7f-57
-# error for D=28 S=106 F=15 T=0 ${RUN} rc5x
-#${RUN} rc6
-#${RUN} rc6-6-20
+${RUN} rc5x
+${RUN} rc6
+${RUN} rc6-6-20
 ${RUN} 'rca(old)'
 ${RUN} rca
 ${RUN} rca-38

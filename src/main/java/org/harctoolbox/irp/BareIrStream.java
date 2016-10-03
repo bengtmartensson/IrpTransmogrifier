@@ -218,6 +218,18 @@ public class BareIrStream extends IrStreamItem {
         return false; // give up
     }
 
+    public boolean hasVariationWithIntroEqualsRepeat() {
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            if (irStreamItem instanceof Variation)
+                return ((Variation) irStreamItem).introEqualsRepeat();
+            if (irStreamItem instanceof BitspecIrstream)
+                return ((BitspecIrstream) irStreamItem).hasVariationWithIntroEqualsRepeat();
+            if (irStreamItem instanceof BareIrStream)
+                return ((BareIrStream) irStreamItem).hasVariationWithIntroEqualsRepeat();
+        }
+        return false; // give up
+    }
+
 /*
     private static List<IrStreamItem> toList(IrpParser.Bare_irstreamContext ctx, Protocol env) {
         List<IrStreamItem> array = new ArrayList<>();
@@ -315,6 +327,11 @@ public class BareIrStream extends IrStreamItem {
         //IrSignal.Pass state = recognizeData.getState();
         //int position = recognizeData.getStart();
         //NameEngine nameEngine = recognizeData.getNameEngine().clone();
+        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat()) {
+            IrpUtils.exiting(logger, "recognize " + pass, "pass (since variation with intro equals repeat)");
+            return true;
+        }
+
         for (int itemNr = 0; itemNr < irStreamItems.size(); itemNr++) {
             IrStreamItem irStreamItem = irStreamItems.get(itemNr);
             ////IrStreamItem lookAheadItem = itemNr < irStreamItems.size() - 1 ? irStreamItems.get(itemNr + 1)

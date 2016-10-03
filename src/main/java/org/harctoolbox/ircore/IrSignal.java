@@ -102,6 +102,7 @@ public class IrSignal implements Cloneable {
 
     /** Duty cycle of the modulation. Between 0 and 1. Use -1 for not assigned. */
     protected double dutyCycle = ModulatedIrSequence.unknownDutyCycle;
+
     /**
      * Constructs an IrSignal from its arguments.
      * @param frequency
@@ -124,6 +125,18 @@ public class IrSignal implements Cloneable {
         map.put(Pass.repeat, repeatSequence);
         map.put(Pass.ending, endingSequence);
     }
+
+    /**
+     * Constructs an IrSignal from its arguments.
+     * @param frequency
+     * @param introSequence
+     * @param repeatSequence
+     * @param endingSequence
+     */
+    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, double frequency) {
+        this(introSequence, repeatSequence, endingSequence, frequency, ModulatedIrSequence.unknownDutyCycle);
+    }
+
     /**
      * Constructs an IrSignal from its arguments.
      *
@@ -151,6 +164,7 @@ public class IrSignal implements Cloneable {
         this(new IrSequence(introSequence), new IrSequence(repeatSequence),
                 new IrSequence(endingSequence), frequency, dutyCycle);
     }
+
     /**
      * Constructs an IrSignal from its arguments.
      *
@@ -169,6 +183,7 @@ public class IrSignal implements Cloneable {
                 new IrSequence(durations, 2 * (noIntroBursts + noRepeatBursts), durations.length - 2 * (noIntroBursts + noRepeatBursts)),
                 frequency, dutyCycle);
     }
+
     /**
      * Constructs an IrSignal of zero length.
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
@@ -176,6 +191,7 @@ public class IrSignal implements Cloneable {
     public IrSignal() throws IncompatibleArgumentException {
         this(new int[0], 0, 0, (int) ModulatedIrSequence.defaultFrequency);
     }
+
     /**
      * Creates an IrSignal from a CCF string. Also some "short formats" of CCF are recognized.
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
@@ -186,6 +202,7 @@ public class IrSignal implements Cloneable {
     public IrSignal(String ccf) throws IncompatibleArgumentException {
         copyFrom(Pronto.parse(ccf));
     }
+
     /**
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
      * @throws org.harctoolbox.ircore.IncompatibleArgumentException
@@ -196,6 +213,7 @@ public class IrSignal implements Cloneable {
     public IrSignal(int[] ccf) throws IncompatibleArgumentException {
         copyFrom(Pronto.parse(ccf));
     }
+
     /**
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
      * @param begin starting index

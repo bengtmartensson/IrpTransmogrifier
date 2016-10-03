@@ -128,16 +128,16 @@ ${RUN} x10.n
 #${RUN} xmpff
 #${RUN} xmpff-1
 #${RUN} xmpff-2
-# WORK ${RUN} zaptor-36
-# WORK ${RUN} zaptor-56
-# FUNNY ${RUN} zenith
+${RUN} zaptor-36
+${RUN} zaptor-56
+# REJECT ${RUN} zenith
 ${RUN} canon
 ${RUN} arctech
 ${RUN} arctech-38
 ${RUN} rs200
 ${RUN} gwts
 ${RUN} rc6-m-56
-# Requires heavy equation solving ${RUN} entone
+# REJECT Requires heavy equation solving ${RUN} entone
 ${RUN} pioneer-mix
-# Solving systems of equations.... #${RUN} fujitsu_aircon
+# REJECT Solving systems of equations.... #${RUN} fujitsu_aircon
 ${RUN} roku-official

@@ -3,7 +3,11 @@ package org.harctoolbox.irp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrCoreException;
+import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -40,6 +44,7 @@ public class ProtocolNGTest {
     private final Protocol rc5x;
     private final Protocol rs200;
     private final Protocol solidtek16;
+    private final Protocol zaptor; // zaptor-36
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -61,6 +66,7 @@ public class ProtocolNGTest {
         rs200 = new Protocol("{35.7k,msb}<50p,-120p|21p,-120p>( 25:6,(H4-1):2,(H3-1):2,(H2-1):2,(H1-1):2,P:1,(D-1):3,F:2,0:2,sum:4,-1160p)*"
                 + "{P=~(#(D-1)+#F):1, sum=9+((H4-1)*4+(H3-1)) + ((H2-1)*4+(H1-1)) + (P*8+(D-1)) + F*4} [H1:1..4, H2:1..4, H3:1..4, H4:1..4, D:1..6, F:0..2]");
         solidtek16 = new Protocol("{38k}<-624,468|468,-624>(S=0,(1820,-590,0:1,D:4,F:7,S:1,C:4,1:1,-143m,S=1)3) {C= F:4:0 + F:3:4 + 8*S } [D:0..15, F:0..127]");
+        zaptor = new Protocol("{36k,330,msb}<-1,1|1,-1>([T=0][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m){C = (D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]");
     }
 
     @BeforeMethod
@@ -577,6 +583,24 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12, F=23}");
             NameEngine recognizeData = solidtek16.recognize(irSignal);
             assertTrue(nameEngine.numbericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = true)
+    public void testZaptor() {
+        try {
+            System.out.println("recognizeZaptor");
+            IrSequence repeat = new IrSequence(new int[]{2640, 1980, 660, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 660, 660, 660, 660, 660, 330, 330, 330, 330, 660, 330, 330, 660, 660, 330, 330, 330, 330, 330, 330, 660, 660, 660, 660, 330, 330, 660, 660, 74330});
+            IrSequence ending = new IrSequence(new int[]{2640, 1980, 660, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 330, 330, 660, 660, 660, 660, 660, 660, 660, 330, 330, 330, 330, 660, 330, 330, 660, 660, 330, 330, 330, 330, 330, 330, 660, 660, 660, 330, 330, 660, 660, 660, 74330});
+            IrSignal irSignal = new IrSignal(repeat, repeat, ending, 36000f);
+            NameEngine nameEngine = new NameEngine("{D=73, F=55, S=42, E=10}");
+            NameEngine recognizeData = zaptor.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            IrSignal silly = new IrSignal(repeat, repeat, repeat, 36000f);
+            recognizeData = zaptor.recognize(silly);
+            assertTrue(recognizeData == null);
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }

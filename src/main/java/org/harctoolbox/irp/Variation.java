@@ -154,6 +154,10 @@ public class Variation extends IrStreamItem {
                 .combine(BareIrStream.startingDurationType(ending, last, gapFlashBitSpecs));
     }
 
+    public boolean introEqualsRepeat() {
+        return intro.equals(repeat);
+    }
+
     @Override
     public int weight() {
         return intro.weight() + repeat.weight() + ending.weight();

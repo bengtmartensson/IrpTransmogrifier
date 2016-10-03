@@ -233,4 +233,8 @@ public class BitspecIrstream extends IrStreamItem {
     public int weight() {
         return bitSpec.weight() + irStream.weight();
     }
+
+    boolean hasVariationWithIntroEqualsRepeat() {
+        return irStream.hasVariationWithIntroEqualsRepeat();
+    }
 }

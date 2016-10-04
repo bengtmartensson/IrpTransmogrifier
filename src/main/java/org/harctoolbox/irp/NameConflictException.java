@@ -21,7 +21,7 @@ package org.harctoolbox.irp;
 public class NameConflictException extends Exception {
 
     public NameConflictException(String name) {
-        super("Multiple definitions of " + name);
+        super("Conflicting definitions of " + name);
     }
 
 }

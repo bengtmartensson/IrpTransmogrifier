@@ -51,12 +51,13 @@ public class ParameterCollector implements Cloneable {
     }
 
     public void add(String name, long value, long bitmask) throws NameConflictException, UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        updateValues();
         Parameter parameter = new Parameter(value, bitmask);
         Parameter oldParameter = map.get(name);
         logger.log(Level.FINER, "Assigning {0} = {1}&{2}", new Object[]{name, value, bitmask});
         if (oldParameter != null) {
-            if (!oldParameter.isConsistent(parameter, toNameEngine())) {
-                logger.log(Level.FINE, "Name conflict: {0}", name);
+            if (!oldParameter.isConsistent(parameter)) {
+                logger.log(Level.FINE, "Name inconsistency: {0}, new value: {1}&{2}, old value: {3}&{4}", new Object[]{name, value, bitmask, oldParameter.value, oldParameter.bitmask});
                 throw new NameConflictException(name);
             }
             oldParameter.complete(parameter);
@@ -90,13 +91,60 @@ public class ParameterCollector implements Cloneable {
         }
     }
 
-    public NameEngine toNameEngine() throws IrpSyntaxException {
+    NameEngine toNumericalNameEngine() throws IrpSyntaxException {
+        NameEngine simple = new NameEngine();
+        for (Map.Entry<String, Parameter> kvp : map.entrySet()) {
+            String name = kvp.getKey();
+            Parameter parameter = kvp.getValue();
+            if (parameter.value != null)
+                simple.define(name, parameter.value);
+        }
+        return simple;
+    }
+
+    public void updateValues() throws IrpSyntaxException {
+        NameEngine simple = toNumericalNameEngine();
+        for (Map.Entry<String, Parameter> kvp : map.entrySet()) {
+            String name = kvp.getKey();
+            Parameter parameter = kvp.getValue();
+            if (parameter.expression != null) {
+                try {
+                    long val = parameter.expression.toNumber(simple);
+                    parameter.value = val;
+                    parameter.needsFinalChecking = false;
+                } catch (UnassignedException ex) {
+                    parameter.needsFinalChecking = true;
+                } catch (IncompatibleArgumentException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    /*public NameEngine toNameEngine() throws IrpSyntaxException {
         NameEngine result = new NameEngine();
         for (Map.Entry<String, Parameter> kvp : map.entrySet()) {
-            result.define(kvp.getKey(), kvp.getValue().value);
+            String name = kvp.getKey();
+            Parameter parameter = kvp.getValue();
+            if (parameter.value != null)
+                result.define(name, parameter.value);
+        }
+        for (Map.Entry<String, Parameter> kvp : map.entrySet()) {
+            String name = kvp.getKey();
+            Parameter parameter = kvp.getValue();
+            if (parameter.expression != null) {
+                try {
+                    long val = parameter.expression.toNumber(result);
+                    result.define(name, val);
+                } catch (UnassignedException ex) {
+                    parameter.needsFinalChecking = true;
+                } catch (IncompatibleArgumentException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
         }
         return result;
-    }
+    }*/
 
     public HashMap<String, Long> toHashMap() {
         HashMap<String, Long> hashMap = new HashMap<>(map.size());
@@ -150,7 +198,7 @@ public class ParameterCollector implements Cloneable {
 
         private Expression expression;
 
-        long value;
+        Long value;
 
         /**
          * 1 for bits known
@@ -164,32 +212,35 @@ public class ParameterCollector implements Cloneable {
         }
 
         Parameter(Expression expression) {
-            this(0L, NOBITS, expression);
+            this(null, NOBITS, expression);
         }
 
         Parameter(long value, long bitmask) {
             this(value, bitmask, null);
         }
 
-        Parameter(long value, long bitmask, Expression expression) {
+        Parameter(Long value, long bitmask, Expression expression) {
             this.value = value;
             this.bitmask = bitmask;
             this.expression = expression;
             this.needsFinalChecking = false;
         }
 
-        boolean isConsistent(Parameter parameter, NameEngine nameEngine) throws IrpSyntaxException, IncompatibleArgumentException {
-            if (expression != null) {
-                long expr;
-                try {
-                    expr = expression.toNumber(nameEngine);
-                    if (((expr ^ parameter.value) & parameter.bitmask) != 0L)
-                        return false;
-                } catch (UnassignedException ex) {
-                    needsFinalChecking = true;
-                }
+        private boolean isConsistent(Parameter parameter/*, NameEngine nameEngine*/) {
+//            if (expression != null) {
+//                long expr;
+//                try {
+//                    expr = expression.toNumber(nameEngine);
+//                    if (((expr ^ parameter.value) & parameter.bitmask) != 0L)
+//                        return false;
+//                } catch (UnassignedException ex) {
+//                    needsFinalChecking = true;
+//                }
+//
+//            }
+            if (value == null || parameter.value == null)
+                return true;
 
-            }
             return ((value ^ parameter.value) & bitmask & parameter.bitmask) == 0L;
         }
 
@@ -198,13 +249,15 @@ public class ParameterCollector implements Cloneable {
         }
 
         void complete(Parameter parameter) {
-            value = (value & bitmask) | (parameter.value & parameter.bitmask);
+            long oldbits = value == null ? 0L : (value & bitmask);
+            value = oldbits | (parameter.value & parameter.bitmask);
             bitmask |= parameter.bitmask;
         }
 
         @Override
         public String toString() {
-            return Long.toString(value) + "&" + Long.toBinaryString(bitmask)
+            return (value == null ? "-" : Long.toString(value))
+                    + "&" + Long.toBinaryString(bitmask)
                     + (expression != null ? ( " " + expression.toIrpString()) : "");
         }
 

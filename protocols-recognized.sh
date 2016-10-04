@@ -33,10 +33,10 @@ ${RUN} fujitsu-56
 ${RUN} g.i.cable
 ${RUN} g.i.4dtv
 ${RUN} 'gi rg'
-# hard... ${RUN} grundig16
-# hard... ${RUN} grundig16-30
+# chunksize does not divide ${RUN} grundig16
+# chunksize does not divide ${RUN} grundig16-30
 ${RUN} gxb
-# chunksize does divide... ${RUN} 'humax 4phase'
+# chunksize does not divide... ${RUN} 'humax 4phase'
 ${RUN} iodatan
 ${RUN} jerrold
 ${RUN} jvc
@@ -61,7 +61,7 @@ ${RUN} necx1
 ${RUN} necx2
 ${RUN} nokia
 ${RUN} nokia12
-# chinksize does not divide... ${RUN} nokia32
+# chunksize does not divide... ${RUN} nokia32
 ${RUN} nrc17
 ${RUN} ortekmce
 ${RUN} pacemss
@@ -100,7 +100,7 @@ ${RUN} sharp{1}
 ${RUN} sharp{2}
 ${RUN} sharpdvd
 ${RUN} sim2
-# EVIL ${RUN} solidtek16
+${RUN} solidtek16
 ${RUN} somfy
 ${RUN} sony8
 ${RUN} sony12

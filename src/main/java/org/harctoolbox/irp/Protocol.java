@@ -499,12 +499,13 @@ public class Protocol extends IrpObject {
 
         if (recognizeData.needsFinalParameterCheck())
             try {
+                //recognizeData.getParameterCollector().refresh();
                 recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
             } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
                 logger.warning(ex.getMessage());
                 return false;
             } catch (UnassignedException ex) {
-                logger.log(Level.SEVERE, "Equation solving not implemented: {0}", ex.getMessage());
+                logger.log(Level.WARNING, "Equation solving not implemented: {0}", ex.getMessage());
                 return false;
             }
 

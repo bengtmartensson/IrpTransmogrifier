@@ -45,6 +45,7 @@ public class ProtocolNGTest {
     private final Protocol rs200;
     private final Protocol solidtek16;
     private final Protocol zaptor; // zaptor-36
+    private final Protocol iodatan;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -67,6 +68,7 @@ public class ProtocolNGTest {
                 + "{P=~(#(D-1)+#F):1, sum=9+((H4-1)*4+(H3-1)) + ((H2-1)*4+(H1-1)) + (P*8+(D-1)) + F*4} [H1:1..4, H2:1..4, H3:1..4, H4:1..4, D:1..6, F:0..2]");
         solidtek16 = new Protocol("{38k}<-624,468|468,-624>(S=0,(1820,-590,0:1,D:4,F:7,S:1,C:4,1:1,-143m,S=1)3) {C= F:4:0 + F:3:4 + 8*S } [D:0..15, F:0..127]");
         zaptor = new Protocol("{36k,330,msb}<-1,1|1,-1>([T=0][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m){C = (D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]");
+        iodatan = new Protocol("{38k,550}<1,-1|1,-3>(16,-8,x:7,D:7,S:7,y:7,F:8,C:4,1,^108m)* {n = F:4 ^ F:4:4 ^ C:4} [D:0..127,S:0..127,F:0..255,C:0..15=0,x:0..127=0,y:0..127=0]");
     }
 
     @BeforeMethod
@@ -575,7 +577,7 @@ public class ProtocolNGTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testRecognizeSolidtek16() {
         try {
             System.out.println("recognizeSolidtek16");
@@ -601,6 +603,19 @@ public class ProtocolNGTest {
             IrSignal silly = new IrSignal(repeat, repeat, repeat, 36000f);
             recognizeData = zaptor.recognize(silly);
             assertTrue(recognizeData == null);
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = false)
+    public void testIodatan() {
+        try {
+            System.out.println("recognizeIodatan");
+            IrSignal irSignal = Pronto.parse("0000 006D 0000 002A 014E 00A7 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 003F 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0627");
+            NameEngine nameEngine = new NameEngine("{D=12, F=23, S=34}");
+            NameEngine recognizeData = iodatan.recognize(irSignal);
+            assertTrue(nameEngine.numbericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -264,10 +264,11 @@ public class FiniteBitField extends BitField {
         Name name = data.toName();
         if (name != null) {
             logger.log(Level.FINE, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(), payload, bitmask});
-            recognizeData.getParameterCollector().add(name.toString(), data.invert(payload), bitmask);
+            //recognizeData.getParameterCollector().add(name.toString(), data.invert(payload), bitmask);
+            recognizeData.add(name.toString(), data.invert(payload), bitmask);
         } else {
             try {
-                long expected = this.toNumber(recognizeData.getParameterCollector().toNumericalNameEngine()); // FIXME
+                long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
                 if (expected != payload)
                     return false;
             } catch (UnassignedException ex) {

@@ -350,7 +350,7 @@ public class ProtocolNGTest {
      * Test of recognize method, of class Protocol.
      */
     @Test
-    public void testRecognize_IrSignal_nec1() {
+    public void testRecognizeNec1() {
         System.out.println("recognize");
         try {
             IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
@@ -591,7 +591,7 @@ public class ProtocolNGTest {
     }
 
     @Test(enabled = true)
-    public void testZaptor() {
+    public void testRecognizeZaptor() {
         try {
             System.out.println("recognizeZaptor");
             IrSequence repeat = new IrSequence(new int[]{2640, 1980, 660, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 660, 660, 660, 660, 660, 330, 330, 330, 330, 660, 330, 330, 660, 660, 330, 330, 330, 330, 330, 330, 660, 660, 660, 660, 330, 330, 660, 660, 74330});
@@ -609,7 +609,7 @@ public class ProtocolNGTest {
     }
 
     @Test(enabled = false)
-    public void testIodatan() {
+    public void testRecognizeIodatan() {
         try {
             System.out.println("recognizeIodatan");
             IrSignal irSignal = Pronto.parse("0000 006D 0000 002A 014E 00A7 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 003F 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0627");

@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -471,7 +472,7 @@ public class Protocol extends IrpObject {
 
     public NameEngine recognize(IrSignal irSignal, boolean checkFrequency, double frequencyTolerance) {
         IrpUtils.entering(logger, Level.FINE, "recognize", this);
-        NameEngine nameEngine = definitions.clone();
+        NameEngine nameEngine = new NameEngine();
 
         boolean success = (!checkFrequency || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
         if (success)
@@ -492,28 +493,35 @@ public class Protocol extends IrpObject {
 
     private boolean process(NameEngine nameEngine, IrSequence irSequence, IrSignal.Pass pass) {
         //RecognizeData inData = new RecognizeData(irSequence);
-        RecognizeData recognizeData = new RecognizeData(generalSpec, irSequence, interleavingOk(), nameEngine);
+        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), nameEngine);
         boolean status = recognize(recognizeData, pass);
         if (!status)
             return false;
 
-        if (recognizeData.needsFinalParameterCheck())
-            try {
-                //recognizeData.getParameterCollector().refresh();
-                recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
-            } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
-                logger.warning(ex.getMessage());
-                return false;
-            } catch (UnassignedException ex) {
-                logger.log(Level.WARNING, "Equation solving not implemented: {0}", ex.getMessage());
-                return false;
-            }
-
+//        try {
+            //        //if (recognizeData.needsFinalParameterCheck())
+//        try {
+//            //recognizeData.getParameterCollector().refresh();
+//            recognizeData.getParameterCollector().checkConsistencyWith(nameEngine);
+//        } catch (NameConflictException | IrpSyntaxException | IncompatibleArgumentException ex) {
+//            logger.warning(ex.getMessage());
+//            return false;
+//        } catch (UnassignedException ex) {
+//            logger.log(Level.WARNING, "Equation solving not implemented: {0}", ex.getMessage());
+//            return false;
+//        }
+//
         try {
-            recognizeData.getParameterCollector().addToNameEngine(nameEngine);
-        } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) { // FIXME
+            recognizeData.transferToNameEngine(nameEngine);
+            recognizeData.checkConsistency(nameEngine);
+        } catch (NameConflictException ex) {
+            return false;
+        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+//        } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) { // FIXME
+//            logger.log(Level.SEVERE, null, ex);
+//        }
         return recognizeData.isSuccess();
     }
 

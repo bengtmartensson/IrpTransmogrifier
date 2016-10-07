@@ -151,6 +151,7 @@ public class IrpTransmogrifier {
                 out.print(protocol.hasMemoryVariable("T") ? "toggle\t" : "\t");
                 out.print(protocol.isStandardPWM() ? "PWM" : "");
                 out.print(protocol.isPWM4() ? "PWM4" : "");
+                out.print(protocol.isPWM16() ? "PWM16" : "");
                 out.print(protocol.isBiphase() ? "Biphase" : "");
                 out.print(protocol.isTrivial(false) ? "Trivial" : "");
                 out.print(protocol.isTrivial(true) ? "invTrivial" : "");
@@ -330,7 +331,8 @@ public class IrpTransmogrifier {
                 irSignal = Pronto.parse(commandRecognize.args);
             }
 
-            Map<String, Long> nameEngine = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters);
+            Map<String, Long> nameEngine = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters,
+                    true, IrCoreUtils.defaultFrequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
             if (commandRecognize.args.isEmpty()) {
                 out.print(protocolName + "\t");

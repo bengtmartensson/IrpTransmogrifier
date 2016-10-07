@@ -386,6 +386,10 @@ public class Protocol extends IrpObject {
         return bitspecIrstream.isPWM4(definitions, generalSpec);
     }
 
+    boolean isPWM16() {
+        return bitspecIrstream.isPWM16(definitions, generalSpec);
+    }
+
     public boolean isBiphase() {
         return bitspecIrstream.isBiphase(definitions, generalSpec);
     }
@@ -471,20 +475,21 @@ public class Protocol extends IrpObject {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) {
-        return recognize(irSignal, true, IrCoreUtils.defaultFrequencyTolerance, keepDefaulted);
+        return recognize(irSignal, keepDefaulted, true, IrCoreUtils.defaultFrequencyTolerance, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean checkFrequency, double frequencyTolerance, boolean keepDefaulted) {
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted, boolean checkFrequency,
+            double frequencyTolerance, double absoluteTolerance, double relativeTolerance) {
         IrpUtils.entering(logger, Level.FINE, "recognize", this);
         Map<String, Long> names = new HashMap<>(8);
 
         boolean success = (!checkFrequency || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
         if (success)
-            success = process(names, irSignal.getIntroSequence(), IrSignal.Pass.intro);
+            success = process(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance);
         if (success)
-            success = process(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat);
+            success = process(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance);
         if (success)
-            success = process(names, irSignal.getEndingSequence(), IrSignal.Pass.ending);
+            success = process(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance);
         if (!success) {
             IrpUtils.exiting(logger, "recognize", "fail");
             return null;
@@ -496,9 +501,9 @@ public class Protocol extends IrpObject {
         return names;
     }
 
-    private boolean process(Map<String, Long> names, IrSequence irSequence, IrSignal.Pass pass) {
+    private boolean process(Map<String, Long> names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) {
         //RecognizeData inData = new RecognizeData(irSequence);
-        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names);
+        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names, absoluteTolerance, relativeTolerance);
         boolean status = recognize(recognizeData, pass);
         if (!status)
             return false;

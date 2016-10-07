@@ -226,37 +226,26 @@ public class BitSpec extends IrpObject {
         return numberDurations;
     }
 
-    /**
-     * Checks if the BitSpec is of type &lt;a,-b|c,-d&gt;, for a,b,c,d &gt; 0.
+   /**
      * @param nameEngine
      * @param generalSpec
      * @return
      */
-    public boolean isStandardPWM(NameEngine nameEngine, GeneralSpec generalSpec) {
-        if (bitCodes.size() != 2)
-            return false;
-        for (BareIrStream bitCode : bitCodes) {
-            try {
-                // toIrSequence throws exception if not positive, negative
-                IrSequence irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec).toIrSequence();
-                if (irSequence.getLength() != 2)
-                    return false;
-            } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
-                return false;
-            }
-        }
-        return true;
+    public boolean isPWM(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return isPWM(2, nameEngine, generalSpec);
     }
 
-   /**
-     * Checks if the BitSpec is of type &lt;a,-b|c,-d|e,-f|g,-h&gt;, for a,b,c,d,e,f,g,h &gt; 0.
+    /**
+     * @param length
      * @param nameEngine
      * @param generalSpec
      * @return
      */
-    public boolean isPWM4(NameEngine nameEngine, GeneralSpec generalSpec) {
-        if (bitCodes.size() != 4)
-            return false;
+    public boolean isPWM(int length, NameEngine nameEngine, GeneralSpec generalSpec) {
+        return bitCodes.size() == length && isTwoLengthGapFlash(nameEngine, generalSpec);
+    }
+
+    private boolean isTwoLengthGapFlash(NameEngine nameEngine, GeneralSpec generalSpec) {
         for (BareIrStream bitCode : bitCodes) {
             try {
                 // toIrSequence throws exception if not positive, negative
@@ -326,7 +315,7 @@ public class BitSpec extends IrpObject {
         Element element = document.createElement("bitspec");
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunksize", Integer.toString(chunkSize));
-        element.setAttribute("standard_pwm", Boolean.toString(isStandardPWM(new NameEngine(), new GeneralSpec())));
+        element.setAttribute("standard_pwm", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
         element.setAttribute("standard_biphase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
         element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));
         for (BareIrStream bitCode : bitCodes)
@@ -339,8 +328,8 @@ public class BitSpec extends IrpObject {
 //    }
 
     boolean interleaveOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-        if (!gapFlashBitSpecs && (isStandardPWM(nameEngine, generalSpec)
-                || isPWM4(nameEngine, generalSpec)))
+        if (!gapFlashBitSpecs && (isPWM(2, nameEngine, generalSpec)
+                || isPWM(4, nameEngine, generalSpec)))
             return true;
 
         for (BareIrStream bareIrStream : bitCodes)

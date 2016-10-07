@@ -41,13 +41,16 @@ public class RecognizeData implements Cloneable {
     private boolean interleaving;
     private final NameEngine definitions;
     private ParameterCollector needsChecking;
+    private final double absoluteTolerance;
+    private final double relativeTolerance;
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, Map<String, Long> nameMap) {
-        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(nameMap), interleaving, nameMap);
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, Map<String, Long> nameMap,
+            double absoulteTolerance, double relativeTolerance) {
+        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(nameMap), interleaving, nameMap, absoulteTolerance, relativeTolerance);
     }
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
-            ParameterCollector parameterCollector, boolean interleaving, Map<String, Long> nameMap) {
+            ParameterCollector parameterCollector, boolean interleaving, Map<String, Long> nameMap, double absoluteTolerance, double relativeTolerance) {
         //this.start = start;
         //this.length = length;
         success = true;
@@ -64,6 +67,8 @@ public class RecognizeData implements Cloneable {
         this.interleaving = interleaving;
         //this.nameMap = nameMap;
         this.needsChecking = new ParameterCollector();
+        this.absoluteTolerance = absoluteTolerance;
+        this.relativeTolerance = relativeTolerance;
     }
 
 //    RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, ParameterCollector nameEngine, boolean interleaving) {
@@ -384,5 +389,19 @@ public class RecognizeData implements Cloneable {
 //            }
 //            needsChecking.remove(name);
 //        }
+    }
+
+    /**
+     * @return the absoluteTolerance
+     */
+    public double getAbsoluteTolerance() {
+        return absoluteTolerance;
+    }
+
+    /**
+     * @return the relativeTolerance
+     */
+    public double getRelativeTolerance() {
+        return relativeTolerance;
     }
 }

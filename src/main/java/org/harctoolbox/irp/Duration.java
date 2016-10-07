@@ -257,7 +257,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
 //                recognizeData.setSuccess(false);
 //
 //        } else {
-            boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted);
+            boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted, recognizeData.getAbsoluteTolerance(), recognizeData.getRelativeTolerance());
             if (equals) {
                 recognizeData.consume();
             } else if (actual > wanted && recognizeData.allowChopping()) {

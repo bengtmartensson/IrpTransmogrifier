@@ -159,6 +159,8 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
     }
 
     public boolean numericallyEquals(Map<String, Long> other) {
+        if (other == null)
+            return false;
         if (other.size() != this.size())
             return false;
 

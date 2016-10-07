@@ -1,6 +1,6 @@
 #!/bin/sh
 
-RUN="target/irptransmogrifier.sh recog -r -p"
+RUN="target/irptransmogrifier.sh -r 0.04 recog -r -p"
 
 ${RUN} 48-nec1
 ${RUN} 48-nec2
@@ -116,18 +116,17 @@ ${RUN} thomson
 ${RUN} thomson7
 ${RUN} tivo
 ${RUN} velleman
-# XMP ${RUN} velodyne
+${RUN} velodyne
 ${RUN} viewstar
 ${RUN} x10
 ${RUN} x10.n
-#${RUN} xmpmeta
-#${RUN} xmp
-#${RUN} xmp-1
-#${RUN} xmp-2
-#${RUN} xmpfinalframemeta
-#${RUN} xmpff
-#${RUN} xmpff-1
-#${RUN} xmpff-2
+${RUN} xmpmeta
+${RUN} xmp
+${RUN} xmp-1
+${RUN} xmp-2
+${RUN} xmpff
+${RUN} xmpff-1
+${RUN} xmpff-2
 ${RUN} zaptor-36
 ${RUN} zaptor-56
 # REJECT (bitfield width as parameter) ${RUN} zenith

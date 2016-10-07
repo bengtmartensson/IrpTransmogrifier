@@ -150,12 +150,12 @@ public class Assignment extends IrStreamItem implements Numerical {
 
     @Override
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
-        return null;
+        return DurationType.none;
     }
 
     @Override
     public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
-        return null;
+        return DurationType.none;
     }
 
     @Override

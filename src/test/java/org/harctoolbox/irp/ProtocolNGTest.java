@@ -44,13 +44,24 @@ public class ProtocolNGTest {
     private final Protocol solidtek16;
     private final Protocol zaptor; // zaptor-36
     private final Protocol iodatan;
+    private final Protocol velodyne;
+    private final Protocol xmp1;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
         rc5 = new Protocol("{36k,msb,889}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[D:0..31,F:0..127,T@:0..1=0]");
         rc6 = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]");
         nokia32 = new Protocol("{36k,msb}<164,-276|164,-445|164,-614|164,-783>(412,-276,D:8,S:8,T:1,X:7,F:8,164,^100m)* [D:0..255,S:0..255,F:0..255,T:0..1,X:0..127]");
-        xmp = new Protocol("{38k,136,msb}<210u,-760u> ( <0:1|0:1,-1|0:1,-2|0:1,-3|0:1,-4|0:1,-5|0:1,-6|0:1,-7|0:1,-8|0:1,-9|0:1,-10|0:1,-11|0:1,-12|0:1,-13|0:1,-14|0:1,-15>   (T=0,      (S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,FF:16,210u,-80.4m,T=8)+   ) ) { C1=-(S+S::4+15+OEM+OEM::4+D+D::4),   C2=-(S+S::4+T+FF+FF::4+FF::8+FF::12) } {FF=F}[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]");
+        xmp = new Protocol("{38k,136,msb}"
+                + "<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>"
+                + "([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m)"
+                + "{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4), C2=-(S+S::4+T+F+F::4+F::8+F::12) }"
+                + "[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]");
+        xmp1 = new Protocol("{38k,136,msb}"
+                + "<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>"
+                + "([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,-80.4m)"
+                + "{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4), C2=-(S + S::4 + T + 256*F + 16*F + F + F::4) }"
+                + "[D:0..255, S:0..255, F:0..255, OEM:0..255=68]");
         amino = new Protocol("{37.3k,268,msb}<-1,1|1,-1>(T=1,(7,-6,3,D:4,1:1,T:1,1:2,0:8,F:8,15:4,C:4,-79m,T=0)+){C =(D:4+4*T+9+F:4+F:4:4+15)&15} [D:0..15,F:0..255]");
         denonK = new Protocol("{37k,432}<1,-1|1,-3>(8,-4,84:8,50:8,0:4,D:4,S:4,F:12,((D*16)^S^(F*16)^(F:8:4)):8,1,-173)* [D:0..15,S:0..15,F:0..4095]");
         arctechsimplified = new Protocol("{0k,388}<1,-3|3,-1>(<0:2|2:2>(D:4,S:4),40:7,F:1,0:1,-10.2m)*[D:0..15,S:0..15,F:0..1]");
@@ -67,6 +78,11 @@ public class ProtocolNGTest {
         solidtek16 = new Protocol("{38k}<-624,468|468,-624>(S=0,(1820,-590,0:1,D:4,F:7,S:1,C:4,1:1,-143m,S=1)3) {C= F:4:0 + F:3:4 + 8*S } [D:0..15, F:0..127]");
         zaptor = new Protocol("{36k,330,msb}<-1,1|1,-1>([T=0][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m){C = (D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]");
         iodatan = new Protocol("{38k,550}<1,-1|1,-3>(16,-8,x:7,D:7,S:7,y:7,F:8,C:4,1,^108m)* {n = F:4 ^ F:4:4 ^ C:4} [D:0..127,S:0..127,F:0..255,C:0..15=0,x:0..127=0,y:0..127=0]");
+        velodyne = new Protocol("{38k,136,msb}"
+                //      0          1          2           3           4           5           6           7           8           9           10         11           12          13          14           15
+                + "<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>"
+                + "([T=0][T=8],S:4:4,~C:4,S:4,15:4,D:4,T:4,F:8,210u,-79m)"
+                + "{C=(8+S:4+S:4:4+15+D+T+F:4+F:4:4)&15} [D:0..15,S:0..255,F:0..255]");
     }
 
     @BeforeMethod
@@ -616,6 +632,45 @@ public class ProtocolNGTest {
             IrSignal irSignal = Pronto.parse("0000 006D 0000 002A 014E 00A7 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 003F 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0627");
             NameEngine nameEngine = new NameEngine("{D=12, F=23, S=34}");
             Map<String, Long> recognizeData = iodatan.recognize(irSignal, false);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = true)
+    public void testRecognizeVelodyne() {
+        try {
+            System.out.println("recognizeVelodyne");
+            IrSignal irSignal = Pronto.parse("0000 006D 0009 0009 0008 0060 0008 0051 0008 0041 0008 006A 0008 0037 0008 001D 0008 0032 0008 0022 0008 0BBA 0008 0060 0008 0027 0008 0041 0008 006A 0008 0037 0008 0046 0008 0032 0008 0022 0008 0BBA");
+            NameEngine nameEngine = new NameEngine("{D=5, F=65, S=215}");
+            Map<String, Long> recognizeData = velodyne.recognize(irSignal, false, true, 500f, 50f, 0.02);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = true)
+    public void testRecognizeXmp() {
+        try {
+            System.out.println("recognizeXmp");
+            IrSignal irSignal = Pronto.parse("0000 006D 0012 0012 0008 006A 0008 0056 0008 003C 0008 006A 0008 0065 0008 006A 0008 003C 0008 0065 0008 020C 0008 006A 0008 0051 0008 001D 0008 003C 0008 002C 0008 0046 0008 0046 0008 0065 0008 0BEF 0008 006A 0008 0056 0008 003C 0008 006A 0008 0065 0008 006A 0008 003C 0008 0065 0008 020C 0008 006A 0008 0027 0008 0046 0008 003C 0008 002C 0008 0046 0008 0046 0008 0065 0008 0BEF");
+            NameEngine nameEngine = new NameEngine("{D=110, F=14478, S=246, OEM=239}");
+            Map<String, Long> recognizeData = xmp.recognize(irSignal, false, true, 500f, 50f, 0.02);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+        } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Test(enabled = true)
+    public void testRecognizeXmp1() {
+        try {
+            System.out.println("recognizeXmp1");
+            IrSignal irSignal = Pronto.parse("0000 006D 0012 0012 0008 006A 0008 001D 0008 003C 0008 006A 0008 0032 0008 0032 0008 003C 0008 0065 0008 020C 0008 006A 0008 0027 0008 001D 0008 003C 0008 004B 0008 001D 0008 001D 0008 001D 0008 0BEF 0008 006A 0008 001D 0008 003C 0008 006A 0008 0032 0008 0032 0008 003C 0008 0065 0008 020C 0008 006A 0008 0051 0008 0046 0008 003C 0008 004B 0008 001D 0008 001D 0008 001D 0008 0BEF");
+            NameEngine nameEngine = new NameEngine("{D=110, F=144, S=246}");
+            Map<String, Long> recognizeData = xmp1.recognize(irSignal, false, true, 500f, 50f, 0.02);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);

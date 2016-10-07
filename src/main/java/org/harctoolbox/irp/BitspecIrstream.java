@@ -198,11 +198,15 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     boolean isStandardPWM(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return bitSpec.isStandardPWM(nameEngine, generalSpec);
+        return bitSpec.isPWM(2, nameEngine, generalSpec);
     }
 
     boolean isPWM4(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return bitSpec.isPWM4(nameEngine, generalSpec);
+        return bitSpec.isPWM(4, nameEngine, generalSpec);
+    }
+
+    boolean isPWM16(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return bitSpec.isPWM(16, nameEngine, generalSpec);
     }
 
     boolean isBiphase(NameEngine nameEngine, GeneralSpec generalSpec) {

@@ -124,9 +124,9 @@ public class BitSpecNGTest {
             BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
             BitSpec rc5 = new BitSpec(RC5BitSpec);
             //BitSpec empty = new BitSpec();
-            assertTrue(nec1.isStandardPWM(nameEngine, generalSpec));
-            assertFalse(nokia32.isStandardPWM(nameEngine, generalSpec));
-            assertFalse(rc5.isStandardPWM(nameEngine, generalSpec));
+            assertTrue(nec1.isPWM(2, nameEngine, generalSpec));
+            assertFalse(nokia32.isPWM(2, nameEngine, generalSpec));
+            assertFalse(rc5.isPWM(nameEngine, generalSpec));
             //assertEquals(result, expResult);
         } catch (IrpSyntaxException | InvalidRepeatException ex) {
             fail();

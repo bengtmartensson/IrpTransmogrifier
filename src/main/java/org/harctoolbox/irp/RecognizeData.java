@@ -17,14 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class RecognizeData implements Cloneable {
 
@@ -44,13 +40,14 @@ public class RecognizeData implements Cloneable {
     ////private IrStreamItem lookAheadItem;
     private boolean interleaving;
     private final NameEngine definitions;
-    private final List<String> needsChecking;
+    private ParameterCollector needsChecking;
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, NameEngine nameEngine) {
-        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(), interleaving);
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, Map<String, Long> nameMap) {
+        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(nameMap), interleaving, nameMap);
     }
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state, ParameterCollector parameterCollector, boolean interleaving) {
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
+            ParameterCollector parameterCollector, boolean interleaving, Map<String, Long> nameMap) {
         //this.start = start;
         //this.length = length;
         success = true;
@@ -65,12 +62,13 @@ public class RecognizeData implements Cloneable {
         this.extentStart = 0;
         ////this.lookAheadItem = null;
         this.interleaving = interleaving;
-        this.needsChecking = new ArrayList<>(4);
+        //this.nameMap = nameMap;
+        this.needsChecking = new ParameterCollector();
     }
 
-    RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, ParameterCollector nameEngine, boolean interleaving) {
-        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, nameEngine, interleaving);
-    }
+//    RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, ParameterCollector nameEngine, boolean interleaving) {
+//        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, nameEngine, interleaving);
+//    }
 
 //    public RecognizeData(IrSequence irSequence, int position) {
 //        this(irSequence, position, 0, IrSignal.Pass.intro, new NameEngine());
@@ -185,24 +183,30 @@ public class RecognizeData implements Cloneable {
         this.parameterCollector = parameterCollector;
     }
 
-    void add(String name, long value, long bitmask) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
-        BitwiseParameter parameter = new BitwiseParameter(value, bitmask);
-
+    void add(String name, BitwiseParameter parameter) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
         Expression expression = definitions.containsKey(name) ? definitions.get(name) : null;
         if (expression != null) {
-            long expected;
             try {
-                expected = expression.toNumber(parameterCollector.toNameEngine());
+                long expected = expression.toNumber(parameterCollector.toNameEngine());
+                //if (!parameter.isConsistent(expected))
                 if (!parameter.isConsistent(expected))
-                    throw new NameConflictException(name); // TODO
+                    throw new NameConflictException(name, parameter.getValue(), expected); // TODO
             } catch (UnassignedException ex) {
                 // It has an expression, but is not presently checkable.
                 // mark for later checking.
-                needsChecking.add(name);
+                needsChecking.add(name, parameter);
                 //parameterCollector.get(name).setNeedsChecking(true);
             }
-        }
-        parameterCollector.add(name, parameter);
+        } else
+            parameterCollector.add(name, parameter);
+    }
+
+    void add(String name, long value, long bitmask) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
+        add(name, new BitwiseParameter(value, bitmask));
+    }
+
+    void add(String name, long value) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
+        add(name, new BitwiseParameter(value));
     }
 
     /**
@@ -352,29 +356,33 @@ public class RecognizeData implements Cloneable {
 //        return parameterCollector.needsFinalParameterCheck();
 //    }
 
-    void transferToNameEngine(NameEngine nameEngine) throws NameConflictException, IrpSyntaxException, IncompatibleArgumentException {
-        parameterCollector.transferToNameEngine(nameEngine);
+    void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, IncompatibleArgumentException {
+        parameterCollector.transferToNamesMap(nameEngine);
     }
 
-    void checkConsistency(NameEngine nameEngine) throws NameConflictException {
-        List<String> copyOfNeedsChecking = new ArrayList<>(needsChecking);
-        for (String name : copyOfNeedsChecking) {
-            Expression expression;
-            try {
-                expression = definitions.get(name);
-            } catch (UnassignedException ex) {
-                throw new ThisCannotHappenException();
-            }
-            try {
-                long value = expression.toNumber(nameEngine);
-                if (!parameterCollector.isConsistent(name, value))
-                    throw new NameConflictException(name);
-            } catch (UnassignedException ex) {
-
-            } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
-                Logger.getLogger(RecognizeData.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            needsChecking.remove(name);
-        }
+    void checkConsistency(Map<String, Long> nameMap) throws NameConflictException, UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+        NameEngine nameEngine = new NameEngine(nameMap);
+        nameEngine.add(definitions);
+        needsChecking.checkConsistency(nameEngine, definitions);
+        needsChecking = new ParameterCollector();
+//        //List<String> copyOfNeedsChecking = new ArrayList<>(needsChecking);
+//        for (String name : needsChecking.copyOfNeedsChecking) {
+//            Expression expression;
+//            try {
+//                expression = definitions.get(name);
+//            } catch (UnassignedException ex) {
+//                throw new ThisCannotHappenException();
+//            }
+//            try {
+//                long value = expression.toNumber(nameEngine);
+//                if (!parameterCollector.isConsistent(name, value))
+//                    throw new NameConflictException(name);
+//            } catch (UnassignedException ex) {
+//
+//            } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+//                Logger.getLogger(RecognizeData.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            needsChecking.remove(name);
+//        }
     }
 }

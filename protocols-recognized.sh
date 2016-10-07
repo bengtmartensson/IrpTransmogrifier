@@ -9,7 +9,7 @@ ${RUN} aiwa
 ${RUN} akai
 ${RUN} amino-56
 ${RUN} amino
-# Repetitions causing non-interlacing ${RUN} anthem
+${RUN} anthem
 ${RUN} apple
 ${RUN} archer
 ${RUN} barco
@@ -92,7 +92,7 @@ ${RUN} recs80-0090
 ${RUN} replay
 ${RUN} revox
 ${RUN} samsung20
-#the -68u gap is a bitch when recognizing. ${RUN} samsung36
+${RUN} samsung36
 ${RUN} sampo
 ${RUN} scatl-6
 ${RUN} sharp
@@ -130,7 +130,7 @@ ${RUN} x10.n
 #${RUN} xmpff-2
 ${RUN} zaptor-36
 ${RUN} zaptor-56
-# REJECT ${RUN} zenith
+# REJECT (bitfield width as parameter) ${RUN} zenith
 ${RUN} canon
 ${RUN} arctech
 ${RUN} arctech-38

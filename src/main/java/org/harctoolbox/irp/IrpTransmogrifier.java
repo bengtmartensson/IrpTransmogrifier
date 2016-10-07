@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -205,7 +206,7 @@ public class IrpTransmogrifier {
 
     private static void render(Protocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
         NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
-                : commandRenderer.random ? protocol.randomParameters()
+                : commandRenderer.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();
         if (commandRenderer.random)
             logger.log(Level.INFO, nameEngine.toString());
@@ -320,22 +321,21 @@ public class IrpTransmogrifier {
                 throw new UsageException("Must either use --random or --nameengine, or have arguments.");
 
             NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-            NameEngine testNameEngine = null;
+            NameEngine testNameEngine = new NameEngine();
             IrSignal irSignal;
-            NameEngine nameEngine;
             if (commandRecognize.args.isEmpty()) {
-                testNameEngine = commandRecognize.random ? protocol.randomParameters() : commandRecognize.nameEngine;
+                testNameEngine = commandRecognize.random ? new NameEngine(protocol.randomParameters()) : commandRecognize.nameEngine;
                 irSignal = protocol.toIrSignal(testNameEngine.clone());
             } else {
                 irSignal = Pronto.parse(commandRecognize.args);
             }
 
-            nameEngine = protocol.recognize(irSignal);
+            Map<String, Long> nameEngine = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters);
 
             if (commandRecognize.args.isEmpty()) {
                 out.print(protocolName + "\t");
                 out.print(testNameEngine + "\t");
-                out.println((nameEngine != null && nameEngine.numbericallyEquals(testNameEngine)) ? "success" : "fail");
+                out.println((nameEngine != null && testNameEngine.numericallyEquals(nameEngine)) ? "success" : "fail");
             } else if (nameEngine != null)
                 out.println(nameEngine);
             else
@@ -795,6 +795,9 @@ public class IrpTransmogrifier {
 
     @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
     private static class CommandRecognize {
+
+        @Parameter(names = { "-k", "--keep-defaulted"}, description = "Normally parameters equal to their default are removed; this option keeps them")
+        private boolean keepDefaultedParameters = false;
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to generate test signal", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();

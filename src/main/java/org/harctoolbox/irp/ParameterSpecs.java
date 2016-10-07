@@ -16,14 +16,17 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,7 +35,7 @@ import org.w3c.dom.Element;
  */
 public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec> {
 
-    private LinkedHashMap<String, ParameterSpec>map;
+    private LinkedHashMap<String, ParameterSpec> map;
 
     public ParameterSpecs() {
         map = new LinkedHashMap<>(3);
@@ -126,19 +129,20 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
             parameter.check(nameEngine);
     }
 
-    public NameEngine random() throws IrpSyntaxException {
-        NameEngine nameEngine = new NameEngine();
-        for (ParameterSpec parameter : map.values())
-            nameEngine.define(parameter.getName(), parameter.random());
+    public Map<String, Long> random() throws IrpSyntaxException {
+        Map<String, Long> nameEngine = new HashMap<>(map.size());
+        map.values().stream().forEach((parameter) -> {
+            nameEngine.put(parameter.getName(), parameter.random());
+        });
 
         return nameEngine;
     }
 
-    public NameEngine randomUsingDefaults() throws IrpSyntaxException {
-        NameEngine nameEngine = new NameEngine();
-        for (ParameterSpec parameter : map.values())
-            if (parameter.getDefault() == null)
-                nameEngine.define(parameter.getName(), parameter.random());
+    public Map<String, Long> randomUsingDefaults() throws IrpSyntaxException {
+        Map<String, Long> nameEngine = new HashMap<>(map.size());
+        map.values().stream().filter((parameter) -> (parameter.getDefault() == null)).forEach((parameter) -> {
+            nameEngine.put(parameter.getName(), parameter.random());
+        });
 
         return nameEngine;
     }
@@ -157,5 +161,35 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         int weight = 0;
         weight = map.values().stream().map((parameterSpec) -> parameterSpec.weight()).reduce(weight, Integer::sum);
         return weight;
+    }
+
+    void reduceNamesMap(Map<String, Long> namesMap, boolean keepDefaulted) {
+        removeNotInParameterSpec(namesMap);
+        if (!keepDefaulted)
+            remoteDefaulteds(namesMap);
+    }
+
+    private void remoteDefaulteds(Map<String, Long> namesMap) {
+        NameEngine nameEngine = new NameEngine(namesMap);
+        List<String> names = new ArrayList<>(namesMap.keySet());
+        for (String name : names) {
+            Expression expression = map.get(name).getDefault();
+            if (expression == null)
+                continue;
+            try {
+                long deflt = expression.toNumber(nameEngine);
+                if (namesMap.get(name) == deflt)
+                    namesMap.remove(name);
+            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+                throw new ThisCannotHappenException();
+            }
+        }
+    }
+
+    private void removeNotInParameterSpec(Map<String, Long> namesMap) {
+        List<String> names = new ArrayList<>(namesMap.keySet());
+         names.stream().filter((name) -> (!map.containsKey(name))).forEach((name) -> {
+            namesMap.remove(name);
+        });
     }
 }

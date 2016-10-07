@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -28,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -66,8 +66,12 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     private HashMap<String, Expression> map;
 
+    public NameEngine(int initialCapacity) {
+        map = new LinkedHashMap<>(initialCapacity);
+    }
+
     public NameEngine() {
-        map = new LinkedHashMap<>(3);
+        this(4);
     }
 
     private NameEngine(HashMap<String, Expression> map) {
@@ -79,6 +83,17 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         if (str != null && !str.isEmpty()) {
             ParserDriver parserDriver = new ParserDriver(str);
             parseDefinitions(parserDriver.getParser().definitions());
+        }
+    }
+
+    public NameEngine(Map<String, Long> numericalParameters) {
+        this(numericalParameters.size());
+        for (Map.Entry<String, Long> entry : numericalParameters.entrySet()) {
+            try {
+                map.put(entry.getKey(), new Expression(entry.getValue()));
+            } catch (IrpSyntaxException ex) {
+                throw new ThisCannotHappenException();
+            }
         }
     }
 
@@ -114,7 +129,7 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         return map.size();
     }
 
-    public boolean numbericallyEquals(Object object) {
+    public boolean numericallyEquals(Object object) {
         if (object == this)
             return true;
         if (!(object instanceof NameEngine))
@@ -140,6 +155,70 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
                 return false;
             }
         }
+        return true;
+    }
+
+    public boolean numericallyEquals(Map<String, Long> other) {
+        if (other.size() != this.size())
+            return false;
+
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            try {
+                String name = kvp.getKey();
+                long value = kvp.getValue().toNumber(this);
+
+                if (value != other.get(name)) {
+                    //logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
+                    return false;
+                }
+            } catch (IrpSyntaxException ex) {
+                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            } catch (UnassignedException | IncompatibleArgumentException ex) {
+                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean numericallyEquals(NameEngine other) {
+        try {
+            return numericallyEquals(other.toMap());
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            return false;
+        }
+    }
+        /*
+        if (object == this)
+            return true;
+        if (!(object instanceof NameEngine))
+            return false;
+
+        NameEngine other = (NameEngine) object;
+        if (other.size() != this.size())
+            return false;
+
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            try {
+                String name = kvp.getKey();
+                long value = kvp.getValue().toNumber(this);
+                Expression expr = other.get(name);
+                if (expr == null)
+                    return false;
+                if (value != expr.toNumber(other)) {
+                    logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
+                    return false;
+                }
+            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+        }
+
+    private Map<String, Long> toMap() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
         return true;
     }
 
@@ -350,9 +429,9 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 //        map.entrySet().stream().forEach((kvp) -> {
 //            stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + kvp.getValue().toIrpString(radix));
 //        });
-        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+        map.entrySet().stream().forEach((kvp) -> {
             stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + kvp.getValue().toIrpString(radix));
-        }
+        });
         return stringJoiner.toString();
     }
 
@@ -383,10 +462,11 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
     }
 
 
-    public HashMap<String, Long> toMap() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public Map<String, Long> toMap() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
         HashMap<String, Long> result = new HashMap<>(map.size());
-        for (Map.Entry<String, Expression> kvp : map.entrySet())
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             result.put(kvp.getKey(), kvp.getValue().toNumber(this));
+        }
         return result;
     }
 
@@ -415,12 +495,12 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         }
     }
 
-    void reduce(ParameterSpecs parameterSpecs) {
-        ArrayList<String> names = new ArrayList<>(map.keySet());
-        names.stream().filter((name) -> (!parameterSpecs.contains(name))).forEach((name) -> {
-            map.remove(name);
-        });
-    }
+//    void reduce(ParameterSpecs parameterSpecs) {
+//        ArrayList<String> names = new ArrayList<>(map.keySet());
+//        names.stream().filter((name) -> (!parameterSpecs.contains(name))).forEach((name) -> {
+//            map.remove(name);
+//        });
+//    }
 
     @Override
     public int weight() {

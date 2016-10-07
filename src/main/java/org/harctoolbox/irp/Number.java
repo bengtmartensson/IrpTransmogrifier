@@ -121,4 +121,9 @@ public class Number extends PrimaryItem {
     public long invert(long rhs) {
         return rhs;
     }
+
+    @Override
+    public boolean isUnary() {
+        return true;
+    }
 }

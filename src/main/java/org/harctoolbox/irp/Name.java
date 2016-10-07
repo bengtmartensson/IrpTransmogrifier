@@ -161,4 +161,9 @@ public class Name extends PrimaryItem implements Floatable {
     public long invert(long rhs) {
         return rhs;
     }
+
+    @Override
+    public boolean isUnary() {
+        return true;
+    }
 }

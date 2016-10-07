@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.XMLConstants;
@@ -145,7 +146,7 @@ public class XmlUtils {
         return newDocument(false);
     }
 
-    public static HashMap<String, Element> createIndex(Element root, String tagName, String idName) {
+    public static Map<String, Element> createIndex(Element root, String tagName, String idName) {
         HashMap<String, Element> index = new HashMap<>(20);
         NodeList nodes = root.getElementsByTagName(tagName);
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -196,7 +197,7 @@ public class XmlUtils {
         return (SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)).newSchema(schemaFile);
     }
 
-    public static HashMap<String, Element> buildIndex(Element element, String tagName, String idName) {
+    public static Map<String, Element> buildIndex(Element element, String tagName, String idName) {
         HashMap<String, Element> index = new HashMap<>(20);
         NodeList nl = element.getElementsByTagName(tagName);
         for (int i = 0; i < nl.getLength(); i++) {

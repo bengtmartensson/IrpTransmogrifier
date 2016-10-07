@@ -462,38 +462,43 @@ public class Protocol extends IrpObject {
         return toIrpString();
     }
 
-    public NameEngine randomParameters() throws IrpSyntaxException {
+    public Map<String, Long> randomParameters() throws IrpSyntaxException {
         return parameterSpecs.random();
     }
 
-    public NameEngine recognize(IrSignal irSignal) {
-        return recognize(irSignal, true, IrCoreUtils.defaultFrequencyTolerance);
+    public Map<String, Long> recognize(IrSignal irSignal) {
+        return recognize(irSignal, true);
     }
 
-    public NameEngine recognize(IrSignal irSignal, boolean checkFrequency, double frequencyTolerance) {
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) {
+        return recognize(irSignal, true, IrCoreUtils.defaultFrequencyTolerance, keepDefaulted);
+    }
+
+    public Map<String, Long> recognize(IrSignal irSignal, boolean checkFrequency, double frequencyTolerance, boolean keepDefaulted) {
         IrpUtils.entering(logger, Level.FINE, "recognize", this);
-        NameEngine nameEngine = new NameEngine();
+        Map<String, Long> names = new HashMap<>(8);
 
         boolean success = (!checkFrequency || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
         if (success)
-            success = process(nameEngine, irSignal.getIntroSequence(), IrSignal.Pass.intro);
+            success = process(names, irSignal.getIntroSequence(), IrSignal.Pass.intro);
         if (success)
-            success = process(nameEngine, irSignal.getRepeatSequence(), IrSignal.Pass.repeat);
+            success = process(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat);
         if (success)
-            success = process(nameEngine, irSignal.getEndingSequence(), IrSignal.Pass.ending);
+            success = process(names, irSignal.getEndingSequence(), IrSignal.Pass.ending);
         if (!success) {
             IrpUtils.exiting(logger, "recognize", "fail");
             return null;
         }
 
-        nameEngine.reduce(parameterSpecs);
-        IrpUtils.entering(logger, Level.FINE, "recognize", nameEngine);
-        return nameEngine;
+        parameterSpecs.reduceNamesMap(names, keepDefaulted);
+
+        IrpUtils.entering(logger, Level.FINE, "recognize", names);
+        return names;
     }
 
-    private boolean process(NameEngine nameEngine, IrSequence irSequence, IrSignal.Pass pass) {
+    private boolean process(Map<String, Long> names, IrSequence irSequence, IrSignal.Pass pass) {
         //RecognizeData inData = new RecognizeData(irSequence);
-        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), nameEngine);
+        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names);
         boolean status = recognize(recognizeData, pass);
         if (!status)
             return false;
@@ -512,12 +517,13 @@ public class Protocol extends IrpObject {
 //        }
 //
         try {
-            recognizeData.transferToNameEngine(nameEngine);
-            recognizeData.checkConsistency(nameEngine);
+            recognizeData.transferToNamesMap(names);
+            recognizeData.checkConsistency(names);
         } catch (NameConflictException ex) {
             return false;
-        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | IncompatibleArgumentException | UnassignedException ex) {
             logger.log(Level.SEVERE, null, ex);
+            return false;
         }
 //        } catch (IrpSyntaxException | NameConflictException | UnassignedException | IncompatibleArgumentException ex) { // FIXME
 //            logger.log(Level.SEVERE, null, ex);

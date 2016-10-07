@@ -1,13 +1,11 @@
 package org.harctoolbox.irp;
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
-import org.harctoolbox.ircore.IrCoreException;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -58,7 +56,7 @@ public class ProtocolNGTest {
         arctechsimplified = new Protocol("{0k,388}<1,-3|3,-1>(<0:2|2:2>(D:4,S:4),40:7,F:1,0:1,-10.2m)*[D:0..15,S:0..15,F:0..1]");
         arctech = new Protocol("{0k,388}<1,-3|3,-1> (<0:2|2:2>((D-1):4,(S-1):4),40:7,F:1,0:1,-10.2m)*[D:1..16,S:1..16,F:0..1]");
         apple = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,C:1,F:7,PairID:8,1,^108m,(16,-4,1,^108m)*){C=1-(#F+#PairID)%2,S=135}[D:0..255=238,F:0..127,PairID:0..255]");
-        anthem = new Protocol("{38.0k,605}<1,-1|1,-3>((8000u,-4000u,D:8,S:8,F:8,C:8,1,-25m)3, -75m)* { C=~(D+S+F+255):8} [D:0..255,S:0..255,F:0..255]");
+        anthem = new Protocol("{38.0k,605}<1,-1|1,-3>((8000u,-4000u,D:8,S:8,F:8,C:8,1,-25m)2, 8000u,-4000u,D:8,S:8,F:8,C:8,1,-100m)* { C=~(D+S+F+255):8} [D:0..255,S:0..255,F:0..255]");
         directv = new Protocol("{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]");
         rc6M56 = new Protocol("{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,M:3,<-2,2|2,-2>(T:1),C:56,-131.0m)*[M:0..7,T@:0..1=0,C:0..72057594037927935]");
         //mce = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,OEM2:8,T:1,D:7,F:8,^107m)*,T=1-T) {OEM1=128,OEM2=S}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
@@ -204,8 +202,8 @@ public class ProtocolNGTest {
                     + " 0006 000A 0006 0015 0006 000A 0006 0015"
                     + " 0006 0C90");
             NameEngine nameEngine = new NameEngine("{D=12,S=56,F=34,T=1,X=73}");
-            NameEngine recognizeData = nokia32.recognize(signal);
-            assertEquals(recognizeData, nameEngine);
+            Map<String, Long> recognizeData = nokia32.recognize(signal);
+            assertEquals(new NameEngine(recognizeData), nameEngine);
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             fail();
         }
@@ -230,8 +228,8 @@ public class ProtocolNGTest {
         try {
             IrSignal aminoD12F34 = Pronto.parse("0000 006F 001C 001C 0046 003C 0028 000A 000A 0014 000A 000A 0014 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 0B83 0046 003C 0028 000A 000A 0014 000A 000A 0014 0014 000A 000A 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 000A 000A 0B83");
             NameEngine nameEngine = new NameEngine("{D=12,F=34}");
-            NameEngine recognizeData = amino.recognize(aminoD12F34);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = amino.recognize(aminoD12F34);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             fail();
         }
@@ -242,7 +240,7 @@ public class ProtocolNGTest {
         System.out.println("recognizeErroneousAmino");
         try {
             IrSignal aminoD12F34Err = Pronto.parse("0000 006F 001C 001C 0046 003C 0028 000A 000A 0014 000A 000A 0014 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 0B83 0046 003C 0028 000A 000A 0014 000A 000A 0014 0014 000A 000A 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 000A 000A 0B83");
-            NameEngine recognizeData = amino.recognize(aminoD12F34Err);
+            Map<String, Long> recognizeData = amino.recognize(aminoD12F34Err);
             assertTrue(recognizeData == null);
         } catch (IncompatibleArgumentException | ArithmeticException ex) {
             fail();
@@ -253,12 +251,11 @@ public class ProtocolNGTest {
     public void testToIrSignalArctech() {
         System.out.println("toIrSignalArchtech");
         try {
-            Protocol arctech = new Protocol("{0k,388}<1,-3|3,-1> (<0:2|2:2>((D-1):4,(S-1):4),40:7,F:1,0:1,-10.2m)+ [D:1..16,S:1..16,F:0..1]");
             IrSignal irSignal = Pronto.parse("0100 000A 0000 0019 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 1267");
             IrSignal result = arctech.toIrSignal(new NameEngine("{D=12,S=9,F=0}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(irSignal));
-        } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | InvalidRepeatException ex) {
+        } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
             fail();
         }
     }
@@ -295,8 +292,8 @@ public class ProtocolNGTest {
         try {
             IrSignal irSignal = Pronto.parse("0000 006D 000A 000A 00E4 002E 002E 002E 0017 0017 0017 0017 002E 0017 0017 0017 002E 0017 002E 002E 0017 0017 0017 0474 0072 002E 002E 002E 0017 0017 0017 0017 002E 0017 0017 0017 002E 0017 002E 002E 0017 0017 0017 0474");
             NameEngine nameEngine = new NameEngine("{D=12,F=34}");
-            NameEngine recognizeData = directv.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = directv.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -355,8 +352,8 @@ public class ProtocolNGTest {
         try {
             IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
             NameEngine nameEngine = new NameEngine("{D=12,S=34,F=56}");
-            NameEngine recognizeData = nec1.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = nec1.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -366,13 +363,17 @@ public class ProtocolNGTest {
      * Test of recognize method, of class Protocol.
      */
     @Test
-    public void testRecognize_IrSignal_rc5() {
+    public void testRecognizeRc5() {
         System.out.println("recognize");
         try {
             IrSignal irSignal = Pronto.parse("0000 0073 0000 000B 0020 0020 0040 0020 0020 0040 0020 0020 0040 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0CC8");
-            NameEngine nameEngine = new NameEngine("{D=12,F=56,T=0}");
-            NameEngine recognizeData = rc5.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            NameEngine nameEngine = new NameEngine("{D=12,F=56}");
+            Map<String, Long> recognizeData = rc5.recognize(irSignal,false);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+
+            nameEngine = new NameEngine("{D=12,F=56,T=0}");
+            recognizeData = rc5.recognize(irSignal,true);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -382,13 +383,13 @@ public class ProtocolNGTest {
      * Test of recognize method, of class Protocol.
      */
     @Test
-    public void testRecognize_IrSignal_denon_k() {
+    public void testRecognizeDenonK() {
         System.out.println("recognize");
         try {
             IrSignal irSignal = Pronto.parse("0000 0070 0000 0032 0080 0040 0010 0010 0010 0010 0010 0030 0010 0010 0010 0030 0010 0010 0010 0030 0010 0010 0010 0010 0010 0030 0010 0010 0010 0010 0010 0030 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0030 0010 0030 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0030 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0010 0010 0ACD");
             NameEngine nameEngine = new NameEngine("{D=12,S=3,F=56}");
-            NameEngine recognizeData = denonK.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = denonK.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -401,8 +402,8 @@ public class ProtocolNGTest {
             Protocol adnotam = new Protocol("{35.7k,895,msb}<1,-1|-1,1>(1,-2,1,D:6,F:6,^114m)*[D:0..63,F:0..63]");
             IrSignal irSignal = Pronto.parse("0000 0074 0000 000C 0020 0040 0040 0020 0020 0040 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0040 0020 0020 0020 0C67");
             NameEngine nameEngine = new NameEngine("{D=12,F=3}");
-            NameEngine recognizeData = adnotam.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = adnotam.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnassignedException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
@@ -415,8 +416,8 @@ public class ProtocolNGTest {
         try {
             IrSignal irSignal = Pronto.parse("0000 0073 0000 0013 0060 0020 0010 0020 0010 0010 0010 0010 0030 0030 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0020 0010 0BCD");
             NameEngine nameEngine = new NameEngine("{D=31,F=30,T=1}");
-            NameEngine recognizeData = rc6.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = rc6.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
@@ -429,8 +430,8 @@ public class ProtocolNGTest {
         try {
             IrSignal irSignal = Pronto.parse("0100 000A 0000 0019 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 1267");
             NameEngine nameEngine = new NameEngine("{D=11,S=4,F=0}");
-            NameEngine recognizeData = arctechsimplified.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = arctechsimplified.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
@@ -443,8 +444,8 @@ public class ProtocolNGTest {
         try {
             IrSignal irSignal = Pronto.parse("0100 000A 0000 0019 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 00A1 01E2 01E2 00A1 00A1 01E2 01E2 00A1 00A1 01E2 00A1 01E2 00A1 1267");
             NameEngine nameEngine = new NameEngine("{D=12,S=5,F=0}");
-            NameEngine recognizeData = arctech.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = arctech.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
@@ -464,8 +465,8 @@ public class ProtocolNGTest {
                     + " 0016 0622"
                     + " 015B 0057 0016 0E6C");
             NameEngine nameEngine = new NameEngine("{D=12,F=34,PairID=123}");
-            NameEngine recognizeData = apple.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = apple.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
@@ -484,7 +485,7 @@ public class ProtocolNGTest {
                     + " 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016"
                     + " 0016 0622"
                     + " 015B 0057 0016 0E6C");
-            NameEngine recognizeData = apple.recognize(irSignal);
+            Map<String, Long> recognizeData = apple.recognize(irSignal);
             assertTrue(recognizeData == null);
         } catch (IncompatibleArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -492,7 +493,7 @@ public class ProtocolNGTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testRecognizeAnthem() {
         try {
             System.out.println("recognizeAnthem");
@@ -516,8 +517,8 @@ public class ProtocolNGTest {
                     + " 0017 0017 0017 0045 0017 0017 0017 0045 0017 0045 0017 0017 0017 0017 0017 0045"
                     + " 0017 0ED8");
             NameEngine nameEngine = new NameEngine("{D=12,F=34,S=56}");
-            NameEngine recognizeData = anthem.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = anthem.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -531,8 +532,8 @@ public class ProtocolNGTest {
                     + " 0060 0020 0010 0010"
                     + " 0010 0020 0020 0010 0020 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0020 0010 0010 0010 0010 0020 0010 0010 0020 0010 0010 0010 0010 0010 126C");
             NameEngine nameEngine = new NameEngine("{M=5, C=806354200, T=1}");
-            NameEngine recognizeData = rc6M56.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = rc6M56.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -544,8 +545,8 @@ public class ProtocolNGTest {
             System.out.println("recognizeMce");
             IrSignal irSignal = Pronto.parse("0000 0073 0000 0020 0060 0020 0010 0010 0010 0010 0010 0020 0010 0020 0030 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0020 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0020 0010 0010 0020 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0020 0020 0010 09CD");
             NameEngine nameEngine = new NameEngine("{D=12, S=56, F=34, T=1}");
-            NameEngine recognizeData = mce.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = mce.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -556,9 +557,9 @@ public class ProtocolNGTest {
         try {
             System.out.println("recognizeRc5x");
             IrSignal irSignal = Pronto.parse("0000 0073 0000 000F 0040 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 00C0 0040 0040 0040 0040 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0AA8");
-            NameEngine nameEngine = new NameEngine("{D=28, S=106, F=15, T=0}");
-            NameEngine recognizeData = rc5x.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            NameEngine nameEngine = new NameEngine("{D=28, S=106, F=15}");
+            Map<String, Long> recognizeData = rc5x.recognize(irSignal, false);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -570,8 +571,8 @@ public class ProtocolNGTest {
             System.out.println("recognizeRs200");
             IrSignal irSignal = Pronto.parse("0000 0074 0000 001A 0032 0078 0015 0078 0015 0078 0032 0078 0032 0078 0015 0078 0015 0078 0015 0078 0015 0078 0032 0078 0032 0078 0015 0078 0032 0078 0032 0078 0015 0078 0032 0078 0015 0078 0032 0078 0015 0078 0032 0078 0032 0078 0032 0078 0015 0078 0015 0078 0032 0078 0015 0500");
             NameEngine nameEngine = new NameEngine("{D=3, F=2, H1=1, H2=2, H3=3, H4=4}");
-            NameEngine recognizeData = rs200.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = rs200.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -583,8 +584,8 @@ public class ProtocolNGTest {
             System.out.println("recognizeSolidtek16");
             IrSignal irSignal = Pronto.parse("0000 006D 002E 0000 0045 002E 0012 0018 0012 0018 0024 0018 0012 0018 0012 0018 0012 0018 0012 002F 0024 002F 0012 0018 0012 0018 0012 0018 0012 0018 0012 0018 0024 0018 0012 1552 0045 002E 0012 0018 0012 0018 0024 0018 0012 0018 0012 0018 0012 0018 0012 002F 0024 002F 0012 0018 0024 002F 0012 0018 0012 0018 0012 0018 0024 1552 0045 002E 0012 0018 0012 0018 0024 0018 0012 0018 0012 0018 0012 0018 0012 002F 0024 002F 0012 0018 0024 002F 0012 0018 0012 0018 0012 0018 0024 1552");
             NameEngine nameEngine = new NameEngine("{D=12, F=23}");
-            NameEngine recognizeData = solidtek16.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = solidtek16.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -598,8 +599,8 @@ public class ProtocolNGTest {
             IrSequence ending = new IrSequence(new int[]{2640, 1980, 660, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 330, 330, 660, 660, 660, 660, 660, 660, 660, 330, 330, 330, 330, 660, 330, 330, 660, 660, 330, 330, 330, 330, 330, 330, 660, 660, 660, 330, 330, 660, 660, 660, 74330});
             IrSignal irSignal = new IrSignal(repeat, repeat, ending, 36000f);
             NameEngine nameEngine = new NameEngine("{D=73, F=55, S=42, E=10}");
-            NameEngine recognizeData = zaptor.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = zaptor.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
             IrSignal silly = new IrSignal(repeat, repeat, repeat, 36000f);
             recognizeData = zaptor.recognize(silly);
             assertTrue(recognizeData == null);
@@ -608,14 +609,14 @@ public class ProtocolNGTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testRecognizeIodatan() {
         try {
             System.out.println("recognizeIodatan");
             IrSignal irSignal = Pronto.parse("0000 006D 0000 002A 014E 00A7 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 003F 0015 003F 0015 003F 0015 0015 0015 003F 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0627");
             NameEngine nameEngine = new NameEngine("{D=12, F=23, S=34}");
-            NameEngine recognizeData = iodatan.recognize(irSignal);
-            assertTrue(nameEngine.numbericallyEquals(recognizeData));
+            Map<String, Long> recognizeData = iodatan.recognize(irSignal, false);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IncompatibleArgumentException | IrpSyntaxException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -145,6 +145,11 @@ public class Expression extends PrimaryItem /* ??? */ {
         return exp1.invert(solution);
     }
 
+    @Override
+    public boolean isUnary() {
+        return parseTree.getChildCount() == 1;
+    }
+
     public int numberNames() {
         if (parseTree.primary_item() != null)
             return newPrimaryItem(parseTree.primary_item()).toName() != null ? 1 : 0;

@@ -19,6 +19,7 @@ package org.harctoolbox.ircore;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.irp.IrpSyntaxException;
@@ -66,9 +67,9 @@ public class IrpMasterUtils {
         return renderIrSignal(protocolName, parameters.toMap());
     }
 
-    public static IrSignal renderIrSignal(String protocolName, HashMap<String, Long> parameters) throws org.harctoolbox.IrpMaster.IrpMasterException {
+    public static IrSignal renderIrSignal(String protocolName, Map<String, Long> parameters) throws org.harctoolbox.IrpMaster.IrpMasterException {
         org.harctoolbox.IrpMaster.Protocol irpMasterProtol = irpMaster.newProtocol(protocolName);
-        org.harctoolbox.IrpMaster.IrSignal irSignal = irpMasterProtol.renderIrSignal(parameters);
+        org.harctoolbox.IrpMaster.IrSignal irSignal = irpMasterProtol.renderIrSignal(new HashMap<>(parameters));
         return toIrSignal(irSignal);
     }
     private IrpMasterUtils() {

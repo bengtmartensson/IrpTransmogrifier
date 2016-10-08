@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2012, 2015 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -116,13 +116,14 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         if (map.size() != other.map.size())
             return false;
 
+        boolean result = true;
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             String key = kvp.getKey();
             if (!kvp.getValue().equals(other.map.get(key)))
-                return false;
+                result = false;
         }
 
-        return true;
+        return result;
     }
 
     public int size() {
@@ -190,38 +191,6 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
             return false;
         }
-    }
-        /*
-        if (object == this)
-            return true;
-        if (!(object instanceof NameEngine))
-            return false;
-
-        NameEngine other = (NameEngine) object;
-        if (other.size() != this.size())
-            return false;
-
-        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
-            try {
-                String name = kvp.getKey();
-                long value = kvp.getValue().toNumber(this);
-                Expression expr = other.get(name);
-                if (expr == null)
-                    return false;
-                if (value != expr.toNumber(other)) {
-                    logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
-                    return false;
-                }
-            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
-                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            }
-        }
-
-    private Map<String, Long> toMap() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-        return true;
     }
 
     /**
@@ -304,45 +273,6 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
     }
 
     /**
-     * Set names according to the content of the default values supplies in the first argument.
-     *
-     * @param parameterSpecs from where the default values are taken
-     * @param initial If false, Parameters with memory (state variables) are not reset.
-     * /
-    public void loadDefaults(ParameterSpecs parameterSpecs, boolean initial) {
-        for (ParameterSpec param : parameterSpecs.getParams()) {
-            if ((initial || ! param.hasMemory()) && param.getDefault() != null) {
-                //System.out.println(">>>>>" + param.getName());
-                map.put(param.getName(), param.getDefault());
-            }
-        }
-    }
-
-    public void loadActualParameters(HashMap<String, Long> ivs, ParameterSpecs paramSpecs) throws DomainViolationException {
-        for (Entry<String, Long> kvp : ivs.entrySet()) {
-            String name = kvp.getKey();
-            // if no Parameter Specs, do not annoy the user; he has been warned already.
-            if (!paramSpecs.isEmpty()) {
-                ParameterSpec ps = paramSpecs.getParameterSpec(name);
-                if (ps == null) {
-                    UserComm.warning("Parameter `" + name + "' unknown in ParameterSpecs.");
-                } else if (!ps.isOK(kvp.getValue())) {
-                    throw new DomainViolationException("Parameter " + name + " = " + kvp.getValue() + " outside of allowed domain (" + ps.domainAsString() + ").");
-                }
-            }
-            assign(name, kvp.getValue());
-        }
-    }
-
-    public void checkAssignments(ParameterSpecs paramSpecs) throws UnassignedException {
-        for (String name : paramSpecs.getNames()) {
-            if (!map.containsKey(name)) {
-                throw new UnassignedException("Parameter `" + name + "' has not been assigned.");
-            }
-        }
-    }*/
-
-    /**
      * Returns the expression associated to the name given as parameter.
      * @param name
      * @return
@@ -364,36 +294,9 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         return get(name).getParseTree();
     }
 
-    /* *
-     *
-     * @param name Input name
-     * @return StringTree of the value.
-     * @throws UnassignedException
-     * /
-    public IrpParser.Bare_expressionContext evaluate(String name) throws UnassignedException {
-        if (map.containsKey(name))
-            return map.get(name);
-        else
-            throw new UnassignedException("Name `" + name + "' not defined.");
-    }
-
-    public IrpParser.Bare_expressionContext evaluate(IrpParser.NameContext ctx) throws UnassignedException {
-        return evaluate(ctx.getText());
-    }*/
-
     public boolean containsKey(String name) {
         return map.containsKey(name);
     }
-
-    /*public String tryEvaluate(String name) {
-        IrpParser.Bare_expressionContext result ;
-        try {
-            result = evaluate(name);
-        } catch (UnassignedException ex) {
-            System.err.println(ex.getMessage());
-        }
-        return result;
-    }*/
 
     void add(NameEngine definitions) {
         map.putAll(definitions.map);
@@ -409,11 +312,6 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     @Override
     public String toString() {
-//        StringBuilder str = new StringBuilder();
-//        for (String name : map.keySet()) {
-//            str.append(name).append("=").append(map.get(name).toString()).append(",");
-//        }
-//        return "{" + (str.length() == 0 ? "" : str.substring(0, str.length()-1)) + "}";
         return toIrpString();
     }
 
@@ -428,32 +326,11 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     public String toIrpString(int radix) {
         StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
-//        map.entrySet().stream().forEach((kvp) -> {
-//            stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + kvp.getValue().toIrpString(radix));
-//        });
         map.entrySet().stream().forEach((kvp) -> {
             stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + kvp.getValue().toIrpString(radix));
         });
         return stringJoiner.toString();
     }
-
-//    /**
-//     * Creates consisting of parameter values that can be used as part of filenames etc.
-//     * Roughly, is a "pretty" variant of toString().
-//     *
-//     * @param equals String between name and value, often "=",
-//     * @param separator String between name-value pairs, often ",".
-//     * @return String
-//     * @throws org.harctoolbox.irp.UnassignedException
-//     */
-//    public String notationString(String equals, String separator) throws UnassignedException {
-//        StringBuilder str = new StringBuilder();
-//        for (String name : map.keySet()) {
-//            if (!name.startsWith("$") && !toParseTree(name).toStringTree().startsWith("("))
-//                str.append(name).append(equals).append(toParseTree(name).toStringTree()).append(separator);
-//        }
-//        return (str.length() == 0 ? "" : str.substring(0, str.length()-1));
-//    }
 
     @Override
     public Element toElement(Document document) {
@@ -496,13 +373,6 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
                 map.put(name, val);
         }
     }
-
-//    void reduce(ParameterSpecs parameterSpecs) {
-//        ArrayList<String> names = new ArrayList<>(map.keySet());
-//        names.stream().filter((name) -> (!parameterSpecs.contains(name))).forEach((name) -> {
-//            map.remove(name);
-//        });
-//    }
 
     @Override
     public int weight() {

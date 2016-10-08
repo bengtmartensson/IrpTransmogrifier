@@ -128,18 +128,4 @@ class BitwiseParameter implements Cloneable {
     public long getBitmask() {
         return bitmask;
     }
-
-//    /**
-//     * @return the needsChecking
-//     */
-//    public boolean isNeedsChecking() {
-//        return needsChecking;
-//    }
-//
-//    /**
-//     * @param needsChecking the needsChecking to set
-//     */
-//    public void setNeedsChecking(boolean needsChecking) {
-//        this.needsChecking = needsChecking;
-//    }
 }

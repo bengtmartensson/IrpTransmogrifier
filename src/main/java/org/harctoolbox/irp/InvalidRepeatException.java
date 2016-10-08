@@ -17,7 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-/** Multiple repetitions discovered. This is not implemented. */
+/**
+ * Multiple repetitions discovered. This is not supported.
+ */
 public class InvalidRepeatException extends IrpException {
 
     public InvalidRepeatException(String string) {

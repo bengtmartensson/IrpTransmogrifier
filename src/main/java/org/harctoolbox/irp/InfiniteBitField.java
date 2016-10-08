@@ -44,9 +44,6 @@ public class InfiniteBitField extends BitField {
         long x = data.toNumber(nameEngine) >>> chop.toNumber(nameEngine);
         if (complement)
             x = ~x;
-        //x &= ((1L << width.toNumber(nameEngine)) - 1L);
-        //if (reverse)
-        //    x = IrpUtils.reverse(x, maxWidth);
 
         return x;
     }
@@ -89,14 +86,10 @@ public class InfiniteBitField extends BitField {
     @Override
     public Element toElement(Document document) throws IrpSyntaxException {
         Element element = document.createElement("infinite_bitfield");
-        //element.setAttribute("reverse", Boolean.toString(reverse));
         element.setAttribute("complement", Boolean.toString(complement));
         Element dataElement = document.createElement("data");
         dataElement.appendChild(data.toElement(document));
         element.appendChild(dataElement);
-        //Element widthElement = document.createElement("width");
-        //widthElement.appendChild(width.toElement(document));
-        //element.appendChild(widthElement);
         if (!(chop instanceof Number && ((Number) chop).toNumber() == 0)) {
             Element chopElement = document.createElement("chop");
             chopElement.appendChild(chop.toElement(document));

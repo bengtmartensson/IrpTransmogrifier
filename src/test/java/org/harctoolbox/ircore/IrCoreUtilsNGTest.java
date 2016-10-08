@@ -95,7 +95,7 @@ public class IrCoreUtilsNGTest {
      */
     @Test
     public void testL1Norm_DoubleObjectArr() {
-        System.out.println("l1Norm");
+        System.out.println("l1NormDouble");
         Double[] sequence = new Double[] { Double.valueOf(1f), Double.valueOf(2f), Double.valueOf(3f), Double.valueOf(4f) };
         double expResult = 10.0;
         double result = IrCoreUtils.l1Norm(sequence);
@@ -107,7 +107,7 @@ public class IrCoreUtilsNGTest {
      */
     @Test
     public void testL1Norm_doubleArr() {
-        System.out.println("l1Norm");
+        System.out.println("l1Normdouble");
         double[] sequence = new double[] { 1f, 2f, 3f, 4f };
         double expResult = 10.0;
         double result = IrCoreUtils.l1Norm(sequence);

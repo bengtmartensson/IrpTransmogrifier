@@ -33,28 +33,21 @@ class EvaluatedIrStream {
     private final static Logger logger = Logger.getLogger(EvaluatedIrStream.class.getName());
 
     private final List<Evaluatable> elements;
-    //private BitField bitField;
-    //private final BitSpec bitSpec;
     private final GeneralSpec generalSpec;
     private final IrSignal.Pass pass;
     private final NameEngine nameEngine;
-    //private double elapsed;
     private IrSignal.Pass state;
 
     EvaluatedIrStream(NameEngine nameEngine, GeneralSpec generalSpec, IrSignal.Pass pass) {
         this.nameEngine = nameEngine;
         this.generalSpec = generalSpec;
         this.pass = pass;
-        //this.bitSpec = bitSpec;
         elements = new ArrayList<>(10);
-        //elapsed = 0f;
         state = null;
     }
 
     IrSequence toIrSequence()
             throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        //evaluateBitStream();
-        //canonicalize();
         IrpUtils.entering(logger, "toIrSequence", this);
         List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
@@ -93,37 +86,21 @@ class EvaluatedIrStream {
 
         int lastIndex = elements.size() - 1;
         if (lastIndex >= 0 && elements.get(lastIndex) instanceof BitStream && evaluatedIrStream.elements.get(0) instanceof BitStream) {
-            //assert (evaluatedIrStream.elements.size() == 1);
             squeezeBitStreams((BitStream) evaluatedIrStream.elements.get(0));
-            //if (bitSpec != null)
-            //    reduce(lastIndex);
             evaluatedIrStream.removeHead();
             add(evaluatedIrStream);
         } else {
-            //evaluateBitStream();
             elements.addAll(evaluatedIrStream.elements);
-            //if (bitSpec != null)
-            //    reduce();
         }
-        //updateElapsed();
-        //updateState();
-        //}
-        //} else {
-        //    elements.addAll(evaluatedIrStream.elements);
-        //}
-        //updateElapsed();
-        //updateState();
     }
 
     public void reduce(BitSpec bitSpec) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         int index = 0;
         while (index < elements.size()) {
-            if (elements.get(index) instanceof BitStream) {
+            if (elements.get(index) instanceof BitStream)
                 index += reduce(bitSpec, index);
-//            add(bitFieldDurations);
-            } else {
+            else
                 index++;
-            }
         }
     }
 
@@ -131,34 +108,14 @@ class EvaluatedIrStream {
         BitStream bitStream = (BitStream) elements.get(index);
         elements.remove(index);
         EvaluatedIrStream bitFieldDurations = bitStream.evaluate(pass, pass, nameEngine, generalSpec, bitSpec);
-        //bitFieldDurations.reduce(bitSpec);
         int length = bitFieldDurations.elements.size();
         elements.addAll(index, bitFieldDurations.elements);
         return length;
     }
 
     void add(Evaluatable evaluatable) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException  {
-        //evaluateBitStream();
         elements.add(evaluatable);
-        //updateElapsed();
-        //updateState();
     }
-
-//    private void updateState() {
-//        for (Evaluatable element : elements)
-//            if (element.stateWhenExiting() != null)
-//                state = element.stateWhenExiting();
-//    }
-
-//    private void evaluateBitStream() throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-//        int lastIndex = elements.size() - 1;
-//        if (lastIndex >= 0 && elements.get(lastIndex) instanceof BitStream) {
-//            BitStream bitStream = (BitStream) elements.get(lastIndex);
-//            elements.remove(lastIndex);
-//            EvaluatedIrStream bitFieldDurations = bitStream.evaluate(pass, pass, nameEngine, generalSpec, bitSpec, elapsed);
-//            add(bitFieldDurations);
-//        }
-//    }
 
     private void removeHead() {
         elements.remove(0);
@@ -183,27 +140,9 @@ class EvaluatedIrStream {
         IrpUtils.entering(logger, "squeezeBitStreams", this.toString() + "+" + bitStream);
         int lastIndex = elements.size() - 1;
         BitStream old = (BitStream) elements.get(lastIndex);
-        //elements.remove(lastIndex);
         old.add(bitStream, nameEngine, generalSpec);
-        //elements.add(newBitField);
         IrpUtils.exiting(logger, "squeezeBitStreams", this);
     }
-
-//    private void updateElapsed() throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-//        elapsed = 0f;
-//        for (Evaluatable element : elements) {
-//            if (element instanceof Floatable)
-//                elapsed += ((Floatable) element).toFloat(nameEngine, generalSpec);
-//            else {
-//                elapsed = -1f;
-//                break;
-//            }
-//        }
-//    }
-//
-//    double getElapsed() {
-//        return elapsed;
-//    }
 
     /**
      * @return the state

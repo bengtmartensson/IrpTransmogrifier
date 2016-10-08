@@ -31,11 +31,9 @@ public class ParameterCollector implements Cloneable {
     public final static long INVALID = -1L;
 
     private HashMap<String, BitwiseParameter> map;
-    //private final List<String> needFinalCheck;
 
     public ParameterCollector() {
         map = new LinkedHashMap<>(8);
-        //needFinalCheck = new ArrayList<>(2);
     }
 
     ParameterCollector(Map<String, Long> nameMap) {
@@ -87,17 +85,6 @@ public class ParameterCollector implements Cloneable {
     public long getValue(String name) {
         return map.containsKey(name) ? map.get(name).getValue() : INVALID;
     }
-/*
-    public void checkConsistencyWith(NameEngine nameEngine) throws NameConflictException, UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-        NameEngine extended = nameEngine.clone();
-        addToNameEngine(extended);
-        for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
-            String name = kvp.getKey();
-            BitwiseParameter parameter = kvp.getValue();
-            if (!parameter.isConsistent(extended.get(name).toNumber(extended)))
-                throw new NameConflictException(name);
-        }
-    }*/
 
     NameEngine toNameEngine() throws IrpSyntaxException {
         NameEngine nameEngine = new NameEngine();
@@ -110,85 +97,10 @@ public class ParameterCollector implements Cloneable {
         return nameEngine;
     }
 
-//    public void updateValues() throws IrpSyntaxException {
-//        NameEngine simple = toNumericalNameEngine();
-//        for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
-//            String name = kvp.getKey();
-//            BitwiseParameter parameter = kvp.getValue();
-//            if (parameter.expression != null) {
-//                try {
-//                    long val = parameter.expression.toNumber(simple);
-//                    parameter.value = val;
-//                    parameter.needsFinalChecking = false;
-//                } catch (UnassignedException ex) {
-//                    parameter.needsFinalChecking = true;
-//                } catch (IncompatibleArgumentException ex) {
-//                    logger.log(Level.SEVERE, null, ex);
-//                }
-//            }
-//        }
-//    }
-
-    /*public NameEngine toNameEngine() throws IrpSyntaxException {
-        NameEngine result = new NameEngine();
-        for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
-            String name = kvp.getKey();
-            BitwiseParameter parameter = kvp.getValue();
-            if (parameter.value != null)
-                result.define(name, parameter.value);
-        }
-        for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
-            String name = kvp.getKey();
-            BitwiseParameter parameter = kvp.getValue();
-            if (parameter.expression != null) {
-                try {
-                    long val = parameter.expression.toNumber(result);
-                    result.define(name, val);
-                } catch (UnassignedException ex) {
-                    parameter.needsFinalChecking = true;
-                } catch (IncompatibleArgumentException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        return result;
-    }*/
-
-//    public HashMap<String, Long> toHashMap() {
-//        HashMap<String, Long> hashMap = new HashMap<>(map.size());
-//
-//        map.entrySet().stream().forEach((kvp) -> {
-//            hashMap.put(kvp.getKey(), kvp.getValue().getValue());
-//        });
-//        return hashMap;
-//    }
-
-    /*public void add(NameEngine nameEngine) throws IrpSyntaxException, NameConflictException, UnassignedException, IncompatibleArgumentException {
-        for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
-//            String name = kvp.getKey();
-            if (!nameEngine.containsKey(kvp.getKey()))
-//                if (nameEngine.get(name).toNumber(nameEngine) != kvp.getValue().value)
-//                    throw new NameConflictException(name);
-//            } else
-                nameEngine.define(kvp.getKey(), kvp.getValue().getValue());
-        }
-    }*/
-
     void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, IncompatibleArgumentException {
-        for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
-            //String name = kvp.getKey();
-            //BitwiseParameter parameter = kvp.getValue();
-//            if (nameEngine.containsKey(name)) {
-//                try {
-//                    Expression expression = nameEngine.get(name);
-//                    long val = expression.toNumber(nameEngine);
-//                    if (!parameter.isConsistent(val))
-//                        throw new NameConflictException(name);
-//                } catch (UnassignedException ex) {
-//                }
-//            }
+        map.entrySet().stream().forEach((kvp) -> {
             nameEngine.put(kvp.getKey(), kvp.getValue().getValue());
-        }
+        });
     }
 
     @Override
@@ -218,10 +130,6 @@ public class ParameterCollector implements Cloneable {
         });
         return result;
     }
-
-//    void checkConsistency(NameEngine nameEngine, NameEngine definitions) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
 
     boolean isConsistent(String name, long value) {
         BitwiseParameter param = get(name);

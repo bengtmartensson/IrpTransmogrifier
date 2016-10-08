@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2012, 2015 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -47,26 +47,12 @@ public class Pronto {
     private final static int rc6Frequency = 0x0073;
     private final static int nec1Frequency = 0x006C;
 
-    private final static String rc5Irp  = "{36k,msb,889}<1,-1|-1,1>((1:1,~F:1:6,T:1,D:5,F:6,^114m)+,T=1-T)[T@:0..1=0,D:0..31,F:0..127]";
-    private final static String rc5xIrp = "{36k,msb,889}<1,-1|-1,1>(1:1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m,T=1-T)+ [D:0..31,S:0..127,F:0..63,T@:0..1=0]";
-    private final static String rc6Irp  = "{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m,T=1-T)+ [D:0..255,F:0..255,T@:0..1=0]";
+    private final static String rc5Irp  = "{36k,msb,889}<1,-1|-1,1>((1:1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[T@:0..1=0,D:0..31,F:0..127]";
+    private final static String rc5xIrp = "{36k,msb,889}<1,-1|-1,1>((1:1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T) [D:0..31,S:0..127,F:0..63,T@:0..1=0]";
+    private final static String rc6Irp  = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]";
     private final static String nec1Irp = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,-78,(16,-4,1,-173)*) [D:0..255,S:0..255=255-D,F:0..255]";
 
     private static final Logger logger = Logger.getLogger(Pronto.class.getName());
-
-
-    /**
-     * Constructor from IrSignal.
-     * @param irSignal
-     * @throws IncompatibleArgumentException
-     */
-    /*public Pronto(IrSignal irSignal) {
-        this.irSignal = irSignal;
-        if (irSignal.getEndingLength() != 0) {
-            logger.log(Level.WARNING,
-                    "When computing the Pronto representation, a (non-empty) ending sequence was ignored");
-        }
-    }*/
 
     /**
      * Formats an integer like seen in CCF strings, in printf-ish, using "%04X".
@@ -121,24 +107,6 @@ public class Pronto {
         return Math.min((int)Math.round(Math.abs(us) * (frequency > 0 ? frequency : dummyFrequency)/1000000.0), 0xFFFF);
     }
 
-    /**
-     * Computes a ccf array, without header.
-     * @param frequency
-     * @param sequence
-     * @return CCF array
-     * @throws IncompatibleArgumentException
-     */
-    /*public static int[] toArray(double frequency, double[] sequence) {
-        if (sequence.length % 2 == 1)
-            throw new IncompatibleArgumentException("IR Sequence must be of even length.");
-
-        int[] data = new int[sequence.length];
-        for (int i = 0; i < sequence.length; i++)
-            data[i] = pulses(sequence[i], frequency);
-
-        return data;
-    }*/
-
     private static double[] usArray(int frequencyCode, int[] ccfArray, int beg, int end) {
         double pulseTime = getPulseTime(frequencyCode);
         double[] data = new double[end - beg];
@@ -170,11 +138,6 @@ public class Pronto {
             throw new IncompatibleArgumentException("Inconsistent length in CCF (claimed "
                     + (introLength + repeatLength) + " pairs, was " + (ccf.length - 4)/2 + " pairs).");
         IrSignal irSignal = null;
-        /*String irp = null;
-        int dev = (int) IrpUtils.invalid;
-        int subdev = (int) IrpUtils.invalid;
-        int cmd = (int) IrpUtils.invalid;
-        int pass = (int) IrpUtils.all*/
 
         switch (type) {
             case learnedCode: // 0x0000
@@ -187,63 +150,51 @@ public class Pronto {
                         type == learnedCode ? getFrequency(frequencyCode) : 0,
                         ModulatedIrSequence.unknownDutyCycle);
                 break;
-/*
-            case rc5Code: // 0x5000:
-                if (repeatLength != 1)
-                    throw new IncompatibleArgumentException("wrong repeat length");
-                irp = rc5Irp;
-                pass = 1;
-                dev = ccf[index++];
-                cmd = ccf[index++];
-                break;
 
-            case rc5xCode: // 0x5001:
-                if (repeatLength != 2)
-                    throw new IncompatibleArgumentException("wrong repeat length");
-                irp = rc5xIrp;
-                pass = 1;
-                dev = ccf[index++];
-                subdev = ccf[index++];
-                cmd = ccf[index++];
-                break;
+                // TODO implement some short cases
 
-            case rc6Code: // 0x6000:
-                if (repeatLength != 1)
-                    throw new IncompatibleArgumentException("wrong repeat length");
-                irp = rc6Irp;
-                pass = 1;
-                dev = ccf[index++];
-                cmd = ccf[index++];
-                break;
-
-            case nec1Code: // 0x900a:
-                if (repeatLength != 1)
-                    throw new IncompatibleArgumentException("wrong repeat length");
-                irp = nec1Irp;
-		dev = ccf[index] >> 8;
-                subdev = ccf[index++] & 0xff;
-		cmd = ccf[index] >> 8;
-		int cmd_chk = 0xff - (ccf[index++] & 0xff);
-		if (cmd != cmd_chk)
-		    throw new IncompatibleArgumentException("checksum erroneous");
-                break;
-*/
+//            case rc5Code: // 0x5000:
+//                if (repeatLength != 1)
+//                    throw new IncompatibleArgumentException("wrong repeat length");
+//                irp = rc5Irp;
+//                pass = 1;
+//                dev = ccf[index++];
+//                cmd = ccf[index++];
+//                break;
+//
+//            case rc5xCode: // 0x5001:
+//                if (repeatLength != 2)
+//                    throw new IncompatibleArgumentException("wrong repeat length");
+//                irp = rc5xIrp;
+//                pass = 1;
+//                dev = ccf[index++];
+//                subdev = ccf[index++];
+//                cmd = ccf[index++];
+//                break;
+//
+//            case rc6Code: // 0x6000:
+//                if (repeatLength != 1)
+//                    throw new IncompatibleArgumentException("wrong repeat length");
+//                irp = rc6Irp;
+//                pass = 1;
+//                dev = ccf[index++];
+//                cmd = ccf[index++];
+//                break;
+//
+//            case nec1Code: // 0x900a:
+//                if (repeatLength != 1)
+//                    throw new IncompatibleArgumentException("wrong repeat length");
+//                irp = nec1Irp;
+//		dev = ccf[index] >> 8;
+//                subdev = ccf[index++] & 0xff;
+//		cmd = ccf[index] >> 8;
+//		int cmd_chk = 0xff - (ccf[index++] & 0xff);
+//		if (cmd != cmd_chk)
+//		    throw new IncompatibleArgumentException("checksum erroneous");
+//                break;
             default:
                 throw new IncompatibleArgumentException("CCF type 0x" + Integer.toHexString(type) + " not supported");
         }
-/*
-        if (irSignal == null) {
-            HashMap<String, Long> parameters = new HashMap<>();
-            parameters.put("D", (long) dev);
-            if (subdev != (int) IrpUtils.invalid)
-                parameters.put("S", (long) subdev);
-            parameters.put("F", (long) cmd);
-            if (pass == 1)
-                parameters.put("T", 0L);
-
-            //Protocol protocol = new Protocol(null, irp, null);
-            //irSignal = protocol.renderIrSignal(parameters, pass);
-        }*/
         return irSignal;
     }
 

@@ -47,16 +47,6 @@ public class NameOrNumber extends IrpObject implements Floatable {
         thing = new NumberWithDecimals(x);
     }
 
-//    @Override
-//    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-//        return thing.toNumber(nameEngine);
-//    }
-//
-//    @Override
-//    public String toInfixCode() throws IrpSyntaxException {
-//        return thing.toInfixCode();
-//    }
-
     @Override
     public String toString() {
         return toIrpString();
@@ -65,12 +55,7 @@ public class NameOrNumber extends IrpObject implements Floatable {
     @Override
     public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec)
             throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        //return (thing instanceof Name) ? ((Name) thing).toNumber(nameEngine) : ((NumberWithDecimals) thing).toFloat();
         return thing.toFloat(nameEngine, generalSpec);
-    }
-
-    Object toNumber(NameEngine nameEngine) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

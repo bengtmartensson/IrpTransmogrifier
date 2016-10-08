@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2012, 2013, 2016 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,18 +33,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
      * Max length of a BitField in this implementation.
      */
     public static final int maxWidth = Long.SIZE - 1; // = 63
-    //private long evaluatePrimaryItem(String s, long deflt) {
-    //    return (s == null || s.isEmpty()) ? deflt : Long.parseLong(s);
-    //}
-
-//    public BitField() {
-//        data = null;
-//        chop = null;
-//        width = null;
-//        complement = false;
-//        reverse = false;
-//        //infinite = false;
-//    }
 
     public static BitField newBitField(String str) throws IrpSyntaxException {
         return newBitField(new ParserDriver(str).getParser().bitfield());
@@ -56,26 +44,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         instance.parseTree = ctx;
         return instance;
     }
-    /*
-    public void init(boolean complement, boolean reverse, boolean infinite, long data, long width, long skip) throws DomainViolationException {
-    if (width > maxWidth)
-    throw new DomainViolationException("Max width of bitfields (= " + maxWidth + ") exceeded.");
-    if (width < 0)
-    throw new DomainViolationException("Width of bitfield must be nonnegative.");
-    if (skip > maxWidth)
-    throw new DomainViolationException("Max skip value in bitfields (= " + maxWidth + ") exceeded.");
-    if (skip < 0)
-    throw new DomainViolationException("Skip value of bitfield must be nonnegative.");
-
-    this.complement = complement;
-    this.reverse = reverse;
-    this.infinite = infinite;
-    this.data = data;
-    this.width = infinite ? maxWidth : (int) width;
-    this.skip = (int) skip;
-    compute();
-    //Debug.debugBitFields("new Bitfield: " + toString() + " = " + toLong());
-    }*/
 
     public static long parse(String str, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
         BitField bitField = newBitField(str);
@@ -84,14 +52,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     private IrpParser.BitfieldContext parseTree;
 
     protected boolean complement;
-    //protected boolean reverse;
-    //boolean infinite;
-    //long data;
-    //int width = maxWidth;
-    //int skip = 0;
-    //long value;
     protected PrimaryItem data;
-    //protected PrimaryItem width;
     protected PrimaryItem chop;
 
     @Override
@@ -121,19 +82,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     public abstract String toString(NameEngine nameEngine);
 
-
-//    public String evaluateAsString() {
-//        String padding = value >= 0
-//                ? "0000000000000000000000000000000000000000000000000000000000000000"
-//                : "1111111111111111111111111111111111111111111111111111111111111111";
-//        String s = Long.toBinaryString(value);
-//        if (s.length() > width)
-//            s = s.substring(s.length() - width);
-//        else if (s.length() < width)
-//            s = padding.substring(0, width - s.length()) + s;
-//        return s;
-//    }
-
     public abstract long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
 
     @Override
@@ -145,39 +93,8 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         }
     }
 
-//    private static void usage(int code) {
-//        System.out.println("Usage:");
-//        System.out.println("\tBitfield [-d]? <bitfield> [{ NameEngine }]*");
-//        System.exit(code);
-//    }
-
-//    public static void main(String[] args) {
-//        boolean debug = false;
-//        if (args.length == 0)
-//            usage(IrpUtils.exitUsageError);
-//        int arg_i = 0;
-//        if (args[0].equals("-d")) {
-//            debug = true;
-//            arg_i++;
-//        }
-//        try {
-//            NameEngine nameEngine = args.length > arg_i + 1
-//                    ? new NameEngine(args[arg_i + 1]) : new NameEngine();
-//            BitField bitField = newBitField(args[arg_i]);
-//            usage(IrpUtils.exitFatalProgramFailure);
-//        } catch (ArrayIndexOutOfBoundsException | IrpSyntaxException ex) {
-//            System.err.println(ex.getMessage());
-//            usage(IrpUtils.exitUsageError);
-//        }
-//    }
-
-//    BitField append(BitField bitField, BitDirection bitDirection) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-
     public boolean hasChop() {
         try {
-            //return !(chop instanceof Number && ((Number) chop).toNumber(null) == 0);
             return chop.toNumber(null) != 0;
         } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
             return true;

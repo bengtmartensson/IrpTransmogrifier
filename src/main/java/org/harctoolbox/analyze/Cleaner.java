@@ -77,8 +77,6 @@ public class Cleaner {
         createCookedData();
         createCleanHistogram();
         createSortedGapsAndFlashes();
-        //createNormedTimings();
-        //System.out.println(toTimingsString());
     }
 
     private void createRawHistogram() {
@@ -90,19 +88,7 @@ public class Cleaner {
                 rawHistogram.put(duration, new HistoPair());
             rawHistogram.get(duration).increment(isFlash);
         }
-//        for (int d : rawData) {
-//            int old = rawHistogram.containsKey(d) ? rawHistogram.get(d) : 0;
-//            rawHistogram.put(d, old + 1);
-//        }
     }
-
-//    public int[] getIndexData() {
-//        return indexData;
-//    }
-
-//    HashMap<Integer, Integer> getRawHistogram() {
-//        return rawHistogram;
-//    }
 
     private void createDumbTimingsTable(int absoluteTolerance, double relativeTolerance) {
         dumbTimingsTable = new ArrayList<>(rawData.length);
@@ -198,13 +184,6 @@ public class Cleaner {
             sum += timings.get(indexData[i]);
         return sum;
     }
-
-//    /**
-//     * @return the timings
-//     */
-//    public List<Integer> getTimings() {
-//        return timings;
-//    }
 
     public int getTiming(int index) {
         return  timings.get(index);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2016 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
+
 package org.harctoolbox.irp;
 
 import java.util.List;
@@ -60,20 +61,6 @@ public class Extent extends Duration {
         return time;
     }
 
-//    @Override
-//    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-//            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-//        //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
-//        if (pass != state)
-//            return null;
-//
-//        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, pass);
-//        //double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
-//        //evaluatedIrStream.add(new Gap(time));
-//        evaluatedIrStream.add(this);
-//        return evaluatedIrStream;
-//    }
-
     @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         return -evaluate(nameEngine, generalSpec, elapsed);
@@ -100,28 +87,6 @@ public class Extent extends Duration {
         IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", theoretical, physical);
         return success;
     }
-
-
-
-
-
-//    @Override
-//    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass,
-//            ArrayList<BitSpec> bitSpecs)
-//            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-//         if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
-//            return false;
-//         if (recognizeData.getPosition() % 2 == 0)
-//            return false;
-//
-//        if (recognizeData.hasRestFlash())
-//            return false;
-//        double physical = recognizeData.getIrSequence().get(recognizeData.getPosition())
-//                + recognizeData.getRest()
-//                + recognizeData.getIrSequence().getDuration(0, recognizeData.getPosition() - 1);
-//        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
-//        return recognize(recognizeData, physical, theoretical);
-//    }
 
     @Override
     protected boolean isOn() {

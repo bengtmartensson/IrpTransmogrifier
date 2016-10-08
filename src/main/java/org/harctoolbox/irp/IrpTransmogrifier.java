@@ -70,7 +70,11 @@ public class IrpTransmogrifier {
         argumentParser.usage(str);
 
         (exitcode == IrpUtils.exitSuccess ? out : System.err).println(str);
-        System.exit(exitcode);
+        doExit(exitcode);
+    }
+
+    private static void doExit(int exitCode) {
+        System.exit(exitCode);
     }
 
     private static List<String> evaluateProtocols(List<String> in, boolean sort, boolean regexp) {
@@ -205,7 +209,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void render(Protocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
+    private static void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
         NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
                 : commandRenderer.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();
@@ -219,12 +223,11 @@ public class IrpTransmogrifier {
             System.out.println(irSignal.ccfString());
 
         if (commandRenderer.test) {
-            String protocolName = ((NamedProtocol) protocol).getName();
+            String protocolName = protocol.getName();
                 IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(protocolName, nameEngine);
                 if (!irSignal.approximatelyEquals(irpMasterSignal)) {
                     out.println(Pronto.toPrintString(irpMasterSignal));
                     out.println("Error in " + protocolName);
-                    //System.exit(1);
                 }
             }
     }
@@ -240,7 +243,7 @@ public class IrpTransmogrifier {
             if (commandRenderer.test)
                 throw new UsageException("Cannot not use --irp together with --test");
 
-            Protocol protocol = new Protocol(commandRenderer.irp);
+            NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
             render(protocol, commandRenderer);
         } else {
             List<String> list = evaluateProtocols(commandRenderer.protocols, commandRenderer.sort, commandRenderer.regexp);
@@ -277,17 +280,19 @@ public class IrpTransmogrifier {
 
         if (commandAnalyze.statistics) {
             out.println("Spaces:");
-            for (int d : analyzer.getDistinctGaps())
+            analyzer.getDistinctGaps().stream().forEach((d) -> {
                 out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberGaps(d));
+            });
 
             out.println("Marks:");
-            for (int d : analyzer.getDistinctFlashes())
+            analyzer.getDistinctFlashes().stream().forEach((d) -> {
                 out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberFlashes(d));
+            });
 
             out.println("Pairs:");
-            for (Burst pair : analyzer.getPairs()) {
+            analyzer.getPairs().stream().forEach((pair) -> {
                 out.println(analyzer.getName(pair) + ":\t" + analyzer.getNumberPairs(pair));
-            }
+            });
             out.println(analyzer.toTimingsString());
         }
 
@@ -577,10 +582,6 @@ public class IrpTransmogrifier {
                 ex.printStackTrace();
         }
     }
-
-//    private static IrSignal parseProntoOrRaw(List<String> args) {
-//        Pronto.parse(args);
-//    }
 
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2016 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
+
 package org.harctoolbox.irp;
 
 import java.util.List;
@@ -28,18 +29,6 @@ import org.harctoolbox.ircore.IrSignal;
  * @author Bengt Martensson
  */
 public abstract class IrStreamItem extends IrpObject {
-    //    public static IrStreamItem parse(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException {
-//        ParseTree child = ctx.getChild(0);
-//        return //ctx instanceof IrpParser.VariationContext ? new Variation((Va))
-//                //ctx.bitfield() != null ? new BitField(ctx.bitfield())
-//                //: ctx instanceof IrpParser.AssignmentContext ? new Assignment((IrpParser.AssignmentContext) ctx)
-//                //: ctx instanceof IrpParser.ExtentContext ? new BitField((IrpParser.ExtentContext) ctx)
-//                (child instanceof IrpParser.DurationContext) ? Duration.newDuration(((IrpParser.DurationContext) child))
-//                //: ctx instanceof IrpParser.IrstreamContext ? new IrStream(ctx.irstream())
-//                //: ctx instanceof IrpParser.Bitspec_irstreamContext ? new BitspecIrstream(ctx.bitspec_irstream())
-//                : null;
-//    }
-
     public static IrStreamItem newIrStreamItem(String str) throws IrpSyntaxException, InvalidRepeatException {
         return newIrStreamItem((new ParserDriver(str)).getParser().irstream_item());
     }
@@ -55,36 +44,11 @@ public abstract class IrStreamItem extends IrpObject {
                 : null;
     }
 
-    //protected Protocol environment;
-    //protected int noAlternatives = 0;
-
-
     protected IrStreamItem() {
         //environment = env;
         //Debug.debugIrStreamItems(this.getClass().getSimpleName() + " constructed.");
     }
     public abstract boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
-
-
-//    /**
-//     * To be overridden in Variation
-//     * @return noAlternatives
-//     */
-//    public int numberOfAlternatives() {
-//        return noAlternatives;
-//    }
-
-//    protected void debugBegin() {
-//
-//    }
-//
-//    protected void debugEnd() {
-//
-//    }
-//
-//    protected void debugEnd(List<IrStreamItem>list) {
-//
-//    }
 
     /**
      *
@@ -134,5 +98,5 @@ public abstract class IrStreamItem extends IrpObject {
     abstract ParserRuleContext getParseTree();
 
     public abstract boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-    throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
+            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
 }

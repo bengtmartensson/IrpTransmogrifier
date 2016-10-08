@@ -24,20 +24,14 @@ import org.harctoolbox.ircore.IrSignal;
 
 public class RecognizeData implements Cloneable {
 
-    //private int start;
-    //private int length;
     private boolean success;
     private int position;
     private double hasConsumed;
-    //private double rest; // microseconds
-    //private boolean restIsFlash;
     private IrSignal.Pass state;
-    //private NameEngine nameEngine;
     private ParameterCollector parameterCollector;
     private final IrSequence irSequence;
     private final GeneralSpec generalSpec;
     private int extentStart;
-    ////private IrStreamItem lookAheadItem;
     private boolean interleaving;
     private final NameEngine definitions;
     private ParameterCollector needsChecking;
@@ -52,8 +46,6 @@ public class RecognizeData implements Cloneable {
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
             ParameterCollector parameterCollector, boolean interleaving, Map<String, Long> nameMap, double absoluteTolerance, double relativeTolerance) {
-        //this.start = start;
-        //this.length = length;
         success = true;
         danglingBitFieldData = new BitwiseParameter();
         this.generalSpec = generalSpec;
@@ -73,18 +65,6 @@ public class RecognizeData implements Cloneable {
         this.relativeTolerance = relativeTolerance;
     }
 
-//    RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, ParameterCollector nameEngine, boolean interleaving) {
-//        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, nameEngine, interleaving);
-//    }
-
-//    public RecognizeData(IrSequence irSequence, int position) {
-//        this(irSequence, position, 0, IrSignal.Pass.intro, new NameEngine());
-//    }
-//
-//    public RecognizeData(IrSequence irSequence, NameEngine nameEngine) {
-//        this(irSequence, 0, 0, IrSignal.Pass.intro, nameEngine);
-//    }
-
     /**
      * Returns a shallow copy, except for the NameEngine, which is copied with NameEngine.clone().
      * @return
@@ -102,27 +82,6 @@ public class RecognizeData implements Cloneable {
         return result;
     }
 
-//    /**
-//     * @return the start
-//     */
-//    public int getStart() {
-//        return start;
-//    }
-//
-//    /**
-//     * @return the length
-//     */
-//    public int getLength() {
-//        return length;
-//    }
-//
-//    /**
-//     * @return the data
-//     */
-//    public NameEngine getNameEngine() {
-//        return nameEngine;
-//    }
-
     /**
      * @return the state
      */
@@ -137,30 +96,12 @@ public class RecognizeData implements Cloneable {
         return irSequence;
     }
 
-//    /**
-//     * @param start the start to set
-//     */
-//    public void setStart(int start) {
-//        this.start = start;
-//    }
-//
-//    /**
-//     * @param length the length to set
-//     */
-//    public void setLength(int length) {
-//        this.length = length;
-//    }
-
     /**
      * @param state the state to set
      */
     public void setState(IrSignal.Pass state) {
         this.state = state;
     }
-
-//    void setNameEngine(NameEngine nameEngine) {
-//        this.nameEngine = nameEngine;
-//    }
 
     /**
      * @return the position
@@ -195,14 +136,12 @@ public class RecognizeData implements Cloneable {
         if (expression != null) {
             try {
                 long expected = expression.toNumber(parameterCollector.toNameEngine());
-                //if (!parameter.isConsistent(expected))
                 if (!parameter.isConsistent(expected))
-                    throw new NameConflictException(name, parameter.getValue(), expected); // TODO
+                    throw new NameConflictException(name, parameter.getValue(), expected);
             } catch (UnassignedException ex) {
                 // It has an expression, but is not presently checkable.
                 // mark for later checking.
                 needsChecking.add(name, parameter);
-                //parameterCollector.get(name).setNeedsChecking(true);
             }
         } else
             parameterCollector.add(name, parameter);
@@ -241,35 +180,6 @@ public class RecognizeData implements Cloneable {
         position += i;
     }
 
-//    public boolean hasRest() {
-//        return ! IrCoreUtils.approximatelyEquals(rest, 0.0);
-//    }
-//
-//    /**
-//     * @return the rest
-//     */
-//    public double getRest() {
-//        return rest;
-//    }
-//
-//    /**
-//     * @param rest the rest to set
-//     */
-//    public void setRest(double rest) {
-//        this.rest = rest;
-//    }
-//
-//    /**
-//     * @return the restIsFlash
-//     */
-//    public boolean isRestIsFlash() {
-//        return !Duration.isOn(position);
-//    }
-//
-//    public void clearRest() {
-//        rest = 0.0f;
-//    }
-
     public boolean isOn() {
         return Duration.isOn(position);
     }
@@ -299,20 +209,6 @@ public class RecognizeData implements Cloneable {
     public void markExtentStart() {
         extentStart = position + 1;
     }
-
-//    /**
-//     * @return the lookAheadItem
-//     */
-//    public IrStreamItem getLookAheadItem() {
-//        return lookAheadItem;
-//    }
-
-//    /**
-//     * @param lookAheadItem the lookAheadItem to set
-//     */
-//    public void setLookAheadItem(IrStreamItem lookAheadItem) {
-//        this.lookAheadItem = lookAheadItem;
-//    }
 
     /**
      * @return the interleaving
@@ -347,21 +243,7 @@ public class RecognizeData implements Cloneable {
 
     public boolean allowChopping() {
         return ! interleaving;
-////        DurationType current = DurationType.newDurationType(isOn());
-////        return lookAheadItem != null
-////                && (current == lookAheadItem.startingDuratingType(current, false));
     }
-
-////    boolean allowChopping(double wanted) {
-////        throw new UnsupportedOperationException("Not supported yet.");
-////    }
-
-//    /**
-//     * @return the needsFinalParameterCheck
-//     */
-//    public boolean needsFinalParameterCheck() {
-//        return parameterCollector.needsFinalParameterCheck();
-//    }
 
     void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, IncompatibleArgumentException {
         parameterCollector.transferToNamesMap(nameEngine);
@@ -372,25 +254,6 @@ public class RecognizeData implements Cloneable {
         nameEngine.add(definitions);
         needsChecking.checkConsistency(nameEngine, definitions);
         needsChecking = new ParameterCollector();
-//        //List<String> copyOfNeedsChecking = new ArrayList<>(needsChecking);
-//        for (String name : needsChecking.copyOfNeedsChecking) {
-//            Expression expression;
-//            try {
-//                expression = definitions.get(name);
-//            } catch (UnassignedException ex) {
-//                throw new ThisCannotHappenException();
-//            }
-//            try {
-//                long value = expression.toNumber(nameEngine);
-//                if (!parameterCollector.isConsistent(name, value))
-//                    throw new NameConflictException(name);
-//            } catch (UnassignedException ex) {
-//
-//            } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
-//                Logger.getLogger(RecognizeData.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            needsChecking.remove(name);
-//        }
     }
 
     /**

@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- *
+ * Thrown if a name is syntactically invalid.
  */
 public class InvalidNameException extends IrpException {
     public InvalidNameException(String name) {

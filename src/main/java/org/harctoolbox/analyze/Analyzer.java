@@ -36,16 +36,6 @@ public class Analyzer extends Cleaner {
 
     private static final Logger logger = Logger.getLogger(Analyzer.class.getName());
 
-    //private final static boolean biPhaseInvert = false; // RC5: invertBiPhase = true
-
-//    private static String toIrpString(Map<String, Long> map, int radix) {
-//        StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
-//        map.entrySet().stream().forEach((kvp) -> {
-//            stringJoiner.add(kvp.getKey() + "=" + IrpUtils.radixPrefix(radix) + Long.toString(kvp.getValue(), radix));
-//        });
-//        return stringJoiner.toString();
-//    }
-
     private int timebase;
     private int[] normedTimings;
     private List<Burst> pairs;
@@ -88,19 +78,6 @@ public class Analyzer extends Cleaner {
         }
     }
 
-//    public GeneralSpec getGeneralSpec(BitDirection bitDirection, double timebase) {
-//         return new GeneralSpec(bitDirection, timebase, getFrequency());
-//    }
-
-//    public GeneralSpec getGeneralSpec(BitDirection bitDirection) {
-//        return getGeneralSpec(bitDirection, getTimebase());
-//    }
-//
-//    public GeneralSpec getGeneralSpec() {
-//        return getGeneralSpec(BitDirection.msb);
-//    }
-
-
     private void createPairs() {
         pairs = new ArrayList<>(16);
         getDistinctFlashes().stream().forEach((mark) -> {
@@ -131,36 +108,6 @@ public class Analyzer extends Cleaner {
     public int getNumberPairs(Burst pair) {
         return getNumberPairs(pair.getFlashDuration(), pair.getGapDuration());
     }
-
-//    private int normalize(int x) {
-//        return (int) Math.round(((double) x)/timebase);
-//    }
-
-//    public Protocol processTrivial(AnalyzerParams params) {
-//        TrivialDecoder trivialDecoder = new TrivialDecoder(this, params);
-//        try {
-//            return trivialDecoder.process();
-//        } catch (DecodeException ex) {
-//            throw new ThisCannotHappenException();
-//        }
-//    }
-//
-//    public Protocol processPWM(AnalyzerParams params) throws DecodeException {
-//        PwmDecoder pwmDecoder = new PwmDecoder(this, params);
-//        return pwmDecoder.process();
-//    }
-//
-//    public Protocol processPWM4(AnalyzerParams params) throws DecodeException {
-////        if (timings.size() < 6)
-////            throw new DecodeException();
-//        Pwm4Decoder pwm4Decoder = new Pwm4Decoder(this, params);//, timings.get(0), timings.get(1), timings.get(3), timings.get(4), timings.get(5));
-//        return pwm4Decoder.process();
-//    }
-//
-//    public Protocol processBiPhase(AnalyzerParams params) throws DecodeException {
-//        BiphaseDecoder biphaseDecoder = new BiphaseDecoder(this, params);
-//        return biphaseDecoder.process();
-//    }
 
     public Protocol searchProtocol(AnalyzerParams params) {
         List<AbstractDecoder> decoders = new ArrayList<>(4);

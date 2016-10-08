@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 /**
  * This is really an Abelean group...
- * @author bengt
  */
 public enum DurationType {
     gap,

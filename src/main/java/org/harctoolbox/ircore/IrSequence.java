@@ -77,6 +77,7 @@ public class IrSequence implements Cloneable {
     private static boolean equalSign(double x, double y) {
         return x <= 0 && y <= 0 || x >= 0 && y >= 0;
     }
+    // TODO: move to testing file.
     /**
      * Just for testing.
      * @param args the command line arguments

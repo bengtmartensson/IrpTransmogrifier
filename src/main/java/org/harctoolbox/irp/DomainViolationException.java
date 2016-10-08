@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2015 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * This class does something interesting and useful. Or not...
+ * This Exception is thrown when a parameter is outside of its domain.
  */
 public class DomainViolationException extends IrpException {
 

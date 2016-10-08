@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2016 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -45,24 +45,6 @@ public class BitSpec extends IrpObject {
             x >>= 1;
         return m;
     }
-//    private static int noInstances = 0;
-//
-//    public static void reset() {
-//        noInstances = 0;
-//    }
-//
-//    public static int getNoInstances() {
-//        return noInstances;
-//    }
-    //    private BitSpec(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
-////        noInstances++;
-//        chunkSize = computeNoBits(list.size());
-//        bitCodes = new ArrayList<>(list.size());
-//        for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list) {
-//            BareIrStream bareIrStream = new BareIrStream(bareIrStreamCtx);
-//            bitCodes.add(bareIrStream);
-//        }
-//    }
 
     private static List<BareIrStream> parse(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
         List<BareIrStream> result = new ArrayList<>(list.size());
@@ -133,49 +115,12 @@ public class BitSpec extends IrpObject {
         sum = bitCodes.stream().map((code) -> code.numberOfInfiniteRepeats()).reduce(sum, Integer::sum);
         return sum;
     }
-    /*
-    public BitSpec(List<BareIrStream> s, Protocol env) {
-    super(env);
-    bitCodes = s;
-    chunkSize = computeNoBits(s.size());
-    }
-
-    //public BitSpec(Protocol env, List<PrimaryIrStream> list) {
-    //    this(env, list.toArray(new PrimaryIrStream[list.size()]));
-    //}
-
-    //public BitSpec(IrpParser.BitspecContext ctx, Protocol env) {
-    //    this(toList(ctx, env), env);
-    //}
-    */
-
-    /*
-    private static List<PrimaryIrStream> toList(IrpParser.BitspecContext ctx, Protocol env) {
-        List<PrimaryIrStream> array = new ArrayList<>();
-        //for (int i = 0; i < ctx.getChildCount(); i++)
-        //    array.add(new BareIrStream(ctx.getChild(i), env));
-        return array;
-    }
-
-    /*
-        ArrayList<PrimaryIrStream> list = new ArrayList<>();
-        for (int i = 0; i < tree.getChildCount(); i++)
-            list.add(bare_irstream((CommonTree)tree.getChild(i), level+1, forceOk, Pass.intro, repeatMarker));
-        BitSpec b = new BitSpec(env, list);
-        return b;
-    }*/
 
     public BareIrStream get(int index) throws IncompatibleArgumentException {
         if (index >= bitCodes.size())
             throw new IncompatibleArgumentException("Cannot encode " + index + " with current bitspec.");
         return bitCodes.get(index);
     }
-
-    /*public void assignBitSpecs(BitSpec bitSpec) {
-        for (IrStream pis : bitCodes) {
-            pis.assignBitSpecs(bitSpec);
-        }
-    }*/
 
     @Override
     public String toString() {
@@ -323,20 +268,12 @@ public class BitSpec extends IrpObject {
         return element;
     }
 
-//    public List<IrStreamItem> evaluate(BitSpec bitSpec) {
-//        throw new UnsupportedOperationException("Not supported yet.");
-//    }
-
     boolean interleaveOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
         if (!gapFlashBitSpecs && (isPWM(2, nameEngine, generalSpec)
                 || isPWM(4, nameEngine, generalSpec)))
             return true;
 
-        for (BareIrStream bareIrStream : bitCodes)
-            if (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitSpecs))
-                return false;
-
-        return true;
+        return bitCodes.stream().noneMatch((bareIrStream) -> (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitSpecs)));
     }
 
     @Override

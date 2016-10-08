@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * This class 
+ * This class is thrown on syntactical error in Irps.
  */
 public class IrpSyntaxException extends IrpException {
     public IrpSyntaxException(String message) {

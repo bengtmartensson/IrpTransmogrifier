@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2014 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

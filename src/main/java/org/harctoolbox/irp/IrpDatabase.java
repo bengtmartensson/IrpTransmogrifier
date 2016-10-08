@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-// TODO: allow more than one file; include directive.
+// TODO: allow more than one file.
 
 /**
  * This class is a data bases manager for the data base of IRP protocols.

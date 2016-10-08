@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2012, 2013 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -253,7 +253,7 @@ public class IrpUtils {
      * @return Nicely formatted header (String)
      */
     public static String variableHeader(HashMap<String, Long> params) {
-        TreeMap<String, Long> map = new TreeMap(params);
+        TreeMap<String, Long> map = new TreeMap<>(params);
         map.remove("D");
         map.remove("F");
         map.remove("S");

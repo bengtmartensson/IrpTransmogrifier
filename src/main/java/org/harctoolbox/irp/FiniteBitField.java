@@ -163,15 +163,6 @@ public class FiniteBitField extends BitField {
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         if (state == pass) {
             BitStream bitStream = new BitStream(this, nameEngine, generalSpec);
-//        EvaluatedIrStream result = (bitSpec != null)
-//                ? bitStream.evaluate(state, pass, nameEngine, generalSpec, bitSpec, elapsed)
-//                : toEvaluatedIrStream(bitStream, pass, nameEngine, generalSpec);
-//        IrpUtils.exiting(logger, "evaluate", result);
-//        return result;
-//    }
-//
-//    private EvaluatedIrStream toEvaluatedIrStream(BitStream bitStream, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-
             result.add(bitStream);
         }
         IrpUtils.exiting(logger, "evaluate", result);
@@ -215,9 +206,7 @@ public class FiniteBitField extends BitField {
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, IrpSyntaxException, UnassignedException {
         IrpUtils.entering(logger, "recognize", this);
-        // first the simplest case: bitSpecs
         BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
-        //int irSequencePostion = recognizeData.getPosition();
         int chunkSize = bitSpec.getChunkSize();
         long payload = 0L;
         int numWidth = (int) width.toNumber(recognizeData.toNameEngine());
@@ -230,20 +219,11 @@ public class FiniteBitField extends BitField {
         int rest = numWidth % chunkSize;
         int noChunks = rest == 0 ? numWidth/chunkSize : numWidth/chunkSize + 1;
 
-        //RecognizeData result = null;
-        //int consumedDurations = 0;
-
         for (int chunk = 0; chunk < noChunks; chunk++) {
             RecognizeData inData = null;
             int bareIrStreamNo;
-
-            //new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
-            //RecognizeData inData = new RecognizeData(recognizeData.getIrSequence(), irSequencePostion, 0, recognizeData.getState(), recognizeData.getNameEngine());
             for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
                 inData = recognizeData.clone();
-                ////if (chunk < noChunks - 1)
-                ////    inData.setLookAheadItem(null);
-                //inData.setPosition(irSequencePostion);
                 List<BitSpec> poppedStack = new ArrayList<>(bitSpecStack);
                 poppedStack.remove(poppedStack.size()-1);
 
@@ -259,8 +239,6 @@ public class FiniteBitField extends BitField {
             }
             recognizeData.setPosition(inData.getPosition());
             recognizeData.setHasConsumed(inData.getHasConsumed());
-            //irSequencePostion = inData.getPosition();
-            //consumedDurations += inData.getLength();
             payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
         }
 
@@ -275,13 +253,12 @@ public class FiniteBitField extends BitField {
             payload = IrCoreUtils.reverse(payload, noChunks);
         if (this.complement)
             payload = ~payload;
-        payload <<= (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
-        long bitmask = IrCoreUtils.ones(width.toNumber(recognizeData.toNameEngine())) << (long) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        payload <<= (int) chop.toNumber(recognizeData.toNameEngine());
+        long bitmask = IrCoreUtils.ones(width.toNumber(recognizeData.toNameEngine())) << chop.toNumber(recognizeData.toNameEngine());
         payload &= bitmask;
         Name name = data.toName();
         if (name != null) {
             logger.log(Level.FINE, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(), payload, bitmask});
-            //recognizeData.getParameterCollector().add(name.toString(), data.invert(payload), bitmask);
             if (data.isUnary())
                 recognizeData.add(name.toString(), payload, bitmask);
             else
@@ -297,16 +274,8 @@ public class FiniteBitField extends BitField {
             }
         }
 
-//            if (data.toNumber(null) != null) {
-//
-//        } else
-//            logger.warning("No match");
-
-
-        //recognizeData.setPosition(inData.getPosition());
         IrpUtils.exiting(logger, "recognize", payload);
-        return true;//recognizeData;
-        //return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), consumedDurations, recognizeData.getState(), recognizeData.getNameEngine());
+        return true;
     }
 
     @Override

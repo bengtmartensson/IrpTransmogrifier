@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2015 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
+
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
@@ -67,12 +68,13 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         if (map.size() != other.map.size())
             return false;
 
+        boolean result = true;
         for (Map.Entry<String, ParameterSpec> kvp : map.entrySet()) {
             String key = kvp.getKey();
             if (!kvp.getValue().equals(other.map.get(key)))
-                return false;
+                result = false;
         }
-        return true;
+        return result;
     }
 
     @Override

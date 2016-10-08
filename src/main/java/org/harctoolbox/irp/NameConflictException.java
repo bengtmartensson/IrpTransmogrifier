@@ -17,7 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-
+/**
+ * Thrown when a name is assigned a value that fatally contradicts the current value.
+ */
 public class NameConflictException extends Exception {
 
     public NameConflictException(String name) {

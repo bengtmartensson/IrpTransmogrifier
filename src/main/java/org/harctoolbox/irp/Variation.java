@@ -60,10 +60,6 @@ public class Variation extends IrStreamItem {
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         BareIrStream actual = select(pass);
         return actual.isEmpty(nameEngine) ? null : actual.evaluate(state, pass, nameEngine, generalSpec);
-//        return pass == Pass.intro ? intro.evaluate(state, pass, nameEngine, generalSpec)
-//                : pass == Pass.repeat ? repeat.evaluate(state, pass, nameEngine, generalSpec)
-//                : ending != null ? ending.evaluate(state, pass, nameEngine, generalSpec)
-//                : new EvaluatedIrStream(nameEngine, generalSpec, pass);
     }
 
     private BareIrStream select(IrSignal.Pass pass) {

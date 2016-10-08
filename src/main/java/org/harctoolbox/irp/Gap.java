@@ -66,43 +66,6 @@ public class Gap extends Duration {
         return "-" + super.toIrpString();
     }
 
-/*
-    @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, ArrayList<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-//        if (recognizeData.getState() != pass)
-//            return new RecognizeData(recognizeData.getIrSequence(), recognizeData.getStart(), 0, recognizeData.getState(), recognizeData.getNameEngine());
-
-        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
-            return false;
-        if (recognizeData.hasRestFlash())
-            return false;
-        double physical;
-        if (recognizeData.getPosition() % 2 == 0) {
-            if (recognizeData.hasRestGap()) {
-                physical = recognizeData.getRest();
-
-            } else
-                return false;
-        } else {
-            physical = recognizeData.getIrSequence().get(recognizeData.getPosition()) + recognizeData.getRest();
-            recognizeData.incrementPosition(1);
-        }
-        recognizeData.clearRest();
-
-        double theoretical = toFloat(/*recognizeData.getNameEngine()* /null, recognizeData.getGeneralSpec());
-
-        boolean equals = IrCoreUtils.approximatelyEquals(physical, theoretical);
-        if (equals) {
-            recognizeData.clearRest();
-        } else if (physical > theoretical) {
-            recognizeData.setRest(physical - theoretical, false);
-        } else
-            recognizeData.setSuccess(false);
-
-        return recognizeData.isSuccess();
-    }*/
-
     @Override
     protected boolean isOn() {
         return false;

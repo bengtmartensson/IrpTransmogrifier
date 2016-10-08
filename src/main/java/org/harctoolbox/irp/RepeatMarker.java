@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2016 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
+
 package org.harctoolbox.irp;
 
 import org.w3c.dom.Document;
@@ -24,20 +25,8 @@ import org.w3c.dom.Element;
  */
 public class RepeatMarker extends IrpObject {
 
-//    private static int noInfiniteRepeats = 0;
-
     private int min;
     private int max;
-
-//    private static void incrementInfiniteRepeats() throws InvalidRepeatException {
-//        if (noInfiniteRepeats > 0)
-//            throw new InvalidRepeatException("Multiple infinite repeats discovered");
-//        noInfiniteRepeats++;
-//    }
-//
-//    static void reset() {
-//        noInfiniteRepeats = 0;
-//    }
 
     public RepeatMarker(String str) throws InvalidRepeatException {
         this((new ParserDriver(str)).getParser().repeat_marker());
@@ -49,19 +38,16 @@ public class RepeatMarker extends IrpObject {
             case "*":
                 min = 0;
                 max = Integer.MAX_VALUE;
-                //incrementInfiniteRepeats();
                 break;
             case "+":
                 min = 1;
                 max = Integer.MAX_VALUE;
-                //incrementInfiniteRepeats();
                 break;
             default:
                 min = Integer.parseInt(ch);
-                if (ctx.getChildCount() > 1) {
+                if (ctx.getChildCount() > 1)
                     max = Integer.MAX_VALUE;
-                    //incrementInfiniteRepeats();
-                } else
+                else
                     max = min;
                 break;
         }
@@ -110,39 +96,7 @@ public class RepeatMarker extends IrpObject {
     public int numberOfInfiniteRepeats() {
         return isInfinite() ? 1 : 0;
     }
-/*
-    public boolean is(int n) {
-        return n == min && n == max;
-    }
 
-    public boolean is(String s) {
-        int n;
-        try {
-            n = Integer.parseInt(s);
-            if (n == min && n == max)
-                return true;
-        } catch (NumberFormatException ex) {
-            // not an error
-        }
-        if (s.endsWith("+")) {
-            try {
-                n = Integer.parseInt(s.substring(0, s.length()-1));
-                if (n == min && max == Integer.MAX_VALUE)
-                    return true;
-            } catch (NumberFormatException ex) {
-                // not an error
-            }
-        }
-
-        return
-                (s.equals("*"))    ? min == 0 && max == Integer.MAX_VALUE
-                : (s.equals("+"))  ? min == 1 && max == Integer.MAX_VALUE
-                : (s.equals(" "))  ? min == 1 && max != 1
-                : (s.equals("n"))  ? min == max && max != Integer.MAX_VALUE
-                : (s.equals("n+")) ? min != Integer.MAX_VALUE && max == Integer.MAX_VALUE
-                : false;
-    }
-*/
     @Override
     public String toString() {
         return

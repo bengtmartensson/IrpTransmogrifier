@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2015 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
+
 package org.harctoolbox.irp;
 
 import java.util.Objects;
@@ -37,10 +38,9 @@ public class ParameterSpec extends IrpObject {
     public static void initRandom(long seed) {
         random = new Random(seed);
     }
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
+
+    // TODO: move stuff to test file
+    //public static void main(String[] args) {
         /*        ParameterSpec dev = null;
         ParameterSpec toggle = null;
         ParameterSpec func = null;
@@ -64,7 +64,7 @@ public class ParameterSpec extends IrpObject {
         } catch (ParseException ex) {
         System.out.println(ex.getMessage());
         }*/
-    }
+    //}
     private Name name;
     private Number min;
     private Number max;

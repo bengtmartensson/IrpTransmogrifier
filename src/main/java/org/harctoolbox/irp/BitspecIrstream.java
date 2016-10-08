@@ -183,10 +183,6 @@ public class BitspecIrstream extends IrStreamItem {
         return interleavingOk(nameEngine, generalSpec, DurationType.gap);
     }
 
-//    private boolean interleavingOk() {
-//        return interleavingOk(null, null, false);
-//    }
-
     @Override
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         return irStream.endingDurationType(last, gapFlashBitSpecs);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2016 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -116,8 +116,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     private void compute(NameEngine nameEngine, GeneralSpec generalSpec)
             throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
         double time = nameOrNumber.toFloat(nameEngine, generalSpec);
-        //if (time == 0f)
-        //    throw new IncompatibleArgumentException("Duration of 0 not sensible");
 
         switch (unit) {
             case "p":
@@ -166,11 +164,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         return evaluate(nameEngine, generalSpec, 0);
     }
 
-//    @Override
-//    public long toNumber(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
-//        return Math.round(toFloat(nameEngine, generalSpec));
-//    }
-
     @Override
     public final boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         return evaluate(nameEngine, null, 0f) == 0;
@@ -184,7 +177,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        //double duration = evaluateWithSign(nameEngine, generalSpec, elapsed);
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, pass);
 
         if (state == pass)
@@ -229,42 +221,27 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-//        if (recognizeData.getPosition() >= recognizeData.getIrSequence().getLength())
-//            return false;
         IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         if (!recognizeData.check(isOn())) {
             IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
             return false;
         }
         double actual = recognizeData.get();
-        double wanted = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
+        double wanted = toFloat(recognizeData.toNameEngine(), recognizeData.getGeneralSpec());
         boolean success = recognize(recognizeData, actual, wanted);
         IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", wanted, actual);
-        //IrpUtils.exiting(logger, Level.FINEST, "recognize", result);
         return success;
     }
 
     protected boolean recognize(RecognizeData recognizeData, double actual, double wanted) {
-//        if (recognizeData.isInterleaving()) {
-//            boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted);
-//            if (equals) {
-//                recognizeData.incrementPosition(1);
-//                //recognizeData.clearRest();
-////        } else if (IrCoreUtils.approximatelyEquals(physical, 2*theoretical)) {
-////            recognizeData.incrementPosition(1);
-////            recognizeData.setRest(physical - theoretical, this instanceof Flash);
-//            } else
-//                recognizeData.setSuccess(false);
-//
-//        } else {
-            boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted, recognizeData.getAbsoluteTolerance(), recognizeData.getRelativeTolerance());
-            if (equals) {
-                recognizeData.consume();
-            } else if (actual > wanted && recognizeData.allowChopping()) {
-                recognizeData.consume(wanted);
-            } else
-                recognizeData.setSuccess(false);
-//        }
+        boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted, recognizeData.getAbsoluteTolerance(), recognizeData.getRelativeTolerance());
+        if (equals) {
+            recognizeData.consume();
+        } else if (actual > wanted && recognizeData.allowChopping()) {
+            recognizeData.consume(wanted);
+        } else
+            recognizeData.setSuccess(false);
+
         return recognizeData.isSuccess();
     }
 

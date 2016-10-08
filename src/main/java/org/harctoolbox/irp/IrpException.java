@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2014 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * This class
+ * This class is a superclass of the exceptions thrown in the package.
  */
 @SuppressWarnings("serial")
 public class IrpException extends Exception {

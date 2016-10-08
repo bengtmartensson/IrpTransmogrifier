@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * This class
+ * This exception is thrown when an Irp defined something impossible.
  */
 public class IrpSemanticException extends IrpException {
     public IrpSemanticException(String message) {

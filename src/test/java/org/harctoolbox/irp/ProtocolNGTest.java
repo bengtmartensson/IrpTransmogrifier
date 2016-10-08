@@ -51,7 +51,7 @@ public class ProtocolNGTest {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
         rc5 = new Protocol("{36k,msb,889}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[D:0..31,F:0..127,T@:0..1=0]");
         rc6 = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]");
-        nokia32 = new Protocol("{36k,msb}<164,-276|164,-445|164,-614|164,-783>(412,-276,D:8,S:8,T:1,X:7,F:8,164,^100m)* [D:0..255,S:0..255,F:0..255,T:0..1,X:0..127]");
+        nokia32 = new Protocol("{36k,1p,msb}<6,-10|6,-16|6,-22|6,-28>((15,-10,D:8,S:8,T:1,X:7,F:8,6,^100m)*,T=1-T) [D:0..255,S:0..255,F:0..255,T@:0..1=0,X:0..127]");
         xmp = new Protocol("{38k,136,msb}"
                 + "<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>"
                 + "([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m)"
@@ -206,20 +206,20 @@ public class ProtocolNGTest {
         }
     }
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testRecognizeNokia32() {
         System.out.println("recognizeNokia32");
         try {
             IrSignal signal = Pronto.parse("0000 0073 0000 0012"
                     + " 000F 000A"
-                    + " 0006 000A 0006 000A 0006 001B 0006 000A"
-                    + " 0006 000A 0006 001B 0006 0015 0006 000A"
-                    + " 0006 001B 0006 000A 0006 0015 0006 0010"
-                    + " 0006 000A 0006 0015 0006 000A 0006 0015"
+                    + " 0006 000A 0006 000A 0006 001B 0006 000A" // D
+                    + " 0006 000A 0006 001B 0006 0015 0006 000A" // S
+                    + " 0006 001B 0006 000A 0006 0015 0006 0010" // T,X
+                    + " 0006 000A 0006 0015 0006 000A 0006 0015" // F
                     + " 0006 0C90");
             NameEngine nameEngine = new NameEngine("{D=12,S=56,F=34,T=1,X=73}");
             Map<String, Long> recognizeData = nokia32.recognize(signal);
-            assertEquals(new NameEngine(recognizeData), nameEngine);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | IncompatibleArgumentException | ArithmeticException ex) {
             fail();
         }

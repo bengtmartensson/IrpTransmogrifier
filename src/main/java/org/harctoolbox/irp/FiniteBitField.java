@@ -219,8 +219,17 @@ public class FiniteBitField extends BitField {
         BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
         //int irSequencePostion = recognizeData.getPosition();
         int chunkSize = bitSpec.getChunkSize();
-        int noChunks = (int) width.toNumber(/*recognizeData.getNameEngine()*/null)/chunkSize;
         long payload = 0L;
+        int numWidth = (int) width.toNumber(recognizeData.toNameEngine());
+        BitwiseParameter danglingData = recognizeData.getDanglingBitFieldData();
+        if (!danglingData.isEmpty()) {
+            payload = danglingData.getValue();
+            numWidth -= Long.bitCount(danglingData.getBitmask());
+            recognizeData.setDanglingBitFieldData();
+        }
+        int rest = numWidth % chunkSize;
+        int noChunks = rest == 0 ? numWidth/chunkSize : numWidth/chunkSize + 1;
+
         //RecognizeData result = null;
         //int consumedDurations = 0;
 
@@ -254,12 +263,20 @@ public class FiniteBitField extends BitField {
             //consumedDurations += inData.getLength();
             payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
         }
+
+        if (rest != 0) {
+            // this has been tested only with bitorder = msb.
+            int bitsToStore = chunkSize - rest;
+            int bitmask = IrCoreUtils.ones(bitsToStore);
+            recognizeData.setDanglingBitFieldData(payload, bitmask);
+            payload >>= bitsToStore;
+        }
         if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
             payload = IrCoreUtils.reverse(payload, noChunks);
         if (this.complement)
             payload = ~payload;
         payload <<= (int) chop.toNumber(/*recognizeData.getNameEngine()*/null);
-        long bitmask = IrCoreUtils.ones((long) noChunks*chunkSize) << (long) chop.toNumber(/*recognizeData.getNameEngine()*/null);
+        long bitmask = IrCoreUtils.ones(width.toNumber(recognizeData.toNameEngine())) << (long) chop.toNumber(/*recognizeData.getNameEngine()*/null);
         payload &= bitmask;
         Name name = data.toName();
         if (name != null) {

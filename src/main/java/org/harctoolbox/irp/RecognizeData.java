@@ -43,6 +43,7 @@ public class RecognizeData implements Cloneable {
     private ParameterCollector needsChecking;
     private final double absoluteTolerance;
     private final double relativeTolerance;
+    private BitwiseParameter danglingBitFieldData;
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, Map<String, Long> nameMap,
             double absoulteTolerance, double relativeTolerance) {
@@ -54,6 +55,7 @@ public class RecognizeData implements Cloneable {
         //this.start = start;
         //this.length = length;
         success = true;
+        danglingBitFieldData = new BitwiseParameter();
         this.generalSpec = generalSpec;
         this.definitions = definitions;
         this.position = position;
@@ -403,5 +405,30 @@ public class RecognizeData implements Cloneable {
      */
     public double getRelativeTolerance() {
         return relativeTolerance;
+    }
+
+    NameEngine toNameEngine() throws IrpSyntaxException {
+        NameEngine nameEngine = definitions.clone();
+        nameEngine.add(parameterCollector.toNameEngine());
+        return nameEngine;
+    }
+
+    /**
+     * @return the danglingBitFieldData
+     */
+    BitwiseParameter getDanglingBitFieldData() {
+        return danglingBitFieldData;
+    }
+
+    /**
+     * @param data
+     * @param bitmask
+     */
+    void setDanglingBitFieldData(long data, long bitmask) {
+        danglingBitFieldData = new BitwiseParameter(data, bitmask);
+    }
+
+    void setDanglingBitFieldData() {
+        danglingBitFieldData = new BitwiseParameter();
     }
 }

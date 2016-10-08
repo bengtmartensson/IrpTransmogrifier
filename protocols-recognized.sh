@@ -33,10 +33,10 @@ ${RUN} fujitsu-56
 ${RUN} g.i.cable
 ${RUN} g.i.4dtv
 ${RUN} 'gi rg'
-# chunksize does not divide ${RUN} grundig16
-# chunksize does not divide ${RUN} grundig16-30
+${RUN} grundig16
+${RUN} grundig16-30
 ${RUN} gxb
-# chunksize does not divide... ${RUN} 'humax 4phase'
+${RUN} 'humax 4phase'
 ${RUN} iodatan
 ${RUN} jerrold
 ${RUN} jvc
@@ -61,7 +61,7 @@ ${RUN} necx1
 ${RUN} necx2
 ${RUN} nokia
 ${RUN} nokia12
-# chunksize does not divide... ${RUN} nokia32
+${RUN} nokia32
 ${RUN} nrc17
 ${RUN} ortekmce
 ${RUN} pacemss

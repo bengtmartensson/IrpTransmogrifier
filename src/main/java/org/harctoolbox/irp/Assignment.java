@@ -138,7 +138,7 @@ public class Assignment extends IrStreamItem implements Numerical {
         if (recognizeData.getState() == pass)
 
             //nameEngine.define(name, value.toNumber(nameEngine));
-            recognizeData.getParameterCollector().overwrite(name.toString(), value.toNumber(/*nameEngine*/));// ???
+            recognizeData.getParameterCollector().overwrite(name.toString(), value.toNumber(recognizeData.toNameEngine()));
 
         return true;//new RecognizeData(inData.getIrSequence(), inData.getStart(), 0, inData.getState(), nameEngine);
     }

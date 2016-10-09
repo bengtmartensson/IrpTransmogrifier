@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -38,8 +39,38 @@ import java.util.logging.Logger;
  * @see IrSequence
  *
  */
+
 public class IrSignal implements Cloneable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
+
+    public static IrSignal parse(List<String> args, double frequency, boolean fixOddSequences) throws OddSequenceLenghtException, IncompatibleArgumentException {
+        try {
+            return Pronto.parse(args);
+        } catch (IncompatibleArgumentException ex) {
+        }
+        return parseRaw(args, frequency, fixOddSequences);
+    }
+
+    public static IrSignal parseRaw(List<String> args, double frequency, boolean fixOddSequences) throws IncompatibleArgumentException {
+        String str = String.join(" ", args).trim();
+
+        IrSequence intro;
+        IrSequence repeat = null;
+        IrSequence ending = null;
+
+        if (str.startsWith("[")) {
+            String[] parts = str.replace("[", "").split("\\]");
+            if (parts.length < 2) {
+                throw new IncompatibleArgumentException("Less than two parts");
+            }
+            intro = new IrSequence(parts[0], fixOddSequences);
+            repeat = new IrSequence(parts[1], fixOddSequences);
+            ending = (parts.length >= 3) ? new IrSequence(parts[2], fixOddSequences) : null;
+        } else
+            intro = new IrSequence(str, fixOddSequences);
+
+        return new IrSignal(intro, repeat, ending, frequency);
+    }
 
     // TODO: move to test.
     /**

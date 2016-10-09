@@ -19,8 +19,6 @@ package org.harctoolbox.ircore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class models an IR Sequence, which is a sequence of pulse pairs, often called "bursts".
@@ -76,32 +74,6 @@ public class IrSequence implements Cloneable {
     }
     private static boolean equalSign(double x, double y) {
         return x <= 0 && y <= 0 || x >= 0 && y >= 0;
-    }
-    // TODO: move to testing file.
-    /**
-     * Just for testing.
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
-            IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
-            IrSequence irSequence = irSignal.toModulatedIrSequence(3).addNoise(10);
-            IrSequence[] seqs = irSequence.chop(25000);
-            for (IrSequence irs : seqs)
-                System.out.println(irs);
-        } catch (IncompatibleArgumentException ex) {
-            Logger.getLogger(IrSequence.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        double[] d = {1, 2, 3, -4};
-        String raw = " +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +1266 -7096 +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270  +422 -1270 +1266 -7096   ";
-        try {
-            IrSequence irs = new IrSequence(d);
-            System.out.println(irs);
-            irs = new IrSequence(raw);
-            System.out.println(irs);
-            System.out.println(new IrSequence());
-        } catch (OddSequenceLenghtException e) {
-        }
     }
 
     /**

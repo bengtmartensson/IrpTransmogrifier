@@ -95,9 +95,8 @@ public class IrpTransmogrifier {
         return evaluateProtocols(list, sort, regexp);
     }
 
-
     private static void list(CommandList commandList) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException {
-        List<String> list = evaluateProtocols(commandList.protocols, commandList.sort, commandList.regexp);
+        List<String> list = evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
         for (String proto : list) {
             if (!irpDatabase.isKnown(proto))
@@ -189,7 +188,7 @@ public class IrpTransmogrifier {
     }
 
     private static void code(CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException {
-        List<String> list = evaluateProtocols(commandCode.protocols, commandCode.sort, commandCode.regexp);
+        List<String> list = evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
         for (String proto : list) {
             NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
             if (commandCode.irp)
@@ -236,7 +235,6 @@ public class IrpTransmogrifier {
         if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
-
         if (commandRenderer.irp != null) {
             if (!commandRenderer.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
@@ -246,7 +244,7 @@ public class IrpTransmogrifier {
             NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
             render(protocol, commandRenderer);
         } else {
-            List<String> list = evaluateProtocols(commandRenderer.protocols, commandRenderer.sort, commandRenderer.regexp);
+            List<String> list = evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp);
             for (String proto : list) {
                 logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
@@ -255,12 +253,10 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void analyze(CommandAnalyze commandAnalyze) throws OddSequenceLenghtException {
-        int[] data = new int[commandAnalyze.args.size()];
-        for (int i = 0; i < commandAnalyze.args.size(); i++)
-            data[i] = Integer.parseInt(commandAnalyze.args.get(i));
-
-        IrSequence irSequence = new ModulatedIrSequence(data, commandAnalyze.frequency);
+    private static void analyze(CommandAnalyze commandAnalyze) throws OddSequenceLenghtException, IncompatibleArgumentException, UsageException {
+        IrSignal inputIrSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
+        IrSequence irSequence = inputIrSignal.toModulatedIrSequence(1);
+        double frequency = inputIrSignal.getFrequency();
 
         if (commandAnalyze.cleaner) {
             Cleaner cleaner = new Cleaner(irSequence);
@@ -268,11 +264,14 @@ public class IrpTransmogrifier {
         }
 
         if (commandAnalyze.repeatFinder) {
+            if (inputIrSignal.getRepeatLength() != 0 || inputIrSignal.getEndingLength() != 0)
+                throw new UsageException("Cannot use --repeatfinder with a signal with repeat- or ending sequence.");
+
             RepeatFinder repeatFinder = new RepeatFinder(irSequence);
             RepeatFinder.RepeatFinderData repeatFinderData = repeatFinder.getRepeatFinderData();
             out.println(repeatFinderData);
-            IrSignal irSignal = repeatFinder.toIrSignal(irSequence, commandAnalyze.frequency);
-            out.println(irSignal);
+            IrSignal repeatFinderIrSignal = repeatFinder.toIrSignal(irSequence, frequency);
+            out.println(repeatFinderIrSignal);
         }
 
         Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.repeatFinder,
@@ -296,7 +295,7 @@ public class IrpTransmogrifier {
             out.println(analyzer.toTimingsString());
         }
 
-        Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(commandAnalyze.frequency, commandAnalyze.timeBase,
+        Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(frequency, commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
 
@@ -318,7 +317,7 @@ public class IrpTransmogrifier {
     }
 
     private static void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException {
-        List<String> list = evaluateProtocols(commandRecognize.protocol, commandRecognize.sort, commandRecognize.regexp);
+        List<String> list = evaluateProtocols(commandRecognize.protocol, commandLineArgs.sort, commandLineArgs.regexp);
         if (list.isEmpty())
             throw new UsageException("No protocol given or matched.");
 
@@ -333,11 +332,11 @@ public class IrpTransmogrifier {
                 testNameEngine = commandRecognize.random ? new NameEngine(protocol.randomParameters()) : commandRecognize.nameEngine;
                 irSignal = protocol.toIrSignal(testNameEngine.clone());
             } else {
-                irSignal = Pronto.parse(commandRecognize.args);
+                irSignal = IrSignal.parse(commandRecognize.args, commandRecognize.frequency, false);
             }
 
             Map<String, Long> nameEngine = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters,
-                    true, IrCoreUtils.defaultFrequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+                    true, commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
             if (commandRecognize.args.isEmpty()) {
                 out.print(protocolName + "\t");
@@ -445,6 +444,11 @@ public class IrpTransmogrifier {
         TreeViewer tv = new TreeViewer(ruleNames, parserRuleContext);
         showTreeViewer(tv, title);
     }
+
+    static void main(String str) {
+        main(str.split(" "));
+    }
+
     /**
      *
      * @param args
@@ -617,6 +621,9 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
         private String configFile = null;
 
+        @Parameter(names = {"-f", "--frequencytolerance"}, description = "Absolute tolerance in microseconds")
+        private double frequencyTolerance = 1000;
+
         @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message")
         private boolean helpRequested = false;
 
@@ -627,11 +634,17 @@ public class IrpTransmogrifier {
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
         private Level logLevel = Level.INFO;
 
-        @Parameter(names = { "-o", "--output" }, description = "Name of output file")
+        @Parameter(names = { "-o", "--output" }, description = "Name of output file (default stdout)")
         private String output = null;
 
         @Parameter(names = {"-r", "--relativetolerance"}, description = "Relative tolerance as a number < 1")
-        private double relativeTolerance = 0.1;
+        private double relativeTolerance = 0.04;
+
+        @Parameter(names = { "--regex", "--regexp"}, description = "Interpret protocol arguments as regular expressions")
+        private boolean regexp = false;
+
+        @Parameter(names = {"-s", "--sort"}, description = "Sort the protocols alphabetically")
+        private boolean sort = false;
 
         @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random)")
         private Long seed = null;
@@ -673,7 +686,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-t", "--timebase"}, description = "Force timebase, in microseconds, or in periods (with ending \"p\")")
         private String timeBase = null;
 
-        @Parameter(description = "durations in microseconds, (pronto hex currently not supported)", required = true)
+        @Parameter(description = "durations in microseconds, or pronto hex", required = true)
         private List<String> args;
     }
 
@@ -717,14 +730,8 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-i", "--irp"}, description = "List irp")
         private boolean irp = false;
 
-        @Parameter(names = {"-r", "--regex", "--regexp"}, description = "Interpret arguments as regular expressions")
-        private boolean regexp = false;
-
-        @Parameter(names = {"-s", "--sort"}, description = "Sort the output")
-        private boolean sort = false;
-
-//        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
-//        private String target = null;
+        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
+        private String target = null;
 
         @Parameter(names = { "--xml"}, description = "List XML")
         private boolean xml = false;
@@ -780,12 +787,6 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-p", "--parse"}, description = "Test parse the protocol(s)")
         private boolean parse = false;
 
-        @Parameter(names = {"-r", "--regex", "--regexp"}, description = "Interpret arguments as regular expressions")
-        private boolean regexp = false;
-
-        @Parameter(names = {"-s", "--sort"}, description = "Sort the output")
-        private boolean sort = false;
-
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;
 
@@ -799,6 +800,9 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
     private static class CommandRecognize {
 
+        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency (ignored for pronto hex signals)")
+        private double frequency = ModulatedIrSequence.defaultFrequency;
+
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "Normally parameters equal to their default are removed; this option keeps them")
         private boolean keepDefaultedParameters = false;
 
@@ -811,16 +815,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-r", "--random"}, description = "Generate a random parameter signal to test")
         private boolean random = false;
 
-        @Parameter(names = { "--regex", "--regexp"}, description = "Interpret protocol arguments as regular expressions")
-        private boolean regexp = false;
-
-        @Parameter(names = { "-s", "--sort"}, description = "Sort the protocols")
-        private boolean sort = false;
-
-//        @Parameter(names = { "-t", "--test"}, description = "Generate a test signal and try to decode it")
-//        private boolean test = false;
-
-        @Parameter(description = "durations, or pronto hex")
+        @Parameter(description = "durations in micro seconds, or pronto hex")
         private List<String> args = new ArrayList<>(16);
     }
 
@@ -842,12 +837,6 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--random" }, description = "Generate random paraneters")
         private boolean random = false;
 
-        @Parameter(names = { "--regex", "--regexp" }, description = "Generate random paraneters")
-        private boolean regexp = false;
-
-        @Parameter(names = { "-s", "--sort" }, description = "Sort the protocols?")
-        private boolean sort = false;
-
         @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
         private boolean test = false;
 
@@ -862,7 +851,7 @@ public class IrpTransmogrifier {
     private static class CommandVersion {
     }
 
-    @Parameters(commandNames = {"writeconfig"}, commandDescription = "Write a new config file in XML format")
+    @Parameters(commandNames = {"writeconfig"}, commandDescription = "Write a new config file in XML format, using the --inifile argument")
     private static class CommandWriteConfig {
     }
 

@@ -181,7 +181,7 @@ public class GeneralSpec extends IrpObject {
 
     public String toIrpString(boolean usePeriods) {
         StringJoiner joiner = new StringJoiner(",", "{", "}");
-        joiner.add(IrCoreUtils.hz2khz(getFrequency()) + "k");
+        joiner.add(String.format("%2.1f", IrCoreUtils.hz2khz(getFrequency())) + "k");
         joiner.add(usePeriods
                 ? (Math.round(IrCoreUtils.us2Periods(unit, getFrequency())) + "p")
                 : Long.toString(Math.round(getUnit())));

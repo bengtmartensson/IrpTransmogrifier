@@ -19,9 +19,10 @@ package org.harctoolbox.irp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -34,6 +35,8 @@ import org.w3c.dom.NodeList;
  *
  */
 public class CodeGenerator {
+
+    private static final Logger logger = Logger.getLogger(CodeGenerator.class.getName());
 
     /**
      * Name space for XLST (1.0 and 2.0)
@@ -103,11 +106,8 @@ public class CodeGenerator {
 //                        stylesheet.getDocumentElement().removeChild(n);
 //                }
 //            }
-        } catch (TransformerConfigurationException e) {
-            System.err.println(e.getMessage());
-        } catch (TransformerException e) {
-            System.err.println(e.getMessage());
+        } catch (TransformerException ex) {
+            logger.log(Level.SEVERE, ex.getMessage());
         }
     }
-
 }

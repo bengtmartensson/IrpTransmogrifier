@@ -50,6 +50,7 @@ import org.xml.sax.SAXParseException;
  */
 public class XmlUtils {
 
+    private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 
     public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
         final String fname = file.getCanonicalPath();
@@ -58,19 +59,17 @@ public class XmlUtils {
         builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
             @Override
             public void error(SAXParseException exception) throws SAXParseException {
-                //System.err.println("Parse Error in file " + fname + ", line " + exception.getLineNumber() + ": " + exception.getMessage());
                 throw new SAXParseException("Parse Error in file " + fname + ", line " + exception.getLineNumber() + ": " + exception.getMessage(), "", fname, exception.getLineNumber(), 0);
             }
 
             @Override
             public void fatalError(SAXParseException exception) throws SAXParseException {
-                //System.err.println("Parse Fatal Error: " + exception.getMessage() + exception.getLineNumber());
                 throw new SAXParseException("Parse Error in file " + fname + ", line " + exception.getLineNumber() + ": " + exception.getMessage(), "", fname, exception.getLineNumber(), 0);
             }
 
             @Override
             public void warning(SAXParseException exception) {
-                System.err.println("Parse Warning: " + exception.getMessage() + exception.getLineNumber());
+                logger.log(Level.WARNING, "Parse Warning: {0}{1}", new Object[]{exception.getMessage(), exception.getLineNumber()});
             }
         });
 
@@ -107,7 +106,7 @@ public class XmlUtils {
 
             @Override
             public void warning(SAXParseException exception) {
-                System.err.println("Parse Warning: " + exception.getMessage() + exception.getLineNumber());
+                logger.log(Level.WARNING, "Parse Warning: {0}{1}", new Object[]{exception.getMessage(), exception.getLineNumber()});
             }
         });
         return builder.parse(stream);
@@ -158,38 +157,31 @@ public class XmlUtils {
         return index;
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) {
-        try {
-            Transformer tr = TransformerFactory.newInstance().newTransformer();
-            if (encoding != null)
-                tr.setOutputProperty(OutputKeys.ENCODING, encoding);
-            tr.setOutputProperty(OutputKeys.INDENT, "yes");
-            tr.setOutputProperty(OutputKeys.METHOD, "xml");
-            if (cdataElements != null)
-                tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
-            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            tr.transform(new DOMSource(doc), new StreamResult(ostr));
-        } catch (TransformerConfigurationException ex) {
-            System.err.println(ex.getMessage());
-        } catch (TransformerException ex) {
-            System.err.println(ex.getMessage());
-        }
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) throws TransformerException {
+        Transformer tr = TransformerFactory.newInstance().newTransformer();
+        if (encoding != null)
+            tr.setOutputProperty(OutputKeys.ENCODING, encoding);
+        tr.setOutputProperty(OutputKeys.INDENT, "yes");
+        tr.setOutputProperty(OutputKeys.METHOD, "xml");
+        if (cdataElements != null)
+            tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
+        tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        tr.transform(new DOMSource(doc), new StreamResult(ostr));
     }
 
-    public static void printDOM(File file, Document doc, String encoding)
-            throws FileNotFoundException {
+    public static void printDOM(File file, Document doc, String encoding) throws FileNotFoundException, TransformerException {
         printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, null);
-        System.err.println("File " + file + " written.");
+        logger.log(Level.INFO, "File {0} written.", file);
     }
 
     // Do not define a function printDOM(File, Document, String),
     // since it would been too error prone.
 
-    public static void printDOM(File file, Document doc) throws FileNotFoundException {
+    public static void printDOM(File file, Document doc) throws FileNotFoundException, TransformerException {
         printDOM(file, doc, null);
     }
 
-    public static void printDOM(Document doc) {
+    public static void printDOM(Document doc) throws TransformerException {
         printDOM(System.out, doc, null, null);
     }
 

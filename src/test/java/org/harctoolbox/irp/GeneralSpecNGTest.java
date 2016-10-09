@@ -2,7 +2,6 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.testng.Assert;
@@ -46,19 +45,14 @@ public class GeneralSpecNGTest {
             System.out.println("toString");
             GeneralSpec instance = new GeneralSpec("{42%, 10p,msb,40k}");
             Assert.assertEquals(instance.toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 42%.");
-            GeneralSpec.evaluatePrint("{ }");
-            GeneralSpec.evaluatePrint("{38.4k,564}");
-            GeneralSpec.evaluatePrint("{564,38.4k}");
-            GeneralSpec.evaluatePrint("{22p,40k}");
-            GeneralSpec.evaluatePrint("{msb, 889u}");
-            GeneralSpec.evaluatePrint("{42%, 10p,msb,40k}");
-            GeneralSpec.evaluatePrint("{msb ,40k , 33.33333% ,10p }");
-            GeneralSpec.evaluatePrint("{msb, 123u, 100k, 10p, 1000k}");
-            try {
-                GeneralSpec.evaluatePrint("{1+2}");
-                Assert.fail();
-            } catch (ParseCancellationException ex) {
-            }
+            assertEquals(new GeneralSpec("{ }").toString(), "Frequency = 38000.0Hz, unit = 1.0us, lsb, Duty cycle: -.");
+            assertEquals(new GeneralSpec("{38.4k,564}").toString(), "Frequency = 38400.0Hz, unit = 564.0us, lsb, Duty cycle: -.");
+            assertEquals(new GeneralSpec("{564,38.4k}").toString(), "Frequency = 38400.0Hz, unit = 564.0us, lsb, Duty cycle: -.");
+            assertEquals(new GeneralSpec("{22p,40k}").toString(), "Frequency = 40000.0Hz, unit = 550.0us, lsb, Duty cycle: -.");
+            assertEquals(new GeneralSpec("{msb, 889u}").toString(), "Frequency = 38000.0Hz, unit = 889.0us, msb, Duty cycle: -.");
+            assertEquals(new GeneralSpec("{42%, 10p,msb,40k}").toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 42%.");
+            assertEquals(new GeneralSpec("{msb ,40k , 33.33333% ,10p }").toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 33%.");
+            assertEquals(new GeneralSpec("{msb, 123u, 100k, 10p, 1000k}").toString(), "Frequency = 1000000.0Hz, unit = 10.0us, msb, Duty cycle: -.");
         } catch (ArithmeticException | IncompatibleArgumentException ex) {
             fail();
         }

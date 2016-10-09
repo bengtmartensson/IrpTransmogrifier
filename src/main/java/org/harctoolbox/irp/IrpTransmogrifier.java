@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.xml.transform.TransformerException;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -183,11 +184,11 @@ public class IrpTransmogrifier {
         out.println(Version.licenseString);
     }
 
-    private static void writeConfig(CommandWriteConfig commandWriteConfig) {
+    private static void writeConfig(CommandWriteConfig commandWriteConfig) throws TransformerException {
         XmlUtils.printDOM(out, irpDatabase.toDocument(), "UTF-8", "{" + IrpDatabase.irpProtocolNS + "}irp");
     }
 
-    private static void code(CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException {
+    private static void code(CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException {
         List<String> list = evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
         for (String proto : list) {
             NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
@@ -217,9 +218,9 @@ public class IrpTransmogrifier {
 
         IrSignal irSignal = protocol.toIrSignal(nameEngine.clone());
         if (commandRenderer.raw)
-            System.out.println(irSignal.toPrintString(true));
+            out.println(irSignal.toPrintString(true));
         if (commandRenderer.pronto)
-            System.out.println(irSignal.ccfString());
+            out.println(irSignal.ccfString());
 
         if (commandRenderer.test) {
             String protocolName = protocol.getName();
@@ -349,7 +350,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void expression(CommandExpression commandExpression) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    private static void expression(CommandExpression commandExpression) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, TransformerException {
         NameEngine nameEngine = commandExpression.nameEngine;
         for (String text : commandExpression.expressions) {
 
@@ -376,7 +377,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private static void bitfield(CommandBitfield commandBitField) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
+    private static void bitfield(CommandBitfield commandBitField) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException, TransformerException {
         NameEngine nameEngine = commandBitField.nameEngine;
 
 //        String generalSpecString = commandExpression.generalspec;
@@ -580,7 +581,7 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (UnsupportedOperationException | ParseCancellationException | IOException | IncompatibleArgumentException | SAXException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnknownProtocolException | UnassignedException | DomainViolationException | UsageException | IrpMasterException ex) {
+        } catch (TransformerException | UnsupportedOperationException | ParseCancellationException | IOException | IncompatibleArgumentException | SAXException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnknownProtocolException | UnassignedException | DomainViolationException | UsageException | IrpMasterException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
@@ -730,8 +731,8 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-i", "--irp"}, description = "List irp")
         private boolean irp = false;
 
-        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
-        private String target = null;
+//        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
+//        private String target = null;
 
         @Parameter(names = { "--xml"}, description = "List XML")
         private boolean xml = false;

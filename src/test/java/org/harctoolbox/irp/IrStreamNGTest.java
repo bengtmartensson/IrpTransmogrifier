@@ -10,14 +10,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class IrStreamNGTest {
+
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
+
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
 
-    //private final NameEngine nameEngine;
     private final IrStream instance;
     private final IrStream repeat;
 

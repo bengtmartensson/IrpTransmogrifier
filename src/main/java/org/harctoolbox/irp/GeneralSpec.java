@@ -35,10 +35,6 @@ public class GeneralSpec extends IrpObject {
     public final static double defaultDutyCycle = ModulatedIrSequence.unknownDutyCycle;
     public final static BitDirection defaultBitDirection = BitDirection.lsb;
     public final static double defaultUnit = 1;
-    static void evaluatePrint(String str) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
-        GeneralSpec gs = new GeneralSpec(str);
-        System.out.println(gs);
-    }
 
     /** Carrier frequency in Hz */
     private double frequency = ModulatedIrSequence.defaultFrequency;

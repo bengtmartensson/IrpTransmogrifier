@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.harctoolbox.irp;
 
 import org.testng.Assert;
@@ -12,14 +7,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author bengt
- */
 public class FlashNGTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
+
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
@@ -29,7 +21,6 @@ public class FlashNGTest {
 
     public FlashNGTest() {
     }
-
 
     @BeforeMethod
     public void setUpMethod() throws Exception {

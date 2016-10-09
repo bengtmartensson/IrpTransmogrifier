@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -16,10 +11,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author bengt
- */
 public class ParameterSpecNGTest {
 
 
@@ -30,6 +21,7 @@ public class ParameterSpecNGTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
+
     public ParameterSpecNGTest() {
     }
 

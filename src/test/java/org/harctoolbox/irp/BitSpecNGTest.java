@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.harctoolbox.irp;
 
 import java.util.logging.Level;
@@ -18,10 +13,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author bengt
- */
 public class BitSpecNGTest {
 
     private static final String NEC1BitSpec = "<1,-1|1,-3>";

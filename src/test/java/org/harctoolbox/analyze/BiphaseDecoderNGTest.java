@@ -72,7 +72,7 @@ public class BiphaseDecoderNGTest {
             System.out.println("processRc5");
             BiphaseDecoder decoder = new BiphaseDecoder(rc5, paramsRc5);
             Protocol result = decoder.process();
-            Protocol expResult = new Protocol("{36k,msb,889}<1,-1|-1,1>(A:1,B:1,C:1,D:5,E:6,^114m){A=1,B=1,C=1,D=12,E=3})");
+            Protocol expResult = new Protocol("{36k,msb,889}<1,-1|-1,1>(A:1,B:1,C:1,D:5,E:6,^114m){A=1,B=1,C=1,D=12,E=3}");
             assertEquals(result, expResult);
         } catch (DecodeException | IrpSemanticException | IrpSyntaxException | ArithmeticException | IncompatibleArgumentException | InvalidRepeatException | UnassignedException ex) {
             fail();

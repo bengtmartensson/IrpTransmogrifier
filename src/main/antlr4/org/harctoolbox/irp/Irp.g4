@@ -21,7 +21,7 @@ grammar Irp;
 // class Protocol
 // Extension: * instead of ?, parameter_specs
 protocol:
-    generalspec bitspec_irstream definitions* parameter_specs?
+    generalspec bitspec_irstream definitions* parameter_specs? EOF
 ;
 
 // 2.2, simplified

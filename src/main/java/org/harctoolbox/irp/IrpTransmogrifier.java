@@ -558,23 +558,13 @@ public class IrpTransmogrifier {
 
     private void bitfield(CommandBitfield commandBitField) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException, TransformerException {
         NameEngine nameEngine = commandBitField.nameEngine;
-
-//        String generalSpecString = commandExpression.generalspec;
-//        if (commandExpression.msb) {
-//            if (commandExpression.generalspec != null)
-//                throw new UsageException("The options --generalspec and --msb are exclusive");
-//            generalSpecString = "{msb}";
-//        }
-//        GeneralSpec generalSpec = new GeneralSpec(generalSpecString);
-
         for (String text : commandBitField.bitfields) {
 
             IrpParser parser = new ParserDriver(text).getParser();
             BitField bitfield = BitField.newBitField(parser.bitfield());
-//            if (!parser.isMatchedEOF()) {
-//                System.err.println("WARNING: Did not match all input");
-//                //System.exit(IrpUtils.exitFatalProgramFailure);
-//            }
+            int last = bitfield.getParseTree().getStop().getStopIndex();
+            if (last != text.length() - 1)
+                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", text.substring(0, last + 1));
 
             long result = bitfield.toNumber(nameEngine);
             out.print(result);
@@ -584,17 +574,12 @@ public class IrpTransmogrifier {
             }
             out.println();
 
-//            if (commandExpression.stringTree)
-//                out.println(bitfield.getParseTree().toStringTree(parser));
             if (commandBitField.xml) {
                 Document doc = XmlUtils.newDocument();
                 Element root = bitfield.toElement(doc);
                 doc.appendChild(root);
                 XmlUtils.printDOM(doc);
             }
-//
-//            if (commandExpression.gui)
-//                IrpTransmogrifier.showTreeViewer(parser, bitfield.getParseTree(), text+"="+result);
             if (commandBitField.gui)
                 IrpTransmogrifier.showTreeViewer(parser, bitfield.getParseTree(),
                         text + "=" + (bitfield instanceof FiniteBitField

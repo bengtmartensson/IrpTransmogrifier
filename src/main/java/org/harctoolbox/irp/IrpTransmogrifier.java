@@ -22,10 +22,12 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,13 +54,19 @@ import org.xml.sax.SAXException;
  */
 public class IrpTransmogrifier {
     public static final String defaultConfigFile = "src/main/config/IrpProtocols.xml";
+    private static final String charSet = "UTF-8";
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
     private static CommandLineArgs commandLineArgs = new CommandLineArgs();
-    private static PrintStream out;
+    private static PrintStream out = null;
     private static IrpDatabase irpDatabase;
     private static final String separator = "\t";
     private static String configFilename;
+
+    // For testing
+    public static void setOut(PrintStream printString) {
+        out = printString;
+    }
 
     private static void usage() {
         StringBuilder str = new StringBuilder(1000);
@@ -471,8 +479,21 @@ public class IrpTransmogrifier {
             irpDatabase.expand();
     }
 
-    static void main(String str) {
-        main(str.split(" "));
+    /**
+     * Runs main on the split-ted argument, and returns the result as a string.
+     * @param input
+     * @return Result as String.
+     */
+    public static String runMain(String input) {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            setOut(new PrintStream(byteArrayOutputStream, false, charSet));
+            main(input.split(" "));
+            out.flush();
+            return new String(byteArrayOutputStream.toByteArray(), charSet);
+        } catch (UnsupportedEncodingException ex) {
+            throw new ThisCannotHappenException();
+        }
     }
 
     /**
@@ -523,7 +544,8 @@ public class IrpTransmogrifier {
         }
 
         try {
-            out = IrpUtils.getPrintSteam(commandLineArgs.output == null ? "-" : commandLineArgs.output);
+            if (out == null)
+                out = IrpUtils.getPrintSteam(commandLineArgs.output == null ? "-" : commandLineArgs.output);
         } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             System.exit(IrpUtils.exitIoError);

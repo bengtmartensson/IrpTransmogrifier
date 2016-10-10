@@ -56,7 +56,6 @@ public class IrpTransmogrifier {
     private static final String charSet = "UTF-8";
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
-    private static CommandLineArgs commandLineArgs = new CommandLineArgs();
     private static PrintStream printStream = null;
     private static final String separator = "\t";
 
@@ -133,7 +132,7 @@ public class IrpTransmogrifier {
      * @param args
      */
     public static void main(String[] args) {
-        commandLineArgs = new CommandLineArgs();
+        CommandLineArgs commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(Version.appName);
         argumentParser.setAllowAbbreviatedOptions(true);
@@ -209,13 +208,13 @@ public class IrpTransmogrifier {
 
             switch (command) {
                 case "analyze":
-                    instance.analyze(commandAnalyze);
+                    instance.analyze(commandAnalyze, commandLineArgs);
                     break;
                 case "bitfield":
                     instance.bitfield(commandBitfield);
                     break;
                 case "code":
-                    instance.code(commandCode);
+                    instance.code(commandCode, commandLineArgs);
                     break;
                 case "expression":
                     instance.expression(commandExpression);
@@ -224,19 +223,19 @@ public class IrpTransmogrifier {
                     instance.help();
                     break;
                 case "list":
-                    instance.list(commandList);
+                    instance.list(commandList, commandLineArgs);
                     break;
                 case "recognize":
-                    instance.recognize(commandRecognize);
+                    instance.recognize(commandRecognize, commandLineArgs);
                     break;
                 case "render":
-                    instance.render(commandRenderer);
+                    instance.render(commandRenderer, commandLineArgs);
                     break;
                 case "version":
-                    instance.version(commandLineArgs.configFile);
+                    instance.version(commandLineArgs.configFile, commandLineArgs);
                     break;
                 case "writeconfig":
-                    instance.writeConfig(commandWriteConfig);
+                    instance.writeConfig(commandWriteConfig, commandLineArgs);
                     break;
                 default:
                     System.err.println("Unknown command: " + command);
@@ -280,8 +279,8 @@ public class IrpTransmogrifier {
         return evaluateProtocols(list, sort, regexp);
     }
 
-    private void list(CommandList commandList) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IOException, SAXException {
-        setupDatabase();
+    private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IOException, SAXException {
+        setupDatabase(commandLineArgs);
         List<String> list = evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
         for (String proto : list) {
@@ -355,10 +354,10 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void version(String filename) {
+    private void version(String filename, CommandLineArgs commandLineArgs) {
         out.println(Version.versionString);
         try {
-            setupDatabase();
+            setupDatabase(commandLineArgs);
             if (irpDatabase != null)
                 out.println("Database: " + filename + " version: " + irpDatabase.getConfigFileVersion());
         } catch (IncompatibleArgumentException | IOException | SAXException ex) {
@@ -370,13 +369,13 @@ public class IrpTransmogrifier {
         out.println(Version.licenseString);
     }
 
-    private void writeConfig(CommandWriteConfig commandWriteConfig) throws TransformerException, IncompatibleArgumentException, IOException, SAXException {
-        setupDatabase(false);
+    private void writeConfig(CommandWriteConfig commandWriteConfig, CommandLineArgs commandLineArgs) throws TransformerException, IncompatibleArgumentException, IOException, SAXException {
+        setupDatabase(false, commandLineArgs);
         XmlUtils.printDOM(out, irpDatabase.toDocument(), "UTF-8", "{" + IrpDatabase.irpProtocolNS + "}irp");
     }
 
-    private void code(CommandCode commandCode) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException {
-        setupDatabase();
+    private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException {
+        setupDatabase(commandLineArgs);
         List<String> list = evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
         for (String proto : list) {
             NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
@@ -420,8 +419,8 @@ public class IrpTransmogrifier {
             }
     }
 
-    private void render(CommandRender commandRenderer) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IrpMasterException, IOException, SAXException {
-        setupDatabase();
+    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IrpMasterException, IOException, SAXException {
+        setupDatabase(commandLineArgs);
         if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
@@ -443,7 +442,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void analyze(CommandAnalyze commandAnalyze) throws OddSequenceLenghtException, IncompatibleArgumentException, UsageException {
+    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws OddSequenceLenghtException, IncompatibleArgumentException, UsageException {
         IrSignal inputIrSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
         IrSequence irSequence = inputIrSignal.toModulatedIrSequence(1);
         double frequency = inputIrSignal.getFrequency();
@@ -497,8 +496,8 @@ public class IrpTransmogrifier {
         out.println(protocol.toIrpString(radix, usePeriods) + " \tweight = " + protocol.weight());
     }
 
-    private void recognize(CommandRecognize commandRecognize) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IOException, SAXException {
-        setupDatabase();
+    private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IOException, SAXException {
+        setupDatabase(commandLineArgs);
         List<String> list = evaluateProtocols(commandRecognize.protocol, commandLineArgs.sort, commandLineArgs.regexp);
         if (list.isEmpty())
             throw new UsageException("No protocol given or matched.");
@@ -589,11 +588,11 @@ public class IrpTransmogrifier {
     }
 
 
-    private void setupDatabase() throws IncompatibleArgumentException, IOException, SAXException {
-        setupDatabase(true);
+    private void setupDatabase(CommandLineArgs commandLineArgs) throws IncompatibleArgumentException, IOException, SAXException {
+        setupDatabase(true, commandLineArgs);
     }
 
-    private void setupDatabase(boolean expand) throws IncompatibleArgumentException, IOException, SAXException {
+    private void setupDatabase(boolean expand, CommandLineArgs commandLineArgs) throws IncompatibleArgumentException, IOException, SAXException {
         configFilename = commandLineArgs.configFile != null
                 ? commandLineArgs.configFile
                 : commandLineArgs.iniFile != null

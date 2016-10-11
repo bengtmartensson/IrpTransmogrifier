@@ -203,8 +203,8 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("bare_irstream");
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
         element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
         for (IrStreamItem item : this.irStreamItems)

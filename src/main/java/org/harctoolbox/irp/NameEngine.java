@@ -58,7 +58,7 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         return nameEngine;
     }
     private static Element mkElement(Document document, Map.Entry<String, Expression> definition) {
-        Element element = document.createElement("definition");
+        Element element = document.createElement("Definition");
         element.appendChild(new Name(definition.getKey()).toElement(document));
         element.appendChild(definition.getValue().toElement(document));
         return element;
@@ -334,7 +334,7 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
 
     @Override
     public Element toElement(Document document) {
-        Element root = document.createElement("definitions");
+        Element root = document.createElement("Definitions"); // do not use super!
         for (Map.Entry<String, Expression> definition : map.entrySet())
             root.appendChild(mkElement(document, definition));
         return root;

@@ -85,7 +85,7 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
 
     @Override
     public Element toElement(Document document) {
-        Element element = document.createElement("number_with_decimals");
+        Element element = super.toElement(document);
         element.setTextContent(toString());
         return element;
     }

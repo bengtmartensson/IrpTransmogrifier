@@ -256,12 +256,12 @@ public class BitSpec extends IrpObject {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("bitspec");
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
         element.setAttribute("size", Integer.toString(bitCodes.size()));
-        element.setAttribute("chunksize", Integer.toString(chunkSize));
-        element.setAttribute("standard_pwm", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
-        element.setAttribute("standard_biphase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
+        element.setAttribute("chunkSize", Integer.toString(chunkSize));
+        element.setAttribute("standardPwm", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
+        element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
         element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));
         for (BareIrStream bitCode : bitCodes)
             element.appendChild(bitCode.toElement(document));

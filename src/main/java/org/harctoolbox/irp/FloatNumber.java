@@ -70,8 +70,8 @@ public class FloatNumber extends IrpObject implements Floatable {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("float");
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
         element.setTextContent(toString());
         return element;
     }

@@ -133,13 +133,13 @@ public class ParameterSpec extends IrpObject {
     }
     @Override
     public Element toElement(Document document) {
-        Element el = document.createElement("parameter");
+        Element el = super.toElement(document);
         el.setAttribute("name", name.toString());
         el.setAttribute("min", min.toString());
         el.setAttribute("max", max.toString());
         el.setAttribute("memory", Boolean.toString(memory));
         if (deflt != null) {
-            Element def = document.createElement("default");
+            Element def = document.createElement("Default");
             el.appendChild(def);
             def.appendChild(deflt.toElement(document));
         }

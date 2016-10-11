@@ -119,7 +119,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
 
     @Override
     public Element toElement(Document document) {
-        Element el = document.createElement("parameters");
+        Element el = super.toElement(document);
         //el.appendChild(document.createComment(toString()));
         for (ParameterSpec parameterSpec : map.values())
             el.appendChild(parameterSpec.toElement(document));

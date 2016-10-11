@@ -130,7 +130,7 @@ public class RepeatMarker extends IrpObject {
 
     @Override
     public Element toElement(Document document) {
-        Element element = document.createElement("repeat_marker");
+        Element element = super.toElement(document);
         if (min > 0)
             element.setAttribute("min", Integer.toString(min));
         if (max < Integer.MAX_VALUE)

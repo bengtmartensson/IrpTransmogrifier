@@ -170,18 +170,18 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("finite_bitfield");
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
         element.setAttribute("reverse", Boolean.toString(reverse));
         element.setAttribute("complement", Boolean.toString(complement));
-        Element dataElement = document.createElement("data");
+        Element dataElement = document.createElement("Data");
         dataElement.appendChild(data.toElement(document));
         element.appendChild(dataElement);
-        Element widthElement = document.createElement("width");
+        Element widthElement = document.createElement("Width");
         widthElement.appendChild(width.toElement(document));
         element.appendChild(widthElement);
         if (!(chop instanceof Number && ((Number) chop).toNumber() == 0)) {
-            Element chopElement = document.createElement("chop");
+            Element chopElement = document.createElement("Chop");
             chopElement.appendChild(chop.toElement(document));
             element.appendChild(chopElement);
         }

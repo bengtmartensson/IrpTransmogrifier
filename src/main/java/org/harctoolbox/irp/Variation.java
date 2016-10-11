@@ -86,8 +86,8 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("variation");
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
         element.appendChild(intro.toElement(document));
         element.appendChild(repeat.toElement(document));
         element.appendChild(ending.toElement(document));

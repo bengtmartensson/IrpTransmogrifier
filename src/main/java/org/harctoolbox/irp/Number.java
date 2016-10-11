@@ -102,7 +102,7 @@ public class Number extends PrimaryItem {
 
     @Override
     public Element toElement(Document document) {
-        Element element = document.createElement("number");
+        Element element = super.toElement(document);
         element.setTextContent(toString());
         return element;
     }

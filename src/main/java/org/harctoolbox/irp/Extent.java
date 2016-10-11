@@ -22,8 +22,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * This class implements Extents as per Chapter 4.
@@ -64,11 +62,6 @@ public class Extent extends Duration {
     @Override
     public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         return -evaluate(nameEngine, generalSpec, elapsed);
-    }
-
-    @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        return toElement(document, "extent");
     }
 
     @Override

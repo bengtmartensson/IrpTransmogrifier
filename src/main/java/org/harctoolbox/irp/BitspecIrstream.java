@@ -89,8 +89,8 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element root = document.createElement("bitspec_irstream");
+    public Element toElement(Document document) {
+        Element root = super.toElement(document);
         root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null)));
         root.appendChild(bitSpec.toElement(document));
         root.appendChild(irStream.toElement(document));

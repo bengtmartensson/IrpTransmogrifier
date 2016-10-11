@@ -84,14 +84,14 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("infinite_bitfield");
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
         element.setAttribute("complement", Boolean.toString(complement));
-        Element dataElement = document.createElement("data");
+        Element dataElement = document.createElement("Data");
         dataElement.appendChild(data.toElement(document));
         element.appendChild(dataElement);
         if (!(chop instanceof Number && ((Number) chop).toNumber() == 0)) {
-            Element chopElement = document.createElement("chop");
+            Element chopElement = document.createElement("Chop");
             chopElement.appendChild(chop.toElement(document));
             element.appendChild(chopElement);
         }
@@ -111,7 +111,7 @@ public class InfiniteBitField extends BitField {
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override

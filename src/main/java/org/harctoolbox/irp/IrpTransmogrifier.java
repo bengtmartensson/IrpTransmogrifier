@@ -362,7 +362,7 @@ public class IrpTransmogrifier {
 
         Document document = XmlUtils.newDocument();
 
-        Element root = document.createElement("protocols");
+        Element root = document.createElement("NamedProtocols");
         document.appendChild(root);
 
         for (String protocolName : list) {
@@ -371,7 +371,7 @@ public class IrpTransmogrifier {
             root.appendChild(element);
         }
         PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
-        XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "irp documentation");
+        XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "Irp Documentation");
     }
 
     private void version(String filename, CommandLineArgs commandLineArgs) {

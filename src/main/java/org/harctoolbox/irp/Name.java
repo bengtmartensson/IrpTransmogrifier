@@ -130,8 +130,8 @@ public class Name extends PrimaryItem implements Floatable {
 
     @Override
     public Element toElement(Document document) {
-        Element element = document.createElement("name");
-        element.setAttribute("name", toString());
+        Element element = super.toElement(document);
+        element.setTextContent(toString());
         return element;
     }
 

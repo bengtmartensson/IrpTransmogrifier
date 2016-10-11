@@ -137,17 +137,17 @@ public class IrStream extends BareIrStream {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("irstream");
-        element.setAttribute("is_repeat", Boolean.toString(isRepeatSequence()));
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
+        element.setAttribute("isRepeat", Boolean.toString(isRepeatSequence()));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
         element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
-        Element intro = document.createElement("intro");
+        Element intro = document.createElement("Intro");
         element.appendChild(intro);
-        Element repeat = document.createElement("repeat");
+        Element repeat = document.createElement("Repeat");
         element.appendChild(repeat);
-        Element ending = document.createElement("ending");
+        Element ending = document.createElement("Ending");
         element.appendChild(ending);
 
         if (!isRepeatSequence()) {

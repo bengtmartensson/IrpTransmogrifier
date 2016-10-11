@@ -59,8 +59,8 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
-        Element element = document.createElement("name_or_number");
+    public Element toElement(Document document) {
+        Element element = super.toElement(document);
         element.appendChild(thing.toElement(document));
         return element;
     }

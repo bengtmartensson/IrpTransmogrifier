@@ -250,7 +250,7 @@ public class Expression extends PrimaryItem {
 
     @Override
     public Element toElement(Document document) {
-        Element element = document.createElement("expression");
+        Element element = super.toElement(document);
         Element op;
         switch (parseTree.children.size()) {
             case 1:
@@ -264,25 +264,25 @@ public class Expression extends PrimaryItem {
                     else
                         ;
                 } catch (IrpSyntaxException ex) {
-                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new ThisCannotHappenException(ex);
                 }
                 break;
 
             case 2:
-                op = document.createElement("unary_operator");
+                op = document.createElement("UnaryOperator");
                 op.setAttribute("type", parseTree.children.get(0).getText());
                 element.appendChild(op);
                 op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
                 break;
             case 3:
-                op = document.createElement("binary_operator");
+                op = document.createElement("BinaryOperator");
                 op.setAttribute("type", parseTree.children.get(1).getText());
                 element.appendChild(op);
                 op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
                 op.appendChild(new Expression(parseTree.expression(1)).toElement(document));
                 break;
             case 5:
-                op = document.createElement("ternary_operator");
+                op = document.createElement("TernaryOperator");
                 element.appendChild(op);
                 op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
                 op.appendChild(new Expression(parseTree.expression(1)).toElement(document));

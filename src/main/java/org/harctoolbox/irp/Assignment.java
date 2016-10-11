@@ -109,7 +109,7 @@ public class Assignment extends IrStreamItem implements Numerical {
 
     @Override
     public Element toElement(Document document) {
-        Element element = document.createElement("assignment");
+        Element element = super.toElement(document);
         element.appendChild(name.toElement(document));
         element.appendChild(value.toElement(document));
         return element;

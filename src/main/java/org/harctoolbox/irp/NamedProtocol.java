@@ -85,15 +85,15 @@ public class NamedProtocol extends Protocol {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSyntaxException {
+    public Element toElement(Document document) {
         Element root = super.toElement(document);
         root.setAttribute("name", name);
 
-        Element docu = document.createElement("documentation");
+        Element docu = document.createElement("Documentation");
         docu.appendChild(document.createTextNode(documentation));
         root.appendChild(docu);
 
-        Element irpElement = document.createElement("irp");
+        Element irpElement = document.createElement("Irp");
         irpElement.appendChild(document.createTextNode(irp));
         root.appendChild(irpElement);
 

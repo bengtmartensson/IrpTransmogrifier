@@ -189,12 +189,12 @@ public class GeneralSpec extends IrpObject {
 
     @Override
     public Element toElement(Document document) {
-        Element element = document.createElement("generalspec");
+        Element element = super.toElement(document);
         element.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
-        element.setAttribute("bitdirection", getBitDirection().toString());
-        element.setAttribute("timeunit", Long.toString(Math.round(getUnit())));
+        element.setAttribute("bitDirection", getBitDirection().toString());
+        element.setAttribute("unit", Long.toString(Math.round(getUnit())));
         if (getDutyCycle() > 0)
-            element.setAttribute("dutycycle", Long.toString(100 * Math.round(getDutyCycle())));
+            element.setAttribute("dutyCycle", Long.toString(100 * Math.round(getDutyCycle())));
         return element;
     }
 

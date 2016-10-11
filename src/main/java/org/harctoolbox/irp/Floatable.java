@@ -37,7 +37,7 @@ public interface Floatable {
      */
     public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
 
-    public Element toElement(Document document) throws IrpSyntaxException;
+    public Element toElement(Document document);
 
     public String toIrpString();
 }

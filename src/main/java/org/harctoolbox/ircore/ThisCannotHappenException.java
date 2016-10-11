@@ -29,4 +29,8 @@ public class ThisCannotHappenException extends RuntimeException {
     public ThisCannotHappenException(String s) {
         super(s);
     }
+
+    public ThisCannotHappenException(Throwable ex) {
+        super(ex);
+    }
 }

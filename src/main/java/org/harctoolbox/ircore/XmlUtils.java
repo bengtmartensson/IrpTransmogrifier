@@ -201,6 +201,11 @@ public class XmlUtils {
         return index;
     }
 
+    public static void addBooleanAttributeIfTrue(Element element, String attName, boolean value) {
+        if (value)
+            element.setAttribute(attName, "true");
+    }
+
     public static void main(String[] args) {
         try {
             Schema schema = args.length > 1 ? readSchemaFromFile(new File(args[1])) : null;

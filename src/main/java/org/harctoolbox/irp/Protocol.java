@@ -32,6 +32,7 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -318,6 +319,17 @@ public class Protocol extends IrpObject {
         Element root = document.createElement("protocol");
         Element renderer = document.createElement("implementation");
         root.appendChild(renderer);
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "togggle", hasMemoryVariable("T"));
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "standardPmw", isStandardPWM());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "pwm4", isPWM4());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "pwm16", isPWM16());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "biphase", isBiphase());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "trivial", isTrivial(false));
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "invTrivial", isTrivial(true));
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "interleavingOk", interleavingOk());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "startsWithDuration", startsWithDuration());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "hasVariation", hasVariation());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "rplus", isRPlus());
         Element generalSpecElement = generalSpec.toElement(document);
         renderer.appendChild(generalSpecElement);
         //renderer.appendChild(nameEngine.toElement(document));

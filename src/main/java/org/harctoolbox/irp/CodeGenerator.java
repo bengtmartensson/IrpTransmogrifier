@@ -17,19 +17,24 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -41,73 +46,67 @@ public class CodeGenerator {
     /**
      * Name space for XLST (1.0 and 2.0)
      */
-    static final String xsltNamespace = "http://www.w3.org/1999/XSL/Transform";
-    private final Document document;
+    public final static String xsltNamespace = "http://www.w3.org/1999/XSL/Transform";
+    public final static String cdataElements = "Irp Documentation";
+    private final static String ending = ".xml";
+    private final static String defaultCharSet = "UTF-8";
+    private Document source;
+    private final String protocolName;
+    private final boolean dumpIntermediates;
 
-    public CodeGenerator(Document document) {
-        this.document = document;
+    public CodeGenerator(Document document, boolean dumpIntermediates) throws FileNotFoundException, TransformerException {
+        this.dumpIntermediates = dumpIntermediates;
+        this.source = document;
+        protocolName = document.getDocumentElement().getAttribute("name");
+        if (dumpIntermediates)
+            XmlUtils.printDOM(new File(protocolName + ending), source);
     }
 
-    public void printDOM(OutputStream ostr, Document stylesheet, /*HashMap<String, String>parameters,
-            boolean binary,*/ String charsetName) throws IOException {
-//        if (debug) {
-//            XmlUtils.printDOM(new File("girr.girr"), this.document);
-//            XmlUtils.printDOM(new File("stylesheet.xsl"), stylesheet);
-//        }
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
-            Transformer tr;
-            if (stylesheet == null) {
-                tr = factory.newTransformer();
+    public void transform(Document stylesheet, String suffix) throws TransformerException, FileNotFoundException {
+        if (stylesheet == null)
+            throw new NullPointerException("stylesheet must not be null");
 
-                tr.setOutputProperty(OutputKeys.METHOD, "xml");
-                tr.setOutputProperty(OutputKeys.ENCODING, charsetName);
+        TransformerFactory factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+        Transformer tr = factory.newTransformer(new DOMSource(stylesheet));
+        Document newDoc = XmlUtils.newDocument();
+        tr.transform(new DOMSource(source), new DOMResult(newDoc));
+        if (dumpIntermediates)
+            XmlUtils.printDOM(new FileOutputStream(protocolName + suffix + ending), newDoc, defaultCharSet, cdataElements);
+        source = newDoc;
+    }
 
-            } else {
-//                if (parameters != null)
-//                    for (Map.Entry<String, String> kvp : parameters.entrySet()) {
-//                        Element e = stylesheet.createElementNS(xsltNamespace, "param");
-//                        e.setAttribute("name", kvp.getKey());
-//                        e.setAttribute("select", kvp.getValue());
-//                        stylesheet.getDocumentElement().insertBefore(e, stylesheet.getDocumentElement().getFirstChild());
-//                    }
-                NodeList nodeList = stylesheet.getDocumentElement().getElementsByTagNameNS(xsltNamespace, "output");
-                if (nodeList.getLength() > 0) {
-                    Element e = (Element) nodeList.item(0);
-                    e.setAttribute("encoding", charsetName);
-                }
-//                if (debug)
-//                    XmlUtils.printDOM(new File("stylesheet-params.xsl"), stylesheet);
-                tr = factory.newTransformer(new DOMSource(stylesheet));
+    public void transform(String filename, String suffix) throws TransformerException, IOException, SAXException {
+        transform(XmlUtils.openXmlFile(new File(filename)), suffix);
+    }
+
+    public void printDOM(OutputStream ostr, String charsetName) throws TransformerException, IOException {
+        printDOM(ostr, (Document) null, charsetName);
+    }
+
+    public void printDOM(OutputStream ostr, File stylesheet, String charsetName) throws TransformerException, IOException, SAXException {
+        printDOM(ostr, XmlUtils.openXmlFile(stylesheet), charsetName);
+    }
+
+    public void printDOM(OutputStream ostr, Document stylesheet, /*HashMap<String, String>parameters,*/
+            String charsetName) throws IOException, TransformerException {
+        TransformerFactory factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+        Transformer tr;
+        if (stylesheet == null) {
+            tr = factory.newTransformer();
+            tr.setOutputProperty(OutputKeys.METHOD, "xml");
+            tr.setOutputProperty(OutputKeys.ENCODING, charsetName);
+
+        } else {
+            NodeList nodeList = stylesheet.getDocumentElement().getElementsByTagNameNS(xsltNamespace, "output");
+            if (nodeList.getLength() > 0) {
+                Element e = (Element) nodeList.item(0);
+                e.setAttribute("encoding", charsetName);
             }
-            tr.setOutputProperty(OutputKeys.INDENT, "yes");
-            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-//            if (binary) {
-//                DOMResult domResult = new DOMResult();
-//                tr.transform(new DOMSource(document), domResult);
-//                Document newDoc = (Document) domResult.getNode();
-////                if (debug)
-////                    XmlUtils.printDOM(new File("girr-binary.xml"), newDoc);
-//                NodeList byteElements = newDoc.getDocumentElement().getElementsByTagName("byte");
-//                for (int i = 0; i < byteElements.getLength(); i++) {
-//                    int val = Integer.parseInt(((Element) byteElements.item(i)).getTextContent());
-//                    ostr.write(val);
-//                }
-//            } else
-                tr.transform(new DOMSource(document), new StreamResult(ostr));
-//            if (parameters != null && stylesheet != null) {
-//                NodeList nl = stylesheet.getDocumentElement().getChildNodes();
-//                for (int i = 0; i < nl.getLength(); i++) {
-//                    Node n = nl.item(i);
-//                    if (n.getNodeType() != Node.ELEMENT_NODE)
-//                        continue;
-//                    Element e = (Element) n;
-//                    if (e.getLocalName().equals("param") && parameters.containsKey(e.getAttribute("name")))
-//                        stylesheet.getDocumentElement().removeChild(n);
-//                }
-//            }
-        } catch (TransformerException ex) {
-            logger.log(Level.SEVERE, ex.getMessage());
+            tr = factory.newTransformer(new DOMSource(stylesheet));
         }
+        tr.setOutputProperty(OutputKeys.INDENT, "yes");
+        tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+        tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
+        tr.transform(new DOMSource(source), new StreamResult(ostr));
     }
 }

@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -138,47 +139,69 @@ public class IrStream extends BareIrStream {
 
     @Override
     public Element toElement(Document document) {
+        //Element element = document.createElement(getClass().getSimpleName());
         Element element = super.toElement(document);
+        //element.appendChild(bareIrStream);
+        if (repeatMarker.getMin() != 1)
+            element.setAttribute("repeatMin", Integer.toString(repeatMarker.getMin()));
+        if (repeatMarker.getMax() != 1)
+            element.setAttribute("repeatMax", repeatMarker.isInfinite() ? "infinite" : Integer.toString(repeatMarker.getMax()));
         element.setAttribute("isRepeat", Boolean.toString(isRepeatSequence()));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
-        element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        if (numberOfBits() >= 0)
+            element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
-        Element intro = document.createElement("Intro");
-        element.appendChild(intro);
-        Element repeat = document.createElement("Repeat");
-        element.appendChild(repeat);
-        Element ending = document.createElement("Ending");
-        element.appendChild(ending);
+//        for (IrStreamItem item : irStreamItems)
+//            element.appendChild(item.toElement(document));
 
-        if (!isRepeatSequence()) {
-            Element current = intro;
-            int bareDurations = 0;
-            int bits = 0;
-            for (IrStreamItem item : irStreamItems) {
-                if (item instanceof IrStream && ((IrStream) item).isRepeatSequence()) {
-                    intro.setAttribute("numberOfBits", Integer.toString(bits));
-                    intro.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
-                    bits = 0;
-                    bareDurations = 0;
-                    repeat.appendChild(item.toElement(document));
-                    repeat.setAttribute("numberOfBareDurations", Integer.toString(item.numberOfBareDurations()));
-                    repeat.setAttribute("numberOfBits", Integer.toString(item.numberOfBits()));
-                    current = ending;
+        //Element intro = document.createElement("Intro");
+        //element.appendChild(intro);
+        //Element repeat = document.createElement("Repeat");
+        //element.appendChild(repeat);
+        //Element ending = document.createElement("Ending");
+        //element.appendChild(ending);
 
-                } else {
-                    current.appendChild(item.toElement(document));
-                    bareDurations += item.numberOfBareDurations();
-                    bits += item.numberOfBits();
-                }
-            }
-            ending.setAttribute("numberOfBits", Integer.toString(bits));
-            ending.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
-        } else {
-            for (IrStreamItem item : irStreamItems)
-                repeat.appendChild(item.toElement(document));
-        }
+//        if (!isRepeatSequence()) {
+//            Element current = intro;
+//            int bareDurations = 0;
+//            int bits = 0;
+//            for (IrStreamItem item : irStreamItems) {
+//                if (item instanceof IrStream && ((IrStream) item).isRepeatSequence()) {
+//                    intro.setAttribute("numberOfBits", Integer.toString(bits));
+//                    intro.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
+//                    bits = 0;
+//                    bareDurations = 0;
+//                    repeat.appendChild(item.toElement(document));
+//                    repeat.setAttribute("numberOfBareDurations", Integer.toString(item.numberOfBareDurations()));
+//                    repeat.setAttribute("numberOfBits", Integer.toString(item.numberOfBits()));
+//                    current = ending;
+//
+//                } else {
+//                    current.appendChild(item.toElement(document));
+//                    bareDurations += item.numberOfBareDurations();
+//                    bits += item.numberOfBits();
+//                }
+//            }
+//            ending.setAttribute("numberOfBits", Integer.toString(bits));
+//            ending.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
+//        } else {
+//            for (IrStreamItem item : irStreamItems)
+//                repeat.appendChild(item.toElement(document));
+//        }
 
-        element.appendChild(repeatMarker.toElement(document));
+        if (!repeatMarker.isTrivial())
+            element.appendChild(repeatMarker.toElement(document));
+
+        return element;
+    }
+
+    public Element toElement(Document document, Pass pass) {
+        Element element = super.toElement(document);
+//        boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
+//        int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
+//        if (evaluateTheRepeat)
+//            recognizeData.setState(IrSignal.Pass.repeat);
+//        boolean status = recognize(recognizeData, pass, bitSpecs, repetitions);
         return element;
     }
 

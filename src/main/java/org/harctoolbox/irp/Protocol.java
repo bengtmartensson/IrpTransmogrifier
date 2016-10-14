@@ -316,6 +316,10 @@ public class Protocol extends IrpObject {
 
     @Override
     public Element toElement(Document document) {
+        return toElement(document, false);
+    }
+
+    public Element toElement(Document document, boolean split) {
         Element root = super.toElement(document);
         Element renderer = document.createElement(Protocol.class.getSimpleName());
         root.appendChild(renderer);
@@ -332,7 +336,7 @@ public class Protocol extends IrpObject {
         XmlUtils.addBooleanAttributeIfTrue(renderer, "rplus", isRPlus());
         Element generalSpecElement = generalSpec.toElement(document);
         renderer.appendChild(generalSpecElement);
-        Element bitspecIrstreamElement = bitspecIrstream.toElement(document);
+        Element bitspecIrstreamElement = bitspecIrstream.toElement(document, split);
         renderer.appendChild(bitspecIrstreamElement);
         Element definitionsElement = definitions.toElement(document);
         renderer.appendChild(definitionsElement);

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -90,10 +91,25 @@ public class BitspecIrstream extends IrStreamItem {
 
     @Override
     public Element toElement(Document document) {
+        return toElement(document, false);
+    }
+
+    public Element toElement(Document document, boolean split) {
         Element root = super.toElement(document);
         root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null)));
         root.appendChild(bitSpec.toElement(document));
-        root.appendChild(irStream.toElement(document));
+        if (split) {
+            Element intro = document.createElement("Intro");
+            root.appendChild(intro);
+            intro.appendChild(irStream.toElement(document, Pass.intro));
+            Element repeat = document.createElement("Repeat");
+            root.appendChild(repeat);
+            repeat.appendChild(irStream.toElement(document, Pass.repeat));
+            Element ending = document.createElement("Ending");
+            root.appendChild(ending);
+            ending.appendChild(irStream.toElement(document, Pass.ending));
+        } else
+            root.appendChild(irStream.toElement(document));
         return root;
     }
 

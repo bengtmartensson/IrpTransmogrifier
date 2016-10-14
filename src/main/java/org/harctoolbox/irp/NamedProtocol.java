@@ -78,15 +78,24 @@ public class NamedProtocol extends Protocol {
         return irp;
     }
 
-    public Document toDocument() throws IrpSyntaxException {
+    public Document toDocument() {
+        return toDocument(false);
+    }
+
+    public Document toDocument(boolean split) {
         Document document = XmlUtils.newDocument();
-        document.appendChild(toElement(document));
+        document.appendChild(toElement(document, split));
         return document;
     }
 
     @Override
     public Element toElement(Document document) {
-        Element root = super.toElement(document);
+        return toElement(document, false);
+    }
+
+    @Override
+    public Element toElement(Document document, boolean split) {
+        Element root = super.toElement(document, split);
         root.setAttribute("name", name);
 
         Element docu = document.createElement("Documentation");
@@ -99,5 +108,4 @@ public class NamedProtocol extends Protocol {
 
         return root;
     }
-
 }

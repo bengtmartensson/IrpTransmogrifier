@@ -206,7 +206,8 @@ public class BareIrStream extends IrStreamItem {
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
-        element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        if (numberOfBits() >= 0)
+            element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
         for (IrStreamItem item : this.irStreamItems)
             element.appendChild(item.toElement(document));
         return element;

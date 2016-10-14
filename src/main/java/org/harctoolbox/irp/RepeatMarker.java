@@ -139,8 +139,12 @@ public class RepeatMarker extends IrpObject {
         return element;
     }
 
+    public boolean isTrivial() {
+        return min == 1 && max == 1;
+    }
+
     @Override
     public int weight() {
-        return (min == 1 && max == 1) ? 0 : 1;
+        return isTrivial() ? 0 : 1;
     }
 }

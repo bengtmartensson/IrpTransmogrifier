@@ -28,6 +28,17 @@ import org.w3c.dom.Element;
  */
 public class NamedProtocol extends Protocol {
 
+    public static Document toDocument(Iterable<NamedProtocol> protocols) {
+        Document document = XmlUtils.newDocument();
+        Element root = document.createElement("NamedProtocols");
+        document.appendChild(root);
+        for (NamedProtocol protocol : protocols) {
+            Element el = protocol.toElement(document);
+            root.appendChild(el);
+        }
+        return document;
+    }
+
     private final String irp;
     private final String name;
     private final String documentation;

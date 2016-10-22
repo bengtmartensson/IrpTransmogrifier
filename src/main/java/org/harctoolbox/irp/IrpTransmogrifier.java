@@ -54,6 +54,7 @@ import org.xml.sax.SAXException;
  */
 public class IrpTransmogrifier {
     public static final String defaultConfigFile = "src/main/config/IrpProtocols.xml";
+    public static final String xsltDir = "src/main/xslt";
     private static final String charSet = "UTF-8"; // Just for runMain
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
@@ -398,22 +399,25 @@ public class IrpTransmogrifier {
         setupDatabase(commandLineArgs);
         List<String> list = evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
-        if (list.size() != 1)
-            throw new UsageException("The code command requires exactly one protocol.");
+        List<NamedProtocol> protocols = new ArrayList<>(list.size());
+        for (String protocolName : list)
+            protocols.add(irpDatabase.getNamedProtocol(protocolName));
 
-        String protocolName = list.get(0);
-        NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-        Document document = protocol.toDocument();
+        Document document = NamedProtocol.toDocument(protocols);
+
         if (commandLineArgs.xmlFile != null) {
             PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
             XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "Irp Documentation");
         }
 
         CodeGenerator codeGenerator = new CodeGenerator(document, commandCode.intermediates);
-        codeGenerator.transform("src/main/xslt/intro-repeat-ending.xsl", ".ire");
-        Document stylesheet = commandCode.xslt == null ? null : XmlUtils.openXmlFile(new File(commandCode.xslt));
-        codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
-        //codeGenerator.printDOM(out, commandLineArgs.encoding);
+        codeGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
+        //codeGenerator.transform(new File(xsltDir, "code.xsl"), ".code");
+        if (commandCode.target != null) {
+            Document stylesheet = commandCode.target == null ? null : XmlUtils.openXmlFile(new File(xsltDir, commandCode.target + ".xsl"));
+            codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
+            //codeGenerator.printDOM(out, commandLineArgs.encoding);
+        }
     }
 
     private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
@@ -766,8 +770,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files")
         private boolean intermediates = false;
 
-//        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
-//        private String target = null;
+        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
+        private String target = null;
 
         @Parameter(names = { "--xsl", "--xslt" }, description = "Pathname to XSLT")
         private String xslt = null;

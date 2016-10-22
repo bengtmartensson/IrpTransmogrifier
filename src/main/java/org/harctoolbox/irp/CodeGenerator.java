@@ -48,18 +48,22 @@ public class CodeGenerator {
      */
     public final static String xsltNamespace = "http://www.w3.org/1999/XSL/Transform";
     public final static String cdataElements = "Irp Documentation";
+    private final static String basename = "irp"; // FIXME
     private final static String ending = ".xml";
     private final static String defaultCharSet = "UTF-8";
     private Document source;
-    private final String protocolName;
     private final boolean dumpIntermediates;
 
     public CodeGenerator(Document document, boolean dumpIntermediates) throws FileNotFoundException, TransformerException {
         this.dumpIntermediates = dumpIntermediates;
         this.source = document;
-        protocolName = document.getDocumentElement().getAttribute("name");
+        //protocolName = document.getDocumentElement().getAttribute("name");
         if (dumpIntermediates)
-            XmlUtils.printDOM(new File(protocolName + ending), source);
+            XmlUtils.printDOM(new File(basename + ending), source);
+    }
+
+    public CodeGenerator(NamedProtocol protocol, boolean dumpIntermediates) throws FileNotFoundException, TransformerException {
+        this(protocol.toDocument(), dumpIntermediates);
     }
 
     public void transform(Document stylesheet, String suffix) throws TransformerException, FileNotFoundException {
@@ -71,12 +75,16 @@ public class CodeGenerator {
         Document newDoc = XmlUtils.newDocument();
         tr.transform(new DOMSource(source), new DOMResult(newDoc));
         if (dumpIntermediates)
-            XmlUtils.printDOM(new FileOutputStream(protocolName + suffix + ending), newDoc, defaultCharSet, cdataElements);
+            XmlUtils.printDOM(new FileOutputStream(basename + suffix + ending), newDoc, defaultCharSet, cdataElements);
         source = newDoc;
     }
 
+    public void transform(File file, String suffix) throws TransformerException, IOException, SAXException {
+        transform(XmlUtils.openXmlFile(file), suffix);
+    }
+
     public void transform(String filename, String suffix) throws TransformerException, IOException, SAXException {
-        transform(XmlUtils.openXmlFile(new File(filename)), suffix);
+        transform(new File(filename), suffix);
     }
 
     public void printDOM(OutputStream ostr, String charsetName) throws TransformerException, IOException {

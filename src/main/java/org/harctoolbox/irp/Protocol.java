@@ -324,7 +324,7 @@ public class Protocol extends IrpObject {
         Element renderer = document.createElement(Protocol.class.getSimpleName());
         root.appendChild(renderer);
         XmlUtils.addBooleanAttributeIfTrue(renderer, "toggle", hasMemoryVariable("T"));
-        XmlUtils.addBooleanAttributeIfTrue(renderer, "standardPmw", isStandardPWM());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "standardPwm", isStandardPWM());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "pwm4", isPWM4());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "pwm16", isPWM16());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "biphase", isBiphase());

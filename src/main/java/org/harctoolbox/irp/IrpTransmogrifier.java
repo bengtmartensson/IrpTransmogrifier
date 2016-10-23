@@ -413,11 +413,9 @@ public class IrpTransmogrifier {
         CodeGenerator codeGenerator = new CodeGenerator(document, commandCode.intermediates);
         codeGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
         //codeGenerator.transform(new File(xsltDir, "code.xsl"), ".code");
-        if (commandCode.target != null) {
-            Document stylesheet = commandCode.target == null ? null : XmlUtils.openXmlFile(new File(xsltDir, commandCode.target + ".xsl"));
-            codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
-            //codeGenerator.printDOM(out, commandLineArgs.encoding);
-        }
+        Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, commandCode.target + ".xsl"));
+        codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
+        //codeGenerator.printDOM(out, commandLineArgs.encoding);
     }
 
     private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
@@ -770,11 +768,11 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files")
         private boolean intermediates = false;
 
-        @Parameter(names = { "--target" }, description = "Target for code generation (not yet evaluated)")
+        @Parameter(names = { "-t", "--target" }, required = true, description = "Target for code generation")
         private String target = null;
 
-        @Parameter(names = { "--xsl", "--xslt" }, description = "Pathname to XSLT")
-        private String xslt = null;
+//        @Parameter(names = { "--xsl", "--xslt" }, description = "Pathname to XSLT")
+//        private String xslt = null;
 
         @Parameter(description = "Protocol")
         private List<String> protocols;

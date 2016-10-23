@@ -180,11 +180,9 @@ public class FiniteBitField extends BitField {
         Element widthElement = document.createElement("Width");
         widthElement.appendChild(width.toElement(document));
         element.appendChild(widthElement);
-        if (!(chop instanceof Number && ((Number) chop).toNumber() == 0)) {
-            Element chopElement = document.createElement("Chop");
-            chopElement.appendChild(chop.toElement(document));
-            element.appendChild(chopElement);
-        }
+        Element chopElement = document.createElement("Chop");
+        chopElement.appendChild(chop.toElement(document));
+        element.appendChild(chopElement);
         return element;
     }
 

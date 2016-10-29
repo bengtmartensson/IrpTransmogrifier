@@ -75,7 +75,7 @@ public class CodeGenerator {
         Document newDoc = XmlUtils.newDocument();
         tr.transform(new DOMSource(source), new DOMResult(newDoc));
         if (dumpIntermediates)
-            XmlUtils.printDOM(new FileOutputStream(basename + suffix + ending), newDoc, defaultCharSet, cdataElements);
+            XmlUtils.printDOM(new File(basename + suffix + ending), newDoc, defaultCharSet, cdataElements);
         source = newDoc;
     }
 

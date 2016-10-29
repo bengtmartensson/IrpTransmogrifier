@@ -169,8 +169,8 @@ public class XmlUtils {
         tr.transform(new DOMSource(doc), new StreamResult(ostr));
     }
 
-    public static void printDOM(File file, Document doc, String encoding) throws FileNotFoundException, TransformerException {
-        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, null);
+    public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException, TransformerException {
+        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements);
         logger.log(Level.INFO, "File {0} written.", file);
     }
 
@@ -178,7 +178,7 @@ public class XmlUtils {
     // since it would been too error prone.
 
     public static void printDOM(File file, Document doc) throws FileNotFoundException, TransformerException {
-        printDOM(file, doc, null);
+        printDOM(file, doc, null, null);
     }
 
     public static void printDOM(Document doc) throws TransformerException {

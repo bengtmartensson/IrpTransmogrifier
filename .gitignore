@@ -5,4 +5,8 @@ hs_err_pid*
 nb*.xml
 .~lock*
 *.dot
-/nbproject/
+/nbproject/irp.xml
+irp.ire.xml
+irp.xml
+catalog.xml
+nbproject

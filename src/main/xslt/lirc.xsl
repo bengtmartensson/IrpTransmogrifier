@@ -28,6 +28,7 @@
             <xsl:attribute name="multiSignal">true</xsl:attribute>
             <xsl:attribute name="simpleSequence">false</xsl:attribute>
             <xsl:attribute name="metadata">true</xsl:attribute>
+            <xsl:attribute name="xsi:schemaLocation" namespace="http://www.w3.org/2001/XMLSchema-instance">http://www.harctoolbox.org/exportformats http://www.harctoolbox.org/schemas/exportformats.xsd</xsl:attribute>
 
             <axsl:stylesheet>
                 <xsl:namespace name="girr" select="'http://www.harctoolbox.org/Girr'"/>
@@ -179,6 +180,80 @@ end remote
         <xsl:apply-templates select="Protocol"/>
     </xsl:template>
 
+    <!-- Have not implemented definitions yet -->
+    <xsl:template match="NamedProtocol[Protocol/Definitions/Definition]" priority="11">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: Definitions not yet implemented </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
+    <!-- Protocol with assignments do not fit into Lirc -->
+    <xsl:template match="NamedProtocol[Protocol[.//Assignment and not(@toggle='true')]]" priority="10">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: Assignment cannot be done in the Lirc framework </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
+    <!-- Protocol with assignments do not fit into Lirc -->
+    <!--xsl:template match="NamedProtocol[Protocol/BitspecIrstream[@interleavingOk='false']]" priority="9">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: interleavingOk is false </xsl:text>
+        </xsl:comment>
+    </xsl:template-->
+
+    <!-- Protocol pwm4 -->
+    <xsl:template match="NamedProtocol[Protocol[@pwm4='true']]">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: pwm4 not yet implemented </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
+    <!-- Expressions as bitfields not implemented yet -->
+    <xsl:template match="NamedProtocol[.//Data/Expression]">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: Expressions as bitfields not implemented yet </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
+    <!-- Variations not implemented yet -->
+    <xsl:template match="NamedProtocol[.//Variation]">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: Variations not implemented yet </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
+    <!-- Expressions as bitfields not implemented yet -->
+    <xsl:template match="NamedProtocol[Protocol[not(@standardPwm='true')
+                                                and not(@pwm4='true')
+                                                and not(@biphase='true')]]" priority="1">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: not one of the simple types (pwm, pwm4, biphase) </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
+    <!-- Expressions as finitely repeating sequences not implemented -->
+    <xsl:template match="NamedProtocol[.//IrStream[number(@repeatMin) > 1]]">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: finite repeats in IrSequences not implemented </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
     <xsl:template match="Protocol">
         <xsl:text xml:space="preserve">&#10;&#10;</xsl:text>
         <xsl:comment> ################## Protocol <xsl:value-of select="../@name"/> ################ </xsl:comment>
@@ -187,12 +262,15 @@ end remote
         <xsl:text xml:space="preserve">&#10;</xsl:text>
         <axsl:template>
             <xsl:attribute name="match">girr:commandSet[girr:command/girr:parameters/@protocol = '<xsl:value-of select="lower-case(../@name)"/>']</xsl:attribute>
+            <xsl:text xml:space="preserve">&#10;</xsl:text>
+            <xsl:apply-templates select="BitspecIrstream" mode="warnIntroAndRepeat"/>
+            <xsl:apply-templates select="BitspecIrstream" mode="warnEnding"/>
             <axsl:text xml:space="preserve">begin remote&#10;&#9;# Protocol name: <xsl:value-of select="../@name"/>&#10;&#9;name&#9;&#9;</axsl:text>
             <axsl:value-of select="../@name"/>
 <axsl:text>
-&#9;bits&#9;&#9;<xsl:value-of select="BitspecIrstream/*[FiniteBitField]/@numberOfBits"/>
+<xsl:apply-templates select="BitspecIrstream" mode="numberOfBits"/>
 &#9;flags&#9;&#9;<xsl:apply-templates select="@standardPwm"/><xsl:apply-templates select="@biphase"/>
-            <xsl:apply-templates select="BitspecIrstream/*[FiniteBitField]/Extent" mode="flags"/>
+            <xsl:apply-templates select="BitspecIrstream/*[FiniteBitField][1]/Extent" mode="flags"/>
 &#9;eps&#9;&#9;<xsl:value-of select="$eps"/>
 &#9;aeps&#9;&#9;<xsl:value-of select="$aeps"/>
 &#9;zero&#9;<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[1]/*"/>
@@ -230,7 +308,19 @@ end remote
         </axsl:template>
 
         <xsl:apply-templates select="BitspecIrstream/*[FiniteBitField and ../../ParameterSpecs/ParameterSpec/Default]" mode="withDefaults"/>
-        <xsl:apply-templates select="BitspecIrstream/*[FiniteBitField]" mode="withoutDefaults"/>
+        <xsl:apply-templates select="BitspecIrstream/Intro[FiniteBitField] | BitspecIrstream/Repeat[FiniteBitField]" mode="withoutDefaults"/>
+    </xsl:template>
+
+    <xsl:template match="BitspecIrstream" mode="warnEnding"/>
+
+    <xsl:template match="BitspecIrstream[Ending[*]]" mode="warnEnding">
+        <axsl:text># Warning: Protocol contains ending that cannot be expressed in Lirc&#10;</axsl:text>
+    </xsl:template>
+
+    <xsl:template match="BitspecIrstream" mode="warnIntroAndRepeat"/>
+
+    <xsl:template match="BitspecIrstream[Intro/FiniteBitField and Repeat/FiniteBitField]" mode="warnIntroAndRepeat">
+        <axsl:text># Warning: Protocol contains repeat elements that cannot be expressed in Lirc&#10;</axsl:text>
     </xsl:template>
 
     <xsl:template match="Intro|Repeat" mode="withoutDefaults">
@@ -416,6 +506,11 @@ end remote
 
     <xsl:template match="function" mode="toggle_bit"/>
 
+    <xsl:template match="BitspecIrstream" mode="numberOfBits">
+        <xsl:text xml:space="preserve">&#10;&#9;bits&#9;&#9;</xsl:text>
+        <xsl:value-of select="*[FiniteBitField][1]/@numberOfBits"/>
+    </xsl:template>
+
     <xsl:template match="BitspecIrstream" mode="toggle_bit">
         <xsl:text xml:space="preserve">
 &#9;toggle_bit&#9;</xsl:text>
@@ -573,9 +668,6 @@ end remote
     </xsl:template>
 
     <!-- REVERSE is not reliable; do not use -->
-    <!--xsl:template match="@bitDirection[.='lsb']" mode="flags">
-        <xsl:text>|REVERSE</xsl:text>
-    </xsl:template-->
 
     <xsl:template match="Extent" mode="flags">
         <xsl:text>|CONST_LENGTH</xsl:text>

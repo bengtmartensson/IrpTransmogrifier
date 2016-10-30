@@ -1,6 +1,9 @@
 #!/bin/sh
 
-java -jar target/IrpTransmogrifier-0.0.1dev-jar-with-dependencies.jar -c target/IrpProtocols.xml -o ../harctoolboxbundle/IrScrutinizer/src/main/config/exportformats.d/lirc.xml code --target lirc \
+java -jar target/IrpTransmogrifier-0.0.1dev-jar-with-dependencies.jar -c target/IrpProtocols.xml -o  ../harctoolboxbundle/IrScrutinizer/src/main/config/exportformats.d/lirc.xml code -i --target lirc
+
+exit 0
+\
 48-nec1 \
 48-nec2 \
 adnotam \
@@ -76,11 +79,6 @@ tivo \
 velleman \
 viewstar \
 x10 \
-
-
-
-exit 0
-
 anthem \
 apple \
 amino-56 \

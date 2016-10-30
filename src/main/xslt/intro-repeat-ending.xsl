@@ -24,11 +24,35 @@
   <!-- General case: ( I R* E) -->
     <xsl:template match="BitspecIrstream/IrStream[IrStream[@repeatMax='infinite']]">
         <Intro>
-            <xsl:apply-templates select="@*|IrStream[@repeatMax='infinite']/preceding-sibling::*"/>
+            <xsl:attribute name="isRepeat" select="'false'"/>
+            <xsl:attribute name="numberOfBareDurations">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/preceding-sibling::Flash)
+                                    + count(IrStream[@repeatMax='infinite']/preceding-sibling::Gap)
+                                    + count(IrStream[@repeatMax='infinite']/preceding-sibling::Extent)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBitSpecs">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/preceding-sibling::BitSpecs)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBits">
+                <xsl:value-of select="sum(IrStream[@repeatMax='infinite']/preceding-sibling::FiniteBitField/Width/Number)"/>
+            </xsl:attribute>
+            <xsl:apply-templates select="IrStream[@repeatMax='infinite']/preceding-sibling::*"/>
         </Intro>
         <xsl:apply-templates select="IrStream[@repeatMax='infinite']" mode="repeat"/>
         <Ending>
-            <xsl:apply-templates select="@*|IrStream[@repeatMax='infinite']/following-sibling::*"/>
+            <xsl:attribute name="isRepeat" select="'false'"/>
+            <xsl:attribute name="numberOfBareDurations">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/following-sibling::Flash)
+                                    + count(IrStream[@repeatMax='infinite']/following-sibling::Gap)
+                                    + count(IrStream[@repeatMax='infinite']/following-sibling::Extent)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBitSpecs">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/following-sibling::BitSpecs)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBits">
+                <xsl:value-of select="sum(IrStream[@repeatMax='infinite']/following-sibling::FiniteBitField/Width/Number)"/>
+            </xsl:attribute>
+            <xsl:apply-templates select="IrStream[@repeatMax='infinite']/following-sibling::*"/>
         </Ending>
     </xsl:template>
 
@@ -44,7 +68,7 @@
         <Intro>
             <xsl:apply-templates select="@*|*"/>
         </Intro>
-        <Eepeat/>
+        <Repeat/>
         <Ending/>
     </xsl:template>
 

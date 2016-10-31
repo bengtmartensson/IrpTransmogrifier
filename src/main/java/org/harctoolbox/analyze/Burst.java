@@ -28,9 +28,13 @@ import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
 
 public class Burst {
-    private static final double maxRoundingError = 0.3f;
-    private static final double maxUnits = 30f;
-    private static final double maxUs = 10000f;
+    private static final double dafaultMaxRoundingError = 0.3f;
+    private static final double defaultMaxUnits = 30f;
+    private static final double defaultMaxUs = 10000f;
+
+    private static double maxRoundingError = dafaultMaxRoundingError;
+    private static double maxUnits = defaultMaxUnits;
+    private static double maxUs = defaultMaxUs;
 
     private static Duration newFlashOrGap(boolean isFlash, double us, double timebase) {
         double units = us/timebase;
@@ -62,6 +66,27 @@ public class Burst {
 
     public static Gap newGap(double duration, double timebase) {
         return (Gap) newFlashOrGap(false, duration, timebase);
+    }
+
+    /**
+     * @param aMaxRoundingError the maxRoundingError to set
+     */
+    public static void setMaxRoundingError(double aMaxRoundingError) {
+        maxRoundingError = aMaxRoundingError;
+    }
+
+    /**
+     * @param aMaxUnits the maxUnits to set
+     */
+    public static void setMaxUnits(double aMaxUnits) {
+        maxUnits = aMaxUnits;
+    }
+
+    /**
+     * @param aMaxUs the maxUs to set
+     */
+    public static void setMaxUs(double aMaxUs) {
+        maxUs = aMaxUs;
     }
 
     private final int gapDuration;

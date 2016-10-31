@@ -465,6 +465,9 @@ public class IrpTransmogrifier {
     }
 
     private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws OddSequenceLenghtException, IncompatibleArgumentException, UsageException {
+        Burst.setMaxUnits(commandAnalyze.maxUnits);
+        Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
+        Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
         IrSignal inputIrSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
         IrSequence irSequence = inputIrSignal.toModulatedIrSequence(1);
         double frequency = inputIrSignal.getFrequency();
@@ -491,12 +494,12 @@ public class IrpTransmogrifier {
         if (commandAnalyze.statistics) {
             out.println("Spaces:");
             analyzer.getDistinctGaps().stream().forEach((d) -> {
-                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberGaps(d));
+                out.println(analyzer.getName(d) + ":\t" + d + "\t" + analyzer.getNumberGaps(d));
             });
 
             out.println("Marks:");
             analyzer.getDistinctFlashes().stream().forEach((d) -> {
-                out.println(analyzer.getName(d) + ": " + d + "    \t" + analyzer.getNumberFlashes(d));
+                out.println(analyzer.getName(d) + ":\t" + d + "\t" + analyzer.getNumberFlashes(d));
             });
 
             out.println("Pairs:");
@@ -717,6 +720,15 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the analyzer")
         private boolean lsb = false;
+
+        @Parameter(names = { "-m", "--maxunits" }, description = "Maximal multiplier of time unit in durations")
+        private double maxUnits = 30f;
+
+        @Parameter(names = { "-u", "--maxmicroseconds" }, description = "Maximal duration to be expressed as micro seconds")
+        private double maxMicroSeconds = 10000f;
+
+        @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit")
+        private double maxRoundingError = 0.3;
 
         @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths")
         private List<Integer> parameterWidths = new ArrayList<>(4);

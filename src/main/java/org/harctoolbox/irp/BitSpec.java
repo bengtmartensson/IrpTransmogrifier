@@ -262,7 +262,7 @@ public class BitSpec extends IrpObject {
         element.setAttribute("chunkSize", Integer.toString(chunkSize));
         element.setAttribute("standardPwm", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
-        element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));
+        //element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));
         for (BareIrStream bitCode : bitCodes)
             element.appendChild(bitCode.toElement(document));
         return element;

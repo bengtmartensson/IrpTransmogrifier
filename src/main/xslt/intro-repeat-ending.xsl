@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-<!-- TODO: implement Variations -->
-
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     version="2.0">
@@ -71,5 +69,60 @@
         <Repeat/>
         <Ending/>
     </xsl:template>
+
+    <xsl:template match="BitspecIrstream/IrStream[Variation]">
+        <Intro>
+            <xsl:attribute name="isRepeat" select="'false'"/>
+            <xsl:apply-templates select="Variation/preceding-sibling::*"/><!-- FIXME -->
+            <xsl:apply-templates select="Variation/BareIrStream[1]/*"/>
+            <xsl:if test="Variation/BareIrStream[1]/*">
+                <xsl:apply-templates select="Variation/following-sibling::*"/>
+            </xsl:if>
+
+
+            <!--xsl:attribute name="numberOfBareDurations">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/preceding-sibling::Flash)
+                                    + count(IrStream[@repeatMax='infinite']/preceding-sibling::Gap)
+                                    + count(IrStream[@repeatMax='infinite']/preceding-sibling::Extent)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBitSpecs">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/preceding-sibling::BitSpecs)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBits">
+                <xsl:value-of select="sum(IrStream[@repeatMax='infinite']/preceding-sibling::FiniteBitField/Width/Number)"/>
+            </xsl:attribute>
+            <xsl:apply-templates select="IrStream[@repeatMax='infinite']/preceding-sibling::*"/-->
+        </Intro>
+        <Repeat>
+            <xsl:attribute name="isRepeat" select="'true'"/>
+            <xsl:apply-templates select="Variation/preceding-sibling::*"/><!-- FIXME -->
+            <xsl:apply-templates select="Variation/BareIrStream[2]/*"/>
+            <xsl:if test="Variation/BareIrStream[2]/*">
+                <xsl:apply-templates select="Variation/following-sibling::*"/>
+            </xsl:if>
+        </Repeat>
+
+        <Ending>
+            <xsl:attribute name="isRepeat" select="'false'"/>
+            <xsl:if test="Variation/BareIrStream[3]/*">
+                <xsl:apply-templates select="Variation/preceding-sibling::*"/><!-- FIXME -->
+                <xsl:apply-templates select="Variation/BareIrStream[3]/*"/>
+                <xsl:apply-templates select="Variation/following-sibling::*"/>
+            </xsl:if>
+            <!--xsl:attribute name="numberOfBareDurations">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/following-sibling::Flash)
+                                    + count(IrStream[@repeatMax='infinite']/following-sibling::Gap)
+                                    + count(IrStream[@repeatMax='infinite']/following-sibling::Extent)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBitSpecs">
+                <xsl:value-of select="count(IrStream[@repeatMax='infinite']/following-sibling::BitSpecs)"/>
+            </xsl:attribute>
+            <xsl:attribute name="numberOfBits">
+                <xsl:value-of select="sum(IrStream[@repeatMax='infinite']/following-sibling::FiniteBitField/Width/Number)"/>
+            </xsl:attribute>
+            <xsl:apply-templates select="IrStream[@repeatMax='infinite']/following-sibling::*"/-->
+        </Ending>
+    </xsl:template>
+
 
 </xsl:stylesheet>

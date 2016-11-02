@@ -412,8 +412,16 @@ public class IrpTransmogrifier {
 
         CodeGenerator codeGenerator = new CodeGenerator(document, commandCode.intermediates);
         codeGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
+        String[] transformations = commandCode.target.split(",");
+        String transformation;
+        for (int i = 0; i < transformations.length - 1; i++) {
+            transformation = transformations[i];
+            File file = new File(xsltDir, transformations[i] + ".xsl");
+            codeGenerator.transform(file, "." + transformation);
+        }
+        transformation = transformations[transformations.length - 1];
         //codeGenerator.transform(new File(xsltDir, "code.xsl"), ".code");
-        Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, commandCode.target + ".xsl"));
+        Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
         codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
         //codeGenerator.printDOM(out, commandLineArgs.encoding);
     }

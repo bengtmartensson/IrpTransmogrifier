@@ -260,6 +260,7 @@ public class BitSpec extends IrpObject {
         Element element = super.toElement(document);
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunkSize", Integer.toString(chunkSize));
+        element.setAttribute("bitMask", Integer.toString(IrCoreUtils.ones(chunkSize)));
         element.setAttribute("standardPwm", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
         //element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));

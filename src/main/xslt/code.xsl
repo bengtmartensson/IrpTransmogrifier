@@ -6,7 +6,7 @@
     version="2.0">
     <xsl:output method="xml" />
 
-    <!-- Default: just copy -->
+    <!-- Default rule: just copy -->
     <xsl:template match="@*|node()">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
@@ -68,36 +68,72 @@
     </xsl:template>
 
     <xsl:template match="Extent" mode="zero-sum-variable">
-        <assignment name="'sumOfDurations'" value="0"/>
+        <assignment name="sumOfDurations" value="0"/>
     </xsl:template>
 
     <xsl:template match="BitSpec" mode="declare_funcs">
-        <xsl:copy>
+        <!--xsl:call-template name="BitSpecLsb"/>
+        <xsl:call-template name="BitSpecMsb"/>
+    </xsl:template>
+
+    <xsl:template name="BitSpecLsb"-->
+        <function>
+            <xsl:attribute name="name" select="'bitSpecLsb'"/>
+
+            <xsl:copy-of select="@*"/>
+            <parameters>
+                <parameter type="parameterType" name="data"/>
+                <parameter type="parameterType" name="width"/>
+            </parameters>
+            <body>
+                <local-variables>
+                    <local-variable name="index" type="intType"/>
+                    <local-variable name="bitmask" type="intType">
+                        <xsl:attribute name="const" select="'true'"/>
+                        <xsl:attribute name="value" select="@bitMask"/> <!-- FIXME -->
+                    </local-variable>
+                </local-variables>
+                <for>
+                    <initial>
+                        <assignment name="index" value="0"/>
+                    </initial>
+                    <condition>
+                        <comparision type="&lt;" left="index" right="width"/>
+                    </condition>
+                    <repeat>
+                        <increment name="index">
+                            <xsl:attribute name="value" select="@chunkSize"/>
+                        </increment>
+                    </repeat>
+                    <body>
+                        <switch variable="data &amp; bitMask">
+                            <xsl:apply-templates select="BareIrStream" mode="in-bitspec"/>
+                        </switch>
+                    </body>
+                </for>
+            </body>
+        </function>
+    </xsl:template>
+
+    <!--xsl:template name="BitSpecMsb">
+        <function>
+            <xsl:attribute name="name" select="'bitSpecMsb'"/>
+
             <xsl:copy-of select="@*"/>
                 <xsl:apply-templates select="BareIrStream" mode="in-bitspec"/>
-        </xsl:copy>
-    </xsl:template>
+        </function>
+    </xsl:template-->
 
-    <xsl:template match="@chunkSize[.='1']">
-        <xsl:text>1</xsl:text>
-    </xsl:template>
 
-    <xsl:template match="@chunkSize[.='2']">
-        <xsl:text>3</xsl:text>
-    </xsl:template>
-
-    <xsl:template match="@chunkSize[.='3']">
-        <xsl:text>7</xsl:text>
-    </xsl:template>
 
     <xsl:template match="BareIrStream" mode="in-bitspec">
-        <xsl:copy>
+        <case>
             <xsl:copy-of select="@*"/>
             <xsl:attribute name="arg">
                 <xsl:value-of select="position()-1"/>
             </xsl:attribute>
             <xsl:apply-templates select="*" mode="in-function"/>
-        </xsl:copy>
+        </case>
     </xsl:template>
 
     <xsl:template match="Definition" mode="declare-variables">
@@ -108,7 +144,7 @@
     </xsl:template>
 
     <xsl:template match="Protocol[.//Extent]" mode="declare-variables">
-        <instance-variable name="sumOfDurations" value="0" type="'microsecondsType'"/>
+        <instance-variable name="sumOfDurations" value="0" type="microsecondsType"/>
     </xsl:template>
 
     <xsl:template match="ParameterSpecs" mode="declare-statics">
@@ -133,144 +169,11 @@
         </static-variable>
     </xsl:template>
 
-
     <xsl:template match="ParameterSpec" mode="function-prototype">
         <parameter>
             <xsl:copy-of select="@*"/>
             <xsl:apply-templates select="Default"/>
         </parameter>
-    </xsl:template>
-
-    <xsl:template match="Default">
-        <xsl:copy>
-            <xsl:apply-templates select="*"/>
-        </xsl:copy>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec[not(Default)]" mode="generate_assign_initial_value">
-        <xsl:value-of select="@name"/>
-        <xsl:text> = </xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init;
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec[@memory='true']" mode="generate_assign_initial_value">
-        <xsl:text>if (</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init &gt;= 0)
-        </xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text> = </xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init;
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec[not(@memory='true') and Default]" mode="generate_assign_initial_value">
-        <xsl:value-of select="@name"/>
-        <xsl:text> = </xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init &gt;= 0 ? </xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init : (</xsl:text>
-        <xsl:apply-templates select="Default"/>
-        <xsl:text>);
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec" mode="local_definition_use_defaults">
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init = </xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>;
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec[not(@memory='true') and ./Default]" mode="local_definition_use_defaults">
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init = -1;
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec[@memory='true']" mode="local_definition_use_defaults">
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init = -1L;
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec" mode="fields_assignment">
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init = parameters.get("</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>");
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec[./Default and not(@memory='true')]" mode="fields_assignment">
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init = parameters.containsKey("</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>") ? parameters.get("</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>") : -1;
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec[@memory='true']" mode="fields_assignment">
-        <xsl:value-of select="@name"/>
-        <xsl:text>_init = parameters.containsKey("</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>") ? parameters.get("</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>") : -1;
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec" mode="arg">
-        <xsl:value-of select="@name"/>
-        <xsl:if test="not(position()=last())">
-            <xsl:text>, </xsl:text>
-        </xsl:if>
-    </xsl:template>
-
-
-    <xsl:template match="ParameterSpec" mode="generate_parameter_this">
-        <xsl:text>parameters.get("</xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text>")</xsl:text>
-        <xsl:if test="not(position()=last())">
-            <xsl:text>, </xsl:text>
-        </xsl:if>
-    </xsl:template>
-
-    <xsl:template match="ParameterSpec" mode="generate_call">
-        <xsl:text></xsl:text>
-        <xsl:value-of select="@name"/>
-        <xsl:text></xsl:text>
-        <xsl:if test="not(position()=last())">
-            <xsl:text>, </xsl:text>
-        </xsl:if>
-    </xsl:template>
-
-    <xsl:template match="BitSpecIrStream">
-        <xsl:text> {
-        </xsl:text>
-        <xsl:apply-templates select="IrStream"/>
-        <xsl:text>}
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="IrStream">
-        <xsl:apply-templates select="Intro[*]"/>
-        <xsl:apply-templates select="Repeat[*]"/>
-        <xsl:apply-templates select="Ending[*]"/>
-    </xsl:template>
-
-    <xsl:template name="multiply">
-        <xsl:param name="x"/>
-        <xsl:param name="y"/>
-        <xsl:value-of select="round(number($x)*number($y))"/>
     </xsl:template>
 
     <xsl:template match="Flash[@unit='']|Gap[@unit='']|Extent[@unit='']" mode="in-function">
@@ -295,66 +198,6 @@
             <xsl:attribute name="unit" select="@unit"/>
         </xsl:element>
     </xsl:template>
-
-    <xsl:template match="@unit[.='1' or .='']">
-        <xsl:text>*</xsl:text>
-        <xsl:value-of select="ancestor::Protocol/GeneralSpec/@unit"/>
-    </xsl:template>
-
-    <xsl:template match="@unit[.='m']">
-        <xsl:text>*</xsl:text>
-        <xsl:value-of select="1000"/>
-    </xsl:template>
-
-    <xsl:template match="@unit[.='u']">
-
-    </xsl:template>
-
-    <xsl:template match="@unit[.='p']">
-        <xsl:text>*1000000/</xsl:text>
-        <xsl:value-of select="ancestor::Protocol/GeneralSpec/@frequency"/>
-    </xsl:template>
-
-    <xsl:template match="Extent[@unit='1']">
-        <xsl:text>extent(</xsl:text>
-        <xsl:apply-templates select="*"/>
-        <xsl:text>*</xsl:text>
-        <xsl:value-of select="ancestor::Protocol/GeneralSpec/@unit"/>
-        <xsl:text>);
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template name="Duration">
-        <xsl:param name="funcName"/>
-        <xsl:param name="multiplier"/>
-        <xsl:param name="object"/>
-        <xsl:value-of select="$object"/>
-        <xsl:if test="../..[not(name(.)='BitSpec')]">
-            <xsl:text>list.</xsl:text>
-        </xsl:if>
-        <xsl:value-of select="$funcName"/>
-        <xsl:text>(</xsl:text>
-        <xsl:apply-templates select="*"/>
-        <xsl:value-of select="$multiplier"/>
-        <xsl:text>);
-        </xsl:text>
-    </xsl:template>
-
-    <xsl:template match="Assignment">
-        <xsl:value-of select="name"/>
-        <xsl:text> = </xsl:text>
-        <xsl:apply-templates select="Expression"/>
-        <xsl:text>;
-        </xsl:text>
-    </xsl:template>
-
-    <!--xsl:template match="NameOrNumber">
-        <xsl:apply-templates select="*"/>
-    </xsl:template-->
-
-    <!--xsl:template match="NumberWithDecimals">
-        <xsl:value-of select="."/>
-    </xsl:template-->
 
     <xsl:template match="FiniteBitField" mode="in-function">
         <funccall>
@@ -387,9 +230,6 @@
         <xsl:apply-templates select="Width"/>
         <xsl:text>, </xsl:text>
         <xsl:apply-templates select="Chop"/>
-        <xsl:if test="not(Chop)">
-            <xsl:text>0</xsl:text>
-        </xsl:if>
         <xsl:text>, </xsl:text>
         <xsl:value-of select="@complement"/>
         <xsl:text>, </xsl:text>
@@ -397,21 +237,7 @@
         <xsl:text>)</xsl:text>
     </xsl:template>
 
-    <xsl:template match="Data">
-        <xsl:apply-templates select="*"/>
-    </xsl:template>
-
-    <!--xsl:template match="Name">
-        <xsl:copy>
-            <xsl:value-of select="."/>
-        </xsl:copy>
-    </xsl:template-->
-
-    <xsl:template match="Name[ancestor::implementation/ParameterSpecs/ParameterSpec/@name=current()/@name]|name[ancestor::Protocol//Assignment/name/@name=current()/@name]">
-        <xsl:value-of select="@name"/>
-    </xsl:template>
-
-    <xsl:template match="Width|Chop">
+    <xsl:template match="Data|Width|Chop">
         <xsl:apply-templates select="*"/>
     </xsl:template>
 

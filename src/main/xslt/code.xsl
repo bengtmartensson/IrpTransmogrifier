@@ -14,6 +14,13 @@
     </xsl:template>
 
     <xsl:template match="/">
+        <xsl:comment>
+            Parameters:
+            intType: data type for integer counteract
+            parameterType: data type for parameters in protocols
+            voidType
+            microsecondsType:
+        </xsl:comment>
         <abstract-code>
 
             <!--xsl:value-of select="$protocolName"/-->
@@ -56,7 +63,7 @@
     <xsl:template match="Intro|Repeat|Ending" mode="define_setup">
         <function>
             <xsl:copy-of select="@*"/>
-            <xsl:attribute name="returnType" select="'void'"/>
+            <!--xsl:attribute name="returnType" select="'void'"/-->
             <xsl:attribute name="name" select="name()"/>
             <xsl:apply-templates select="ancestor::Protocol/ParameterSpecs" mode="function-prototype"/>
             <body>
@@ -72,11 +79,58 @@
     </xsl:template>
 
     <xsl:template match="BitSpec" mode="declare_funcs">
-        <!--xsl:call-template name="BitSpecLsb"/>
+        <xsl:call-template name="BitSpecLsb"/>
         <xsl:call-template name="BitSpecMsb"/>
+        <xsl:call-template name="BitSpec5args"/>
     </xsl:template>
 
-    <xsl:template name="BitSpecLsb"-->
+    <xsl:template name="BitSpec5args">
+        <function>
+            <xsl:attribute name="name" select="'finiteBitField'"/>
+            <xsl:copy-of select="@*"/>
+            <parameters>
+                <parameter type="parameterType" name="data"/>
+                <parameter type="parameterType" name="width"/>
+                <parameter type="parameterType" name="chop"/>
+                <parameter type="booleanType" name="complement"/>
+                <parameter type="booleanType" name="reverse"/>
+            </parameters>
+            <body>
+                <local-variable type="parameterType" name="d"/>
+                <assignment name="d" value="(complement ? ~data : data) &gt;&gt; chop"/>
+                <if>
+                    <xsl:attribute name="condition">
+                        <xsl:if test="ancestor::Protocol/GeneralSpec/@bitDirection='msb'">
+                            <xsl:text>!</xsl:text>
+                        </xsl:if>
+                        <xsl:text>reverse</xsl:text>
+                    </xsl:attribute>
+                    <true-clause>
+                        <funccall name="bitSpecMsb">
+                            <param name="data">
+                                <xsl:text>d</xsl:text>
+                            </param>
+                            <param name="width">
+                                <xsl:text>width</xsl:text>
+                            </param>
+                        </funccall>
+                    </true-clause>
+                    <false-clause>
+                        <funccall name="bitSpecLsb">
+                            <param name="data">
+                                <xsl:text>d</xsl:text>
+                            </param>
+                            <param name="width">
+                                <xsl:text>width</xsl:text>
+                            </param>
+                        </funccall>
+                    </false-clause>
+                </if>
+            </body>
+        </function>
+    </xsl:template>
+
+    <xsl:template name="BitSpecLsb">
         <function>
             <xsl:attribute name="name" select="'bitSpecLsb'"/>
 
@@ -88,9 +142,9 @@
             <body>
                 <local-variables>
                     <local-variable name="index" type="intType"/>
-                    <local-variable name="bitmask" type="intType">
+                    <local-variable name="bitmask" type="parameterType">
                         <xsl:attribute name="const" select="'true'"/>
-                        <xsl:attribute name="value" select="@bitMask"/> <!-- FIXME -->
+                        <xsl:attribute name="value" select="@bitMask"/>
                     </local-variable>
                 </local-variables>
                 <for>
@@ -101,9 +155,12 @@
                         <comparision type="&lt;" left="index" right="width"/>
                     </condition>
                     <repeat>
-                        <increment name="index">
-                            <xsl:attribute name="value" select="@chunkSize"/>
-                        </increment>
+                        <assignment name="value">
+                            <xsl:attribute name="value">
+                                <xsl:text>value + </xsl:text>
+                                <xsl:value-of select="@chunkSize"/>
+                            </xsl:attribute>
+                        </assignment>
                     </repeat>
                     <body>
                         <switch variable="data &amp; bitMask">
@@ -115,16 +172,51 @@
         </function>
     </xsl:template>
 
-    <!--xsl:template name="BitSpecMsb">
-        <function>
+    <xsl:template name="BitSpecMsb">
+         <function>
             <xsl:attribute name="name" select="'bitSpecMsb'"/>
-
             <xsl:copy-of select="@*"/>
-                <xsl:apply-templates select="BareIrStream" mode="in-bitspec"/>
+            <parameters>
+                <parameter type="parameterType" name="data"/>
+                <parameter type="parameterType" name="width"/>
+            </parameters>
+            <body>
+                <local-variables>
+                    <local-variable name="index" type="intType"/>
+                    <local-variable name="bitmask" type="parameterType">
+                        <xsl:attribute name="const" select="'true'"/>
+                        <xsl:attribute name="value" select="@bitMask"/>
+                    </local-variable>
+                </local-variables>
+                <for>
+                    <initial>
+                        <assignment name="index" value="0"/>
+                    </initial>
+                    <condition>
+                        <comparision type="&lt;" left="index" right="width"/>
+                    </condition>
+                    <repeat>
+                        <assignment name="index" select="index">
+                            <xsl:attribute name="value">
+                                <xsl:text>index + </xsl:text>
+                                <xsl:value-of select="@chunkSize"/>
+                            </xsl:attribute>
+                        </assignment>
+                    </repeat>
+                    <body>
+                        <switch>
+                            <xsl:attribute name="variable">
+                                <xsl:text>(data >> (width - (index + </xsl:text>
+                                <xsl:value-of select="@chunkSize"/>
+                                <xsl:text>))) &amp; bitMask</xsl:text>
+                            </xsl:attribute>
+                            <xsl:apply-templates select="BareIrStream" mode="in-bitspec"/>
+                        </switch>
+                    </body>
+                </for>
+            </body>
         </function>
-    </xsl:template-->
-
-
+    </xsl:template>
 
     <xsl:template match="BareIrStream" mode="in-bitspec">
         <case>
@@ -178,51 +270,51 @@
 
     <xsl:template match="Flash[@unit='']|Gap[@unit='']|Extent[@unit='']" mode="in-function">
         <funccall>
-            <xsl:attribute name="name" select="name()"/>
-            <xsl:attribute name="us" select="number(*) * number(ancestor::Protocol/GeneralSpec/@unit)"/>
+            <xsl:attribute name="name" select="lower-case(name())"/>
+            <param name="us">
+                <xsl:value-of select="number(*) * number(ancestor::Protocol/GeneralSpec/@unit)"/>
+            </param>
         </funccall>
     </xsl:template>
 
     <xsl:template match="Flash[@unit='m']|Gap[@unit='m']|Extent[@unit='m']" mode="in-function">
         <funccall>
-            <xsl:attribute name="name" select="name()"/>
-            <xsl:attribute name="us">
+            <xsl:attribute name="name" select="lower-case(name())"/>
+            <param name="us">
                 <xsl:value-of select="number(*) * 1000"/>
-            </xsl:attribute>
+            </param>
         </funccall>
     </xsl:template>
 
-    <xsl:template match="Flash|Gap|Extent" mode="in-function">
+    <!--xsl:template match="Flash|Gap|Extent" mode="in-function">
         <xsl:element name="{lower-case(name(.))}">
             <xsl:attribute name="time" select="."/>
             <xsl:attribute name="unit" select="@unit"/>
         </xsl:element>
-    </xsl:template>
+    </xsl:template-->
 
     <xsl:template match="FiniteBitField" mode="in-function">
         <funccall>
             <xsl:attribute name="name" select="'finiteBitField'"/>
-            <xsl:attribute name="complement">
-                <xsl:value-of select="@complement"/>
-            </xsl:attribute>
-            <xsl:attribute name="reverse">
-                <xsl:value-of select="@reverse"/>
-            </xsl:attribute>
-            <xsl:attribute name="data">
+            <param name="data">
                 <xsl:apply-templates select="Data"/>
-            </xsl:attribute>
-            <xsl:attribute name="width">
+            </param>
+            <param name="width">
                 <xsl:apply-templates select="Width"/>
-            </xsl:attribute>
-            <xsl:attribute name="chop">
+            </param>
+            <param name="chop">
                 <xsl:apply-templates select="Chop"/>
-                <xsl:if test="not(Chop)">
-                    <xsl:text>0</xsl:text>
-                </xsl:if>
-            </xsl:attribute>
+            </param>
+            <param name="complement">
+                <xsl:value-of select="@complement"/>
+            </param>
+            <param name="reverse">
+                <xsl:value-of select="@reverse"/>
+            </param>
         </funccall>
     </xsl:template>
 
+    <!-- BitField in numeric context -->
     <xsl:template match="FiniteBitField[..[name(.)='Expression']]">
         <xsl:text>finiteBitField(</xsl:text>
         <xsl:apply-templates select="Data"/>

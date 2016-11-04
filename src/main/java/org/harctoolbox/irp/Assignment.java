@@ -158,4 +158,9 @@ public class Assignment extends IrStreamItem implements Numerical {
     public int weight() {
         return name.weight() + value.weight();
     }
+
+    @Override
+    public boolean hasExtent() {
+        return false;
+    }
 }

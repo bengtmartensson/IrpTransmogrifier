@@ -55,6 +55,7 @@ import org.xml.sax.SAXException;
 public class IrpTransmogrifier {
     public static final String defaultConfigFile = "src/main/config/IrpProtocols.xml";
     public static final String xsltDir = "src/main/xslt";
+    public static final String stDir = "src/main/st";
     private static final String charSet = "UTF-8"; // Just for runMain
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
@@ -403,27 +404,34 @@ public class IrpTransmogrifier {
         for (String protocolName : list)
             protocols.add(irpDatabase.getNamedProtocol(protocolName));
 
-        Document document = NamedProtocol.toDocument(protocols);
+        if (commandCode.stringtemplate) {
+            StringTemplateCodeGenerator.setStDir(stDir);
+            StringTemplateCodeGenerator codeGenerator = new StringTemplateCodeGenerator(commandCode.target);
+            codeGenerator.render(protocols, out);
+        } else {
 
-        if (commandLineArgs.xmlFile != null) {
-            PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
-            XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "Irp Documentation");
-        }
+            Document document = NamedProtocol.toDocument(protocols);
 
-        CodeGenerator codeGenerator = new CodeGenerator(document, commandCode.intermediates);
-        codeGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
-        String[] transformations = commandCode.target.split(",");
-        String transformation;
-        for (int i = 0; i < transformations.length - 1; i++) {
-            transformation = transformations[i];
-            File file = new File(xsltDir, transformations[i] + ".xsl");
-            codeGenerator.transform(file, "." + transformation);
+//            if (commandLineArgs.xmlFile != null) {
+//                PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
+//                XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "Irp Documentation");
+//            }
+
+            CodeGenerator codeGenerator = new CodeGenerator(document, commandCode.intermediates);
+            codeGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
+            String[] transformations = commandCode.target.split(",");
+            String transformation;
+            for (int i = 0; i < transformations.length - 1; i++) {
+                transformation = transformations[i];
+                File file = new File(xsltDir, transformations[i] + ".xsl");
+                codeGenerator.transform(file, "." + transformation);
+            }
+            transformation = transformations[transformations.length - 1];
+            //codeGenerator.transform(new File(xsltDir, "code.xsl"), ".code");
+            Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
+            codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
+            //codeGenerator.printDOM(out, commandLineArgs.encoding);
         }
-        transformation = transformations[transformations.length - 1];
-        //codeGenerator.transform(new File(xsltDir, "code.xsl"), ".code");
-        Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
-        codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
-        //codeGenerator.printDOM(out, commandLineArgs.encoding);
     }
 
     private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
@@ -787,6 +795,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files")
         private boolean intermediates = false;
+
+        @Parameter(names = { "-s", "--st" }, description = "Use stringtemplate")
+        private boolean stringtemplate = false;
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target for code generation")
         private String target = null;

@@ -178,4 +178,9 @@ public class Variation extends IrStreamItem {
         hash = 61 * hash + Objects.hashCode(this.ending);
         return hash;
     }
+
+    @Override
+    public boolean hasExtent() {
+        return intro.hasExtent() || repeat.hasExtent() || ending.hasExtent();
+    }
 }

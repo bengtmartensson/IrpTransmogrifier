@@ -91,4 +91,9 @@ public class Extent extends Duration {
         int hash = 7;
         return hash + 31*super.hashCode();
     }
+
+    @Override
+    public boolean hasExtent() {
+        return true;
+    }
 }

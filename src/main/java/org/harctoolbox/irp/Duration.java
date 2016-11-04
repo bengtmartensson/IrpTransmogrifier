@@ -268,4 +268,13 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     public int weight() {
         return nameOrNumber.weight();
     }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    @Override
+    public boolean hasExtent() {
+        return false; // overridden in Extent
+    }
 }

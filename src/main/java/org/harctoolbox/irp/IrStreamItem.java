@@ -99,4 +99,6 @@ public abstract class IrStreamItem extends IrpObject {
 
     public abstract boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
+
+    public abstract boolean hasExtent();
 }

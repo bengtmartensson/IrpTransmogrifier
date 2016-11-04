@@ -274,7 +274,7 @@ public class BitSpec extends IrpObject {
                 || isPWM(4, nameEngine, generalSpec)))
             return true;
 
-        return bitCodes.stream().noneMatch((bareIrStream) -> (bareIrStream.irStreamItems.size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitSpecs)));
+        return bitCodes.stream().noneMatch((bareIrStream) -> (bareIrStream.getIrStreamItems().size() < 2 || !bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitSpecs)));
     }
 
     @Override
@@ -282,5 +282,9 @@ public class BitSpec extends IrpObject {
         int weight = 0;
         weight = bitCodes.stream().map((bitCode) -> bitCode.weight()).reduce(weight, Integer::sum);
         return weight;
+    }
+
+    public boolean hasExtent() {
+        return bitCodes.stream().anyMatch((bitCode) -> (bitCode.hasExtent()));
     }
 }

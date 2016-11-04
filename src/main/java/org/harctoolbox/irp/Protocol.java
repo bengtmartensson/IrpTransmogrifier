@@ -314,6 +314,14 @@ public class Protocol extends IrpObject {
         return bitspecIrstream.hasVariation(true);
     }
 
+    public boolean hasExtent() {
+        return bitspecIrstream.hasExtent();
+    }
+
+    public BitspecIrstream getBitspecIrstream() {
+        return bitspecIrstream;
+    }
+
     @Override
     public Element toElement(Document document) {
         return toElement(document, false);

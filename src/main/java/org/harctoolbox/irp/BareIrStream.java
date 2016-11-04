@@ -55,7 +55,7 @@ public class BareIrStream extends IrStreamItem {
         return irStreamItems;
     }
 
-    protected List<IrStreamItem> irStreamItems = null;
+    private List<IrStreamItem> irStreamItems = null;
     private IrpParser.Bare_irstreamContext parseTree = null;
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
@@ -302,5 +302,17 @@ public class BareIrStream extends IrStreamItem {
         int weight = 0;
         weight = irStreamItems.stream().map((item) -> item.weight()).reduce(weight, Integer::sum);
         return weight;
+    }
+
+    @Override
+    public boolean hasExtent() {
+        return irStreamItems.stream().anyMatch((item) -> (item.hasExtent()));
+    }
+
+    /**
+     * @return the irStreamItems
+     */
+    public List<IrStreamItem> getIrStreamItems() {
+        return irStreamItems;
     }
 }

@@ -253,4 +253,17 @@ public class BitspecIrstream extends IrStreamItem {
     boolean hasVariationWithIntroEqualsRepeat() {
         return irStream.hasVariationWithIntroEqualsRepeat();
     }
+
+    @Override
+    public boolean hasExtent() {
+        return bitSpec.hasExtent() || irStream.hasExtent();
+    }
+
+    public BitSpec getBitSpec() {
+        return bitSpec;
+    }
+
+    public IrStream getIrStream() {
+        return irStream;
+    }
 }

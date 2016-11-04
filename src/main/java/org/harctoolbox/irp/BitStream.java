@@ -180,4 +180,9 @@ class BitStream extends IrStreamItem implements Evaluatable {
         hash = 53 * hash + Objects.hashCode(this.data);
         return hash;
     }
+
+    @Override
+    public boolean hasExtent() {
+        return false;
+    }
 }

@@ -110,4 +110,9 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     public int weight() {
         return data.weight() + chop.weight();
     }
+
+    @Override
+    public boolean hasExtent() {
+        return false;
+    }
 }

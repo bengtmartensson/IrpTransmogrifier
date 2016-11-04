@@ -208,14 +208,14 @@ public class IrStream extends BareIrStream {
     @Override
     int numberOfBareDurations() {
         int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfBareDurations()).reduce(sum, Integer::sum);
+        sum = getIrStreamItems().stream().map((item) -> item.numberOfBareDurations()).reduce(sum, Integer::sum);
         return sum;
     }
 
     @Override
     int numberOfBits() {
         int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
+        sum = getIrStreamItems().stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
         return sum;
     }
 

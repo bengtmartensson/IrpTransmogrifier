@@ -287,4 +287,48 @@ public class BitSpec extends IrpObject {
     public boolean hasExtent() {
         return bitCodes.stream().anyMatch((bitCode) -> (bitCode.hasExtent()));
     }
+
+    public String code(CodeGenerator codeGenerator) {
+        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
+        st.addAttribute("arg1", code(false, codeGenerator));
+        st.addAttribute("arg2", code(true, codeGenerator));
+/*
+s1 = code(false, generalSpec, pass, codeGenerator);
+        codeGenerator.addLine(code(true, generalSpec, pass, codeGenerator));
+
+        String normalBeginTemplateName  = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
+        String reverseBeginTemplateName = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
+        String normalEndTemplateName    = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
+        String reverseEndTemplateName   = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
+
+        codeGenerator.newItemCodeGenerator("BitSpecBegin");
+
+        ItemCodeGenerator normalBeginTemplate  = codeGenerator.newItemCodeGenerator(normalBeginTemplateName);
+        ItemCodeGenerator reverseBeginTemplate = codeGenerator.newItemCodeGenerator(reverseBeginTemplateName);
+        ItemCodeGenerator normalEndTemplate    = codeGenerator.newItemCodeGenerator(normalEndTemplateName);
+        ItemCodeGenerator reverseEndTemplate   = codeGenerator.newItemCodeGenerator(reverseEndTemplateName);
+*/
+        return st.render();
+    }
+
+    private String code(boolean reverse, CodeGenerator codeGenerator) {
+        List<String> list = new ArrayList<>(bitCodes.size());
+        for (int i = 0; i < bitCodes.size(); i++) {
+            BareIrStream bitCode = bitCodes.get(i);
+            ItemCodeGenerator bitSpecCaseTemplate = codeGenerator.newItemCodeGenerator("BitSpecCase");
+            bitSpecCaseTemplate.addAttribute("number", i);
+            bitSpecCaseTemplate.addAttribute("code", bitCode.code(null, null, codeGenerator));
+            list.add(bitSpecCaseTemplate.render());
+        }
+
+        String normalStr  = reverse == (codeGenerator.getGeneralSpec().getBitDirection() == BitDirection.msb) ? "Lsb" : "Msb";
+        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BitSpec" + normalStr);
+        st.addAttribute("chunkSize", chunkSize);
+        st.addAttribute("bitmask", IrCoreUtils.ones(chunkSize));
+        st.addAttribute("body", list);
+
+        ItemCodeGenerator bitSpecTemplate  = codeGenerator.newItemCodeGenerator(reverse ? "ReverseBitSpec" : "NormalBitSpec");
+        bitSpecTemplate.addAttribute("body", st.render());
+        return bitSpecTemplate.render();
+    }
 }

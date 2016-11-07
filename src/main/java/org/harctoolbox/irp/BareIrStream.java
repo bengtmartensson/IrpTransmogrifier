@@ -315,4 +315,37 @@ public class BareIrStream extends IrStreamItem {
     public List<IrStreamItem> getIrStreamItems() {
         return irStreamItems;
     }
+
+//    @Override
+//    public String code(IrSignal.Pass state, IrSignal.Pass pass, boolean eval, CodeGenerator codeGenerator) {
+//        IrSignal.Pass state = pass == null ? null : IrSignal.Pass.intro;
+//        return code(state, pass, eval, codeGenerator);
+//    }
+
+    @Override
+    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+        List<String> list = new ArrayList<>(irStreamItems.size());
+        for (IrStreamItem item : irStreamItems) {
+            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
+                IrStream irs = (IrStream) item;
+                if (irs.getRepeatMarker().isInfinite())
+                    state = IrSignal.Pass.repeat;
+            }
+            //IrSignal.Pass nextState = item.stateWhenEntering(state);
+            //if (nextState != null)
+            //    state = nextState;
+            if (pass == null || pass == state)
+                list.add(item.code(state, pass, codeGenerator));
+
+            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
+                IrStream irs = (IrStream) item;
+                if (irs.getRepeatMarker().isInfinite())
+                    state = IrSignal.Pass.ending;
+            }
+        }
+
+        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
+        st.addAttribute("body", list);
+        return st.render();
+    }
 }

@@ -17,10 +17,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
+import java.util.Locale;
+
 /**
  * Some useful static functions.
  */
 public class IrCoreUtils {
+
+    public static final String lineSeparator = System.getProperty("line.separator");
 
     /**
      * Default absolute tolerance in micro seconds.
@@ -186,6 +190,10 @@ public class IrCoreUtils {
 
     public static long maskTo(int data, int width) {
         return data & ones(width);
+    }
+
+    public static String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase(Locale.US) + s.substring(1);
     }
 
     private IrCoreUtils() {

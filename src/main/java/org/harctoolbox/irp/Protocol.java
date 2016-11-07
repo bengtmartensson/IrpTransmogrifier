@@ -440,4 +440,12 @@ public class Protocol extends IrpObject {
         return generalSpec.weight() + bitspecIrstream.weight()
                 + definitions.weight() + parameterSpecs.weight();
     }
+
+    public GeneralSpec getGeneralSpec() {
+        return this.generalSpec;
+    }
+
+    protected ParameterSpecs getParameterSpecs() {
+        return parameterSpecs;
+    }
 }

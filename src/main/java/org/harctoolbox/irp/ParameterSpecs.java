@@ -194,4 +194,14 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
             namesMap.remove(name);
         });
     }
+
+    public String code(CodeGenerator codeGenerator) {
+        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
+        List<String> list = new ArrayList<>(map.size());
+        for (ParameterSpec param : map.values())
+            list.add(param.code(codeGenerator));
+
+        template.addAttribute("arg", list);
+        return template.render();
+    }
 }

@@ -101,4 +101,6 @@ public abstract class IrStreamItem extends IrpObject {
             throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
 
     public abstract boolean hasExtent();
+
+    public abstract String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator);
 }

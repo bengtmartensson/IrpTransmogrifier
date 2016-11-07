@@ -347,4 +347,97 @@ public class Expression extends PrimaryItem {
         weight = parseTree.children.stream().filter((child) -> (child instanceof IrpObject)).map((child) -> ((IrpObject) child).weight()).reduce(weight, Integer::sum);
         return weight;
     }
+
+    @Override
+    public String code(boolean eval, CodeGenerator codeGenerator) {
+        if (parseTree == null)
+            return "";
+
+        switch (parseTree.children.size()) {
+            case 1:
+                ParseTree child = parseTree.children.get(0);
+
+                try {
+                    if (child instanceof IrpParser.Primary_itemContext)
+                        return newPrimaryItem((IrpParser.Primary_itemContext) child).code(eval, codeGenerator);
+                    else if (child instanceof IrpParser.BitfieldContext)
+                        return BitField.newBitField((IrpParser.BitfieldContext) child).code(eval, codeGenerator);
+                    else
+                        return "";
+                } catch (IrpSyntaxException ex) {
+                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+
+            case 2: {
+
+                String operator = parseTree.children.get(0).getText();
+                String templateName = operator.equals("~") ? "BitInvert"
+                        : operator.equals("!") ? "Negate"
+                        : operator.equals("-") ? "UnaryMinus"
+                        : operator.equals("#") ? "BitCount"
+                        : "Error";
+                ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(templateName);
+                String arg = new Expression(parseTree.expression(0)).code(eval, codeGenerator);
+                itemGenerator.addAttribute("arg", arg);
+                return itemGenerator.render();
+
+                //return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
+            }
+            case 3: {
+                String operator = parseTree.children.get(1).getText();
+                String templateName = operator.equals("**") ? "Exponentiate"
+                        : operator.equals("+") ? "Add"
+                        : operator.equals("-") ? "Subtract"
+                        : operator.equals("*") ? "Multiply"
+                        : operator.equals("/") ? "Divide"
+                        : operator.equals("%") ? "Modulo"
+                        : operator.equals("<<") ? "ShiftLeft"
+                        : operator.equals(">>") ? "ShiftRight"
+                        : operator.equals("<=") ? "LessOrEqual"
+                        : operator.equals(">=") ? "GreaterOrEqual"
+                        : operator.equals(">") ? "Greater"
+                        : operator.equals("<") ? "Less"
+                        : operator.equals("==") ? "Equals"
+                        : operator.equals("!=") ? "NotEquals"
+                        : operator.equals("&") ? "BitwiseAnd"
+                        : operator.equals("|") ? "BitwiseOr"
+                        : operator.equals("^") ? "BitwiseExclusiveOr"
+                        : operator.equals("&&") ? "And"
+                        : operator.equals("||") ? "Or"
+                        : "Error";
+                ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(templateName);
+                String arg1 = new Expression(parseTree.expression(0)).code(eval, codeGenerator);
+                String arg2 = new Expression(parseTree.expression(1)).code(eval, codeGenerator);
+                itemGenerator.addAttribute("arg1", arg1);
+                itemGenerator.addAttribute("arg2", arg2);
+                return itemGenerator.render();
+
+                //return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
+            }
+//                return "("
+//                        + new Expression(parseTree.expression(0)).toIrpString(radix)
+//                        + parseTree.children.get(1).getText()
+//                        + new Expression(parseTree.expression(1)).toIrpString(radix)
+//                        + ")";
+            case 5: {
+                ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator("Conditional");
+                String arg1 = new Expression(parseTree.expression(0)).code(eval, codeGenerator);
+                String arg2 = new Expression(parseTree.expression(1)).code(eval, codeGenerator);
+                String arg3 = new Expression(parseTree.expression(2)).code(eval, codeGenerator);
+                itemGenerator.addAttribute("arg1", arg1);
+                itemGenerator.addAttribute("arg2", arg2);
+                itemGenerator.addAttribute("arg3", arg3);
+                return itemGenerator.render();
+            }
+//                return "("
+//                        + new Expression(parseTree.expression(0)).toIrpString(radix) + "?"
+//                        + new Expression(parseTree.expression(1)).toIrpString(radix) + ":"
+//                        + new Expression(parseTree.expression(2)).toIrpString(radix)
+//                        + ")";
+            default:
+                throw new ThisCannotHappenException("Unknown case in Expression.toElement");
+        }
+        return "";
+    }
 }

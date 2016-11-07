@@ -133,6 +133,13 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         }
     }
 
+    private double multiplicator(GeneralSpec generalSpec) {
+        return unit.equals("p") ? IrCoreUtils.seconds2microseconds(1/generalSpec.getFrequency())
+                : unit.equals("m") ? 1000
+                : unit.equals("u") ? 1
+                : time_units;
+    }
+
 
     public abstract double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
@@ -276,5 +283,45 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     public boolean hasExtent() {
         return false; // overridden in Extent
+    }
+
+//    @Override
+//    public String code(boolean eval, GeneralSpec generalSpec, STGroup stGroup) {
+//        ST st = stGroup.getInstanceOf(getClass().getSimpleName());
+//        try {
+//            long num = Math.round(toFloat(null, generalSpec));
+//            st.add("arg", num);
+//            return st.render();
+//        } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
+//        }
+//        ST s = stGroup.getInstanceOf("mul");
+//        String name = nameOrNumber.code(eval, generalSpec, stGroup);
+//        s.add("x", name);
+//        s.add("y", multiplicator(generalSpec));
+//        String arg = s.render();
+//        st.add("arg", arg);
+//        return st.render();
+//    }
+
+    @Override
+    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(this);
+        String arg = code(true, codeGenerator);
+        itemGenerator.addAttribute("arg", arg);
+        return itemGenerator.render();
+    }
+
+    @Override
+    public String code(boolean eval, CodeGenerator codeGenerator) {
+        try {
+            long num = Math.round(toFloat(null, codeGenerator.getGeneralSpec()));
+            return Long.toString(num);
+        } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
+        }
+        ItemCodeGenerator s = codeGenerator.newItemCodeGenerator("mul");
+        String name = nameOrNumber.code(eval, codeGenerator);
+        s.addAttribute("arg1", name);
+        s.addAttribute("arg2", multiplicator(codeGenerator.getGeneralSpec()));
+        return s.render();
     }
 }

@@ -88,9 +88,8 @@ public class IrStream extends BareIrStream {
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
             throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "evaluate", this);
-        boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
-        int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
-        EvaluatedIrStream result = evaluate(evaluateTheRepeat ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, repetitions);
+        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+        EvaluatedIrStream result = evaluate(evaluateTheRepeat(pass) ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, repetitions);
         IrpUtils.exiting(logger, "evaluate", result);
         return result;
     }
@@ -226,13 +225,17 @@ public class IrStream extends BareIrStream {
                 : repeatMarker.getMin() * noir;
     }
 
+    private boolean evaluateTheRepeat(IrSignal.Pass pass) {
+        return pass == IrSignal.Pass.repeat && isInfiniteRepeat();
+    }
+
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
             throws NameConflictException {
         IrpUtils.entering(logger, "recognize " + pass, this);
-        boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
-        int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
-        if (evaluateTheRepeat)
+        //boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
+        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+        if (evaluateTheRepeat(pass))
             recognizeData.setState(IrSignal.Pass.repeat);
         boolean status = recognize(recognizeData, pass, bitSpecs, repetitions);
         IrpUtils.exiting(logger, "recognize " + pass, status ? "pass" : "fail");
@@ -256,5 +259,28 @@ public class IrStream extends BareIrStream {
     @Override
     public int weight() {
         return super.weight() + repeatMarker.weight();
+    }
+
+    @Override
+    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
+        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+        if (repetitions == 0)
+            return "";
+        if (repetitions != 1)
+            template.addAttribute("repeats", repetitions);
+        String body = super.code(state, pass, codeGenerator);
+        template.addAttribute("body", body);
+        return template.render();
+    }
+
+    public String code(Pass pass, CodeGenerator codeGenerator) {
+        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("FunctionBody");
+        Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
+        String body = code(state, pass, codeGenerator);
+        template.addAttribute("body", body);
+        if (!body.isEmpty() && hasExtent())
+            template.addAttribute("reset", hasExtent());
+        return template.render();
     }
 }

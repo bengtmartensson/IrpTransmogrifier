@@ -57,4 +57,6 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
     public abstract String toIrpString(int radix);
 
     public abstract boolean isUnary();
+
+    public abstract String code(boolean eval, CodeGenerator codeGenerator);
 }

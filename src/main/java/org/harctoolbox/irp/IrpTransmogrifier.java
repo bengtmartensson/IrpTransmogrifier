@@ -405,9 +405,10 @@ public class IrpTransmogrifier {
             protocols.add(irpDatabase.getNamedProtocol(protocolName));
 
         if (commandCode.stringtemplate) {
-            StringTemplateCodeGenerator.setStDir(stDir);
-            StringTemplateCodeGenerator codeGenerator = new StringTemplateCodeGenerator(commandCode.target);
-            codeGenerator.render(protocols, out);
+            //StringTemplateCodeGenerator.setStDir(stDir);
+            //StringTemplateCodeGenerator codeGenerator = new StringTemplateCodeGenerator(commandCode.target, protocols.get(0));
+            //codeGenerator.render(out);
+            out.print(protocols.get(0).code(commandCode.target)); // contains a trailing newline
         } else {
 
             Document document = NamedProtocol.toDocument(protocols);
@@ -417,19 +418,19 @@ public class IrpTransmogrifier {
 //                XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "Irp Documentation");
 //            }
 
-            CodeGenerator codeGenerator = new CodeGenerator(document, commandCode.intermediates);
-            codeGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
+            XmlGenerator xmlGenerator = new XmlGenerator(document, commandCode.intermediates);
+            xmlGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
             String[] transformations = commandCode.target.split(",");
             String transformation;
             for (int i = 0; i < transformations.length - 1; i++) {
                 transformation = transformations[i];
                 File file = new File(xsltDir, transformations[i] + ".xsl");
-                codeGenerator.transform(file, "." + transformation);
+                xmlGenerator.transform(file, "." + transformation);
             }
             transformation = transformations[transformations.length - 1];
             //codeGenerator.transform(new File(xsltDir, "code.xsl"), ".code");
             Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
-            codeGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
+            xmlGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
             //codeGenerator.printDOM(out, commandLineArgs.encoding);
         }
     }

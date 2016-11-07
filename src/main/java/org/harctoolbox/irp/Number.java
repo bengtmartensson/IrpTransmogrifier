@@ -126,4 +126,9 @@ public class Number extends PrimaryItem {
     public boolean isUnary() {
         return true;
     }
+
+    @Override
+    public String code(boolean eval, CodeGenerator codeGenerator) {
+        return toString();
+    }
 }

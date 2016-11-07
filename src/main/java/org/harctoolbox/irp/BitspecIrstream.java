@@ -266,4 +266,16 @@ public class BitspecIrstream extends IrStreamItem {
     public IrStream getIrStream() {
         return irStream;
     }
+
+    @Override
+    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+//    public String code(GeneralSpec generalSpec, CodeGenerator codeGenerator) {
+//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
+//        st.addAttribute("arg1", bitSpec.code(generalSpec, null, codeGenerator));
+//        st.addAttribute("arg2", irStream.code(generalSpec, null, codeGenerator));
+//        return st.render();
+//    }
 }

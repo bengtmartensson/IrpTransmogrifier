@@ -96,4 +96,9 @@ public class FloatNumber extends IrpObject implements Floatable {
         hash = 23 * hash + (int) (Double.doubleToLongBits(this.data) ^ (Double.doubleToLongBits(this.data) >>> 32));
         return hash;
     }
+
+    @Override
+    public String code(boolean eval, CodeGenerator codeGenerator) {
+        return toString();
+    }
 }

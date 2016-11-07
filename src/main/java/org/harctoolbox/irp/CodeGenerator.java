@@ -17,103 +17,58 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.logging.Logger;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.harctoolbox.ircore.XmlUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.harctoolbox.ircore.IrCoreUtils;
 
-/**
- *
- */
-public class CodeGenerator {
+public abstract class CodeGenerator {
 
-    private static final Logger logger = Logger.getLogger(CodeGenerator.class.getName());
+    private final GeneralSpec generalSpec;
+    private final StringBuilder stringBuilder;
+
+    protected CodeGenerator(GeneralSpec generalSpec) {
+        this.generalSpec = generalSpec;
+        this.stringBuilder = new StringBuilder(8192);
+    }
+
+    public abstract ItemCodeGenerator newItemCodeGenerator(String name);
+
+//    public ItemCodeGenerator newItemCodeGenerator(Class<?> clazz) {
+//        return newItemCodeGenerator(clazz.getSimpleName());
+//    }
 
     /**
-     * Name space for XLST (1.0 and 2.0)
+     * @return the generalSpec
      */
-    public final static String xsltNamespace = "http://www.w3.org/1999/XSL/Transform";
-    public final static String cdataElements = "Irp Documentation";
-    private final static String basename = "irp"; // FIXME
-    private final static String ending = ".xml";
-    private final static String defaultCharSet = "UTF-8";
-    private Document source;
-    private final boolean dumpIntermediates;
-
-    public CodeGenerator(Document document, boolean dumpIntermediates) throws FileNotFoundException, TransformerException {
-        this.dumpIntermediates = dumpIntermediates;
-        this.source = document;
-        //protocolName = document.getDocumentElement().getAttribute("name");
-        if (dumpIntermediates)
-            XmlUtils.printDOM(new File(basename + ending), source);
+    public GeneralSpec getGeneralSpec() {
+        return generalSpec;
     }
 
-    public CodeGenerator(NamedProtocol protocol, boolean dumpIntermediates) throws FileNotFoundException, TransformerException {
-        this(protocol.toDocument(), dumpIntermediates);
+    public ItemCodeGenerator newItemCodeGenerator(Object object) {
+        return newItemCodeGenerator(object.getClass().getSimpleName());
     }
 
-    public void transform(Document stylesheet, String suffix) throws TransformerException, FileNotFoundException {
-        if (stylesheet == null)
-            throw new NullPointerException("stylesheet must not be null");
-
-        TransformerFactory factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
-        Transformer tr = factory.newTransformer(new DOMSource(stylesheet));
-        Document newDoc = XmlUtils.newDocument();
-        tr.transform(new DOMSource(source), new DOMResult(newDoc));
-        if (dumpIntermediates)
-            XmlUtils.printDOM(new File(basename + suffix + ending), newDoc, defaultCharSet, cdataElements);
-        source = newDoc;
+    public String fileExtension() {
+        return newItemCodeGenerator("CodeFileExtension").render();
     }
 
-    public void transform(File file, String suffix) throws TransformerException, IOException, SAXException {
-        transform(XmlUtils.openXmlFile(file), suffix);
+    public void add(String str) {
+        stringBuilder.append(str);
     }
 
-    public void transform(String filename, String suffix) throws TransformerException, IOException, SAXException {
-        transform(new File(filename), suffix);
+    public void addLine(String str) {
+        add(str);
+        add(IrCoreUtils.lineSeparator);
     }
 
-    public void printDOM(OutputStream ostr, String charsetName) throws TransformerException, IOException {
-        printDOM(ostr, (Document) null, charsetName);
+    public void addLine(ItemCodeGenerator st) {
+        addLine(st.render());
     }
 
-    public void printDOM(OutputStream ostr, File stylesheet, String charsetName) throws TransformerException, IOException, SAXException {
-        printDOM(ostr, XmlUtils.openXmlFile(stylesheet), charsetName);
+    public void addStatement(ItemCodeGenerator st) {
+        add(st.render());
+        addLine(newItemCodeGenerator("StatementSeparator").render());
     }
 
-    public void printDOM(OutputStream ostr, Document stylesheet, /*HashMap<String, String>parameters,*/
-            String charsetName) throws IOException, TransformerException {
-        TransformerFactory factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
-        Transformer tr;
-        if (stylesheet == null) {
-            tr = factory.newTransformer();
-            tr.setOutputProperty(OutputKeys.METHOD, "xml");
-            tr.setOutputProperty(OutputKeys.ENCODING, charsetName);
-
-        } else {
-            NodeList nodeList = stylesheet.getDocumentElement().getElementsByTagNameNS(xsltNamespace, "output");
-            if (nodeList.getLength() > 0) {
-                Element e = (Element) nodeList.item(0);
-                e.setAttribute("encoding", charsetName);
-            }
-            tr = factory.newTransformer(new DOMSource(stylesheet));
-        }
-        tr.setOutputProperty(OutputKeys.INDENT, "yes");
-        tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-        tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
-        tr.transform(new DOMSource(source), new StreamResult(ostr));
+    public String result() {
+        return stringBuilder.toString();
     }
 }

@@ -183,4 +183,9 @@ public class Variation extends IrStreamItem {
     public boolean hasExtent() {
         return intro.hasExtent() || repeat.hasExtent() || ending.hasExtent();
     }
+
+    @Override
+    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

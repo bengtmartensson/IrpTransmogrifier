@@ -163,4 +163,12 @@ public class Assignment extends IrStreamItem implements Numerical {
     public boolean hasExtent() {
         return false;
     }
+
+    @Override
+    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
+        st.addAttribute("name", name.code(false, codeGenerator));
+        st.addAttribute("expression", value.code(true, codeGenerator));
+        return st.render();
+    }
 }

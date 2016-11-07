@@ -90,4 +90,9 @@ public class NameOrNumber extends IrpObject implements Floatable {
         hash = 97 * hash + Objects.hashCode(this.thing);
         return hash;
     }
+
+    @Override
+    public String code(boolean eval, CodeGenerator codeGenerator) {
+        return thing.code(eval, codeGenerator);
+    }
 }

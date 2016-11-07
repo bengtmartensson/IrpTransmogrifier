@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.io.IOException;
 import java.util.Objects;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -118,5 +120,69 @@ public class NamedProtocol extends Protocol {
         root.appendChild(irpElement);
 
         return root;
+    }
+
+    public String code(String target) throws IOException {
+        return code(new STCodeGenerator(target, getGeneralSpec()));
+    }
+
+    public String code(CodeGenerator codeGenerator) {
+
+        //StringBuilder str = new StringBuilder(10000);
+        codeGenerator.addLine(codeGenerator.newItemCodeGenerator("FileBegin"));
+        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("ProtocolNameComment");
+        st.addAttribute("name", getName());
+        codeGenerator.addLine(st);
+        st = codeGenerator.newItemCodeGenerator("Irp");
+        st.addAttribute("irp", getIrp());
+        codeGenerator.addLine(st);
+        st = codeGenerator.newItemCodeGenerator("Documentation");
+        st.addAttribute("documentation", getDocumentation());
+        codeGenerator.addLine(st);
+
+        if (hasExtent()) {
+            st = codeGenerator.newItemCodeGenerator("InstanceVariableDefinition");
+            st.addAttribute("type", "microsecondsType");
+            st.addAttribute("name", "sumOfDurations");
+            //st.addAttribute("initialValue", 0);
+            codeGenerator.addLine(st);
+        }
+
+        st = codeGenerator.newItemCodeGenerator("DefineFlashGapExtent");
+        if (hasExtent())
+            st.addAttribute("hasExtent", true);
+        codeGenerator.addLine(st);
+
+        codeGenerator.addLine(getBitspecIrstream().getBitSpec().code(codeGenerator));
+
+        codeGenerator.addLine(codeFunc(IrSignal.Pass.intro, codeGenerator));
+        codeGenerator.addLine(codeFunc(IrSignal.Pass.repeat, codeGenerator));
+        codeGenerator.addLine(codeFunc(IrSignal.Pass.ending, codeGenerator));
+
+        //String body = getBitspecIrstream().code(getGeneralSpec(), codeGenerator);
+        //addLine(str, body);
+
+        codeGenerator.addLine(codeGenerator.newItemCodeGenerator("FileEnd"));
+
+        return codeGenerator.result();
+    }
+
+//    private void addLine(StringBuilder str, String s) {
+//        str.append(s).append(IrCoreUtils.lineSeparator);
+//    }
+
+//    private void addLine(StringBuilder str, ItemCodeGenerator st) {
+//        addLine(str, st.render());
+//    }
+
+    private String codeFunc(IrSignal.Pass pass, CodeGenerator codeGenerator) {
+        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("XFunction");
+        template.addAttribute("name", pass.toString());
+        String parameterList = getParameterSpecs().code(codeGenerator);
+        template.addAttribute("parameterList", parameterList);
+        String functionBody = getBitspecIrstream().getIrStream().code(pass, codeGenerator);
+        template.addAttribute("functionBody", functionBody);
+        template.addAttribute("protocolName", IrpUtils.toCIdentifier(name));
+        return template.render();
     }
 }

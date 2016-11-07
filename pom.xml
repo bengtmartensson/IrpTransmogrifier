@@ -225,7 +225,7 @@
                 <version>2.19.1</version>
                 <configuration>
                     <!--groups>x</groups-->
-                    <skipTests>true</skipTests>
+                    <skipTests>false</skipTests>
                     <argLine>-Djava.library.path=/usr/local/lib64 -Dfile.encoding=${project.build.sourceEncoding}</argLine>
                 </configuration>
             </plugin>

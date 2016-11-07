@@ -115,4 +115,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     public boolean hasExtent() {
         return false;
     }
+
+    public abstract String code(boolean eval, CodeGenerator codeGenerator);
 }

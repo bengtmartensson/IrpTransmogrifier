@@ -166,4 +166,12 @@ public class Name extends PrimaryItem implements Floatable {
     public boolean isUnary() {
         return true;
     }
+
+    @Override
+    public String code(boolean eval, CodeGenerator codeGenerator) {
+        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(this);
+        itemGenerator.addAttribute("name", name);
+        itemGenerator.addAttribute("eval", eval);
+        return itemGenerator.render();
+    }
 }

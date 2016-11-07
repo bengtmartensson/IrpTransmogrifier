@@ -277,6 +277,11 @@ public class IrpUtils {
         return prefix + map.get(name) + postfix;
     }
 
+    public static String toCIdentifier(String s) {
+        String rep = s.replaceAll("[^_0-9a-zA-Z]", "_");
+        return rep.matches("^\\d.*$") ? ("x" + rep) : rep;
+    }
+
     public static void entering(Logger logger, Level level, String member, Object arg) {
         logger.logp(level, logger.getName(), member, String.format("-> %0$s", arg.toString()));
     }

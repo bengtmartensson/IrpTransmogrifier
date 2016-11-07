@@ -210,4 +210,14 @@ public class ParameterSpec extends IrpObject {
         hash = 61 * hash + (this.memory ? 1 : 0);
         return hash;
     }
+
+    String code(CodeGenerator codeGenerator) {
+        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
+        template.addAttribute("name", name);
+        template.addAttribute("min", min);
+        template.addAttribute("max", max);
+        template.addAttribute("deflt", deflt);
+        template.addAttribute("memory", memory);
+        return template.render();
+    }
 }

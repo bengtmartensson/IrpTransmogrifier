@@ -1,6 +1,8 @@
 package org.harctoolbox.irp;
 
+import java.io.IOException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -75,4 +77,68 @@ public class DurationNGTest {
             fail();
         }
     }
+
+    /**
+     * Test of code method, of class Duration.
+     * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @throws org.harctoolbox.irp.IrpSemanticException
+     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws java.io.IOException
+     */
+    @Test
+//    public void testCode() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
+//        GeneralSpec generalSpec = new GeneralSpec("{100u,38k}");
+//        System.out.println("code");
+//        STGroup stGroup = new STGroupFile("src/main/st/c.stg");
+//        String result = new Flash("123").code(true, generalSpec, stGroup);
+//        assertEquals(result, "flash(12300)");
+//
+//        result = new Flash("123p").code(true, generalSpec, stGroup);
+//        assertEquals(result, "flash(3237)");
+//
+//        result = new Flash("108m").code(true, generalSpec, stGroup);
+//        assertEquals(result, "flash(108000)");
+//
+//        result = new Flash("123u").code(true, generalSpec, stGroup);
+//        assertEquals(result, "flash(123)");
+//
+//        result = new Flash("A p").code(true, generalSpec, stGroup);
+//        assertEquals(result, "flash(A*26.315789473684212)");
+//    }
+    public void testCode() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, IOException {
+        GeneralSpec generalSpec = new GeneralSpec("{100u,38k}");
+        CodeGenerator codeGenerator = new STCodeGenerator("c", generalSpec);
+        System.out.println("code");
+        //STGroup stGroup = new STGroupFile("src/main/st/c.stg");
+        Flash flash = new Flash("123");
+        String result = flash.code(null, IrSignal.Pass.intro, codeGenerator);
+        assertEquals(result, "flash(12300)");
+
+        result = new Flash("123p").code(null, null, codeGenerator);
+        assertEquals(result, "flash(3237)");
+
+        result = new Flash("108m").code(null, null, codeGenerator);
+        assertEquals(result, "flash(108000)");
+
+        result = new Flash("123u").code(null, null, codeGenerator);
+        assertEquals(result, "flash(123)");
+
+        result = new Flash("A p").code(null, null, codeGenerator);
+        assertEquals(result, "flash(A*26.315789473684212)");
+    }
+
+//    public class DurationImpl extends Duration {
+//
+//        public DurationImpl() {
+//            super(0.0);
+//        }
+//
+//        public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+//            return 0.0;
+//        }
+//
+//        public boolean isOn() {
+//            return false;
+//        }
+//    }
 }

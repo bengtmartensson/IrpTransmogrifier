@@ -5,12 +5,11 @@ endComment() ::= ""
 
 FileBegin() ::= <<
 <LineComment("This file was generated from IrpTransmogrifier")>
-typedef unsigned int microseconds_t;
+package org.harctoolbox.render;
 
-extern void  on(microseconds_t duration);
-extern void off(microseconds_t duration);
+import java.util.Map;
+import org.harctoolbox.ircore.IrSignal;
 
-#define INLINE static inline
 >>
 
 //FileEnd() ::= <<
@@ -24,36 +23,106 @@ LineComment(text) ::= <<
 
 RestOfLineComment(text) ::= "<beginComment()><text><endComment()>"
 
-NamedProtocol(name, irp, documentation, instanceVariableDefinition, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
-<ProtocolNameComment(name)>
-<Irp(irp)>
+NamedProtocol(name, irp, documentation, frequency, dutycycle, parameters, instanceVariableDefinition, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
+public final class <name>Renderer extends IrpRenderer {
+    <Irp(irp)>
+    <Documentation(documentation)>
+    <DeclareParameters(parameters)>
+    <DeclareFrequency(frequency)>
+    <DeclareDutycycle(dutycycle)>
+    <DeclareParameterlessConstructor(name)>
+    <DeclareCompute(name, parameters)>
 
-<instanceVariableDefinition>
-<defineFlashGapExtent>
-<bitSpec>
-<introCode>
-<repeatCode>
-<endingCode>
+    <!instanceVariableDefinition!>
+    <!defineFlashGapExtent!>
+
+    <introCode>
+    <repeatCode>
+    <endingCode>
+    <DefineClassList(bitSpec)>
+}
 >>
 
 Irp(irp) ::= <<
-<beginComment()>IRP: <irp><endComment()>
+public final static String irpString = "<irp>";
 >>
 
 //Documentation(documentation) ::= <<
 //<beginComment()><documentation><endComment()>
 //>>
-Documentation(documentation) ::= ""
+Documentation(documentation) ::= <<
+public final static String documentation = "<documentation>";
+>>
 
 ProtocolNameComment(name) ::= <<
 <beginComment()>ProtocolName: <name><endComment()>
 >>
 
 implementationTypes ::= [
-    "intType": "unsigned int",
-    "booleanType": "bool",
-    "parameterType": "unsigned int"
+    "intType": "int",
+    "booleanType": "boolean",
+    "parameterType": "long"
 ]
+
+DeclareParameterlessConstructor(name) ::= <<
+public <name>Renderer() {
+}
+>>
+
+DeclareParameters(parameters) ::= <<
+<parameters:DeclareParameter()>
+>>
+
+DeclareParameter(parameter) ::= <<
+private <ImplementationType("parameterType")> <parameter>;
+
+>>
+
+DeclareCompute(name, parameters) ::= <<
+public IrSignal compute(<parameters:DeclareFormalParameter(); separator=", ">) {
+    <parameters:LocalAssignment(); separator="\n">
+    setup();
+    return getIrSignal();
+}
+
+@Override
+public IrSignal compute(Map\<String,Long> map) {
+    <parameters:MapLocalAssignment(); separator="\n">
+    setup();
+    return getIrSignal();
+}
+
+public static IrSignal newIrSignal(<parameters:DeclareFormalParameter(); separator=", ">) {
+    <name>Renderer instance = new <name>Renderer();
+    return instance.compute(<parameters; separator=", ">);
+}
+>>
+
+LocalAssignment(par) ::= <<
+this.<par> = <par>;
+>>
+
+MapLocalAssignment(par) ::= <<
+<par> = map.get("<par>");
+>>
+
+DeclareFormalParameter(parameter) ::= <<
+<ImplementationType("parameterType")> <parameter>
+>>
+
+DeclareFrequency(frequency) ::= <<
+@Override
+public double getFrequency() {
+    return <frequency>;
+}
+>>
+
+DeclareDutycycle(dutycycle) ::= <<
+@Override
+public double getDutycycle() {
+    return <dutycycle>;
+}
+>>
 
 DefineFlashGapExtent(hasExtent) ::= <<
 static void INLINE flash(microseconds_t duration) {
@@ -77,6 +146,16 @@ static void INLINE extent(microseconds_t duration) {
 <endif>
 >>
 
+Assignment(name, expression) ::= <<
+<name> = <expression>
+>>
+
+DefineClassList(bitSpec) ::= <<
+private static class LocalIrList extends IrpRenderer.IrList {
+    <bitSpec>
+}
+>>
+
 InitValue(v) ::= "<if(v)> = <v><endif>"
 
 InstanceVariableDefinition(type, name, initialValue) ::= <<
@@ -90,15 +169,6 @@ ImplementationType(type) ::= <<
 CodeFileExtension() ::= ".c"
 
 StatementSeparator() ::= ";"
-
-templateNames ::= [
-    "class org.harctoolbox.irp.Flash": "FlashTemplate",
-    "class org.harctoolbox.irp.Gap": "GapTemplate",
-    "class org.harctoolbox.irp.Extent": "ExtentTemplate",
-    "class org.harctoolbox.irp.FiniteBitField": "FiniteBitFieldTemplate",
-    "class org.harctoolbox.irp.IrStream": "IrStreamTemplate"
-
-]
 
 FlashTemplate(x, unit) ::= "FLaSh <x> <x.unit> <unit>"
 GapTemplate() ::= "GAP"
@@ -130,7 +200,7 @@ BitSpec(arg1, arg2) ::= <<
 
 BitSpecCase(number,code) ::= <<
 case <number>: {
-<code>;
+    <code>;
 }
 break;
 >>
@@ -141,7 +211,7 @@ BareIrStream(body) ::= <<
 
 BitSpecMsb(chunkSize,bitmask,body) ::= <<
 for (<ImplementationType("intType")> i = 0; i \< width; i += <chunkSize>) {
-    switch((data \>> (width - i - <chunkSize>)) & <bitmask>) {
+    switch(((<ImplementationType("intType")>)data \>> (width - i - <chunkSize>)) & <bitmask>) {
         <body; separator="\n">
     }
 }
@@ -149,23 +219,27 @@ for (<ImplementationType("intType")> i = 0; i \< width; i += <chunkSize>) {
 
 BitSpecLsb(chunkSize, bitmask, body) ::= <<
 for (<ImplementationType("intType")> i = 0; i \< width; i += <chunkSize>) {
-    switch((data \>> i) & <bitmask>) {
+    switch(((<ImplementationType("intType")>)data \>> i) & <bitmask>) {
         <body; separator="\n">
     }
 }
 >>
 
 NormalBitSpec(body) ::= <<
-static void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
-<body>
+@Override
+void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
+    LocalIrList list = this;
+    <body>
 }
 >>
 
-ReverseBitSpec(body) ::= <<
-static void bitFieldReverse(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
-<body>
-}
->>
+//ReverseBitSpec(body) ::= <<
+//void bitFieldReverse(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
+//    LocalIrList list = this;
+//    <body>
+//}
+//>>
+ReverseBitSpec(body) ::= ""
 
 ParameterSpecs(arg) ::= <<
 <arg; separator=", ">
@@ -176,14 +250,18 @@ ParameterSpec(name, min, max, deflt, memory) ::= <<
 >>
 
 XFunction(name,parameterList, protocolName, functionBody) ::= <<
-void <name><protocolName>(<parameterList>) {
-<functionBody>;
+@Override
+protected LocalIrList setup<name>() {
+    LocalIrList list = new LocalIrList();
+    <functionBody>;
+    return list;
 }
 >>
 
-ResetDurationCounter() ::= <<
-sumOfDurations = 0
->>
+//ResetDurationCounter() ::= <<
+//sumOfDurations = 0
+//>>
+ResetDurationCounter() ::= ""
 
 Repeat(repeats, body) ::= <<
 for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <repeats>; repeatCounter++) {
@@ -192,7 +270,7 @@ for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <repeat
 >>
 
 FunctionBody(reset, body) ::= <<
-<if(reset)><ResetDurationCounter()>;<endif>
+<if(reset)><ResetDurationCounter()><endif>
 <body>
 >>
 
@@ -203,7 +281,7 @@ SetOfStatements(body) ::= <<
 Chop(chop) ::= "<if(chop)> >> (<chop>)<endif>"
 
 FiniteBitField(data, width, chop, complement, reverse) ::= <<
-<if(reverse)>bitFieldReverse<else>bitField<endif>(<if(complement)>~<endif>((<data>)<Chop(chop)>), <width>)
+list.<if(reverse)>bitFieldReverse<else>bitField<endif>(<if(complement)>~<endif>((<data>)<Chop(chop)>), <width>)
 >>
 
 InfiniteBitFieldExpression(data, chop, complement) ::= <<
@@ -214,9 +292,9 @@ FiniteBitFieldExpression(data, width, chop, complement, reverse) ::= <<
 <if(reverse)>finiteBitFieldExpressionReverse(TODO)<else><if(complement)>~<endif>(((<data>) \>> (<chop>)) & ((1 \<\< <width>)-1))<endif>
 >>
 
-Flash(arg)          ::= "flash(<arg>)"
-Gap(arg)            ::= "gap(<arg>)"
-Extent(arg)         ::= "extent(<arg>)"
+Flash(arg)          ::= "list.flash(<arg>)"
+Gap(arg)            ::= "list.gap(<arg>)"
+Extent(arg)         ::= "list.extent(<arg>)"
 
 Name(name, eval)    ::= "<name>"
 

@@ -196,6 +196,10 @@ public class IrCoreUtils {
         return s.substring(0, 1).toUpperCase(Locale.US) + s.substring(1);
     }
 
+    public static String javaifyString(String s) {
+        return s.replaceAll("\n\r?", "\\n").replace("\"", "\\\"");
+    }
+
     private IrCoreUtils() {
     }
 }

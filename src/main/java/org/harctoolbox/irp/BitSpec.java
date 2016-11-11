@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -330,5 +332,13 @@ s1 = code(false, generalSpec, pass, codeGenerator);
         ItemCodeGenerator bitSpecTemplate  = codeGenerator.newItemCodeGenerator(reverse ? "ReverseBitSpec" : "NormalBitSpec");
         bitSpecTemplate.addAttribute("body", st.render());
         return bitSpecTemplate.render();
+    }
+
+    Set<String> assignmentVariables() {
+        Set<String> list = new HashSet<>(1);
+        bitCodes.stream().forEach((bitCode) -> {
+            list.addAll(bitCode.assignmentVariables());
+        });
+        return list;
     }
 }

@@ -169,7 +169,7 @@ public class Name extends PrimaryItem implements Floatable {
 
     @Override
     public String code(boolean eval, CodeGenerator codeGenerator) {
-        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(this);
+        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(codeGenerator.getNameEngine().containsKey(name) ? "NameAsDefinition" : "Name");
         itemGenerator.addAttribute("name", name);
         itemGenerator.addAttribute("eval", eval);
         return itemGenerator.render();

@@ -18,8 +18,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -189,5 +191,10 @@ class BitStream extends IrStreamItem implements Evaluatable {
     @Override
     public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        return new HashSet<>(0);
     }
 }

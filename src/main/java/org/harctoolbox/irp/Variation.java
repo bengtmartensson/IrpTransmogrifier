@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -187,5 +188,13 @@ public class Variation extends IrStreamItem {
     @Override
     public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        Set<String> list = intro.assignmentVariables();
+        list.addAll(repeat.assignmentVariables());
+        list.addAll(ending.assignmentVariables());
+        return list;
     }
 }

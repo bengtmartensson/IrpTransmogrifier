@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.List;
+import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -103,4 +104,6 @@ public abstract class IrStreamItem extends IrpObject {
     public abstract boolean hasExtent();
 
     public abstract String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator);
+
+    public abstract Set<String> assignmentVariables();
 }

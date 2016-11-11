@@ -27,6 +27,8 @@ public abstract class ItemCodeGenerator {
 
     public abstract void addAttribute(String name, Object value);
 
+    public abstract void addAggregate(String string, Object... args);
+
     public void setAttribute(Map<String, Object> map) {
         map.entrySet().stream().forEach((kvp) -> {
             setAttribute(kvp.getKey(), kvp.getValue());
@@ -40,5 +42,4 @@ public abstract class ItemCodeGenerator {
     }
 
     public abstract String render();
-
 }

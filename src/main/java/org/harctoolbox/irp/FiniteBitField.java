@@ -18,8 +18,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -328,5 +330,10 @@ public class FiniteBitField extends BitField {
         itemCodeGenerator.addAttribute("complement", complement);
         itemCodeGenerator.addAttribute("reverse", reverse);
         return itemCodeGenerator.render();
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        return new HashSet<>(0);
     }
 }

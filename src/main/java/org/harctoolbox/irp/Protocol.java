@@ -448,4 +448,11 @@ public class Protocol extends IrpObject {
     protected ParameterSpecs getParameterSpecs() {
         return parameterSpecs;
     }
+
+    /**
+     * @return the definitions
+     */
+    public NameEngine getDefinitions() {
+        return definitions;
+    }
 }

@@ -107,7 +107,7 @@ public class DurationNGTest {
 //    }
     public void testCode() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, IOException {
         GeneralSpec generalSpec = new GeneralSpec("{100u,38k}");
-        CodeGenerator codeGenerator = new STCodeGenerator("c", generalSpec);
+        CodeGenerator codeGenerator = new STCodeGenerator("c", generalSpec, new NameEngine());
         System.out.println("code");
         //STGroup stGroup = new STGroupFile("src/main/st/c.stg");
         Flash flash = new Flash("123");

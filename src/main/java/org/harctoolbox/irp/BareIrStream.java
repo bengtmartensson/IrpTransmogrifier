@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -316,36 +318,42 @@ public class BareIrStream extends IrStreamItem {
         return irStreamItems;
     }
 
-//    @Override
-//    public String code(IrSignal.Pass state, IrSignal.Pass pass, boolean eval, CodeGenerator codeGenerator) {
-//        IrSignal.Pass state = pass == null ? null : IrSignal.Pass.intro;
-//        return code(state, pass, eval, codeGenerator);
-//    }
-
     @Override
     public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
         List<String> list = new ArrayList<>(irStreamItems.size());
         for (IrStreamItem item : irStreamItems) {
-            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
-                IrStream irs = (IrStream) item;
-                if (irs.getRepeatMarker().isInfinite())
-                    state = IrSignal.Pass.repeat;
-            }
-            //IrSignal.Pass nextState = item.stateWhenEntering(state);
-            //if (nextState != null)
-            //    state = nextState;
+//            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
+//                IrStream irs = (IrStream) item;
+//                if (irs.getRepeatMarker().isInfinite())
+//                    state = IrSignal.Pass.repeat;
+//            }
+            IrSignal.Pass nextState = item.stateWhenEntering(pass);
+            if (nextState != null)
+                state = nextState;
             if (pass == null || pass == state)
                 list.add(item.code(state, pass, codeGenerator));
 
-            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
-                IrStream irs = (IrStream) item;
-                if (irs.getRepeatMarker().isInfinite())
-                    state = IrSignal.Pass.ending;
-            }
+//            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
+//                IrStream irs = (IrStream) item;
+//                if (irs.getRepeatMarker().isInfinite())
+//                    state = IrSignal.Pass.ending;
+//            }
+            nextState = item.stateWhenExiting(state);
+            if (nextState != null)
+                state = nextState;
         }
 
         ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
         st.addAttribute("body", list);
         return st.render();
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        Set<String> set = new HashSet<>(4);
+        irStreamItems.stream().forEach((item) -> {
+            set.addAll(item.assignmentVariables());
+        });
+        return set;
     }
 }

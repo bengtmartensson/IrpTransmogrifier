@@ -17,9 +17,11 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -64,7 +66,7 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         return element;
     }
 
-    private HashMap<String, Expression> map;
+    private Map<String, Expression> map;
 
     public NameEngine(int initialCapacity) {
         map = new LinkedHashMap<>(initialCapacity);
@@ -74,9 +76,9 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         this(4);
     }
 
-    private NameEngine(HashMap<String, Expression> map) {
-        this.map = map;
-    }
+//    private NameEngine(HashMap<String, Expression> map) {
+//        this.map = map;
+//    }
 
     public NameEngine(String str) throws IrpSyntaxException {
         this();
@@ -377,5 +379,18 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
     @Override
     public int weight() {
         return WEIGHT;
+    }
+
+    public String code(CodeGenerator codeGenerator) {
+        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
+        List<String> list = new ArrayList<>(map.size());
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("NameDefinition");
+            st.addAttribute("name", kvp.getKey());
+            st.addAttribute("expression", kvp.getValue().code(true, codeGenerator));
+            list.add(st.render());
+        }
+        template.addAttribute("definitions", list);
+        return template.render();
     }
 }

@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -278,4 +279,11 @@ public class BitspecIrstream extends IrStreamItem {
 //        st.addAttribute("arg2", irStream.code(generalSpec, null, codeGenerator));
 //        return st.render();
 //    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        Set<String> list = bitSpec.assignmentVariables();
+        list.addAll(irStream.assignmentVariables());
+        return list;
+    }
 }

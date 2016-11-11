@@ -17,7 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -145,5 +147,10 @@ public class InfiniteBitField extends BitField {
         itemCodeGenerator.addAttribute("chop", chop.code(true, codeGenerator));
         itemCodeGenerator.addAttribute("complement", complement);
         return itemCodeGenerator.render();
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        return new HashSet<>(0);
     }
 }

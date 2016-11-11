@@ -17,16 +17,16 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.IrCoreUtils;
-
 public abstract class CodeGenerator {
 
     private final GeneralSpec generalSpec;
-    private final StringBuilder stringBuilder;
+    private final NameEngine nameEngine;
+    //private final StringBuilder stringBuilder;
 
-    protected CodeGenerator(GeneralSpec generalSpec) {
+    protected CodeGenerator(GeneralSpec generalSpec, NameEngine nameEngine) {
         this.generalSpec = generalSpec;
-        this.stringBuilder = new StringBuilder(8192);
+        this.nameEngine = nameEngine;
+        //this.stringBuilder = new StringBuilder(8192);
     }
 
     public abstract ItemCodeGenerator newItemCodeGenerator(String name);
@@ -50,25 +50,36 @@ public abstract class CodeGenerator {
         return newItemCodeGenerator("CodeFileExtension").render();
     }
 
-    public void add(String str) {
-        stringBuilder.append(str);
+    public String fileSuffix() {
+        return newItemCodeGenerator("FileSuffix").render();
     }
 
-    public void addLine(String str) {
-        add(str);
-        add(IrCoreUtils.lineSeparator);
-    }
+//    public void add(String str) {
+//        stringBuilder.append(str);
+//    }
 
-    public void addLine(ItemCodeGenerator st) {
-        addLine(st.render());
-    }
+//    public void addLine(String str) {
+//        add(str);
+//        add(IrCoreUtils.lineSeparator);
+//    }
 
-    public void addStatement(ItemCodeGenerator st) {
-        add(st.render());
-        addLine(newItemCodeGenerator("StatementSeparator").render());
-    }
+//    public void addLine(ItemCodeGenerator st) {
+//        addLine(st.render());
+//    }
 
-    public String result() {
-        return stringBuilder.toString();
+//    public void addStatement(ItemCodeGenerator st) {
+//        add(st.render());
+//        addLine(newItemCodeGenerator("StatementSeparator").render());
+//    }
+
+//    public String result() {
+//        return stringBuilder.toString();
+//    }
+
+    /**
+     * @return the nameEngine
+     */
+    public NameEngine getNameEngine() {
+        return nameEngine;
     }
 }

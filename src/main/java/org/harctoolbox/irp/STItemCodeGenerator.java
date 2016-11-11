@@ -43,4 +43,9 @@ public class STItemCodeGenerator extends ItemCodeGenerator {
     public String render() {
         return st.render(Locale.US);
     }
+
+    @Override
+    public void addAggregate(String string, Object... args) {
+        st.addAggr(string, args);
+    }
 }

@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
@@ -124,21 +125,28 @@ public class NamedProtocol extends Protocol {
     }
 
     public String code(String target) throws IOException {
-        CodeGenerator codeGenerator = new STCodeGenerator(target, getGeneralSpec());
-        codeGenerator.addLine(codeGenerator.newItemCodeGenerator("FileBegin"));
-        codeGenerator.addLine(code(codeGenerator));
-        codeGenerator.addLine(codeGenerator.newItemCodeGenerator("FileEnd"));
-        return codeGenerator.result();
+        CodeGenerator codeGenerator = new STCodeGenerator(target, getGeneralSpec(), getDefinitions());
+        String start = codeGenerator.newItemCodeGenerator("FileBegin").render();
+        String body = code(codeGenerator);
+        String end = codeGenerator.newItemCodeGenerator("FileEnd").render();
+        return start + IrCoreUtils.lineSeparator + body + IrCoreUtils.lineSeparator + end;
     }
 
     public String code(CodeGenerator codeGenerator) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
-        template.addAttribute("name", IrpUtils.toCIdentifier(getName()));
+        template.addAttribute("protocolName", getName());
+        template.addAttribute("cProtocolName", IrpUtils.toCIdentifier(getName()));
         template.addAttribute("irp", getIrp());
         template.addAttribute("documentation", IrCoreUtils.javaifyString(getDocumentation()));
         template.addAttribute("frequency", codeGenerator.getGeneralSpec().getFrequency());
-        template.addAttribute("dutycycle", codeGenerator.getGeneralSpec().getDutyCycle());
-        template.addAttribute("parameters", getParameterSpecs().getNames());
+        template.addAttribute("dutyCycle", codeGenerator.getGeneralSpec().getDutyCycle());
+        //template.addAttribute("parameters", getParameterSpecs().getNames());
+        getParameterSpecs().fillAttributes(template, "parameterSpecs");
+        Set<String> variables = getBitspecIrstream().assignmentVariables();
+        Set<String> params = getParameterSpecs().getNames();
+        variables.removeAll(params);
+        template.addAttribute("assignmentVariables", variables);
+        template.addAttribute("definitions", getDefinitions().code(codeGenerator));
 
         if (hasExtent()) {
             ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("InstanceVariableDefinition");

@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -323,5 +325,10 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         s.addAttribute("arg1", name);
         s.addAttribute("arg2", multiplicator(codeGenerator.getGeneralSpec()));
         return s.render();
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        return new HashSet<>(0);
     }
 }

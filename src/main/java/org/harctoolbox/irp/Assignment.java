@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -170,5 +172,12 @@ public class Assignment extends IrStreamItem implements Numerical {
         st.addAttribute("name", name.code(false, codeGenerator));
         st.addAttribute("expression", value.code(true, codeGenerator));
         return st.render();
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        Set<String> list = new HashSet<>(1);
+        list.add(name.toString());
+        return list;
     }
 }

@@ -198,10 +198,26 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     public String code(CodeGenerator codeGenerator) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
         List<String> list = new ArrayList<>(map.size());
-        for (ParameterSpec param : map.values())
+        map.values().stream().forEach((param) -> {
             list.add(param.code(codeGenerator));
+        });
 
         template.addAttribute("arg", list);
         return template.render();
+    }
+
+//    void fillSTAttributes(ST template, String aggregateName) {
+//        for (ParameterSpec ps : map.values())
+//            template.addAggr(aggregateName + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
+//    }
+
+    void fillAttributes(ItemCodeGenerator template, String parameterSpecsName) {
+        map.values().stream().forEach((ps) -> {
+            template.addAggregate(parameterSpecsName + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
+//            template.addAttribute(parameterSpecsName + ".name",   ps.getName());
+//            template.addAttribute(parameterSpecsName + ".min",    ps.getMin());
+//            template.addAttribute(parameterSpecsName + ".max",    ps.getMax());
+//            template.addAttribute(parameterSpecsName + ".memory", ps.hasMemory());
+        });
     }
 }

@@ -41,18 +41,28 @@ public class STCodeGenerator extends CodeGenerator {
         STGroup.trackCreationEvents = value;
     }
 
+    public static String fileExtension(String target) throws IOException {
+        STCodeGenerator cg = new STCodeGenerator(target, null, null);
+        return cg.fileExtension();
+    }
+
+    static String fileSuffix(String target) throws IOException {
+        STCodeGenerator cg = new STCodeGenerator(target, null, null);
+        return cg.fileSuffix();
+    }
+
     private STGroup stGroup;
 
-    public STCodeGenerator(String target, GeneralSpec generalSpec) throws IOException {
-        this(new File(stDir, target + sTGroupFileExtension), generalSpec);
+    public STCodeGenerator(String target, GeneralSpec generalSpec, NameEngine nameEngine) throws IOException {
+        this(new File(stDir, target + sTGroupFileExtension), generalSpec, nameEngine);
     }
 
-    public STCodeGenerator(File file, GeneralSpec generalSpec) throws IOException {
-        this(new STGroupFile(file.getCanonicalPath()), generalSpec);
+    public STCodeGenerator(File file, GeneralSpec generalSpec, NameEngine nameEngine) throws IOException {
+        this(new STGroupFile(file.getCanonicalPath()), generalSpec, nameEngine);
     }
 
-    public STCodeGenerator(STGroup stGroup, GeneralSpec generalSpec) {
-        super(generalSpec);
+    public STCodeGenerator(STGroup stGroup, GeneralSpec generalSpec, NameEngine nameEngine) {
+        super(generalSpec, nameEngine);
         this.stGroup = stGroup;
     }
 

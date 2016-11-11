@@ -199,6 +199,8 @@ public class IrpTransmogrifier {
                     : IrpUtils.getPrintSteam(commandLineArgs.output);
             IrpTransmogrifier instance = new IrpTransmogrifier(ps);
 
+            // Since we have help and version as subcommands, --help and --version
+            // are a little off. Keep them for compatibility, and
             // map --help and --version to the subcommands
             String command = commandLineArgs.helpRequested ? "help"
                     : commandLineArgs.versionRequested ? "version"
@@ -397,6 +399,14 @@ public class IrpTransmogrifier {
     }
 
     private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException, UsageException {
+        File directory = null;
+        if (commandCode.directory != null) {
+            if (commandLineArgs.output != null)
+                throw new UsageException("The --output and the --directory options are exclusive.");
+            directory = new File(commandCode.directory);
+            if (!(directory.exists() && directory.isDirectory() && directory.canWrite()))
+                throw new UsageException("The argument of --directory must be an existing and writeable directory.");
+        }
         setupDatabase(commandLineArgs);
         List<String> list = evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
@@ -404,13 +414,23 @@ public class IrpTransmogrifier {
         for (String protocolName : list)
             protocols.add(irpDatabase.getNamedProtocol(protocolName));
 
-        if (commandCode.stringtemplate) {
-            //StringTemplateCodeGenerator.setStDir(stDir);
-            //StringTemplateCodeGenerator codeGenerator = new StringTemplateCodeGenerator(commandCode.target, protocols.get(0));
-            //codeGenerator.render(out);
-            out.print(protocols.get(0).code(commandCode.target)); // contains a trailing newline
-        } else {
 
+        if (commandCode.stringtemplate) {
+            String filename = null;
+            String suffix = STCodeGenerator.fileSuffix(commandCode.target);
+            for (NamedProtocol protocol : protocols) {
+                if (directory != null) {
+                    File file = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + suffix);
+                    filename = file.getCanonicalPath();
+                    out = IrpUtils.getPrintSteam(filename);
+                }
+                out.print(protocol.code(commandCode.target)); // contains a trailing newline
+                if (filename != null)
+                    logger.log(Level.INFO, "Wrote {0}", filename);
+            }
+        } else {
+            if (directory != null)
+                out = IrpUtils.getPrintSteam(new File(directory, commandCode.protocols.get(0)).getAbsolutePath());
             Document document = NamedProtocol.toDocument(protocols);
 
 //            if (commandLineArgs.xmlFile != null) {
@@ -785,6 +805,9 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"code"}, commandDescription = "Generate code")
     private static class CommandCode {
 
+        @Parameter(names = { "-d", "--directory" }, description = "Directory to generate output files, if not using the --output option.")
+        private String directory = null;
+
 //        @Parameter(names = { "--decode" }, description = "Generate code for decoding, otherwise for rendering. Target dependent.")
 //        private boolean decode = false;
 
@@ -794,10 +817,10 @@ public class IrpTransmogrifier {
 //        @Parameter(names = {"-i", "--irp"}, description = "List irp")
 //        private boolean irp = false;
 
-        @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files")
+        @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files (unless using --stringtemplate)")
         private boolean intermediates = false;
 
-        @Parameter(names = { "-s", "--st" }, description = "Use stringtemplate")
+        @Parameter(names = { "-s", "--st", "--stringtemplate" }, description = "Use stringtemplate")
         private boolean stringtemplate = false;
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target for code generation")

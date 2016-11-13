@@ -270,7 +270,7 @@ public class BitspecIrstream extends IrStreamItem {
 
     @Override
     public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Hierarchical BitSpecs not supported yet.");
     }
 
 //    public String code(GeneralSpec generalSpec, CodeGenerator codeGenerator) {

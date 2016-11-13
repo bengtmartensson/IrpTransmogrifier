@@ -29,6 +29,14 @@ public abstract class ItemCodeGenerator {
 
     public abstract void addAggregate(String string, Object... args);
 
+    public void addAggregateList(String name, AggregateLister aggregateLister) {
+        aggregateLister.listAggregates(name, this);
+    }
+
+    void addAggregateList(String name, String[] names, Object... args) {
+        this.addAggregate(name + ".{" + String.join(",", names) + "}", args);
+    }
+
     public void setAttribute(Map<String, Object> map) {
         map.entrySet().stream().forEach((kvp) -> {
             setAttribute(kvp.getKey(), kvp.getValue());

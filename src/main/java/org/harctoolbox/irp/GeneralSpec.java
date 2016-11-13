@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * This class implements GeneralSpec as given in Chapter 2 of Dixon: "Specification of IRP Notation", second draft.
  * This class is immutable; can only be build by the constructor, and not altered.
  */
-public class GeneralSpec extends IrpObject {
+public class GeneralSpec extends IrpObject implements AggregateLister {
     private final static int WEIGHT = 0;
     public final static double defaultDutyCycle = ModulatedIrSequence.unknownDutyCycle;
     public final static BitDirection defaultBitDirection = BitDirection.lsb;
@@ -201,5 +201,10 @@ public class GeneralSpec extends IrpObject {
     @Override
     public int weight() {
         return WEIGHT;
+    }
+
+    @Override
+    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
+        itemCodeGenerator.addAggregateList(name, new String[] {"frequency", "dutyCycle"}, this.frequency, this.dutyCycle);
     }
 }

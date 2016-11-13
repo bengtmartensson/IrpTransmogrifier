@@ -12,6 +12,7 @@ FileBegin() ::= <<
 package org.harctoolbox.render;
 
 import java.util.Map;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 
 >>
@@ -27,14 +28,14 @@ LineComment(text) ::= <<
 
 RestOfLineComment(text) ::= "<beginComment()><text><endComment()>"
 
-NamedProtocol(protocolName, cProtocolName, irp, documentation, frequency, dutyCycle, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
+NamedProtocol(protocolName, cProtocolName, irp, documentation, generalSpec, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
 public final class <cProtocolName>Renderer extends IrpRenderer {
     <Irp(irp)>
     <Documentation(documentation)>
     <DeclareParameters(parameterSpecs)>
     <DeclareAssignmentVariables(assignmentVariables)>
-    <DeclareFrequency(frequency)>
-    <DeclareDutyCycle(dutyCycle)>
+    <DeclareFrequency(generalSpec.frequency)>
+    <DeclareDutyCycle(generalSpec.dutyCycle)>
     <DeclareParameterlessConstructor(cProtocolName)>
     <DeclareCompute(cProtocolName, parameterSpecs)>
     <DefineNames(definitions)>
@@ -292,7 +293,7 @@ ResetDurationCounter() ::= ""
 
 Repeat(repeats, body) ::= <<
 for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <repeats>; repeatCounter++) {
-    <body>
+    <body>;
 }
 >>
 
@@ -307,8 +308,10 @@ SetOfStatements(body) ::= <<
 
 Chop(chop) ::= "<if(chop)> >> (<chop>)<endif>"
 
+//list.<if(reverse)>bitFieldReverse<else>bitField<endif>(<if(complement)>~<endif>((<data>)<Chop(chop)>), <width>)
+
 FiniteBitField(data, width, chop, complement, reverse) ::= <<
-list.<if(reverse)>bitFieldReverse<else>bitField<endif>(<if(complement)>~<endif>((<data>)<Chop(chop)>), <width>)
+list.bitField(<if(complement)>~<endif>(<if(reverse)>IrCoreUtils.reverse<endif>(<data><if(reverse)>, (int)<width><endif>)<Chop(chop)>), <width>)
 >>
 
 InfiniteBitFieldExpression(data, chop, complement) ::= <<
@@ -330,6 +333,8 @@ Add(arg1,arg2)      ::= "(<arg1>)+(<arg2>)"
 Subtract(arg1,arg2) ::= "(<arg1>)-(<arg2>)"
 Multiply(arg1,arg2) ::= "(<arg1>)*(<arg2>)"
 Divide(arg1,arg2)   ::= "(<arg1>)/(<arg2>)"
+Modulo(arg1,arg2)   ::= "(<arg1>)%(<arg2>)"
+Exponentiate(arg1,arg2) ::= "IrpUtils.power(arg1,arg2)"
 
 add(arg1,arg2)      ::= "<arg1>+<arg2>"
 sub(arg1,arg2)      ::= "<arg1>-<arg2>"
@@ -338,3 +343,6 @@ div(arg1,arg2)      ::= "<arg1>/<arg2>"
 
 BitwiseExclusiveOr(arg1,arg2) ::= "(<arg1>)^(<arg2>)"
 BitwiseAnd(arg1,arg2)         ::= "(<arg1>)&(<arg2>)"
+BitwiseOr(arg1,arg2)          ::= "(<arg1>)|(<arg2>)"
+BitCount(arg)                 ::= "Long.bitCount(<arg>)"
+UnaryMinus(arg)               ::= "-(<arg>)"

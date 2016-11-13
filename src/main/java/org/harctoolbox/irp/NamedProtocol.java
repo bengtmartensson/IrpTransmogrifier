@@ -138,10 +138,8 @@ public class NamedProtocol extends Protocol {
         template.addAttribute("cProtocolName", IrpUtils.toCIdentifier(getName()));
         template.addAttribute("irp", getIrp());
         template.addAttribute("documentation", IrCoreUtils.javaifyString(getDocumentation()));
-        template.addAttribute("frequency", codeGenerator.getGeneralSpec().getFrequency());
-        template.addAttribute("dutyCycle", codeGenerator.getGeneralSpec().getDutyCycle());
-        //template.addAttribute("parameters", getParameterSpecs().getNames());
-        getParameterSpecs().fillAttributes(template, "parameterSpecs");
+        template.addAggregateList("generalSpec", getGeneralSpec());
+        template.addAggregateList("parameterSpecs", getParameterSpecs());
         Set<String> variables = getBitspecIrstream().assignmentVariables();
         Set<String> params = getParameterSpecs().getNames();
         variables.removeAll(params);

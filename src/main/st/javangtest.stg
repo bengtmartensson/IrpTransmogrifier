@@ -35,7 +35,7 @@ LineComment(text) ::= <<
 
 RestOfLineComment(text) ::= "<beginComment()><text><endComment()>"
 
-NamedProtocol(protocolName, cProtocolName, irp, documentation, frequency, dutyCycle, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
+NamedProtocol(protocolName, cProtocolName, irp, documentation, generalSpec, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
 public class <cProtocolName>RendererNGTest {
     private final static String configFile = "../IrpTransmogrifier/src/main/config/IrpProtocols.xml";
     private final static int noRandomTests = 10;
@@ -44,6 +44,7 @@ public class <cProtocolName>RendererNGTest {
     private final NamedProtocol prot;
     public <cProtocolName>RendererNGTest() throws IOException, SAXException, IncompatibleArgumentException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
         irpDatabase = new IrpDatabase(configFile);
+        irpDatabase.expand();
         prot = irpDatabase.getNamedProtocol("<protocolName>");
     }
 
@@ -108,7 +109,7 @@ DeclareExhaustiveTest(parameterSpecs) ::= <<
 //@Test
 public void testNewIrSignalExhaustive() {
 System.out.println("newIrSignalExhaustive");
-<parameterSpecs:{par |    for (<ImplementationType("parameterType")> <par.name> = <par.min>; <par.name> \<= <par.max>; <par.name>++)}; separator="\n">
+<parameterSpecs:{par |    for (<ImplementationType("parameterType")> <par.name> = <par.min>L; <par.name> \<= <par.max>L; <par.name>++)}; separator="\n">
         testNewIrSignalParameters(<parameterSpecs:{p | <p.name>}; separator=", ">);
 }
 >>
@@ -376,6 +377,8 @@ Add(arg1,arg2)      ::= "(<arg1>)+(<arg2>)"
 Subtract(arg1,arg2) ::= "(<arg1>)-(<arg2>)"
 Multiply(arg1,arg2) ::= "(<arg1>)*(<arg2>)"
 Divide(arg1,arg2)   ::= "(<arg1>)/(<arg2>)"
+Modulo(arg1,arg2)   ::= "(<arg1>)%(<arg2>)"
+Exponentiate(arg1,arg2) ::= "IrpUtils.power(arg1,arg2)"
 
 add(arg1,arg2)      ::= "<arg1>+<arg2>"
 sub(arg1,arg2)      ::= "<arg1>-<arg2>"
@@ -384,3 +387,6 @@ div(arg1,arg2)      ::= "<arg1>/<arg2>"
 
 BitwiseExclusiveOr(arg1,arg2) ::= "(<arg1>)^(<arg2>)"
 BitwiseAnd(arg1,arg2)         ::= "(<arg1>)&(<arg2>)"
+BitwiseOr(arg1,arg2)          ::= "(<arg1>)|(<arg2>)"
+BitCount(arg)                 ::= "Long.bitCount(<arg>)"
+UnaryMinus(arg)               ::= "-(<arg>)"

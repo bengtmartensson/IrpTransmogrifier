@@ -188,6 +188,7 @@
                             <arguments>
                                 <argument>+x</argument>
                                 <argument>${project.nameLowercase}.sh</argument>
+                                <argument>javagenerator.sh</argument>
                             </arguments>
                         </configuration>
                     </execution>

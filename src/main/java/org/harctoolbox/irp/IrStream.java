@@ -267,11 +267,15 @@ public class IrStream extends BareIrStream {
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         if (repetitions == 0)
             return "";
-        if (repetitions != 1)
-            template.addAttribute("repeats", repetitions);
         String body = super.code(state, pass, codeGenerator);
         template.addAttribute("body", body);
-        return template.render();
+        if (repetitions == 1)
+            return template.render();
+
+        ItemCodeGenerator repeatTemplate = codeGenerator.newItemCodeGenerator("Repeat");
+        repeatTemplate.addAttribute("body", template.render());
+        repeatTemplate.addAttribute("repeats", repetitions);
+        return repeatTemplate.render();
     }
 
     public String code(Pass pass, CodeGenerator codeGenerator) {

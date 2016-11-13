@@ -424,7 +424,8 @@ public class IrpTransmogrifier {
                     filename = file.getCanonicalPath();
                     out = IrpUtils.getPrintSteam(filename);
                 }
-                out.print(protocol.code(commandCode.target)); // contains a trailing newline
+                String code = protocol.code(commandCode.target);// contains a trailing newline
+                out.print(code);
                 if (filename != null)
                     logger.log(Level.INFO, "Wrote {0}", filename);
             }

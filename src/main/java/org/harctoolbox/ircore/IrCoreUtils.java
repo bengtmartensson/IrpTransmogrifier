@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -110,6 +111,13 @@ public class IrCoreUtils {
         double sum = 0;
         for (int i = beg; i < beg + length; i++)
             sum += Math.abs(sequence[i]);
+        return sum;
+    }
+
+    public static double l1Norm(List<Double> list, int beg) {
+        double sum = 0;
+        for (int i = beg; i < list.size(); i++)
+            sum += Math.abs(list.get(i));
         return sum;
     }
 

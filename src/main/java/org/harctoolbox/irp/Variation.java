@@ -187,7 +187,8 @@ public class Variation extends IrStreamItem {
 
     @Override
     public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        BareIrStream actual = select(pass);
+        return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
     }
 
     @Override

@@ -13,6 +13,11 @@ in IrpMaster (like the "ugliness" of embedding actions within the grammar, no le
 Unfortunately, this means that using version 4 instead of version 3 is not like updating a compiler or such,
 but "necessitates" a complete rewrite of the actions.
 
+But that is of course not all: Both DecodeIR by John Fine and the Analyzer by Graham Dixon have shown to be (at least IMHO)
+essentially impossible to maintain and extend. Although DecodeIR and IrpMaster (through the data base IrpProtocols.ini)
+agree on most protocols, this consists of two different, discoupled sources of protocol information. Finally, to be able to 
+generate code from the IRP form is a natural wish.
+
 
 ## Use cases
 The reason for this project is not (just) to migrate IrpMaster to ANTLR4 -- version 3 is still operational,
@@ -22,7 +27,7 @@ and no more broken than it was at the start. There are a number of interesting u
 with numerical values assigned to the parameters.
 
 _This has essentially been completed. Ambition level: only one infinite repeat allowed. With that restriction, should be
-complete solution, down to specification holes. Remains: testing._
+complete solution, down to specification holes. Remains: test framework._
 
 2. __Recognition__. This use case corresponds to a dynamic version of DecodeIR: given a numerical IR signal,
  find one (or all) parameter/protocol combinations that could have generated the given signal.
@@ -30,20 +35,38 @@ complete solution, down to specification holes. Remains: testing._
  using IRP ["Meta protocols"](http://www.harctoolbox.org/IrpMaster.html#Preprocessing+and+inheritance).
 
 _Ambition level: should grok almost all of the existing protocols in IrpProtocols, but not necessarily be "complete".
-Status: Three protocols declared un-doable (zenith (bitfield width as parameter), entone, fujitsu_aircon (complicated equation solving)).
-All other protocols recognizable. Remains: top-level algorithm for deciding what protocols to try, parameter tuning, testing, testing_
+Status: Three protocols declared un-doable (zenith (bitfield width as parameter), entone, fujitsu_aircon (would require non-trivial equation solving)).
+All other protocols recognizable. Most protocol sort-of works, but as a-priori given protocol, not like DecodeIR.
+Remains: top-level algorithm for deciding what protocols to try, parameter tuning, testing, test framework_
 
 3. __Code generation for rendering__. For a particular protocol, generate target code (C, C++, Java, Python,...) that can render signals
-   with the selected protocol. As opposed to the previous use cases, efficency (memory, execution time) is potentially
+   with the selected protocol. As opposed to the previous use cases, efficency (memory, execution time) (for the generated code) is potentially
    an issue. This should be able to generate protocol renders for e.g. the Arduino libraries IrRemote, IrLib, and AGirs.
-   At least in the first version, not all protocols describable by IRPs need to be supported.
+   At least in the first version, not all protocols describable by IRPs need to be supported. Not implemented in the first phase: Protocols with hierarchical bitspecs 
+(rc6*, replay, arctech, entone), protocols with bitspec lenght as parameter (zenith, nec1-shirrif). Also default are not implemented, e.g. NEC1 has to be
+called with 3 parameters.
+
+Targets:
+* Lircd.conf generation from IrScrutinizer. This generates
+ [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/harctoolboxbundle/blob/master/IrScrutinizer/src/main/config/exportformats.d/lirc.xml)
+Handling of definitions as well as expressions as bitfields not implemented, as well as a few other things (search for "omitted" in the above file),
+otherwise works.
+* Java. Essentially to test. This is essentially working, including a test rig.
+* C++ (Infrared4Arduino).
+* IRremote
 
 _Ambition level: Should be able to generate the "important" protocols, not necessarily "complete". 
 Status: An intermediate XML file is generated, on which XSLT stylesheets are operating. Presently, generating only Java code -- the simplest.
-Most protocol sort-of works, but as a-priori given protocol, not like DecodeIR._
+_
 
 4. __Code generation for recognition__. Like above, but for recognizing received signals
  on embedded processors, using a certain protocol.
+
+Targets:
+* Java. Essentially to test. This is essentially working, including a test rig.
+* C++ (Infrared4Arduino).
+* IRremote
+* Lirc kernel modules.
 
 _Status: not started_
 

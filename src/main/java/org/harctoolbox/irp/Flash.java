@@ -16,7 +16,10 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.List;
+import java.util.Map;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This class implements Flash as per Chapter 3.

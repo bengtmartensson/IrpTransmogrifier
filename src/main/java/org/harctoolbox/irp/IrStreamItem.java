@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -106,4 +107,6 @@ public abstract class IrStreamItem extends IrpObject {
     public abstract String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator);
 
     public abstract Set<String> assignmentVariables();
+
+    public abstract List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec);
 }

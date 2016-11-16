@@ -17,7 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -30,7 +33,7 @@ import org.w3c.dom.Element;
  * This class implements Irstream as of Chapter 6.
  *
  */
-public class IrStream extends BareIrStream {
+public class IrStream extends BareIrStream implements AggregateLister {
 
     private static final Logger logger = Logger.getLogger(IrStream.class.getName());
 
@@ -263,28 +266,109 @@ public class IrStream extends BareIrStream {
 
     @Override
     public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
+        //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         if (repetitions == 0)
-            return "";
-        String body = super.code(state, pass, codeGenerator);
-        template.addAttribute("body", body);
-        if (repetitions == 1)
-            return template.render();
+            return null;
+        List<String> body = super.codeList(state, pass, codeGenerator);
 
-        ItemCodeGenerator repeatTemplate = codeGenerator.newItemCodeGenerator("Repeat");
-        repeatTemplate.addAttribute("body", template.render());
-        repeatTemplate.addAttribute("repeats", repetitions);
-        return repeatTemplate.render();
+        //if (repetitions == 1)
+        //    return template.render();
+        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(repetitions == 1 ? "SetOfStatements" : "Repeat");
+        for (String s : body)
+            //template.addAttribute("body", s);
+            template.addAttribute("body", s);
+        if (repetitions > 1)
+            template.addAttribute("repeats", repetitions);
+        return template.render();
     }
+
+//    public List<String> codeList(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+//        //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
+//        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+//        if (repetitions == 0)
+//            return new ArrayList<>(0);
+//
+//        String body = super.code(state, pass, codeGenerator);
+//        template.addAttribute("body", body);
+//        if (repetitions == 1)
+//            return template.render();
+//
+//        ItemCodeGenerator repeatTemplate = codeGenerator.newItemCodeGenerator("Repeat");
+//        repeatTemplate.addAttribute("body", template.render());
+//        repeatTemplate.addAttribute("repeats", repetitions);
+//        return repeatTemplate.render();
+//    }
 
     public String code(Pass pass, CodeGenerator codeGenerator) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("FunctionBody");
         Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
         String body = code(state, pass, codeGenerator);
-        template.addAttribute("body", body);
-        if (!body.isEmpty() && hasExtent())
+        if (body != null && !body.isEmpty())
+            template.addAttribute("body", body);
+        if (body != null && !body.isEmpty() && hasExtent())
             template.addAttribute("reset", hasExtent());
         return template.render();
+    }
+
+//    public List<String> codeList(Pass pass, CodeGenerator codeGenerator) {
+//        // ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("FunctionBody");
+//        Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
+//        List<String> body = codeList(state, pass, codeGenerator);
+////        template.addAttribute("body", body);
+////        if (!body.isEmpty() && hasExtent())
+////            template.addAttribute("reset", hasExtent());
+////        return template.render();
+//        return body;
+//    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(1);
+        Map<String, Object> m = new HashMap<>(4);
+        m.put("intro", propertiesMapList(IrSignal.Pass.intro, generalSpec));
+        m.put("repeat", propertiesMapList(IrSignal.Pass.repeat, generalSpec));
+        m.put("ending", propertiesMapList(IrSignal.Pass.ending, generalSpec));
+        list.add(m);
+        return list;
+    }
+
+    private List<Map<String, Object>> propertiesMapList(Pass pass, GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(1);
+        Map<String, Object> m = new HashMap<>(2);
+        list.add(m);
+
+        Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
+        List<Map<String, Object>> body = propertiesMapList(state, pass, generalSpec);
+        m.put("body", body);
+//        template.addAttribute("body", body);
+//        if (!body.isEmpty() && hasExtent())
+//            template.addAttribute("reset", hasExtent());
+//        return template.render();
+        //if (!body.isEmpty() && hasExtent())
+        m.put("reset", hasExtent());
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(Pass state, Pass pass, GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(1);
+        Map<String, Object> m = new HashMap<>(2);
+        list.add(m);
+
+        //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
+        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+        if (repetitions == 0)
+            return new ArrayList<>(0);
+        List<Map<String, Object>> body = super.propertiesMapList(state, pass, generalSpec);
+//        template.addAttribute("body", body);
+//        if (repetitions == 1)
+//            return template.render();
+
+        //ItemCodeGenerator repeatTemplate = codeGenerator.newItemCodeGenerator("Repeat");
+        m.put("body", body);
+        if (repetitions > 1)
+            m.put("repeats", repetitions);
+        return list;
     }
 }

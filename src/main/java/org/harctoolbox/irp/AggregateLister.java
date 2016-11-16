@@ -17,6 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.List;
+import java.util.Map;
+
 public interface AggregateLister {
-    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator);
+    //public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator);
+    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec);
 }

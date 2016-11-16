@@ -17,8 +17,12 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.misc.Aggregate;
 
 public class STItemCodeGenerator extends ItemCodeGenerator {
 
@@ -47,5 +51,15 @@ public class STItemCodeGenerator extends ItemCodeGenerator {
     @Override
     public void addAggregate(String string, Object... args) {
         st.addAggr(string, args);
+    }
+
+    @Override
+    public void addAggregateList(String name, AggregateLister aggregateLister, GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = aggregateLister.propertiesMapList(generalSpec);
+        for (Map<String, Object> map : list) {
+            Aggregate aggregate = new Aggregate();
+            aggregate.properties = new HashMap<>(map);
+            st.add(name, aggregate);
+        }
     }
 }

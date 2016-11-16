@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
@@ -270,7 +271,7 @@ public class BitspecIrstream extends IrStreamItem {
 
     @Override
     public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
-        throw new UnsupportedOperationException("Hierarchical BitSpecs not supported yet.");
+        throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
     }
 
 //    public String code(GeneralSpec generalSpec, CodeGenerator codeGenerator) {
@@ -285,5 +286,10 @@ public class BitspecIrstream extends IrStreamItem {
         Set<String> list = bitSpec.assignmentVariables();
         list.addAll(irStream.assignmentVariables());
         return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(Pass state, Pass pass, GeneralSpec generalSpec) {
+        throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
     }
 }

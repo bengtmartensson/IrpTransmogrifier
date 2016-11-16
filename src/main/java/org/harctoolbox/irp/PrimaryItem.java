@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 
@@ -59,4 +60,6 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
     public abstract boolean isUnary();
 
     public abstract String code(boolean eval, CodeGenerator codeGenerator);
+
+    public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec);
 }

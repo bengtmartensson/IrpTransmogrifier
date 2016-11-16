@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
@@ -318,8 +319,7 @@ public class BareIrStream extends IrStreamItem {
         return irStreamItems;
     }
 
-    @Override
-    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+    public List<String> codeList(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
         List<String> list = new ArrayList<>(irStreamItems.size());
         for (IrStreamItem item : irStreamItems) {
 //            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
@@ -330,8 +330,11 @@ public class BareIrStream extends IrStreamItem {
             IrSignal.Pass nextState = item.stateWhenEntering(pass);
             if (nextState != null)
                 state = nextState;
-            if (pass == null || pass == state)
-                list.add(item.code(state, pass, codeGenerator));
+            if (pass == null || pass == state) {
+                String s = item.code(state, pass, codeGenerator);
+                if (s != null && !s.isEmpty())
+                    list.add(s);
+            }
 
 //            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
 //                IrStream irs = (IrStream) item;
@@ -342,7 +345,12 @@ public class BareIrStream extends IrStreamItem {
             if (nextState != null)
                 state = nextState;
         }
+        return list;
+    }
 
+    @Override
+    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+        List<String> list = codeList(state, pass, codeGenerator);
         ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
         st.addAttribute("body", list);
         return st.render();
@@ -355,5 +363,38 @@ public class BareIrStream extends IrStreamItem {
             set.addAll(item.assignmentVariables());
         });
         return set;
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
+        for (IrStreamItem item : irStreamItems) {
+//            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
+//                IrStream irs = (IrStream) item;
+//                if (irs.getRepeatMarker().isInfinite())
+//                    state = IrSignal.Pass.repeat;
+//            }
+            IrSignal.Pass nextState = item.stateWhenEntering(pass);
+            if (nextState != null)
+                state = nextState;
+            if (pass == null || pass == state) {
+                List<Map<String, Object>> lst = item.propertiesMapList(state, pass, generalSpec);
+                if (!lst.isEmpty())
+                    list.add(item.propertiesMapList(state, pass, generalSpec).get(0));
+            }
+
+//            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
+//                IrStream irs = (IrStream) item;
+//                if (irs.getRepeatMarker().isInfinite())
+//                    state = IrSignal.Pass.ending;
+//            }
+            nextState = item.stateWhenExiting(state);
+            if (nextState != null)
+                state = nextState;
+        }
+
+//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
+//        st.addAttribute("body", list);
+        return list;
     }
 }

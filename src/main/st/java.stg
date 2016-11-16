@@ -28,25 +28,37 @@ LineComment(text) ::= <<
 
 RestOfLineComment(text) ::= "<beginComment()><text><endComment()>"
 
-NamedProtocol(protocolName, cProtocolName, irp, documentation, generalSpec, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
+NamedProtocol(protocolName, cProtocolName, irp, documentation, generalSpec, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, chunkSize, code, introCode, repeatCode, endingCode) ::= <<
 public final class <cProtocolName>Renderer extends IrpRenderer {
     <Irp(irp)>
     <Documentation(documentation)>
+    
+    <DeclareStatic(cProtocolName, parameterSpecs)>
+    
     <DeclareParameters(parameterSpecs)>
+    
     <DeclareAssignmentVariables(assignmentVariables)>
-    <DeclareFrequency(generalSpec.frequency)>
-    <DeclareDutyCycle(generalSpec.dutyCycle)>
+    
     <DeclareParameterlessConstructor(cProtocolName)>
+    
+    <DeclareFrequency(generalSpec.frequency)>
+    
+    <DeclareDutyCycle(generalSpec.dutyCycle)>
+    
     <DeclareCompute(cProtocolName, parameterSpecs)>
+    
     <DefineNames(definitions)>
 
     <!instanceVariableDefinition!>
     <!defineFlashGapExtent!>
-
+    <!DefineCode(code)!>
     <introCode>
+    
     <repeatCode>
+    
     <endingCode>
-    <DefineClassList(bitSpec)>
+    
+    <DefineClassList(bitSpec,chunkSize)>
 }
 >>
 
@@ -77,16 +89,22 @@ public <cProtocolName>Renderer() {
 >>
 
 DeclareParameters(parameters) ::= <<
-<parameters:{par | <DeclareParameter(par.name)>}>
+// Parameters as declared in ParameterSpec
+<parameters:{par | <DeclareParameter(par)>}>
 >>
 
-DeclareParameter(parameterName) ::= <<
-private <ImplementationType("parameterType")> <parameterName>;
+DeclareParameter(parameter) ::= <<
+private <if(parameter.memory)>static <endif><ImplementationType("parameterType")> <parameter.name><if(parameter.memory)> = <parameter.default><endif>;
 
+>>
+
+DeclareSimpleParameter(parameterName) ::= <<
+private <ImplementationType("parameterType")> <parameterName>;
 >>
 
 DeclareAssignmentVariables(assignmentVariables) ::= <<
-<assignmentVariables:DeclareParameter()>
+// Internal variables, not declared in ParameterSpec
+<assignmentVariables:DeclareSimpleParameter()>
 >>
 
 DeclareCompute(cProtocolName, parameters) ::= <<
@@ -102,7 +120,10 @@ public IrSignal compute(Map\<String,Long> map) {
     setup();
     return getIrSignal();
 }
+>>
 
+DeclareStatic(cProtocolName, parameters) ::= <<
+// Static convenience functions
 public static IrSignal newIrSignal(<parameters:DeclareFormalParameter(); separator=", ">) {
     <cProtocolName>Renderer instance = new <cProtocolName>Renderer();
     return instance.compute(<parameters:{p | <p.name>}; separator=", ">);
@@ -127,6 +148,7 @@ DeclareFormalParameter(parameter) ::= <<
 >>
 
 DefineNames(definitions) ::= <<
+// Local functions; corresponds to Definitions in the IRP.
 <definitions>
 >>
 
@@ -180,8 +202,12 @@ Assignment(name, expression) ::= <<
 <name> = <expression>
 >>
 
-DefineClassList(bitSpec) ::= <<
+DefineClassList(bitSpec,chunkSize) ::= <<
 private static class LocalIrList extends IrpRenderer.IrList {
+<if(chunkSize)>
+    private long pendingData = 0L;
+    private long pendingBits = 0L;
+<endif>
     <bitSpec>
 }
 >>
@@ -196,7 +222,7 @@ ImplementationType(type) ::= <<
 <implementationTypes.(type)>
 >>
 
-StatementSeparator() ::= ";"
+//StatementSeparator() ::= ";"
 
 FlashTemplate(x, unit) ::= "FLaSh <x> <x.unit> <unit>"
 GapTemplate() ::= "GAP"
@@ -253,10 +279,24 @@ for (<ImplementationType("intType")> i = 0; i \< width; i += <chunkSize>) {
 }
 >>
 
-NormalBitSpec(body) ::= <<
+NormalBitSpec(body, chunkSize) ::= <<
 @Override
 void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
     LocalIrList list = this;
+    <if(chunkSize)>
+    if (pendingBits > 0L) {
+        // This code is valid for msb only
+        data &= (1L \<\< width) - 1L;
+        data |= pendingData \<\< width;
+        width += pendingBits;
+        pendingBits = 0L;
+    }
+    if (width % <chunkSize>L != 0L) {
+        pendingData = data;
+        pendingBits = width;
+        width = 0L;
+    }
+    <endif>
     <body>
 }
 >>
@@ -267,7 +307,7 @@ void bitField(<ImplementationType("parameterType")> data, <ImplementationType("p
 //    <body>
 //}
 //>>
-ReverseBitSpec(body) ::= ""
+ReverseBitSpec(body, chunkSize) ::= ""
 
 ParameterSpecs(arg) ::= <<
 <arg; separator=", ">
@@ -277,11 +317,15 @@ ParameterSpec(name, min, max, deflt, memory) ::= <<
 <ImplementationType("parameterType")> <name>
 >>
 
+Statement(stmt) ::= <<
+<stmt>;
+>>
+
 XFunction(name,parameterList, protocolName, functionBody) ::= <<
 @Override
 protected LocalIrList setup<name>() {
     LocalIrList list = new LocalIrList();
-    <functionBody>;
+    <functionBody>
     return list;
 }
 >>
@@ -293,17 +337,17 @@ ResetDurationCounter() ::= ""
 
 Repeat(repeats, body) ::= <<
 for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <repeats>; repeatCounter++) {
-    <body>;
+    <SetOfStatements(body)>
 }
 >>
 
 FunctionBody(reset, body) ::= <<
 <if(reset)><ResetDurationCounter()><endif>
-<body>
+<body:{x|<x>;}; separator="\n">
 >>
 
 SetOfStatements(body) ::= <<
-<body; separator=";\n">
+<body:{x|<x>;}; separator="\n">
 >>
 
 Chop(chop) ::= "<if(chop)> >> (<chop>)<endif>"
@@ -311,7 +355,7 @@ Chop(chop) ::= "<if(chop)> >> (<chop>)<endif>"
 //list.<if(reverse)>bitFieldReverse<else>bitField<endif>(<if(complement)>~<endif>((<data>)<Chop(chop)>), <width>)
 
 FiniteBitField(data, width, chop, complement, reverse) ::= <<
-list.bitField(<if(complement)>~<endif>(<if(reverse)>IrCoreUtils.reverse<endif>(<data><if(reverse)>, (int)<width><endif>)<Chop(chop)>), <width>)
+list.bitField(<if(complement)>~<endif><if(reverse)>IrCoreUtils.reverse<endif>(<data><if(reverse)>, (int)<width><endif>)<Chop(chop)>, <width>)
 >>
 
 InfiniteBitFieldExpression(data, chop, complement) ::= <<
@@ -320,6 +364,28 @@ InfiniteBitFieldExpression(data, chop, complement) ::= <<
 
 FiniteBitFieldExpression(data, width, chop, complement, reverse) ::= <<
 finiteBitField(<data>, <width>, <if(chop)><chop><else>0<endif>, <complement>, <reverse>)
+>>
+
+DefineCode(code) ::= <<
+<DefineFunction("Intro",[code.intro])>
+
+<DefineFunction("Repeat",code.repeat)>
+
+<DefineFunction("Ending",code.ending)>
+<code>
+
+<code.intro.body>
+
+>>
+
+DefineFunction(name, codes) ::= <<
+@Override
+protected LocalIrList setup<name>() {
+    LocalIrList list = new LocalIrList();
+    <if(codes.reset)>RESET<endif>
+    <codes><!functionBody:Statement()!>
+    return list;
+}
 >>
 
 Flash(arg)          ::= "list.flash(<arg>)"

@@ -35,7 +35,7 @@ LineComment(text) ::= <<
 
 RestOfLineComment(text) ::= "<beginComment()><text><endComment()>"
 
-NamedProtocol(protocolName, cProtocolName, irp, documentation, generalSpec, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, introCode, repeatCode, endingCode) ::= <<
+NamedProtocol(protocolName, cProtocolName, irp, documentation, generalSpec, parameterSpecs, instanceVariableDefinition, assignmentVariables, definitions, defineFlashGapExtent, bitSpec, chunkSize, introCode, repeatCode, endingCode) ::= <<
 public class <cProtocolName>RendererNGTest {
     private final static String configFile = "../IrpTransmogrifier/src/main/config/IrpProtocols.xml";
     private final static int noRandomTests = 10;
@@ -299,7 +299,7 @@ for (<ImplementationType("intType")> i = 0; i \< width; i += <chunkSize>) {
 }
 >>
 
-NormalBitSpec(body) ::= <<
+NormalBitSpec(body, chunkSize) ::= <<
 @Override
 void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
     LocalIrList list = this;
@@ -313,7 +313,7 @@ void bitField(<ImplementationType("parameterType")> data, <ImplementationType("p
 //    <body>
 //}
 //>>
-ReverseBitSpec(body) ::= ""
+ReverseBitSpec(body, chunkSize) ::= ""
 
 ParameterSpecs(arg) ::= <<
 <arg; separator=", ">

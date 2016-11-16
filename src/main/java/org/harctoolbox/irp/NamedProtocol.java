@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -138,8 +139,8 @@ public class NamedProtocol extends Protocol {
         template.addAttribute("cProtocolName", IrpUtils.toCIdentifier(getName()));
         template.addAttribute("irp", getIrp());
         template.addAttribute("documentation", IrCoreUtils.javaifyString(getDocumentation()));
-        template.addAggregateList("generalSpec", getGeneralSpec());
-        template.addAggregateList("parameterSpecs", getParameterSpecs());
+        template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec());
+        template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec());
         Set<String> variables = getBitspecIrstream().assignmentVariables();
         Set<String> params = getParameterSpecs().getNames();
         variables.removeAll(params);
@@ -159,7 +160,12 @@ public class NamedProtocol extends Protocol {
             template.addAttribute("defineFlashGapExtent", st.render());
         }
 
+        //template.addAggregateList("code", getBitspecIrstream().getIrStream(), getGeneralSpec());
+
         template.addAttribute("bitSpec", getBitspecIrstream().getBitSpec().code(codeGenerator));
+        //template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec());
+        if (getBitspecIrstream().getBitSpec().getChunkSize() > 1)
+            template.addAttribute("chunkSize", getBitspecIrstream().getBitSpec().getChunkSize());
 
         template.addAttribute("introCode", codeFunc(IrSignal.Pass.intro, codeGenerator));
         template.addAttribute("repeatCode", codeFunc(IrSignal.Pass.repeat, codeGenerator));

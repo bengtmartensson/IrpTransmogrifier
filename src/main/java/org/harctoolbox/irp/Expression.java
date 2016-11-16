@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -439,5 +441,11 @@ public class Expression extends PrimaryItem {
                 throw new ThisCannotHappenException("Unknown case in Expression.toElement");
         }
         return "";
+    }
+
+    @Override
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) {
+        HashMap<String, Object> map = new HashMap<String, Object>(5);
+        return map;
     }
 }

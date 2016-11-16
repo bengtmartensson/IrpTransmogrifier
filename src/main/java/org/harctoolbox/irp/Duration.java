@@ -17,8 +17,11 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
@@ -330,5 +333,15 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     @Override
     public Set<String> assignmentVariables() {
         return new HashSet<>(0);
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(1);
+        Map<String, Object> map = new HashMap<>(2);
+        list.add(map);
+        map.put("duration", multiplicator(generalSpec));
+        map.put("isOn", this.isOn());
+        return list;
     }
 }

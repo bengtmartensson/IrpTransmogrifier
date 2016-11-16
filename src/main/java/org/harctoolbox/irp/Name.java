@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -173,5 +175,12 @@ public class Name extends PrimaryItem implements Floatable {
         itemGenerator.addAttribute("name", name);
         itemGenerator.addAttribute("eval", eval);
         return itemGenerator.render();
+    }
+
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) {
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("name", name);
+        map.put("eval", eval);
+        return map;
     }
 }

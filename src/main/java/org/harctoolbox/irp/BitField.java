@@ -16,9 +16,14 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This class implements Bitfields as described in Chapter 5, except for that it does not
@@ -117,4 +122,24 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     }
 
     public abstract String code(boolean eval, CodeGenerator codeGenerator);
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
+        List<Map<String, Object>> list = new ArrayList<>(1);
+        Map<String, Object> map = new HashMap<>(5);
+        list.add(map);
+        map.put("data", data.propertiesMap(true, generalSpec));
+        //map.put("width", width.propertiesMap(true, generalSpec));
+        try {
+            long num = chop.toNumber(null);
+            if (num != 0)
+                map.put("chop", num);
+        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            map.put("chop", chop.propertiesMap(true, generalSpec));
+        }
+        map.put("complement", complement);
+        //map.put("reverse", reverse);
+        return list;
+    }
 }

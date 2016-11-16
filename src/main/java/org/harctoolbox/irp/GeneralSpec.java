@@ -17,6 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -203,8 +207,18 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         return WEIGHT;
     }
 
+//    @Override
+//    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
+//        itemCodeGenerator.addAggregateList(name, new String[] {"frequency", "dutyCycle"}, this.frequency, this.dutyCycle);
+//    }
+
     @Override
-    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
-        itemCodeGenerator.addAggregateList(name, new String[] {"frequency", "dutyCycle"}, this.frequency, this.dutyCycle);
+    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec) {
+        List<Map<String,Object>> list = new ArrayList<>(1);
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("frequency", frequency);
+        map.put("dutyCycle", dutyCycle);
+        list.add(map);
+        return list;
     }
 }

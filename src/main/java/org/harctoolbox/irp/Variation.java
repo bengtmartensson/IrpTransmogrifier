@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -197,5 +198,12 @@ public class Variation extends IrStreamItem {
         list.addAll(repeat.assignmentVariables());
         list.addAll(ending.assignmentVariables());
         return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(Pass state, Pass pass, GeneralSpec generalSpec) {
+        BareIrStream actual = select(pass);
+        //return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
+        return actual.propertiesMapList(state, pass, generalSpec);
     }
 }

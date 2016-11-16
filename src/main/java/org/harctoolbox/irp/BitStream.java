@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -196,5 +197,10 @@ class BitStream extends IrStreamItem implements Evaluatable {
     @Override
     public Set<String> assignmentVariables() {
         return new HashSet<>(0);
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

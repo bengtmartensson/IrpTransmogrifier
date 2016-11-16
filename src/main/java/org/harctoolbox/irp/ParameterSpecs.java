@@ -221,10 +221,26 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         });
     }
 
+//    @Override
+//    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
+//        map.values().stream().forEach((ps) -> {
+//            itemCodeGenerator.addAggregate(name + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
+//        });
+//    }
+
     @Override
-    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
-        map.values().stream().forEach((ps) -> {
-            itemCodeGenerator.addAggregate(name + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
-        });
+    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(map.size());
+        for (ParameterSpec ps : map.values()) {
+            Map<String, Object> m = new HashMap<>(4);
+            m.put("name", ps.getName());
+            m.put("min", ps.getMin());
+            m.put("max", ps.getMax());
+            //if (ps.hasMemory())
+                m.put("memory", ps.hasMemory());
+            m.put("default", ps.getDefault());
+            list.add(m);
+        }
+        return list;
     }
 }

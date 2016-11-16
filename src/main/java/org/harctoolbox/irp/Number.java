@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -130,5 +132,12 @@ public class Number extends PrimaryItem {
     @Override
     public String code(boolean eval, CodeGenerator codeGenerator) {
         return toString();
+    }
+
+    @Override
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) {
+        HashMap<String, Object> map = new HashMap<>(1);
+        map.put("value", toString());
+        return map;
     }
 }

@@ -18,8 +18,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
@@ -335,5 +337,15 @@ public class FiniteBitField extends BitField {
     @Override
     public Set<String> assignmentVariables() {
         return new HashSet<>(0);
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
+        List<Map<String, Object>> list = super.propertiesMapList(state, pass, generalSpec);
+        Map<String, Object> map = list.get(0);
+        map.put("width", width.propertiesMap(true, generalSpec));
+        map.put("reverse", reverse);
+        return list;
     }
 }

@@ -17,8 +17,11 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -178,6 +181,16 @@ public class Assignment extends IrStreamItem implements Numerical {
     public Set<String> assignmentVariables() {
         Set<String> list = new HashSet<>(1);
         list.add(name.toString());
+        return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(1);
+        Map<String, Object> map = new HashMap<>(2);
+        list.add(map);
+        map.put("name", name.propertiesMap(false, generalSpec));
+        map.put("expression", value.propertiesMap(true, generalSpec));
         return list;
     }
 }

@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
@@ -32,7 +34,7 @@ import org.w3c.dom.Element;
  * This class implements BitSpecs, as described in Chapter 7.
  *
  */
-public class BitSpec extends IrpObject {
+public class BitSpec extends IrpObject implements AggregateLister {
 
     // Computes the upper integer part of the 2-logarithm of the integer n.
     // Treat n = 0 and n = 1 differently, since coding on a zero or one-letter alphaber is ... special.
@@ -331,14 +333,55 @@ s1 = code(false, generalSpec, pass, codeGenerator);
 
         ItemCodeGenerator bitSpecTemplate  = codeGenerator.newItemCodeGenerator(reverse ? "ReverseBitSpec" : "NormalBitSpec");
         bitSpecTemplate.addAttribute("body", st.render());
+        if (chunkSize > 1)
+            bitSpecTemplate.addAttribute("chunkSize", chunkSize);
         return bitSpecTemplate.render();
     }
+/*
+    private String code(boolean reverse, CodeGenerator codeGenerator) {
+        List<String> list = new ArrayList<>(bitCodes.size());
+        for (int i = 0; i < bitCodes.size(); i++) {
+            BareIrStream bitCode = bitCodes.get(i);
+            ItemCodeGenerator bitSpecCaseTemplate = codeGenerator.newItemCodeGenerator("BitSpecCase");
+            bitSpecCaseTemplate.addAttribute("number", i);
+            bitSpecCaseTemplate.addAttribute("code", bitCode.code(null, null, codeGenerator));
+            list.add(bitSpecCaseTemplate.render());
+        }
+
+        String normalStr  = reverse == (codeGenerator.getGeneralSpec().getBitDirection() == BitDirection.msb) ? "Lsb" : "Msb";
+        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BitSpec" + normalStr);
+        st.addAttribute("chunkSize", chunkSize);
+        st.addAttribute("bitmask", IrCoreUtils.ones(chunkSize));
+        st.addAttribute("body", list);
+
+        ItemCodeGenerator bitSpecTemplate  = codeGenerator.newItemCodeGenerator(reverse ? "ReverseBitSpec" : "NormalBitSpec");
+        bitSpecTemplate.addAttribute("body", st.render());
+        if (chunkSize > 1)
+            bitSpecTemplate.addAttribute("chunkSize", chunkSize);
+        return bitSpecTemplate.render();
+    }*/
 
     Set<String> assignmentVariables() {
         Set<String> list = new HashSet<>(1);
         bitCodes.stream().forEach((bitCode) -> {
             list.addAll(bitCode.assignmentVariables());
         });
+        return list;
+    }
+
+//    @Override
+//    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
+//        //itemCodeGenerator.addAggregateList(name, new String[] {"normal", "reverse", chunkSize"}, , , chunkSize);
+//    }
+
+    @Override
+    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec) {
+        List<Map<String,Object>> list = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put("chunkSize", chunkSize);
+        map.put("normal", "normal");
+        map.put("reverse", "reverse");
+        list.add(map);
         return list;
     }
 }

@@ -186,11 +186,11 @@ public class Variation extends IrStreamItem {
         return intro.hasExtent() || repeat.hasExtent() || ending.hasExtent();
     }
 
-    @Override
-    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
-        BareIrStream actual = select(pass);
-        return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
-    }
+//    @Override
+//    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
+//        BareIrStream actual = select(pass);
+//        return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
+//    }
 
     @Override
     public Set<String> assignmentVariables() {
@@ -201,9 +201,9 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(Pass state, Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec) {
         BareIrStream actual = select(pass);
         //return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
-        return actual.propertiesMapList(state, pass, generalSpec);
+        return actual.propertiesMap(state, pass, generalSpec);
     }
 }

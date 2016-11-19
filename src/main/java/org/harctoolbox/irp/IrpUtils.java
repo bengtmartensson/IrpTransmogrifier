@@ -282,6 +282,12 @@ public class IrpUtils {
         return rep.matches("^\\d.*$") ? ("x" + rep) : rep;
     }
 
+    static Map<String, Object> propertiesMap(int noProps, Object object) {
+        Map<String, Object> result = new HashMap<>(noProps + 1);
+        result.put("kind", object.getClass().getSimpleName());
+        return result;
+    }
+
     public static void entering(Logger logger, Level level, String member, Object arg) {
         logger.logp(level, logger.getName(), member, String.format("-> %0$s", arg.toString()));
     }

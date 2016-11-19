@@ -131,23 +131,23 @@ public class InfiniteBitField extends BitField {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    @Override
-    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
-        itemCodeGenerator.addAttribute("data", data.code(true, codeGenerator));
-        itemCodeGenerator.addAttribute("chop", chop.code(true, codeGenerator));
-        itemCodeGenerator.addAttribute("complement", complement);
-        return itemCodeGenerator.render();
-    }
-
-    @Override
-    public String code(boolean eval, CodeGenerator codeGenerator) {
-        ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator("InfiniteBitFieldExpression");
-        itemCodeGenerator.addAttribute("data", data.code(true, codeGenerator));
-        itemCodeGenerator.addAttribute("chop", chop.code(true, codeGenerator));
-        itemCodeGenerator.addAttribute("complement", complement);
-        return itemCodeGenerator.render();
-    }
+//    @Override
+//    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+//        ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
+//        itemCodeGenerator.addAttribute("data", data.code(true, codeGenerator));
+//        itemCodeGenerator.addAttribute("chop", chop.code(true, codeGenerator));
+//        itemCodeGenerator.addAttribute("complement", complement);
+//        return itemCodeGenerator.render();
+//    }
+//
+//    @Override
+//    public String code(boolean eval, CodeGenerator codeGenerator) {
+//        ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator("InfiniteBitFieldExpression");
+//        itemCodeGenerator.addAttribute("data", data.code(true, codeGenerator));
+//        itemCodeGenerator.addAttribute("chop", chop.code(true, codeGenerator));
+//        itemCodeGenerator.addAttribute("complement", complement);
+//        return itemCodeGenerator.render();
+//    }
 
     @Override
     public Set<String> assignmentVariables() {

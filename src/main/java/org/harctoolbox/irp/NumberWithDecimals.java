@@ -111,8 +111,8 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
         return hash;
     }
 
-    @Override
-    public String code(boolean eval, CodeGenerator codeGenerator) {
-        return toString();
-    }
+//    @Override
+//    public String code(boolean eval, CodeGenerator codeGenerator) {
+//        return toString();
+//    }
 }

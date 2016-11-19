@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
 // TODO: There are probably too many accessing functions here.
 // Clean up by eliminating and making private.
 
-public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Entry<String, Expression>> {
+public class NameEngine extends IrpObject implements Cloneable, AggregateLister, Iterable<Map.Entry<String, Expression>> {
     private final static int WEIGHT = 0;
 
     private final static Logger logger = Logger.getLogger(NameEngine.class.getName());
@@ -392,5 +392,20 @@ public class NameEngine extends IrpObject implements Cloneable, Iterable<Map.Ent
         }
         template.addAttribute("definitions", list);
         return template.render();
+    }
+
+    @Override
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+        Map<String, Object> result = new HashMap<>(2);
+        result.put("kind", this.getClass().getSimpleName());
+        List<Map<String, Object>> list = new ArrayList<>(map.size());
+        result.put("list", list);
+        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+            Map<String, Object> m = new HashMap<>(2);
+            m.put("name", kvp.getKey());
+            m.put("expression", kvp.getValue().propertiesMap(true, generalSpec));
+            list.add(m);
+        }
+        return result;
     }
 }

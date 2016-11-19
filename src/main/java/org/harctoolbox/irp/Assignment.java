@@ -17,8 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -169,13 +167,13 @@ public class Assignment extends IrStreamItem implements Numerical {
         return false;
     }
 
-    @Override
-    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
-        st.addAttribute("name", name.code(false, codeGenerator));
-        st.addAttribute("expression", value.code(true, codeGenerator));
-        return st.render();
-    }
+//    @Override
+//    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
+//        st.addAttribute("name", name.code(false, codeGenerator));
+//        st.addAttribute("expression", value.code(true, codeGenerator));
+//        return st.render();
+//    }
 
     @Override
     public Set<String> assignmentVariables() {
@@ -185,12 +183,10 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
-        List<Map<String, Object>> list = new ArrayList<>(1);
-        Map<String, Object> map = new HashMap<>(2);
-        list.add(map);
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        Map<String, Object> map = super.propertiesMap(2);
         map.put("name", name.propertiesMap(false, generalSpec));
         map.put("expression", value.propertiesMap(true, generalSpec));
-        return list;
+        return map;
     }
 }

@@ -1,0 +1,195 @@
+/*
+Copyright (C) 2016 Bengt Martensson.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/.
+*/
+
+import "java.stg"
+
+FileSuffix() ::= "Renderer.java"
+
+FilePreamble() ::= <<
+package org.harctoolbox.render;
+
+import java.util.Map;
+import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSignal;
+
+>>
+
+ClassName() ::= "<metaData.cProtocolName>Renderer"
+
+NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
+public final class <ClassName()> extends IrpRenderer {
+    <ClassBody()>
+}
+>>
+
+ClassBody() ::= <<
+<Irp()>
+<Documentation()>
+    
+<DeclareStatic()>
+    
+<DeclareParameters()>
+    
+<DeclareAssignmentVariables()>
+    
+<DeclareParameterlessConstructor()>
+    
+<DeclareFrequency()>
+    
+<DeclareDutyCycle()>
+    
+<DeclareCompute()>
+    
+<DefineNames()>
+
+<TopFunctions()>
+    
+<DefineClassList()>
+>>
+
+DeclareCompute() ::= <<
+public IrSignal compute(<parameterSpecs.list:DeclareFormalParameter(); separator=", ">) {
+    <parameterSpecs.list:LocalAssignment(); separator="\n">
+    setup();
+    return getIrSignal();
+}
+
+@Override
+public IrSignal compute(Map\<String, <ImplementationType("parameterTypeClass")>\> map) {
+    <parameterSpecs.list:{p | <MapLocalAssignment(p)>;}; separator="\n">
+    setup();
+    return getIrSignal();
+}
+>>
+
+DeclareStatic() ::= <<
+// Static convenience functions
+public static IrSignal newIrSignal(<parameterSpecs.list:{p | <ImplementationType("parameterType")> <p.name>}; separator=", ">) {
+    <ClassName()> instance = new <ClassName()>();
+    return instance.compute(<parameterSpecs.list:{p | <p.name>}; separator=", ">);
+}
+
+public static IrSignal newIrSignal(Map\<String, <ImplementationType("parameterTypeClass")>\> map) {
+    <ClassName()> instance = new <ClassName()>();
+    return instance.compute(map);
+}
+>>
+
+/////////////// TOCHK
+//NameEngine(definitions) ::= <<
+//<definitions; separator=";\n">
+//>>
+
+DeclareFrequency() ::= <<
+@Override
+public <ImplementationType("frequencyType")> getFrequency() {
+    return <generalSpec.frequency><ImplementationType("frequencyTypeSuffix")>;
+}
+>>
+
+DeclareDutyCycle() ::= <<
+@Override
+public <ImplementationType("dutyCycleType")> getDutyCycle() {
+    return <generalSpec.dutyCycle><ImplementationType("dutyCycleTypeSuffix")>;
+}
+>>
+/////////////// TOCHK
+//DefineFlashGapExtent(hasExtent) ::= <<
+//static void INLINE flash(microseconds_t duration) {
+//<if(hasExtent)>
+//    sumOfDurations += duration;
+//<endif>
+//    on(duration);
+//}
+
+//static void INLINE gap(microseconds_t duration) {
+//<if(hasExtent)>
+//    sumOfDurations += duration;
+//<endif>
+//    off(duration);
+//}
+
+//<if(hasExtent)>
+//static void INLINE extent(microseconds_t duration) {
+//    off(duration - sumOfDurations);
+//}
+//<endif>
+//>>
+
+DefineClassList() ::= <<
+private static class LocalIrList extends IrpRenderer.IrList {
+<if(bitSpec.chunkSize)>
+    private <ImplementationType("parameterType")> pendingData = 0L;
+    private <ImplementationType("parameterType")> pendingBits = 0L;
+<endif>
+
+    @Override
+    void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
+    LocalIrList list = this;
+    <if(bitSpec.chunkSize)>
+    if (pendingBits > 0L) {
+        // This code is valid for msb only
+        data &= (1L \<\< width) - 1L;
+        data |= pendingData \<\< width;
+        width += pendingBits;
+        pendingBits = 0L;
+    }
+    if (width % <bitSpec.chunkSize>L != 0L) {
+        pendingData = data;
+        pendingBits = width;
+        width = 0L;
+    }
+    <endif>
+    
+    for (<ImplementationType("intType")> i = 0; i \< width; i<if(bitSpec.chunkSize)> += <bitSpec.chunkSize><else>++<endif>) {
+        switch(((<ImplementationType("intType")>)data \>> <ShiftBitSpec("i", "width")>) & <bitSpec.bitMask>) {
+            <bitSpec.list:{bitCode | <Case(i0, bitCode.items)>}; separator="\n">
+        }
+    }
+}
+>>
+
+TopFunction(passName, functionBody) ::= <<
+@Override
+protected LocalIrList setup<passName>() {
+    LocalIrList list = new LocalIrList();
+    <TopFunctionBody(functionBody)>
+    return list;
+}
+>>
+
+ResetDurationCounter() ::= ""
+
+FiniteBitField(fbf) ::= <<
+list.bitField(<if(fbf.complement)>~<endif><if(fbf.reverse)>IrCoreUtils.reverse<endif>(<(fbf.data.kind)(fbf.data)><if(fbf.reverse)>, (<ImplementationType("intType")>)<(fbf.width.kind)(fbf.width)><endif>)<Chop(fbf.chop)>, <(fbf.width.kind)(fbf.width)>)
+>>
+
+InfiniteBitFieldExpression(data, chop, complement) ::= <<
+<if(complement)>~<endif>((<data>) \>> (<chop>))
+>>
+
+FiniteBitFieldExpression(arg) ::= <<
+finiteBitField(<(arg.data.kind)(arg.data)>, <(arg.width.kind)(arg.width)>, <if(arg.chop)><(arg.chop.kind)(arg.chop)><else>0<endif>, <arg.complement>, <arg.reverse>)
+>>
+
+Flash(arg)          ::= "list.flash(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
+Gap(arg)            ::= "list.gap(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
+Extent(arg)         ::= "list.extent(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
+
+NameAsDefinition(name, eval)    ::= "<name>()"
+
+Exponentiate(arg1,arg2) ::= "IrpUtils.power(arg1,arg2)"

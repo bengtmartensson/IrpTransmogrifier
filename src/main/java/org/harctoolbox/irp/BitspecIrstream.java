@@ -269,10 +269,10 @@ public class BitspecIrstream extends IrStreamItem {
         return irStream;
     }
 
-    @Override
-    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
-        throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
-    }
+//    @Override
+//    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
+//        throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
+//    }
 
 //    public String code(GeneralSpec generalSpec, CodeGenerator codeGenerator) {
 //        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
@@ -289,7 +289,7 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(Pass state, Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec) {
         throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
     }
 }

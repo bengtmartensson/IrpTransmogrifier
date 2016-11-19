@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -318,7 +319,7 @@ public class BareIrStream extends IrStreamItem {
     public List<IrStreamItem> getIrStreamItems() {
         return irStreamItems;
     }
-
+/*
     public List<String> codeList(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
         List<String> list = new ArrayList<>(irStreamItems.size());
         for (IrStreamItem item : irStreamItems) {
@@ -354,7 +355,7 @@ public class BareIrStream extends IrStreamItem {
         ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
         st.addAttribute("body", list);
         return st.render();
-    }
+    }*/
 
     @Override
     public Set<String> assignmentVariables() {
@@ -366,8 +367,9 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
         List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
+        //List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
         for (IrStreamItem item : irStreamItems) {
 //            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
 //                IrStream irs = (IrStream) item;
@@ -378,9 +380,11 @@ public class BareIrStream extends IrStreamItem {
             if (nextState != null)
                 state = nextState;
             if (pass == null || pass == state) {
-                List<Map<String, Object>> lst = item.propertiesMapList(state, pass, generalSpec);
-                if (!lst.isEmpty())
-                    list.add(item.propertiesMapList(state, pass, generalSpec).get(0));
+                Map<String, Object> m = item.propertiesMap(state, pass, generalSpec);
+                if (!m.isEmpty())
+                    list.add(m);
+                    //list.add(item.propertiesMapList(state, pass, generalSpec).get(0));
+
             }
 
 //            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
@@ -395,6 +399,9 @@ public class BareIrStream extends IrStreamItem {
 
 //        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
 //        st.addAttribute("body", list);
-        return list;
+        Map<String, Object> result = new HashMap<>(2);
+        result.put("kind", "BareIrStream"); // NOT this.getClass...
+        result.put("items", list);
+        return result;
     }
 }

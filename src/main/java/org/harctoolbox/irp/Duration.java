@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -308,27 +307,27 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
 //        return st.render();
 //    }
 
-    @Override
-    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(this);
-        String arg = code(true, codeGenerator);
-        itemGenerator.addAttribute("arg", arg);
-        return itemGenerator.render();
-    }
+//    @Override
+//    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
+//        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(this);
+//        String arg = code(true, codeGenerator);
+//        itemGenerator.addAttribute("arg", arg);
+//        return itemGenerator.render();
+//    }
 
-    @Override
-    public String code(boolean eval, CodeGenerator codeGenerator) {
-        try {
-            long num = Math.round(toFloat(null, codeGenerator.getGeneralSpec()));
-            return Long.toString(num);
-        } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
-        }
-        ItemCodeGenerator s = codeGenerator.newItemCodeGenerator("mul");
-        String name = nameOrNumber.code(eval, codeGenerator);
-        s.addAttribute("arg1", name);
-        s.addAttribute("arg2", multiplicator(codeGenerator.getGeneralSpec()));
-        return s.render();
-    }
+//    @Override
+//    public String code(boolean eval, CodeGenerator codeGenerator) {
+//        try {
+//            long num = Math.round(toFloat(null, codeGenerator.getGeneralSpec()));
+//            return Long.toString(num);
+//        } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
+//        }
+//        ItemCodeGenerator s = codeGenerator.newItemCodeGenerator("mul");
+//        String name = nameOrNumber.code(eval, codeGenerator);
+//        s.addAttribute("arg1", name);
+//        s.addAttribute("arg2", multiplicator(codeGenerator.getGeneralSpec()));
+//        return s.render();
+//    }
 
     @Override
     public Set<String> assignmentVariables() {
@@ -336,12 +335,17 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
-        List<Map<String, Object>> list = new ArrayList<>(1);
-        Map<String, Object> map = new HashMap<>(2);
-        list.add(map);
-        map.put("duration", multiplicator(generalSpec));
-        map.put("isOn", this.isOn());
-        return list;
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+        Map<String, Object> map = new HashMap<>(3);
+        map.put("kind", this.getClass().getSimpleName());
+        try {
+            long num = Math.round(toFloat(null, generalSpec));
+            map.put("microseconds", num);
+            return map;
+        } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
+        }
+        map.put("name", nameOrNumber.toString());
+        map.put("multiplicator", multiplicator(generalSpec));
+        return map;
     }
 }

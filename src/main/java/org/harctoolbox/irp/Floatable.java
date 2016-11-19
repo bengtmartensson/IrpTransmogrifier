@@ -43,5 +43,5 @@ public interface Floatable {
 
     //public String code(boolean eval, GeneralSpec generalSpec, STGroup stGroup);
 
-    public String code(boolean eval, CodeGenerator codeGenerator);
+    //public String code(boolean eval, CodeGenerator codeGenerator);
 }

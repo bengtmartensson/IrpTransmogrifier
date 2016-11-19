@@ -229,18 +229,20 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
 //    }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+        Map<String, Object> result = new HashMap<>(2);
+        result.put("kind", this.getClass().getSimpleName());
         List<Map<String, Object>> list = new ArrayList<>(map.size());
-        for (ParameterSpec ps : map.values()) {
-            Map<String, Object> m = new HashMap<>(4);
+        result.put("list", list);
+        map.values().stream().forEach((ps) -> {
+            Map<String, Object> m = new HashMap<>(5);
+            list.add(m);
             m.put("name", ps.getName());
             m.put("min", ps.getMin());
             m.put("max", ps.getMax());
-            //if (ps.hasMemory())
-                m.put("memory", ps.hasMemory());
+            m.put("memory", ps.hasMemory());
             m.put("default", ps.getDefault());
-            list.add(m);
-        }
-        return list;
+        });
+        return result;
     }
 }

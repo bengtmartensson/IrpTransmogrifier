@@ -91,8 +91,8 @@ public class NameOrNumber extends IrpObject implements Floatable {
         return hash;
     }
 
-    @Override
-    public String code(boolean eval, CodeGenerator codeGenerator) {
-        return thing.code(eval, codeGenerator);
-    }
+//    @Override
+//    public String code(boolean eval, CodeGenerator codeGenerator) {
+//        return thing.code(eval, codeGenerator);
+//    }
 }

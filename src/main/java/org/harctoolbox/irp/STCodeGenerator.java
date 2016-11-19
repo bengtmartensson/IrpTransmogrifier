@@ -51,6 +51,15 @@ public class STCodeGenerator extends CodeGenerator {
         return cg.fileSuffix();
     }
 
+    // STGroupFile(String) throws IllegalArgumentException (extends RuntimeException)
+    // if the file is not found.
+    // This does not fit in here, so throw IOException if the file is not readable.
+    private static STGroupFile newSTGroupFile(File file) throws IOException {
+        if (!file.canRead())
+            throw new IOException("ST Group file " + file.getCanonicalPath() + " cannot be read.");
+        return new STGroupFile(file.getCanonicalPath());
+    }
+
     private STGroup stGroup;
 
     public STCodeGenerator(String target, GeneralSpec generalSpec, NameEngine nameEngine) throws IOException {
@@ -58,7 +67,7 @@ public class STCodeGenerator extends CodeGenerator {
     }
 
     public STCodeGenerator(File file, GeneralSpec generalSpec, NameEngine nameEngine) throws IOException {
-        this(new STGroupFile(file.getCanonicalPath()), generalSpec, nameEngine);
+        this(newSTGroupFile(file), generalSpec, nameEngine);
     }
 
     public STCodeGenerator(STGroup stGroup, GeneralSpec generalSpec, NameEngine nameEngine) {

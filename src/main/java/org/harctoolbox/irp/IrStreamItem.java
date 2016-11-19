@@ -104,9 +104,13 @@ public abstract class IrStreamItem extends IrpObject {
 
     public abstract boolean hasExtent();
 
-    public abstract String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator);
+    //public abstract String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator);
 
     public abstract Set<String> assignmentVariables();
 
-    public abstract List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec);
+    public abstract Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec);
+
+    protected Map<String, Object> propertiesMap(int noProperites) {
+        return IrpUtils.propertiesMap(noProperites, this);
+    }
 }

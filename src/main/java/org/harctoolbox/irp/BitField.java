@@ -16,9 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -121,25 +119,28 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         return false;
     }
 
-    public abstract String code(boolean eval, CodeGenerator codeGenerator);
+    //public abstract String code(boolean eval, CodeGenerator codeGenerator);
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
         //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
-        List<Map<String, Object>> list = new ArrayList<>(1);
-        Map<String, Object> map = new HashMap<>(5);
-        list.add(map);
+        Map<String, Object> map = new HashMap<>(6);
+        map.put("kind", this.getClass().getSimpleName());
         map.put("data", data.propertiesMap(true, generalSpec));
         //map.put("width", width.propertiesMap(true, generalSpec));
         try {
             long num = chop.toNumber(null);
             if (num != 0)
-                map.put("chop", num);
+                map.put("chop", chop.propertiesMap(true, generalSpec));
         } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
             map.put("chop", chop.propertiesMap(true, generalSpec));
         }
         map.put("complement", complement);
         //map.put("reverse", reverse);
-        return list;
+        return map;
+    }
+
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) throws IrpSyntaxException {
+        throw new IrpSyntaxException("Only finite bitfileds can be contrained in expressions");
     }
 }

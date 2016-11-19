@@ -1,0 +1,59 @@
+/*
+Copyright (C) 2016 Bengt Martensson.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/.
+*/
+
+import "infix.stg"
+
+// NOTE: C versions not having // as comment are not supported.
+
+beginComment()                ::= "/* "
+endComment()                  ::= " */"
+
+beginLineComment()            ::= "// "
+endLineComment()              ::= ""
+
+Case(number,codeList) ::= <<
+case <number>: {
+    <codeList:{stmt | <(stmt.kind)(stmt)>;}; separator="\n">
+}
+break;
+>>
+
+ShiftBitSpec(indexVariable,widthVariable) ::= <<
+<if(bitSpec.reverse)><indexVariable><else>(<widthVariable> - <indexVariable> - <if(bitSpec.chunkSize)><bitSpec.chunkSize><else>1<endif>)<endif>
+>>
+
+InitValue(v) ::= "<if(v)> = <v><endif>"
+Chop(chop) ::= "<if(chop)> >> (<(chop.kind)(chop)>)<endif>"
+
+InstanceVariableDefinition(type, name, initialValue) ::= <<
+static <ImplementationType(type)> <name><InitValue(initialValue)>;
+>>
+
+Repeat(body) ::= <<
+<if(body.repeats)>for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <body.repeats>; repeatCounter++) { <endif>
+<if(body.repeats)>    <endif><(body.repeatBody.kind)(body.repeatBody)>
+<if(body.repeats)>}<endif>
+>>
+
+Assignment(arg) ::= <<
+<(arg.name.kind)(arg.name)> = <(arg.expression.kind)(arg.expression)>
+>>
+
+Modulo(e)             ::= "(<(e.arg1.kind)(e.arg1)>)%(<(e.arg2.kind)(e.arg2)>)"
+BitwiseExclusiveOr(e) ::= "(<(e.arg1.kind)(e.arg1)>)^(<(e.arg2.kind)(e.arg2)>)"
+BitwiseAnd(e)         ::= "(<(e.arg1.kind)(e.arg1)>)&(<(e.arg2.kind)(e.arg2)>)"
+BitwiseOr(e)          ::= "(<(e.arg1.kind)(e.arg1)>)|(<(e.arg2.kind)(e.arg2)>)"

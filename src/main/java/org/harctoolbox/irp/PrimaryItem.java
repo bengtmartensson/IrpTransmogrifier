@@ -59,7 +59,11 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
 
     public abstract boolean isUnary();
 
-    public abstract String code(boolean eval, CodeGenerator codeGenerator);
+    //public abstract String code(boolean eval, CodeGenerator codeGenerator);
 
     public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec);
+
+    protected Map<String, Object> propertiesMap(int noProps) {
+        return IrpUtils.propertiesMap(noProps, this);
+    }
 }

@@ -292,29 +292,29 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return bitCodes.stream().anyMatch((bitCode) -> (bitCode.hasExtent()));
     }
 
-    public String code(CodeGenerator codeGenerator) {
-        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
-        st.addAttribute("arg1", code(false, codeGenerator));
-        st.addAttribute("arg2", code(true, codeGenerator));
+//    public String code(CodeGenerator codeGenerator) {
+//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
+//        st.addAttribute("arg1", code(false, codeGenerator));
+//        st.addAttribute("arg2", code(true, codeGenerator));
+///*
+//s1 = code(false, generalSpec, pass, codeGenerator);
+//        codeGenerator.addLine(code(true, generalSpec, pass, codeGenerator));
+//
+//        String normalBeginTemplateName  = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
+//        String reverseBeginTemplateName = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
+//        String normalEndTemplateName    = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
+//        String reverseEndTemplateName   = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
+//
+//        codeGenerator.newItemCodeGenerator("BitSpecBegin");
+//
+//        ItemCodeGenerator normalBeginTemplate  = codeGenerator.newItemCodeGenerator(normalBeginTemplateName);
+//        ItemCodeGenerator reverseBeginTemplate = codeGenerator.newItemCodeGenerator(reverseBeginTemplateName);
+//        ItemCodeGenerator normalEndTemplate    = codeGenerator.newItemCodeGenerator(normalEndTemplateName);
+//        ItemCodeGenerator reverseEndTemplate   = codeGenerator.newItemCodeGenerator(reverseEndTemplateName);
+//*/
+//        return st.render();
+//    }
 /*
-s1 = code(false, generalSpec, pass, codeGenerator);
-        codeGenerator.addLine(code(true, generalSpec, pass, codeGenerator));
-
-        String normalBeginTemplateName  = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
-        String reverseBeginTemplateName = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
-        String normalEndTemplateName    = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
-        String reverseEndTemplateName   = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
-
-        codeGenerator.newItemCodeGenerator("BitSpecBegin");
-
-        ItemCodeGenerator normalBeginTemplate  = codeGenerator.newItemCodeGenerator(normalBeginTemplateName);
-        ItemCodeGenerator reverseBeginTemplate = codeGenerator.newItemCodeGenerator(reverseBeginTemplateName);
-        ItemCodeGenerator normalEndTemplate    = codeGenerator.newItemCodeGenerator(normalEndTemplateName);
-        ItemCodeGenerator reverseEndTemplate   = codeGenerator.newItemCodeGenerator(reverseEndTemplateName);
-*/
-        return st.render();
-    }
-
     private String code(boolean reverse, CodeGenerator codeGenerator) {
         List<String> list = new ArrayList<>(bitCodes.size());
         for (int i = 0; i < bitCodes.size(); i++) {
@@ -336,7 +336,7 @@ s1 = code(false, generalSpec, pass, codeGenerator);
         if (chunkSize > 1)
             bitSpecTemplate.addAttribute("chunkSize", chunkSize);
         return bitSpecTemplate.render();
-    }
+    }*/
 /*
     private String code(boolean reverse, CodeGenerator codeGenerator) {
         List<String> list = new ArrayList<>(bitCodes.size());
@@ -361,6 +361,27 @@ s1 = code(false, generalSpec, pass, codeGenerator);
         return bitSpecTemplate.render();
     }*/
 
+    private List<Map<String, Object>> propertiesMap(boolean reverse, GeneralSpec generalSpec) {
+        List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
+        for (BareIrStream bitCode : bitCodes) {
+            Map<String, Object> map = bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec);
+            list.add(map);
+        }
+
+//        String normalStr  = reverse == (generalSpec.getBitDirection() == BitDirection.msb) ? "Lsb" : "Msb";
+//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BitSpec" + normalStr);
+//
+//        st.addAttribute("chunkSize", chunkSize);
+//
+//
+//
+//        ItemCodeGenerator bitSpecTemplate  = codeGenerator.newItemCodeGenerator(reverse ? "ReverseBitSpec" : "NormalBitSpec");
+//        bitSpecTemplate.addAttribute("body", st.render());
+//        if (chunkSize > 1)
+//            bitSpecTemplate.addAttribute("chunkSize", chunkSize);
+        return list;
+    }
+
     Set<String> assignmentVariables() {
         Set<String> list = new HashSet<>(1);
         bitCodes.stream().forEach((bitCode) -> {
@@ -375,13 +396,43 @@ s1 = code(false, generalSpec, pass, codeGenerator);
 //    }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec) {
-        List<Map<String,Object>> list = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>();
-        map.put("chunkSize", chunkSize);
-        map.put("normal", "normal");
-        map.put("reverse", "reverse");
-        list.add(map);
-        return list;
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+        Map<String, Object> map = new HashMap<>(7);
+        if (chunkSize > 1)
+            map.put("chunkSize", chunkSize);
+        map.put("bitMask", IrCoreUtils.ones(chunkSize));
+        map.put("size", bitCodes.size());
+        map.put("standardPwm", isPWM(2, new NameEngine(), new GeneralSpec()));
+        map.put("standardBiPhase", isStandardBiPhase(new NameEngine(), new GeneralSpec()));
+        map.put("reverse", generalSpec.getBitDirection() == BitDirection.lsb);
+//        List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
+//        for (BareIrStream bitCode : bitCodes)
+//            list.add(bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec));
+
+        map.put("list", propertiesMap(false, generalSpec));
+        //map.put("reverseList", propertiesMap(true, generalSpec));
+
+//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
+//        st.addAttribute("arg1", code(false, codeGenerator));
+//        st.addAttribute("arg2", code(true, codeGenerator));
+///*
+//s1 = code(false, generalSpec, pass, codeGenerator);
+//        codeGenerator.addLine(code(true, generalSpec, pass, codeGenerator));
+//
+//        String normalBeginTemplateName  = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
+//        String reverseBeginTemplateName = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbBegin" : "BitSpecMsbBegin";
+//        String normalEndTemplateName    = generalSpec.getBitDirection() == BitDirection.lsb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
+//        String reverseEndTemplateName   = generalSpec.getBitDirection() == BitDirection.msb ? "BitSpecLsbEnd"   : "BitSpecMsbEnd";
+//
+//        codeGenerator.newItemCodeGenerator("BitSpecBegin");
+//
+//        ItemCodeGenerator normalBeginTemplate  = codeGenerator.newItemCodeGenerator(normalBeginTemplateName);
+//        ItemCodeGenerator reverseBeginTemplate = codeGenerator.newItemCodeGenerator(reverseBeginTemplateName);
+//        ItemCodeGenerator normalEndTemplate    = codeGenerator.newItemCodeGenerator(normalEndTemplateName);
+//        ItemCodeGenerator reverseEndTemplate   = codeGenerator.newItemCodeGenerator(reverseEndTemplateName);
+//*/
+//        return st.render();
+//    }
+        return map;
     }
 }

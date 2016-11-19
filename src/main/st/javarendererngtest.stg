@@ -1,0 +1,108 @@
+/*
+Copyright (C) 2016 Bengt Martensson.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/.
+*/
+
+import "java.stg"
+
+FileSuffix() ::= "RendererNGTest.java"
+
+FilePreamble() ::= <<
+package org.harctoolbox.render;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.irp.*;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
+import org.xml.sax.SAXException;
+
+>>
+
+ClassName() ::= "<metaData.cProtocolName>RendererNGTest"
+
+NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
+public class <ClassName()> {
+    <ClassBody()>
+}
+>>
+
+ClassBody() ::= <<
+<DeclareStatic()>
+    
+<DeclareParameterlessConstructor()>
+    
+<DeclareCompute()>
+>>
+
+DeclareParameterlessConstructor() ::= <<
+public <ClassName()>() throws IOException, SAXException, IncompatibleArgumentException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
+    irpDatabase = new IrpDatabase(configFile);
+    irpDatabase.expand();
+    prot = irpDatabase.getNamedProtocol("<metaData.protocolName>");
+}
+>>
+
+DeclareCompute() ::= <<
+private void testNewIrSignalParameters(<parameterSpecs.list:DeclareFormalParameter(); separator=", ">) {
+    Map\<String, Long> map = new HashMap\<>(<length(parameterSpecs.list)>);
+    <parameterSpecs.list:{p|map.put("<p.name>", <p.name>);}; separator="\n">
+    testMap(map);
+}
+
+public void testMap(Map\<String, Long> map) {
+    try {
+        NameEngine nameEngine = new NameEngine(map);
+        //System.out.println(nameEngine);
+        IrSignal expResult = prot.toIrSignal(nameEngine);
+        IrSignal result = NEC1Renderer.newIrSignal(map);
+        assertTrue(result.approximatelyEquals(expResult));
+    } catch (IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | IrpSyntaxException | DomainViolationException ex) {
+        fail();
+    }
+}
+
+/**
+ * Exhaustive test of newIrSignal method, of class <metaData.cProtocolName>Renderer.
+ */
+//@Test
+public void testNewIrSignalExhaustive() {
+    System.out.println("newIrSignalExhaustive");
+    <parameterSpecs.list:{p|for (long <p.name> = <p.min>; <p.name> \<= <p.max>; <p.name>++)}; separator="\n">
+        testNewIrSignalParameters(D, S, F);
+}
+
+/**
+  * Test of newIrSignal method, of class RC5Renderer.
+  */
+ @Test
+ public void testNewIrSignal() throws IrpSyntaxException {
+    System.out.println("newIrSignal@<metaData.protocolName>");
+    for (int i = 0; i \< noRandomTests; i++)
+        testMap(prot.randomParameters());
+ }
+>>
+
+DeclareStatic() ::= <<
+private final static String configFile = "../IrpTransmogrifier/src/main/config/IrpProtocols.xml";
+private final static int noRandomTests = 10;
+
+private final IrpDatabase irpDatabase;
+private final NamedProtocol prot;
+>>

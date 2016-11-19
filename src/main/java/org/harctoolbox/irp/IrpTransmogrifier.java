@@ -424,7 +424,7 @@ public class IrpTransmogrifier {
                     filename = file.getCanonicalPath();
                     out = IrpUtils.getPrintSteam(filename);
                 }
-                String code = protocol.code(commandCode.target);// contains a trailing newline
+                String code = protocol.code(commandCode.target, commandCode.inspect);// contains a trailing newline
                 out.print(code);
                 if (filename != null)
                     logger.log(Level.INFO, "Wrote {0}", filename);
@@ -817,6 +817,9 @@ public class IrpTransmogrifier {
 //
 //        @Parameter(names = {"-i", "--irp"}, description = "List irp")
 //        private boolean irp = false;
+
+        @Parameter(names = {       "--inspect" }, description = "Fire up strintemplate inspector on generated code")
+        private boolean inspect = false;
 
         @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files (unless using --stringtemplate)")
         private boolean intermediates = false;

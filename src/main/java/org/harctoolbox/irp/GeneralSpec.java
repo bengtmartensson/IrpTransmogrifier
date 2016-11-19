@@ -17,9 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -213,12 +211,11 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
 //    }
 
     @Override
-    public List<Map<String, Object>> propertiesMapList(GeneralSpec generalSpec) {
-        List<Map<String,Object>> list = new ArrayList<>(1);
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
         Map<String, Object> map = new HashMap<>(2);
+        // bitDirection and unit deliberately left out
         map.put("frequency", frequency);
         map.put("dutyCycle", dutyCycle);
-        list.add(map);
-        return list;
+        return map;
     }
 }

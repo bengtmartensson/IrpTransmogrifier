@@ -1,0 +1,13 @@
+import "generic.stg"
+
+UnaryMinus(e)   ::= "-(<(e.arg.kind)(e.arg)>)"
+
+Add(e)          ::= "(<(e.arg1.kind)(e.arg1)>)+(<(e.arg2.kind)(e.arg2)>)"
+Subtract(e)     ::= "(<(e.arg1.kind)(e.arg1)>)-(<(e.arg2.kind)(e.arg2)>)"
+Multiply(e)     ::= "(<(e.arg1.kind)(e.arg1)>)*(<(e.arg2.kind)(e.arg2)>)"
+Divide(e)       ::= "(<(e.arg1.kind)(e.arg1)>)/(<(e.arg2.kind)(e.arg2)>)"
+
+//add(arg1,arg2)      ::= "<arg1>+<arg2>"
+//sub(arg1,arg2)      ::= "<arg1>-<arg2>"
+//mul(arg1,arg2)      ::= "<arg1>*<arg2>"
+//div(arg1,arg2)      ::= "<arg1>/<arg2>"

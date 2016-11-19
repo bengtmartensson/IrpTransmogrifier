@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -169,16 +168,17 @@ public class Name extends PrimaryItem implements Floatable {
         return true;
     }
 
-    @Override
-    public String code(boolean eval, CodeGenerator codeGenerator) {
-        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(codeGenerator.getNameEngine().containsKey(name) ? "NameAsDefinition" : "Name");
-        itemGenerator.addAttribute("name", name);
-        itemGenerator.addAttribute("eval", eval);
-        return itemGenerator.render();
-    }
+//    @Override
+//    public String code(boolean eval, CodeGenerator codeGenerator) {
+//        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(codeGenerator.getNameEngine().containsKey(name) ? "NameAsDefinition" : "Name");
+//        itemGenerator.addAttribute("name", name);
+//        itemGenerator.addAttribute("eval", eval);
+//        return itemGenerator.render();
+//    }
 
+    @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) {
-        Map<String, Object> map = new HashMap<>(2);
+        Map<String, Object> map = super.propertiesMap(2);
         map.put("name", name);
         map.put("eval", eval);
         return map;

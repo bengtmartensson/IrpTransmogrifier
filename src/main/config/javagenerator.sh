@@ -8,10 +8,10 @@ JAR=${IRPHOME}/${project.name}-${project.version}-jar-with-dependencies.jar
 CONFIG=${IRPHOME}/IrpProtocols.xml
 
 "${JAVA}" -Djava.library.path="${DECODEIRDIR}" -jar "${JAR}" -c "${CONFIG}" \
-    code -s --target java \
+    code -s --target javarenderer \
     --directory ${IRPHOME}/../../JavaIrpProtocolTest/src/main/java/org/harctoolbox/render \
     "$@"
 "${JAVA}" -Djava.library.path="${DECODEIRDIR}" -jar "${JAR}" -c "${CONFIG}" \
-    code -s --target javangtest \
+    code -s --target javarendererngtest \
     --directory ${IRPHOME}/../../JavaIrpProtocolTest/src/test/java/org/harctoolbox/render \
     "$@"

@@ -395,7 +395,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     }
 
     @Override
-    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> result = new HashMap<>(2);
         result.put("kind", this.getClass().getSimpleName());
         List<Map<String, Object>> list = new ArrayList<>(map.size());
@@ -403,7 +403,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             Map<String, Object> m = new HashMap<>(2);
             m.put("name", kvp.getKey());
-            m.put("expression", kvp.getValue().propertiesMap(true, generalSpec));
+            m.put("expression", kvp.getValue().propertiesMap(true, generalSpec, nameEngine));
             list.add(m);
         }
         return result;

@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -122,25 +121,22 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     //public abstract String code(boolean eval, CodeGenerator codeGenerator);
 
     @Override
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
-        Map<String, Object> map = new HashMap<>(6);
-        map.put("kind", this.getClass().getSimpleName());
-        map.put("data", data.propertiesMap(true, generalSpec));
+        Map<String, Object> map = IrpUtils.propertiesMap(6, this);
+        map.put("data", data.propertiesMap(true, generalSpec, nameEngine));
         //map.put("width", width.propertiesMap(true, generalSpec));
         try {
             long num = chop.toNumber(null);
             if (num != 0)
-                map.put("chop", chop.propertiesMap(true, generalSpec));
+                map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
-            map.put("chop", chop.propertiesMap(true, generalSpec));
+            map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         }
         map.put("complement", complement);
         //map.put("reverse", reverse);
         return map;
     }
 
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) throws IrpSyntaxException {
-        throw new IrpSyntaxException("Only finite bitfileds can be contrained in expressions");
-    }
+    public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSyntaxException;
 }

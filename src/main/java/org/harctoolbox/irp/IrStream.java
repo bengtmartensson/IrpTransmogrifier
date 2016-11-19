@@ -337,20 +337,20 @@ public class IrStream extends BareIrStream implements AggregateLister {
 //    }
 
     @Override
-    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> m = new HashMap<>(3);
-        m.put("intro", propertiesMap(IrSignal.Pass.intro, generalSpec));
-        m.put("repeat", propertiesMap(IrSignal.Pass.repeat, generalSpec));
-        m.put("ending", propertiesMap(IrSignal.Pass.ending, generalSpec));
+        m.put("intro", propertiesMap(IrSignal.Pass.intro, generalSpec, nameEngine));
+        m.put("repeat", propertiesMap(IrSignal.Pass.repeat, generalSpec, nameEngine));
+        m.put("ending", propertiesMap(IrSignal.Pass.ending, generalSpec, nameEngine));
         return m;
     }
 
-    private Map<String, Object> propertiesMap(Pass pass, GeneralSpec generalSpec) {
+    private Map<String, Object> propertiesMap(Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> m = new HashMap<>(3);
         m.put("kind", "FunktionBody");
 
         Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
-        Map<String, Object> body = propertiesMap(state, pass, generalSpec);
+        Map<String, Object> body = propertiesMap(state, pass, generalSpec, nameEngine);
         m.put("irStream", body);
 //        template.addAttribute("body", body);
 //        if (!body.isEmpty() && hasExtent())
@@ -362,7 +362,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> m = new HashMap<>(2);
         m.put("kind", "Repeat");
 
@@ -370,7 +370,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         if (repetitions == 0)
             return new HashMap<>(0);
-        Map<String, Object> body = super.propertiesMap(state, pass, generalSpec);
+        Map<String, Object> body = super.propertiesMap(state, pass, generalSpec, nameEngine);
 //        template.addAttribute("body", body);
 //        if (repetitions == 1)
 //            return template.render();

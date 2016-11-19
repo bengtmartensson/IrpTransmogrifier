@@ -367,7 +367,7 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
         //List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
         for (IrStreamItem item : irStreamItems) {
@@ -380,7 +380,7 @@ public class BareIrStream extends IrStreamItem {
             if (nextState != null)
                 state = nextState;
             if (pass == null || pass == state) {
-                Map<String, Object> m = item.propertiesMap(state, pass, generalSpec);
+                Map<String, Object> m = item.propertiesMap(state, pass, generalSpec, nameEngine);
                 if (!m.isEmpty())
                     list.add(m);
                     //list.add(item.propertiesMapList(state, pass, generalSpec).get(0));

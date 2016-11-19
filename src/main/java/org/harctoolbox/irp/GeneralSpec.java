@@ -211,7 +211,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
 //    }
 
     @Override
-    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = new HashMap<>(2);
         // bitDirection and unit deliberately left out
         map.put("frequency", frequency);

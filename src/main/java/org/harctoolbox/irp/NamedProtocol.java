@@ -140,13 +140,13 @@ public class NamedProtocol extends Protocol {
 //        template.addAttribute("irp", getIrp());
 //        template.addAttribute("documentation", IrCoreUtils.javaifyString(getDocumentation()));
         template.addAggregateList("metaData", metaData());
-        template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec());
-        template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec());
+        template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec(), getDefinitions());
+        template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec(), getDefinitions());
         Set<String> variables = getBitspecIrstream().assignmentVariables();
         Set<String> params = getParameterSpecs().getNames();
         variables.removeAll(params);
         template.addAttribute("assignmentVariables", variables);
-        template.addAggregateList("definitions", getDefinitions(), getGeneralSpec());
+        template.addAggregateList("definitions", getDefinitions(), getGeneralSpec(), getDefinitions());
 //        template.addAttribute("hasExtent", hasExtent());
 
 //        if (hasExtent()) {
@@ -162,8 +162,8 @@ public class NamedProtocol extends Protocol {
 //            template.addAttribute("defineFlashGapExtent", st.render());
 //        }
 
-        template.addAggregateList("code", getBitspecIrstream().getIrStream(), getGeneralSpec());
-        template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec());
+        template.addAggregateList("code", getBitspecIrstream().getIrStream(), getGeneralSpec(), getDefinitions());
+        template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec(), getDefinitions());
         //template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec());
 //        if (getBitspecIrstream().getBitSpec().getChunkSize() > 1)
 //            template.addAttribute("chunkSize", getBitspecIrstream().getBitSpec().getChunkSize());

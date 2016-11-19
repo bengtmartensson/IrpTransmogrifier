@@ -39,11 +39,11 @@ ProtocolNameComment(protocolName) ::= <<
 >>
 
 TopFunctions() ::= <<
-<TopFunction("intro", code.intro)>
+<TopFunction("Intro", code.intro)>
     
-<TopFunction("repeat", code.repeat)>
+<TopFunction("Repeat", code.repeat)>
     
-<TopFunction("ending", code.ending)>
+<TopFunction("Ending", code.ending)>
 >>
 
 implementationTypes ::= [
@@ -67,7 +67,6 @@ TopFunctionBody(functionBody) ::= <<
 <if(functionBody.irStream.kind)><(functionBody.irStream.kind)(functionBody.irStream)><endif>
 >>
 
-Expression(e)       ::= "<(e.type)(e)>"
+Expression(e)       ::= "<(e.kind)(e)>"
 
-Number(arg)         ::= "<arg.value>"
-Name(arg)           ::= "<arg.name>"
+Number(arg)         ::= "<arg.value><ImplementationType(\"parameterTypeSuffix\")>"

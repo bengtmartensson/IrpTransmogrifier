@@ -58,8 +58,8 @@ public class STItemCodeGenerator extends ItemCodeGenerator {
     }
 
     @Override
-    public void addAggregateList(String name, AggregateLister aggregateLister, GeneralSpec generalSpec) {
-        Map<String, Object> map = aggregateLister.propertiesMap(generalSpec);
+    public void addAggregateList(String name, AggregateLister aggregateLister, GeneralSpec generalSpec, NameEngine nameEngine) {
+        Map<String, Object> map = aggregateLister.propertiesMap(generalSpec, nameEngine);
         addAggregateList(name, map);
     }
 

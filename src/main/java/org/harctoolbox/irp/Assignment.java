@@ -183,10 +183,10 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = super.propertiesMap(2);
-        map.put("name", name.propertiesMap(false, generalSpec));
-        map.put("expression", value.propertiesMap(true, generalSpec));
+        map.put("name", name.propertiesMap(false, generalSpec, nameEngine));
+        map.put("expression", value.propertiesMap(true, generalSpec, nameEngine));
         return map;
     }
 }

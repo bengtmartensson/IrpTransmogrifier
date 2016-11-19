@@ -201,9 +201,9 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         BareIrStream actual = select(pass);
         //return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
-        return actual.propertiesMap(state, pass, generalSpec);
+        return actual.propertiesMap(state, pass, generalSpec, nameEngine);
     }
 }

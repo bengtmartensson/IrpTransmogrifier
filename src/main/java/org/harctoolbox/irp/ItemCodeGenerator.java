@@ -29,7 +29,7 @@ public abstract class ItemCodeGenerator {
 
     public abstract void addAggregate(String string, Object... args);
 
-    public abstract void addAggregateList(String name, AggregateLister aggregateLister, GeneralSpec generalSpec);
+    public abstract void addAggregateList(String name, AggregateLister aggregateLister, GeneralSpec generalSpec, NameEngine nameEngine);
 
     public abstract void addAggregateList(String name, Map<String, Object> map);
 

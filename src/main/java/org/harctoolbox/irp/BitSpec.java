@@ -361,10 +361,10 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return bitSpecTemplate.render();
     }*/
 
-    private List<Map<String, Object>> propertiesMap(boolean reverse, GeneralSpec generalSpec) {
+    private List<Map<String, Object>> propertiesMap(boolean reverse, GeneralSpec generalSpec, NameEngine nameEngine) {
         List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
         for (BareIrStream bitCode : bitCodes) {
-            Map<String, Object> map = bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec);
+            Map<String, Object> map = bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
             list.add(map);
         }
 
@@ -396,7 +396,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 //    }
 
     @Override
-    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = new HashMap<>(7);
         if (chunkSize > 1)
             map.put("chunkSize", chunkSize);
@@ -409,7 +409,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 //        for (BareIrStream bitCode : bitCodes)
 //            list.add(bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec));
 
-        map.put("list", propertiesMap(false, generalSpec));
+        map.put("list", propertiesMap(false, generalSpec, nameEngine));
         //map.put("reverseList", propertiesMap(true, generalSpec));
 
 //        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);

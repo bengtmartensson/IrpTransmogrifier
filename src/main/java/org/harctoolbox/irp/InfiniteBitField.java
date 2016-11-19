@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -152,5 +153,12 @@ public class InfiniteBitField extends BitField {
     @Override
     public Set<String> assignmentVariables() {
         return new HashSet<>(0);
+    }
+
+    @Override
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
+        Map<String, Object> map = propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
+        map.put("kind", "InfiniteBitFieldExpression");
+        return map;
     }
 }

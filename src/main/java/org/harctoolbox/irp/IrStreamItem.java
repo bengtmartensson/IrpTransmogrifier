@@ -108,7 +108,7 @@ public abstract class IrStreamItem extends IrpObject {
 
     public abstract Set<String> assignmentVariables();
 
-    public abstract Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec);
+    public abstract Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine);
 
     protected Map<String, Object> propertiesMap(int noProperites) {
         return IrpUtils.propertiesMap(noProperites, this);

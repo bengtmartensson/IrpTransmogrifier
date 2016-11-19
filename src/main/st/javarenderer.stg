@@ -89,11 +89,6 @@ public static IrSignal newIrSignal(Map\<String, <ImplementationType("parameterTy
 }
 >>
 
-/////////////// TOCHK
-//NameEngine(definitions) ::= <<
-//<definitions; separator=";\n">
-//>>
-
 DeclareFrequency() ::= <<
 @Override
 public <ImplementationType("frequencyType")> getFrequency() {
@@ -107,57 +102,35 @@ public <ImplementationType("dutyCycleType")> getDutyCycle() {
     return <generalSpec.dutyCycle><ImplementationType("dutyCycleTypeSuffix")>;
 }
 >>
-/////////////// TOCHK
-//DefineFlashGapExtent(hasExtent) ::= <<
-//static void INLINE flash(microseconds_t duration) {
-//<if(hasExtent)>
-//    sumOfDurations += duration;
-//<endif>
-//    on(duration);
-//}
-
-//static void INLINE gap(microseconds_t duration) {
-//<if(hasExtent)>
-//    sumOfDurations += duration;
-//<endif>
-//    off(duration);
-//}
-
-//<if(hasExtent)>
-//static void INLINE extent(microseconds_t duration) {
-//    off(duration - sumOfDurations);
-//}
-//<endif>
-//>>
 
 DefineClassList() ::= <<
 private static class LocalIrList extends IrpRenderer.IrList {
 <if(bitSpec.chunkSize)>
-    private <ImplementationType("parameterType")> pendingData = 0L;
-    private <ImplementationType("parameterType")> pendingBits = 0L;
+    private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
+    private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
 <endif>
 
     @Override
     void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
-    LocalIrList list = this;
-    <if(bitSpec.chunkSize)>
-    if (pendingBits > 0L) {
-        // This code is valid for msb only
-        data &= (1L \<\< width) - 1L;
-        data |= pendingData \<\< width;
-        width += pendingBits;
-        pendingBits = 0L;
-    }
-    if (width % <bitSpec.chunkSize>L != 0L) {
-        pendingData = data;
-        pendingBits = width;
-        width = 0L;
-    }
-    <endif>
-    
-    for (<ImplementationType("intType")> i = 0; i \< width; i<if(bitSpec.chunkSize)> += <bitSpec.chunkSize><else>++<endif>) {
-        switch(((<ImplementationType("intType")>)data \>> <ShiftBitSpec("i", "width")>) & <bitSpec.bitMask>) {
-            <bitSpec.list:{bitCode | <Case(i0, bitCode.items)>}; separator="\n">
+        LocalIrList list = this;
+        <if(bitSpec.chunkSize)>
+        if (pendingBits > 0<ImplementationType("parameterTypeSuffix")>) {
+            // This code is valid for msb only
+            data &= (1<ImplementationType("parameterTypeSuffix")> \<\< width) - 1<ImplementationType("parameterTypeSuffix")>;
+            data |= pendingData \<\< width;
+            width += pendingBits;
+            pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
+        }
+        if (width % <bitSpec.chunkSize><ImplementationType("parameterTypeSuffix")> != 0<ImplementationType("parameterTypeSuffix")>) {
+            pendingData = data;
+            pendingBits = width;
+            width = 0<ImplementationType("parameterTypeSuffix")>;
+        }
+        <endif>
+        for (<ImplementationType("intType")> i = 0; i \< (<ImplementationType("intType")>) width; i<if(bitSpec.chunkSize)> += <bitSpec.chunkSize><else>++<endif>) {
+            switch(((<ImplementationType("intType")>)data \>> <ShiftBitSpec("i", "width")>) & <bitSpec.bitMask>) {
+                <bitSpec.list:{bitCode | <Case(i0, bitCode.items)>}; separator="\n">
+            }
         }
     }
 }
@@ -178,8 +151,8 @@ FiniteBitField(fbf) ::= <<
 list.bitField(<if(fbf.complement)>~<endif><if(fbf.reverse)>IrCoreUtils.reverse<endif>(<(fbf.data.kind)(fbf.data)><if(fbf.reverse)>, (<ImplementationType("intType")>)<(fbf.width.kind)(fbf.width)><endif>)<Chop(fbf.chop)>, <(fbf.width.kind)(fbf.width)>)
 >>
 
-InfiniteBitFieldExpression(data, chop, complement) ::= <<
-<if(complement)>~<endif>((<data>) \>> (<chop>))
+InfiniteBitFieldExpression(arg) ::= <<
+<if(arg.complement)>~<endif>((<(arg.data.kind)(arg.data)>) \>> (<(arg.chop.kind)(arg.chop)>))
 >>
 
 FiniteBitFieldExpression(arg) ::= <<

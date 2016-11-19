@@ -442,7 +442,7 @@ public class Protocol extends IrpObject {
     }
 
     public GeneralSpec getGeneralSpec() {
-        return this.generalSpec;
+        return generalSpec;
     }
 
     protected ParameterSpecs getParameterSpecs() {

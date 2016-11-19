@@ -20,5 +20,5 @@ package org.harctoolbox.irp;
 import java.util.Map;
 
 public interface AggregateLister {
-    public Map<String, Object> propertiesMap(GeneralSpec generalSpec);
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine);
 }

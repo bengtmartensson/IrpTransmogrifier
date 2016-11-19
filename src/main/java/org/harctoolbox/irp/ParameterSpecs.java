@@ -229,7 +229,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
 //    }
 
     @Override
-    public Map<String, Object> propertiesMap(GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> result = new HashMap<>(2);
         result.put("kind", this.getClass().getSimpleName());
         List<Map<String, Object>> list = new ArrayList<>(map.size());

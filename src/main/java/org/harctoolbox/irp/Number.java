@@ -134,7 +134,7 @@ public class Number extends PrimaryItem {
 //    }
 
     @Override
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = super.propertiesMap(1);
         map.put("value", toString());
         return map;

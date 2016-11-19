@@ -271,13 +271,13 @@ public class Expression extends PrimaryItem {
 
             case 2:
                 op = document.createElement("UnaryOperator");
-                op.setAttribute("type", parseTree.children.get(0).getText());
+                op.setAttribute("kind", parseTree.children.get(0).getText());
                 element.appendChild(op);
                 op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
                 break;
             case 3:
                 op = document.createElement("BinaryOperator");
-                op.setAttribute("type", parseTree.children.get(1).getText());
+                op.setAttribute("kind", parseTree.children.get(1).getText());
                 element.appendChild(op);
                 op.appendChild(new Expression(parseTree.expression(0)).toElement(document));
                 op.appendChild(new Expression(parseTree.expression(1)).toElement(document));
@@ -443,7 +443,7 @@ public class Expression extends PrimaryItem {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = super.propertiesMap(10);
         if (parseTree == null)
             return map;
@@ -453,11 +453,11 @@ public class Expression extends PrimaryItem {
                 ParseTree child = parseTree.children.get(0);
 
                 if (child instanceof IrpParser.Primary_itemContext)
-                    return newPrimaryItem((IrpParser.Primary_itemContext) child).propertiesMap(eval, generalSpec);
+                    return newPrimaryItem((IrpParser.Primary_itemContext) child).propertiesMap(eval, generalSpec, nameEngine);
                 else if (child instanceof IrpParser.BitfieldContext)
                     try {
                         BitField bf = BitField.newBitField((IrpParser.BitfieldContext) child);
-                            map = bf.propertiesMap(eval, generalSpec);
+                        map = bf.propertiesMap(eval, generalSpec, nameEngine);
                     } catch (IrpSyntaxException ex) {
                         Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex); // FIXME
                     }
@@ -476,9 +476,9 @@ public class Expression extends PrimaryItem {
                         : operator.equals("-") ? "UnaryMinus"
                         : operator.equals("#") ? "BitCount"
                         : "Error";
-                map.put("type", type);
+                map.put("kind", type);
                 //ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(templateName);
-                Map<String, Object> arg = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec);
+                Map<String, Object> arg = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine);
                 map.put("arg", arg);
                 //itemGenerator.addAttribute("arg", arg);
                 //return itemGenerator.render();
@@ -508,11 +508,11 @@ public class Expression extends PrimaryItem {
                         : operator.equals("&&") ? "And"
                         : operator.equals("||") ? "Or"
                         : "Error";
-                map.put("type", type);
+                map.put("kind", type);
                 //ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(templateName);
-                Map<String, Object> arg1 = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec);
+                Map<String, Object> arg1 = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine);
                 map.put("arg1", arg1);
-                Map<String, Object> arg2 = new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec);
+                Map<String, Object> arg2 = new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec, nameEngine);
                 map.put("arg2", arg2);
                 //itemGenerator.addAttribute("arg1", arg1);
                 //itemGenerator.addAttribute("arg2", arg2);
@@ -528,10 +528,10 @@ public class Expression extends PrimaryItem {
 //                        + ")";
             case 5: {
                 //ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator("Conditional");
-                map.put("type", "ConditionalOp");
-                map.put("arg1", new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec));
-                map.put("arg2", new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec));
-                map.put("arg3", new Expression(parseTree.expression(2)).propertiesMap(eval, generalSpec));
+                map.put("kind", "ConditionalOp");
+                map.put("arg1", new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine));
+                map.put("arg2", new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec, nameEngine));
+                map.put("arg3", new Expression(parseTree.expression(2)).propertiesMap(eval, generalSpec, nameEngine));
                 break;
             }
 //                return "("

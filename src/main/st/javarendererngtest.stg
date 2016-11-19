@@ -35,7 +35,8 @@ import org.xml.sax.SAXException;
 
 >>
 
-ClassName() ::= "<metaData.cProtocolName>RendererNGTest"
+RendererClassName() ::= "<metaData.cProtocolName>Renderer"
+ClassName() ::= "<RendererClassName()>NGTest"
 
 NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
 public class <ClassName()> {
@@ -71,7 +72,7 @@ public void testMap(Map\<String, Long> map) {
         NameEngine nameEngine = new NameEngine(map);
         //System.out.println(nameEngine);
         IrSignal expResult = prot.toIrSignal(nameEngine);
-        IrSignal result = NEC1Renderer.newIrSignal(map);
+        IrSignal result = <RendererClassName()>.newIrSignal(map);
         assertTrue(result.approximatelyEquals(expResult));
     } catch (IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | IrpSyntaxException | DomainViolationException ex) {
         fail();
@@ -79,17 +80,17 @@ public void testMap(Map\<String, Long> map) {
 }
 
 /**
- * Exhaustive test of newIrSignal method, of class <metaData.cProtocolName>Renderer.
+ * Exhaustive test of newIrSignal method, of class <RendererClassName()>.
  */
 //@Test
 public void testNewIrSignalExhaustive() {
     System.out.println("newIrSignalExhaustive");
-    <parameterSpecs.list:{p|for (long <p.name> = <p.min>; <p.name> \<= <p.max>; <p.name>++)}; separator="\n">
-        testNewIrSignalParameters(D, S, F);
+    <parameterSpecs.list:{p|for (long <p.name> = <p.min><ImplementationType("parameterTypeSuffix")>; <p.name> \<= <p.max><ImplementationType("parameterTypeSuffix")>; <p.name>++)}; separator="\n">
+        testNewIrSignalParameters(<parameterSpecs.list:{p|<p.name>}; separator=", ">);
 }
 
 /**
-  * Test of newIrSignal method, of class RC5Renderer.
+  * Test of newIrSignal method, of class <RendererClassName()>.
   */
  @Test
  public void testNewIrSignal() throws IrpSyntaxException {

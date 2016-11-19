@@ -339,17 +339,17 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec) {
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
-        Map<String, Object> map = super.propertiesMap(state, pass, generalSpec);
-        map.put("width", width.propertiesMap(true, generalSpec));
+        Map<String, Object> map = super.propertiesMap(state, pass, generalSpec, nameEngine);
+        map.put("width", width.propertiesMap(true, generalSpec, nameEngine));
         map.put("reverse", reverse);
         return map;
     }
 
     @Override
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec) {
-        Map<String, Object> map = propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec);
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
+        Map<String, Object> map = propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
         map.put("kind", "FiniteBitFieldExpression");
         return map;
     }

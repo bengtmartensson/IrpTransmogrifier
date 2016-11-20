@@ -55,14 +55,14 @@
     </xsl:template>
 
     <!-- Special case: just one sequence, which repeats -->
-    <xsl:template match="BitspecIrstream/IrStream[@repeatMax='infinite']">
+    <xsl:template match="BitspecIrstream/IrStream[not(Variation) and @repeatMax='infinite']">
         <Intro/>
         <xsl:apply-templates select="." mode="repeat"/>
         <Ending/>
     </xsl:template>
 
     <!-- Special case: just one sequence, shot exactly once -->
-    <xsl:template match="BitspecIrstream/IrStream[not(@repeatMax='infinite') and not(IrStream[@repeatMax='infinite'])]">
+    <xsl:template match="BitspecIrstream/IrStream[not(Variation) and not(@repeatMax='infinite') and not(IrStream[@repeatMax='infinite'])]">
         <Intro>
             <xsl:apply-templates select="@*|*"/>
         </Intro>

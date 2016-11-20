@@ -431,7 +431,7 @@ end remote
         <xsl:text>(</xsl:text>
         <xsl:apply-templates select="Expression[1]"/>
         <xsl:text>)</xsl:text>
-        <xsl:value-of select="@type"/>
+        <xsl:value-of select="@kind"/>
         <xsl:text>(</xsl:text>
         <xsl:apply-templates select="Expression[2]"/>
         <xsl:text>)</xsl:text>

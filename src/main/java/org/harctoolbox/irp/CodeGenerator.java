@@ -19,67 +19,29 @@ package org.harctoolbox.irp;
 
 public abstract class CodeGenerator {
 
-    private final GeneralSpec generalSpec;
-    private final NameEngine nameEngine;
-    //private final StringBuilder stringBuilder;
-
-    protected CodeGenerator(GeneralSpec generalSpec, NameEngine nameEngine) {
-        this.generalSpec = generalSpec;
-        this.nameEngine = nameEngine;
-        //this.stringBuilder = new StringBuilder(8192);
-    }
-
     public abstract ItemCodeGenerator newItemCodeGenerator(String name);
-
-//    public ItemCodeGenerator newItemCodeGenerator(Class<?> clazz) {
-//        return newItemCodeGenerator(clazz.getSimpleName());
-//    }
-
-    /**
-     * @return the generalSpec
-     */
-    public GeneralSpec getGeneralSpec() {
-        return generalSpec;
-    }
 
     public ItemCodeGenerator newItemCodeGenerator(Object object) {
         return newItemCodeGenerator(object.getClass().getSimpleName());
     }
 
+    public String render(String name) {
+        return newItemCodeGenerator(name).render();
+    }
+
     public String fileExtension() {
-        return newItemCodeGenerator("CodeFileExtension").render();
+        return render("CodeFileExtension");
     }
 
     public String fileSuffix() {
-        return newItemCodeGenerator("FileSuffix").render();
+        return render("FileSuffix");
     }
 
-//    public void add(String str) {
-//        stringBuilder.append(str);
-//    }
+    public boolean isAbstract() {
+        return Boolean.parseBoolean(render("IsAbstract"));
+    }
 
-//    public void addLine(String str) {
-//        add(str);
-//        add(IrCoreUtils.lineSeparator);
-//    }
-
-//    public void addLine(ItemCodeGenerator st) {
-//        addLine(st.render());
-//    }
-
-//    public void addStatement(ItemCodeGenerator st) {
-//        add(st.render());
-//        addLine(newItemCodeGenerator("StatementSeparator").render());
-//    }
-
-//    public String result() {
-//        return stringBuilder.toString();
-//    }
-
-    /**
-     * @return the nameEngine
-     */
-    public NameEngine getNameEngine() {
-        return nameEngine;
+    public boolean manyProtocolsInOneFile() {
+        return Boolean.parseBoolean(render("ManyProtocolsInOneFile"));
     }
 }

@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -415,45 +416,68 @@ public class IrpTransmogrifier {
             protocols.add(irpDatabase.getNamedProtocol(protocolName));
 
 
-        if (commandCode.stringtemplate) {
-            String filename = null;
-            String suffix = STCodeGenerator.fileSuffix(commandCode.target);
+        if (commandCode.stringtemplate)
+            codeST(protocols, commandCode.target, directory, commandCode.inspect);
+        else
+            codeXSLT(protocols, commandCode.target, directory, commandCode.intermediates, commandLineArgs.encoding);
+    }
+
+    private void codeST(Collection<NamedProtocol> protocols, String target, File directory, boolean inspect) throws UsageException, IOException {
+        STCodeGenerator codeGenerator = new STCodeGenerator(target);
+        if (codeGenerator.isAbstract())
+            throw new UsageException("Target " + target + " cannot generete code since it is declared abstract.");
+
+        STCodeGenerator.trackCreationEvents(inspect); // ???
+        String pre = codeGenerator.render("FileBegin");
+        String post = codeGenerator.render("FileEnd");
+        if (codeGenerator.manyProtocolsInOneFile()) {
+            if (directory != null)
+                throw new UsageException("--directory cannot be used with the selected code generator, since it writes in one file only");
+            out.println(pre);
             for (NamedProtocol protocol : protocols) {
+                ItemCodeGenerator code = protocol.code(codeGenerator);// contains a trailing newline
+                if (inspect)
+                    code.inspect();
+                out.println(code.render());
+            }
+            out.print(post); // not println
+        } else {
+            for (NamedProtocol protocol : protocols) {
+                ItemCodeGenerator code = protocol.code(codeGenerator);// contains a trailing newline
+                if (inspect)
+                    code.inspect();
+                String filename = null;
                 if (directory != null) {
-                    File file = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + suffix);
+                    File file = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + codeGenerator.fileSuffix());
                     filename = file.getCanonicalPath();
                     out = IrpUtils.getPrintSteam(filename);
                 }
-                String code = protocol.code(commandCode.target, commandCode.inspect);// contains a trailing newline
-                out.print(code);
+                out.println(pre);
+                out.println(code.render());
+                out.print(post); // not println
                 if (filename != null)
                     logger.log(Level.INFO, "Wrote {0}", filename);
             }
-        } else {
-            if (directory != null)
-                out = IrpUtils.getPrintSteam(new File(directory, commandCode.protocols.get(0)).getAbsolutePath());
-            Document document = NamedProtocol.toDocument(protocols);
-
-//            if (commandLineArgs.xmlFile != null) {
-//                PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
-//                XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "Irp Documentation");
-//            }
-
-            XmlGenerator xmlGenerator = new XmlGenerator(document, commandCode.intermediates);
-            xmlGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
-            String[] transformations = commandCode.target.split(",");
-            String transformation;
-            for (int i = 0; i < transformations.length - 1; i++) {
-                transformation = transformations[i];
-                File file = new File(xsltDir, transformations[i] + ".xsl");
-                xmlGenerator.transform(file, "." + transformation);
-            }
-            transformation = transformations[transformations.length - 1];
-            //codeGenerator.transform(new File(xsltDir, "code.xsl"), ".code");
-            Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
-            xmlGenerator.printDOM(out, stylesheet, commandLineArgs.encoding);
-            //codeGenerator.printDOM(out, commandLineArgs.encoding);
         }
+    }
+
+    private void codeXSLT(List<NamedProtocol> protocols, String target, File directory, boolean intermediates, String encoding) throws TransformerException, IOException, SAXException {
+        if (directory != null)
+            out = IrpUtils.getPrintSteam(new File(directory, protocols.get(0).getName()).getAbsolutePath());
+        Document document = NamedProtocol.toDocument(protocols);
+
+        XmlGenerator xmlGenerator = new XmlGenerator(document, intermediates);
+        xmlGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
+        String[] transformations = target.split(",");
+        String transformation;
+        for (int i = 0; i < transformations.length - 1; i++) {
+            transformation = transformations[i];
+            File file = new File(xsltDir, transformations[i] + ".xsl");
+            xmlGenerator.transform(file, "." + transformation);
+        }
+        transformation = transformations[transformations.length - 1];
+        Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
+        xmlGenerator.printDOM(out, stylesheet, encoding);
     }
 
     private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {

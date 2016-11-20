@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -124,22 +123,13 @@ public class NamedProtocol extends Protocol {
         return root;
     }
 
-    public String code(String target, boolean inspect) throws IOException {
-        CodeGenerator codeGenerator = new STCodeGenerator(target, getGeneralSpec(), getDefinitions());
-        STCodeGenerator.trackCreationEvents(true);
-        String start = codeGenerator.newItemCodeGenerator("FileBegin").render();
-        String body = code(codeGenerator, inspect);
-        String end = codeGenerator.newItemCodeGenerator("FileEnd").render();
-        return start + IrCoreUtils.lineSeparator + body + IrCoreUtils.lineSeparator + end;
-    }
-
-    private String code(CodeGenerator codeGenerator, boolean inspect) {
+    ItemCodeGenerator code(CodeGenerator codeGenerator) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
 //        template.addAttribute("protocolName", getName());
 //        template.addAttribute("cProtocolName", IrpUtils.toCIdentifier(getName()));
 //        template.addAttribute("irp", getIrp());
 //        template.addAttribute("documentation", IrCoreUtils.javaifyString(getDocumentation()));
-        template.addAggregateList("metaData", metaData());
+        template.addAggregateList("metaData", metaDataPropertiesMap());
         template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec(), getDefinitions());
         template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec(), getDefinitions());
         Set<String> variables = getBitspecIrstream().assignmentVariables();
@@ -164,6 +154,7 @@ public class NamedProtocol extends Protocol {
 
         template.addAggregateList("code", getBitspecIrstream().getIrStream(), getGeneralSpec(), getDefinitions());
         template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec(), getDefinitions());
+        return template;
         //template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec());
 //        if (getBitspecIrstream().getBitSpec().getChunkSize() > 1)
 //            template.addAttribute("chunkSize", getBitspecIrstream().getBitSpec().getChunkSize());
@@ -174,9 +165,9 @@ public class NamedProtocol extends Protocol {
 //        template.addAggregateList(name, aggregateLister, generalSpec);ttribute("intro.{reset, body}", map.get("reset"), map.get("body"));
 //        template.addAttribute("repeat", getBitspecIrstream().getIrStream().code(IrSignal.Pass.repeat, codeGenerator));
 //        template.addAttribute("ending", getBitspecIrstream().getIrStream().code(IrSignal.Pass.ending, codeGenerator));
-        if (inspect)
-            template.inspect();
-        return template.render();
+//        if (inspect)
+//            template.inspect();
+//        return template.render();
     }
 
 //    private String codeFunc(IrSignal.Pass pass, CodeGenerator codeGenerator) {
@@ -190,7 +181,7 @@ public class NamedProtocol extends Protocol {
 //        return template.render();
 //    }
 
-    private Map<String, Object> metaData() {
+    private Map<String, Object> metaDataPropertiesMap() {
         Map<String, Object> map = IrpUtils.propertiesMap(4, this);
         map.put("protocolName", getName());
         map.put("cProtocolName", IrpUtils.toCIdentifier(getName()));

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -317,7 +318,7 @@ public class BareIrStream extends IrStreamItem {
      * @return the irStreamItems
      */
     public List<IrStreamItem> getIrStreamItems() {
-        return irStreamItems;
+        return Collections.unmodifiableList(irStreamItems);
     }
 /*
     public List<String> codeList(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {

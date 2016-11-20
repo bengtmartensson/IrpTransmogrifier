@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 import "java.stg"
 
+IsAbstract() ::= "false"
+
 FileSuffix() ::= "Renderer.java"
 
 FilePreamble() ::= <<

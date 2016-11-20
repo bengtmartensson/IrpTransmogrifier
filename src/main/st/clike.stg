@@ -44,9 +44,11 @@ static <ImplementationType(type)> <name><InitValue(initialValue)>;
 >>
 
 Repeat(body) ::= <<
-<if(body.repeats)>for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <body.repeats>; repeatCounter++) { <endif>
-<if(body.repeats)>    <endif><(body.repeatBody.kind)(body.repeatBody)>
-<if(body.repeats)>}<endif>
+<if(body.repeats)>for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <body.repeats>; repeatCounter++) {
+    <(body.repeatBody.kind)(body.repeatBody)>
+}<else>
+<(body.repeatBody.kind)(body.repeatBody)>
+<endif>
 >>
 
 Assignment(arg) ::= <<

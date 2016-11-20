@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,37 +42,26 @@ public class STCodeGenerator extends CodeGenerator {
         STGroup.trackCreationEvents = value;
     }
 
-    public static String fileExtension(String target) throws IOException {
-        STCodeGenerator cg = new STCodeGenerator(target, null, null);
-        return cg.fileExtension();
-    }
-
-    static String fileSuffix(String target) throws IOException {
-        STCodeGenerator cg = new STCodeGenerator(target, null, null);
-        return cg.fileSuffix();
-    }
-
     // STGroupFile(String) throws IllegalArgumentException (extends RuntimeException)
     // if the file is not found.
     // This does not fit in here, so throw IOException if the file is not readable.
     private static STGroupFile newSTGroupFile(File file) throws IOException {
         if (!file.canRead())
-            throw new IOException("ST Group file " + file.getCanonicalPath() + " cannot be read.");
+            throw new FileNotFoundException("ST Group file " + file.getCanonicalPath() + " cannot be read.");
         return new STGroupFile(file.getCanonicalPath());
     }
 
     private STGroup stGroup;
 
-    public STCodeGenerator(String target, GeneralSpec generalSpec, NameEngine nameEngine) throws IOException {
-        this(new File(stDir, target + sTGroupFileExtension), generalSpec, nameEngine);
+    public STCodeGenerator(String target) throws IOException {
+        this(new File(stDir, target + sTGroupFileExtension));
     }
 
-    public STCodeGenerator(File file, GeneralSpec generalSpec, NameEngine nameEngine) throws IOException {
-        this(newSTGroupFile(file), generalSpec, nameEngine);
+    public STCodeGenerator(File file) throws IOException {
+        this(newSTGroupFile(file));
     }
 
-    public STCodeGenerator(STGroup stGroup, GeneralSpec generalSpec, NameEngine nameEngine) {
-        super(generalSpec, nameEngine);
+    public STCodeGenerator(STGroup stGroup) {
         this.stGroup = stGroup;
     }
 

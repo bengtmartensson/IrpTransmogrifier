@@ -4,6 +4,7 @@ Parser for IRP notation protocols, with rendering, code generation, recognition 
 This is a new program, written from scratch, that is intended to replace IrpMaster, DecodeIR, and (most of) ExchangeIR,
 and much more like potentially replacing "all" hand written decoders/renderers.
 It consists of an API library that is also callable from the command line as a command line program.
+A GUI is possible, but should not cripple the command line interface.
 
 ## Background
 The Irp parser [IrpMaster](http://www.harctoolbox.org/IrpMaster,html)
@@ -23,13 +24,15 @@ generate code from the IRP form is a natural wish.
 The reason for this project is not (just) to migrate IrpMaster to ANTLR4 -- version 3 is still operational,
 and no more broken than it was at the start. There are a number of interesting use cases for a nice parser/tree traverser:
 
-1. __Rendering__. This use case corresponds to IrpMaster. It is probably to be implemented as a traversing of the parse tree of an IRP protocol,
+### Rendering
+This use case corresponds to IrpMaster. It is probably to be implemented as a traversing of the parse tree of an IRP protocol,
 with numerical values assigned to the parameters.
 
 _This has essentially been completed. Ambition level: only one infinite repeat allowed. With that restriction, should be
 complete solution, down to specification holes. Remains: test framework._
 
-2. __Recognition__. This use case corresponds to a dynamic version of DecodeIR: given a numerical IR signal,
+### Recognition
+This use case corresponds to a dynamic version of DecodeIR: given a numerical IR signal,
  find one (or all) parameter/protocol combinations that could have generated the given signal.
  Probably trying a number of different pre-rendered IRP parse trees, possibly a two-stage strategy,
  using IRP ["Meta protocols"](http://www.harctoolbox.org/IrpMaster.html#Preprocessing+and+inheritance).
@@ -39,48 +42,45 @@ Status: Three protocols declared un-doable (zenith (bitfield width as parameter)
 All other protocols recognizable. Most protocol sort-of works, but as a-priori given protocol, not like DecodeIR.
 Remains: top-level algorithm for deciding what protocols to try, parameter tuning, testing, test framework_
 
-3. __Code generation for rendering__. For a particular protocol, generate target code (C, C++, Java, Python,...) that can render signals
+### Code generation for rendering and/or decoding
+For a particular protocol, generate target code (C, C++, Java, Python,...) that can render or decode signals
    with the selected protocol. As opposed to the previous use cases, efficency (memory, execution time) (for the generated code) is potentially
    an issue. This should be able to generate protocol renders for e.g. the Arduino libraries IrRemote, IrLib, and AGirs.
    At least in the first version, not all protocols describable by IRPs need to be supported. Not implemented in the first phase: Protocols with hierarchical bitspecs 
 (rc6*, replay, arctech, entone), protocols with bitspec lenght as parameter (zenith, nec1-shirrif). Also default are not implemented, e.g. NEC1 has to be
 called with 3 parameters.
 
+Two mechanisms are available: XSLT and [Stringtemplate](http://www.stringtemplate.org/).
+The program invokes either one (or many) XSLT2 transformations  on an XML representation of the protocol,
+or invokes Stringtemplate. In both cases, the program just invokes the stylesheet or template, without caring what it does; if it generates a renderer or decoder.
+The user is instead governs this by invoking the style sheets or templates (s)he want using the --target option to the `code` sub subcommand.
+(For this reason, there is no `--renderer` or `--decoder` option to the `code` sub command.)
+
 Targets:
-* Lircd.conf generation from IrScrutinizer. This generates
+* [Lircd.conf](http://lirc.org/html/lircd.conf.html) generation from IrScrutinizer. This is based on an XSLT-transformation (lirc.xsd) and generates
  [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/harctoolboxbundle/blob/master/IrScrutinizer/src/main/config/exportformats.d/lirc.xml)
 Handling of definitions as well as expressions as bitfields not implemented, as well as a few other things (search for "omitted" in the above file),
-otherwise works.
-* Java. Essentially to test. This is essentially working, including a test rig.
-* C++ (Infrared4Arduino).
-* IRremote
+otherwise works. "90% complete".
+* Java. Essentially for testing. This is essentially working for rendering, including a test rig (see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest).
+* C++ ([Infrared4Arduino](https://github.com/bengtmartensson/Infrared4Arduino)).
+* [IRremote](https://github.com/z3t0/Arduino-IRremote)
+* Linux kernel modules in [linux/drivers/media/rc](https://github.com/torvalds/linux/tree/master/drivers/media/rc) (decoding only).
 
-_Ambition level: Should be able to generate the "important" protocols, not necessarily "complete". 
-Status: An intermediate XML file is generated, on which XSLT stylesheets are operating. Presently, generating only Java code -- the simplest.
-_
+_Ambition level: Should be able to generate the "important" protocols, not necessarily "complete"._
 
-4. __Code generation for recognition__. Like above, but for recognizing received signals
- on embedded processors, using a certain protocol.
-
-Targets:
-* Java. Essentially to test. This is essentially working, including a test rig.
-* C++ (Infrared4Arduino).
-* IRremote
-* Lirc kernel modules.
-
-_Status: not started_
-
-5. General (automated) __code analysis__. Not really connected to parsing IRP, but fits in the general framework.
- This corresponds to the Analyzer and the RepeatFinder in Graham Dixon's ExchangeIR.
+### General code analysis
+Not really connected to parsing IRP, but fits in the general framework.
+This corresponds to the Analyzer and the RepeatFinder in Graham Dixon's ExchangeIR.
 
 _Status: (`org.harctoolbox.analyze.`)`Repeatfinder` and `Cleaner` completed (essentially adapted from recent
-IrpMaster). Decoders: BiphaseDecoder, Pwm4Decoder, Pwm4Decoder, TrivialDecoder written, remains Pwm16/XMP. Remains: testing and tuning._ 
+IrpMaster). Decoders: BiphaseDecoder, Pwm4Decoder, Pwm4Decoder, TrivialDecoder written, remains Pwm16 (XMP). Remains: testing and tuning._ 
 
 ## Protocol Data Base
-The "ini"-file `IrpProtocols.ini` has been replaced by an XML file, per default called `IrpProtocols.xml`. The XML format
+The "ini"-file `IrpProtocols.ini` of IrpMaster (and thus IrScrutinizer) has been replaced by an XML file,
+per default called `IrpProtocols.xml`. The XML format
 is defined by the schema [irp-protocols](http://www.harctoolbox.org/schemas/irp-protocols.xsd), and has the name space 
 `http://www.harctoolbox.org/irp-protocols`. This format has many advantages in 
-comparison with the previous, more primitive, format.
+comparison with the previous, more primitive, format, for example, it can contain embedded XHTLM fragments.
 
 The program is capable of reading and translating the old format.
 
@@ -94,6 +94,9 @@ Using from the command line, this is a command with subcommands
 	   Default: 50
 	-c, --configfile
 	   Pathname of IRP database file in XML format
+	-e, --encoding
+	   Encoding used for generating output
+	   Default: UTF-8
 	-f, --frequencytolerance
 	   Absolute tolerance in microseconds
 	   Default: 1000.0
@@ -112,7 +115,7 @@ Using from the command line, this is a command with subcommands
 	   Interpret protocol arguments as regular expressions
 	   Default: false
 	-r, --relativetolerance
-	   Relative tolerance as a number < 1
+	   Relative tolerance as a number < 1 (NOT: percent)
 	   Default: 0.04
 	--seed
 	   Set seed for pseudo random number generation (default: random)
@@ -122,6 +125,8 @@ Using from the command line, this is a command with subcommands
 	-v, --version
 	   Report version
 	   Default: false
+	--xmlFile
+	   Generate XML and write to file argument
       Commands:
 	analyze      Analyze signal
 	  Usage: analyze [options] durations in microseconds, or pronto hex
@@ -141,6 +146,15 @@ Using from the command line, this is a command with subcommands
 	      -l, --lsb
 		 Force lsb-first bitorder for the analyzer
 		 Default: false
+	      -u, --maxmicroseconds
+		 Maximal duration to be expressed as micro seconds
+		 Default: 10000.0
+	      --maxroundingerror
+		 Maximal rounding errors for expressing as multiple of time unit
+		 Default: 0.3
+	      -m, --maxunits
+		 Maximal multiplier of time unit in durations
+		 Default: 30.0
 	      -w, --parameterwidths
 		 Comma separated list of parameter widths
 		 Default: []
@@ -168,29 +182,24 @@ Using from the command line, this is a command with subcommands
 	      -n, --nameengine
 		 Name Engine to use
 		 Default: {}
-	      --xml
-		 List XML
-		 Default: false
 
 	code      Generate code
-	  Usage: code [options] List of protocols (default all)
+	  Usage: code [options] Protocol
 	    Options:
-	      --documentation
-		 List documentation
+	      -d, --directory
+		 Directory to generate output files, if not using the --output
+		 option.
+	      --inspect
+		 Fire up strintemplate inspector on generated code
 		 Default: false
-	      -e, --encoding
-		 Encoding used for generating output
-		 Default: UTF-8
-	      -i, --irp
-		 List irp
+	      -i, --intermediates
+		 Dump intermediate results to files (unless using --stringtemplate)
 		 Default: false
-	      --target
-		 Target for code generation (not yet evaluated)
-	      --xml
-		 List XML
+	      -s, --st, --stringtemplate
+		 Use stringtemplate
 		 Default: false
-	      --xslt
-		 Pathname to XSLT
+	    * -t, --target
+		 Target for code generation
 
 	expression      Evaluate expression
 	  Usage: expression [options] expression
@@ -203,9 +212,6 @@ Using from the command line, this is a command with subcommands
 		 Default: {}
 	      --stringtree
 		 Produce stringtree
-		 Default: false
-	      --xml
-		 List XML
 		 Default: false
 
 	help      Report usage
@@ -284,5 +290,3 @@ Using from the command line, this is a command with subcommands
 
 	writeconfig      Write a new config file in XML format, using the --inifile argument
 	  Usage: writeconfig [options]
-
-

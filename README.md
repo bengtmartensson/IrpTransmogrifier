@@ -36,6 +36,7 @@ This use case corresponds to a dynamic version of DecodeIR: given a numerical IR
  find one (or all) parameter/protocol combinations that could have generated the given signal.
  Probably trying a number of different pre-rendered IRP parse trees, possibly a two-stage strategy,
  using IRP ["Meta protocols"](http://www.harctoolbox.org/IrpMaster.html#Preprocessing+and+inheritance).
+See [this issue](https://github.com/bengtmartensson/IrpTransmogrifier/issues/7).
 
 _Ambition level: should grok almost all of the existing protocols in IrpProtocols, but not necessarily be "complete".
 Status: Three protocols declared un-doable (zenith (bitfield width as parameter), entone, fujitsu_aircon (would require non-trivial equation solving)).
@@ -60,7 +61,7 @@ Targets:
 * [Lircd.conf](http://lirc.org/html/lircd.conf.html) generation from IrScrutinizer. This is based on an XSLT-transformation (lirc.xsd) and generates
  [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/harctoolboxbundle/blob/master/IrScrutinizer/src/main/config/exportformats.d/lirc.xml)
 Handling of definitions as well as expressions as bitfields not implemented, as well as a few other things (search for "omitted" in the above file),
-otherwise works. "90% complete".
+otherwise works. "90% complete", see [this issue](https://github.com/bengtmartensson/IrpTransmogrifier/issues/6).
 * Java. Essentially for testing. This is essentially working for rendering, including a test rig (see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest).
 * C++ ([Infrared4Arduino](https://github.com/bengtmartensson/Infrared4Arduino)).
 * [IRremote](https://github.com/z3t0/Arduino-IRremote)

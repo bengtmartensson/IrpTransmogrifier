@@ -18,18 +18,18 @@ this program. If not, see http://www.gnu.org/licenses/.
 import "clike.stg"
 
 implementationTypes ::= [
-    "intType": "int",
-    "intTypeSuffix": "",
-    "booleanType": "boolean",
-    "parameterType": "long",
-    "parameterTypeClass": "Long",
-    "parameterTypeSuffix": "L",
-    "frequencyType": "double",
-    "frequencyTypeSuffix": "f",
-    "dutyCycleType": "double",
-    "dutyCycleTypeSuffix": "f",
-    "microsecondsType": "double",
-    "microsecondsTypeSuffix": "f"
+"booleanType":              "boolean",
+"dutyCycleType":            "double",
+"dutyCycleTypeSuffix":      "f",
+"frequencyType":            "double",
+"frequencyTypeSuffix":      "f",
+"intType":                  "int",
+"intTypeSuffix":            "",
+"microsecondsType":         "double",
+"microsecondsTypeSuffix":   "f",
+"parameterType":            "long",
+"parameterTypeClass":       "Long",
+"parameterTypeSuffix":      "L"
 ]
 
 ImplementationType(type) ::= <<

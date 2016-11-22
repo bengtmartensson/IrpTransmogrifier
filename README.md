@@ -71,7 +71,9 @@ _Ambition level: Should be able to generate the "important" protocols, not neces
 
 ### General code analysis
 Not really connected to parsing IRP, but fits in the general framework.
-This corresponds to the Analyzer and the RepeatFinder in Graham Dixon's ExchangeIR.
+This corresponds to the Analyzer and the RepeatFinder in
+[Graham Dixon's ExchangeIR](http://www.hifi-remote.com/forums/dload.php?action=file&file_id=8460)
+([Java translation](https://sourceforge.net/p/controlremote/code/HEAD/tree/trunk/exchangeir/)).
 
 _Status: (`org.harctoolbox.analyze.`)`Repeatfinder` and `Cleaner` completed (essentially adapted from recent
 IrpMaster). Decoders: BiphaseDecoder, Pwm4Decoder, Pwm4Decoder, TrivialDecoder written, remains Pwm16 (XMP). Remains: testing and tuning._ 

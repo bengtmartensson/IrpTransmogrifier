@@ -106,7 +106,7 @@ public <ImplementationType("dutyCycleType")> getDutyCycle() {
 >>
 
 DefineClassList() ::= <<
-private static class LocalIrList extends IrpRenderer.IrList {
+private static class <metaData.cProtocolName>IrList extends IrpRenderer.IrList {
 <if(bitSpec.chunkSize)>
     private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
     private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
@@ -114,7 +114,7 @@ private static class LocalIrList extends IrpRenderer.IrList {
 
     @Override
     void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
-        LocalIrList list = this;
+        <metaData.cProtocolName>IrList list = this;
         <if(bitSpec.chunkSize)>
         if (pendingBits > 0<ImplementationType("parameterTypeSuffix")>) {
             // This code is valid for msb only
@@ -140,8 +140,8 @@ private static class LocalIrList extends IrpRenderer.IrList {
 
 TopFunction(passName, functionBody) ::= <<
 @Override
-protected LocalIrList setup<passName>() {
-    LocalIrList list = new LocalIrList();
+protected <metaData.cProtocolName>IrList setup<passName>() {
+    <metaData.cProtocolName>IrList list = new <metaData.cProtocolName>IrList();
     <TopFunctionBody(functionBody)>
     return list;
 }

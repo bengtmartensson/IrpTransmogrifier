@@ -20,13 +20,13 @@ import "clike.stg"
 implementationTypes ::= [
 "booleanType":              "boolean",
 "dutyCycleType":            "double",
-"dutyCycleTypeSuffix":      "f",
+"dutyCycleTypeSuffix":      "d",
 "frequencyType":            "double",
-"frequencyTypeSuffix":      "f",
+"frequencyTypeSuffix":      "d",
 "intType":                  "int",
 "intTypeSuffix":            "",
 "microsecondsType":         "double",
-"microsecondsTypeSuffix":   "f",
+"microsecondsTypeSuffix":   "d",
 "parameterType":            "long",
 "parameterTypeClass":       "Long",
 "parameterTypeSuffix":      "L"

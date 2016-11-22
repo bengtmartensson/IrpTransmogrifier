@@ -24,7 +24,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 /**
  * This object represents a parameter, for which only some bit positions are known.
  */
-class BitwiseParameter implements Cloneable {
+public class BitwiseParameter implements Cloneable {
 
     public final static long ALLBITS = -1L;
     public final static long NOBITS = 0L;
@@ -43,15 +43,15 @@ class BitwiseParameter implements Cloneable {
 
     //private boolean needsChecking;
 
-    BitwiseParameter(long value) {
+    public BitwiseParameter(long value) {
         this(value, ALLBITS);
     }
 
-    BitwiseParameter() {
+    public BitwiseParameter() {
         this(0L, NOBITS);
     }
 
-    BitwiseParameter(long value, long bitmask) {
+    public BitwiseParameter(long value, long bitmask) {
         this.value = value & bitmask;
         this.bitmask = bitmask;
         //this.needsChecking = false;
@@ -73,7 +73,7 @@ class BitwiseParameter implements Cloneable {
         return ((value ^ val) & bitmask) == 0L;
     }
 
-    void aggregate(BitwiseParameter parameter) {
+    public void aggregate(BitwiseParameter parameter) {
         parameter.canonicalize();
         logger.log(Level.FINEST, "Changing {0} to {1}", new Object[] { toString(), toString(value | parameter.value, bitmask | parameter.bitmask)});
         value |= parameter.value;

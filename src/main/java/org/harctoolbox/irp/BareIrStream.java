@@ -382,8 +382,12 @@ public class BareIrStream extends IrStreamItem {
                 state = nextState;
             if (pass == null || pass == state) {
                 Map<String, Object> m = item.propertiesMap(state, pass, generalSpec, nameEngine);
-                if (!m.isEmpty())
-                    list.add(m);
+                if (!m.isEmpty()) {
+                    if (m.containsKey("items"))
+                        list.addAll((List<Map<String, Object>>)m.get("items"));
+                    else
+                        list.add(m);
+                }
                     //list.add(item.propertiesMapList(state, pass, generalSpec).get(0));
 
             }

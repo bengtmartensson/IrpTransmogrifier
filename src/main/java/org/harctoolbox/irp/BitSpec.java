@@ -82,6 +82,19 @@ public class BitSpec extends IrpObject implements AggregateLister {
         bitCodes = new ArrayList<>(2);
     }
 
+    public int noDurations() {
+        int result = -1;
+        for (BareIrStream bitCode : bitCodes) {
+            if (bitCode.numberOfBitSpecs() > 0)
+                return -1;
+            int curr = bitCode.numberOfBareDurations();
+            if (result > 0 && result != curr)
+                return -1;
+            result = curr;
+        }
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof BitSpec))
@@ -267,6 +280,8 @@ public class BitSpec extends IrpObject implements AggregateLister {
         element.setAttribute("bitMask", Integer.toString(IrCoreUtils.ones(chunkSize)));
         element.setAttribute("standardPwm", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
+        if (noDurations() > 0)
+            element.setAttribute("noDurations", Integer.toString(noDurations()));
         //element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));
         for (BareIrStream bitCode : bitCodes)
             element.appendChild(bitCode.toElement(document));
@@ -397,7 +412,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> map = new HashMap<>(7);
+        Map<String, Object> map = new HashMap<>(8);
         if (chunkSize > 1)
             map.put("chunkSize", chunkSize);
         map.put("bitMask", IrCoreUtils.ones(chunkSize));
@@ -405,6 +420,8 @@ public class BitSpec extends IrpObject implements AggregateLister {
         map.put("standardPwm", isPWM(2, new NameEngine(), new GeneralSpec()));
         map.put("standardBiPhase", isStandardBiPhase(new NameEngine(), new GeneralSpec()));
         map.put("reverse", generalSpec.getBitDirection() == BitDirection.lsb);
+        if (noDurations() > 0)
+            map.put("noDurations", noDurations());
 //        List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
 //        for (BareIrStream bitCode : bitCodes)
 //            list.add(bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec));

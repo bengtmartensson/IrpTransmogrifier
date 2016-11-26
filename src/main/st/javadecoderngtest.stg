@@ -19,10 +19,10 @@ import "java.stg"
 
 IsAbstract() ::= "false"
 
-FileSuffix() ::= "RendererNGTest.java"
+FileSuffix() ::= "DecoderNGTest.java"
 
 FilePreamble() ::= <<
-package org.harctoolbox.render;
+package org.harctoolbox.decoders;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,15 +30,14 @@ import java.util.Map;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.irp.*;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 >>
 
-RendererClassName() ::= "<metaData.cProtocolName>Renderer"
-ClassName() ::= "<RendererClassName()>NGTest"
+DecoderClassName() ::= "<metaData.cProtocolName>Decoder"
+ClassName() ::= "<DecoderClassName()>NGTest"
 
 NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
 public class <ClassName()> {
@@ -55,50 +54,54 @@ ClassBody() ::= <<
 >>
 
 DeclareParameterlessConstructor() ::= <<
-public <ClassName()>() throws IOException, SAXException, IncompatibleArgumentException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
+public <ClassName()>() throws IOException, IrpException, SAXException, IncompatibleArgumentException {
     irpDatabase = new IrpDatabase(configFile);
     irpDatabase.expand();
-    prot = irpDatabase.getNamedProtocol("<metaData.protocolName>");
+    protocol = irpDatabase.getNamedProtocol("<metaData.protocolName>");
 }
 >>
 
 DeclareCompute() ::= <<
-private void testNewIrSignalParameters(<parameterSpecs.list:DeclareFormalParameter(); separator=", ">) {
+private void testDecodeParameters(<parameterSpecs.list:DeclareFormalParameter(); separator=", ">) throws IrpException, IncompatibleArgumentException {
     Map\<String, Long> map = new HashMap\<>(<length(parameterSpecs.list)>);
     <parameterSpecs.list:{p|map.put("<p.name>", <p.name>);}; separator="\n">
     testMap(map);
 }
 
-public void testMap(Map\<String, Long> map) {
-    try {
-        NameEngine nameEngine = new NameEngine(map);
-        //System.out.println(nameEngine);
-        IrSignal expResult = prot.toIrSignal(nameEngine);
-        IrSignal result = <RendererClassName()>.newIrSignal(map);
-        assertTrue(result.approximatelyEquals(expResult));
-    } catch (IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | IrpSyntaxException | DomainViolationException ex) {
-        fail();
-    }
+public void testMap(Map\<String, Long> map) throws IrpException, IncompatibleArgumentException {
+    NameEngine nameEngine = new NameEngine(map);
+    //System.out.println(nameEngine);
+    IrSignal irSignal = protocol.toIrSignal(nameEngine);
+    Map\<String, Long> result = <DecoderClassName()>.decodeSignal(irSignal);
+    assertEquals(result, map);
 }
 
 /**
- * Exhaustive test of newIrSignal method, of class <RendererClassName()>.
+ * Exhaustive test of newIrSignal method, of class <DecoderClassName()>.
+ * @throws org.harctoolbox.irp.IrpException
+ * @throws org.harctoolbox.ircore.IncompatibleArgumentException
  */
 //@Test
-public void testNewIrSignalExhaustive() {
-    System.out.println("newIrSignalExhaustive");
+public void testDecodeSignalExhaustive() throws IrpException, IncompatibleArgumentException {
+    System.out.println("newDecodeSignalExhaustive");
     <parameterSpecs.list:{p|for (long <p.name> = <p.min><ImplementationType("parameterTypeSuffix")>; <p.name> \<= <p.max><ImplementationType("parameterTypeSuffix")>; <p.name>++)}; separator="\n">
-        testNewIrSignalParameters(<parameterSpecs.list:{p|<p.name>}; separator=", ">);
+        testDecodeParameters(<parameterSpecs.list:{p|<p.name>}; separator=", ">);
 }
 
 /**
- * Test of newIrSignal method, of class <RendererClassName()>.
+ * Test of newIrSignal method, of class <DecoderClassName()>.
+ * @throws org.harctoolbox.irp.IrpException
+ * @throws org.harctoolbox.ircore.IncompatibleArgumentException
  */
  @Test
- public void testNewIrSignal() throws IrpSyntaxException {
-    System.out.println("newIrSignal@<metaData.protocolName>");
-    for (int i = 0; i \< noRandomTests; i++)
-        testMap(prot.randomParameters());
+ public void testDecodeSignal() throws IrpException, IncompatibleArgumentException {
+    System.out.println("decodeSignal@<metaData.protocolName>");
+    for (int i = 0; i \< noRandomTests; i++) {
+        Map\<String, Long> params = protocol.randomParameters();
+        IrSignal irSignal = protocol.toIrSignal(new NameEngine(params));
+        Map\<String, Long> result = <DecoderClassName()>.decodeSignal(irSignal);
+        assertEquals(result, params);
+    }
  }
 >>
 
@@ -107,5 +110,5 @@ private final static String configFile = "../IrpTransmogrifier/src/main/config/I
 private final static int noRandomTests = 10;
 
 private final IrpDatabase irpDatabase;
-private final NamedProtocol prot;
+private final NamedProtocol protocol;
 >>

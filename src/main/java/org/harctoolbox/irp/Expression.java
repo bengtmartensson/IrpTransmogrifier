@@ -452,9 +452,11 @@ public class Expression extends PrimaryItem {
             case 1:
                 ParseTree child = parseTree.children.get(0);
 
-                if (child instanceof IrpParser.Primary_itemContext)
-                    return newPrimaryItem((IrpParser.Primary_itemContext) child).propertiesMap(eval, generalSpec, nameEngine);
-                else if (child instanceof IrpParser.BitfieldContext)
+                if (child instanceof IrpParser.Primary_itemContext) {
+                    Map<String, Object> m = newPrimaryItem((IrpParser.Primary_itemContext) child).propertiesMap(eval, generalSpec, nameEngine);
+                    m.put("scalar", true);
+                    return m;
+                } else if (child instanceof IrpParser.BitfieldContext)
                     try {
                         BitField bf = BitField.newBitField((IrpParser.BitfieldContext) child);
                         map = bf.propertiesMap(eval, generalSpec, nameEngine);

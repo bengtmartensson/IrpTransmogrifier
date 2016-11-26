@@ -178,7 +178,7 @@ public class Name extends PrimaryItem implements Floatable {
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> map = super.propertiesMap(3);
+        Map<String, Object> map = super.propertiesMap(4);
         map.put("name", name);
         map.put("eval", eval);
         map.put("isDefinition", nameEngine.containsKey(name));

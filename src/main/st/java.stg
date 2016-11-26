@@ -97,7 +97,7 @@ MapLocalAssignment(par) ::= <<
 >>
 
 BitCount(e)           ::= <<
-<ImplementationType("parameterTypeClass")>.bitCount(<(e.arg.kind)(e.arg)>)
+bitCount(<(e.arg.kind)(e.arg)>)
 >>
 
 Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"

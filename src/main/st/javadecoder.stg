@@ -1,0 +1,243 @@
+/*
+Copyright (C) 2016 Bengt Martensson.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/.
+*/
+
+import "java.stg"
+
+IsAbstract() ::= "false"
+
+FileSuffix() ::= "Decoder.java"
+
+FilePreamble() ::= <<
+package org.harctoolbox.decoders;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.irp.BitwiseParameter;
+
+>>
+
+ClassName() ::= "<metaData.cProtocolName>Decoder"
+
+NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
+public final class <ClassName()> extends IrpDecoder {
+    <ClassBody()>
+}
+>>
+
+ClassBody() ::= <<
+<Irp()>
+<Documentation()>
+    
+<DeclareStatic()>
+    
+<DeclareParameters()>
+    
+<DeclareAssignmentVariables()>
+    
+<DeclareParameterlessConstructor()>
+
+<DeclareOneParameterConstructor()>
+    
+<DeclareFrequency()>
+    
+<DeclareDutyCycle()>
+    
+<DeclareCompute()>
+    
+<DefineNames()>
+
+<TopFunctions()>
+    
+<DefineClassList()>
+>>
+
+// Override from java.stg
+DeclareParameter(parameter) ::= <<
+private final <!if(parameter.memory)>static <endif!>BitwiseParameter <parameter.name><!if(parameter.memory)> = <parameter.default><endif!>
+>>
+
+// Override from java.stg
+DeclareParameterlessConstructor() ::= <<
+public <ClassName()>() {
+    super();
+    <parameterSpecs.list:{ps|<ps.name> = new BitwiseParameter();}; separator="\n">
+}
+>>
+
+DeclareOneParameterConstructor() ::= <<
+public <ClassName()>(IrSignal irSignal) {
+    this();
+    decode(irSignal);
+}
+>>
+
+DeclareCompute() ::= <<
+@Override
+public Map\<String, <ImplementationType("parameterTypeClass")>\> getParameters() {
+    if (!isValid())
+        return null;
+    HashMap\<String, Long> map = new HashMap\<>(<length(parameterSpecs.list)>);
+    <parameterSpecs.list:{p | map.put("<p.name>", <p.name>.getValue());}; separator="\n">
+    return map;
+}
+>>
+
+DeclareStatic() ::= <<
+// Static convenience functions
+public static Map\<String, Long> decodeSignal(IrSignal IrSignal) {
+    <ClassName()> instance = new <ClassName()>(IrSignal);
+    return instance.getParameters();
+}
+>>
+
+DeclareFrequency() ::= <<
+@Override
+public <ImplementationType("frequencyType")> getFrequency() {
+    return <generalSpec.frequency><ImplementationType("frequencyTypeSuffix")>;
+}
+>>
+
+DeclareDutyCycle() ::= <<
+@Override
+public <ImplementationType("dutyCycleType")> getDutyCycle() {
+    return <generalSpec.dutyCycle><ImplementationType("dutyCycleTypeSuffix")>;
+}
+>>
+
+DefineClassList() ::= <<
+private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.DecodeSequence {
+<if(bitSpec.chunkSize)>
+    private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
+    private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
+<endif>
+    private final static int chunkSize = <if(bitSpec.chunkSize)><bitSpec.chunkSize><else>1<endif>;
+    private final static boolean lsbFirst = <bitSpec.reverse>;
+
+    private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
+        super(irSequence);
+    }
+
+    private long parseData(long length) {
+        long data = 0L;
+        for (int i = 0; i \< (int) length; i += chunkSize) {
+            long chunk =
+            <bitSpec.list:{b|<BitSpecDecode(b,i0)>}; separator="\n: ">
+            : -1L;
+            
+            if (chunk == -1L)
+                return -1;
+            data = data \<\< chunkSize | chunk;
+            pull(<bitSpec.noDurations>);
+        }
+        return data;
+    }
+
+        <!if(bitSpec.chunkSize)>
+        if (pendingBits > 0<ImplementationType("parameterTypeSuffix")>) {
+            // This code is valid for msb only
+            data &= (1<ImplementationType("parameterTypeSuffix")> \<\< width) - 1<ImplementationType("parameterTypeSuffix")>;
+            data |= pendingData \<\< width;
+            width += pendingBits;
+            pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
+        }
+        if (width % <bitSpec.chunkSize><ImplementationType("parameterTypeSuffix")> != 0<ImplementationType("parameterTypeSuffix")>) {
+            pendingData = data;
+            pendingBits = width;
+            width = 0<ImplementationType("parameterTypeSuffix")>;
+        }
+        <endif!>
+    private BitwiseParameter parseData(long length, long chop, boolean complement, boolean reverse) {
+        long read = parseData(length);
+        long data = finiteBitField(read, length, chop, complement, reverse != lsbFirst);
+        return new BitwiseParameter(data, mkBitMask(length, chop));
+    }
+
+    protected boolean bitField(long expected, long length, long chop, boolean complement, boolean reverse) {
+        BitwiseParameter newParam = parseData(length, chop, complement, reverse);
+        return newParam.isConsistent(expected);
+    }
+
+    @Override
+    protected boolean bitField(BitwiseParameter parameter, long length, long chop, boolean complement, boolean reverse) {
+        BitwiseParameter newParam = parseData(length, chop, complement, reverse);
+        if (!parameter.isConsistent(newParam))
+            return false;
+        parameter.aggregate(newParam);
+        return true;
+    }
+}
+>>
+
+//Repeat(body,scalar) ::= <<
+//<if(body.repeats)>for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <body.repeats>; repeatCounter++) {
+//    <(body.repeatBody.kind)(body.repeatBody,false)>;
+//}<else>
+//<(body.repeatBody.kind)(body.repeatBody,false)>
+//<endif>
+//>>
+
+BitSpecDecode(b, caseNo) ::= <<
+(<b.items:{item|duration(<item.microseconds>d, <i0>)}; separator=" && ">) ? <caseNo>L
+>>
+
+TopFunction(passName, functionBody) ::= <<
+@Override
+public boolean decodeAs<passName>(IrSequence irSequence) {
+<if(functionBody.irStream.items)>
+    <metaData.cProtocolName>DecodeSequence seq = new <metaData.cProtocolName>DecodeSequence(irSequence);
+    <TopFunctionBody(functionBody)>;
+<else>
+    return irSequence.isEmpty();
+<endif>
+}
+>>
+
+BareIrStream(body) ::= <<
+return
+    <body.items:{ s | <(s.kind)(s)>}; separator="\n&& ">
+>>
+
+ResetDurationCounter() ::= ""
+
+FiniteBitField(fbf) ::= <<
+seq.bitField(<(fbf.data.kind)(fbf.data)>, <(fbf.width.kind)(fbf.width)>, <if(fbf.chop)><(fbf.chop.kind)(fbf.chop)><else>0L<endif>, <fbf.complement>, <fbf.reverse>)
+>>
+
+InfiniteBitFieldExpression(arg) ::= <<
+<if(arg.complement)>~<endif>((<(arg.data.kind)(arg.data)>) \>> (<(arg.chop.kind)(arg.chop)>))
+>>
+
+FiniteBitFieldExpression(arg) ::= <<
+finiteBitField(<(arg.data.kind)(arg.data)>, <(arg.width.kind)(arg.width)>, <if(arg.chop)><(arg.chop.kind)(arg.chop)><else>0L<endif>, <arg.complement>, <arg.reverse>)
+>>
+
+//BailoutOnFailure(statement) ::= <<
+//if (!<statement>)
+//    return false
+//>>
+
+Assignment(arg)     ::= "assign(<(arg.name.kind)(arg.name)>,<(arg.expression.kind)(arg.expression)>)"
+
+Flash(arg)          ::= "seq.flash(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
+Gap(arg)            ::= "seq.gap(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
+Extent(arg)         ::= "seq.extent(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
+
+Name(arg)           ::= "<arg.name><if(arg.scalar)>.getValue()<endif><if(arg.isDefinition)>()<endif>"
+
+Exponentiate(arg1,arg2) ::= "IrpUtils.power(arg1,arg2)"

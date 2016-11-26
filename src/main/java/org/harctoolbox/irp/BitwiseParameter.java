@@ -69,7 +69,7 @@ public class BitwiseParameter implements Cloneable {
         return ((value ^ parameter.value) & bitmask & parameter.bitmask) == 0L;
     }
 
-    boolean isConsistent(long val) {
+    public boolean isConsistent(long val) {
         return ((value ^ val) & bitmask) == 0L;
     }
 
@@ -127,5 +127,10 @@ public class BitwiseParameter implements Cloneable {
      */
     public long getBitmask() {
         return bitmask;
+    }
+
+    public void assign(long value) {
+        this.value = value;
+        bitmask = ALLBITS;
     }
 }

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -363,22 +364,27 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     @Override
     public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> m = new HashMap<>(2);
-        m.put("kind", "Repeat");
-
         //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         if (repetitions == 0)
             return new HashMap<>(0);
+
+        Map<String, Object> m = new HashMap<>(2);
+        //m.put("kind", "Repeat");
         Map<String, Object> body = super.propertiesMap(state, pass, generalSpec, nameEngine);
 //        template.addAttribute("body", body);
 //        if (repetitions == 1)
 //            return template.render();
-
         //ItemCodeGenerator repeatTemplate = codeGenerator.newItemCodeGenerator("Repeat");
-        m.put("repeatBody", body);
-        if (repetitions > 1)
-            m.put("repeats", repetitions);
+//        m.put("repeatBody", body);
+//        if (repetitions > 1)
+//            m.put("repeats", repetitions);
+        List<Map<String, Object>> items = (List<Map<String,Object>>) body.get("items");
+        m.put("kind", body.get("kind"));
+        ArrayList<Map<String, Object>> repeatedList = new ArrayList<>(repetitions*items.size());
+        m.put("items", repeatedList);
+        for (int r = 0; r < repetitions; r++)
+            repeatedList.addAll(items);
         return m;
     }
 }

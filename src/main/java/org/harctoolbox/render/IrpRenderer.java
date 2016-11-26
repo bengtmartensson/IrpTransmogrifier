@@ -44,6 +44,10 @@ public abstract class IrpRenderer {
         return realdata;
     }
 
+    protected static long bitCount(long number) {
+        return Long.bitCount(number);
+    }
+
     private IrSequence intro;
     private IrSequence repeat;
     private IrSequence ending;

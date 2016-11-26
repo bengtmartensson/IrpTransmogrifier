@@ -77,10 +77,11 @@ BareIrStream(body) ::= <<
 >>
 
 TopFunctionBody(functionBody) ::= <<
-<if(functionBody.reset)><ResetDurationCounter()><endif>
+<!if(functionBody.reset)><ResetDurationCounter()><endif!>
 <if(functionBody.irStream.kind)><(functionBody.irStream.kind)(functionBody.irStream)><endif>
 >>
 
 Expression(e)       ::= "<(e.kind)(e)>"
 
+//Number(arg,scalar)         ::= "<arg.value><ImplementationType(\"parameterTypeSuffix\")>"
 Number(arg)         ::= "<arg.value><ImplementationType(\"parameterTypeSuffix\")>"

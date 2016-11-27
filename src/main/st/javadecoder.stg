@@ -184,14 +184,6 @@ private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.D
 }
 >>
 
-//Repeat(body,scalar) ::= <<
-//<if(body.repeats)>for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <body.repeats>; repeatCounter++) {
-//    <(body.repeatBody.kind)(body.repeatBody,false)>;
-//}<else>
-//<(body.repeatBody.kind)(body.repeatBody,false)>
-//<endif>
-//>>
-
 BitSpecDecode(b, caseNo) ::= <<
 (<b.items:{item|duration(<item.microseconds>d, <i0>)}; separator=" && ">) ? <caseNo>L
 >>
@@ -226,11 +218,6 @@ InfiniteBitFieldExpression(arg) ::= <<
 FiniteBitFieldExpression(arg) ::= <<
 finiteBitField(<(arg.data.kind)(arg.data)>, <(arg.width.kind)(arg.width)>, <if(arg.chop)><(arg.chop.kind)(arg.chop)><else>0L<endif>, <arg.complement>, <arg.reverse>)
 >>
-
-//BailoutOnFailure(statement) ::= <<
-//if (!<statement>)
-//    return false
-//>>
 
 Assignment(arg)     ::= "assign(<(arg.name.kind)(arg.name)>,<(arg.expression.kind)(arg.expression)>)"
 

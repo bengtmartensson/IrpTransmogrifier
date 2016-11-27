@@ -83,5 +83,4 @@ TopFunctionBody(functionBody) ::= <<
 
 Expression(e)       ::= "<(e.kind)(e)>"
 
-//Number(arg,scalar)         ::= "<arg.value><ImplementationType(\"parameterTypeSuffix\")>"
 Number(arg)         ::= "<arg.value><ImplementationType(\"parameterTypeSuffix\")>"

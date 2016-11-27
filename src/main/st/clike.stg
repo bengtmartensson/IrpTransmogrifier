@@ -43,14 +43,6 @@ InstanceVariableDefinition(type, name, initialValue) ::= <<
 static <ImplementationType(type)> <name><InitValue(initialValue)>;
 >>
 
-//Repeat(body,scalar) ::= <<
-//<if(body.repeats)>for (<ImplementationType("intType")> repeatCounter = 0; repeatCounter \< <body.repeats>; repeatCounter++) {
-//    <(body.repeatBody.kind)(body.repeatBody,false)>
-//}<else>
-//<(body.repeatBody.kind)(body.repeatBody,false)>
-//<endif>
-//>>
-
 Assignment(arg) ::= <<
 <(arg.name.kind)(arg.name)> = <(arg.expression.kind)(arg.expression)>
 >>

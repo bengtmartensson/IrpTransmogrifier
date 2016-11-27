@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -47,5 +48,13 @@ public abstract class IrpObject implements XmlExport {
     @Override
     public Element toElement(Document document) {
         return document.createElement(getClass().getSimpleName());
+    }
+
+    @Override
+    public Document toDocument() {
+        Document document = XmlUtils.newDocument();
+        Element element = toElement(document);
+        document.appendChild(element);
+        return document;
     }
 }

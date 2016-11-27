@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.harctoolbox.irp.IrpUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -172,6 +174,11 @@ public class XmlUtils {
     public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException, TransformerException {
         printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements);
         logger.log(Level.INFO, "File {0} written.", file);
+    }
+
+    public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException, TransformerException {
+        PrintStream xmlStream = IrpUtils.getPrintSteam(xmlFileName); // FIXME: should not use org.harctoolbox.irp
+        printDOM(xmlStream, doc, encoding, cdataElements);
     }
 
     // Do not define a function printDOM(File, Document, String),

@@ -92,6 +92,7 @@ public class NamedProtocol extends Protocol {
         return irp;
     }
 
+    @Override
     public Document toDocument() {
         return toDocument(false);
     }

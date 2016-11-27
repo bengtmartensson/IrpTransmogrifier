@@ -30,4 +30,6 @@ public interface XmlExport {
      * @return
      */
     public Element toElement(Document document);
+
+    public Document toDocument();
 }

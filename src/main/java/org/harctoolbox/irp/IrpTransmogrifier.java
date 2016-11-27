@@ -355,28 +355,8 @@ public class IrpTransmogrifier {
                 out.print(protocol.hasVariation() ? "variation\t" : "\t");
                 out.print(protocol.isRPlus() ? "R+" : "");
             }
-
             out.println();
         }
-
-        if (commandLineArgs.xmlFile != null)
-            createXmlProtocols(list, commandLineArgs);
-    }
-
-    private void createXmlProtocols(List<String> list, CommandLineArgs commandLineArgs) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, FileNotFoundException, TransformerException {
-
-        Document document = XmlUtils.newDocument();
-
-        Element root = document.createElement("NamedProtocols");
-        document.appendChild(root);
-
-        for (String protocolName : list) {
-            NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-            Element element = protocol.toElement(document);
-            root.appendChild(element);
-        }
-        PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
-        XmlUtils.printDOM(xmlStream, document, commandLineArgs.encoding, "Irp Documentation");
     }
 
     private void version(String filename, CommandLineArgs commandLineArgs) {
@@ -478,6 +458,23 @@ public class IrpTransmogrifier {
         transformation = transformations[transformations.length - 1];
         Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
         xmlGenerator.printDOM(out, stylesheet, encoding);
+    }
+
+    // In this version, not used
+    private void createXmlProtocols(List<String> list, String xmlFile, String encoding) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, FileNotFoundException, TransformerException {
+
+        Document document = XmlUtils.newDocument();
+
+        Element root = document.createElement("NamedProtocols");
+        document.appendChild(root);
+
+        for (String protocolName : list) {
+            NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
+            Element element = protocol.toElement(document);
+            root.appendChild(element);
+        }
+        PrintStream xmlStream = IrpUtils.getPrintSteam(xmlFile);
+        XmlUtils.printDOM(xmlStream, document, encoding, "Irp Documentation");
     }
 
     private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
@@ -617,30 +614,23 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, TransformerException, FileNotFoundException {
+    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, TransformerException, FileNotFoundException, UsageException {
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
 
-        IrpParser parser = new ParserDriver(text).getParser();
-        Expression expression = new Expression(parser.expression());
-        int last = expression.getParseTree().getStop().getStopIndex();
-        if (last != text.length() - 1)
-            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", text.substring(0, last + 1));
-
+        Expression expression = new Expression(text);
         long result = expression.toNumber(nameEngine);
         out.println(result);
         if (commandExpression.stringTree)
-            out.println(expression.getParseTree().toStringTree(parser));
-        if (commandLineArgs.xmlFile != null) {
-            Document doc = XmlUtils.newDocument();
-            Element root = expression.toElement(doc);
-            doc.appendChild(root);
-            PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
-            XmlUtils.printDOM(xmlStream, doc, commandLineArgs.encoding, null);
+            out.println(expression.toStringTree());
+
+        if (commandExpression.xml != null) {
+            XmlUtils.printDOM(commandExpression.xml, expression.toDocument(), commandLineArgs.encoding, null);
+            logger.log(Level.INFO, "Wrote {0}", commandExpression.xml);
         }
 
         if (commandExpression.gui)
-            IrpTransmogrifier.showTreeViewer(parser, expression.getParseTree(), text + "=" + result);
+            IrpTransmogrifier.showTreeViewer(expression.toTreeViewer(), text + "=" + result);
     }
 
     private void bitfield(CommandBitfield commandBitField, CommandLineArgs commandLineArgs) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException, TransformerException, FileNotFoundException {
@@ -661,11 +651,11 @@ public class IrpTransmogrifier {
             }
             out.println();
 
-            if (commandLineArgs.xmlFile != null) {
+            if (commandBitField.xml != null) {
                 Document doc = XmlUtils.newDocument();
                 Element root = bitfield.toElement(doc);
                 doc.appendChild(root);
-                PrintStream xmlStream = IrpUtils.getPrintSteam(commandLineArgs.xmlFile);
+                PrintStream xmlStream = IrpUtils.getPrintSteam(commandBitField.xml);
                 XmlUtils.printDOM(xmlStream, doc, commandLineArgs.encoding, null);
             }
             if (commandBitField.gui)
@@ -733,7 +723,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-f", "--frequencytolerance"}, description = "Absolute tolerance in microseconds")
         private double frequencyTolerance = 1000;
 
-        @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message")
+        @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message (deprecated; use command help instead)")
         private boolean helpRequested = false;
 
         @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
@@ -758,11 +748,8 @@ public class IrpTransmogrifier {
         @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random)")
         private Long seed = null;
 
-        @Parameter(names = {"-v", "--version"}, description = "Report version")
+        @Parameter(names = {"-v", "--version"}, description = "Report version (deprecated; use command version instead)")
         private boolean versionRequested = false;
-
-        @Parameter(names = { "--xmlFile"}, description = "Generate XML and write to file argument")
-        private String xmlFile = null;
     }
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
@@ -823,6 +810,9 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
         private boolean gui = false;
 
+        @Parameter(names = { "--xml"}, description = "Generate XML and write to file argument")
+        private String xml = null;
+
         @Parameter(description = "bitfield", required = true)
         private List<String> bitfields;
     }
@@ -842,7 +832,7 @@ public class IrpTransmogrifier {
 //        @Parameter(names = {"-i", "--irp"}, description = "List irp")
 //        private boolean irp = false;
 
-        @Parameter(names = {       "--inspect" }, description = "Fire up strintemplate inspector on generated code")
+        @Parameter(names = {       "--inspect" }, description = "Fire up stringtemplate inspector on generated code (if sensible)")
         private boolean inspect = false;
 
         @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files (unless using --stringtemplate)")
@@ -873,7 +863,10 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
         private boolean gui = false;
 
-        @Parameter(description = "expression")
+        @Parameter(names = { "--xml"}, description = "Generate XML and write to file argument")
+        private String xml = null;
+
+        @Parameter(description = "expression", required = true)
         private List<String> expressions;
     }
 

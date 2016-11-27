@@ -17,10 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -33,7 +36,10 @@ import org.w3c.dom.Element;
  */
 public class Expression extends PrimaryItem {
 
+    private static final Logger logger = Logger.getLogger(Extent.class.getName());
+
     private IrpParser.ExpressionContext parseTree;
+    private IrpParser parser;
 
     /**
      * Construct an Expression from the number supplied as argument.
@@ -51,10 +57,14 @@ public class Expression extends PrimaryItem {
      */
     public Expression(String str) throws IrpSyntaxException {
         this(new ParserDriver(str));
+        int last = parseTree.getStop().getStopIndex();
+        if (last != str.length() - 1)
+            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
     }
-
+//        IrpParser parser = new ParserDriver(text).getParser();
     Expression(ParserDriver parserDriver) throws IrpSyntaxException {
         this(parserDriver.getParser().expression());
+        parser = parserDriver.getParser();
     }
 
     public Expression(IrpParser.Para_expressionContext ctx) {
@@ -63,6 +73,12 @@ public class Expression extends PrimaryItem {
 
     public Expression(IrpParser.ExpressionContext ctx) {
         this.parseTree = ctx;
+    }
+
+    public TreeViewer toTreeViewer() {
+        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+        // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
+        return new TreeViewer(ruleNames, parseTree);
     }
 
     @Override
@@ -92,7 +108,7 @@ public class Expression extends PrimaryItem {
     }
 
     public String toStringTree() {
-        return parseTree.toStringTree();
+        return parseTree.toStringTree(parser);
     }
 
     @Override

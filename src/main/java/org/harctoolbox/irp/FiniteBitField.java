@@ -43,6 +43,10 @@ public class FiniteBitField extends BitField {
 
     public FiniteBitField(String str) throws IrpSyntaxException {
         this((IrpParser.Finite_bitfieldContext) new ParserDriver(str).getParser().bitfield());
+        this.parser = new ParserDriver(str).getParser();
+        int last = getParseTree().getStop().getStopIndex();
+            if (last != str.length() - 1)
+                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
     }
 
     public FiniteBitField(String name, int width) {
@@ -59,6 +63,7 @@ public class FiniteBitField extends BitField {
             complement = true;
             index++;
         }
+        parseTree = ctx;
         data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
         width = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
         chop = ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0);

@@ -144,8 +144,8 @@ public class IrpTransmogrifier {
         CommandAnalyze commandAnalyze = new CommandAnalyze();
         argumentParser.addCommand(commandAnalyze);
 
-        CommandBitfield commandBitfield = new CommandBitfield();
-        argumentParser.addCommand(commandBitfield);
+        CommandBitField commandBitField = new CommandBitField();
+        argumentParser.addCommand(commandBitField);
 
         CommandCode commandCode = new CommandCode();
         argumentParser.addCommand(commandCode);
@@ -217,7 +217,7 @@ public class IrpTransmogrifier {
                     instance.analyze(commandAnalyze, commandLineArgs);
                     break;
                 case "bitfield":
-                    instance.bitfield(commandBitfield, commandLineArgs);
+                    instance.bitfield(commandBitField, commandLineArgs);
                     break;
                 case "code":
                     instance.code(commandCode, commandLineArgs);
@@ -617,7 +617,6 @@ public class IrpTransmogrifier {
     private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, TransformerException, FileNotFoundException, UsageException {
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
-
         Expression expression = new Expression(text);
         long result = expression.toNumber(nameEngine);
         out.println(result);
@@ -633,37 +632,24 @@ public class IrpTransmogrifier {
             IrpTransmogrifier.showTreeViewer(expression.toTreeViewer(), text + "=" + result);
     }
 
-    private void bitfield(CommandBitfield commandBitField, CommandLineArgs commandLineArgs) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException, TransformerException, FileNotFoundException {
+    private void bitfield(CommandBitField commandBitField, CommandLineArgs commandLineArgs) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException, TransformerException, FileNotFoundException {
         NameEngine nameEngine = commandBitField.nameEngine;
-        for (String text : commandBitField.bitfields) {
-
-            IrpParser parser = new ParserDriver(text).getParser();
-            BitField bitfield = BitField.newBitField(parser.bitfield());
-            int last = bitfield.getParseTree().getStop().getStopIndex();
-            if (last != text.length() - 1)
-                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", text.substring(0, last + 1));
-
-            long result = bitfield.toNumber(nameEngine);
-            out.print(result);
-            if (bitfield instanceof FiniteBitField) {
-                FiniteBitField fbf = (FiniteBitField) bitfield;
-                out.print("\t" + fbf.toBinaryString(nameEngine, commandBitField.lsb));
-            }
-            out.println();
-
-            if (commandBitField.xml != null) {
-                Document doc = XmlUtils.newDocument();
-                Element root = bitfield.toElement(doc);
-                doc.appendChild(root);
-                PrintStream xmlStream = IrpUtils.getPrintSteam(commandBitField.xml);
-                XmlUtils.printDOM(xmlStream, doc, commandLineArgs.encoding, null);
-            }
-            if (commandBitField.gui)
-                IrpTransmogrifier.showTreeViewer(parser, bitfield.getParseTree(),
-                        text + "=" + (bitfield instanceof FiniteBitField
-                                ? ((FiniteBitField) bitfield).toBinaryString(nameEngine, commandBitField.lsb)
-                                : bitfield.toString(nameEngine)));
+        String text = String.join("", commandBitField.bitField).trim();
+        BitField bitfield = BitField.newBitField(text);
+        long result = bitfield.toNumber(nameEngine);
+        out.print(result);
+        if (bitfield instanceof FiniteBitField) {
+            FiniteBitField fbf = (FiniteBitField) bitfield;
+            out.print("\t" + fbf.toBinaryString(nameEngine, commandBitField.lsb));
         }
+        out.println();
+
+        if (commandBitField.xml != null) {
+            XmlUtils.printDOM(IrpUtils.getPrintSteam(commandBitField.xml), bitfield.toDocument(), commandLineArgs.encoding, null);
+            logger.log(Level.INFO, "Wrote {0}", commandBitField.xml);
+        }
+        if (commandBitField.gui)
+            IrpTransmogrifier.showTreeViewer(bitfield.toTreeViewer(), text + "=" + result);
     }
 
 
@@ -799,7 +785,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield")
-    private static class CommandBitfield {
+    private static class CommandBitField {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
@@ -814,7 +800,7 @@ public class IrpTransmogrifier {
         private String xml = null;
 
         @Parameter(description = "bitfield", required = true)
-        private List<String> bitfields;
+        private List<String> bitField;
     }
 
     @Parameters(commandNames = {"code"}, commandDescription = "Generate code")

@@ -16,8 +16,13 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -35,10 +40,22 @@ public abstract class BitField extends IrStreamItem implements Numerical {
      * Max length of a BitField in this implementation.
      */
     public static final int maxWidth = Long.SIZE - 1; // = 63
+    private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
 
     public static BitField newBitField(String str) throws IrpSyntaxException {
-        return newBitField(new ParserDriver(str).getParser().bitfield());
+        BitField bitField = newBitField(new ParserDriver(str).getParser());
+        int last = bitField.getParseTree().getStop().getStopIndex();
+        if (last != str.length() - 1)
+            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
+        return bitField;
     }
+
+    private static BitField newBitField(IrpParser parser) throws IrpSyntaxException {
+        BitField instance = newBitField(parser.bitfield());
+        instance.parser = parser;
+        return instance;
+    }
+
     public static BitField newBitField(IrpParser.BitfieldContext ctx) throws IrpSyntaxException {
         BitField instance = (ctx instanceof IrpParser.Finite_bitfieldContext)
                 ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
@@ -51,8 +68,9 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         BitField bitField = newBitField(str);
         return bitField.toNumber(nameEngine);
     }
-    private IrpParser.BitfieldContext parseTree;
 
+    protected IrpParser.BitfieldContext parseTree = null;
+    protected IrpParser parser = null;
     protected boolean complement;
     protected PrimaryItem data;
     protected PrimaryItem chop;
@@ -139,4 +157,9 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     }
 
     public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSyntaxException;
+
+    public TreeViewer toTreeViewer() {
+        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+        return new TreeViewer(ruleNames, parseTree);
+    }
 }

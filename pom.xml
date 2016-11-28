@@ -87,12 +87,11 @@
                     </catalogs>
                 </configuration>
 
-                <!-- Use Saxon for xslt 2 -->
                 <dependencies>
                     <dependency>
-                        <groupId>net.sf.saxon</groupId>
-                        <artifactId>saxon</artifactId>
-                        <version>8.7</version>
+                        <groupId>xalan</groupId>
+                        <artifactId>xalan</artifactId>
+                        <version>2.7.2</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -287,11 +286,6 @@
             <artifactId>testng</artifactId>
             <version>6.9.10</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
-            <version>9.7.0-6</version>
         </dependency>
 
         <!-- Should only be used for testing! Might be removed in the future -->

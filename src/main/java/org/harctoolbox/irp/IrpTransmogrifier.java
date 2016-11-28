@@ -51,7 +51,6 @@ import org.xml.sax.SAXException;
  */
 public class IrpTransmogrifier {
     public static final String defaultConfigFile = "src/main/config/IrpProtocols.xml";
-    public static final String xsltDir = "src/main/xslt";
     public static final String stDir = "src/main/st";
     private static final String charSet = "UTF-8"; // Just for runMain
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
@@ -354,25 +353,6 @@ public class IrpTransmogrifier {
             codeGenerator.generate(protocolNames, irpDatabase, out, inspect);
     }
 
-    private void codeXSLT(List<NamedProtocol> protocols, String target, File directory, boolean intermediates, String encoding) throws TransformerException, IOException, SAXException {
-        if (directory != null)
-            out = IrpUtils.getPrintSteam(new File(directory, protocols.get(0).getName()).getAbsolutePath());
-        Document document = NamedProtocol.toDocument(protocols);
-
-        XmlGenerator xmlGenerator = new XmlGenerator(document, intermediates);
-        xmlGenerator.transform(new File(xsltDir, "intro-repeat-ending.xsl"), ".ire");
-        String[] transformations = target.split(",");
-        String transformation;
-        for (int i = 0; i < transformations.length - 1; i++) {
-            transformation = transformations[i];
-            File file = new File(xsltDir, transformations[i] + ".xsl");
-            xmlGenerator.transform(file, "." + transformation);
-        }
-        transformation = transformations[transformations.length - 1];
-        Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
-        xmlGenerator.printDOM(out, stylesheet, encoding);
-    }
-    
     private void createXmlProtocols(List<String> protocolNames, String encoding) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, FileNotFoundException, TransformerException {
         Document document = irpDatabase.toDocument(protocolNames);
         XmlUtils.printDOM(out, document, encoding, "Irp Documentation");

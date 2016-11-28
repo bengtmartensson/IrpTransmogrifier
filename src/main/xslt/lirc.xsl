@@ -8,7 +8,8 @@
 
     <xsl:namespace-alias stylesheet-prefix="axsl" result-prefix="xsl"/>
 
-    <xsl:output method="xml" />
+    <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
+    <xsl:strip-space elements="*"/>
 
     <xsl:param name="eps" select="'30'"/>
     <xsl:param name="aeps" select= "'100'"/>

@@ -28,7 +28,7 @@ import org.stringtemplate.v4.STGroupFile;
 
 public class STCodeGenerator extends CodeGenerator {
 
-    private static final Logger logger = Logger.getLogger(XmlGenerator.class.getName());
+    private static final Logger logger = Logger.getLogger(STCodeGenerator.class.getName());
 
     private static final String sTGroupFileExtension = ".stg";
 

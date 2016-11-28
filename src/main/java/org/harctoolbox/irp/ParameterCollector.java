@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 
 public class ParameterCollector implements Cloneable {
 
@@ -97,7 +97,7 @@ public class ParameterCollector implements Cloneable {
         return nameEngine;
     }
 
-    void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, IncompatibleArgumentException {
+    void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, InvalidArgumentException {
         map.entrySet().stream().forEach((kvp) -> {
             nameEngine.put(kvp.getKey(), kvp.getValue().getValue());
         });
@@ -136,7 +136,7 @@ public class ParameterCollector implements Cloneable {
         return param.isConsistent(value);
     }
 
-    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
+    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
         for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
             String name = kvp.getKey();
             BitwiseParameter param = kvp.getValue();

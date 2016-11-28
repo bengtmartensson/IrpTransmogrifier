@@ -23,7 +23,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 
 public abstract class CodeGenerator {
 
@@ -67,7 +67,7 @@ public abstract class CodeGenerator {
             NamedProtocol protocol;
             try {
                 protocol = irpDatabase.getNamedProtocol(protocolName);
-            } catch (IrpException | ArithmeticException | IncompatibleArgumentException ex) {
+            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}, ignoring protocol {1}", new Object[] { ex, protocolName });
                 continue;
             }
@@ -92,14 +92,14 @@ public abstract class CodeGenerator {
         protocolNames.stream().forEach((protocolName) -> {
             try {
                 generate(protocolName, irpDatabase, out, false, inspect);
-            } catch (IrpException | ArithmeticException | IncompatibleArgumentException ex) {
+            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}, ignoring this protol", ex);
             }
         });
         out.print(render("FileEnd")); // not println
     }
 
-    private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect) throws IrpException, ArithmeticException, IncompatibleArgumentException {
+    private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect) throws IrpException, ArithmeticException, InvalidArgumentException {
         NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
         generate(protocol, out, printPostAndPre, inspect);
     }

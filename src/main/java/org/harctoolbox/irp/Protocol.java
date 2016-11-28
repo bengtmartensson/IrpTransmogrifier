@@ -26,13 +26,12 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -82,24 +81,24 @@ public class Protocol extends IrpObject {
      * @param irpString
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.IrpSemanticException
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @throws org.harctoolbox.irp.InvalidRepeatException
      * @throws org.harctoolbox.irp.UnassignedException
      */
     public Protocol(String irpString)
-            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
+            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnassignedException {
         this(new ParserDriver(irpString));
     }
 
     public Protocol(ParserDriver parserDriver)
-            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
+            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnassignedException {
         this(parserDriver.getParser().protocol());
         this.parser = parserDriver.getParser();
         this.parseDriver = parserDriver;
     }
 
     public Protocol(IrpParser.ProtocolContext parseTree)
-            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
+            throws IrpSemanticException, IrpSyntaxException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnassignedException {
         this(new GeneralSpec(parseTree), new BitspecIrstream(parseTree), new NameEngine(), new ParameterSpecs(parseTree), parseTree);
         for (IrpParser.DefinitionsContext defs : parseTree.definitions())
             definitions.parseDefinitions(defs);
@@ -161,7 +160,7 @@ public class Protocol extends IrpObject {
      *
      * @param nameEngine
      * @return
-     * @throws IncompatibleArgumentException
+     * @throws InvalidArgumentException
      * @throws IrpSemanticException
      * @throws ArithmeticException
      * @throws UnassignedException
@@ -169,7 +168,7 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.DomainViolationException
      */
     public IrSignal toIrSignal(NameEngine nameEngine)
-            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
+            throws InvalidArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
         IrpUtils.entering(logger, "toIrSignal");
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
@@ -204,13 +203,13 @@ public class Protocol extends IrpObject {
      * @param nameEngine, NameEngine, may be altered.
      * @param pass
      * @return
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.UnassignedException
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.DomainViolationException
      */
-    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
+    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws InvalidArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
         return new ModulatedIrSequence(toIrSequence(nameEngine, pass), getFrequency(), getDutyCycle());
     }
 
@@ -219,14 +218,14 @@ public class Protocol extends IrpObject {
      * @param nameEngine Name engine, may be altered
      * @param pass
      * @return
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.UnassignedException
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.DomainViolationException
      */
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass)
-            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
+            throws InvalidArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException, DomainViolationException {
         IrpUtils.entering(logger, "toIrSequence", pass);
         EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(IrSignal.Pass.intro, pass, nameEngine, generalSpec);
         IrSequence irSequence = evaluatedIrStream.toIrSequence();
@@ -259,7 +258,7 @@ public class Protocol extends IrpObject {
         return parseDriver != null ? parseTree.toStringTree(parseDriver.getParser()) : null;
     }
 
-    long getMemoryVariable(String name) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    long getMemoryVariable(String name) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         return memoryVariables.get(name).toNumber();
     }
 
@@ -405,7 +404,7 @@ public class Protocol extends IrpObject {
             recognizeData.checkConsistency(names);
         } catch (NameConflictException ex) {
             return false;
-        } catch (IrpSyntaxException | IncompatibleArgumentException | UnassignedException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | UnassignedException ex) {
             logger.log(Level.SEVERE, null, ex);
             return false;
         }

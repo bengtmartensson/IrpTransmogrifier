@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -133,9 +133,9 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return sum;
     }
 
-    public BareIrStream get(int index) throws IncompatibleArgumentException {
+    public BareIrStream get(int index) throws InvalidArgumentException {
         if (index >= bitCodes.size())
-            throw new IncompatibleArgumentException("Cannot encode " + index + " with current bitspec.");
+            throw new InvalidArgumentException("Cannot encode " + index + " with current bitspec.");
         return bitCodes.get(index);
     }
 
@@ -214,7 +214,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 IrSequence irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec).toIrSequence();
                 if (irSequence.getLength() != 2)
                     return false;
-            } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
+            } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
                 return false;
             }
         }
@@ -242,7 +242,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 if (! (IrCoreUtils.approximatelyEquals(a, on.get(0), 1, 0) && IrCoreUtils.approximatelyEquals(-a, on.get(1), 1, 0)))
                     return false;
                 a = -a;
-            } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
+            } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
                 return false;
             }
         }
@@ -267,7 +267,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
             boolean sign = off.get(0) > 0;
             return IrCoreUtils.approximatelyEquals(on.get(0), -off.get(0)) && (sign == inverted);
-        } catch (IrpException | IncompatibleArgumentException | ArithmeticException ex) {
+        } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
             return false;
         }
     }

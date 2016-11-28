@@ -3,7 +3,7 @@ package org.harctoolbox.irp;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
@@ -42,21 +42,21 @@ public class ExpressionNGTest {
         System.out.println("toNumber");
         try {
             assertEquals(new Expression("A+2*B*C").toNumber(nameEngine), 24);
-        } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
             fail();
         }
         try {
             new Expression("A+2*B*C+").toNumber(nameEngine);
             fail();
         } catch (ParseCancellationException | IrpSyntaxException ex) {
-        } catch (UnassignedException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | InvalidArgumentException ex) {
             fail();
         }
 
         try {
             assertEquals(new Expression("2**3").toNumber(), 8);
             assertEquals(new Expression("2**3**3").toNumber(), 134217728);
-        } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
             fail();
         }
     }
@@ -116,7 +116,7 @@ public class ExpressionNGTest {
             try {
             instance.toNumber();
             fail();
-        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException ex) {
             fail();
         } catch (UnassignedException ex) {
         }
@@ -136,7 +136,7 @@ public class ExpressionNGTest {
             Expression instance = new Expression("A+2*B*C");
             long result = instance.toNumber(nameEngine);
             assertEquals(result, 24);
-        } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
             fail();
         }
     }

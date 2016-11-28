@@ -42,8 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.xml.validation.Schema;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
-import org.harctoolbox.ircore.XmlUtils;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -66,7 +65,7 @@ public class IrpDatabase {
 
 
     private final static int maxRecursionDepth = 5;
-    public static boolean isKnown(String protocolsPath, String protocol) throws FileNotFoundException, IncompatibleArgumentException, UnsupportedEncodingException, IOException, SAXException {
+    public static boolean isKnown(String protocolsPath, String protocol) throws FileNotFoundException, InvalidArgumentException, UnsupportedEncodingException, IOException, SAXException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
     /**
@@ -77,9 +76,9 @@ public class IrpDatabase {
      * @return String with IRP representation
      * @throws java.io.UnsupportedEncodingException
      * @throws org.xml.sax.SAXException
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public static String getIrp(String configFilename, String protocolName) throws UnsupportedEncodingException, IOException, SAXException, IncompatibleArgumentException {
+    public static String getIrp(String configFilename, String protocolName) throws UnsupportedEncodingException, IOException, SAXException, InvalidArgumentException {
         IrpDatabase irpMaster = null;
         try {
             irpMaster = new IrpDatabase(configFilename);
@@ -253,24 +252,32 @@ public class IrpDatabase {
      * @throws java.io.UnsupportedEncodingException
      */
 
-    public IrpDatabase(Reader reader) throws IOException, SAXException, IncompatibleArgumentException {
+    /**
+     * Sets up a new IrpMaster from its first argument.
+     * @param reader
+     * @throws FileNotFoundException
+     * @throws org.xml.sax.SAXException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws java.io.UnsupportedEncodingException
+     */
+    public IrpDatabase(Reader reader) throws IOException, SAXException, InvalidArgumentException {
         this(XmlUtils.openXmlReader(reader, (Schema) null, true, true));
     }
-    public IrpDatabase(InputStream inputStream) throws IOException, SAXException, IncompatibleArgumentException {
+    public IrpDatabase(InputStream inputStream) throws IOException, SAXException, InvalidArgumentException {
         this(XmlUtils.openXmlStream(inputStream, null, true, true));
     }
-    public IrpDatabase(File file) throws IOException, SAXException, IncompatibleArgumentException {
+    public IrpDatabase(File file) throws IOException, SAXException, InvalidArgumentException {
         this(XmlUtils.openXmlFile(file, (Schema) null, true, true));
     }
-    public IrpDatabase(String file) throws IOException, SAXException, IncompatibleArgumentException {
+    public IrpDatabase(String file) throws IOException, SAXException, InvalidArgumentException {
         this(IrpUtils.getInputSteam(file));
     }
     /**
      *
      * @param doc
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public IrpDatabase(Document doc) throws IncompatibleArgumentException {
+    public IrpDatabase(Document doc) throws InvalidArgumentException {
         Element root = doc.getDocumentElement();
         configFileVersion = root.getAttribute("version");
         NodeList nodes = root.getElementsByTagNameNS(irpProtocolNS, "protocol");
@@ -315,7 +322,7 @@ public class IrpDatabase {
                 NamedProtocol protocol = getNamedProtocol(protocolName);
                 Element element = protocol.toElement(document);
                 root.appendChild(element);
-            } catch (IrpException | ArithmeticException | IncompatibleArgumentException ex) {
+            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}; protocol ignored", ex.getMessage());
             }
 
@@ -394,7 +401,7 @@ public class IrpDatabase {
         return prot == null ? null : prot.getProperty(key);
     }
 
-    public NamedProtocol getNamedProtocol(String name) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
+    public NamedProtocol getNamedProtocol(String name) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
         UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
         if (prot == null)
             throw new UnknownProtocolException(name);
@@ -408,7 +415,7 @@ public class IrpDatabase {
                 list.add(getNamedProtocol(protocolName));
             } catch (UnknownProtocolException ex) {
                 logger.log(Level.WARNING, "Protocol {0} unknown, skipped", protocolName);
-            } catch (IrpException | ArithmeticException | IncompatibleArgumentException ex) {
+            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
                 logger.log(Level.WARNING, "Protocol {0} error: {1}", ex);
             }
         });
@@ -417,15 +424,15 @@ public class IrpDatabase {
 
 
 
-    public void expand() throws IncompatibleArgumentException {
+    public void expand() throws InvalidArgumentException {
         for (String protocol : protocols.keySet())
             expand(0, protocol);
     }
 
-    private void expand(int depth, String name) throws IncompatibleArgumentException {
+    private void expand(int depth, String name) throws InvalidArgumentException {
         UnparsedProtocol p = protocols.get(name);
         if (!p.getIrp().contains("{"))
-            throw new IncompatibleArgumentException("IRP `" + p.getIrp() + "' does not contain `{'.");
+            throw new InvalidArgumentException("IRP `" + p.getIrp() + "' does not contain `{'.");
 
         if (!p.getIrp().startsWith("{")) {
             String p_name = p.getIrp().substring(0, p.getIrp().indexOf('{')).trim();
@@ -480,7 +487,7 @@ public class IrpDatabase {
         return evaluateProtocols(list, sort, regexp);
     }
 
-    public Protocol getProtocol(String protocolName) throws IrpException, IncompatibleArgumentException {
+    public Protocol getProtocol(String protocolName) throws IrpException, InvalidArgumentException {
         if (!isKnown(protocolName))
             throw new UnknownProtocolException(protocolName);
         return new Protocol(getIrp(protocolName));
@@ -556,7 +563,7 @@ public class IrpDatabase {
             return map.get(documentationName);
         }
 
-        NamedProtocol toNamedProtocol() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
+        NamedProtocol toNamedProtocol() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnassignedException {
             return new NamedProtocol(getName(), getIrp(), getDocumentation());
         }
 

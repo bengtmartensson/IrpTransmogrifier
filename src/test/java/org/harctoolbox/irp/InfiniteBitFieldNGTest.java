@@ -2,7 +2,7 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
@@ -44,7 +44,7 @@ public class InfiniteBitFieldNGTest {
         long result = 0;
         try {
             result = instance.toNumber(nameEngine);
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             Logger.getLogger(InfiniteBitFieldNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         assertEquals(result, -2L);

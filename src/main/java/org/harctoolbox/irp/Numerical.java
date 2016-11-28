@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 
 /**
  * Interface for classes that can produce a numerical (long) result.
@@ -29,7 +29,7 @@ public interface Numerical {
      * @return result, long.
      * @throws UnassignedException
      * @throws IrpSyntaxException
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException;
 }

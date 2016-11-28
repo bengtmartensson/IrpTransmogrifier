@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -270,7 +270,7 @@ public class RepeatFinder {
                         ? irSequence.toIrSignal(beginLength, repeatLength, numberRepeats)
                         : // no repeat found, just do the trival
                         irSequence.toIrSignal();
-            } catch (IncompatibleArgumentException ex) {
+            } catch (InvalidArgumentException ex) {
                 assert(false); // cannot happen: repeatStart repeatLength have been checked to be even.
                 return null;
             }

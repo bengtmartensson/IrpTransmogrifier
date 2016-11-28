@@ -1,6 +1,6 @@
 package org.harctoolbox.analyze;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -33,7 +33,7 @@ public class CleanerNGTest {
             irSignal = Pronto.parse(nec_12_34_56);
             irSequence = irSignal.toModulatedIrSequence(5);
             noisy = irSequence.addNoise(60.0);
-        } catch (IncompatibleArgumentException ex) {
+        } catch (InvalidArgumentException ex) {
             fail();
         }
     }

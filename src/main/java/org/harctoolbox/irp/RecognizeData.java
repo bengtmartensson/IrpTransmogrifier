@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Map;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 
@@ -131,7 +131,7 @@ public class RecognizeData implements Cloneable {
         this.parameterCollector = parameterCollector;
     }
 
-    void add(String name, BitwiseParameter parameter) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
+    void add(String name, BitwiseParameter parameter) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
         Expression expression = definitions.containsKey(name) ? definitions.get(name) : null;
         if (expression != null) {
             try {
@@ -147,11 +147,11 @@ public class RecognizeData implements Cloneable {
             parameterCollector.add(name, parameter);
     }
 
-    void add(String name, long value, long bitmask) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
+    void add(String name, long value, long bitmask) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
         add(name, new BitwiseParameter(value, bitmask));
     }
 
-    void add(String name, long value) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, NameConflictException {
+    void add(String name, long value) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
         add(name, new BitwiseParameter(value));
     }
 
@@ -245,11 +245,11 @@ public class RecognizeData implements Cloneable {
         return ! interleaving;
     }
 
-    void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, IncompatibleArgumentException {
+    void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, InvalidArgumentException {
         parameterCollector.transferToNamesMap(nameEngine);
     }
 
-    void checkConsistency(Map<String, Long> nameMap) throws NameConflictException, UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    void checkConsistency(Map<String, Long> nameMap) throws NameConflictException, UnassignedException, IrpSyntaxException, InvalidArgumentException {
         NameEngine nameEngine = new NameEngine(nameMap);
         nameEngine.add(definitions);
         needsChecking.checkConsistency(nameEngine, definitions);

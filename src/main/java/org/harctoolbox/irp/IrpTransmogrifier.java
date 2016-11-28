@@ -234,7 +234,7 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (IrpException | TransformerException | UnsupportedOperationException | ParseCancellationException | IOException | IncompatibleArgumentException | SAXException | ArithmeticException | UsageException | IrpMasterException ex) {
+        } catch (IrpException | TransformerException | UnsupportedOperationException | ParseCancellationException | IOException | InvalidArgumentException | SAXException | ArithmeticException | UsageException | IrpMasterException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
@@ -253,7 +253,7 @@ public class IrpTransmogrifier {
         usage();
     }
 
-    private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IOException, SAXException, TransformerException {
+    private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, InvalidArgumentException, UnassignedException, IOException, SAXException, TransformerException {
         setupDatabase(commandLineArgs);
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
@@ -317,7 +317,7 @@ public class IrpTransmogrifier {
             setupDatabase(commandLineArgs);
             if (irpDatabase != null)
                 out.println("Database: " + filename + " version: " + irpDatabase.getConfigFileVersion());
-        } catch (IncompatibleArgumentException | IOException | SAXException ex) {
+        } catch (InvalidArgumentException | IOException | SAXException ex) {
             logger.log(Level.WARNING, "Could not setup IRP data base: {0}", ex.getMessage());
         }
 
@@ -326,12 +326,12 @@ public class IrpTransmogrifier {
         out.println(Version.licenseString);
     }
 
-    private void writeConfig(CommandWriteConfig commandWriteConfig, CommandLineArgs commandLineArgs) throws TransformerException, IncompatibleArgumentException, IOException, SAXException {
+    private void writeConfig(CommandWriteConfig commandWriteConfig, CommandLineArgs commandLineArgs) throws TransformerException, InvalidArgumentException, IOException, SAXException {
         setupDatabase(false, commandLineArgs);
         XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
     }
 
-    private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException, UsageException, IrpException {
+    private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException, UsageException, IrpException {
         if (commandCode.directory != null && commandLineArgs.output != null)
                 throw new UsageException("The --output and the --directory options are exclusive.");
 
@@ -353,12 +353,12 @@ public class IrpTransmogrifier {
             codeGenerator.generate(protocolNames, irpDatabase, out, inspect);
     }
 
-    private void createXmlProtocols(List<String> protocolNames, String encoding) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, FileNotFoundException, TransformerException {
+    private void createXmlProtocols(List<String> protocolNames, String encoding) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, FileNotFoundException, TransformerException {
         Document document = irpDatabase.toDocument(protocolNames);
         XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
     }
 
-    private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
+    private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, InvalidArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
         NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
                 : commandRenderer.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();
@@ -381,7 +381,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IrpMasterException, IOException, SAXException {
+    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IrpMasterException, IOException, SAXException {
         if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
@@ -405,7 +405,7 @@ public class IrpTransmogrifier {
     }
 
     // TODO: Cleanup
-    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws OddSequenceLenghtException, IncompatibleArgumentException, UsageException {
+    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws OddSequenceLenghtException, InvalidArgumentException, UsageException {
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
@@ -462,7 +462,7 @@ public class IrpTransmogrifier {
         out.println(protocol.toIrpString(radix, usePeriods) + " \tweight = " + protocol.weight());
     }
 
-    private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IOException, SAXException {
+    private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IOException, SAXException {
         setupDatabase(commandLineArgs);
         List<String> list = irpDatabase.evaluateProtocols(commandRecognize.protocol, commandLineArgs.sort, commandLineArgs.regexp);
         if (list.isEmpty())
@@ -495,7 +495,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, TransformerException, FileNotFoundException, UsageException {
+    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, TransformerException, FileNotFoundException, UsageException {
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
         Expression expression = new Expression(text);
@@ -513,7 +513,7 @@ public class IrpTransmogrifier {
             IrpTransmogrifier.showTreeViewer(expression.toTreeViewer(), text + "=" + result);
     }
 
-    private void bitfield(CommandBitField commandBitField, CommandLineArgs commandLineArgs) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException, TransformerException, FileNotFoundException {
+    private void bitfield(CommandBitField commandBitField, CommandLineArgs commandLineArgs) throws IrpSyntaxException, UnassignedException, InvalidArgumentException, TransformerException, FileNotFoundException {
         NameEngine nameEngine = commandBitField.nameEngine;
         String text = String.join("", commandBitField.bitField).trim();
         BitField bitfield = BitField.newBitField(text);
@@ -534,11 +534,11 @@ public class IrpTransmogrifier {
     }
 
 
-    private void setupDatabase(CommandLineArgs commandLineArgs) throws IncompatibleArgumentException, IOException, SAXException {
+    private void setupDatabase(CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException {
         setupDatabase(true, commandLineArgs);
     }
 
-    private void setupDatabase(boolean expand, CommandLineArgs commandLineArgs) throws IncompatibleArgumentException, IOException, SAXException {
+    private void setupDatabase(boolean expand, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException {
         configFilename = commandLineArgs.configFile != null
                 ? commandLineArgs.configFile
                 : commandLineArgs.iniFile != null

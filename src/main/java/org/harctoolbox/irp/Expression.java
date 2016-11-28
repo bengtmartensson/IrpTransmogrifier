@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -112,7 +112,7 @@ public class Expression extends PrimaryItem {
     }
 
     @Override
-    public long invert(long rhs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public long invert(long rhs) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
 
         int noChilden = parseTree.getChildCount();
         long solution;
@@ -173,16 +173,16 @@ public class Expression extends PrimaryItem {
                 : null;
     }
 
-    public long toNumber() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public long toNumber() throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         return toNumber(parseTree, new NameEngine());
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         return toNumber(parseTree, nameEngine);
     }
 
-    private long toNumber(IrpParser.ExpressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    private long toNumber(IrpParser.ExpressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         int noChilden = ctx.getChildCount();
         return noChilden == 1
                 ? toNumberPrimary(ctx.getChild(0), nameEngine)
@@ -194,7 +194,7 @@ public class Expression extends PrimaryItem {
                 : throwNewRuntimeException();
     }
 
-    private long toNumberPrimary(ParseTree child, NameEngine nameEngine) throws IrpSyntaxException, IncompatibleArgumentException, UnassignedException {
+    private long toNumberPrimary(ParseTree child, NameEngine nameEngine) throws IrpSyntaxException, InvalidArgumentException, UnassignedException {
         return child instanceof IrpParser.Primary_itemContext
                 ? newPrimaryItem((IrpParser.Primary_itemContext) child).toNumber(nameEngine)
                 : child instanceof IrpParser.BitfieldContext ? BitField.newBitField((IrpParser.BitfieldContext) child).toNumber(nameEngine)
@@ -202,7 +202,7 @@ public class Expression extends PrimaryItem {
     }
 
     private long toNumberUnary(String operator, IrpParser.ExpressionContext expressionContext, NameEngine nameEngine)
-            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+            throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         long operand = new Expression(expressionContext).toNumber(nameEngine);
         return operator.equals("!") ? (operand == 0L ? 1L : 0L)
                 : operator.equals("#") ? Long.bitCount(operand)
@@ -213,7 +213,7 @@ public class Expression extends PrimaryItem {
 
     private long toNumberBinary(IrpParser.ExpressionContext expressionContext, String operator,
             IrpParser.ExpressionContext expressionContext0, NameEngine nameEngine)
-            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+            throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         long left = new Expression(expressionContext).toNumber(nameEngine);
         long right = new Expression(expressionContext0).toNumber(nameEngine);
 
@@ -241,7 +241,7 @@ public class Expression extends PrimaryItem {
 
     private long toNumberTernary(IrpParser.ExpressionContext expressionContext, IrpParser.ExpressionContext trueExpContext,
             IrpParser.ExpressionContext falseExpContext, NameEngine nameEngine)
-            throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+            throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         long ctrl = new Expression(expressionContext).toNumber(nameEngine);
         return new Expression(ctrl != 0L ? trueExpContext : falseExpContext).toNumber(nameEngine);
     }

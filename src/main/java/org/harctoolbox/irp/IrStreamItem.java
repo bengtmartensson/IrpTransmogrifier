@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 
 /**
@@ -50,7 +50,7 @@ public abstract class IrStreamItem extends IrpObject {
         //environment = env;
         //Debug.debugIrStreamItems(this.getClass().getSimpleName() + " constructed.");
     }
-    public abstract boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+    public abstract boolean isEmpty(NameEngine nameEngine) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
 
     /**
      *
@@ -59,13 +59,13 @@ public abstract class IrStreamItem extends IrpObject {
      * @param nameEngine
      * @param generalSpec
      * @return EvaluatedIrStream or null if termination requested.
-     * @throws IncompatibleArgumentException
+     * @throws InvalidArgumentException
      * @throws ArithmeticException
      * @throws UnassignedException
      * @throws IrpSyntaxException
      */
     abstract EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
 
     int numberOfBitSpecs() {
         return 0;
@@ -100,7 +100,7 @@ public abstract class IrStreamItem extends IrpObject {
     abstract ParserRuleContext getParseTree();
 
     public abstract boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException;
+            throws NameConflictException, ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException;
 
     public abstract boolean hasExtent();
 

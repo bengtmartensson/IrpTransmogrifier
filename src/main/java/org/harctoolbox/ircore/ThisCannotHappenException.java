@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 /**
- *
+ * This is thrown for situations that "cannot happen", typically a programming error.
  */
 public class ThisCannotHappenException extends RuntimeException {
 

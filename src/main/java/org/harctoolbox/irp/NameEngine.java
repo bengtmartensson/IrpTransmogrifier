@@ -28,7 +28,7 @@ import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -153,7 +153,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
                     logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
                     return false;
                 }
-            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
                 Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
@@ -179,7 +179,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
             } catch (IrpSyntaxException ex) {
                 Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
-            } catch (UnassignedException | IncompatibleArgumentException ex) {
+            } catch (UnassignedException | InvalidArgumentException ex) {
                 Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
@@ -190,7 +190,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     public boolean numericallyEquals(NameEngine other) {
         try {
             return numericallyEquals(other.toMap());
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             return false;
         }
     }
@@ -287,7 +287,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         return map.get(name);
     }
 
-    public long toNumber(String name) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public long toNumber(String name) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         Expression expression = get(name);
         return expression.toNumber(this);
     }
@@ -343,7 +343,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     }
 
 
-    public Map<String, Long> toMap() throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public Map<String, Long> toMap() throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         HashMap<String, Long> result = new HashMap<>(map.size());
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             result.put(kvp.getKey(), kvp.getValue().toNumber(this));
@@ -368,7 +368,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
                     }
                 } catch (UnassignedException ex) {
 
-                } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+                } catch (IrpSyntaxException | InvalidArgumentException ex) {
                     Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else

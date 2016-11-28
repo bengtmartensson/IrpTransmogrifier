@@ -19,7 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 
 /**
  *
@@ -53,7 +53,7 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
 
     public abstract Name toName();
 
-    public abstract long invert(long rhs) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
+    public abstract long invert(long rhs) throws UnassignedException, IrpSyntaxException, InvalidArgumentException;
 
     public abstract String toIrpString(int radix);
 

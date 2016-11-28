@@ -19,7 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -54,7 +54,7 @@ public class NameOrNumber extends IrpObject implements Floatable {
 
     @Override
     public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec)
-            throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException {
+            throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
         return thing.toFloat(nameEngine, generalSpec);
     }
 

@@ -2,7 +2,7 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -144,7 +144,7 @@ public class BitSpecNGTest {
             assertFalse(nokia32.isStandardBiPhase(nameEngine, generalSpec));
             assertTrue(rc5.isStandardBiPhase(nameEngine, generalSpec));
             assertTrue(rc6.isStandardBiPhase(nameEngine, generalSpec));
-        } catch (IrpException | ArithmeticException | IncompatibleArgumentException ex) {
+        } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
             fail();
         }
     }

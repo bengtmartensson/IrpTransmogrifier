@@ -2,7 +2,7 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
@@ -48,14 +48,14 @@ public class FiniteBitFieldNGTest {
 //            assertEquals(instance.toNumber(nameEngine), 31L);
 //            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
             assertEquals(instance.toNumber(nameEngine), 31L);
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             fail();
         }
         try {
             FiniteBitField fbf = new FiniteBitField("~foobar:-6:2");
             fbf.toNumber(nameEngine);
             fail();
-        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException ex) {
             fail();
         } catch (UnassignedException ex) {
         }

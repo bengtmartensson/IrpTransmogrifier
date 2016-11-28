@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2012, 2014 Bengt Martensson.
+Copyright (C) 2011, 2012, 2014, 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import java.util.List;
 public class IrSequence implements Cloneable {
     private static final double epsilon = 0.001;
     private static final int dummySpaceDuration = 50; // should not translate to 0000 in Pronto
+
     /**
      * Concatenates the elements in the argument.
      * @param sequences
@@ -54,6 +55,7 @@ public class IrSequence implements Cloneable {
         }
         return s;
     }
+
     private static List<Double> normalize(List<Double> list, boolean nukeLeadingZeros) {
         if (list == null || list.isEmpty())
             return list;
@@ -72,6 +74,7 @@ public class IrSequence implements Cloneable {
         }
         return list;
     }
+
     private static boolean equalSign(double x, double y) {
         return x <= 0 && y <= 0 || x >= 0 && y >= 0;
     }
@@ -188,21 +191,22 @@ public class IrSequence implements Cloneable {
         this(str, false);
     }
 
-
     /**
      * Constructs an IrSequence from the parameter data.
      * @param idata Data
      * @param offset First index to be used
      * @param length Length of used subset of the idata array.
+     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     // @throws RuntimeException If data is contradictory or erroneous.
-    public IrSequence(int[] idata, int offset, int length) /*throws IncompatibleArgumentException*/ {
+    public IrSequence(int[] idata, int offset, int length) throws OddSequenceLenghtException, InvalidArgumentException {
         if (length % 2 != 0)
-            throw new RuntimeException("IrSequence has odd length = " + length);
+            throw new OddSequenceLenghtException("IrSequence has odd length = " + length);
         if (offset >= idata.length && length != 0)
-            throw new RuntimeException("IrSequence: offset beyond end.");
+            throw new InvalidArgumentException("IrSequence: offset beyond end.");
         if (offset + length > idata.length)
-            throw new RuntimeException("IrSequence: length too large.");
+            throw new InvalidArgumentException("IrSequence: length too large.");
 
         data = new double[length];
         for (int i = 0; i < length; i++)
@@ -233,6 +237,7 @@ public class IrSequence implements Cloneable {
     public IrSequence(IrSequence src) {
         data = src.data.clone();
     }
+
     /**
      * Returns the i'th value, a duration in micro seconds.
      * If i is even, it is a flash (light on), if i is odd, a gal (light off).
@@ -242,6 +247,7 @@ public class IrSequence implements Cloneable {
     public final double get(int i) {
         return data[i];
     }
+
     /**
      * Returns the i'th value, the duration in micro seconds, rounded to integer.
      * @param i index
@@ -250,6 +256,7 @@ public class IrSequence implements Cloneable {
     public final int iget(int i) {
         return (int) Math.round(Math.abs(data[i]));
     }
+
     /**
      * Returns an array of integers of durations.
      * This is a copy of the original data, so it might be manipulated without affecting the original instance.
@@ -258,6 +265,7 @@ public class IrSequence implements Cloneable {
     public final int[] toInts() {
         return toInts(false);
     }
+
     /**
      * Returns an array of integers of durations.
      * This is a copy of the original data, so it might be manipulated without affecting the original instance.
@@ -273,6 +281,7 @@ public class IrSequence implements Cloneable {
 
         return array;
     }
+
     /**
      * Returns an array of doubles of durations.
      * This is a copy of the original data, so it might be manipulated without affecting the original instance.
@@ -281,6 +290,7 @@ public class IrSequence implements Cloneable {
     public final double[] toDoubles() {
         return data.clone();
     }
+
     /**
      * For the frequency given as argument, computes an array of durations in number of periods in the given frequency.
      * @param frequency Frequency in Hz.
@@ -293,6 +303,7 @@ public class IrSequence implements Cloneable {
 
         return array;
     }
+
     private boolean sameSign(int x, int y) {
         return (x < 0) == (y < 0);
     }
@@ -328,11 +339,11 @@ public class IrSequence implements Cloneable {
      * Appends a delay to the end of the IrSequence. Original is left untouched.
      * @param delay microseconds of silence to be appended to the IrSequence.
      * @return Copy of object with additional delay at end.
-     * @throws IncompatibleArgumentException
+     * @throws InvalidArgumentException
      */
-    public IrSequence append(double delay) throws IncompatibleArgumentException {
+    public IrSequence append(double delay) throws InvalidArgumentException {
         if (data.length == 0)
-            throw new IncompatibleArgumentException("IrSequence is empty");
+            throw new InvalidArgumentException("IrSequence is empty");
         IrSequence irSequence = new IrSequence(this);
         irSequence.data[data.length-1] = -(Math.abs(data[data.length-1]) + Math.abs(delay));
         return irSequence;
@@ -350,7 +361,7 @@ public class IrSequence implements Cloneable {
             result = (IrSequence) super.clone();
             result.data = this.data.clone();
         } catch (CloneNotSupportedException ex) {
-            throw new InternalError(ex);
+            throw new ThisCannotHappenException(ex);
         }
         return result;
     }
@@ -360,11 +371,11 @@ public class IrSequence implements Cloneable {
      * @param start Index of first duration
      * @param length Length of new sequence
      * @return IrSequence
-     * @throws IncompatibleArgumentException if length or start are not even.
+     * @throws InvalidArgumentException if length or start are not even.
      */
-    public IrSequence subSequence(int start, int length) throws IncompatibleArgumentException {
+    public IrSequence subSequence(int start, int length) throws InvalidArgumentException {
         if (start % 2 != 0)
-            throw new IncompatibleArgumentException("Starting index has to be even, was " + start);
+            throw new InvalidArgumentException("Starting index has to be even, was " + start);
         double[] newData = new double[length];
         System.arraycopy(this.data, start, newData, 0, length);
         return new IrSequence(newData);
@@ -375,9 +386,9 @@ public class IrSequence implements Cloneable {
      * Equivalent to subSequence with first argument 0.
      * @param length Length of new sequence
      * @return IrSequence
-     * @throws IncompatibleArgumentException if length not even.
+     * @throws InvalidArgumentException if length not even.
      */
-    public IrSequence truncate(int length) throws IncompatibleArgumentException {
+    public IrSequence truncate(int length) throws InvalidArgumentException {
         return subSequence(0, length);
     }
 
@@ -407,7 +418,7 @@ public class IrSequence implements Cloneable {
     /**
      * Adds an amount to all flashes.
      *
-     * @param amount Amount to add in microsecods.
+     * @param amount Amount to add in microseconds.
      * @return New instance
      */
     public IrSequence addToFlashes(double amount) {
@@ -532,7 +543,6 @@ public class IrSequence implements Cloneable {
     public boolean approximatelyEquals(int beginning, int compareStart, int length, double absoluteTolerance, double relativeTolerance) {
         return IrSequence.this.approximatelyEquals(beginning, compareStart, length, absoluteTolerance, relativeTolerance, 0f);
     }
-
 
     /**
      * Returns the number of gaps and flashes. Always even.
@@ -702,5 +712,4 @@ public class IrSequence implements Cloneable {
 
         return result.append("]").toString();
     }
-
 }

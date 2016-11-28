@@ -1,6 +1,6 @@
 package org.harctoolbox.analyze;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
@@ -57,7 +57,7 @@ public class RepeatFinderNGTest {
             ModulatedIrSequence modulatedIrSequence = new ModulatedIrSequence(arr, 38400f);
             RepeatFinder repeatFinder = new RepeatFinder(modulatedIrSequence);
             assertEquals(repeatFinder.getRepeatFinderData().getNumberRepeats(), 3);
-        } catch (IncompatibleArgumentException ex) {
+        } catch (InvalidArgumentException ex) {
             assert(false);
         }
     }

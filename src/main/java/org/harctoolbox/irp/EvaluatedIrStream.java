@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 
@@ -47,7 +47,7 @@ class EvaluatedIrStream {
     }
 
     IrSequence toIrSequence()
-            throws IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws InvalidArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "toIrSequence", this);
         List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
@@ -80,7 +80,7 @@ class EvaluatedIrStream {
         return joiner.toString();
     }
 
-    void add(EvaluatedIrStream evaluatedIrStream) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    void add(EvaluatedIrStream evaluatedIrStream) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         if (evaluatedIrStream == null || evaluatedIrStream.isEmpty())
             return;
 
@@ -94,7 +94,7 @@ class EvaluatedIrStream {
         }
     }
 
-    public void reduce(BitSpec bitSpec) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public void reduce(BitSpec bitSpec) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         int index = 0;
         while (index < elements.size()) {
             if (elements.get(index) instanceof BitStream)
@@ -104,7 +104,7 @@ class EvaluatedIrStream {
         }
     }
 
-    private int reduce(BitSpec bitSpec, int index) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    private int reduce(BitSpec bitSpec, int index) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         BitStream bitStream = (BitStream) elements.get(index);
         elements.remove(index);
         EvaluatedIrStream bitFieldDurations = bitStream.evaluate(pass, pass, nameEngine, generalSpec, bitSpec);
@@ -113,7 +113,7 @@ class EvaluatedIrStream {
         return length;
     }
 
-    void add(Evaluatable evaluatable) throws ArithmeticException, IncompatibleArgumentException, UnassignedException, IrpSyntaxException  {
+    void add(Evaluatable evaluatable) throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException  {
         elements.add(evaluatable);
     }
 
@@ -129,7 +129,7 @@ class EvaluatedIrStream {
         return elements.size();
     }
 
-    public double get(int i) throws IrpSemanticException, IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public double get(int i) throws IrpSemanticException, InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         Evaluatable object = elements.get(i);
         if (!(object instanceof Duration))
             throw new IrpSemanticException("Not numeric");

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011,2012,2014 Bengt Martensson.
+Copyright (C) 2011,2012,2014,2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * This class models a rendered IR signals.
+ * This class models a numerical IR signals.
  * It consists of a frequency, a duty cycle, and an intro sequence,
  * a repeat sequence, and an ending sequence. Any of the latter three,
  * but not all, can be empty, but not null. If the ending sequence is non-empty,
@@ -43,15 +43,15 @@ import java.util.logging.Logger;
 public class IrSignal implements Cloneable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
 
-    public static IrSignal parse(List<String> args, double frequency, boolean fixOddSequences) throws OddSequenceLenghtException, IncompatibleArgumentException {
+    public static IrSignal parse(List<String> args, double frequency, boolean fixOddSequences) throws OddSequenceLenghtException, InvalidArgumentException {
         try {
             return Pronto.parse(args);
-        } catch (IncompatibleArgumentException ex) {
+        } catch (InvalidArgumentException ex) {
         }
         return parseRaw(args, frequency, fixOddSequences);
     }
 
-    public static IrSignal parseRaw(List<String> args, double frequency, boolean fixOddSequences) throws IncompatibleArgumentException {
+    public static IrSignal parseRaw(List<String> args, double frequency, boolean fixOddSequences) throws InvalidArgumentException {
         String str = String.join(" ", args).trim();
 
         IrSequence intro;
@@ -61,7 +61,7 @@ public class IrSignal implements Cloneable {
         if (str.startsWith("[")) {
             String[] parts = str.replace("[", "").split("\\]");
             if (parts.length < 2) {
-                throw new IncompatibleArgumentException("Less than two parts");
+                throw new InvalidArgumentException("Less than two parts");
             }
             intro = new IrSequence(parts[0], fixOddSequences);
             repeat = new IrSequence(parts[1], fixOddSequences);
@@ -176,9 +176,9 @@ public class IrSignal implements Cloneable {
      * @param noIntroBursts
      * @param noRepeatBursts
      * @param frequency
-     * @throws IncompatibleArgumentException
+     * @throws InvalidArgumentException
      */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) throws IncompatibleArgumentException {
+    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) throws InvalidArgumentException {
         this(durations, noIntroBursts, noRepeatBursts, frequency, ModulatedIrSequence.unknownDutyCycle);
     }
     /**
@@ -208,8 +208,9 @@ public class IrSignal implements Cloneable {
      * @param noRepeatBursts Number of bursts (half the number of entries) belonging to the intro sequence.
      * @param frequency Modulation frequency in Hz.
      * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, double frequency, double dutyCycle) {
+    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, double frequency, double dutyCycle) throws InvalidArgumentException {
         this(new IrSequence(durations, 0, 2 * noIntroBursts),
                 new IrSequence(durations, 2 * noIntroBursts, 2 * noRepeatBursts),
                 new IrSequence(durations, 2 * (noIntroBursts + noRepeatBursts), durations.length - 2 * (noIntroBursts + noRepeatBursts)),
@@ -218,43 +219,43 @@ public class IrSignal implements Cloneable {
 
     /**
      * Constructs an IrSignal of zero length.
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public IrSignal() throws IncompatibleArgumentException {
+    public IrSignal() throws InvalidArgumentException {
         this(new int[0], 0, 0, (int) ModulatedIrSequence.defaultFrequency);
     }
 
     /**
      * Creates an IrSignal from a CCF string. Also some "short formats" of CCF are recognized.
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @see Pronto
      *
      * @param ccf String supposed to represent a valid CCF signal.
      */
-    public IrSignal(String ccf) throws IncompatibleArgumentException {
+    public IrSignal(String ccf) throws InvalidArgumentException {
         copyFrom(Pronto.parse(ccf));
     }
 
     /**
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @see Pronto
      *
      * @param ccf Integer array supposed to represent a valid CCF signal.
      */
-    public IrSignal(int[] ccf) throws IncompatibleArgumentException {
+    public IrSignal(int[] ccf) throws InvalidArgumentException {
         copyFrom(Pronto.parse(ccf));
     }
 
     /**
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
      * @param begin starting index
-     * @throws org.harctoolbox.ircore.IncompatibleArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @see Pronto
      *
      * @param ccf String array supposed to represent a valid CCF signal.
      */
-    public IrSignal(String[] ccf, int begin) throws IncompatibleArgumentException {
+    public IrSignal(String[] ccf, int begin) throws InvalidArgumentException {
         copyFrom(Pronto.parse(ccf, begin));
     }
 
@@ -273,7 +274,7 @@ public class IrSignal implements Cloneable {
         try {
             result = (IrSignal) super.clone();
         } catch (CloneNotSupportedException ex) {
-            throw new InternalError(ex);
+            throw new ThisCannotHappenException(ex);
         }
         result.introSequence = introSequence.clone();
         result.repeatSequence = repeatSequence.clone();

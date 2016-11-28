@@ -1,6 +1,6 @@
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -23,7 +23,7 @@ public class NameOrNumberNGTest {
     private final NameOrNumber a;
     private final NameOrNumber b;
 
-    public NameOrNumberNGTest() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException {
+    public NameOrNumberNGTest() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException {
         generalSpec = new GeneralSpec("{40k,1000u}");
         nameEngine = new NameEngine("{A=123, B=73}");
         a = new NameOrNumber("A");

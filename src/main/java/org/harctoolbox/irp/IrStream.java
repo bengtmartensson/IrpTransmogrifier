@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -89,7 +89,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     @Override
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "evaluate", this);
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         EvaluatedIrStream result = evaluate(evaluateTheRepeat(pass) ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, repetitions);
@@ -98,7 +98,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, int repeats)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrSignal.Pass actualState = state;
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         for (int i = 0; i < repeats; i++) {

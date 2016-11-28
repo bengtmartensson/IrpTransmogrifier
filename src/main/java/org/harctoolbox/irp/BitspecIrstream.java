@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -116,13 +116,13 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public boolean isEmpty(NameEngine nameEngine) throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public boolean isEmpty(NameEngine nameEngine) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "evaluate(4args)", this);
         EvaluatedIrStream evaluatedIrStream = irStream.evaluate(state, pass, nameEngine, generalSpec);
         evaluatedIrStream.reduce(bitSpec);
@@ -132,7 +132,7 @@ public class BitspecIrstream extends IrStreamItem {
 
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
             BitSpec bitSpec)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "evaluate(5args)", this);
         EvaluatedIrStream inner = evaluate(state, pass, nameEngine, generalSpec);
         inner.reduce(bitSpec);

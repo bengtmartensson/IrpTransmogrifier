@@ -2,7 +2,7 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -63,7 +63,7 @@ public class NameEngineNGTest {
             //System.out.println(instance.get(name));
             Assert.assertTrue(names.containsKey(name));
             Assert.assertEquals(names.toNumber(name), value);
-        } catch (IrpSyntaxException | UnassignedException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
             Assert.fail("testDefine valid failed.");
         }
     }
@@ -93,20 +93,20 @@ public class NameEngineNGTest {
         long value = 123L;
         NameEngine names = new NameEngine();
         try {
-            names.define(name, value);
+        names.define(name, value);
         } catch (IrpSyntaxException ex) {
             fail();
         }
         try {
             assertEquals(names.get(name).toNumber(), value);
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             fail();
         }
         try {
             assertEquals(names.get("Z").toNumber(), value);
             fail();
         } catch (UnassignedException ex) {
-        } catch (IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException ex) {
             fail();
         }
     }
@@ -149,7 +149,7 @@ public class NameEngineNGTest {
         try {
             result = instance.toNumber("F");
             assertEquals(result, 255);
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             fail();
         }
     }

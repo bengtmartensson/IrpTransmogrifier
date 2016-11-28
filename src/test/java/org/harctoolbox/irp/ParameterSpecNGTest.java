@@ -1,6 +1,6 @@
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -47,14 +47,14 @@ public class ParameterSpecNGTest {
             instance.check(nameEngine);
             fail();
         } catch (UnassignedException ex) {
-        } catch (IrpSyntaxException | IncompatibleArgumentException | DomainViolationException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | DomainViolationException ex) {
             fail();
         }
 
         try {
             nameEngine = new NameEngine("{D=15}");
             instance.check(nameEngine);
-        } catch (IrpSyntaxException | IncompatibleArgumentException | DomainViolationException | UnassignedException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | DomainViolationException | UnassignedException ex) {
             fail();
         }
 
@@ -62,7 +62,7 @@ public class ParameterSpecNGTest {
             nameEngine = new NameEngine("{D=9}");
             instance.check(nameEngine);
             fail();
-        } catch (IrpSyntaxException | IncompatibleArgumentException | UnassignedException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | UnassignedException ex) {
             fail();
         } catch (DomainViolationException ex) {
         }
@@ -71,7 +71,7 @@ public class ParameterSpecNGTest {
             nameEngine = new NameEngine("{D=21}");
             instance.check(nameEngine);
             fail();
-        } catch (IrpSyntaxException | IncompatibleArgumentException | UnassignedException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | UnassignedException ex) {
             fail();
         } catch (DomainViolationException ex) {
         }

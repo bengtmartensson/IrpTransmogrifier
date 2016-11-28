@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 Bengt Martensson.
+Copyright (C) 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@ package org.harctoolbox.ircore;
  * Fatally incompatible arguments discovered.
  */
 @SuppressWarnings("serial")
-public class IncompatibleArgumentException extends IrCoreException {
+public class InvalidArgumentException extends IrCoreException {
 
-    public IncompatibleArgumentException(String string) {
+    public InvalidArgumentException(String string) {
         super(string);
     }
 
-    public IncompatibleArgumentException(Throwable ex) {
+    public InvalidArgumentException(Throwable ex) {
         super(ex);
     }
 }

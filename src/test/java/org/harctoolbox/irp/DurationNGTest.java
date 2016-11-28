@@ -1,6 +1,6 @@
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -71,7 +71,7 @@ public class DurationNGTest {
             result = Duration.newDuration("^A p");
             assertTrue(result instanceof Extent);
             assertEquals(result.toFloat(nameEngine, generalSpec), 3750f, 0.0001);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | IncompatibleArgumentException | UnassignedException ex) {
+        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidArgumentException | UnassignedException ex) {
             fail();
         }
     }

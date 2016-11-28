@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 
 /**
@@ -64,7 +64,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         return instance;
     }
 
-    public static long parse(String str, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, IncompatibleArgumentException {
+    public static long parse(String str, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, InvalidArgumentException {
         BitField bitField = newBitField(str);
         return bitField.toNumber(nameEngine);
     }
@@ -102,13 +102,13 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     public abstract String toString(NameEngine nameEngine);
 
-    public abstract long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException;
+    public abstract long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException;
 
     @Override
     public boolean isEmpty(NameEngine nameEngine) {
         try {
             return getWidth(nameEngine) == 0;
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             return false;
         }
     }
@@ -116,7 +116,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     public boolean hasChop() {
         try {
             return chop.toNumber(null) != 0;
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             return true;
         }
     }
@@ -148,7 +148,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
             long num = chop.toNumber(null);
             if (num != 0)
                 map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         }
         map.put("complement", complement);

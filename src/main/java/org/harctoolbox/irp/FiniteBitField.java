@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -88,7 +88,7 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         long x = data.toNumber(nameEngine) >> chop.toNumber(nameEngine);
         if (complement)
             x = ~x;
@@ -99,7 +99,7 @@ public class FiniteBitField extends BitField {
         return x;
     }
 
-    public String toBinaryString(NameEngine nameEngine, boolean reverse) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public String toBinaryString(NameEngine nameEngine, boolean reverse) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         String str = toBinaryString(nameEngine);
         return reverse ? reverse(str) : str;
     }
@@ -111,7 +111,7 @@ public class FiniteBitField extends BitField {
         return s.toString();
     }
 
-    public String toBinaryString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public String toBinaryString(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         String str = Long.toBinaryString(toNumber(nameEngine));
         int wid = (int) width.toNumber(nameEngine);
         int len = str.length();
@@ -125,7 +125,7 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    public long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException {
+    public long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
         return width.toNumber(nameEngine);
     }
 
@@ -135,7 +135,7 @@ public class FiniteBitField extends BitField {
         if (hasChop()) {
             try {
                 chopString =Long.toString(chop.toNumber(nameEngine));
-            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
                 chopString = chop.toIrpString();
             }
             chopString = ":" + chopString;
@@ -144,14 +144,14 @@ public class FiniteBitField extends BitField {
         String dataString;
         try {
             dataString = Long.toString(data.toNumber(nameEngine));
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             dataString = data.toIrpString();
         }
 
         String widthString;
         try {
             widthString = Long.toString(width.toNumber(nameEngine));
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             widthString = width.toIrpString();
         }
 
@@ -166,7 +166,7 @@ public class FiniteBitField extends BitField {
 
     @Override
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "evaluate", this.toString());
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         if (state == pass) {
@@ -198,7 +198,7 @@ public class FiniteBitField extends BitField {
     int numberOfBits() {
         try {
             return (int) getWidth(new NameEngine());
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
             return -99999;
         }
     }
@@ -210,7 +210,7 @@ public class FiniteBitField extends BitField {
 
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack)
-            throws NameConflictException, ArithmeticException, IncompatibleArgumentException, IrpSyntaxException, UnassignedException {
+            throws NameConflictException, ArithmeticException, InvalidArgumentException, IrpSyntaxException, UnassignedException {
         IrpUtils.entering(logger, "recognize", this);
         BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
         int chunkSize = bitSpec.getChunkSize();

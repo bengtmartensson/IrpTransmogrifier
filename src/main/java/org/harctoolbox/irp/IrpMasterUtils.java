@@ -15,16 +15,17 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 */
 
-package org.harctoolbox.ircore;
+package org.harctoolbox.irp;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.irp.IrpSyntaxException;
-import org.harctoolbox.irp.NameEngine;
-import org.harctoolbox.irp.UnassignedException;
+import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLenghtException;
 
 /**
  * This class exists <strong>only</strong> to be able to test the products of this package
@@ -63,7 +64,7 @@ public class IrpMasterUtils {
         }
     }
 
-    public static IrSignal renderIrSignal(String protocolName, NameEngine parameters) throws org.harctoolbox.IrpMaster.IrpMasterException, UnassignedException, IrpSyntaxException, org.harctoolbox.ircore.IncompatibleArgumentException {
+    public static IrSignal renderIrSignal(String protocolName, NameEngine parameters) throws org.harctoolbox.IrpMaster.IrpMasterException, UnassignedException, IrpSyntaxException, org.harctoolbox.ircore.InvalidArgumentException {
         return renderIrSignal(protocolName, parameters.toMap());
     }
 

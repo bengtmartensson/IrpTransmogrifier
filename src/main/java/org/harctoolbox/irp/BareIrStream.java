@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -123,7 +123,7 @@ public class BareIrStream extends IrStreamItem {
 
     @Override
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws IncompatibleArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
         IrpUtils.entering(logger, "evaluate", this);
         IrSignal.Pass actualState = state;
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
@@ -258,7 +258,7 @@ public class BareIrStream extends IrStreamItem {
                 boolean success = false;
                 try {
                     success = irStreamItem.recognize(recognizeData, pass, bitSpecStack);
-                } catch (ArithmeticException | IncompatibleArgumentException | UnassignedException | IrpSyntaxException ex) {
+                } catch (ArithmeticException | InvalidArgumentException | UnassignedException | IrpSyntaxException ex) {
                     logger.log(Level.SEVERE, ex.getMessage());
                 }
                 if (!success) {

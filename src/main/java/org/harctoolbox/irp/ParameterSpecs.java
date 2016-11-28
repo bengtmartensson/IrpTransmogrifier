@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -126,7 +126,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return el;
     }
 
-    void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, IncompatibleArgumentException, DomainViolationException {
+    void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, DomainViolationException {
         for (ParameterSpec parameter : map.values())
             parameter.check(nameEngine);
     }
@@ -182,7 +182,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
                 long deflt = expression.toNumber(nameEngine);
                 if (namesMap.get(name) == deflt)
                     namesMap.remove(name);
-            } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
+            } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
                 throw new ThisCannotHappenException();
             }
         }

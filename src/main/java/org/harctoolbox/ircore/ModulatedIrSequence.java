@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012, 2014 Bengt Martensson.
+Copyright (C) 2012, 2014, 2016 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ public class ModulatedIrSequence extends IrSequence {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
     }
 
-
     /**
      * Modulation frequency in Hz. Use 0 for no modulation. Use
      * <code>unknownFrequency</code> for no information.
@@ -45,7 +44,6 @@ public class ModulatedIrSequence extends IrSequence {
      * Duty cycle of the modulation, a number between 0 and 1. Use <code>unknownDutyCycle</code> for unassigned.
      */
     protected double dutyCycle = unknownDutyCycle;
-
 
     private ModulatedIrSequence() {
     }
@@ -131,6 +129,7 @@ public class ModulatedIrSequence extends IrSequence {
     public final double getFrequency() {
         return frequency;
     }
+
     /**
      *
      * @return Duty cycle.
@@ -138,6 +137,7 @@ public class ModulatedIrSequence extends IrSequence {
     public final double getDutyCycle() {
         return dutyCycle;
     }
+
     @Override
     public String toString() {
         return "{" + Integer.toString((int)Math.round(frequency)) + "," + super.toString() + "}";
@@ -212,9 +212,9 @@ public class ModulatedIrSequence extends IrSequence {
      * @param repeatLength Length of the repeat sequence
      * @param noRepeats Number of occurrences of the repeat sequence
      * @return IrSignal
-     * @throws IncompatibleArgumentException
+     * @throws InvalidArgumentException
      */
-    public IrSignal toIrSignal(int beginningLength, int repeatLength, int noRepeats) throws IncompatibleArgumentException {
+    public IrSignal toIrSignal(int beginningLength, int repeatLength, int noRepeats) throws InvalidArgumentException {
         IrSequence intro = truncate(beginningLength);
         IrSequence repeat = subSequence(beginningLength, repeatLength);
         int startEnding = beginningLength + noRepeats * repeatLength;
@@ -255,22 +255,21 @@ public class ModulatedIrSequence extends IrSequence {
      * Appends a delay to the end of the ModulatedIrSequence. Original is left untouched.
      * @param delay microseconds of silence to be appended to the IrSequence.
      * @return Copy of object with additional delay at end.
-     * @throws IncompatibleArgumentException
+     * @throws InvalidArgumentException
      */
     @Override
-    public ModulatedIrSequence append(double delay) throws IncompatibleArgumentException {
+    public ModulatedIrSequence append(double delay) throws InvalidArgumentException {
         IrSequence irSequence = super.append(delay);
         return new ModulatedIrSequence(irSequence, frequency, dutyCycle);
     }
 
-    public ModulatedIrSequence append(ModulatedIrSequence tail) throws IncompatibleArgumentException {
+    public ModulatedIrSequence append(ModulatedIrSequence tail) throws InvalidArgumentException {
         if (isZeroModulated() ? (! tail.isZeroModulated())
             : (Math.abs(frequency - tail.getFrequency())/frequency > allowedFrequencyDeviation))
-            throw new IncompatibleArgumentException("concationation not possible; modulation frequencies differ");
+            throw new InvalidArgumentException("concationation not possible; modulation frequencies differ");
         IrSequence irSequence = super.append(tail);
         return new ModulatedIrSequence(irSequence, frequency, dutyCycle);
     }
-
 
     @Override
     public final ModulatedIrSequence[] chop(double amount) {

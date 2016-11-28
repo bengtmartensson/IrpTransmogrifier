@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  */
 public class Expression extends PrimaryItem {
 
-    private static final Logger logger = Logger.getLogger(Extent.class.getName());
+    private static final Logger logger = Logger.getLogger(Expression.class.getName());
 
     private IrpParser.ExpressionContext parseTree;
     private IrpParser parser;

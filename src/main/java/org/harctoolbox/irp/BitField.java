@@ -40,7 +40,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
      * Max length of a BitField in this implementation.
      */
     public static final int maxWidth = Long.SIZE - 1; // = 63
-    private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
+    private static final Logger logger = Logger.getLogger(BitField.class.getName());
 
     public static BitField newBitField(String str) throws IrpSyntaxException {
         BitField bitField = newBitField(new ParserDriver(str).getParser());

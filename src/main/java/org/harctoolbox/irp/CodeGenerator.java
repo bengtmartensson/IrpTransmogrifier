@@ -27,7 +27,7 @@ import org.harctoolbox.ircore.IncompatibleArgumentException;
 
 public abstract class CodeGenerator {
 
-    private static final Logger logger = Logger.getLogger(STCodeGenerator.class.getName());
+    private static final Logger logger = Logger.getLogger(CodeGenerator.class.getName());
 
     public abstract ItemCodeGenerator newItemCodeGenerator(String name);
 

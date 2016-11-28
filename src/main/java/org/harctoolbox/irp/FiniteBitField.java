@@ -44,7 +44,7 @@ public class FiniteBitField extends BitField {
     public FiniteBitField(String str) throws IrpSyntaxException {
         this((IrpParser.Finite_bitfieldContext) new ParserDriver(str).getParser().bitfield());
         this.parser = new ParserDriver(str).getParser();
-        int last = getParseTree().getStop().getStopIndex();
+        int last = parseTree.getStop().getStopIndex();
             if (last != str.length() - 1)
                 logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
     }

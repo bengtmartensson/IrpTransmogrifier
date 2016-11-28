@@ -18,14 +18,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.antlr.v4.gui.TreeViewer;
 import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -45,19 +45,6 @@ import org.w3c.dom.Element;
 public class Protocol extends IrpObject {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
-    // from irpmaster.XmlExport
-    public static Document newDocument() {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-        factory.setNamespaceAware(false);
-        Document doc = null;
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            doc = builder.newDocument();
-        } catch (ParserConfigurationException e) {
-        }
-        return doc;
-    }
 
     private GeneralSpec generalSpec;
     private ParameterSpecs parameterSpecs;
@@ -66,6 +53,7 @@ public class Protocol extends IrpObject {
     private ParserDriver parseDriver;
     private NameEngine definitions;
     private NameEngine memoryVariables;
+    private IrpParser parser = null;
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree) {
@@ -106,6 +94,7 @@ public class Protocol extends IrpObject {
     public Protocol(ParserDriver parserDriver)
             throws IrpSemanticException, IrpSyntaxException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnassignedException {
         this(parserDriver.getParser().protocol());
+        this.parser = parserDriver.getParser();
         this.parseDriver = parserDriver;
     }
 
@@ -454,5 +443,10 @@ public class Protocol extends IrpObject {
      */
     public NameEngine getDefinitions() {
         return definitions;
+    }
+
+    public TreeViewer toTreeViewer() {
+        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+        return new TreeViewer(ruleNames, parseTree);
     }
 }

@@ -30,6 +30,8 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -279,7 +281,7 @@ public class IrpDatabase {
         //expand();
     }
 
-    public Document toDocument() {
+    private Document emptyDocument() {
         Document doc = XmlUtils.newDocument(true);
         Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
         root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
@@ -289,13 +291,35 @@ public class IrpDatabase {
         root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
         root.setAttribute("version", configFileVersion);
         doc.appendChild(root);
+        return doc;
+    }
 
+    public Document toDocument() {
+        Document doc = emptyDocument();
+        Element root = doc.getDocumentElement();
         for (UnparsedProtocol protocol : this.protocols.values()) {
             Element element = toElement(doc, protocol.map);
             root.appendChild(element);
         }
 
         return doc;
+    }
+
+    public Document toDocument(List<String> protocolNames) {
+        Document document = XmlUtils.newDocument();
+        Element root = document.createElement("NamedProtocols");
+        document.appendChild(root);
+
+        for (String protocolName : protocolNames)
+            try {
+                NamedProtocol protocol = getNamedProtocol(protocolName);
+                Element element = protocol.toElement(document);
+                root.appendChild(element);
+            } catch (IrpException | ArithmeticException | IncompatibleArgumentException ex) {
+                logger.log(Level.WARNING, "{0}; protocol ignored", ex.getMessage());
+            }
+
+        return document;
     }
 
     /**
@@ -377,6 +401,21 @@ public class IrpDatabase {
         return prot.toNamedProtocol();
     }
 
+    public List<NamedProtocol> getNamedProtocol(Collection<String> protocolNames) {
+        List<NamedProtocol> list = new ArrayList<>(protocolNames.size());
+        protocolNames.stream().forEach((protocolName) -> {
+            try {
+                list.add(getNamedProtocol(protocolName));
+            } catch (UnknownProtocolException ex) {
+                logger.log(Level.WARNING, "Protocol {0} unknown, skipped", protocolName);
+            } catch (IrpException | ArithmeticException | IncompatibleArgumentException ex) {
+                logger.log(Level.WARNING, "Protocol {0} error: {1}", ex);
+            }
+        });
+        return list;
+    }
+
+
 
     public void expand() throws IncompatibleArgumentException {
         for (String protocol : protocols.keySet())
@@ -421,6 +460,30 @@ public class IrpDatabase {
         if (protocols.containsKey(nameLower))
             logger.log(Level.WARNING, "Multiple definitions of protocol `{0}''. Keeping the last.", nameLower);
         protocols.put(nameLower, proto);
+    }
+
+    public List<String> evaluateProtocols(List<String> protocols, boolean sort, boolean regexp) {
+        List<String> list = (protocols == null || protocols.isEmpty()) ? new ArrayList<>(getNames())
+                : regexp ? getMatchingNames(protocols)
+                        : protocols;
+        if (sort)
+            Collections.sort(list);
+        return list;
+    }
+
+    public List<String> evaluateProtocols(String in, boolean sort, boolean regexp) {
+        if (in == null || in.isEmpty())
+            return new ArrayList<>(0);
+
+        List<String> list = new ArrayList<>(1);
+        list.add(in);
+        return evaluateProtocols(list, sort, regexp);
+    }
+
+    public Protocol getProtocol(String protocolName) throws IrpException, IncompatibleArgumentException {
+        if (!isKnown(protocolName))
+            throw new UnknownProtocolException(protocolName);
+        return new Protocol(getIrp(protocolName));
     }
 
     private static class UnparsedProtocol {

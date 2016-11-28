@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,13 +39,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.xml.transform.TransformerException;
 import org.antlr.v4.gui.TreeViewer;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.IrpMaster.IrpMasterException;
 import org.harctoolbox.analyze.*;
 import org.harctoolbox.ircore.*;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
@@ -92,7 +88,7 @@ public class IrpTransmogrifier {
     }
 
     /**
-     * show the given Tree Viewer
+     * show the TreeViewer given as argument
      *
      * @param tv
      * @param title
@@ -103,14 +99,6 @@ public class IrpTransmogrifier {
         panel.add(tv);
 
         JOptionPane.showMessageDialog(null, panel, title, JOptionPane.PLAIN_MESSAGE);
-    }
-
-    public static void showTreeViewer(IrpParser parser, ParserRuleContext parserRuleContext, String title) {
-        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
-
-        // http://stackoverflow.com/questions/34832518/antlr4-dotgenerator-example
-        TreeViewer tv = new TreeViewer(ruleNames, parserRuleContext);
-        showTreeViewer(tv, title);
     }
 
     /**
@@ -247,7 +235,7 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (TransformerException | UnsupportedOperationException | ParseCancellationException | IOException | IncompatibleArgumentException | SAXException | IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnknownProtocolException | UnassignedException | DomainViolationException | UsageException | IrpMasterException ex) {
+        } catch (IrpException | TransformerException | UnsupportedOperationException | ParseCancellationException | IOException | IncompatibleArgumentException | SAXException | ArithmeticException | UsageException | IrpMasterException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
@@ -262,83 +250,48 @@ public class IrpTransmogrifier {
         this.out = out;
     }
 
-
     private void help() {
         usage();
     }
 
-    private List<String> evaluateProtocols(List<String> in, boolean sort, boolean regexp) {
-        List<String> list = (in == null || in.isEmpty()) ? new ArrayList<>(irpDatabase.getNames())
-                : regexp ? irpDatabase.getMatchingNames(in)
-                        : in;
-        if (sort)
-            Collections.sort(list);
-        return list;
-    }
-
-    private List<String> evaluateProtocols(String in, boolean sort, boolean regexp) {
-        if (in == null)
-            return new ArrayList<>(0);
-
-        List<String> list = new ArrayList<>(1);
-        list.add(in);
-        return evaluateProtocols(list, sort, regexp);
-    }
-
     private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws UnknownProtocolException, IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, IncompatibleArgumentException, UnassignedException, IOException, SAXException, TransformerException {
         setupDatabase(commandLineArgs);
-        List<String> list = evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp);
+        List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
-        for (String proto : list) {
-            if (!irpDatabase.isKnown(proto))
-                throw new UnknownProtocolException(proto);
+        for (String protocolName : list) {
+            Protocol protocol;
+            try {
+                protocol = irpDatabase.getProtocol(protocolName);
+                logger.log(Level.FINE, "Protocol {0} parsed", protocolName);
+            } catch (UnknownProtocolException ex) {
+                logger.log(Level.WARNING, "{0}", ex.getMessage());
+                continue;
+            } catch (IrpException ex) {
+                logger.log(Level.WARNING, "Unparsable protocol {0}", protocolName);
+                continue;
+            }
 
-            out.print(proto);
+            out.print(protocolName);
 
             if (commandList.irp)
-                out.print(separator + irpDatabase.getIrp(proto));
+                out.print(separator + irpDatabase.getIrp(protocolName));
 
             if (commandList.documentation)
-                out.print(separator + irpDatabase.getDocumentation(proto));
+                out.print(separator + irpDatabase.getDocumentation(protocolName));
 
-            if (commandList.stringTree) {
-                Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
+            if (commandList.stringTree)
                 out.print(separator + protocol.toStringTree());
-            }
 
-            if (commandList.is) {
-                Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
+            if (commandList.is)
                 out.print(separator + protocol.toIrpString());
-            }
 
-            if (commandList.gui) {
-                IrpParser parser = new ParserDriver(irpDatabase.getIrp(proto)).getParser();
-                //parser = new ParserDriver(irpDatabase.getIrp(proto)).getParser();
-                Protocol protocol = new Protocol(parser.protocol());
-                showTreeViewer(parser, protocol.getParseTree(), "Parse tree for " + proto);
-            }
+            if (commandList.gui)
+                showTreeViewer(protocol.toTreeViewer(), "Parse tree for " + protocolName);
 
-            if (commandList.weight) {
-                try {
-                    Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
-                    int weight = protocol.weight();
-                    out.print(separator + "Weight: " + weight);
-                } catch (IrpSyntaxException ex) {
-                    logger.log(Level.WARNING, "Unparsable protocol {0}", proto);
-                }
-            }
-
-            if (commandList.parse)
-                try {
-                    Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
-                    out.print(separator + protocol);
-                    out.println(separator + "Parsing succeeded");
-                } catch (IrpSyntaxException ex) {
-                    logger.log(Level.WARNING, "Unparsable protocol {0}", proto);
-                }
+            if (commandList.weight)
+                out.print(separator + "Weight: " + protocol.weight());
 
             if (commandList.classify) {
-                Protocol protocol = new Protocol(irpDatabase.getIrp(proto));
                 out.print("\t");
                 out.print((int) protocol.getFrequency());
                 out.print("\t");
@@ -379,66 +332,26 @@ public class IrpTransmogrifier {
         XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
     }
 
-    private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException, UsageException {
-        File directory = null;
-        if (commandCode.directory != null) {
-            if (commandLineArgs.output != null)
+    private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, IOException, SAXException, TransformerException, UsageException, IrpException {
+        if (commandCode.directory != null && commandLineArgs.output != null)
                 throw new UsageException("The --output and the --directory options are exclusive.");
-            directory = new File(commandCode.directory);
-            if (!(directory.exists() && directory.isDirectory() && directory.canWrite()))
-                throw new UsageException("The argument of --directory must be an existing and writeable directory.");
-        }
+
         setupDatabase(commandLineArgs);
-        List<String> list = evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
+        List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
-        List<NamedProtocol> protocols = new ArrayList<>(list.size());
-        for (String protocolName : list)
-            protocols.add(irpDatabase.getNamedProtocol(protocolName));
-
-
-        if (commandCode.stringtemplate)
-            codeST(protocols, commandCode.target, directory, commandCode.inspect);
+        // Hardcoded selection of technologies for different targets
+        if (commandCode.target.equalsIgnoreCase("xml"))
+            createXmlProtocols(protocolNames, commandLineArgs.encoding);
         else
-            codeXSLT(protocols, commandCode.target, directory, commandCode.intermediates, commandLineArgs.encoding);
+            codeST(protocolNames, commandCode.target, commandCode.directory, commandCode.inspect);
     }
 
-    private void codeST(Collection<NamedProtocol> protocols, String target, File directory, boolean inspect) throws UsageException, IOException {
+    private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect) throws IOException, IrpException {
         STCodeGenerator codeGenerator = new STCodeGenerator(target);
-        if (codeGenerator.isAbstract())
-            throw new UsageException("Target " + target + " cannot generete code since it is declared abstract.");
-
-        STCodeGenerator.trackCreationEvents(inspect); // ???
-        String pre = codeGenerator.render("FileBegin");
-        String post = codeGenerator.render("FileEnd");
-        if (codeGenerator.manyProtocolsInOneFile()) {
-            if (directory != null)
-                throw new UsageException("--directory cannot be used with the selected code generator, since it writes in one file only");
-            out.println(pre);
-            for (NamedProtocol protocol : protocols) {
-                ItemCodeGenerator code = protocol.code(codeGenerator);// contains a trailing newline
-                if (inspect)
-                    code.inspect();
-                out.println(code.render());
-            }
-            out.print(post); // not println
-        } else {
-            for (NamedProtocol protocol : protocols) {
-                ItemCodeGenerator code = protocol.code(codeGenerator);// contains a trailing newline
-                if (inspect)
-                    code.inspect();
-                String filename = null;
-                if (directory != null) {
-                    File file = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + codeGenerator.fileSuffix());
-                    filename = file.getCanonicalPath();
-                    out = IrpUtils.getPrintSteam(filename);
-                }
-                out.println(pre);
-                out.println(code.render());
-                out.print(post); // not println
-                if (filename != null)
-                    logger.log(Level.INFO, "Wrote {0}", filename);
-            }
-        }
+        if (directory != null)
+            codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect);
+        else
+            codeGenerator.generate(protocolNames, irpDatabase, out, inspect);
     }
 
     private void codeXSLT(List<NamedProtocol> protocols, String target, File directory, boolean intermediates, String encoding) throws TransformerException, IOException, SAXException {
@@ -459,22 +372,10 @@ public class IrpTransmogrifier {
         Document stylesheet = XmlUtils.openXmlFile(new File(xsltDir, transformation + ".xsl"));
         xmlGenerator.printDOM(out, stylesheet, encoding);
     }
-
-    // In this version, not used
-    private void createXmlProtocols(List<String> list, String xmlFile, String encoding) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, FileNotFoundException, TransformerException {
-
-        Document document = XmlUtils.newDocument();
-
-        Element root = document.createElement("NamedProtocols");
-        document.appendChild(root);
-
-        for (String protocolName : list) {
-            NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-            Element element = protocol.toElement(document);
-            root.appendChild(element);
-        }
-        PrintStream xmlStream = IrpUtils.getPrintSteam(xmlFile);
-        XmlUtils.printDOM(xmlStream, document, encoding, "Irp Documentation");
+    
+    private void createXmlProtocols(List<String> protocolNames, String encoding) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, FileNotFoundException, TransformerException {
+        Document document = irpDatabase.toDocument(protocolNames);
+        XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
     }
 
     private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpSyntaxException, IncompatibleArgumentException, IrpSemanticException, ArithmeticException, UnassignedException, DomainViolationException, IrpMasterException {
@@ -492,29 +393,29 @@ public class IrpTransmogrifier {
 
         if (commandRenderer.test) {
             String protocolName = protocol.getName();
-                IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(protocolName, nameEngine);
-                if (!irSignal.approximatelyEquals(irpMasterSignal)) {
-                    out.println(Pronto.toPrintString(irpMasterSignal));
-                    out.println("Error in " + protocolName);
-                }
+            IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(protocolName, nameEngine);
+            if (!irSignal.approximatelyEquals(irpMasterSignal)) {
+                out.println(Pronto.toPrintString(irpMasterSignal));
+                out.println("Error in " + protocolName);
             }
+        }
     }
 
     private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IrpMasterException, IOException, SAXException {
-        setupDatabase(commandLineArgs);
         if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
+
+        setupDatabase(commandLineArgs);
 
         if (commandRenderer.irp != null) {
             if (!commandRenderer.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
             if (commandRenderer.test)
                 throw new UsageException("Cannot not use --irp together with --test");
-
             NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
             render(protocol, commandRenderer);
         } else {
-            List<String> list = evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp);
+            List<String> list = irpDatabase.evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp);
             for (String proto : list) {
                 logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
@@ -523,6 +424,7 @@ public class IrpTransmogrifier {
         }
     }
 
+    // TODO: Cleanup
     private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws OddSequenceLenghtException, IncompatibleArgumentException, UsageException {
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
@@ -582,14 +484,13 @@ public class IrpTransmogrifier {
 
     private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IrpSyntaxException, IrpSemanticException, ArithmeticException, IncompatibleArgumentException, InvalidRepeatException, UnknownProtocolException, UnassignedException, DomainViolationException, IOException, SAXException {
         setupDatabase(commandLineArgs);
-        List<String> list = evaluateProtocols(commandRecognize.protocol, commandLineArgs.sort, commandLineArgs.regexp);
+        List<String> list = irpDatabase.evaluateProtocols(commandRecognize.protocol, commandLineArgs.sort, commandLineArgs.regexp);
         if (list.isEmpty())
             throw new UsageException("No protocol given or matched.");
-
-        for (String protocolName : list) {
-            if (numberTrue(commandRecognize.random, !commandRecognize.nameEngine.isEmpty(), !commandRecognize.args.isEmpty()) != 1)
+        if (numberTrue(commandRecognize.random, !commandRecognize.nameEngine.isEmpty(), !commandRecognize.args.isEmpty()) != 1)
                 throw new UsageException("Must either use --random or --nameengine, or have arguments.");
 
+        for (String protocolName : list) {
             NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
             NameEngine testNameEngine = new NameEngine();
             IrSignal irSignal;
@@ -600,15 +501,15 @@ public class IrpTransmogrifier {
                 irSignal = IrSignal.parse(commandRecognize.args, commandRecognize.frequency, false);
             }
 
-            Map<String, Long> nameEngine = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters,
+            Map<String, Long> parameters = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters,
                     true, commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
             if (commandRecognize.args.isEmpty()) {
                 out.print(protocolName + "\t");
                 out.print(testNameEngine + "\t");
-                out.println((nameEngine != null && testNameEngine.numericallyEquals(nameEngine)) ? "success" : "fail");
-            } else if (nameEngine != null)
-                out.println(nameEngine);
+                out.println((parameters != null && testNameEngine.numericallyEquals(parameters)) ? "success" : "fail");
+            } else if (parameters != null)
+                out.println(parameters);
             else
                 out.println("no decode");
         }
@@ -725,7 +626,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-r", "--relativetolerance"}, description = "Relative tolerance as a number < 1 (NOT: percent)")
         private double relativeTolerance = 0.04;
 
-        @Parameter(names = { "--regex", "--regexp"}, description = "Interpret protocol arguments as regular expressions")
+        @Parameter(names = { "--regex"}, description = "Interpret protocol arguments as regular expressions")
         private boolean regexp = false;
 
         @Parameter(names = {"-s", "--sort"}, description = "Sort the protocols alphabetically")
@@ -809,31 +710,13 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-d", "--directory" }, description = "Directory to generate output files, if not using the --output option.")
         private String directory = null;
 
-//        @Parameter(names = { "--decode" }, description = "Generate code for decoding, otherwise for rendering. Target dependent.")
-//        private boolean decode = false;
-
-//        @Parameter(names = { "--documentation"}, description = "List documentation")
-//        private boolean documentation = false;
-//
-//        @Parameter(names = {"-i", "--irp"}, description = "List irp")
-//        private boolean irp = false;
-
         @Parameter(names = {       "--inspect" }, description = "Fire up stringtemplate inspector on generated code (if sensible)")
         private boolean inspect = false;
-
-        @Parameter(names = { "-i", "--intermediates" }, description = "Dump intermediate results to files (unless using --stringtemplate)")
-        private boolean intermediates = false;
-
-        @Parameter(names = { "-s", "--st", "--stringtemplate" }, description = "Use stringtemplate")
-        private boolean stringtemplate = false;
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target for code generation")
         private String target = null;
 
-//        @Parameter(names = { "--xsl", "--xslt" }, description = "Pathname to XSLT")
-//        private String xslt = null;
-
-        @Parameter(description = "Protocol")
+        @Parameter(description = "protocol")
         private List<String> protocols;
     }
 
@@ -877,9 +760,6 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "--documentation"}, description = "List documentation")
         private boolean documentation = false;
-
-        @Parameter(names = {"-p", "--parse"}, description = "Test parse the protocol(s)")
-        private boolean parse = false;
 
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;

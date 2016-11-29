@@ -17,16 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-import org.harctoolbox.ircore.IrCoreException;
+class DecodeException extends Exception {
 
-public class DecodeException extends IrCoreException {
-
-    public DecodeException(int i) {
+    DecodeException(int i) {
         super("Decode failed at token " + Integer.toString(i));
     }
 
-    public DecodeException() {
+    DecodeException() {
         super();
     }
-
 }

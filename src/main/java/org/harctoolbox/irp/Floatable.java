@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -30,12 +29,11 @@ public interface Floatable {
      * @param nameEngine
      * @param generalSpec
      * @return Floating representation of class.
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @throws ArithmeticException
+     * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.UnassignedException
-     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException;
+    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException;
 
     public Element toElement(Document document);
 

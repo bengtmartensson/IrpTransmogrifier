@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 
 /**
@@ -31,10 +30,11 @@ import org.harctoolbox.ircore.IrSignal;
  * @author Bengt Martensson
  */
 public abstract class IrStreamItem extends IrpObject {
-    public static IrStreamItem newIrStreamItem(String str) throws IrpSyntaxException, InvalidRepeatException {
+    public static IrStreamItem newIrStreamItem(String str) {
         return newIrStreamItem((new ParserDriver(str)).getParser().irstream_item());
     }
-    public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+
+    public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) {
         ParseTree child = ctx.getChild(0);
         return (child instanceof IrpParser.VariationContext) ? new Variation(((IrpParser.VariationContext) child))
                 : (child instanceof IrpParser.BitfieldContext) ? BitField.newBitField((IrpParser.BitfieldContext) child)
@@ -50,7 +50,7 @@ public abstract class IrStreamItem extends IrpObject {
         //environment = env;
         //Debug.debugIrStreamItems(this.getClass().getSimpleName() + " constructed.");
     }
-    public abstract boolean isEmpty(NameEngine nameEngine) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+    public abstract boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
 
     /**
      *
@@ -65,7 +65,7 @@ public abstract class IrStreamItem extends IrpObject {
      * @throws IrpSyntaxException
      */
     abstract EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+            throws UnassignedException, InvalidNameException;
 
     int numberOfBitSpecs() {
         return 0;
@@ -85,7 +85,7 @@ public abstract class IrStreamItem extends IrpObject {
 
     public abstract DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs);
 
-    abstract int numberOfBits();
+    abstract int numberOfBits() throws UnassignedException;
 
     abstract int numberOfBareDurations();
 
@@ -100,7 +100,7 @@ public abstract class IrStreamItem extends IrpObject {
     abstract ParserRuleContext getParseTree();
 
     public abstract boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException;
+            throws UnassignedException, InvalidNameException, NameConflictException, IrpSemanticException;
 
     public abstract boolean hasExtent();
 

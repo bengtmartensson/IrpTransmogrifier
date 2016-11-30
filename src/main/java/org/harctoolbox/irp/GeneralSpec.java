@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.w3c.dom.Document;
@@ -88,19 +87,19 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         this(defaultBitDirection, defaultUnit, ModulatedIrSequence.defaultFrequency, ModulatedIrSequence.unknownDutyCycle);
     }
 
-    public GeneralSpec(String str) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException {
+    public GeneralSpec(String str) throws IrpSemanticException {
         this(new ParserDriver(str).getParser().generalspec());
     }
 
-    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, InvalidArgumentException {
+    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException {
         this(ctx.generalspec());
     }
 
-    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, InvalidArgumentException {
+    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException {
         this(ctx.generalspec_list());
     }
 
-    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException, IrpSyntaxException, ArithmeticException, InvalidArgumentException {
+    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException {
         double unitInPeriods = -1f;
         for (IrpParser.Generalspec_itemContext node : ctx.generalspec_item()) {
             ParseTree item = node.getChild(0);

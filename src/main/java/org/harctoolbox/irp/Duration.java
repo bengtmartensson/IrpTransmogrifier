@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -44,7 +43,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     private static final Logger logger = Logger.getLogger(Duration.class.getName());
     private static final double DUMMYTIMEUNIT = 999;
 
-    public static Duration newDuration(String str) throws IrpSyntaxException {
+    public static Duration newDuration(String str) {
         IrpParser parser = new ParserDriver(str).getParser();
         try {
             return newDuration(parser.duration());
@@ -53,7 +52,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         }
     }
 
-    public static Duration newDuration(IrpParser.DurationContext d) throws IrpSyntaxException {
+    public static Duration newDuration(IrpParser.DurationContext d) {
         ParseTree child = d.getChild(0);
         Duration instance = (child instanceof IrpParser.FlashContext)
                 ? new Flash((IrpParser.FlashContext) child)
@@ -64,7 +63,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         return instance;
     }
 
-    public static Duration newDuration(IrpParser.ExtentContext e) throws IrpSyntaxException {
+    public static Duration newDuration(IrpParser.ExtentContext e) {
         return new Extent(e);
     }
 
@@ -88,7 +87,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         this(us, "u");
     }
 
-    protected Duration(IrpParser.Name_or_numberContext ctx, String unit) throws IrpSyntaxException {
+    protected Duration(IrpParser.Name_or_numberContext ctx, String unit) {
         super();
         nameOrNumber = new NameOrNumber(ctx);
         this.unit = unit != null ? unit : "";
@@ -117,8 +116,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
                 && IrCoreUtils.approximatelyEquals(time_units, other.time_units);
     }
 
-    private void compute(NameEngine nameEngine, GeneralSpec generalSpec)
-            throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    private void compute(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
         double time = nameOrNumber.toFloat(nameEngine, generalSpec);
 
         switch (unit) {
@@ -145,11 +143,9 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
 
-    public abstract double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException;
+    public abstract double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException;
 
-    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
-            throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
         compute(nameEngine, generalSpec);
         if (time_periods != IrCoreUtils.invalid) {
             if (generalSpec == null)
@@ -171,23 +167,22 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         }
     }
 
-    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
         return evaluate(nameEngine, generalSpec, 0);
     }
 
     @Override
-    public final boolean isEmpty(NameEngine nameEngine) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public final boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
         return evaluate(nameEngine, null, 0f) == 0;
     }
 
     @Override
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
         return evaluate(nameEngine, generalSpec, 0f);
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) {
         EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, pass);
 
         if (state == pass)
@@ -231,8 +226,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException {
         IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         if (!recognizeData.check(isOn())) {
             IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
@@ -342,7 +336,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
             long num = Math.round(toFloat(null, generalSpec));
             map.put("microseconds", num);
             return map;
-        } catch (ArithmeticException | InvalidArgumentException | UnassignedException | IrpSyntaxException ex) {
+        } catch (ArithmeticException | UnassignedException | IrpSemanticException ex) {
         }
         map.put("name", nameOrNumber.toString());
         map.put("multiplicator", multiplicator(generalSpec));

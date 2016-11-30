@@ -27,11 +27,11 @@ import org.w3c.dom.Element;
 public class FloatNumber extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
 
-    public static double parse(String str) throws IrpSyntaxException {
+    public static double parse(String str) {
         FloatNumber floatNumber = new FloatNumber(str);
         return floatNumber.toFloat();
     }
-    public static double parse(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
+    public static double parse(IrpParser.Float_numberContext ctx) {
         FloatNumber floatNumber = new FloatNumber(ctx);
         return floatNumber.toFloat();
     }
@@ -42,11 +42,11 @@ public class FloatNumber extends IrpObject implements Floatable {
         data = x;
     }
 
-    public FloatNumber(IrpParser.Float_numberContext ctx) throws IrpSyntaxException {
+    public FloatNumber(IrpParser.Float_numberContext ctx) {
         data = Double.parseDouble(ctx.getText());
     }
 
-    public FloatNumber(String str) throws IrpSyntaxException {
+    public FloatNumber(String str) {
         this(new ParserDriver((str)).getParser().float_number());
     }
 

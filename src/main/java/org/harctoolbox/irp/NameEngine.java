@@ -28,8 +28,6 @@ import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.InvalidArgumentException;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -46,7 +44,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
 
     private final static Logger logger = Logger.getLogger(NameEngine.class.getName());
 
-    public static NameEngine parseLoose(String str) throws IrpSyntaxException {
+    public static NameEngine parseLoose(String str) throws InvalidNameException {
         NameEngine nameEngine = new NameEngine();
         if (str == null || str.trim().isEmpty())
             return nameEngine;
@@ -80,7 +78,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
 //        this.map = map;
 //    }
 
-    public NameEngine(String str) throws IrpSyntaxException {
+    public NameEngine(String str) throws InvalidNameException {
         this();
         if (str != null && !str.isEmpty()) {
             ParserDriver parserDriver = new ParserDriver(str);
@@ -90,13 +88,9 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
 
     public NameEngine(Map<String, Long> numericalParameters) {
         this(numericalParameters.size());
-        for (Map.Entry<String, Long> entry : numericalParameters.entrySet()) {
-            try {
-                map.put(entry.getKey(), new Expression(entry.getValue()));
-            } catch (IrpSyntaxException ex) {
-                throw new ThisCannotHappenException();
-            }
-        }
+        numericalParameters.entrySet().stream().forEach((entry) -> {
+            map.put(entry.getKey(), new Expression(entry.getValue()));
+        });
     }
 
     @Override
@@ -153,7 +147,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
                     logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
                     return false;
                 }
-            } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+            } catch (UnassignedException ex) {
                 Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
@@ -176,11 +170,11 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
                     //logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
                     return false;
                 }
-            } catch (IrpSyntaxException ex) {
-                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            } catch (UnassignedException | InvalidArgumentException ex) {
-                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IrpSyntaxException ex) {
+//                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+//                return false;
+            } catch (UnassignedException ex) {
+                logger.log(Level.SEVERE, null, ex);
                 return false;
             }
         }
@@ -190,7 +184,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     public boolean numericallyEquals(NameEngine other) {
         try {
             return numericallyEquals(other.toMap());
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException ex) {
             return false;
         }
     }
@@ -218,37 +212,37 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         return map.entrySet().iterator();
     }
 
-    public void define(String name, String value) throws IrpSyntaxException {
+    public void define(String name, String value) throws InvalidNameException {
         Expression exp = new Expression(value);
         define(name, exp.getParseTree());
     }
 
-    private void define(String name, IrpParser.ExpressionContext ctx) throws IrpSyntaxException {
+    private void define(String name, IrpParser.ExpressionContext ctx) throws InvalidNameException {
         if (!Name.validName(name))
-            throw new IrpSyntaxException("Invalid name: " + name);
+            throw new InvalidNameException(name);
         Expression expression = new Expression(ctx);
         map.put(name, expression);
     }
 
-    public void define(String name, Expression expression) throws IrpSyntaxException {
+    public void define(String name, Expression expression) throws InvalidNameException {
         if (!Name.validName(name)) // ????
-            throw new IrpSyntaxException("Invalid name: " + name);
+            throw new InvalidNameException(name);
         map.put(name, expression);
     }
 
-    public void define(Name name, Expression expression) throws IrpSyntaxException {
+    public void define(Name name, Expression expression) throws InvalidNameException {
         define(name.toString(), expression);
     }
 
-    public void define(String name, long value) throws IrpSyntaxException {
+    public void define(String name, long value) throws InvalidNameException {
         define(name, new Expression(value));
     }
 
-    public void define(Name name, long value) throws IrpSyntaxException {
+    public void define(Name name, long value) throws InvalidNameException {
         define(name, new Expression(value));
     }
 
-    public void define(PrimaryItem data, long value) throws IrpSyntaxException {
+    public void define(PrimaryItem data, long value) throws InvalidNameException {
         Name name = data.toName();
         if (name != null)
             define(name, value);
@@ -258,19 +252,19 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
      * Invoke the parser on the supplied argument, and stuff the result into the name engine.
      *
      * @param str String to be parsed, like "{C = F*4 + D + 3}".
-     * @throws org.harctoolbox.irp.IrpSyntaxException
+     * @throws org.harctoolbox.irp.InvalidNameException
      */
-    public void parseDefinitions(String str) throws IrpSyntaxException {
+    public void parseDefinitions(String str) throws InvalidNameException {
         ParserDriver parserDriver = new ParserDriver(str);
         parseDefinitions(parserDriver.getParser().definitions());
     }
 
-    public final void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) throws IrpSyntaxException {
+    public final void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) throws InvalidNameException {
         for (IrpParser.DefinitionContext definition : ctx.definitions_list().definition())
             parseDefinition(definition);
     }
 
-    private void parseDefinition(IrpParser.DefinitionContext ctx /* DEFINITION */) throws IrpSyntaxException {
+    private void parseDefinition(IrpParser.DefinitionContext ctx /* DEFINITION */) throws InvalidNameException {
         define(ctx.name().getText(), ctx.expression());
     }
 
@@ -287,7 +281,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         return map.get(name);
     }
 
-    public long toNumber(String name) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public long toNumber(String name) throws UnassignedException, IrpSyntaxException {
         Expression expression = get(name);
         return expression.toNumber(this);
     }
@@ -343,7 +337,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     }
 
 
-    public Map<String, Long> toMap() throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public Map<String, Long> toMap() throws UnassignedException, IrpSyntaxException {
         HashMap<String, Long> result = new HashMap<>(map.size());
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             result.put(kvp.getKey(), kvp.getValue().toNumber(this));
@@ -367,9 +361,9 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
                         throw new NameConflictException(name);
                     }
                 } catch (UnassignedException ex) {
-
-                } catch (IrpSyntaxException | InvalidArgumentException ex) {
-                    Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
+//
+//                } catch (IrpSyntaxException | InvalidArgumentException ex) {
+//                    Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else
                 map.put(name, val);

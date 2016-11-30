@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,7 +50,7 @@ public class BareIrStream extends IrStreamItem {
         return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
     }
 
-    private static List<IrStreamItem> parse(List<IrpParser.Irstream_itemContext> list) throws IrpSyntaxException, InvalidRepeatException {
+    private static List<IrStreamItem> parse(List<IrpParser.Irstream_itemContext> list) {
         List<IrStreamItem> irStreamItems = new ArrayList<>(list.size());
         for (IrpParser.Irstream_itemContext item : list) {
             IrStreamItem irStreamItem = newIrStreamItem(item);
@@ -63,7 +62,7 @@ public class BareIrStream extends IrStreamItem {
     private List<IrStreamItem> irStreamItems = null;
     private IrpParser.Bare_irstreamContext parseTree = null;
 
-    public BareIrStream(IrpParser.Bare_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+    public BareIrStream(IrpParser.Bare_irstreamContext ctx) {
         this(parse(ctx.irstream_item()));
         parseTree = ctx;
         //this(toList(ctx, env), env);
@@ -122,8 +121,7 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
         IrpUtils.entering(logger, "evaluate", this);
         IrSignal.Pass actualState = state;
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
@@ -211,8 +209,12 @@ public class BareIrStream extends IrStreamItem {
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
-        if (numberOfBits() >= 0)
-            element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        try {
+            if (numberOfBits() >= 0)
+                element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        } catch (UnassignedException ex) {
+            // numberOfBits has no meaninful value
+        }
         for (IrStreamItem item : this.irStreamItems)
             element.appendChild(item.toElement(document));
         return element;
@@ -225,10 +227,13 @@ public class BareIrStream extends IrStreamItem {
         return sum;
     }
 
+
     @Override
-    int numberOfBits() {
+    int numberOfBits() throws UnassignedException {
         int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
+        for (IrStreamItem item : irStreamItems) {
+            sum += item.numberOfBits();
+        }
         return sum;
     }
 
@@ -238,8 +243,7 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack)
-            throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack) throws NameConflictException, InvalidNameException, IrpSemanticException {
         IrpUtils.entering(logger, "recognize " + pass, this);
         if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat()) {
             IrpUtils.exiting(logger, "recognize " + pass, "pass (since variation with intro equals repeat)");
@@ -258,7 +262,7 @@ public class BareIrStream extends IrStreamItem {
                 boolean success = false;
                 try {
                     success = irStreamItem.recognize(recognizeData, pass, bitSpecStack);
-                } catch (ArithmeticException | InvalidArgumentException | UnassignedException | IrpSyntaxException ex) {
+                } catch (ArithmeticException | UnassignedException | IrpSyntaxException ex) {
                     logger.log(Level.SEVERE, ex.getMessage());
                 }
                 if (!success) {

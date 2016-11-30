@@ -18,9 +18,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Map;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class RecognizeData implements Cloneable {
 
@@ -131,9 +131,15 @@ public class RecognizeData implements Cloneable {
         this.parameterCollector = parameterCollector;
     }
 
-    void add(String name, BitwiseParameter parameter) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
-        Expression expression = definitions.containsKey(name) ? definitions.get(name) : null;
-        if (expression != null) {
+    void add(String name, BitwiseParameter parameter) throws NameConflictException, InvalidNameException {
+        //Expression expression = definitions.containsKey(name) ? definitions.get(name) : null;
+        if (definitions.containsKey(name)) {
+            Expression expression;
+            try {
+                expression = definitions.get(name);
+            } catch (UnassignedException ex) {
+                throw new ThisCannotHappenException();
+            }
             try {
                 long expected = expression.toNumber(parameterCollector.toNameEngine());
                 if (!parameter.isConsistent(expected))
@@ -147,11 +153,11 @@ public class RecognizeData implements Cloneable {
             parameterCollector.add(name, parameter);
     }
 
-    void add(String name, long value, long bitmask) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
+    void add(String name, long value, long bitmask) throws NameConflictException, InvalidNameException {
         add(name, new BitwiseParameter(value, bitmask));
     }
 
-    void add(String name, long value) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
+    void add(String name, long value) throws NameConflictException, InvalidNameException {
         add(name, new BitwiseParameter(value));
     }
 
@@ -245,11 +251,11 @@ public class RecognizeData implements Cloneable {
         return ! interleaving;
     }
 
-    void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, InvalidArgumentException {
+    void transferToNamesMap(Map<String, Long> nameEngine) {
         parameterCollector.transferToNamesMap(nameEngine);
     }
 
-    void checkConsistency(Map<String, Long> nameMap) throws NameConflictException, UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    void checkConsistency(Map<String, Long> nameMap) throws NameConflictException, UnassignedException {
         NameEngine nameEngine = new NameEngine(nameMap);
         nameEngine.add(definitions);
         needsChecking.checkConsistency(nameEngine, definitions);
@@ -270,7 +276,7 @@ public class RecognizeData implements Cloneable {
         return relativeTolerance;
     }
 
-    NameEngine toNameEngine() throws IrpSyntaxException {
+    NameEngine toNameEngine() throws InvalidNameException {
         NameEngine nameEngine = definitions.clone();
         nameEngine.add(parameterCollector.toNameEngine());
         return nameEngine;

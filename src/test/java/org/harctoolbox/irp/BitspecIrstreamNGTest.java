@@ -19,7 +19,7 @@ public class BitspecIrstreamNGTest {
     public static void tearDownClass() throws Exception {
     }
     private final BitspecIrstream instance;
-    public BitspecIrstreamNGTest() throws IrpSyntaxException, InvalidRepeatException {
+    public BitspecIrstreamNGTest() throws IrpSyntaxException, UnsupportedRepeatException {
         instance = new BitspecIrstream("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
     }
 
@@ -129,9 +129,10 @@ public class BitspecIrstreamNGTest {
 
     /**
      * Test of numberOfBits method, of class BitspecIrstream.
+     * @throws org.harctoolbox.irp.UnassignedException
      */
     @Test
-    public void testNumberOfBits() {
+    public void testNumberOfBits() throws UnassignedException {
         System.out.println("numberOfBits");
         int result = instance.numberOfBits();
         assertEquals(result, 32);

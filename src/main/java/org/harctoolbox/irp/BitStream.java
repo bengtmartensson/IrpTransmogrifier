@@ -25,8 +25,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -43,10 +43,9 @@ class BitStream extends IrStreamItem implements Evaluatable {
         length = 0;
     }
 
-    BitStream(BitField bitField, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    BitStream(BitField bitField, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException {
         if (bitField instanceof InfiniteBitField)
-            throw new InvalidArgumentException("Infinite bitfields cannot be converted to BitStreams.");
+            throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
 
         data = BigInteger.valueOf((generalSpec != null && generalSpec.getBitDirection() == BitDirection.msb)
                     ? bitField.toNumber(nameEngine)
@@ -84,8 +83,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
 
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) {
         IrpUtils.entering(logger, "evaluate", this);
 
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);
@@ -95,8 +93,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
         return list;
     }
 
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec) throws UnassignedException, InvalidNameException {
         IrpUtils.entering(logger, "evaluate", this);
 
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);
@@ -142,8 +139,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

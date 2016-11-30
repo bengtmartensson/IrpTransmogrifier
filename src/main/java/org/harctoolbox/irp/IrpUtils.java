@@ -29,6 +29,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import org.antlr.v4.gui.TreeViewer;
 
 /**
  * This class is a collection of useful utilities as static functions and constants.
@@ -286,6 +289,20 @@ public class IrpUtils {
         Map<String, Object> result = new HashMap<>(noProps + 1);
         result.put("kind", object.getClass().getSimpleName());
         return result;
+    }
+
+    /**
+     * Show the TreeViewer given as argument. Requires a graphic environment.
+     *
+     * @param tv
+     * @param title
+     */
+    public static void showTreeViewer(TreeViewer tv, String title) {
+        JPanel panel = new JPanel();
+        //tv.setScale(2);
+        panel.add(tv);
+
+        JOptionPane.showMessageDialog(null, panel, title, JOptionPane.PLAIN_MESSAGE);
     }
 
     public static void entering(Logger logger, Level level, String member, Object arg) {

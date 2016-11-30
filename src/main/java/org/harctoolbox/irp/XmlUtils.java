@@ -38,6 +38,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -52,7 +53,7 @@ public class XmlUtils {
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 
-    public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
+    public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
         final String fname = file.getCanonicalPath();
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
 
@@ -76,21 +77,21 @@ public class XmlUtils {
         return builder.parse(file);
     }
 
-    public static Document openXmlFile(File file, File schemaFile, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
+    public static Document openXmlFile(File file, File schemaFile, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
         Schema schema = readSchemaFromFile(schemaFile);
         return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
     }
 
-    public static Document openXmlFile(File file) throws IOException, SAXParseException, SAXException {
+    public static Document openXmlFile(File file) throws IOException, SAXException {
         return openXmlFile(file, (Schema) null, true, true);
     }
 
     // NOTE: By silly reader, makes null as InputStream, producing silly error messages.
-    public static Document openXmlReader(Reader reader, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
+    public static Document openXmlReader(Reader reader, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
         return openXmlStream((new InputSource(reader)).getByteStream(), schema, isNamespaceAware, isXIncludeAware);
     }
 
-    public static Document openXmlStream(InputStream stream, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXParseException, SAXException {
+    public static Document openXmlStream(InputStream stream, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
 
         builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
@@ -112,7 +113,7 @@ public class XmlUtils {
         return builder.parse(stream);
     }
 
-    private static DocumentBuilder newDocumentBuilder(Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {
+    private static DocumentBuilder newDocumentBuilder(Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
         factory.setNamespaceAware(isNamespaceAware);
@@ -126,19 +127,14 @@ public class XmlUtils {
             builder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
             // there is something seriously wrong
-            throw new RuntimeException(ex);
+            throw new ThisCannotHappenException(ex);
         }
         return builder;
     }
 
     public static Document newDocument(boolean isNamespaceAware) {
-        try {
-            DocumentBuilder builder = newDocumentBuilder(null, isNamespaceAware, false);
-            return builder.newDocument();
-        } catch (SAXException ex) {
-            // should never happen
-            return null;
-        }
+        DocumentBuilder builder = newDocumentBuilder(null, isNamespaceAware, false);
+        return builder.newDocument();
     }
 
     public static Document newDocument() {
@@ -157,24 +153,29 @@ public class XmlUtils {
         return index;
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) throws TransformerException {
-        Transformer tr = TransformerFactory.newInstance().newTransformer();
-        if (encoding != null)
-            tr.setOutputProperty(OutputKeys.ENCODING, encoding);
-        tr.setOutputProperty(OutputKeys.INDENT, "yes");
-        tr.setOutputProperty(OutputKeys.METHOD, "xml");
-        if (cdataElements != null)
-            tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
-        tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        tr.transform(new DOMSource(doc), new StreamResult(ostr));
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) {
+        try {
+            Transformer tr = TransformerFactory.newInstance().newTransformer();
+            if (encoding != null)
+                tr.setOutputProperty(OutputKeys.ENCODING, encoding);
+            tr.setOutputProperty(OutputKeys.INDENT, "yes");
+            tr.setOutputProperty(OutputKeys.METHOD, "xml");
+            if (cdataElements != null)
+                tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
+            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            tr.transform(new DOMSource(doc), new StreamResult(ostr));
+        } catch (TransformerException ex) {
+            logger.log(Level.SEVERE, "{0}", ex.getMessage());
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
-    public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException, TransformerException {
+    public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException {
         printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements);
         logger.log(Level.INFO, "File {0} written.", file);
     }
 
-    public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException, TransformerException {
+    public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException {
         PrintStream xmlStream = IrpUtils.getPrintSteam(xmlFileName); // FIXME: should not use org.harctoolbox.irp
         printDOM(xmlStream, doc, encoding, cdataElements);
     }
@@ -182,16 +183,21 @@ public class XmlUtils {
     // Do not define a function printDOM(File, Document, String),
     // since it would been too error prone.
 
-    public static void printDOM(File file, Document doc) throws FileNotFoundException, TransformerException {
+    public static void printDOM(File file, Document doc) throws FileNotFoundException {
         printDOM(file, doc, null, null);
     }
 
-    public static void printDOM(Document doc) throws TransformerException {
+    public static void printDOM(Document doc) {
         printDOM(System.out, doc, null, null);
     }
 
-    private static Schema readSchemaFromFile(File schemaFile) throws SAXException {
-        return (SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)).newSchema(schemaFile);
+    private static Schema readSchemaFromFile(File schemaFile) {
+        try {
+            return (SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)).newSchema(schemaFile);
+        } catch (SAXException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     public static Map<String, Element> buildIndex(Element element, String tagName, String idName) {
@@ -221,5 +227,6 @@ public class XmlUtils {
         }
     }
 
-    private XmlUtils() {}
+    private XmlUtils() {
+    }
 }

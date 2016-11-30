@@ -40,7 +40,7 @@ public class BiphaseDecoder extends AbstractDecoder {
     }
 
     @Override
-    protected List<IrStreamItem> process(int beg, int length) throws DecodeException {
+    protected List<IrStreamItem> process(int beg, int length) {
         List<IrStreamItem> items = new ArrayList<>(2*length);
         data = new ParameterData();
         BiphaseState state = BiphaseState.start;

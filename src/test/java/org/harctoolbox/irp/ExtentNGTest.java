@@ -1,7 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -77,14 +75,9 @@ public class ExtentNGTest {
 
     @Test
     public void testToIrpString() {
-        try {
-            System.out.println("toIrpString");
-            Extent instance = new Extent("^108m");
-            String result = instance.toIrpString();
-            Assert.assertEquals(result, "^108m");
-        } catch (IrpSyntaxException ex) {
-            Logger.getLogger(ExtentNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("toIrpString");
+        Extent instance = new Extent("^108m");
+        String result = instance.toIrpString();
+        Assert.assertEquals(result, "^108m");
     }
-
 }

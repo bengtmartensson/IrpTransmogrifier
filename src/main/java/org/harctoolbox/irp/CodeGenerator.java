@@ -23,7 +23,6 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 
 public abstract class CodeGenerator {
 
@@ -65,12 +64,12 @@ public abstract class CodeGenerator {
 
         for (String protocolName : protocolNames) {
             NamedProtocol protocol;
-            try {
+//            try {
                 protocol = irpDatabase.getNamedProtocol(protocolName);
-            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
-                logger.log(Level.WARNING, "{0}, ignoring protocol {1}", new Object[] { ex, protocolName });
-                continue;
-            }
+//            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
+//                logger.log(Level.WARNING, "{0}, ignoring protocol {1}", new Object[] { ex, protocolName });
+//                continue;
+//            }
             String filename = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + fileSuffix()).getCanonicalPath();
             try (PrintStream out = IrpUtils.getPrintSteam(filename)) {
                 generate(protocol, out, true, inspect);
@@ -79,7 +78,7 @@ public abstract class CodeGenerator {
         }
     }
 
-    public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect) throws IOException, IrpException {
+    public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect) throws IrpException {
         if (isAbstract())
             throw new IrpException("This target cannot generete code since it is declared abstract.");
         if (!manyProtocolsInOneFile() && protocolNames.size() > 1)
@@ -92,14 +91,14 @@ public abstract class CodeGenerator {
         protocolNames.stream().forEach((protocolName) -> {
             try {
                 generate(protocolName, irpDatabase, out, false, inspect);
-            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
+            } catch (IrpException | ArithmeticException ex) {
                 logger.log(Level.WARNING, "{0}, ignoring this protol", ex);
             }
         });
         out.print(render("FileEnd")); // not println
     }
 
-    private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect) throws IrpException, ArithmeticException, InvalidArgumentException {
+    private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect) throws UnknownProtocolException, IrpException {
         NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
         generate(protocol, out, printPostAndPre, inspect);
     }

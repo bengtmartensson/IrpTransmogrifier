@@ -2,11 +2,9 @@ package org.harctoolbox.analyze;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.irp.BitDirection;
-import org.harctoolbox.irp.InvalidRepeatException;
 import org.harctoolbox.irp.IrpSemanticException;
 import org.harctoolbox.irp.IrpSyntaxException;
 import org.harctoolbox.irp.Protocol;
@@ -68,7 +66,7 @@ public class PwmDecoderNGTest {
         Protocol result;
         try {
             result = pwm.process();
-        } catch (DecodeException ex) {
+        } catch (Exception ex) {
             fail();
             return;
         }
@@ -76,7 +74,7 @@ public class PwmDecoderNGTest {
         try {
             Protocol expResult = new Protocol("{38.4k,564,msb}<1,-1|1,-3>(16,-8,A:32,1,^108m){A=0x30441ce3}");
             assertEquals(result, expResult);
-        } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | InvalidArgumentException | InvalidRepeatException | UnassignedException ex) {
+        } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException ex) {
             Logger.getLogger(PwmDecoderNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

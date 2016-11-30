@@ -21,6 +21,7 @@ package org.harctoolbox.irp;
  * This exception is thrown when an Irp defined something impossible.
  */
 public class IrpSemanticException extends IrpException {
+
     public IrpSemanticException(String message) {
         super(message);
     }

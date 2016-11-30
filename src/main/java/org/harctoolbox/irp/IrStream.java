@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -39,11 +38,11 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     private RepeatMarker repeatMarker; // must not be null!
 
-    public IrStream(String str) throws IrpSyntaxException, InvalidRepeatException{
+    public IrStream(String str) {
         this(new ParserDriver(str).getParser().irstream());
     }
 
-    public IrStream(IrpParser.IrstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+    public IrStream(IrpParser.IrstreamContext ctx) {
         super(ctx.bare_irstream());
         IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
         repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : new RepeatMarker();
@@ -88,8 +87,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
         IrpUtils.entering(logger, "evaluate", this);
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         EvaluatedIrStream result = evaluate(evaluateTheRepeat(pass) ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, repetitions);
@@ -97,8 +95,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
         return result;
     }
 
-    private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, int repeats)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, int repeats) throws UnassignedException, InvalidNameException {
         IrSignal.Pass actualState = state;
         EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         for (int i = 0; i < repeats; i++) {
@@ -150,8 +147,12 @@ public class IrStream extends BareIrStream implements AggregateLister {
             element.setAttribute("repeatMax", repeatMarker.isInfinite() ? "infinite" : Integer.toString(repeatMarker.getMax()));
         element.setAttribute("isRepeat", Boolean.toString(isRepeatSequence()));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
-        if (numberOfBits() >= 0)
-            element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        try {
+            if (numberOfBits() >= 0)
+                element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
+        } catch (UnassignedException ex) {
+            // computation of numberOfBits not meaningful
+        }
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
 //        for (IrStreamItem item : irStreamItems)
 //            element.appendChild(item.toElement(document));
@@ -215,9 +216,10 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     @Override
-    int numberOfBits() {
+    int numberOfBits() throws UnassignedException {
         int sum = 0;
-        sum = getIrStreamItems().stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
+        for (IrStreamItem item : getIrStreamItems())
+            sum += item.numberOfBits();
         return sum;
     }
 
@@ -233,8 +235,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws NameConflictException, InvalidNameException, IrpSemanticException {
         IrpUtils.entering(logger, "recognize " + pass, this);
         //boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
@@ -246,7 +247,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     private boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs, int repeats)
-            throws NameConflictException {
+            throws NameConflictException, InvalidNameException, IrpSemanticException {
         for (int i = 0; i < repeats; i++) {
             boolean status = super.recognize(recognizeData, pass, bitSpecs);
             if (!status)

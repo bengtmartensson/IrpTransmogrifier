@@ -1,7 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -50,21 +48,17 @@ public class IrStreamItemNGTest {
      */
     @Test
     public void testNewIrStreamItem_String() {
-        try {
-            System.out.println("newIrStreamItem");
-            String str = "";
-            IrStreamItem expResult = null;
-            IrStreamItem result = IrStreamItem.newIrStreamItem("42");
-            assertTrue(result instanceof Flash);
-            result = IrStreamItem.newIrStreamItem("answer=42");
-            assertTrue(result instanceof Assignment);
-            result = IrStreamItem.newIrStreamItem("(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
-            assertTrue(result instanceof IrStream);
-            result = IrStream.newIrStreamItem("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
-            assertTrue(result instanceof BitspecIrstream);
-            System.out.println(result);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            Logger.getLogger(IrStreamItemNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("newIrStreamItem");
+        String str = "";
+        IrStreamItem expResult = null;
+        IrStreamItem result = IrStreamItem.newIrStreamItem("42");
+        assertTrue(result instanceof Flash);
+        result = IrStreamItem.newIrStreamItem("answer=42");
+        assertTrue(result instanceof Assignment);
+        result = IrStreamItem.newIrStreamItem("(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
+        assertTrue(result instanceof IrStream);
+        result = IrStream.newIrStreamItem("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
+        assertTrue(result instanceof BitspecIrstream);
+        System.out.println(result);
     }
 }

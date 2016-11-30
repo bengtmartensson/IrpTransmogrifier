@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,10 +31,11 @@ import org.w3c.dom.Element;
  * This class models assignments as defined in Chapter 11.
  */
 public class Assignment extends IrStreamItem implements Numerical {
-    public static long parse(String str, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public static long parse(String str, NameEngine nameEngine) throws UnassignedException {
         Assignment assignment = new Assignment(str);
         return assignment.toNumber(nameEngine);
     }
+
     private Name name;
     private Expression value;
     private IrpParser.AssignmentContext parseTree = null;
@@ -81,7 +81,7 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException {
         return value.toNumber(nameEngine);
     }
 
@@ -100,8 +100,7 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
         if (state == pass) {
             long val = value.toNumber(nameEngine);
             nameEngine.define(name, val);
@@ -134,8 +133,7 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
         if (recognizeData.getState() == pass)
             recognizeData.getParameterCollector().overwrite(name.toString(), value.toNumber(recognizeData.toNameEngine()));
 

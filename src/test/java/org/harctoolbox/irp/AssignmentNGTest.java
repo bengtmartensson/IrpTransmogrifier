@@ -1,6 +1,5 @@
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
@@ -52,7 +51,7 @@ public class AssignmentNGTest {
             Assignment instance = new Assignment("x = answer*sheldon");
             long result = instance.toNumber(nameEngine);
             assertEquals(result, 42*73);
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
     }

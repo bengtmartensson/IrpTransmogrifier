@@ -2,7 +2,6 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
@@ -53,7 +52,7 @@ public class GeneralSpecNGTest {
             assertEquals(new GeneralSpec("{42%, 10p,msb,40k}").toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 42%.");
             assertEquals(new GeneralSpec("{msb ,40k , 33.33333% ,10p }").toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 33%.");
             assertEquals(new GeneralSpec("{msb, 123u, 100k, 10p, 1000k}").toString(), "Frequency = 1000000.0Hz, unit = 10.0us, msb, Duty cycle: -.");
-        } catch (ArithmeticException | InvalidArgumentException ex) {
+        } catch (ArithmeticException ex) {
             fail();
         }
     }
@@ -76,7 +75,7 @@ public class GeneralSpecNGTest {
             instance = new GeneralSpec("{40k , 33.33333% ,10p }");
             result = instance.getBitDirection();
             Assert.assertEquals(result, BitDirection.lsb);
-        } catch (ArithmeticException | InvalidArgumentException ex) {
+        } catch (ArithmeticException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -94,7 +93,7 @@ public class GeneralSpecNGTest {
             double result = instance.getFrequency();
             Assert.assertEquals(result, 12300f, 0.0001);
             Assert.assertEquals(new GeneralSpec("{msb, 33.33333% ,10p }").getFrequency(), ModulatedIrSequence.defaultFrequency, 0.0001);
-        } catch (ArithmeticException | InvalidArgumentException ex) {
+        } catch (ArithmeticException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -112,7 +111,7 @@ public class GeneralSpecNGTest {
             double expResult = 250f;
             double result = instance.getUnit();
             Assert.assertEquals(result, expResult, 0.0001);
-        } catch (ArithmeticException | InvalidArgumentException ex) {
+        } catch (ArithmeticException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -128,7 +127,7 @@ public class GeneralSpecNGTest {
             double expResult = 0.73f;
             double result = instance.getDutyCycle();
             Assert.assertEquals(result, expResult, 0.0001);
-        } catch (ArithmeticException | InvalidArgumentException | IrpSyntaxException | IrpSemanticException ex) {
+        } catch (ArithmeticException | IrpSemanticException ex) {
             fail();
         }
     }
@@ -156,7 +155,7 @@ public class GeneralSpecNGTest {
             String expResult = "{40.0k,250,msb,73%}";
             String result = instance.toIrpString();
             assertEquals(result, expResult);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidArgumentException ex) {
+        } catch (IrpSemanticException | ArithmeticException ex) {
             fail();
         }
     }

@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import java.util.Objects;
 import java.util.Random;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -113,7 +112,7 @@ public class ParameterSpec extends IrpObject {
         return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
     }
 
-    public void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, DomainViolationException {
+    public void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException {
         if (!nameEngine.containsKey(name.getName())) {
             if (this.hasMemory())
                 return;
@@ -131,6 +130,7 @@ public class ParameterSpec extends IrpObject {
             throw new DomainViolationException("Parameter " + name + " outside of the allowed domain: "
                     + domainAsString());
     }
+
     @Override
     public Element toElement(Document document) {
         Element el = super.toElement(document);

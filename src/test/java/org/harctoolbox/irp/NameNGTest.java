@@ -2,7 +2,6 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -91,7 +90,7 @@ public class NameNGTest {
             long expResult = 6L;
             long result = instance.toNumber(nameEngine);
             assertEquals(result, expResult);
-        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
+        } catch (IrpSyntaxException | UnassignedException ex) {
             fail();
         }
     }
@@ -132,7 +131,7 @@ public class NameNGTest {
             GeneralSpec generalSpec = new GeneralSpec();
             Name instance = new Name("answer");
             assertEquals(instance.toFloat(nameEngine, generalSpec), 42f, 0.000001);
-        } catch (IrpSyntaxException | ArithmeticException | InvalidArgumentException | UnassignedException ex) {
+        } catch (IrpSyntaxException | ArithmeticException | UnassignedException ex) {
             fail();
         }
     }

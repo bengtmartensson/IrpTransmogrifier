@@ -21,6 +21,7 @@ package org.harctoolbox.irp;
  * This class is thrown on syntactical error in Irps.
  */
 public class IrpSyntaxException extends IrpException {
+
     public IrpSyntaxException(String message) {
         super(message);
     }

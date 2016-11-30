@@ -28,21 +28,21 @@ import org.w3c.dom.Element;
 public class NumberWithDecimals extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
 
-    public static double parse(String str) throws IrpSyntaxException {
+    public static double parse(String str) {
         NumberWithDecimals numberWithDecimals = new NumberWithDecimals(str);
         return numberWithDecimals.toFloat();
     }
-    public static double parse(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
+    public static double parse(IrpParser.Number_with_decimalsContext ctx) {
         NumberWithDecimals numberWithDecimals = new NumberWithDecimals(ctx);
         return numberWithDecimals.toFloat();
     }
     private double data;
 
-    public NumberWithDecimals(String str) throws IrpSyntaxException {
+    public NumberWithDecimals(String str) {
         this(new ParserDriver(str).getParser().number_with_decimals());
     }
 
-    public NumberWithDecimals(IrpParser.Number_with_decimalsContext ctx) throws IrpSyntaxException {
+    public NumberWithDecimals(IrpParser.Number_with_decimalsContext ctx) {
         ParseTree child = ctx.getChild(0);
         data = (child instanceof IrpParser.Float_numberContext)
                 ? FloatNumber.parse((IrpParser.Float_numberContext) child)

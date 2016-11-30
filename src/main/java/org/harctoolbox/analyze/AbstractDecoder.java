@@ -28,10 +28,9 @@ import org.harctoolbox.irp.Extent;
 import org.harctoolbox.irp.FiniteBitField;
 import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
-import org.harctoolbox.irp.InvalidRepeatException;
+import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrStream;
 import org.harctoolbox.irp.IrStreamItem;
-import org.harctoolbox.irp.IrpSyntaxException;
 import org.harctoolbox.irp.IrpUtils;
 import org.harctoolbox.irp.NameEngine;
 import org.harctoolbox.irp.Protocol;
@@ -40,11 +39,11 @@ import org.harctoolbox.irp.RepeatMarker;
 public abstract class AbstractDecoder {
 
     private static BitSpec mkBitSpec(List<BareIrStream> list, double timebase) {
-        try {
+//        try {
             return new BitSpec(list);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            throw new ThisCannotHappenException();
-        }
+//        } catch (IrpSyntaxException | UnsupportedRepeatException ex) {
+//            throw new ThisCannotHappenException();
+//        }
     }
 
     protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
@@ -87,11 +86,11 @@ public abstract class AbstractDecoder {
             list.add(new BareIrStream(listOffOn));
             list.add(new BareIrStream(listOnOff));
         }
-        try {
+//        try {
             return new BitSpec(list);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            throw new ThisCannotHappenException();
-        }
+//        } catch (IrpSyntaxException | UnsupportedRepeatException ex) {
+//            throw new ThisCannotHappenException();
+//        }
     }
 
     protected NameEngine nameEngine;
@@ -109,7 +108,7 @@ public abstract class AbstractDecoder {
         this.bitSpec = new BitSpec();
     }
 
-    public Protocol process() throws DecodeException {
+    public Protocol process() {
         nameEngine = new NameEngine();
         noPayload = 0;
         RepeatFinder.RepeatFinderData repeatfinderData = analyzer.getRepeatFinderData();
@@ -152,14 +151,13 @@ public abstract class AbstractDecoder {
         String name = Analyzer.mkName(noPayload++);
         try {
             nameEngine.define(name, parameterData.getData());
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
             throw new ThisCannotHappenException();
         }
         items.add(new FiniteBitField(name, parameterData.getNoBits()));
     }
 
-    protected abstract List<IrStreamItem> process(int beginStart, int beginLength)
-            throws DecodeException;
+    protected abstract List<IrStreamItem> process(int beginStart, int beginLength);
 
     protected int getNoBitsLimit(List<Integer> parameterWidths) {
         return (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);

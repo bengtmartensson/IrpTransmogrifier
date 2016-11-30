@@ -2,14 +2,10 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.irp.BitDirection;
-import org.harctoolbox.irp.InvalidRepeatException;
-import org.harctoolbox.irp.IrpSemanticException;
-import org.harctoolbox.irp.IrpSyntaxException;
+import org.harctoolbox.irp.IrpException;
 import org.harctoolbox.irp.Protocol;
-import org.harctoolbox.irp.UnassignedException;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -74,7 +70,7 @@ public class BiphaseDecoderNGTest {
             Protocol result = decoder.process();
             Protocol expResult = new Protocol("{36k,msb,889}<1,-1|-1,1>(A:1,B:1,C:1,D:5,E:6,^114m){A=1,B=1,C=1,D=12,E=3}");
             assertEquals(result, expResult);
-        } catch (DecodeException | IrpSemanticException | IrpSyntaxException | ArithmeticException | InvalidArgumentException | InvalidRepeatException | UnassignedException ex) {
+        } catch (IrpException | ArithmeticException ex) {
             fail();
         }
     }
@@ -87,7 +83,7 @@ public class BiphaseDecoderNGTest {
             Protocol result = decoder.process();
             Protocol expResult = new Protocol("{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:4,-2,2,B:16,^107m){A=8,B=30723}");
             assertEquals(result, expResult);
-        } catch (DecodeException | IrpSemanticException | IrpSyntaxException | ArithmeticException | InvalidArgumentException | InvalidRepeatException | UnassignedException ex) {
+        } catch (IrpException | ArithmeticException ex) {
             fail();
         }
     }

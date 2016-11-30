@@ -2,7 +2,6 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -48,7 +47,7 @@ public class NameEngineNGTest {
         try {
             instance.define(name, value);
             Assert.fail("testDefine failed.");
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
         }
     }
 
@@ -63,7 +62,7 @@ public class NameEngineNGTest {
             //System.out.println(instance.get(name));
             Assert.assertTrue(names.containsKey(name));
             Assert.assertEquals(names.toNumber(name), value);
-        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
+        } catch (IrpSyntaxException | UnassignedException ex) {
             Assert.fail("testDefine valid failed.");
         }
     }
@@ -94,20 +93,18 @@ public class NameEngineNGTest {
         NameEngine names = new NameEngine();
         try {
         names.define(name, value);
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
             fail();
         }
         try {
             assertEquals(names.get(name).toNumber(), value);
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
         try {
             assertEquals(names.get("Z").toNumber(), value);
             fail();
         } catch (UnassignedException ex) {
-        } catch (IrpSyntaxException | InvalidArgumentException ex) {
-            fail();
         }
     }
 
@@ -149,7 +146,7 @@ public class NameEngineNGTest {
         try {
             result = instance.toNumber("F");
             assertEquals(result, 255);
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException | IrpSyntaxException ex) {
             fail();
         }
     }
@@ -205,7 +202,7 @@ public class NameEngineNGTest {
             assertEquals(result.toString(), "{}");
             result = NameEngine.parseLoose(null);
             assertEquals(result.toString(), "{}");
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
             Logger.getLogger(NameEngineNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

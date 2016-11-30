@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import org.harctoolbox.ircore.IrSignal;
 
-
 interface Evaluatable {
 
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass);

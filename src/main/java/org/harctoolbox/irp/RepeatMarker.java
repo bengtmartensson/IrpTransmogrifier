@@ -28,11 +28,11 @@ public class RepeatMarker extends IrpObject {
     private int min;
     private int max;
 
-    public RepeatMarker(String str) throws InvalidRepeatException {
+    public RepeatMarker(String str) {
         this((new ParserDriver(str)).getParser().repeat_marker());
     }
 
-    public RepeatMarker(IrpParser.Repeat_markerContext ctx) throws InvalidRepeatException {
+    public RepeatMarker(IrpParser.Repeat_markerContext ctx) {
         String ch = ctx.getChild(0).getText();
         switch (ch) {
             case "*":
@@ -66,7 +66,7 @@ public class RepeatMarker extends IrpObject {
         this(1, 1);
     }
 
-    public RepeatMarker(char ch) throws InvalidRepeatException {
+    public RepeatMarker(char ch) {
         this(Character.toString(ch));
     }
 

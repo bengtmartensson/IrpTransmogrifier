@@ -64,7 +64,7 @@ public class IrpMasterUtils {
         }
     }
 
-    public static IrSignal renderIrSignal(String protocolName, NameEngine parameters) throws org.harctoolbox.IrpMaster.IrpMasterException, UnassignedException, IrpSyntaxException, org.harctoolbox.ircore.InvalidArgumentException {
+    public static IrSignal renderIrSignal(String protocolName, NameEngine parameters) throws org.harctoolbox.IrpMaster.IrpMasterException, UnassignedException, IrpSyntaxException {
         return renderIrSignal(protocolName, parameters.toMap());
     }
 

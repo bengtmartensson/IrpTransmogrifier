@@ -22,6 +22,7 @@ package org.harctoolbox.irp;
  */
 @SuppressWarnings("serial")
 public class IrpException extends Exception {
+
     public IrpException(String message) {
         super(message);
     }

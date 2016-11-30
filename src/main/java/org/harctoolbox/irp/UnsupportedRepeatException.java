@@ -18,11 +18,11 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * Multiple repetitions discovered. This is not supported.
+ * Unsupported repeat found, for example, more than one infinite repeat, or hierarchical repeats.
  */
-public class InvalidRepeatException extends IrpException {
+public class UnsupportedRepeatException extends IrpSemanticException {
 
-    public InvalidRepeatException(String string) {
+    public UnsupportedRepeatException(String string) {
         super(string);
     }
 }

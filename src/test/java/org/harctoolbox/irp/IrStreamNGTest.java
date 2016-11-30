@@ -22,7 +22,7 @@ public class IrStreamNGTest {
     private final IrStream instance;
     private final IrStream repeat;
 
-    public IrStreamNGTest() throws IrpSyntaxException, InvalidRepeatException {
+    public IrStreamNGTest() throws IrpSyntaxException, UnsupportedRepeatException {
         //nameEngine = new NameEngine("{D=12, S=34, F= 56}");
         instance = new IrStream("(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
         repeat = new IrStream("(16,-4,1,^108m)*");
@@ -117,9 +117,10 @@ public class IrStreamNGTest {
 
     /**
      * Test of numberOfBits method, of class IrStream.
+     * @throws org.harctoolbox.irp.UnassignedException
      */
     @Test
-    public void testNumberOfBits() {
+    public void testNumberOfBits() throws UnassignedException {
         System.out.println("numberOfBits");
         int result = instance.numberOfBits();
         assertEquals(result, 32);

@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 /**
  * Thrown when a name is assigned a value that fatally contradicts the current value.
  */
-public class NameConflictException extends Exception {
+public class NameConflictException extends IrpException {
 
     public NameConflictException(String name) {
         super("Conflicting assignments of " + name);

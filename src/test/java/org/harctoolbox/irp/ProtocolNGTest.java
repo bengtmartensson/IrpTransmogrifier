@@ -47,7 +47,7 @@ public class ProtocolNGTest {
     private final Protocol velodyne;
     private final Protocol xmp1;
 
-    public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, InvalidRepeatException, ArithmeticException, InvalidArgumentException, UnassignedException {
+    public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, UnsupportedRepeatException, ArithmeticException, InvalidArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
         rc5 = new Protocol("{36k,msb,889}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[D:0..31,F:0..127,T@:0..1=0]");
         rc6 = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]");
@@ -104,7 +104,7 @@ public class ProtocolNGTest {
             double expResult = 56000f;
             double result = instance.getFrequency();
             assertEquals(result, expResult, 0.0);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | InvalidArgumentException | InvalidRepeatException | UnassignedException ex) {
+        } catch (IrpException | ArithmeticException ex) {
             fail();
         }
     }
@@ -118,10 +118,10 @@ public class ProtocolNGTest {
         try {
             new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,(F:8)+,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
             fail();
-        } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | InvalidArgumentException | UnassignedException ex) {
-            fail();
-        } catch (InvalidRepeatException ex) {
+        } catch (UnsupportedRepeatException ex) {
             // success!
+        } catch (IrpException | ArithmeticException ex) {
+            fail();
         }
     }
 
@@ -420,7 +420,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,F=3}");
             Map<String, Long> recognizeData = adnotam.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | InvalidRepeatException | UnassignedException ex) {
+        } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }

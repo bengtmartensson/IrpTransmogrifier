@@ -13,7 +13,7 @@ public class BitFieldNGTest {
     public BitFieldNGTest() {
         try {
             names = new NameEngine("{A = 7, F=244, D=4}");
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
             Logger.getLogger(BitFieldNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

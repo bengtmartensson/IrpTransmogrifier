@@ -41,22 +41,22 @@ public class Analyzer extends Cleaner {
     private List<Burst> pairs;
     private RepeatFinder.RepeatFinderData repeatfinderData;
 
-    public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder, int absoluteTolerance, double relativeTolerance) throws OddSequenceLenghtException {
+    public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder, int absoluteTolerance, double relativeTolerance) {
         super(irSequence, absoluteTolerance, relativeTolerance);
         repeatfinderData = getRepeatFinderData(invokeRepeatFinder, irSequence.getLength());
         createNormedTimings();
         createPairs();
     }
 
-    public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) throws OddSequenceLenghtException {
+    public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) {
         this(irSequence, invokeRepeatFinder, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public Analyzer(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) throws OddSequenceLenghtException {
+    public Analyzer(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
         this(irSequence, false, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(IrSequence irSequence) throws OddSequenceLenghtException {
+    public Analyzer(IrSequence irSequence) {
         this(irSequence, false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
@@ -64,7 +64,7 @@ public class Analyzer extends Cleaner {
         this(new IrSequence(data), false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int length) throws OddSequenceLenghtException {
+    private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int length) {
         return invokeRepeatFinder ? new RepeatFinder(toIrSequence()).getRepeatFinderData()
                 : new RepeatFinder.RepeatFinderData(length);
     }
@@ -131,7 +131,7 @@ public class Analyzer extends Cleaner {
                     best = protocol;
                     weight = protocol.weight();
                 }
-            } catch (DecodeException ex) {
+            } catch (Exception ex) {
                 logger.log(Level.FINE, "{0}: {1}", new Object[]{decoder.name(), ex.getMessage()});
             }
         }

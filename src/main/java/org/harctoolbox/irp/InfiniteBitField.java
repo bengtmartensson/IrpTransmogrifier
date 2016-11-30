@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,11 +30,11 @@ import org.w3c.dom.Element;
  */
 public class InfiniteBitField extends BitField {
 
-    public InfiniteBitField(String str) throws IrpSyntaxException {
+    public InfiniteBitField(String str) {
         this((IrpParser.Infinite_bitfieldContext) (new ParserDriver(str)).getParser().bitfield());
     }
 
-    public InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx) throws IrpSyntaxException {
+    public InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx) {
         if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext))
             complement = true;
         data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
@@ -43,7 +42,7 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException {
         long x = data.toNumber(nameEngine) >>> chop.toNumber(nameEngine);
         if (complement)
             x = ~x;
@@ -61,14 +60,14 @@ public class InfiniteBitField extends BitField {
         String chopString;
         try {
             chopString = Long.toString(chop.toNumber(nameEngine));
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             chopString = chop.toIrpString();
         }
 
         String dataString;
         try {
             dataString = Long.toString(data.toNumber(nameEngine));
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             dataString = data.toIrpString();
         }
 
@@ -81,8 +80,7 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) {
         throw new UnsupportedOperationException("Unsupported operation.");
     }
 
@@ -112,8 +110,7 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
         throw new UnsupportedOperationException("Not supported.");
     }
 

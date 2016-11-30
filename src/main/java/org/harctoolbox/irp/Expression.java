@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,25 +43,23 @@ public class Expression extends PrimaryItem {
     /**
      * Construct an Expression from the number supplied as argument.
      * @param value
-     * @throws IrpSyntaxException
      */
-    public Expression(long value) throws IrpSyntaxException { // FIXME: insanely inefficient
+    public Expression(long value) { // FIXME: insanely inefficient
         this(new ParserDriver(Long.toString(value)));
     }
 
     /**
      * Construct an Expression by parsing the argument.
      * @param str
-     * @throws IrpSyntaxException
      */
-    public Expression(String str) throws IrpSyntaxException {
+    public Expression(String str) {
         this(new ParserDriver(str));
         int last = parseTree.getStop().getStopIndex();
         if (last != str.length() - 1)
             logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
     }
 //        IrpParser parser = new ParserDriver(text).getParser();
-    Expression(ParserDriver parserDriver) throws IrpSyntaxException {
+    Expression(ParserDriver parserDriver) {
         this(parserDriver.getParser().expression());
         parser = parserDriver.getParser();
     }
@@ -112,7 +109,7 @@ public class Expression extends PrimaryItem {
     }
 
     @Override
-    public long invert(long rhs) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public long invert(long rhs) throws UnassignedException {
 
         int noChilden = parseTree.getChildCount();
         long solution;
@@ -173,16 +170,16 @@ public class Expression extends PrimaryItem {
                 : null;
     }
 
-    public long toNumber() throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public long toNumber() throws UnassignedException {
         return toNumber(parseTree, new NameEngine());
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException {
         return toNumber(parseTree, nameEngine);
     }
 
-    private long toNumber(IrpParser.ExpressionContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    private long toNumber(IrpParser.ExpressionContext ctx, NameEngine nameEngine) throws UnassignedException {
         int noChilden = ctx.getChildCount();
         return noChilden == 1
                 ? toNumberPrimary(ctx.getChild(0), nameEngine)
@@ -194,15 +191,14 @@ public class Expression extends PrimaryItem {
                 : throwNewRuntimeException();
     }
 
-    private long toNumberPrimary(ParseTree child, NameEngine nameEngine) throws IrpSyntaxException, InvalidArgumentException, UnassignedException {
+    private long toNumberPrimary(ParseTree child, NameEngine nameEngine) throws UnassignedException {
         return child instanceof IrpParser.Primary_itemContext
                 ? newPrimaryItem((IrpParser.Primary_itemContext) child).toNumber(nameEngine)
                 : child instanceof IrpParser.BitfieldContext ? BitField.newBitField((IrpParser.BitfieldContext) child).toNumber(nameEngine)
                 : throwNewRuntimeException();
     }
 
-    private long toNumberUnary(String operator, IrpParser.ExpressionContext expressionContext, NameEngine nameEngine)
-            throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    private long toNumberUnary(String operator, IrpParser.ExpressionContext expressionContext, NameEngine nameEngine) throws UnassignedException {
         long operand = new Expression(expressionContext).toNumber(nameEngine);
         return operator.equals("!") ? (operand == 0L ? 1L : 0L)
                 : operator.equals("#") ? Long.bitCount(operand)
@@ -212,8 +208,7 @@ public class Expression extends PrimaryItem {
     }
 
     private long toNumberBinary(IrpParser.ExpressionContext expressionContext, String operator,
-            IrpParser.ExpressionContext expressionContext0, NameEngine nameEngine)
-            throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+            IrpParser.ExpressionContext expressionContext0, NameEngine nameEngine) throws UnassignedException {
         long left = new Expression(expressionContext).toNumber(nameEngine);
         long right = new Expression(expressionContext0).toNumber(nameEngine);
 
@@ -240,18 +235,17 @@ public class Expression extends PrimaryItem {
     }
 
     private long toNumberTernary(IrpParser.ExpressionContext expressionContext, IrpParser.ExpressionContext trueExpContext,
-            IrpParser.ExpressionContext falseExpContext, NameEngine nameEngine)
-            throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+            IrpParser.ExpressionContext falseExpContext, NameEngine nameEngine) throws UnassignedException {
         long ctrl = new Expression(expressionContext).toNumber(nameEngine);
         return new Expression(ctrl != 0L ? trueExpContext : falseExpContext).toNumber(nameEngine);
     }
 
     private long throwNewRuntimeException() {
-        throw new RuntimeException("This cannot happen");
+        throw new ThisCannotHappenException();
     }
 
     private long throwNewRuntimeException(String msg) {
-        throw new RuntimeException(msg);
+        throw new ThisCannotHappenException(msg);
     }
 
     private long cBoolean(boolean x) {
@@ -273,16 +267,16 @@ public class Expression extends PrimaryItem {
             case 1:
                 ParseTree child = parseTree.children.get(0);
 
-                try {
+//                try {
                     if (child instanceof IrpParser.Primary_itemContext)
                         element.appendChild(newPrimaryItem((IrpParser.Primary_itemContext) child).toElement(document));
                     else if (child instanceof IrpParser.BitfieldContext)
                         element.appendChild(BitField.newBitField((IrpParser.BitfieldContext) child).toElement(document));
                     else
                         ;
-                } catch (IrpSyntaxException ex) {
-                    throw new ThisCannotHappenException(ex);
-                }
+//                } catch (IrpSyntaxException ex) {
+//                    throw new ThisCannotHappenException(ex);
+//                }
                 break;
 
             case 2:
@@ -325,17 +319,17 @@ public class Expression extends PrimaryItem {
             case 1:
                 ParseTree child = parseTree.children.get(0);
 
-                try {
+//                try {
                     if (child instanceof IrpParser.Primary_itemContext)
                         return newPrimaryItem((IrpParser.Primary_itemContext) child).toIrpString(radix);
                     else if (child instanceof IrpParser.BitfieldContext)
                         return BitField.newBitField((IrpParser.BitfieldContext) child).toIrpString();
                     else
                         return null;
-                } catch (IrpSyntaxException ex) {
-                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                break;
+//                } catch (IrpSyntaxException ex) {
+//                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                break;
 
             case 2:
                 return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
@@ -355,7 +349,7 @@ public class Expression extends PrimaryItem {
             default:
                 throw new ThisCannotHappenException("Unknown case in Expression.toElement");
         }
-        return null;
+//        return null;
     }
 
     @Override
@@ -476,7 +470,7 @@ public class Expression extends PrimaryItem {
                     try {
                         BitField bf = BitField.newBitField((IrpParser.BitfieldContext) child);
                         map = bf.propertiesMap(eval, generalSpec, nameEngine);
-                    } catch (IrpSyntaxException ex) {
+                    } catch (/*IrpSyntax*/Exception ex) {
                         Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex); // FIXME
                     }
                 else

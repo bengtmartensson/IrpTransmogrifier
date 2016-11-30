@@ -1,9 +1,6 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
@@ -42,21 +39,21 @@ public class ExpressionNGTest {
         System.out.println("toNumber");
         try {
             assertEquals(new Expression("A+2*B*C").toNumber(nameEngine), 24);
-        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
         try {
             new Expression("A+2*B*C+").toNumber(nameEngine);
             fail();
-        } catch (ParseCancellationException | IrpSyntaxException ex) {
-        } catch (UnassignedException | InvalidArgumentException ex) {
+        } catch (ParseCancellationException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
 
         try {
             assertEquals(new Expression("2**3").toNumber(), 8);
             assertEquals(new Expression("2**3**3").toNumber(), 134217728);
-        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
     }
@@ -66,14 +63,10 @@ public class ExpressionNGTest {
      */
     @Test
     public void testToString() {
-        try {
-            System.out.println("toString");
-            Expression instance = new Expression("A+2*B*C");
-            String result = instance.toString();
-            assertEquals(result, "(A+((2*B)*C))");
-        } catch (IrpSyntaxException ex) {
-            fail();
-        }
+        System.out.println("toString");
+        Expression instance = new Expression("A+2*B*C");
+        String result = instance.toString();
+        assertEquals(result, "(A+((2*B)*C))");
     }
 
 //    /**
@@ -111,18 +104,11 @@ public class ExpressionNGTest {
     @Test
     public void testToNumber_0args() {
         System.out.println("toNumber");
+        Expression instance = new Expression("A+2*B*C");
         try {
-            Expression instance = new Expression("A+2*B*C");
-            try {
             instance.toNumber();
             fail();
-        } catch (IrpSyntaxException | InvalidArgumentException ex) {
-            fail();
         } catch (UnassignedException ex) {
-        }
-        } catch (IrpSyntaxException ex) {
-            fail();
-            Logger.getLogger(ExpressionNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -136,7 +122,7 @@ public class ExpressionNGTest {
             Expression instance = new Expression("A+2*B*C");
             long result = instance.toNumber(nameEngine);
             assertEquals(result, 24);
-        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
     }
@@ -175,13 +161,9 @@ public class ExpressionNGTest {
      */
     @Test
     public void testToIrpString() {
-        try {
-            System.out.println("toIrpString");
-            Expression instance = new Expression("A*#5+3*4");
-            String result = instance.toIrpString();
-            assertEquals(result, "((A*(#5))+(3*4))");
-        } catch (IrpSyntaxException ex) {
-            fail();
-        }
+        System.out.println("toIrpString");
+        Expression instance = new Expression("A*#5+3*4");
+        String result = instance.toIrpString();
+        assertEquals(result, "((A*(#5))+(3*4))");
     }
 }

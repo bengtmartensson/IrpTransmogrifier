@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,7 +41,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         map = new LinkedHashMap<>(3);
     }
 
-    public ParameterSpecs(String parameter_specs) throws IrpSyntaxException {
+    public ParameterSpecs(String parameter_specs) {
         this(new ParserDriver(parameter_specs).getParser().parameter_specs());
     }
 
@@ -126,12 +125,12 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return el;
     }
 
-    void check(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, DomainViolationException {
+    void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException {
         for (ParameterSpec parameter : map.values())
             parameter.check(nameEngine);
     }
 
-    public Map<String, Long> random() throws IrpSyntaxException {
+    public Map<String, Long> random() {
         Map<String, Long> nameEngine = new HashMap<>(map.size());
         map.values().stream().forEach((parameter) -> {
             nameEngine.put(parameter.getName(), parameter.random());
@@ -140,7 +139,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return nameEngine;
     }
 
-    public Map<String, Long> randomUsingDefaults() throws IrpSyntaxException {
+    public Map<String, Long> randomUsingDefaults() {
         Map<String, Long> nameEngine = new HashMap<>(map.size());
         map.values().stream().filter((parameter) -> (parameter.getDefault() == null)).forEach((parameter) -> {
             nameEngine.put(parameter.getName(), parameter.random());
@@ -182,7 +181,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
                 long deflt = expression.toNumber(nameEngine);
                 if (namesMap.get(name) == deflt)
                     namesMap.remove(name);
-            } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+            } catch (UnassignedException ex) {
                 throw new ThisCannotHappenException();
             }
         }

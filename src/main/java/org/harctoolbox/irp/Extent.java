@@ -20,7 +20,6 @@ package org.harctoolbox.irp;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 
 /**
@@ -31,11 +30,11 @@ public class Extent extends Duration {
 
     private static final Logger logger = Logger.getLogger(Extent.class.getName());
 
-    public Extent(String str) throws IrpSyntaxException {
+    public Extent(String str) {
         this((new ParserDriver(str)).getParser().extent());
     }
 
-    public Extent(IrpParser.ExtentContext ctx) throws IrpSyntaxException {
+    public Extent(IrpParser.ExtentContext ctx) {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
     }
 
@@ -52,15 +51,15 @@ public class Extent extends Duration {
     }
 
     @Override
-    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
         double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
         if (time < 0)
-            throw new InvalidArgumentException("Argument of extent smaller than actual duration.");
+            throw new IrpSemanticException("Argument of extent smaller than actual duration.");
         return time;
     }
 
     @Override
-    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
         return -evaluate(nameEngine, generalSpec, elapsed);
     }
 
@@ -70,8 +69,7 @@ public class Extent extends Duration {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws NameConflictException, ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, IrpSemanticException {
         IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         double physical = recognizeData.getExtentDuration();
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());

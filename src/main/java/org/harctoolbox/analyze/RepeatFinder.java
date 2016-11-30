@@ -22,6 +22,7 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 
 /**
  *
@@ -102,7 +103,7 @@ public class RepeatFinder {
         this.irSequence = irSequence;
         try {
             analyze();
-        } catch (OddSequenceLenghtException ex) {
+        } catch (Exception ex) {
         }
     }
 
@@ -111,11 +112,16 @@ public class RepeatFinder {
     }
 
 
-    private void analyze() throws OddSequenceLenghtException {
+    private void analyze() {
         RepeatFinderData candidate = new RepeatFinderData(irSequence.getLength());
         for (int length = irSequence.getNumberBursts() / 2; length >= 2; length--) {
             for (int beginning = 0; beginning < irSequence.getNumberBursts() - length; beginning++) {
-                RepeatFinderData newCandidate = countRepeats(2*beginning, 2*length);
+                RepeatFinderData newCandidate;
+                try {
+                    newCandidate = countRepeats(2*beginning, 2*length);
+                } catch (OddSequenceLenghtException ex) {
+                    throw new ThisCannotHappenException();
+                }
                 if (newCandidate.numberRepeats > 1
                         && newCandidate.lastGap > minRepeatLastGap
                         && newCandidate.repeatsDuration > candidate.repeatsDuration - 0.1)
@@ -202,17 +208,21 @@ public class RepeatFinder {
         private double lastGap;
         private double repeatsDuration;
 
-        private RepeatFinderData() throws OddSequenceLenghtException {
-            this(0, 0, 0, 0);
+        private RepeatFinderData() {
+            setup(0, 0, 0, 0);
         }
 
-        public RepeatFinderData(int length) throws OddSequenceLenghtException {
-            this(length, 0, 0, 0);
+        public RepeatFinderData(int length) {
+            setup(length, 0, 0, 0);
         }
 
         public RepeatFinderData(int beginLength, int repeatLength, int numberRepeats, int endingLength) throws OddSequenceLenghtException {
             if (beginLength % 2 != 0 || repeatLength % 2 != 0 || endingLength % 2 != 0)
                 throw new OddSequenceLenghtException("Lengths and start must be even");
+            setup(beginLength, repeatLength, numberRepeats, endingLength);
+        }
+
+        private void setup(int beginLength, int repeatLength, int numberRepeats, int endingLength) {
             this.beginLength = beginLength;
             this.repeatLength = repeatLength;
             this.numberRepeats = numberRepeats;

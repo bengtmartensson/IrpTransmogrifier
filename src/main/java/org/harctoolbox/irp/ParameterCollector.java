@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 
 public class ParameterCollector implements Cloneable {
 
@@ -86,7 +85,7 @@ public class ParameterCollector implements Cloneable {
         return map.containsKey(name) ? map.get(name).getValue() : INVALID;
     }
 
-    NameEngine toNameEngine() throws IrpSyntaxException {
+    NameEngine toNameEngine() throws InvalidNameException {
         NameEngine nameEngine = new NameEngine();
         for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
             String name = kvp.getKey();
@@ -97,7 +96,7 @@ public class ParameterCollector implements Cloneable {
         return nameEngine;
     }
 
-    void transferToNamesMap(Map<String, Long> nameEngine) throws NameConflictException, IrpSyntaxException, InvalidArgumentException {
+    void transferToNamesMap(Map<String, Long> nameEngine) {
         map.entrySet().stream().forEach((kvp) -> {
             nameEngine.put(kvp.getKey(), kvp.getValue().getValue());
         });
@@ -136,7 +135,7 @@ public class ParameterCollector implements Cloneable {
         return param.isConsistent(value);
     }
 
-    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws UnassignedException, IrpSyntaxException, InvalidArgumentException, NameConflictException {
+    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws NameConflictException, UnassignedException {
         for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
             String name = kvp.getKey();
             BitwiseParameter param = kvp.getValue();

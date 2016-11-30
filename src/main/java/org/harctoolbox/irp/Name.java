@@ -20,7 +20,6 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -71,7 +70,7 @@ public class Name extends PrimaryItem implements Floatable {
         }
     }
 
-    public static long toNumber(IrpParser.NameContext ctx, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, InvalidArgumentException {
+    public static long toNumber(IrpParser.NameContext ctx, NameEngine nameEngine) throws UnassignedException {
         Expression exp = nameEngine.get(toString(ctx));
         return exp.toNumber(nameEngine);
     }
@@ -122,7 +121,7 @@ public class Name extends PrimaryItem implements Floatable {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException {
         if (nameEngine == null)
             throw new UnassignedException(name);
         Expression expression = nameEngine.get(getName());
@@ -137,7 +136,7 @@ public class Name extends PrimaryItem implements Floatable {
     }
 
     @Override
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException {
         return toNumber(nameEngine);
     }
 

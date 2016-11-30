@@ -20,7 +20,6 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,7 +44,7 @@ public class NamedProtocol extends Protocol {
     private final String name;
     private final String documentation;
 
-    public NamedProtocol(String name, String irp, String documentation) throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException, InvalidRepeatException, UnassignedException {
+    public NamedProtocol(String name, String irp, String documentation) throws IrpSemanticException, InvalidNameException, UnassignedException {
         super(irp);
         this.irp = irp;
         this.name = name;

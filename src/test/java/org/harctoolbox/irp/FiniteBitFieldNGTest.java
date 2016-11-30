@@ -1,8 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
@@ -48,14 +45,12 @@ public class FiniteBitFieldNGTest {
 //            assertEquals(instance.toNumber(nameEngine), 31L);
 //            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
             assertEquals(instance.toNumber(nameEngine), 31L);
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
         try {
             FiniteBitField fbf = new FiniteBitField("~foobar:-6:2");
             fbf.toNumber(nameEngine);
-            fail();
-        } catch (IrpSyntaxException | InvalidArgumentException ex) {
             fail();
         } catch (UnassignedException ex) {
         }
@@ -115,18 +110,14 @@ public class FiniteBitFieldNGTest {
         System.out.println("toIrpString");
         String result = instance.toIrpString();
         assertEquals(result, "~D:-6:2");
-        try {
-            FiniteBitField fbf = new FiniteBitField("X:Y");
-            assertEquals(fbf.toIrpString(), "X:Y");
-            fbf = new FiniteBitField("X:Y:Z");
-            assertEquals(fbf.toIrpString(), "X:Y:Z");
-            fbf = new FiniteBitField("X:Y");
-            assertEquals(fbf.toIrpString(), "X:Y");
-            fbf = new FiniteBitField("X:Y:0");
-            assertEquals(fbf.toIrpString(), "X:Y");
-        } catch (IrpSyntaxException ex) {
-            Logger.getLogger(FiniteBitFieldNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        FiniteBitField fbf = new FiniteBitField("X:Y");
+        assertEquals(fbf.toIrpString(), "X:Y");
+        fbf = new FiniteBitField("X:Y:Z");
+        assertEquals(fbf.toIrpString(), "X:Y:Z");
+        fbf = new FiniteBitField("X:Y");
+        assertEquals(fbf.toIrpString(), "X:Y");
+        fbf = new FiniteBitField("X:Y:0");
+        assertEquals(fbf.toIrpString(), "X:Y");
     }
 
 //    /**
@@ -163,9 +154,10 @@ public class FiniteBitFieldNGTest {
 
     /**
      * Test of numberOfBits method, of class FiniteBitField.
+     * @throws org.harctoolbox.irp.UnassignedException
      */
     @Test
-    public void testNumberOfBits() {
+    public void testNumberOfBits() throws UnassignedException {
         System.out.println("numberOfBits");
         int result = instance.numberOfBits();
         assertEquals(result, 6);

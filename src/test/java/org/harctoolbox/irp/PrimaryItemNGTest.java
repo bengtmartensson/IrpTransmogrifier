@@ -2,7 +2,6 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -44,7 +43,7 @@ public class PrimaryItemNGTest {
             System.out.println("newPrimaryItem");
             PrimaryItem result = PrimaryItem.newPrimaryItem(42);
             assertEquals(result.toNumber(nameEngine), 42);
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             fail();
         }
     }
@@ -65,7 +64,7 @@ public class PrimaryItemNGTest {
             result = PrimaryItem.newPrimaryItem("(#A)");
             assertTrue(result instanceof Expression);
             assertEquals(result.toNumber(nameEngine), 3);
-        } catch (IrpSyntaxException | UnassignedException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             Logger.getLogger(PrimaryItemNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -31,11 +30,11 @@ public class NameOrNumber extends IrpObject implements Floatable {
 
     private Floatable thing;
 
-    public NameOrNumber(String str) throws IrpSyntaxException {
+    public NameOrNumber(String str) {
         this(new ParserDriver(str).getParser().name_or_number());
     }
 
-    public NameOrNumber(IrpParser.Name_or_numberContext ctx) throws IrpSyntaxException {
+    public NameOrNumber(IrpParser.Name_or_numberContext ctx) {
         ParseTree child = ctx.getChild(0);
         if (child instanceof IrpParser.NameContext)
             thing = new Name(ctx.name());
@@ -53,8 +52,7 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     @Override
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec)
-            throws ArithmeticException, InvalidArgumentException, UnassignedException, IrpSyntaxException {
+    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
         return thing.toFloat(nameEngine, generalSpec);
     }
 

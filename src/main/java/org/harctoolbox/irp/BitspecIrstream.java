@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -41,7 +40,7 @@ public class BitspecIrstream extends IrStreamItem {
     private IrStream irStream;
     private final IrpParser.Bitspec_irstreamContext parseTree;
 
-    public BitspecIrstream(IrpParser.ProtocolContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+    public BitspecIrstream(IrpParser.ProtocolContext ctx) {
         this(ctx.bitspec_irstream());
     }
 
@@ -55,11 +54,11 @@ public class BitspecIrstream extends IrStreamItem {
         this(bitSpec, irStream, null);
     }
 
-    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+    public BitspecIrstream(IrpParser.Bitspec_irstreamContext ctx) {
         this(new BitSpec(ctx.bitspec()), new IrStream(ctx.irstream()), ctx);
     }
 
-    public BitspecIrstream(String str) throws IrpSyntaxException, InvalidRepeatException {
+    public BitspecIrstream(String str) {
         this((new ParserDriver(str)).getParser().bitspec_irstream());
     }
 
@@ -116,13 +115,12 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public boolean isEmpty(NameEngine nameEngine) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean isEmpty(NameEngine nameEngine) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
         IrpUtils.entering(logger, "evaluate(4args)", this);
         EvaluatedIrStream evaluatedIrStream = irStream.evaluate(state, pass, nameEngine, generalSpec);
         evaluatedIrStream.reduce(bitSpec);
@@ -131,8 +129,7 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+            BitSpec bitSpec) throws UnassignedException, InvalidNameException {
         IrpUtils.entering(logger, "evaluate(5args)", this);
         EvaluatedIrStream inner = evaluate(state, pass, nameEngine, generalSpec);
         inner.reduce(bitSpec);
@@ -150,7 +147,7 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    int numberOfBits() {
+    int numberOfBits() throws UnassignedException {
         return irStream.numberOfBits();
     }
 
@@ -171,7 +168,7 @@ public class BitspecIrstream extends IrStreamItem {
 
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs)
-            throws NameConflictException {
+            throws NameConflictException, InvalidNameException, IrpSemanticException {
         IrpUtils.entering(logger, "recognize " + pass, this);
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);

@@ -1,7 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -34,7 +32,7 @@ public class RepeatMarkerNGTest {
     }
 
 
-    private void testit(String str, int min, int max) throws InvalidRepeatException {
+    private void testit(String str, int min, int max) throws UnsupportedRepeatException {
         //RepeatMarker.reset();
         RepeatMarker rep = new RepeatMarker(str);
         assertEquals(rep.getMin(), min);
@@ -55,24 +53,13 @@ public class RepeatMarkerNGTest {
             testit("7", 7, 7);
             testit("17+", 17, Integer.MAX_VALUE);
             testit("\t7+   ", 7, Integer.MAX_VALUE);
-        } catch (InvalidRepeatException ex) {
+        } catch (UnsupportedRepeatException ex) {
             fail();
         }
         RepeatMarker rep;
-        try {
-            //RepeatMarker.reset();
-            rep = new RepeatMarker("*");
-            assertEquals(rep.getMin(), 0);
-            assertEquals(rep.getMax(), Integer.MAX_VALUE);
-        } catch (InvalidRepeatException ex) {
-            fail();
-        }
-
-//        try {
-//            new RepeatMarker("7+");
-//            fail();
-//        } catch (InvalidRepeatException ex) {
-//        }
+        rep = new RepeatMarker("*");
+        assertEquals(rep.getMin(), 0);
+        assertEquals(rep.getMax(), Integer.MAX_VALUE);
     }
 
     /**
@@ -82,16 +69,10 @@ public class RepeatMarkerNGTest {
     public void testIsInfinite() {
         System.out.println("isInfinite");
         RepeatMarker instance;
-        try {
-            instance = new RepeatMarker("*");
-            assertTrue(instance.isInfinite());
-            instance = new RepeatMarker("33");
-            assertFalse(instance.isInfinite());
-        } catch (InvalidRepeatException ex) {
-            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
+        instance = new RepeatMarker("*");
+        assertTrue(instance.isInfinite());
+        instance = new RepeatMarker("33");
+        assertFalse(instance.isInfinite());
     }
 
     /**
@@ -113,14 +94,10 @@ public class RepeatMarkerNGTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        try {
-            RepeatMarker instance = new RepeatMarker("111+");
-            String expResult = "111+";
-            String result = instance.toString();
-            assertEquals(result, expResult);
-        } catch (InvalidRepeatException ex) {
-            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        RepeatMarker instance = new RepeatMarker("111+");
+        String expResult = "111+";
+        String result = instance.toString();
+        assertEquals(result, expResult);
     }
 
     /**
@@ -129,14 +106,10 @@ public class RepeatMarkerNGTest {
     @Test
     public void testToIrpString() {
         System.out.println("toIrpString");
-        try {
-            RepeatMarker instance = new RepeatMarker("3+");
-            String expResult = "3+";
-            String result = instance.toIrpString();
-            assertEquals(result, expResult);
-        } catch (InvalidRepeatException ex) {
-            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        RepeatMarker instance = new RepeatMarker("3+");
+        String expResult = "3+";
+        String result = instance.toIrpString();
+        assertEquals(result, expResult);
     }
 
     /**
@@ -144,15 +117,11 @@ public class RepeatMarkerNGTest {
      */
     @Test
     public void testGetMin() {
-        try {
-            System.out.println("getMin");
-            RepeatMarker instance = new RepeatMarker("7*");
-            int expResult = 7;
-            int result = instance.getMin();
-            assertEquals(result, expResult);
-        } catch (InvalidRepeatException ex) {
-            Logger.getLogger(RepeatMarkerNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("getMin");
+        RepeatMarker instance = new RepeatMarker("7*");
+        int expResult = 7;
+        int result = instance.getMin();
+        assertEquals(result, expResult);
 
     }
 

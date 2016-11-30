@@ -20,7 +20,8 @@ package org.harctoolbox.irp;
 /**
  * Thrown if a name is syntactically invalid.
  */
-public class InvalidNameException extends IrpException {
+public class InvalidNameException extends IrpSyntaxException {
+
     public InvalidNameException(String name) {
         super("Invalid name: " + name);
     }

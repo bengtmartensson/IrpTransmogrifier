@@ -16,19 +16,17 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.InvalidArgumentException;
-
 /**
  * This class implements Gap as per Chapter 3.
  *
  */
 public class Gap extends Duration {
 
-    public Gap(String str) throws IrpSyntaxException {
+    public Gap(String str) {
         this((new ParserDriver(str)).getParser().gap());
     }
 
-    Gap(IrpParser.GapContext ctx) throws IrpSyntaxException {
+    Gap(IrpParser.GapContext ctx) {
         super(ctx.name_or_number(), ctx.getChildCount() > 2 ? ctx.getChild(2).getText() : null);
     }
 
@@ -49,8 +47,7 @@ public class Gap extends Duration {
     }
 
     @Override
-    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
         return -evaluate(nameEngine, generalSpec, elapsed);
     }
 

@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 public class IrSignal implements Cloneable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
 
-    public static IrSignal parse(List<String> args, double frequency, boolean fixOddSequences) throws OddSequenceLenghtException, InvalidArgumentException {
+    public static IrSignal parse(List<String> args, double frequency, boolean fixOddSequences) throws InvalidArgumentException {
         try {
             return Pronto.parse(args);
         } catch (InvalidArgumentException ex) {

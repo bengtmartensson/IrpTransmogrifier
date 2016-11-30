@@ -52,7 +52,7 @@ public class ShortPronto extends Pronto {
      * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      * @throws InvalidArgumentException
      */
-    public static IrSignal parse(int[] ccf) throws OddSequenceLenghtException, InvalidArgumentException {
+    public static IrSignal parse(int[] ccf) throws InvalidArgumentException {
         if (ccf.length < 4)
             throw new InvalidArgumentException("CCF is invalid since less than 4 numbers long.");
         if (ccf.length % 2 != 0)
@@ -128,18 +128,18 @@ public class ShortPronto extends Pronto {
                 if (subdev != (int) IrpUtils.invalid)
                     nameEngine.define("S", subdev);
                 nameEngine.define("F", cmd);
-            } catch (IrpSyntaxException ex) {
+            } catch (InvalidNameException ex) {
                 Logger.getLogger(ShortPronto.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             try {
                 Protocol protocol = new Protocol(irp);
-                irSignal = protocol.toIrSignal(nameEngine); // do not catch DomainViolationException
-            } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | InvalidRepeatException | UnassignedException ex) {
-                throw new ThisCannotHappenException(ex);
+                irSignal = protocol.toIrSignal(nameEngine);
             } catch (DomainViolationException ex) {
                 logger.log(Level.SEVERE, "{0}", ex.getMessage());
                 throw new InvalidArgumentException(ex);
+            } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException ex) {
+                throw new ThisCannotHappenException(ex);
             }
         }
         return irSignal;

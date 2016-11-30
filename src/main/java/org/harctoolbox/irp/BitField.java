@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 
 /**
@@ -42,7 +41,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     public static final int maxWidth = Long.SIZE - 1; // = 63
     private static final Logger logger = Logger.getLogger(BitField.class.getName());
 
-    public static BitField newBitField(String str) throws IrpSyntaxException {
+    public static BitField newBitField(String str) {
         BitField bitField = newBitField(new ParserDriver(str).getParser());
         int last = bitField.getParseTree().getStop().getStopIndex();
         if (last != str.length() - 1)
@@ -50,13 +49,13 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         return bitField;
     }
 
-    private static BitField newBitField(IrpParser parser) throws IrpSyntaxException {
+    private static BitField newBitField(IrpParser parser) {
         BitField instance = newBitField(parser.bitfield());
         instance.parser = parser;
         return instance;
     }
 
-    public static BitField newBitField(IrpParser.BitfieldContext ctx) throws IrpSyntaxException {
+    public static BitField newBitField(IrpParser.BitfieldContext ctx) {
         BitField instance = (ctx instanceof IrpParser.Finite_bitfieldContext)
                 ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
                 : new InfiniteBitField((IrpParser.Infinite_bitfieldContext) ctx);
@@ -64,7 +63,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         return instance;
     }
 
-    public static long parse(String str, NameEngine nameEngine) throws IrpSyntaxException, UnassignedException, InvalidArgumentException {
+    public static long parse(String str, NameEngine nameEngine) throws UnassignedException {
         BitField bitField = newBitField(str);
         return bitField.toNumber(nameEngine);
     }
@@ -102,13 +101,13 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     public abstract String toString(NameEngine nameEngine);
 
-    public abstract long getWidth(NameEngine nameEngine) throws UnassignedException, IrpSyntaxException, InvalidArgumentException;
+    public abstract long getWidth(NameEngine nameEngine) throws UnassignedException;
 
     @Override
     public boolean isEmpty(NameEngine nameEngine) {
         try {
             return getWidth(nameEngine) == 0;
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             return false;
         }
     }
@@ -116,7 +115,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     public boolean hasChop() {
         try {
             return chop.toNumber(null) != 0;
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             return true;
         }
     }
@@ -148,7 +147,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
             long num = chop.toNumber(null);
             if (num != 0)
                 map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
-        } catch (UnassignedException | IrpSyntaxException | InvalidArgumentException ex) {
+        } catch (UnassignedException ex) {
             map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         }
         map.put("complement", complement);
@@ -156,7 +155,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         return map;
     }
 
-    public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSyntaxException;
+    public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine);
 
     public TreeViewer toTreeViewer() {
         List<String> ruleNames = Arrays.asList(parser.getRuleNames());

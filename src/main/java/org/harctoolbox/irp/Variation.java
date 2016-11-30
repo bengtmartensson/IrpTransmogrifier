@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -41,11 +40,11 @@ public class Variation extends IrStreamItem {
     private BareIrStream ending;
     private final IrpParser.VariationContext parseTree;
 
-    public Variation(String str) throws IrpSyntaxException, InvalidRepeatException {
+    public Variation(String str) {
         this((new ParserDriver(str)).getParser().variation());
     }
 
-    public Variation(IrpParser.VariationContext variation) throws IrpSyntaxException, InvalidRepeatException {
+    public Variation(IrpParser.VariationContext variation) {
         parseTree = variation;
         intro = new BareIrStream(variation.alternative(0).bare_irstream());
         repeat = new BareIrStream(variation.alternative(1).bare_irstream());
@@ -53,13 +52,12 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public boolean isEmpty(NameEngine nameEngine) throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public boolean isEmpty(NameEngine nameEngine) {
         return intro.isEmpty(nameEngine) && repeat.isEmpty(nameEngine) && (ending == null || ending.isEmpty(nameEngine));
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
         BareIrStream actual = select(pass);
         return actual.isEmpty(nameEngine) ? null : actual.evaluate(state, pass, nameEngine, generalSpec);
     }
@@ -127,7 +125,7 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) throws NameConflictException {
+    public boolean recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) throws NameConflictException, InvalidNameException, IrpSemanticException {
         return select(pass).recognize(recognizeData, pass, bitSpecs);
     }
 

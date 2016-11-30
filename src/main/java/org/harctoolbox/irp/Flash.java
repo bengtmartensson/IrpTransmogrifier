@@ -16,19 +16,17 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.InvalidArgumentException;
-
 /**
  * This class implements Flash as per Chapter 3.
  *
  */
 public class Flash extends Duration {
 
-    public Flash(String str) throws IrpSyntaxException {
+    public Flash(String str) {
         this((new ParserDriver(str)).getParser().flash());
     }
 
-    public Flash(IrpParser.FlashContext ctx) throws IrpSyntaxException {
+    public Flash(IrpParser.FlashContext ctx) {
         super(ctx.name_or_number(), ctx.getChildCount() > 1 ? ctx.getChild(1).getText() : null);
     }
 
@@ -45,8 +43,7 @@ public class Flash extends Duration {
     }
 
     @Override
-    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed)
-            throws InvalidArgumentException, ArithmeticException, UnassignedException, IrpSyntaxException {
+    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
         return evaluate(nameEngine, generalSpec, elapsed);
     }
 

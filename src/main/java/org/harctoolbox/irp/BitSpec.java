@@ -23,10 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -50,10 +51,11 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return m;
     }
 
-    private static List<BareIrStream> parse(List<IrpParser.Bare_irstreamContext> list) throws IrpSyntaxException, InvalidRepeatException {
+    private static List<BareIrStream> parse(List<IrpParser.Bare_irstreamContext> list) {
         List<BareIrStream> result = new ArrayList<>(list.size());
-        for (IrpParser.Bare_irstreamContext bareIrStreamCtx : list)
+        list.stream().forEach((bareIrStreamCtx) -> {
             result.add(new BareIrStream(bareIrStreamCtx));
+        });
 
         return result;
     }
@@ -63,16 +65,16 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     private List<BareIrStream> bitCodes;
 
-    public BitSpec(String str) throws IrpSyntaxException, InvalidRepeatException {
+    public BitSpec(String str) {
         this(new ParserDriver(str).getParser().bitspec());
     }
 
-    public BitSpec(IrpParser.BitspecContext ctx) throws IrpSyntaxException, InvalidRepeatException {
+    public BitSpec(IrpParser.BitspecContext ctx) {
         this(parse(ctx.bare_irstream()));
     }
 
 
-    public BitSpec(List<BareIrStream> list) throws IrpSyntaxException, InvalidRepeatException {
+    public BitSpec(List<BareIrStream> list) {
         chunkSize = computeNoBits(list.size());
         bitCodes = list;
     }
@@ -133,9 +135,9 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return sum;
     }
 
-    public BareIrStream get(int index) throws InvalidArgumentException {
+    public BareIrStream get(int index) {
         if (index >= bitCodes.size())
-            throw new InvalidArgumentException("Cannot encode " + index + " with current bitspec.");
+            throw new ThisCannotHappenException("Cannot encode " + index + " with current bitspec.");
         return bitCodes.get(index);
     }
 
@@ -214,7 +216,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 IrSequence irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec).toIrSequence();
                 if (irSequence.getLength() != 2)
                     return false;
-            } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
+            } catch (IrpException | ArithmeticException | OddSequenceLenghtException ex) {
                 return false;
             }
         }
@@ -242,7 +244,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 if (! (IrCoreUtils.approximatelyEquals(a, on.get(0), 1, 0) && IrCoreUtils.approximatelyEquals(-a, on.get(1), 1, 0)))
                     return false;
                 a = -a;
-            } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
+            } catch (UnassignedException | InvalidNameException | IrpSemanticException ex) {
                 return false;
             }
         }
@@ -267,7 +269,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
             boolean sign = off.get(0) > 0;
             return IrCoreUtils.approximatelyEquals(on.get(0), -off.get(0)) && (sign == inverted);
-        } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
+        } catch (UnassignedException | InvalidNameException | IrpSemanticException ex) {
             return false;
         }
     }
@@ -378,10 +380,9 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     private List<Map<String, Object>> propertiesMap(boolean reverse, GeneralSpec generalSpec, NameEngine nameEngine) {
         List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
-        for (BareIrStream bitCode : bitCodes) {
-            Map<String, Object> map = bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
+        bitCodes.stream().map((bitCode) -> bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine)).forEach((map) -> {
             list.add(map);
-        }
+        });
 
 //        String normalStr  = reverse == (generalSpec.getBitDirection() == BitDirection.msb) ? "Lsb" : "Msb";
 //        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BitSpec" + normalStr);

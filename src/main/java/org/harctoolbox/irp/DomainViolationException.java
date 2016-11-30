@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * This Exception is thrown when a parameter is outside of its domain.
+ * This Exception is thrown when a protocol parameter is outside of its domain.
  */
 public class DomainViolationException extends IrpException {
 

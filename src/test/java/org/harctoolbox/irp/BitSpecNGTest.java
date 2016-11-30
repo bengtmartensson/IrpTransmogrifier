@@ -1,8 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -75,17 +72,13 @@ public class BitSpecNGTest {
      */
     @Test
     public void testGetChunkSize() {
-        try {
-            System.out.println("getChunkSize");
-            BitSpec nec1 = new BitSpec(NEC1BitSpec);
-            BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
-            BitSpec rc5 = new BitSpec(RC5BitSpec);
-            assertEquals(nec1.getChunkSize(), 1);
-            assertEquals(rc5.getChunkSize(), 1);
-            assertEquals(nokia32.getChunkSize(), 2);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            fail();
-        }
+        System.out.println("getChunkSize");
+        BitSpec nec1 = new BitSpec(NEC1BitSpec);
+        BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
+        BitSpec rc5 = new BitSpec(RC5BitSpec);
+        assertEquals(nec1.getChunkSize(), 1);
+        assertEquals(rc5.getChunkSize(), 1);
+        assertEquals(nokia32.getChunkSize(), 2);
     }
 
     /**
@@ -95,11 +88,7 @@ public class BitSpecNGTest {
     public void testIsEmpty() {
         System.out.println("isEmpty");
         assertEquals(new BitSpec().isEmpty(), true);
-        try {
-            assertEquals(new BitSpec(NEC1BitSpec).isEmpty(), false);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            fail();
-        }
+        assertEquals(new BitSpec(NEC1BitSpec).isEmpty(), false);
     }
 
     /**
@@ -107,21 +96,17 @@ public class BitSpecNGTest {
      */
     @Test
     public void testIsStandardPWM() {
-        try {
-            System.out.println("isStandardPWM");
-            NameEngine nameEngine = new NameEngine();
-            GeneralSpec generalSpec = new GeneralSpec();
-            BitSpec nec1 = new BitSpec(NEC1BitSpec);
-            BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
-            BitSpec rc5 = new BitSpec(RC5BitSpec);
-            //BitSpec empty = new BitSpec();
-            assertTrue(nec1.isPWM(2, nameEngine, generalSpec));
-            assertFalse(nokia32.isPWM(2, nameEngine, generalSpec));
-            assertFalse(rc5.isPWM(nameEngine, generalSpec));
-            //assertEquals(result, expResult);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            fail();
-        }
+        System.out.println("isStandardPWM");
+        NameEngine nameEngine = new NameEngine();
+        GeneralSpec generalSpec = new GeneralSpec();
+        BitSpec nec1 = new BitSpec(NEC1BitSpec);
+        BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
+        BitSpec rc5 = new BitSpec(RC5BitSpec);
+        //BitSpec empty = new BitSpec();
+        assertTrue(nec1.isPWM(2, nameEngine, generalSpec));
+        assertFalse(nokia32.isPWM(2, nameEngine, generalSpec));
+        assertFalse(rc5.isPWM(nameEngine, generalSpec));
+        //assertEquals(result, expResult);
 
 
     }
@@ -144,7 +129,7 @@ public class BitSpecNGTest {
             assertFalse(nokia32.isStandardBiPhase(nameEngine, generalSpec));
             assertTrue(rc5.isStandardBiPhase(nameEngine, generalSpec));
             assertTrue(rc6.isStandardBiPhase(nameEngine, generalSpec));
-        } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
+        } catch (IrpException | ArithmeticException ex) {
             fail();
         }
     }
@@ -170,14 +155,10 @@ public class BitSpecNGTest {
     @Test
     public void testNumberOfInfiniteRepeats() {
         System.out.println("numberOfInfiniteRepeats");
-        try {
-            BitSpec instance = new BitSpec(Nokia32BitSpec);
-            int expResult = 0;
-            int result = instance.numberOfInfiniteRepeats();
-            assertEquals(result, expResult);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            Logger.getLogger(BitSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        BitSpec instance = new BitSpec(Nokia32BitSpec);
+        int expResult = 0;
+        int result = instance.numberOfInfiniteRepeats();
+        assertEquals(result, expResult);
     }
 
     /**
@@ -185,14 +166,10 @@ public class BitSpecNGTest {
      */
     @Test
     public void testToIrpString() {
-        try {
-            System.out.println("toIrpString");
-            BitSpec instance = new BitSpec(Nokia32BitSpec);
-            String result = instance.toIrpString();
-            assertEquals(result, "<164,-276|164,-445|164,-614|164,-783>");
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            Logger.getLogger(BitSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("toIrpString");
+        BitSpec instance = new BitSpec(Nokia32BitSpec);
+        String result = instance.toIrpString();
+        assertEquals(result, "<164,-276|164,-445|164,-614|164,-783>");
     }
 
     /**
@@ -201,11 +178,7 @@ public class BitSpecNGTest {
     @Test
     public void testNumberOfBitspecDurations() {
         System.out.println("numberOfBitspecDurations");
-        try {
-            int result = new BitSpec(Nokia32BitSpec).numberOfBitspecDurations();
-            assertEquals(result, 2);
-        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-            Logger.getLogger(BitSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        int result = new BitSpec(Nokia32BitSpec).numberOfBitspecDurations();
+        assertEquals(result, 2);
     }
 }

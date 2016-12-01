@@ -209,7 +209,7 @@ public class IrpDatabase {
                     break;
                 case UnparsedProtocol.irpName: {
                     Element irp = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":" + UnparsedProtocol.irpName);
-                    irp.setTextContent(kvp.getValue());
+                    irp.appendChild(doc.createCDATASection(kvp.getValue()));
                     element.appendChild(irp);
                 }
                 break;

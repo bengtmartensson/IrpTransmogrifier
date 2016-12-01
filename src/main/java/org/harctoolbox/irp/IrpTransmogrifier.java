@@ -343,6 +343,8 @@ public class IrpTransmogrifier {
     private void writeConfig(CommandWriteConfig commandWriteConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException {
         setupDatabase(false, commandLineArgs);
         XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
+        if (commandLineArgs.output != null)
+            logger.log(Level.INFO, "Wrote {0}", commandLineArgs.output);
     }
 
     private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws UsageException, IOException, IrpException, SAXException {

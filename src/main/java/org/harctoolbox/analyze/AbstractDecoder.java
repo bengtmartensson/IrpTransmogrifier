@@ -19,6 +19,7 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BareIrStream;
 import org.harctoolbox.irp.BitDirection;
@@ -38,12 +39,10 @@ import org.harctoolbox.irp.RepeatMarker;
 
 public abstract class AbstractDecoder {
 
+    private static final Logger logger = Logger.getLogger(AbstractDecoder.class.getName());
+
     private static BitSpec mkBitSpec(List<BareIrStream> list, double timebase) {
-//        try {
-            return new BitSpec(list);
-//        } catch (IrpSyntaxException | UnsupportedRepeatException ex) {
-//            throw new ThisCannotHappenException();
-//        }
+        return new BitSpec(list);
     }
 
     protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
@@ -86,11 +85,7 @@ public abstract class AbstractDecoder {
             list.add(new BareIrStream(listOffOn));
             list.add(new BareIrStream(listOnOff));
         }
-//        try {
-            return new BitSpec(list);
-//        } catch (IrpSyntaxException | UnsupportedRepeatException ex) {
-//            throw new ThisCannotHappenException();
-//        }
+        return new BitSpec(list);
     }
 
     protected NameEngine nameEngine;

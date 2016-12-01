@@ -446,23 +446,8 @@ public class IrpTransmogrifier {
         Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.repeatFinder,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
-        if (commandAnalyze.statistics) {
-            out.println("Spaces:");
-            analyzer.getDistinctGaps().stream().forEach((d) -> {
-                out.println(analyzer.getName(d) + ":\t" + d + "\t" + analyzer.getNumberGaps(d));
-            });
-
-            out.println("Marks:");
-            analyzer.getDistinctFlashes().stream().forEach((d) -> {
-                out.println(analyzer.getName(d) + ":\t" + d + "\t" + analyzer.getNumberFlashes(d));
-            });
-
-            out.println("Pairs:");
-            analyzer.getPairs().stream().forEach((pair) -> {
-                out.println(analyzer.getName(pair) + ":\t" + analyzer.getNumberPairs(pair));
-            });
-            out.println(analyzer.toTimingsString());
-        }
+        if (commandAnalyze.statistics)
+            analyzer.printStatistics(out);
 
         Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(frequency, commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,

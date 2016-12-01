@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.harctoolbox.irp.Protocol;
 public class Analyzer extends Cleaner {
 
     private static final Logger logger = Logger.getLogger(Analyzer.class.getName());
+    private static final int numberOfDecoders = 4;
 
     private int timebase;
     private int[] normedTimings;
@@ -85,6 +87,21 @@ public class Analyzer extends Cleaner {
                 pairs.add(new Burst(mark, space));
             });
         });
+        Collections.sort(pairs, (a, b) -> getNumberPairs(b) - getNumberPairs(a));
+    }
+
+
+    private List<AbstractDecoder> setupDecoders(Analyzer.AnalyzerParams params) {
+        List<AbstractDecoder> decoders = new ArrayList<>(numberOfDecoders);
+        decoders.add(new TrivialDecoder(this, params));
+        decoders.add(new PwmDecoder(this, params));
+        try {
+            decoders.add(new Pwm4Decoder(this, params));
+        } catch (DecodeException ex) {
+            logger.log(Level.FINE, ex.getMessage());
+        }
+        decoders.add(new BiphaseDecoder(this, params));
+        return decoders;
     }
 
     /**
@@ -110,16 +127,7 @@ public class Analyzer extends Cleaner {
     }
 
     public Protocol searchProtocol(AnalyzerParams params) {
-        List<AbstractDecoder> decoders = new ArrayList<>(4);
-        decoders.add(new TrivialDecoder(this, params));
-        decoders.add(new PwmDecoder(this, params));
-        try {
-            decoders.add(new Pwm4Decoder(this, params));
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-        }
-        decoders.add(new BiphaseDecoder(this, params));
-
+        List<AbstractDecoder> decoders = setupDecoders(params);
         Protocol best = null;
         int weight = Integer.MAX_VALUE;
 
@@ -144,6 +152,26 @@ public class Analyzer extends Cleaner {
 
     public RepeatFinder.RepeatFinderData getRepeatFinderData() {
         return repeatfinderData;
+    }
+
+    public void printStatistics(PrintStream out) {
+        out.println("Spaces:");
+        this.getDistinctGaps().stream().forEach((d) -> {
+            out.println(this.getName(d) + ":\t" + d + "\t" + this.getNumberGaps(d));
+        });
+
+        out.println("Marks:");
+        this.getDistinctFlashes().stream().forEach((d) -> {
+            out.println(this.getName(d) + ":\t" + d + "\t" + this.getNumberFlashes(d));
+        });
+
+        out.println("Pairs:");
+        this.getPairs().stream().forEach((pair) -> {
+            out.println(this.getName(pair) + ":\t" + this.getNumberPairs(pair));
+        });
+
+        out.println("Signal as sequence of pairs:");
+        out.println(this.toTimingsString());
     }
 
     public static class AnalyzerParams {

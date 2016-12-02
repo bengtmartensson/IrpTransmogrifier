@@ -60,11 +60,10 @@ import org.xml.sax.SAXException;
 public class IrpTransmogrifier {
     // TODO: make these user settable, reading environment vars, etc.
     private static final String defaultConfigFile = "src/main/config/IrpProtocols.xml";
-    private static final String stDir = "src/main/st";
 
     // No need to make these settable
     private static final String charSet = "UTF-8"; // Just for runMain
-    private static final String separator = "\t";
+    private static final String SEPARATOR = "\t";
 
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
@@ -86,15 +85,6 @@ public class IrpTransmogrifier {
 
     private static void doExit(int exitCode) {
         System.exit(exitCode);
-    }
-
-    private static int numberTrue(Boolean... bool) {
-        int result = 0;
-        for (boolean b : bool) {
-            if (b)
-                result++;
-        }
-        return result;
     }
 
     /**
@@ -287,53 +277,34 @@ public class IrpTransmogrifier {
             out.print(protocolName);
 
             if (commandList.irp)
-                out.print(separator + irpDatabase.getIrp(protocolName));
+                out.print(SEPARATOR + irpDatabase.getIrp(protocolName));
 
             if (commandList.documentation)
-                out.print(separator + irpDatabase.getDocumentation(protocolName));
+                out.print(SEPARATOR + irpDatabase.getDocumentation(protocolName));
 
             if (commandList.stringTree)
-                out.print(separator + protocol.toStringTree());
+                out.print(SEPARATOR + protocol.toStringTree());
 
             if (commandList.is)
-                out.print(separator + protocol.toIrpString());
+                out.print(SEPARATOR + protocol.toIrpString());
 
             if (commandList.gui)
                 IrpUtils.showTreeViewer(protocol.toTreeViewer(), "Parse tree for " + protocolName);
 
             if (commandList.weight)
-                out.print(separator + "Weight: " + protocol.weight());
+                out.print(SEPARATOR + "Weight: " + protocol.weight());
 
-            if (commandList.classify) {
-                out.print("\t");
-                out.print((int) protocol.getFrequency());
-                out.print("\t");
-                out.print(protocol.hasMemoryVariable("T") ? "toggle\t" : "\t");
-                out.print(protocol.isStandardPWM() ? "PWM" : "");
-                out.print(protocol.isPWM4() ? "PWM4" : "");
-                out.print(protocol.isPWM16() ? "PWM16" : "");
-                out.print(protocol.isBiphase() ? "Biphase" : "");
-                out.print(protocol.isTrivial(false) ? "Trivial" : "");
-                out.print(protocol.isTrivial(true) ? "invTrivial" : "");
-                out.print("\t");
-                out.print(protocol.interleavingOk() ? "interleaving\t" : "\t");
-                out.print(protocol.startsWithDuration() ? "SWD\t" : "\t");
-                out.print(protocol.hasVariation() ? "variation\t" : "\t");
-                out.print(protocol.isRPlus() ? "R+" : "");
-            }
+            if (commandList.classify)
+                out.print(SEPARATOR + protocol.classificationString());
+
             out.println();
         }
     }
 
-    private void version(String filename, CommandLineArgs commandLineArgs) throws UsageException {
+    private void version(String filename, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException {
         out.println(Version.versionString);
-        try {
-            setupDatabase(commandLineArgs);
-            if (irpDatabase != null)
-                out.println("Database: " + filename + " version: " + irpDatabase.getConfigFileVersion());
-        } catch (IOException | IrpException | SAXException ex) {
-            logger.log(Level.WARNING, "Could not setup IRP data base: {0}", ex.getMessage());
-        }
+        setupDatabase(commandLineArgs);
+        out.println("Database: " + filename + " version: " + irpDatabase.getConfigFileVersion());
 
         out.println("JVM: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("os.name") + "-" + System.getProperty("os.arch"));
         out.println();
@@ -460,7 +431,7 @@ public class IrpTransmogrifier {
     }
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
-        out.println(protocol.toIrpString(radix, usePeriods) + " \tweight = " + protocol.weight());
+        out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
     }
 
     private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, InvalidArgumentException {
@@ -468,7 +439,7 @@ public class IrpTransmogrifier {
         List<String> list = irpDatabase.evaluateProtocols(commandRecognize.protocol, commandLineArgs.sort, commandLineArgs.regexp);
         if (list.isEmpty())
             throw new UsageException("No protocol given or matched.");
-        if (numberTrue(commandRecognize.random, !commandRecognize.nameEngine.isEmpty(), !commandRecognize.args.isEmpty()) != 1)
+        if (IrpUtils.numberTrue(commandRecognize.random, !commandRecognize.nameEngine.isEmpty(), !commandRecognize.args.isEmpty()) != 1)
                 throw new UsageException("Must either use --random or --nameengine, or have arguments.");
 
         for (String protocolName : list) {
@@ -490,8 +461,8 @@ public class IrpTransmogrifier {
                     true, commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
             if (commandRecognize.args.isEmpty()) {
-                out.print(protocolName + "\t");
-                out.print(testNameEngine + "\t");
+                out.print(protocolName + SEPARATOR);
+                out.print(testNameEngine + SEPARATOR);
                 out.println((parameters != null && testNameEngine.numericallyEquals(parameters)) ? "success" : "fail");
             } else if (parameters != null)
                 out.println(parameters);
@@ -526,7 +497,7 @@ public class IrpTransmogrifier {
         out.print(result);
         if (bitfield instanceof FiniteBitField) {
             FiniteBitField fbf = (FiniteBitField) bitfield;
-            out.print("\t" + fbf.toBinaryString(nameEngine, commandBitField.lsb));
+            out.print(SEPARATOR + fbf.toBinaryString(nameEngine, commandBitField.lsb));
         }
         out.println();
 

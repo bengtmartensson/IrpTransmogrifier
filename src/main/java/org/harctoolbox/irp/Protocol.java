@@ -441,4 +441,21 @@ public class Protocol extends IrpObject {
         List<String> ruleNames = Arrays.asList(parser.getRuleNames());
         return new TreeViewer(ruleNames, parseTree);
     }
+
+    public String classificationString() {
+        StringBuilder str = new StringBuilder(128);
+        str.append((int) getFrequency());
+        str.append("\t").append(hasMemoryVariable("T") ? "toggle\t" : "\t");
+        str.append(isStandardPWM() ? "PWM" : "");
+        str.append(isPWM4() ? "PWM4" : "");
+        str.append(isPWM16() ? "PWM16" : "");
+        str.append(isBiphase() ? "Biphase" : "");
+        str.append(isTrivial(false) ? "Trivial" : "");
+        str.append(isTrivial(true) ? "invTrivial" : "");
+        str.append("\t").append(interleavingOk() ? "interleaving\t" : "\t");
+        str.append(startsWithDuration() ? "SWD\t" : "\t");
+        str.append(hasVariation() ? "variation\t" : "\t");
+        str.append(isRPlus() ? "R+" : "");
+        return str.toString();
+    }
 }

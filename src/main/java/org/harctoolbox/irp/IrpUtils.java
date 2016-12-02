@@ -133,6 +133,15 @@ public class IrpUtils {
         return newName.matches("\\d.*") ? ("X" + newName) : newName;
     }
 
+    public static int numberTrue(Boolean... bool) {
+        int result = 0;
+        for (boolean b : bool) {
+            if (b)
+                result++;
+        }
+        return result;
+    }
+
     /**
      * Either opens a file (optionally for appending (if beginning with +)) or returns stdout.
      *

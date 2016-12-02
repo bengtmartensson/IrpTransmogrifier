@@ -267,7 +267,7 @@ public class IrpTransmogrifier {
         usage();
     }
 
-    private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException {
+    private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
         setupDatabase(commandLineArgs);
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp);
 
@@ -325,7 +325,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void version(String filename, CommandLineArgs commandLineArgs) {
+    private void version(String filename, CommandLineArgs commandLineArgs) throws UsageException {
         out.println(Version.versionString);
         try {
             setupDatabase(commandLineArgs);
@@ -340,7 +340,7 @@ public class IrpTransmogrifier {
         out.println(Version.licenseString);
     }
 
-    private void writeConfig(CommandWriteConfig commandWriteConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException {
+    private void writeConfig(CommandWriteConfig commandWriteConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
         setupDatabase(false, commandLineArgs);
         XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
         if (commandLineArgs.output != null)
@@ -478,9 +478,7 @@ public class IrpTransmogrifier {
             try {
                 if (commandRecognize.args.isEmpty()) {
                     testNameEngine = commandRecognize.random ? new NameEngine(protocol.randomParameters()) : commandRecognize.nameEngine;
-
                     irSignal = protocol.toIrSignal(testNameEngine.clone());
-
                 } else {
                     irSignal = IrSignal.parse(commandRecognize.args, commandRecognize.frequency, false);
                 }
@@ -541,18 +539,19 @@ public class IrpTransmogrifier {
     }
 
 
-    private void setupDatabase(CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException {
+    private void setupDatabase(CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
         setupDatabase(true, commandLineArgs);
     }
 
-    private void setupDatabase(boolean expand, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException {
-        configFilename = commandLineArgs.configFile != null
-                ? commandLineArgs.configFile
-                : commandLineArgs.iniFile != null
-                        ? commandLineArgs.iniFile : defaultConfigFile;
-        irpDatabase = commandLineArgs.iniFile != null
-                ? new IrpDatabase(IrpDatabase.readIni(commandLineArgs.iniFile))
-                : new IrpDatabase(configFilename);
+    private void setupDatabase(boolean expand, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
+        if (commandLineArgs.iniFile != null) {
+            if (commandLineArgs.configFile != null)
+                throw new UsageException("configfile and inifile cannot both be specified");
+            irpDatabase = IrpDatabase.readIni(commandLineArgs.iniFile);
+        } else {
+            configFilename = commandLineArgs.configFile != null ? commandLineArgs.configFile : defaultConfigFile;
+            irpDatabase = new IrpDatabase(configFilename);
+        }
         if (expand)
             irpDatabase.expand();
     }

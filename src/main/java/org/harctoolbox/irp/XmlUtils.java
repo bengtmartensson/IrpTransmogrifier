@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -52,6 +53,15 @@ import org.xml.sax.SAXParseException;
 public class XmlUtils {
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
+
+    public static Document parseStringToXmlDocument(String string, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {
+        try {
+            InputStream stream = new ByteArrayInputStream(string.getBytes("UTF-8"));
+            return openXmlStream(stream, null, isNamespaceAware, isXIncludeAware);
+        } catch (IOException ex) {
+            throw new ThisCannotHappenException();
+        }
+    }
 
     public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
         final String fname = file.getCanonicalPath();

@@ -128,6 +128,11 @@ public class IrpUtils {
         return result;
     }
 
+    public static String toCName(String name) {
+        String newName = name.replaceAll("[^0-9A-Za-z_]", "");
+        return newName.matches("\\d.*") ? ("X" + newName) : newName;
+    }
+
     /**
      * Either opens a file (optionally for appending (if beginning with +)) or returns stdout.
      *

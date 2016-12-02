@@ -372,6 +372,7 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
+    @SuppressWarnings("AssignmentToMethodParameter")
     public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
         //List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());

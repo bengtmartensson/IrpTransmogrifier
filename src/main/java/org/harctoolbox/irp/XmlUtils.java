@@ -172,7 +172,7 @@ public class XmlUtils {
             tr.setOutputProperty(OutputKeys.METHOD, "xml");
             if (cdataElements != null)
                 tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
-            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             tr.transform(new DOMSource(doc), new StreamResult(ostr));
         } catch (TransformerException ex) {
             logger.log(Level.SEVERE, "{0}", ex.getMessage());

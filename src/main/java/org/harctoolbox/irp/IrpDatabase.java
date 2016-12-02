@@ -43,6 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.SAXException;
 
 /**
@@ -223,6 +224,9 @@ public class IrpDatabase {
 
     private Document emptyDocument() {
         Document doc = XmlUtils.newDocument(true);
+        ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
+                "type=\"text/xsl\" href=\"IrpProtocols2html.xsl\"");
+        doc.appendChild(pi);
         Element root = doc.createElementNS(irpProtocolNS, irpProtocolPrefix + ":protocols");
         root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");

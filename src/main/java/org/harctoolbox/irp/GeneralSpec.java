@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -178,7 +179,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
 
     public String toIrpString(boolean usePeriods) {
         StringJoiner joiner = new StringJoiner(",", "{", "}");
-        joiner.add(String.format("%2.1f", IrCoreUtils.hz2khz(getFrequency())) + "k");
+        joiner.add(String.format(Locale.US, "%2.1f", IrCoreUtils.hz2khz(getFrequency())) + "k");
         joiner.add(usePeriods
                 ? (Math.round(IrCoreUtils.us2Periods(unit, getFrequency())) + "p")
                 : Long.toString(Math.round(getUnit())));

@@ -765,7 +765,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-r", "--raw" }, description = "Generate raw form")
         private boolean raw = false;
 
-        @Parameter(names = { "--random" }, description = "Generate random paraneters")
+        @Parameter(names = { "--random" }, description = "Generate random, but valid, parameters")
         private boolean random = false;
 
         @Parameter(names = { "--test" }, description = "Compare with IrpMaster")

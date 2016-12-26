@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.StringJoiner;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -35,19 +37,30 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
  */
 public class Cleaner {
     private final static int numberOfTimingsCapacity = 20;
-    public static IrSequence clean(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+    
+    public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
         return cleaner.toIrSequence();
     }
+    
     public static IrSequence clean(IrSequence irSequence) {
-        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return clean(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
-    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+    
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         return new ModulatedIrSequence(clean((IrSequence)irSequence, absoluteTolerance, relativeTolerance),
                 irSequence.getFrequency(), irSequence.getDutyCycle());
     }
+    
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
-        return clean(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return clean(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+    }
+    
+    public static IrSignal clean(IrSignal irSignal, double absoluteTolerance, double relativeTolerance) throws InvalidArgumentException {
+        ModulatedIrSequence irSequence = irSignal.toModulatedIrSequence(1);
+        Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
+        IrSequence cleansed = cleaner.toIrSequence();
+        return new IrSignal(cleansed, irSignal.getIntroLength(), irSignal.getRepeatLength(), irSignal.getFrequency(), irSignal.getDutyCycle());
     }
 
     public static String mkName(Integer n) {
@@ -66,10 +79,10 @@ public class Cleaner {
     private List<Integer> sortedFlashes;
 
     public Cleaner(IrSequence irSequence) {
-        this(irSequence, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public Cleaner(IrSequence irSequence, int absoluteTolerance, double relativeTolerance) {
+    public Cleaner(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         rawData = irSequence.toInts();
         createRawHistogram();
         createDumbTimingsTable(absoluteTolerance, relativeTolerance);
@@ -90,7 +103,7 @@ public class Cleaner {
         }
     }
 
-    private void createDumbTimingsTable(int absoluteTolerance, double relativeTolerance) {
+    private void createDumbTimingsTable(double absoluteTolerance, double relativeTolerance) {
         dumbTimingsTable = new ArrayList<>(rawData.length);
         sorted = rawData.clone();
         Arrays.sort(sorted);
@@ -103,7 +116,7 @@ public class Cleaner {
         }
     }
 
-    private void improveTimingsTable(int absoluteTolerance, double relativeTolerance) {
+    private void improveTimingsTable(double absoluteTolerance, double relativeTolerance) {
         lookDownTable = new HashMap<>(numberOfTimingsCapacity);
         timings = new ArrayList<>(numberOfTimingsCapacity);
         int indexInSortedTimings = 0;

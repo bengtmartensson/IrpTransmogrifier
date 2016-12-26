@@ -173,13 +173,13 @@ public class IrSignal implements Cloneable {
      * Constructs an IrSignal from its arguments.
      *
      * @param durations
-     * @param noIntroBursts
-     * @param noRepeatBursts
+     * @param noIntro
+     * @param noRepeat
      * @param frequency
      * @throws InvalidArgumentException
      */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, int frequency) throws InvalidArgumentException {
-        this(durations, noIntroBursts, noRepeatBursts, frequency, ModulatedIrSequence.unknownDutyCycle);
+    public IrSignal(int[] durations, int noIntro, int noRepeat, int frequency) throws InvalidArgumentException {
+        this(durations, noIntro, noRepeat, frequency, ModulatedIrSequence.unknownDutyCycle);
     }
     /**
      * Constructs an IrSignal from its arguments.
@@ -200,20 +200,27 @@ public class IrSignal implements Cloneable {
     /**
      * Constructs an IrSignal from its arguments.
      *
-     * The first 2*noIntroBursts durations belong to the Intro signal,
-     * the next 2*noRepeatBursts to the repetition part, and the remaining to the ending sequence.
+     * The first noIntro durations belong to the Intro signal,
+     * the next noRepeat to the repetition part, and the remaining to the ending sequence.
      *
      * @param durations Integer array of durations. Signs of the entries are ignored,
-     * @param noIntroBursts Number of bursts (half the number of entries) belonging to the intro sequence.
-     * @param noRepeatBursts Number of bursts (half the number of entries) belonging to the intro sequence.
+     * @param noIntro Number of entries belonging to the intro sequence.
+     * @param noRepeat Number of entries belonging to the repeat sequence.
      * @param frequency Modulation frequency in Hz.
      * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public IrSignal(int[] durations, int noIntroBursts, int noRepeatBursts, double frequency, double dutyCycle) throws InvalidArgumentException {
-        this(new IrSequence(durations, 0, 2 * noIntroBursts),
-                new IrSequence(durations, 2 * noIntroBursts, 2 * noRepeatBursts),
-                new IrSequence(durations, 2 * (noIntroBursts + noRepeatBursts), durations.length - 2 * (noIntroBursts + noRepeatBursts)),
+    public IrSignal(int[] durations, int noIntro, int noRepeat, double frequency, double dutyCycle) throws InvalidArgumentException {
+        this(new IrSequence(durations, 0, noIntro),
+                new IrSequence(durations, noIntro, noRepeat),
+                new IrSequence(durations, noIntro + noRepeat, durations.length - (noIntro + noRepeat)),
+                frequency, dutyCycle);
+    }
+    
+    public IrSignal(IrSequence irSequence, int noIntro, int noRepeat, double frequency, double dutyCycle) throws InvalidArgumentException {
+        this(irSequence.subSequence(0, noIntro),
+                irSequence.subSequence(noIntro, noRepeat),
+                irSequence.subSequence(noIntro + noRepeat, irSequence.getLength() - noIntro - noRepeat),
                 frequency, dutyCycle);
     }
 
@@ -292,15 +299,6 @@ public class IrSignal implements Cloneable {
     }
 
     /**
-     * Returns number of burst pairs in the intro sequence.
-     * @see IrSequence
-     * @return number of burst pairs in intro sequence
-     */
-    public final int getIntroBursts() {
-        return introSequence.getNumberBursts();
-    }
-
-    /**
      * Returns the data in the intro sequence, as a sequence of microsecond durations.
      * @param alternatingSigns
      * @see IrSequence
@@ -333,10 +331,6 @@ public class IrSignal implements Cloneable {
         return repeatSequence.getLength();
     }
 
-    public final int getRepeatBursts() {
-        return repeatSequence.getNumberBursts();
-    }
-
     public final int[] getRepeatInts(boolean alternatingSigns) {
         return repeatSequence.toInts(alternatingSigns);
     }
@@ -351,10 +345,6 @@ public class IrSignal implements Cloneable {
 
     public final int getEndingLength() {
         return endingSequence.getLength();
-    }
-
-    public final int getEndingBursts() {
-        return endingSequence.getNumberBursts();
     }
 
     public final int[] getEndingInts(boolean alternatingSigns) {
@@ -453,7 +443,7 @@ public class IrSignal implements Cloneable {
 
     /**
      * Returns an integer array of one intro sequence, repeat number of repeat sequence, followed by one ending sequence.
-     * The sizes can be obtained with the get*Length()- or get*Bursts()-functions.
+     * The sizes can be obtained with the get*Length()-functions.
      * @param repetitions Number of times of to include the repeat sequence.
      * @return integer array as copy.
      */
@@ -477,7 +467,7 @@ public class IrSignal implements Cloneable {
 
     /**
      * Returns an integer array of one intro sequence, count or count-1 number of repeat sequence, dependent on if intro is empty or not, followed by one ending sequence.
-     * The sizes can be obtained with the get*Length()- or get*Bursts()-functions.
+     * The sizes can be obtained with the get*Length()-functions.
      * @param count Number of times of the "signal" to send, according to the count semantic.
      * @return integer array as copy.
      */
@@ -563,7 +553,7 @@ public class IrSignal implements Cloneable {
     public final ModulatedIrSequence toModulatedIrSequence(boolean intro, int repetitions, boolean ending) {
         IrSequence seq1 = intro ? introSequence : new IrSequence();
         IrSequence seq2 = seq1.append(repeatSequence, repetitions);
-        return new ModulatedIrSequence(ending ? seq2.append(endingSequence) : seq2, frequency, dutyCycle);
+        return new ModulatedIrSequence(ending && !endingSequence.isEmpty() ? seq2.append(endingSequence) : seq2, frequency, dutyCycle);
     }
 
     /**

@@ -114,8 +114,8 @@ public class RepeatFinder {
 
     private void analyze() {
         RepeatFinderData candidate = new RepeatFinderData(irSequence.getLength());
-        for (int length = irSequence.getNumberBursts() / 2; length >= 2; length--) {
-            for (int beginning = 0; beginning < irSequence.getNumberBursts() - length; beginning++) {
+        for (int length = irSequence.getLength() / 4; length >= 2; length--) {
+            for (int beginning = 0; beginning < irSequence.getLength() / 2 - length; beginning++) {
                 RepeatFinderData newCandidate;
                 try {
                     newCandidate = countRepeats(2*beginning, 2*length);

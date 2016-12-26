@@ -56,7 +56,7 @@ public class ModulatedIrSequence extends IrSequence {
      * @param dutyCycle
      */
     public ModulatedIrSequence(IrSequence irSequence, double frequency, double dutyCycle) {
-        data = irSequence.data;
+        super(irSequence.data);
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
     }

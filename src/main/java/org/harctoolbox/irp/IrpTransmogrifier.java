@@ -42,6 +42,7 @@ import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.analyze.Cleaner;
 import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -140,6 +141,9 @@ public class IrpTransmogrifier {
 
         CommandCode commandCode = new CommandCode();
         argumentParser.addCommand(commandCode);
+        
+        CommandDecode commandDecode = new CommandDecode();
+        argumentParser.addCommand(commandDecode);
 
         CommandExpression commandExpression = new CommandExpression();
         argumentParser.addCommand(commandExpression);
@@ -212,6 +216,9 @@ public class IrpTransmogrifier {
                     break;
                 case "code":
                     instance.code(commandCode, commandLineArgs);
+                    break;
+                case "decode":
+                    instance.decode(commandDecode, commandLineArgs);
                     break;
                 case "expression":
                     instance.expression(commandExpression, commandLineArgs);
@@ -358,6 +365,7 @@ public class IrpTransmogrifier {
         if (commandRenderer.pronto)
             out.println(irSignal.ccfString());
 
+        // FIXME (to be removed)
         if (commandRenderer.test) {
             String protocolName = protocol.getName();
             IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(protocolName, nameEngine);
@@ -390,46 +398,28 @@ public class IrpTransmogrifier {
             }
         }
     }
-
-    // TODO: Cleanup
-    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException, InvalidArgumentException {
+    
+    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
-        IrSignal inputIrSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
-        IrSequence irSequence = inputIrSignal.toModulatedIrSequence(1);
-        double frequency = inputIrSignal.getFrequency();
-
-        if (commandAnalyze.cleaner) {
-            Cleaner cleaner = new Cleaner(irSequence);
-            irSequence = cleaner.toIrSequence();
-        }
-
-        if (commandAnalyze.repeatFinder) {
-            if (inputIrSignal.getRepeatLength() != 0 || inputIrSignal.getEndingLength() != 0)
-                throw new UsageException("Cannot use --repeatfinder with a signal with repeat- or ending sequence.");
-
-            RepeatFinder repeatFinder = new RepeatFinder(irSequence);
-            RepeatFinder.RepeatFinderData repeatFinderData = repeatFinder.getRepeatFinderData();
-            out.println(repeatFinderData);
-            IrSignal repeatFinderIrSignal = repeatFinder.toIrSignal(irSequence, frequency);
-            out.println(repeatFinderIrSignal);
-        }
-
-        Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.repeatFinder,
-                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-
-        if (commandAnalyze.statistics)
-            analyzer.printStatistics(out);
-
-        Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(frequency, commandAnalyze.timeBase,
+        
+        IrSignal irSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
+        Analyzer analyzer = new Analyzer(irSignal, commandAnalyze.repeatFinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
 
         Protocol protocol = analyzer.searchProtocol(params);
         printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
     }
-
+      
+    private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
+        IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
+        Analyzer analyzer = new Analyzer(irSignal, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        // TODO...
+    }
+       
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
         out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
     }
@@ -556,7 +546,7 @@ public class IrpTransmogrifier {
     private final static class CommandLineArgs {
 
         @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
-        private int absoluteTolerance = 50;
+        private double absoluteTolerance = 50;
 
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
         private String configFile = null;
@@ -599,9 +589,6 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
     private static class CommandAnalyze {
 
-        @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
-        private boolean cleaner = false;
-
         @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
         private boolean extent = false;
 
@@ -631,9 +618,6 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {"--radix" }, description = "Radix of parameter output")
         private int radix = 16;
-
-        @Parameter(names = {"-s", "--statistics"}, description = "Print some statistics on the analyzed signal")
-        private boolean statistics = false;
 
         @Parameter(names = {"-t", "--timebase"}, description = "Force timebase, in microseconds, or in periods (with ending \"p\")")
         private String timeBase = null;
@@ -675,6 +659,16 @@ public class IrpTransmogrifier {
 
         @Parameter(description = "protocol")
         private List<String> protocols;
+    }
+    
+    @Parameters(commandNames = {"decode"}, commandDescription = "Decode given IR signal")
+    private static class CommandDecode {
+        
+        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
+        private double frequency = IrCoreUtils.invalid;
+
+        @Parameter(description = "durations in microseconds, or pronto hex", required = true)
+        private List<String> args;
     }
 
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
@@ -768,6 +762,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--random" }, description = "Generate random, but valid, parameters")
         private boolean random = false;
 
+        // FIXME (to be removed)
         @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
         private boolean test = false;
 

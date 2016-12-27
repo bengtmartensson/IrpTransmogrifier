@@ -33,17 +33,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.XMLFormatter;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.IrpMaster.IrpMasterException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
-import org.harctoolbox.analyze.Cleaner;
-import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
-import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
@@ -173,23 +176,44 @@ public class IrpTransmogrifier {
             usage(IrpUtils.exitUsageError);
         }
 
-        Logger topLevelLogger = Logger.getLogger("");
-        System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", "%4$s(%2$s): %5$s%n");
-        //SimpleFormatter formatter = new SimpleFormatter();
-        //formatter.
-        //ConsoleHandler handler = new ConsoleHandler();
-        //handler.setLevel(commandLineArgs.logLevel);
-        //topLevelLogger.addHandler(handler);
-        topLevelLogger.getHandlers()[0].setLevel(commandLineArgs.logLevel);
-        topLevelLogger.setLevel(commandLineArgs.logLevel);
-        //logger.removeHandler(logger.getHandlers()[0]);
-        //logger.setLevel(commandLineArgs.logLevel/*Level.ALL*/);
-        //Logger.getLogger(Protocol.class.getName()).setLevel(Level.INFO);
-
-        if (commandLineArgs.seed != null)
-            ParameterSpec.initRandom(commandLineArgs.seed);
-
         try {
+            Logger topLevelLogger = Logger.getLogger("");
+            Formatter formatter = commandLineArgs.xmlLog ? new XMLFormatter() : new SimpleFormatter();
+            Handler[] handlers = topLevelLogger.getHandlers();
+            for (Handler handler : handlers)
+                topLevelLogger.removeHandler(handler);
+            
+            System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", commandLineArgs.logformat);
+
+            String[] logclasses = commandLineArgs.logclasses.split("\\|");
+            @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+            List<Logger> loggers = new ArrayList<>(logclasses.length);
+            for (String logclass : logclasses) {
+                String[] classLevel = logclass.trim().split(":");
+                if (classLevel.length < 2)
+                    continue;
+                
+                Logger log = Logger.getLogger(classLevel[0].trim());
+                loggers.add(log); // stop them from being garbage collected
+                Level level = Level.parse(classLevel[1].trim().toUpperCase(Locale.US));
+                log.setLevel(level);
+                log.setUseParentHandlers(false);
+                Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
+                handler.setLevel(level);
+                handler.setFormatter(formatter);
+                log.addHandler(handler);
+            }
+        
+            Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
+            handler.setFormatter(formatter);
+            topLevelLogger.addHandler(handler);
+
+            handler.setLevel(commandLineArgs.logLevel);
+            topLevelLogger.setLevel(commandLineArgs.logLevel);
+
+            if (commandLineArgs.seed != null)
+                ParameterSpec.initRandom(commandLineArgs.seed);
+
             PrintStream ps = printStream != null ? printStream
                     : commandLineArgs.output == null ? System.out
                     : IrpUtils.getPrintSteam(commandLineArgs.output);
@@ -563,6 +587,15 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
         private String iniFile = null;//"src/main/config/IrpProtocols.ini";
 
+        @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels.")
+        private String logclasses = "";
+        
+        @Parameter(names = {"-L", "--logfile"}, description = "Log file. If empty, log to stderr.")
+        private String logfile = null;
+ 
+        @Parameter(names = {"-F", "--logformat"}, description = "Log format, see class SimpleFormatter.")
+        private String logformat = "%4$s(%2$s): %5$s%n";
+ 
         @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
         private Level logLevel = Level.INFO;
@@ -584,6 +617,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {"-v", "--version"}, description = "Report version (deprecated; use command version instead)")
         private boolean versionRequested = false;
+        
+        @Parameter(names = {"-x", "--xmllog"}, description = "Log in XML format.")
+        private boolean xmlLog = false;
     }
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")

@@ -186,18 +186,6 @@ public class IrSequenceNGTest {
     }
 
     /**
-     * Test of getNumberBursts method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testGetNumberBursts() {
-        System.out.println("getNumberBursts");
-        IrSequence instance = new IrSequence();
-        int expResult = 0;
-        int result = instance.getNumberBursts();
-        assertEquals(result, expResult);
-    }
-
-    /**
      * Test of getDuration method, of class IrSequence.
      */
     @Test(enabled = false)

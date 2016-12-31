@@ -231,7 +231,7 @@ public class IrpTransmogrifier {
 
             assert(command != null); // for FindBugs
 
-            switch (command) {
+          switch (command) {
                 case "analyze":
                     instance.analyze(commandAnalyze, commandLineArgs);
                     break;
@@ -434,7 +434,7 @@ public class IrpTransmogrifier {
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
 
-        Protocol protocol = analyzer.searchProtocol(params);
+        Protocol protocol = analyzer.searchProtocol(params, commandAnalyze.decoder);
         printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
     }
       
@@ -445,7 +445,8 @@ public class IrpTransmogrifier {
     }
        
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
-        out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
+        if (protocol != null)
+            out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
     }
 
     private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, InvalidArgumentException {
@@ -645,6 +646,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit")
         private double maxRoundingError = 0.3;
+        
+        @Parameter(names = {      "--decoder" }, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")
+        private String decoder = null;
 
         @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths")
         private List<Integer> parameterWidths = new ArrayList<>(4);

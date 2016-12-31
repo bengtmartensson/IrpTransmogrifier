@@ -384,7 +384,7 @@ Many Pioneer commands are sent as combinations of two different Pioneer signals.
     <irp:protocol c-name="RC5" name="RC5">
         <irp:parameter name="uei_executor">00E8</irp:parameter>
         <irp:irp><![CDATA[{36k,msb,889}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[D:0..31,F:0..127,T@:0..1=0]]]></irp:irp>
-        <irp:documentation>What we call "D" is really the "System" and what we call "F" is really the "Command". If you are using ProntoEdit to create the RC5 signals directly, that GUI uses that correct (System and Command) Philips terminology.</irp:documentation>
+        <irp:documentation>In Philips' (the creator of the protocol) terminology, "D" is called "System" and "F" is called "Command".</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="RC57F" name="RC5-7F">
         <irp:parameter name="uei_executor">0182</irp:parameter>
@@ -399,7 +399,7 @@ Many Pioneer commands are sent as combinations of two different Pioneer signals.
     <irp:protocol c-name="RC5x" name="RC5x">
         <irp:parameter name="uei_executor">00F2</irp:parameter>
         <irp:irp><![CDATA[{36k,msb,889}<1,-1|-1,1>((1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T) [D:0..31,S:0..127,F:0..63,T@:0..1=0]]]></irp:irp>
-        <irp:documentation>What we call "D" is really the "System". What we call "S" is really the "Command". What we call "F" is really the "Data". If you are using ProntoEdit to create the RC5 signals directly, that GUI uses that correct (System, Command and Data) Philips terminology.</irp:documentation>
+        <irp:documentation>In Philips' (the creator of the protocol) terminology, "D" is called "System", "S" is called "Command", and is called "Data".</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="RC6" name="RC6">
         <irp:parameter name="uei_executor">0058</irp:parameter>

@@ -50,9 +50,9 @@ public class IrSequence implements Cloneable {
      */
     public static IrSequence concatenate(Collection<IrSequence> sequences) {
         IrSequence s = new IrSequence();
-        for (IrSequence seq : sequences) {
+        for (IrSequence seq : sequences)
             s = s.append(seq);
-        }
+        
         return s;
     }
 
@@ -93,13 +93,13 @@ public class IrSequence implements Cloneable {
 
     /**
      * Constructs an IrSequence from the parameter data.
-     * @param data Array of durations. Is copied.
+     * @param data Array of durations. Is referenced, not copied.
      * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      */
     public IrSequence(double[] data) throws OddSequenceLenghtException {
         if (data.length % 2 != 0)
             throw new OddSequenceLenghtException(data.length);
-        this.data = data.clone();
+        this.data = data;
     }
 
     /**
@@ -237,6 +237,15 @@ public class IrSequence implements Cloneable {
     public IrSequence(IrSequence src) {
         data = src.data.clone();
     }
+    
+    public IrSequence(IrSequence src, int start, int length) throws InvalidArgumentException {
+        if (start % 2 != 0 || length % 2 != 0)
+            throw new OddSequenceLenghtException("Start and length must be even");
+        if (start + length > src.data.length)
+            throw new InvalidArgumentException("Selection extends beyond end.");
+        data = new double[length];
+        System.arraycopy(src.data, start, data, 0, length);
+    }
 
     /**
      * Returns the i'th value, a duration in micro seconds.
@@ -320,9 +329,11 @@ public class IrSequence implements Cloneable {
         System.arraycopy(data, 0, newData, 0, data.length);
         for (int r = 0; r < repetitions; r++)
             System.arraycopy(tail.data, 0, newData, data.length + r*tail.data.length, tail.data.length);
-        IrSequence irSequence = new IrSequence();
-        irSequence.data = newData;
-        return irSequence;
+        try {
+            return new IrSequence(newData);
+        } catch (OddSequenceLenghtException ex) {
+            throw new ThisCannotHappenException();
+        }
     }
 
      /**
@@ -365,22 +376,18 @@ public class IrSequence implements Cloneable {
         }
         return result;
     }
-
+   
     /**
      * Returns a new IrSequence consisting of the length durations.
      * @param start Index of first duration
      * @param length Length of new sequence
-     * @return IrSequence
+     * @return IrSequence, a subsequence of the current
      * @throws InvalidArgumentException if length or start are not even.
      */
     public IrSequence subSequence(int start, int length) throws InvalidArgumentException {
-        if (start % 2 != 0)
-            throw new InvalidArgumentException("Starting index has to be even, was " + start);
-        double[] newData = new double[length];
-        System.arraycopy(this.data, start, newData, 0, length);
-        return new IrSequence(newData);
+        return new IrSequence(this, start, length);
     }
-
+    
     /**
      * Returns a new IrSequence consisting of the first length durations.
      * Equivalent to subSequence with first argument 0.
@@ -593,14 +600,6 @@ public class IrSequence implements Cloneable {
                 wasChanged = true;
             }
         return wasChanged;
-    }
-
-    /**
-     * Returns the number of bursts, half of the length.
-     * @return number bursts.
-     */
-    public final int getNumberBursts() {
-        return data.length/2;
     }
 
     /**

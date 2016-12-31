@@ -181,20 +181,6 @@ public class IrSequenceNGTest {
         boolean expResult = false;
         boolean result = instance.replaceZeros(replacement);
         assertEquals(result, expResult);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getNumberBursts method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testGetNumberBursts() {
-        System.out.println("getNumberBursts");
-        IrSequence instance = new IrSequence();
-        int expResult = 0;
-        int result = instance.getNumberBursts();
-        assertEquals(result, expResult);
     }
 
     /**

@@ -33,16 +33,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.XMLFormatter;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.IrpMaster.IrpMasterException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
-import org.harctoolbox.analyze.Cleaner;
-import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.InvalidArgumentException;
-import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
@@ -140,6 +144,9 @@ public class IrpTransmogrifier {
 
         CommandCode commandCode = new CommandCode();
         argumentParser.addCommand(commandCode);
+        
+        CommandDecode commandDecode = new CommandDecode();
+        argumentParser.addCommand(commandDecode);
 
         CommandExpression commandExpression = new CommandExpression();
         argumentParser.addCommand(commandExpression);
@@ -169,23 +176,44 @@ public class IrpTransmogrifier {
             usage(IrpUtils.exitUsageError);
         }
 
-        Logger topLevelLogger = Logger.getLogger("");
-        System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", "%4$s(%2$s): %5$s%n");
-        //SimpleFormatter formatter = new SimpleFormatter();
-        //formatter.
-        //ConsoleHandler handler = new ConsoleHandler();
-        //handler.setLevel(commandLineArgs.logLevel);
-        //topLevelLogger.addHandler(handler);
-        topLevelLogger.getHandlers()[0].setLevel(commandLineArgs.logLevel);
-        topLevelLogger.setLevel(commandLineArgs.logLevel);
-        //logger.removeHandler(logger.getHandlers()[0]);
-        //logger.setLevel(commandLineArgs.logLevel/*Level.ALL*/);
-        //Logger.getLogger(Protocol.class.getName()).setLevel(Level.INFO);
-
-        if (commandLineArgs.seed != null)
-            ParameterSpec.initRandom(commandLineArgs.seed);
-
         try {
+            Logger topLevelLogger = Logger.getLogger("");
+            Formatter formatter = commandLineArgs.xmlLog ? new XMLFormatter() : new SimpleFormatter();
+            Handler[] handlers = topLevelLogger.getHandlers();
+            for (Handler handler : handlers)
+                topLevelLogger.removeHandler(handler);
+            
+            System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", commandLineArgs.logformat);
+
+            String[] logclasses = commandLineArgs.logclasses.split("\\|");
+            @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+            List<Logger> loggers = new ArrayList<>(logclasses.length);
+            for (String logclass : logclasses) {
+                String[] classLevel = logclass.trim().split(":");
+                if (classLevel.length < 2)
+                    continue;
+                
+                Logger log = Logger.getLogger(classLevel[0].trim());
+                loggers.add(log); // stop them from being garbage collected
+                Level level = Level.parse(classLevel[1].trim().toUpperCase(Locale.US));
+                log.setLevel(level);
+                log.setUseParentHandlers(false);
+                Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
+                handler.setLevel(level);
+                handler.setFormatter(formatter);
+                log.addHandler(handler);
+            }
+        
+            Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
+            handler.setFormatter(formatter);
+            topLevelLogger.addHandler(handler);
+
+            handler.setLevel(commandLineArgs.logLevel);
+            topLevelLogger.setLevel(commandLineArgs.logLevel);
+
+            if (commandLineArgs.seed != null)
+                ParameterSpec.initRandom(commandLineArgs.seed);
+
             PrintStream ps = printStream != null ? printStream
                     : commandLineArgs.output == null ? System.out
                     : IrpUtils.getPrintSteam(commandLineArgs.output);
@@ -203,7 +231,7 @@ public class IrpTransmogrifier {
 
             assert(command != null); // for FindBugs
 
-            switch (command) {
+          switch (command) {
                 case "analyze":
                     instance.analyze(commandAnalyze, commandLineArgs);
                     break;
@@ -212,6 +240,9 @@ public class IrpTransmogrifier {
                     break;
                 case "code":
                     instance.code(commandCode, commandLineArgs);
+                    break;
+                case "decode":
+                    instance.decode(commandDecode, commandLineArgs);
                     break;
                 case "expression":
                     instance.expression(commandExpression, commandLineArgs);
@@ -358,6 +389,7 @@ public class IrpTransmogrifier {
         if (commandRenderer.pronto)
             out.println(irSignal.ccfString());
 
+        // FIXME (to be removed)
         if (commandRenderer.test) {
             String protocolName = protocol.getName();
             IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(protocolName, nameEngine);
@@ -390,48 +422,31 @@ public class IrpTransmogrifier {
             }
         }
     }
-
-    // TODO: Cleanup
-    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException, InvalidArgumentException {
+    
+    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
-        IrSignal inputIrSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
-        IrSequence irSequence = inputIrSignal.toModulatedIrSequence(1);
-        double frequency = inputIrSignal.getFrequency();
-
-        if (commandAnalyze.cleaner) {
-            Cleaner cleaner = new Cleaner(irSequence);
-            irSequence = cleaner.toIrSequence();
-        }
-
-        if (commandAnalyze.repeatFinder) {
-            if (inputIrSignal.getRepeatLength() != 0 || inputIrSignal.getEndingLength() != 0)
-                throw new UsageException("Cannot use --repeatfinder with a signal with repeat- or ending sequence.");
-
-            RepeatFinder repeatFinder = new RepeatFinder(irSequence);
-            RepeatFinder.RepeatFinderData repeatFinderData = repeatFinder.getRepeatFinderData();
-            out.println(repeatFinderData);
-            IrSignal repeatFinderIrSignal = repeatFinder.toIrSignal(irSequence, frequency);
-            out.println(repeatFinderIrSignal);
-        }
-
-        Analyzer analyzer = new Analyzer(irSequence, commandAnalyze.repeatFinder,
-                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-
-        if (commandAnalyze.statistics)
-            analyzer.printStatistics(out);
-
-        Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(frequency, commandAnalyze.timeBase,
+        
+        IrSignal irSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
+        Analyzer analyzer = new Analyzer(irSignal, commandAnalyze.repeatFinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
 
-        Protocol protocol = analyzer.searchProtocol(params);
+        Protocol protocol = analyzer.searchProtocol(params, commandAnalyze.decoder);
         printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
     }
-
+      
+    private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
+        IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
+        Analyzer analyzer = new Analyzer(irSignal, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        // TODO...
+    }
+       
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
-        out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
+        if (protocol != null)
+            out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
     }
 
     private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, InvalidArgumentException {
@@ -556,7 +571,7 @@ public class IrpTransmogrifier {
     private final static class CommandLineArgs {
 
         @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
-        private int absoluteTolerance = 50;
+        private double absoluteTolerance = 50;
 
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
         private String configFile = null;
@@ -573,6 +588,15 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
         private String iniFile = null;//"src/main/config/IrpProtocols.ini";
 
+        @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels.")
+        private String logclasses = "";
+        
+        @Parameter(names = {"-L", "--logfile"}, description = "Log file. If empty, log to stderr.")
+        private String logfile = null;
+ 
+        @Parameter(names = {"-F", "--logformat"}, description = "Log format, see class SimpleFormatter.")
+        private String logformat = "%4$s(%2$s): %5$s%n";
+ 
         @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
         private Level logLevel = Level.INFO;
@@ -594,13 +618,13 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {"-v", "--version"}, description = "Report version (deprecated; use command version instead)")
         private boolean versionRequested = false;
+        
+        @Parameter(names = {"-x", "--xmllog"}, description = "Log in XML format.")
+        private boolean xmlLog = false;
     }
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
     private static class CommandAnalyze {
-
-        @Parameter(names = { "-c", "--clean" }, description = "Invoke the cleaner")
-        private boolean cleaner = false;
 
         @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
         private boolean extent = false;
@@ -622,6 +646,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit")
         private double maxRoundingError = 0.3;
+        
+        @Parameter(names = {      "--decoder" }, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")
+        private String decoder = null;
 
         @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths")
         private List<Integer> parameterWidths = new ArrayList<>(4);
@@ -631,9 +658,6 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {"--radix" }, description = "Radix of parameter output")
         private int radix = 16;
-
-        @Parameter(names = {"-s", "--statistics"}, description = "Print some statistics on the analyzed signal")
-        private boolean statistics = false;
 
         @Parameter(names = {"-t", "--timebase"}, description = "Force timebase, in microseconds, or in periods (with ending \"p\")")
         private String timeBase = null;
@@ -675,6 +699,16 @@ public class IrpTransmogrifier {
 
         @Parameter(description = "protocol")
         private List<String> protocols;
+    }
+    
+    @Parameters(commandNames = {"decode"}, commandDescription = "Decode given IR signal")
+    private static class CommandDecode {
+        
+        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
+        private double frequency = IrCoreUtils.invalid;
+
+        @Parameter(description = "durations in microseconds, or pronto hex", required = true)
+        private List<String> args;
     }
 
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
@@ -765,9 +799,10 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-r", "--raw" }, description = "Generate raw form")
         private boolean raw = false;
 
-        @Parameter(names = { "--random" }, description = "Generate random paraneters")
+        @Parameter(names = { "--random" }, description = "Generate random, but valid, parameters")
         private boolean random = false;
 
+        // FIXME (to be removed)
         @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
         private boolean test = false;
 

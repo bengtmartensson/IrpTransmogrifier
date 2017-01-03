@@ -25,6 +25,7 @@ import org.harctoolbox.irp.BareIrStream;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.BitspecIrstream;
+import org.harctoolbox.irp.Duration;
 import org.harctoolbox.irp.Extent;
 import org.harctoolbox.irp.FiniteBitField;
 import org.harctoolbox.irp.Flash;
@@ -40,6 +41,18 @@ import org.harctoolbox.irp.RepeatMarker;
 public abstract class AbstractDecoder {
 
     private static final Logger logger = Logger.getLogger(AbstractDecoder.class.getName());
+
+    static final Class<?>[] decoders = {
+        TrivialDecoder.class,
+        PwmDecoder.class,
+        Pwm4Decoder.class,
+        //Pwm16Decoder.class,
+        BiphaseDecoder.class,
+        BiphaseWithStartbitDecoder.class,
+        //"SerialDecoder",
+    };
+
+    static final int NUMBERDECODERS = decoders.length;
 
     private static BitSpec mkBitSpec(List<BareIrStream> list, double timebase) {
         return new BitSpec(list);
@@ -103,13 +116,13 @@ public abstract class AbstractDecoder {
         this.bitSpec = new BitSpec();
     }
 
-    public Protocol process() {
+    public Protocol parse() throws DecodeException {
         nameEngine = new NameEngine();
         noPayload = 0;
         RepeatFinder.RepeatFinderData repeatfinderData = analyzer.getRepeatFinderData();
-        List<IrStreamItem> items = process(0, repeatfinderData.getBeginLength());
-        List<IrStreamItem> repeatItems = process(repeatfinderData.getBeginLength(), repeatfinderData.getRepeatLength());
-        List<IrStreamItem> endingItems = process(repeatfinderData.getEndingStart(), repeatfinderData.getEndingLength());
+        List<IrStreamItem> items = parse(0, repeatfinderData.getBeginLength());
+        List<IrStreamItem> repeatItems = parse(repeatfinderData.getBeginLength(), repeatfinderData.getRepeatLength());
+        List<IrStreamItem> endingItems = parse(repeatfinderData.getEndingStart(), repeatfinderData.getEndingLength());
         IrStream irStream;
         RepeatMarker repeatMarker = new RepeatMarker(repeatfinderData.getNumberRepeats());
         if (repeatfinderData.getBeginLength() == 0 && repeatfinderData.getEndingLength() == 0) {
@@ -138,6 +151,10 @@ public abstract class AbstractDecoder {
         return Burst.newGap(space, timebase);
     }
 
+    protected Duration newFlashOrGap(boolean isFlash, int time) {
+        return isFlash ? newFlash(time) : newGap(time);
+    }
+
     protected void saveParameter(ParameterData parameterData, List<IrStreamItem> items, BitDirection bitDirection) {
         if (parameterData.isEmpty())
             return;
@@ -152,7 +169,7 @@ public abstract class AbstractDecoder {
         items.add(new FiniteBitField(name, parameterData.getNoBits()));
     }
 
-    protected abstract List<IrStreamItem> process(int beginStart, int beginLength);
+    protected abstract List<IrStreamItem> parse(int beginStart, int beginLength) throws DecodeException;
 
     protected int getNoBitsLimit(List<Integer> parameterWidths) {
         return (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);

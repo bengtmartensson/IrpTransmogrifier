@@ -28,7 +28,7 @@ public class TrivialDecoder extends AbstractDecoder {
     }
 
     @Override
-    protected List<IrStreamItem> process(int beg, int length) {
+    protected List<IrStreamItem> parse(int beg, int length) {
         List<IrStreamItem> items = new ArrayList<>(length);
         for (int i = beg; i < beg + length - 1; i += 2) {
             int mark = analyzer.getCleanedTime(i);

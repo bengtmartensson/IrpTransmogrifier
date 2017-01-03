@@ -62,7 +62,7 @@ public class Pwm4Decoder extends AbstractDecoder {
     }
 
     @Override
-    protected List<IrStreamItem> process(int beg, int length) {
+    protected List<IrStreamItem> parse(int beg, int length) {
         List<IrStreamItem> items = new ArrayList<>(16);
         ParameterData data = new ParameterData(CHUNKSIZE);
         for (int i = beg; i < beg + length - 1; i += 2) {

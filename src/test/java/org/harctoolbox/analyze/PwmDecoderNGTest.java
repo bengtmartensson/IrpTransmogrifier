@@ -61,12 +61,12 @@ public class PwmDecoderNGTest {
      * Test of process method, of class PwmDecoder.
      */
     @Test
-    public void testProcess() {
+    public void testParse() {
         System.out.println("process");
         Protocol result;
         try {
-            result = pwm.process();
-        } catch (Exception ex) {
+            result = pwm.parse();
+        } catch (DecodeException ex) {
             fail();
             return;
         }

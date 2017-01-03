@@ -620,7 +620,7 @@ public class ProtocolNGTest {
             IrSignal silly = new IrSignal(repeat, repeat, repeat, 36000f);
             recognizeData = zaptor.recognize(silly);
             assertTrue(recognizeData == null);
-        } catch (IrpSyntaxException ex) {
+        } catch (InvalidNameException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -18,16 +18,20 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.analyze;
 
 import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.GeneralSpec;
 import org.harctoolbox.irp.Protocol;
@@ -49,7 +53,7 @@ public class Analyzer extends Cleaner {
     public Analyzer(IrSignal irSignal, boolean invokeRepeatFinder, double absoluteTolerance, double relativeTolerance) {
         this(irSignal.toModulatedIrSequence(1), invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
-     
+
     public Analyzer(IrSequence irSequence, double frequency, boolean invokeRepeatFinder, double absoluteTolerance, double relativeTolerance) {
         super(irSequence, absoluteTolerance, relativeTolerance);
         this.frequency = frequency;
@@ -57,7 +61,7 @@ public class Analyzer extends Cleaner {
         createNormedTimings();
         createPairs();
     }
-    
+
     public Analyzer(ModulatedIrSequence irSequence, boolean invokeRepeatFinder, double absoluteTolerance, double relativeTolerance) {
         this(irSequence, irSequence.getFrequency(), invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
@@ -103,16 +107,24 @@ public class Analyzer extends Cleaner {
     }
 
 
-    private List<AbstractDecoder> setupDecoders(Analyzer.AnalyzerParams params) {
-        List<AbstractDecoder> decoders = new ArrayList<>(numberOfDecoders);
-        decoders.add(new TrivialDecoder(this, params));
-        decoders.add(new PwmDecoder(this, params));
-        try {
-            decoders.add(new Pwm4Decoder(this, params));
-        } catch (DecodeException ex) {
-            logger.log(Level.FINE, ex.getMessage());
+    private List<AbstractDecoder> setupDecoders(Analyzer.AnalyzerParams params, String decoderPattern) {
+        Pattern pattern = decoderPattern != null ? Pattern.compile(decoderPattern, Pattern.CASE_INSENSITIVE) : null;
+        List<AbstractDecoder> decoders = new ArrayList<>(AbstractDecoder.NUMBERDECODERS);
+        for (Class<?> decoderClass : AbstractDecoder.decoders) {
+            if (pattern == null || pattern.matcher(decoderClass.getSimpleName()).matches()) {
+                try {
+                    Constructor<?> constructor = decoderClass.getConstructor(Analyzer.class, AnalyzerParams.class);
+                    AbstractDecoder decoder = (AbstractDecoder) constructor.newInstance(this, params);
+                    decoders.add(decoder);
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InstantiationException ex) {
+                    // consider this as programming error
+                    throw new ThisCannotHappenException(ex);
+                } catch (InvocationTargetException ex) {
+                    // Likely OK, the decoder just did not accept the data.
+                    logger.log(Level.FINE, String.format("Decoder %1$s failed: %2$s", decoderClass.getSimpleName(), ex.getTargetException().getMessage()));
+                }
+            }
         }
-        decoders.add(new BiphaseDecoder(this, params));
         return decoders;
     }
 
@@ -137,29 +149,29 @@ public class Analyzer extends Cleaner {
     public int getNumberPairs(Burst pair) {
         return getNumberPairs(pair.getFlashDuration(), pair.getGapDuration());
     }
-    
+
     public double getFrequency() {
         return frequency;
     }
 
-    public Protocol searchProtocol(AnalyzerParams params) {
-        List<AbstractDecoder> decoders = setupDecoders(params);
-        Protocol best = null;
+    public Protocol searchProtocol(AnalyzerParams params, String decoderPattern) {
+        List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern);
+        Protocol bestSoFar = null;
         int weight = Integer.MAX_VALUE;
 
         for (AbstractDecoder decoder : decoders) {
             try {
-                Protocol protocol = decoder.process();
+                Protocol protocol = decoder.parse();
                 logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(), protocol.weight()});
                 if (protocol.weight() < weight) {
-                    best = protocol;
+                    bestSoFar = protocol;
                     weight = protocol.weight();
                 }
-            } catch (Exception ex) {
+            } catch (DecodeException ex) {
                 logger.log(Level.FINE, "{0}: {1}", new Object[]{decoder.name(), ex.getMessage()});
             }
         }
-        return best;
+        return bestSoFar;
     }
 
     public int getCleanedTime(int i) {

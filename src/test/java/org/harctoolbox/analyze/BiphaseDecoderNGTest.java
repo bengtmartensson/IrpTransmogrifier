@@ -63,27 +63,27 @@ public class BiphaseDecoderNGTest {
      * Test of process method, of class BiphaseDecoder.
      */
     @Test
-    public void testProcessRc5() {
+    public void testParseRc5() {
         try {
             System.out.println("processRc5");
             BiphaseDecoder decoder = new BiphaseDecoder(rc5, paramsRc5);
-            Protocol result = decoder.process();
+            Protocol result = decoder.parse();
             Protocol expResult = new Protocol("{36k,msb,889}<1,-1|-1,1>(A:1,B:1,C:1,D:5,E:6,^114m){A=1,B=1,C=1,D=12,E=3}");
             assertEquals(result, expResult);
-        } catch (IrpException | ArithmeticException ex) {
+        } catch (IrpException | ArithmeticException | DecodeException ex) {
             fail();
         }
     }
 
     @Test
-    public void testProcessRc6() {
+    public void testParseRc6() {
         try {
             System.out.println("processRc6");
-            BiphaseDecoder decoder = new BiphaseDecoder(rc6, paramsRc6);
-            Protocol result = decoder.process();
+            AbstractBiphaseDecoder decoder = new BiphaseDecoder(rc6, paramsRc6);
+            Protocol result = decoder.parse();
             Protocol expResult = new Protocol("{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:4,-2,2,B:16,^107m){A=8,B=30723}");
             assertEquals(result, expResult);
-        } catch (IrpException | ArithmeticException ex) {
+        } catch (IrpException | ArithmeticException | DecodeException ex) {
             fail();
         }
     }

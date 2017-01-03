@@ -20,7 +20,7 @@ package org.harctoolbox.analyze;
 class DecodeException extends Exception {
 
     DecodeException(int i) {
-        super("Decode failed at token " + Integer.toString(i));
+        super("Decode failed at token/duration #" + Integer.toString(i));
     }
 
     DecodeException() {

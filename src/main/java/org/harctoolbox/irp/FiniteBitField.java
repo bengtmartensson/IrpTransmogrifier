@@ -49,7 +49,11 @@ public class FiniteBitField extends BitField {
     }
 
     public FiniteBitField(String name, int width) {
-        this.complement = false;
+        this(name, width, false);
+    }
+
+    public FiniteBitField(String name, int width, boolean complement) {
+        this.complement = complement;
         data = new Name(name);
         this.width = new Number(width);
         this.chop = new Number(0);

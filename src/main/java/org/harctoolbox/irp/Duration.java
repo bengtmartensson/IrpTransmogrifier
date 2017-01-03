@@ -278,6 +278,10 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         return unit;
     }
 
+    public double getTimeInUnits() throws IrpSemanticException {
+        return nameOrNumber.toRawNumber();
+    }
+
     @Override
     public boolean hasExtent() {
         return false; // overridden in Extent

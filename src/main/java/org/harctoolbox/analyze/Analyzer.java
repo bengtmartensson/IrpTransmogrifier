@@ -162,10 +162,11 @@ public class Analyzer extends Cleaner {
         for (AbstractDecoder decoder : decoders) {
             try {
                 Protocol protocol = decoder.parse();
-                logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(), protocol.weight()});
-                if (protocol.weight() < weight) {
+                int protocolWeight = protocol.weight();
+                logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(), protocolWeight});
+                if (protocolWeight < weight) {
                     bestSoFar = protocol;
-                    weight = protocol.weight();
+                    weight = protocolWeight;
                 }
             } catch (DecodeException ex) {
                 logger.log(Level.FINE, "{0}: {1}", new Object[]{decoder.name(), ex.getMessage()});

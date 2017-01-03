@@ -68,6 +68,12 @@ public class NameOrNumber extends IrpObject implements Floatable {
         return thing.toIrpString();
     }
 
+    double toRawNumber() throws IrpSemanticException {
+        if (!(thing instanceof NumberWithDecimals))
+            throw new IrpSemanticException("Not a number");
+        return ((NumberWithDecimals) thing).toFloat();
+    }
+
     @Override
     public int weight() {
         return WEIGHT;

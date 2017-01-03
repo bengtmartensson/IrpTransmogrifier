@@ -20,6 +20,7 @@ package org.harctoolbox.analyze;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BareIrStream;
 import org.harctoolbox.irp.BitDirection;
@@ -49,7 +50,7 @@ public abstract class AbstractDecoder {
         //Pwm16Decoder.class,
         BiphaseDecoder.class,
         BiphaseWithStartbitDecoder.class,
-        //"SerialDecoder",
+        SerialDecoder.class,
     };
 
     static final int NUMBERDECODERS = decoders.length;
@@ -97,6 +98,25 @@ public abstract class AbstractDecoder {
         } else {
             list.add(new BareIrStream(listOffOn));
             list.add(new BareIrStream(listOnOff));
+        }
+        return new BitSpec(list);
+    }
+
+    private static BitSpec mkBitSpecSerial(boolean invert) {
+        Flash on = new Flash(1f, null);
+        Gap off = new Gap(1f, null);
+        List<IrStreamItem> listOn = new ArrayList<>(1);
+        listOn.add(on);
+
+        List<IrStreamItem> listOff = new ArrayList<>(1);
+        listOff.add(off);
+        List<BareIrStream> list = new ArrayList<>(2);
+        if (invert) {
+            list.add(new BareIrStream(listOn));
+            list.add(new BareIrStream(listOff));
+        } else {
+            list.add(new BareIrStream(listOff));
+            list.add(new BareIrStream(listOn));
         }
         return new BitSpec(list);
     }
@@ -156,11 +176,18 @@ public abstract class AbstractDecoder {
     }
 
     protected void saveParameter(ParameterData parameterData, List<IrStreamItem> items, BitDirection bitDirection) {
+        saveParameter(parameterData, items, bitDirection, false);
+    }
+
+    protected void saveParameter(ParameterData parameterData, List<IrStreamItem> items, BitDirection bitDirection, boolean complement) {
         if (parameterData.isEmpty())
             return;
 
         parameterData.fixBitDirection(bitDirection);
-        String name = Analyzer.mkName(noPayload++);
+        if (complement)
+            parameterData.invertData();
+        String name = Analyzer.mkName(noPayload);
+        noPayload++;
         try {
             nameEngine.define(name, parameterData.getData());
         } catch (InvalidNameException ex) {
@@ -187,6 +214,10 @@ public abstract class AbstractDecoder {
         bitSpec = mkBitSpec(timebase, params.isInvert());
     }
 
+    protected final void setBitSpecSerial() {
+        bitSpec = mkBitSpecSerial(params.isInvert());
+    }
+
     public String name() {
         return getClass().getSimpleName();
     }
@@ -197,10 +228,14 @@ public abstract class AbstractDecoder {
         private int noBits;
         private final int chunkSize;
 
-        ParameterData(int chunkSize) {
-            data = 0L;
-            noBits = 0;
+        private ParameterData(long data, int noBits, int chunkSize) {
+            this.data = data;
+            this.noBits = noBits;
             this.chunkSize = chunkSize;
+        }
+
+        ParameterData(int chunkSize) {
+            this(0L, 0, chunkSize);
         }
 
         ParameterData() {
@@ -213,13 +248,35 @@ public abstract class AbstractDecoder {
         }
 
         public void update(int amount) {
-            data <<= chunkSize;
+            update(amount, chunkSize);
+        }
+
+        public void update(int amount, int bits) {
+            data <<= bits;
             data += amount;
-            noBits += chunkSize;
+            noBits += bits;
         }
 
         public void update(boolean invert) {
             update(invert ? 1 : 0);
+        }
+
+        public ParameterData reduce(int maxBits) {
+            ParameterData pd;
+            if (noBits <= maxBits) {
+                pd = new ParameterData(data, noBits, chunkSize);
+                data = 0L;
+                noBits = 0;
+            } else {
+                pd = new ParameterData(data >> (noBits - maxBits), maxBits, chunkSize);
+                noBits -= maxBits;
+                data &= IrpUtils.ones(noBits);
+            }
+            return pd;
+        }
+
+        private void invertData() {
+            data = IrCoreUtils.maskTo(~data, noBits);
         }
 
         private void fixBitDirection(BitDirection bitDirection) {

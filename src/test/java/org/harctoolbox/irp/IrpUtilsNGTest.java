@@ -166,4 +166,20 @@ public class IrpUtilsNGTest {
 //        assertEquals("xyz0", IrpUtils.toCIdentifier("xyz0"));
 //        assertEquals("xyz0", IrpUtils.toCIdentifier("xyz0"));
     }
+
+    /**
+     * Test of log2 method, of class IrpUtils.
+     */
+    @Test
+    public void testLog2() {
+        System.out.println("log2");
+        assertEquals(IrpUtils.log2(15), 4);
+        assertEquals(IrpUtils.log2(16), 4);
+        assertEquals(IrpUtils.log2(17), 5);
+        try {
+            assertEquals(IrpUtils.log2(0), 5);
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
+    }
 }

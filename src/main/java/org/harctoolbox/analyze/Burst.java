@@ -26,6 +26,7 @@ import org.harctoolbox.irp.Extent;
 import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
+import org.harctoolbox.irp.IrpUtils;
 
 public class Burst {
     private static final double dafaultMaxRoundingError = 0.3f;
@@ -37,9 +38,9 @@ public class Burst {
     private static double maxUs = defaultMaxUs;
 
     private static Duration newFlashOrGap(boolean isFlash, double us, double timebase) {
-        double units = us/timebase;
+        double units = timebase > 0 ? us/timebase : IrpUtils.invalid;
         double roundingError = Math.round(units) - units;
-        String unit = (units < maxUnits && Math.abs(roundingError) < maxRoundingError) ? ""
+        String unit = (units > 0 && units < maxUnits && Math.abs(roundingError) < maxRoundingError) ? ""
                 : us < maxUs ? "u"
                 : "m";
         double duration = unit.isEmpty() ? Math.round(units)

@@ -194,6 +194,22 @@ public class IrpUtils {
     }
 
     /**
+     * Computes ceil(log2(x))
+     * @param x
+     * @return
+     */
+    public static long log2(long x) {
+        if (x <= 0)
+            throw new IllegalArgumentException("argument must be positive");
+        long pow = 1;
+        for (long n = 0; ; n++) {
+            if (pow >= x)
+                return n;
+            pow *= 2;
+        }
+    }
+
+    /**
      * Reverses the bits, living in a width-bit wide world.
      *
      * @param x

@@ -17,12 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
-import org.harctoolbox.irp.BareIrStream;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.BitspecIrstream;
@@ -47,79 +45,13 @@ public abstract class AbstractDecoder {
         TrivialDecoder.class,
         PwmDecoder.class,
         Pwm4Decoder.class,
-        //Pwm16Decoder.class,
+        XmpDecoder.class,
         BiphaseDecoder.class,
         BiphaseWithStartbitDecoder.class,
         SerialDecoder.class,
     };
 
     static final int NUMBERDECODERS = decoders.length;
-
-    private static BitSpec mkBitSpec(List<BareIrStream> list, double timebase) {
-        return new BitSpec(list);
-    }
-
-    protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
-        List<BareIrStream> list = new ArrayList<>(2);
-        list.add(zero.toBareIrStream(timebase));
-        list.add(one.toBareIrStream(timebase));
-        return mkBitSpec(list, timebase);
-    }
-
-    protected static BitSpec mkBitSpec(Burst zero, Burst one, Burst two, Burst three, double timebase) {
-        List<BareIrStream> list = new ArrayList<>(4);
-        list.add(zero.toBareIrStream(timebase));
-        list.add(one.toBareIrStream(timebase));
-        list.add(two.toBareIrStream(timebase));
-        list.add(three.toBareIrStream(timebase));
-        return mkBitSpec(list, timebase);
-    }
-
-    protected static BitSpec mkBitSpec(double timebase) {
-        List<BareIrStream> list = new ArrayList<>(0);
-        return mkBitSpec(list, timebase);
-    }
-
-    private static BitSpec mkBitSpec(double timebase, boolean invert) {
-        Flash on = Burst.newFlash(timebase, timebase);
-        Gap off = Burst.newGap(timebase, timebase);
-        List<IrStreamItem> listOffOn = new ArrayList<>(2);
-        listOffOn.add(off);
-        listOffOn.add(on);
-
-        List<IrStreamItem> listOnOff = new ArrayList<>(2);
-        listOnOff.add(on);
-        listOnOff.add(off);
-
-        List<BareIrStream> list = new ArrayList<>(2);
-        if (invert) {
-            list.add(new BareIrStream(listOnOff));
-            list.add(new BareIrStream(listOffOn));
-        } else {
-            list.add(new BareIrStream(listOffOn));
-            list.add(new BareIrStream(listOnOff));
-        }
-        return new BitSpec(list);
-    }
-
-    private static BitSpec mkBitSpecSerial(boolean invert) {
-        Flash on = new Flash(1f, null);
-        Gap off = new Gap(1f, null);
-        List<IrStreamItem> listOn = new ArrayList<>(1);
-        listOn.add(on);
-
-        List<IrStreamItem> listOff = new ArrayList<>(1);
-        listOff.add(off);
-        List<BareIrStream> list = new ArrayList<>(2);
-        if (invert) {
-            list.add(new BareIrStream(listOn));
-            list.add(new BareIrStream(listOff));
-        } else {
-            list.add(new BareIrStream(listOff));
-            list.add(new BareIrStream(listOn));
-        }
-        return new BitSpec(list);
-    }
 
     protected NameEngine nameEngine;
     protected int noPayload;
@@ -202,24 +134,13 @@ public abstract class AbstractDecoder {
         return (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
     }
 
-    protected final void setBitSpec(Burst zero, Burst one) {
-        bitSpec = mkBitSpec(zero, one, timebase);
-    }
-
-    protected final void setBitSpec(Burst zero, Burst one, Burst two, Burst three) {
-        bitSpec = mkBitSpec(zero, one, two, three, timebase);
-    }
-
-    protected final void setBitSpec(double timebase) {
-        bitSpec = mkBitSpec(timebase, params.isInvert());
-    }
-
-    protected final void setBitSpecSerial() {
-        bitSpec = mkBitSpecSerial(params.isInvert());
-    }
-
     public String name() {
         return getClass().getSimpleName();
+    }
+
+    protected void dumpParameters(ParameterData data, List<IrStreamItem> items, int noBitsLimit) {
+        ParameterData lowerParam = data.reduce(noBitsLimit);
+        saveParameter(lowerParam, items, params.getBitDirection(), params.isInvert());
     }
 
     protected static class ParameterData {

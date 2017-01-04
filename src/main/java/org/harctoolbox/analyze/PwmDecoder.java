@@ -19,16 +19,25 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.irp.BareIrStream;
+import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.IrStreamItem;
 
 public class PwmDecoder extends AbstractDecoder {
+
+    protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
+        List<BareIrStream> list = new ArrayList<>(2);
+        list.add(zero.toBareIrStream(timebase));
+        list.add(one.toBareIrStream(timebase));
+        return new BitSpec(list);
+    }
 
     private final Burst zero;
     private final Burst one;
 
     public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
         super(analyzer, params);//, mkBitSpec(zero, one, params.getTimebase()));
-        setBitSpec(zero, one);
+        bitSpec = mkBitSpec(zero, one, timebase);
         this.zero = zero;
         this.one = one;
     }

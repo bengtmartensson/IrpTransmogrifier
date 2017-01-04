@@ -20,9 +20,35 @@ package org.harctoolbox.analyze;
 import java.util.ArrayList;
 import java.util.List;
 import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.harctoolbox.irp.BareIrStream;
+import org.harctoolbox.irp.BitSpec;
+import org.harctoolbox.irp.Flash;
+import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
 
 public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
+
+    private static BitSpec mkBitSpec(double timebase, boolean invert) {
+        Flash on = Burst.newFlash(timebase, timebase);
+        Gap off = Burst.newGap(timebase, timebase);
+        List<IrStreamItem> listOffOn = new ArrayList<>(2);
+        listOffOn.add(off);
+        listOffOn.add(on);
+
+        List<IrStreamItem> listOnOff = new ArrayList<>(2);
+        listOnOff.add(on);
+        listOnOff.add(off);
+
+        List<BareIrStream> list = new ArrayList<>(2);
+        if (invert) {
+            list.add(new BareIrStream(listOnOff));
+            list.add(new BareIrStream(listOffOn));
+        } else {
+            list.add(new BareIrStream(listOffOn));
+            list.add(new BareIrStream(listOnOff));
+        }
+        return new BitSpec(list);
+    }
 
     private final int half;
     private final int full;
@@ -30,7 +56,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
 
     public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full)  {
         super(analyzer, params);
-        setBitSpec(analyzer.getTimebase());
+        bitSpec = mkBitSpec(timebase, params.isInvert());
         this.half = half;
         this.full = full;
     }
@@ -38,6 +64,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
     public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params)  {
         this(analyzer, params, analyzer.getTiming(0), analyzer.getTiming(1));
     }
+
 
     @Override
     protected List<IrStreamItem> parse(int beg, int length) throws DecodeException {

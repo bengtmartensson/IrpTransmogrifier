@@ -21,15 +21,38 @@ import java.util.ArrayList;
 import java.util.List;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.harctoolbox.irp.BareIrStream;
+import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.Duration;
+import org.harctoolbox.irp.Flash;
+import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
 import org.harctoolbox.irp.IrpSemanticException;
 
 public class SerialDecoder extends AbstractDecoder {
 
+    private static BitSpec mkBitSpec(boolean invert) {
+        Flash on = new Flash(1f, null);
+        Gap off = new Gap(1f, null);
+        List<IrStreamItem> listOn = new ArrayList<>(1);
+        listOn.add(on);
+
+        List<IrStreamItem> listOff = new ArrayList<>(1);
+        listOff.add(off);
+        List<BareIrStream> list = new ArrayList<>(2);
+        if (invert) {
+            list.add(new BareIrStream(listOn));
+            list.add(new BareIrStream(listOff));
+        } else {
+            list.add(new BareIrStream(listOff));
+            list.add(new BareIrStream(listOn));
+        }
+        return new BitSpec(list);
+    }
+
     public SerialDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
         super(analyzer, params);
-        setBitSpecSerial();
+        bitSpec = mkBitSpec(params.isInvert());
     }
 
     @Override
@@ -70,10 +93,5 @@ public class SerialDecoder extends AbstractDecoder {
             dumpParameters(data, items, noBitsLimit);
 
         return items;
-    }
-
-    private void dumpParameters(ParameterData data, List<IrStreamItem> items, int noBitsLimit) {
-        ParameterData lowerParam = data.reduce(noBitsLimit);
-        saveParameter(lowerParam, items, params.getBitDirection(), params.isInvert());
     }
 }

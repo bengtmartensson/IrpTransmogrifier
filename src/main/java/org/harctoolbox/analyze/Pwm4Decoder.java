@@ -20,11 +20,22 @@ package org.harctoolbox.analyze;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.harctoolbox.irp.BareIrStream;
+import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.IrStreamItem;
 
 public class Pwm4Decoder extends AbstractDecoder {
 
     public final static int CHUNKSIZE = 2;
+
+    protected static BitSpec mkBitSpec(Burst zero, Burst one, Burst two, Burst three, double timebase) {
+        List<BareIrStream> list = new ArrayList<>(4);
+        list.add(zero.toBareIrStream(timebase));
+        list.add(one.toBareIrStream(timebase));
+        list.add(two.toBareIrStream(timebase));
+        list.add(three.toBareIrStream(timebase));
+        return new BitSpec(list);
+    }
 
     private final Burst zero;
     private final Burst one;
@@ -33,7 +44,7 @@ public class Pwm4Decoder extends AbstractDecoder {
 
     public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one, Burst two, Burst three) {
         super(analyzer, params);
-        setBitSpec(zero, one, two, three);
+        bitSpec = mkBitSpec(zero, one, two, three, timebase);
         this.zero = zero;
         this.one = one;
         this.two = two;
@@ -58,7 +69,7 @@ public class Pwm4Decoder extends AbstractDecoder {
         one  = new Burst(analyzer.getSortedFlashes(0), gaps.get(1));
         two  = new Burst(analyzer.getSortedFlashes(0), gaps.get(2));
         three= new Burst(analyzer.getSortedFlashes(0), gaps.get(3));
-        setBitSpec(zero, one, two, three);
+        bitSpec = mkBitSpec(zero, one, two, three, timebase);
     }
 
     @Override

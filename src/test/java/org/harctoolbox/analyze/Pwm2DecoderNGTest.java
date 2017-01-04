@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
  *
  * @author bengt
  */
-public class PwmDecoderNGTest {
+public class Pwm2DecoderNGTest {
     private final static int[] nec12_34_56_durations
             = new int[]{9024, 4512, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 44268};
 
@@ -34,16 +34,16 @@ public class PwmDecoderNGTest {
 
     private IrSequence irSequence;
     private Analyzer analyzer;
-    private PwmDecoder pwm;
+    private Pwm2Decoder pwm;
 
-    public PwmDecoderNGTest() {
+    public Pwm2DecoderNGTest() {
         this.analyzer = null;
         this.irSequence = null;
         try {
             irSequence = new IrSequence(nec12_34_56_durations);
             Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400f, null, BitDirection.msb, true, null, false);
             analyzer = new Analyzer(irSequence);
-            pwm = new PwmDecoder(analyzer, analyzerParams);
+            pwm = new Pwm2Decoder(analyzer, analyzerParams);
         } catch (OddSequenceLenghtException ex) {
             fail();
         }
@@ -58,7 +58,7 @@ public class PwmDecoderNGTest {
     }
 
     /**
-     * Test of process method, of class PwmDecoder.
+     * Test of process method, of class Pwm2Decoder.
      */
     @Test
     public void testParse() {
@@ -75,7 +75,7 @@ public class PwmDecoderNGTest {
             Protocol expResult = new Protocol("{38.4k,564,msb}<1,-1|1,-3>(16,-8,A:32,1,^108m){A=0x30441ce3}");
             assertEquals(result, expResult);
         } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException ex) {
-            Logger.getLogger(PwmDecoderNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Pwm2DecoderNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

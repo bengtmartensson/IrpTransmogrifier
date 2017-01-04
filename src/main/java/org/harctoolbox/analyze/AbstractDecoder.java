@@ -43,7 +43,7 @@ public abstract class AbstractDecoder {
 
     static final Class<?>[] decoders = {
         TrivialDecoder.class,
-        PwmDecoder.class,
+        Pwm2Decoder.class,
         Pwm4Decoder.class,
         XmpDecoder.class,
         BiphaseDecoder.class,

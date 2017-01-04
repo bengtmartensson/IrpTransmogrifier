@@ -23,7 +23,7 @@ import org.harctoolbox.irp.BareIrStream;
 import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.IrStreamItem;
 
-public class PwmDecoder extends AbstractDecoder {
+public class Pwm2Decoder extends AbstractDecoder {
 
     protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
         List<BareIrStream> list = new ArrayList<>(2);
@@ -35,22 +35,22 @@ public class PwmDecoder extends AbstractDecoder {
     private final Burst zero;
     private final Burst one;
 
-    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
         super(analyzer, params);//, mkBitSpec(zero, one, params.getTimebase()));
         bitSpec = mkBitSpec(zero, one, timebase);
         this.zero = zero;
         this.one = one;
     }
 
-    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int zeroFlash, int zeroGap, int oneFlash, int oneGap) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int zeroFlash, int zeroGap, int oneFlash, int oneGap) {
         this(analyzer, params, new Burst(zeroFlash, zeroGap), new Burst(oneFlash, oneGap));
     }
 
-    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int a, int b) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int a, int b) {
         this(analyzer, params, a, a, a, b);
     }
 
-    public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
         this(analyzer, params,
                 analyzer.getPairs().get(0).getFlashDuration(), analyzer.getPairs().get(0).getGapDuration(),
                 analyzer.getPairs().get(1).getFlashDuration(), analyzer.getPairs().get(1).getGapDuration());

@@ -1,6 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.io.UnsupportedEncodingException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.AfterClass;
@@ -34,10 +33,9 @@ public class IrpTransmogrifierNGTest {
 
     /**
      * Test of main method, of class IrpTransmogrifier.
-     * @throws java.io.UnsupportedEncodingException
      */
     @Test(enabled = true)
-    public void testAnalyze() throws UnsupportedEncodingException {
+    public void testAnalyze() {
         System.out.println("analyze");
         String args = "-a 20 analyze -t 1p 0000 0073 0000 0012 000F 000A 0006 000A 0006 000A 0006 001B 0006 000A 0006 000A 0006 001B 0006 0015 0006 000A 0006 001B 0006 000A 0006 0015 0006 0010 0006 000A 0006 0015 0006 000A 0006 0015 0006 0C90";
         String result = IrpTransmogrifier.runMain(args);

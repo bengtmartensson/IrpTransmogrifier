@@ -17,29 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.harctoolbox.irp.BareIrStream;
-import org.harctoolbox.irp.BitSpec;
-import org.harctoolbox.irp.IrStreamItem;
-
-public class Pwm2Decoder extends AbstractDecoder {
-
-    protected static BitSpec mkBitSpec(Burst zero, Burst one, double timebase) {
-        List<BareIrStream> list = new ArrayList<>(2);
-        list.add(zero.toBareIrStream(timebase));
-        list.add(one.toBareIrStream(timebase));
-        return new BitSpec(list);
-    }
-
-    private final Burst zero;
-    private final Burst one;
+public class Pwm2Decoder extends PwmDecoder {
 
     public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
-        super(analyzer, params);//, mkBitSpec(zero, one, params.getTimebase()));
-        bitSpec = mkBitSpec(zero, one, timebase);
-        this.zero = zero;
-        this.one = one;
+        super(analyzer, params, mkBursts(zero, one));
     }
 
     public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int zeroFlash, int zeroGap, int oneFlash, int oneGap) {
@@ -54,43 +35,5 @@ public class Pwm2Decoder extends AbstractDecoder {
         this(analyzer, params,
                 analyzer.getPairs().get(0).getFlashDuration(), analyzer.getPairs().get(0).getGapDuration(),
                 analyzer.getPairs().get(1).getFlashDuration(), analyzer.getPairs().get(1).getGapDuration());
-    }
-
-    @Override
-    protected List<IrStreamItem> parse(int beg, int length) {
-        List<IrStreamItem> items = new ArrayList<>(16);
-        ParameterData data = new ParameterData();
-        for (int i = beg; i < beg + length - 1; i += 2) {
-            int noBitsLimit = params.getNoBitsLimit(noPayload);
-            //getNoBitsLimit(parameterWidths);
-            int mark = analyzer.getCleanedTime(i);
-            int space = analyzer.getCleanedTime(i + 1);
-            Burst burst = new Burst(mark, space);
-            if (burst.equals(zero)) {
-                data.update(0);
-            } else if (burst.equals(one)) {
-                data.update(1);
-            } else {
-                if (!data.isEmpty()) {
-                    saveParameter(data, items, params.getBitDirection());
-                    data = new ParameterData();
-                }
-
-                items.add(newFlash(mark));
-                if (i == beg + length - 2 && params.isUseExtents())
-                    items.add(newExtent(analyzer.getTotalDuration(beg, length)));
-                else
-                    items.add(newGap(space));
-            }
-
-            if (data.getNoBits() >= noBitsLimit) {
-                saveParameter(data, items, params.getBitDirection());
-                data = new ParameterData();
-            }
-        }
-        if (!data.isEmpty())
-            saveParameter(data, items, params.getBitDirection());
-
-        return items;
     }
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016 Bengt Martensson.
+Copyright (C) 2017 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,25 +37,25 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
  */
 public class Cleaner {
     private final static int numberOfTimingsCapacity = 20;
-    
+
     public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
         return cleaner.toIrSequence();
     }
-    
+
     public static IrSequence clean(IrSequence irSequence) {
         return clean(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
-    
+
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         return new ModulatedIrSequence(clean((IrSequence)irSequence, absoluteTolerance, relativeTolerance),
                 irSequence.getFrequency(), irSequence.getDutyCycle());
     }
-    
+
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
         return clean(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
-    
+
     public static IrSignal clean(IrSignal irSignal, double absoluteTolerance, double relativeTolerance) throws InvalidArgumentException {
         ModulatedIrSequence irSequence = irSignal.toModulatedIrSequence(1);
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);

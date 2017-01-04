@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011,2012,2014,2016 Bengt Martensson.
+Copyright (C) 2011,2012,2014,2016, 2017 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -216,7 +216,7 @@ public class IrSignal implements Cloneable {
                 new IrSequence(durations, noIntro + noRepeat, durations.length - (noIntro + noRepeat)),
                 frequency, dutyCycle);
     }
-    
+
     public IrSignal(IrSequence irSequence, int noIntro, int noRepeat, double frequency, double dutyCycle) throws InvalidArgumentException {
         this(irSequence.subSequence(0, noIntro),
                 irSequence.subSequence(noIntro, noRepeat),

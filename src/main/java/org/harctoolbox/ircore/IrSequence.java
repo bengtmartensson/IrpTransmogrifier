@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, 2012, 2014, 2016 Bengt Martensson.
+Copyright (C) 2011, 2012, 2014, 2016, 2017 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public class IrSequence implements Cloneable {
         IrSequence s = new IrSequence();
         for (IrSequence seq : sequences)
             s = s.append(seq);
-        
+
         return s;
     }
 
@@ -237,7 +237,7 @@ public class IrSequence implements Cloneable {
     public IrSequence(IrSequence src) {
         data = src.data.clone();
     }
-    
+
     public IrSequence(IrSequence src, int start, int length) throws InvalidArgumentException {
         if (start % 2 != 0 || length % 2 != 0)
             throw new OddSequenceLenghtException("Start and length must be even");
@@ -376,7 +376,7 @@ public class IrSequence implements Cloneable {
         }
         return result;
     }
-   
+
     /**
      * Returns a new IrSequence consisting of the length durations.
      * @param start Index of first duration
@@ -387,7 +387,7 @@ public class IrSequence implements Cloneable {
     public IrSequence subSequence(int start, int length) throws InvalidArgumentException {
         return new IrSequence(this, start, length);
     }
-    
+
     /**
      * Returns a new IrSequence consisting of the first length durations.
      * Equivalent to subSequence with first argument 0.

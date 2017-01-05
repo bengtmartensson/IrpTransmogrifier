@@ -99,14 +99,14 @@ public class Burst {
     }
 
     /**
-     * @return the spaceDuration
+     * @return the gapDuration
      */
     public int getGapDuration() {
         return gapDuration;
     }
 
     /**
-     * @return the markDuration
+     * @return the flashDuration
      */
     public int getFlashDuration() {
         return flashDuration;

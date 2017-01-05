@@ -31,14 +31,14 @@ public class TrivialDecoder extends AbstractDecoder {
     protected List<IrStreamItem> parse(int beg, int length) {
         List<IrStreamItem> items = new ArrayList<>(length);
         for (int i = beg; i < beg + length - 1; i += 2) {
-            int mark = analyzer.getCleanedTime(i);
-            int space = analyzer.getCleanedTime(i + 1);
+            int gap = analyzer.getCleanedTime(i);
+            int flash = analyzer.getCleanedTime(i + 1);
 
-            items.add(newFlash(mark));
+            items.add(newFlash(gap));
             if (i == beg + length - 2 && params.isUseExtents())
                 items.add(newExtent(analyzer.getTotalDuration(beg, length)));
             else
-                items.add(newGap(space));
+                items.add(newGap(flash));
         }
         return items;
     }

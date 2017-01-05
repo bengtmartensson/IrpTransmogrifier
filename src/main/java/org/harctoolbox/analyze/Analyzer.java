@@ -98,9 +98,9 @@ public class Analyzer extends Cleaner {
 
     private void createPairs() {
         pairs = new ArrayList<>(16);
-        getFlashes().stream().forEach((mark) -> {
-            getGaps().stream().filter((space) -> (getNumberPairs(mark, space) > 0)).forEach((space) -> {
-                pairs.add(new Burst(mark, space));
+        getFlashes().stream().forEach((flash) -> {
+            getGaps().stream().filter((gap) -> (getNumberPairs(flash, gap) > 0)).forEach((gp) -> {
+                pairs.add(new Burst(flash, gp));
             });
         });
         Collections.sort(pairs, (a, b) -> getNumberPairs(b) - getNumberPairs(a));
@@ -184,12 +184,12 @@ public class Analyzer extends Cleaner {
     }
 
     public void printStatistics(PrintStream out) {
-        out.println("Spaces:");
+        out.println("Gaps:");
         this.getGaps().stream().forEach((d) -> {
             out.println(this.getName(d) + ":\t" + d + "\t" + this.getNumberGaps(d));
         });
 
-        out.println("Marks:");
+        out.println("Flashes:");
         this.getFlashes().stream().forEach((d) -> {
             out.println(this.getName(d) + ":\t" + d + "\t" + this.getNumberFlashes(d));
         });

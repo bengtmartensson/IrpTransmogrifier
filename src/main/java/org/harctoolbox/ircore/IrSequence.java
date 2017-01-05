@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class IrSequence implements Cloneable {
     private static final double epsilon = 0.001;
-    private static final int dummySpaceDuration = 50; // should not translate to 0000 in Pronto
+    private static final int dummyGapDuration = 50; // should not translate to 0000 in Pronto
 
     /**
      * Concatenates the elements in the argument.
@@ -136,7 +136,7 @@ public class IrSequence implements Cloneable {
      * Constructs an IrSequence from the parameter data.
      * This version does not require flashes and gaps to be interleaved (signs alternating).
      * @param str String of durations, possibly using signed numbers.
-     * @param fixOddSequences it true, odd sequences (ending with space) are silently fixed by adding a dummy gap.
+     * @param fixOddSequences it true, odd sequences (ending with gap) are silently fixed by adding a dummy gap.
      * @throws OddSequenceLenghtException If last duration is not a gap, and fixOddSequences false.
      */
     public IrSequence(String str, boolean fixOddSequences) throws OddSequenceLenghtException {
@@ -171,9 +171,9 @@ public class IrSequence implements Cloneable {
             }
             if (index % 2 == 0) {
                 if (fixOddSequences)
-                    tmplist[++index] = dummySpaceDuration;
+                    tmplist[++index] = dummyGapDuration;
                 else
-                    throw new OddSequenceLenghtException("IrSequence ends with a space");
+                    throw new OddSequenceLenghtException();
             }
             data = new double[index+1];
             for (int i = 0; i < index+1; i++)

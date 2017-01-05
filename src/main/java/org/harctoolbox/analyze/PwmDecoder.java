@@ -55,9 +55,9 @@ public abstract class PwmDecoder extends AbstractDecoder {
         ParameterData data = new ParameterData(chunksize);
         for (int i = beg; i < beg + length - 1; i += 2) {
             noBitsLimit = params.getNoBitsLimit(noPayload);
-            int mark = analyzer.getCleanedTime(i);
-            int space = analyzer.getCleanedTime(i + 1);
-            Burst burst = new Burst(mark, space);
+            int flash = analyzer.getCleanedTime(i);
+            int gap = analyzer.getCleanedTime(i + 1);
+            Burst burst = new Burst(flash, gap);
             boolean hit = false;
             int n = 0;
             while (!hit && n < bursts.length) {
@@ -71,11 +71,11 @@ public abstract class PwmDecoder extends AbstractDecoder {
                 while (!data.isEmpty())
                     dumpParameters(data, items, noBitsLimit);
 
-                items.add(newFlash(mark));
+                items.add(newFlash(flash));
                 if (i == beg + length - 2 && params.isUseExtents())
                     items.add(newExtent(analyzer.getTotalDuration(beg, length)));
                 else
-                    items.add(newGap(space));
+                    items.add(newGap(gap));
             }
 
             while (data.getNoBits() >= noBitsLimit)

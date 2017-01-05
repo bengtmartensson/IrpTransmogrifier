@@ -91,16 +91,16 @@ public abstract class AbstractDecoder {
         return protocol;
     }
 
-    protected Flash newFlash(int mark) {
-        return Burst.newFlash(mark, timebase);
+    protected Flash newFlash(int flash) {
+        return Burst.newFlash(flash, timebase);
     }
 
     protected Extent newExtent(int total) {
         return Burst.newExtent(total, timebase);
     }
 
-    protected Gap newGap(int space) {
-        return Burst.newGap(space, timebase);
+    protected Gap newGap(int gap) {
+        return Burst.newGap(gap, timebase);
     }
 
     protected Duration newFlashOrGap(boolean isFlash, int time) {

@@ -65,7 +65,15 @@
     </xs:element>
 
     <xs:element name="documentation">
-        <xs:complexType mixed="true"/>
+        <xs:complexType mixed="true">
+            <xs:annotation>
+                <xs:documentation>Textual notes, possibly using formatting in HTML.</xs:documentation>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+            </xs:sequence>
+            <xs:attribute ref="xml:lang" default="en"/>
+        </xs:complexType>
     </xs:element>
 
     <xs:element name="parameter">
@@ -93,7 +101,7 @@
     <xs:attributeGroup name="c-name">
         <xs:attribute name="c-name" type="xs:string">
             <xs:annotation>
-                <xs:documentation>Name of the protocol.</xs:documentation>
+                <xs:documentation>Name of the protocol, as used in code.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>

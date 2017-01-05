@@ -436,7 +436,7 @@ public class IrpTransmogrifier {
 
         if (commandAnalyze.statistics)
             analyzer.printStatistics(out); // FIXME
-        Protocol protocol = analyzer.searchProtocol(params, commandAnalyze.decoder);
+        Protocol protocol = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
         printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
     }
 
@@ -609,7 +609,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-r", "--relativetolerance"}, description = "Relative tolerance as a number < 1 (NOT: percent)")
         private double relativeTolerance = 0.04;
 
-        @Parameter(names = { "--regex"}, description = "Interpret protocol arguments as regular expressions")
+        @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions")
         private boolean regexp = false;
 
         @Parameter(names = {"-s", "--sort"}, description = "Sort the protocols alphabetically")

@@ -107,24 +107,44 @@ public class Analyzer extends Cleaner {
     }
 
 
-    private List<AbstractDecoder> setupDecoders(Analyzer.AnalyzerParams params, String decoderPattern) {
+    private List<Class<?>> selectDecoderClasses(String decoderPattern, boolean regexp) {
+        return regexp ? selectDecoderClassesRegexp(decoderPattern) : selectDecoderClassesSubstring(decoderPattern);
+    }
+
+    private List<Class<?>> selectDecoderClassesRegexp(String decoderPattern) {
         Pattern pattern = decoderPattern != null ? Pattern.compile(decoderPattern, Pattern.CASE_INSENSITIVE) : null;
+        List<Class<?>> decoders = new ArrayList<>(AbstractDecoder.NUMBERDECODERS);
+        for (Class<?> decoderClass : AbstractDecoder.decoders)
+            if (pattern == null || pattern.matcher(decoderClass.getSimpleName()).matches())
+                decoders.add(decoderClass);
+        return decoders;
+    }
+
+    private List<Class<?>> selectDecoderClassesSubstring(String decoderPattern) {
+        List<Class<?>> decoders = new ArrayList<>(AbstractDecoder.NUMBERDECODERS);
+        for (Class<?> decoderClass : AbstractDecoder.decoders)
+            if (decoderPattern == null
+                    || decoderClass.getSimpleName().regionMatches(true, 0, decoderPattern, 0, decoderPattern.length()))
+                decoders.add(decoderClass);
+        return decoders;
+    }
+
+    private List<AbstractDecoder> setupDecoders(Analyzer.AnalyzerParams params, String decoderPattern, boolean regexp) {
+        List<Class<?>> decoderClasses = selectDecoderClasses(decoderPattern, regexp);
         List<AbstractDecoder> decoders = new ArrayList<>(AbstractDecoder.NUMBERDECODERS);
-        for (Class<?> decoderClass : AbstractDecoder.decoders) {
-            if (pattern == null || pattern.matcher(decoderClass.getSimpleName()).matches()) {
-                try {
-                    Constructor<?> constructor = decoderClass.getConstructor(Analyzer.class, AnalyzerParams.class);
-                    AbstractDecoder decoder = (AbstractDecoder) constructor.newInstance(this, params);
-                    decoders.add(decoder);
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InstantiationException ex) {
-                    // consider this as programming error
-                    throw new ThisCannotHappenException(ex);
-                } catch (InvocationTargetException ex) {
-                    // Likely OK, the decoder just did not accept the data.
-                    logger.log(Level.FINE, String.format("Decoder %1$s failed: %2$s", decoderClass.getSimpleName(), ex.getTargetException().getMessage()));
-                }
+        decoderClasses.forEach((decoderClass) -> {
+            try {
+                Constructor<?> constructor = decoderClass.getConstructor(Analyzer.class, AnalyzerParams.class);
+                AbstractDecoder decoder = (AbstractDecoder) constructor.newInstance(this, params);
+                decoders.add(decoder);
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InstantiationException ex) {
+                // consider this as programming error
+                throw new ThisCannotHappenException(ex);
+            } catch (InvocationTargetException ex) {
+                // Likely not a fatal problem, the decoder just did not accept the data.
+                logger.log(Level.FINE, String.format("Decoder %1$s failed: %2$s", decoderClass.getSimpleName(), ex.getTargetException().getMessage()));
             }
-        }
+        });
         return decoders;
     }
 
@@ -154,8 +174,8 @@ public class Analyzer extends Cleaner {
         return frequency;
     }
 
-    public Protocol searchProtocol(AnalyzerParams params, String decoderPattern) {
-        List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern);
+    public Protocol searchProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) {
+        List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern, regexp);
         Protocol bestSoFar = null;
         int weight = Integer.MAX_VALUE;
 

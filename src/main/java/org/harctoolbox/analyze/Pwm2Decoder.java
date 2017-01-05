@@ -33,7 +33,7 @@ public class Pwm2Decoder extends PwmDecoder {
 
     public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
         this(analyzer, params,
-                analyzer.getPairs().get(0).getFlashDuration(), analyzer.getPairs().get(0).getGapDuration(),
-                analyzer.getPairs().get(1).getFlashDuration(), analyzer.getPairs().get(1).getGapDuration());
+                analyzer.getFlashes().get(0), analyzer.getGaps().get(0),
+                analyzer.getFlashes().get(0), analyzer.getGaps().get(1));
     }
 }

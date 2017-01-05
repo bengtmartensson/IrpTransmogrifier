@@ -30,8 +30,8 @@ public class Pwm4Decoder extends PwmDecoder {
     private static Burst[] mkBursts(Analyzer analyzer) throws DecodeException {
         if (analyzer.getNumberOfGaps() < NO_BURSTS)
             throw new DecodeException();
-        int flash = analyzer.getDistinctFlashes().get(0);
-        List<Integer> gaps = analyzer.getDistinctGaps();
+        int flash = analyzer.getFlashes().get(0);
+        List<Integer> gaps = analyzer.getGaps();
 
         return mkBursts(flash, gaps.get(0), gaps.get(1), gaps.get(2), gaps.get(3));
     }

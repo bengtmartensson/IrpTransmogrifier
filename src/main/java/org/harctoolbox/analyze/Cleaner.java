@@ -75,8 +75,8 @@ public class Cleaner {
     protected int indexData[];
     private int[] sorted;
     private HashMap<Integer, Integer> lookDownTable;
-    private List<Integer> sortedGaps;
-    private List<Integer> sortedFlashes;
+    private List<Integer> gapsSortedAfterFrequency;
+    private List<Integer> flashesSortedAfterFrequency;
 
     public Cleaner(IrSequence irSequence) {
         this(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
@@ -214,11 +214,11 @@ public class Cleaner {
         return list;
     }
 
-    public List<Integer> getDistinctGaps() {
+    public List<Integer> getGaps() {
         return getFalshesOrGaps(false);
     }
 
-    public List<Integer> getDistinctFlashes() {
+    public List<Integer> getFlashes() {
         return getFalshesOrGaps(true);
     }
 
@@ -256,26 +256,26 @@ public class Cleaner {
     }
 
     private void createSortedGapsAndFlashes() {
-        sortedGaps = getFalshesOrGaps(false);
-        Collections.sort(sortedGaps,    (a, b) -> cleanedHistogram.get(b).numberGaps    - cleanedHistogram.get(a).numberGaps);
-        sortedFlashes = getFalshesOrGaps(true);
-        Collections.sort(sortedFlashes, (a, b) -> cleanedHistogram.get(b).numberFlashes - cleanedHistogram.get(a).numberFlashes);
+        gapsSortedAfterFrequency = getFalshesOrGaps(false);
+        Collections.sort(gapsSortedAfterFrequency,    (a, b) -> cleanedHistogram.get(b).numberGaps    - cleanedHistogram.get(a).numberGaps);
+        flashesSortedAfterFrequency = getFalshesOrGaps(true);
+        Collections.sort(flashesSortedAfterFrequency, (a, b) -> cleanedHistogram.get(b).numberFlashes - cleanedHistogram.get(a).numberFlashes);
     }
 
-    public int getSortedGaps(int i) {
-        return sortedGaps.get(i);
+    public int getGapsSortedAfterFrequency(int i) {
+        return gapsSortedAfterFrequency.get(i);
     }
 
-    public int getSortedFlashes(int i) {
-        return sortedFlashes.get(i);
+    public int getFlashesSortedAfterFrequency(int i) {
+        return flashesSortedAfterFrequency.get(i);
     }
 
     public int getNumberOfGaps() {
-        return sortedGaps.size();
+        return gapsSortedAfterFrequency.size();
     }
 
     public int getNumberOfFlashes() {
-        return sortedFlashes.size();
+        return flashesSortedAfterFrequency.size();
     }
 
     private static class HistoPair {

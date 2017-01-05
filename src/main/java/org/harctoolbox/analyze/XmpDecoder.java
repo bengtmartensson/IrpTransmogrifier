@@ -33,8 +33,8 @@ public class XmpDecoder extends PwmDecoder {
     }
 
     private static Burst[] mkBursts(Analyzer analyzer) {
-        int flash = analyzer.getDistinctFlashes().get(0);
-        List<Integer> gaps = analyzer.getDistinctGaps(); // sorted?
+        int flash = analyzer.getFlashes().get(0);
+        List<Integer> gaps = analyzer.getGaps(); // sorted?
         int gapsBase = gaps.get(0);
         int delta = Integer.MAX_VALUE;
 

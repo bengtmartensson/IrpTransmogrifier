@@ -172,30 +172,6 @@
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
-                <executions>
-                    <execution>
-                        <id>make-wrapper-executable</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>chmod</executable> <!-- not portable, sorry -->
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                            <arguments>
-                                <argument>+x</argument>
-                                <argument>${project.nameLowercase}.sh</argument>
-                                <argument>javagenerator.sh</argument>
-                                <argument>javadecodergenerator.sh</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>1.9.1</version>
                 <executions>
@@ -250,6 +226,45 @@
             </plugin-->
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>buildSetup.exe</id>
+            <activation>
+                <file>
+                    <exists>/usr/bin/chmod</exists> <!-- good enough for now :-) -->
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>make-wrapper-executable</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>chmod</executable>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                    <arguments>
+                                        <argument>0755</argument>
+                                        <argument>${project.nameLowercase}.sh</argument>
+                                        <argument>javagenerator.sh</argument>
+                                        <argument>javadecodergenerator.sh</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>

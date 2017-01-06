@@ -303,7 +303,7 @@ public class IrpDatabase {
         return protocols.keySet();
     }
 
-    public List<String> getMatchingNames(String regexp) {
+    public List<String> getMatchingNamesRegexp(String regexp) {
         Pattern pattern = Pattern.compile(regexp.toLowerCase(Locale.US));
         List<String> result = new ArrayList<>(10);
         protocols.keySet().stream().filter((candidate) -> (pattern.matcher(candidate).matches())).forEach((candidate) -> {
@@ -312,11 +312,19 @@ public class IrpDatabase {
         return result;
     }
 
-    public List<String> getMatchingNames(Iterable<String> iterable) {
+    public List<String> getMatchingNamesExact(String string) {
         List<String> result = new ArrayList<>(10);
-        for (String s : iterable) {
-            result.addAll(getMatchingNames(s));
-        }
+        protocols.keySet().stream().filter((candidate) -> (candidate.equalsIgnoreCase(string))).forEachOrdered((candidate) -> {
+            result.add(candidate);
+        });
+        return result;
+    }
+
+    public List<String> getMatchingNames(Iterable<String> iterable, boolean regexp) {
+        List<String> result = new ArrayList<>(10);
+        for (String s : iterable)
+            result.addAll(regexp ? getMatchingNamesRegexp(s) : getMatchingNamesExact(s));
+
         return result;
     }
 
@@ -382,21 +390,11 @@ public class IrpDatabase {
     }
 
     public List<String> evaluateProtocols(List<String> protocols, boolean sort, boolean regexp) {
-        List<String> list = (protocols == null || protocols.isEmpty()) ? new ArrayList<>(getNames())
-                : regexp ? getMatchingNames(protocols)
-                        : protocols;
+        List<String> list = (protocols == null || protocols.isEmpty())
+                ? new ArrayList<>(getNames()) : getMatchingNames(protocols, regexp);
         if (sort)
             Collections.sort(list);
         return list;
-    }
-
-    public List<String> evaluateProtocols(String in, boolean sort, boolean regexp) {
-        if (in == null || in.isEmpty())
-            return new ArrayList<>(0);
-
-        List<String> list = new ArrayList<>(1);
-        list.add(in);
-        return evaluateProtocols(list, sort, regexp);
     }
 
     public Protocol getProtocol(String protocolName) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {

@@ -477,8 +477,8 @@ public class IrpTransmogrifier {
             Map<String, Long> parameters = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters,
                     true, commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
+            out.print(protocolName + SEPARATOR);
             if (commandRecognize.args.isEmpty()) {
-                out.print(protocolName + SEPARATOR);
                 out.print(testNameEngine + SEPARATOR);
                 out.println((parameters != null && testNameEngine.numericallyEquals(parameters)) ? "success" : "fail");
             } else if (parameters != null)
@@ -779,8 +779,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to generate test signal", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
 
-        @Parameter(names = { "-p", "--protocol"}, description = "Protocol to decode against (default all)")
-        private String protocol = null;
+        @Parameter(names = { "-p", "--protocol"}, variableArity = true, required = true, description = "Protocol to decode against (default all)")
+        private List<String> protocol = null;
 
         @Parameter(names = { "-r", "--random"}, description = "Generate a random parameter signal to test")
         private boolean random = false;

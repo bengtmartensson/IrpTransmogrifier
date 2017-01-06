@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -40,15 +41,40 @@ public class NamedProtocol extends Protocol {
         return document;
     }
 
-    private final String irp;
+    private final String irp; // original one on input, not canonicalized
     private final String name;
     private final String documentation;
+    private final double absoluteTolerance;
+    private final double relativeTolerance;
+    private final double frequencyTolerance;
 
-    public NamedProtocol(String name, String irp, String documentation) throws IrpSemanticException, InvalidNameException, UnassignedException {
+    public NamedProtocol(String name, String irp, String documentation, String frequencyTolerance, String absoluteTolerance, String relativeTolerance)
+            throws IrpSemanticException, InvalidNameException, UnassignedException {
         super(irp);
         this.irp = irp;
         this.name = name;
         this.documentation = documentation;
+        this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : IrCoreUtils.invalid;
+        this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : IrCoreUtils.invalid;
+        this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : IrCoreUtils.invalid;
+    }
+
+    public NamedProtocol(String name, String irp, String documentation) throws IrpSemanticException, InvalidNameException, UnassignedException {
+        this(name, irp, documentation, null, null, null);
+    }
+
+    public NamedProtocol(Map<String, String> map) throws IrpSemanticException, InvalidNameException, UnassignedException {
+        this(map.get(IrpDatabase.nameName), map.get(IrpDatabase.irpName), map.get(IrpDatabase.documentationName),
+                map.get(IrpDatabase.frequencyToleranceName), map.get(IrpDatabase.absoluteToleranceName), map.get(IrpDatabase.relativeToleranceName));
+    }
+
+    @Override
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted, boolean checkFrequency,
+            double fallbackFrequencyTolerance, double fallbackAbsoluteTolerance, double fallbackRelativeTolerance) {
+        return super.recognize(irSignal, keepDefaulted, checkFrequency,
+                getFrequencyTolerance(fallbackFrequencyTolerance),
+                getAbsoluteTolerance(fallbackAbsoluteTolerance), getRelativeTolerance(fallbackRelativeTolerance));
+
     }
 
     @Override
@@ -57,6 +83,8 @@ public class NamedProtocol extends Protocol {
         hash = 41 * hash + Objects.hashCode(this.irp);
         hash = 41 * hash + Objects.hashCode(this.name);
         hash = 41 * hash + Objects.hashCode(this.documentation);
+        hash = 41 * hash + Objects.hashCode(this.absoluteTolerance);
+        hash = 41 * hash + Objects.hashCode(this.relativeTolerance);
         return hash;
     }
 
@@ -69,7 +97,9 @@ public class NamedProtocol extends Protocol {
         return super.equals(obj)
                 && irp.equals(other.irp)
                 && name.equals(other.name)
-                && documentation.equals(other.documentation);
+                && documentation.equals(other.documentation)
+                && Double.compare(absoluteTolerance, other.absoluteTolerance) == 0
+                && Double.compare(relativeTolerance, other.relativeTolerance) == 0;
     }
 
     /**
@@ -88,6 +118,22 @@ public class NamedProtocol extends Protocol {
 
     public String getIrp() {
         return irp;
+    }
+
+    private double getDoubleWithSubstitute(double value, double fallback) {
+        return value >= 0 ? value : fallback;
+    }
+
+    public double getRelativeTolerance(double fallback) throws NumberFormatException {
+        return getDoubleWithSubstitute(relativeTolerance, fallback);
+    }
+
+    public double getAbsoluteTolerance(double fallback) throws NumberFormatException {
+        return getDoubleWithSubstitute(absoluteTolerance, fallback);
+    }
+
+    public double getFrequencyTolerance(double fallback) throws NumberFormatException {
+        return getDoubleWithSubstitute(frequencyTolerance, fallback);
     }
 
     @Override
@@ -109,14 +155,14 @@ public class NamedProtocol extends Protocol {
     @Override
     public Element toElement(Document document, boolean split) {
         Element root = super.toElement(document, split);
-        root.setAttribute("name", name);
+        root.setAttribute("name", getName());
 
         Element docu = document.createElement("Documentation");
-        docu.appendChild(document.createTextNode(documentation));
+        docu.appendChild(document.createTextNode(getDocumentation()));
         root.appendChild(docu);
 
         Element irpElement = document.createElement("Irp");
-        irpElement.appendChild(document.createTextNode(irp));
+        irpElement.appendChild(document.createTextNode(getIrp()));
         root.appendChild(irpElement);
 
         return root;

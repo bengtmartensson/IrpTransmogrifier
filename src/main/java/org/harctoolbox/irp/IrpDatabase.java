@@ -68,6 +68,7 @@ public class IrpDatabase {
     public static final String usableName = "usable";
     public static final String documentationName = "documentation";
     public static final String parameterName = "parameter";
+    public static final String recognizableName = "recognizable";
     public static final String frequencyToleranceName = "frequencyTolerance";
     public static final String relativeToleranceName = "relativeTolerance";
     public static final String absoluteToleranceName = "absoluteTolerance";
@@ -415,13 +416,15 @@ public class IrpDatabase {
         return new Protocol(getIrp(protocolName));
     }
 
-
     private static class UnparsedProtocol {
         public static final int APRIORI_SIZE = 4;
 
         private static HashMap<String, String> parseElement(Element element) {
             HashMap<String, String> map = new HashMap<>(APRIORI_SIZE);
             map.put(nameName, element.getAttribute(nameName));
+            String usable = element.getAttribute(usableName);
+            if (!usable.isEmpty())
+                map.put(usableName, usable);
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);

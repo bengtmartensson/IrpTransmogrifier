@@ -410,7 +410,7 @@ public class Protocol extends IrpObject {
         try {
             success = bitspecIrstream.recognize(recognizeData, pass, new ArrayList<>(0));
         } catch (NameConflictException | InvalidNameException | IrpSemanticException | ArithmeticException ex) {
-            logger.log(Level.INFO, ex.getMessage());
+            logger.log(Level.FINE, ex.getMessage());
         }
         IrpUtils.exiting(logger, "recognize " + pass, success ? "pass" : "fail");
         return success;

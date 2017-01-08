@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -440,10 +441,23 @@ public class IrpTransmogrifier {
         printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
     }
 
-    private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
+    private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException, IrpException, UsageException {
         IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
         Analyzer analyzer = new Analyzer(irSignal, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-        // TODO...
+        setupDatabase(commandLineArgs);
+        Set<String> list = this.irpDatabase.getNames();
+        for (String protocolName : list) {
+            NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
+            NameEngine testNameEngine = new NameEngine();
+
+            Map<String, Long> parameters = protocol.recognize(irSignal, commandDecode.keepDefaultedParameters,
+                    true, commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+
+            if (parameters != null)
+                out.println(protocolName + SEPARATOR + parameters);
+            else
+                logger.log(Level.FINE, "Protocol {0} did not decode", protocolName);
+        }
     }
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
@@ -540,8 +554,10 @@ public class IrpTransmogrifier {
             configFilename = commandLineArgs.configFile != null ? commandLineArgs.configFile : defaultConfigFile;
             irpDatabase = new IrpDatabase(configFilename);
         }
-        if (expand)
+        if (expand) {
             irpDatabase.expand();
+            //irpDatabase.removeUnusables();
+        }
     }
 
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
@@ -711,6 +727,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
         private double frequency = IrCoreUtils.invalid;
+
+        @Parameter(names = { "-k", "--keep-defaulted"}, description = "Normally parameters equal to their default are removed; this option keeps them")
+        private boolean keepDefaultedParameters = false;
 
         @Parameter(description = "durations in microseconds, or pronto hex", required = true)
         private List<String> args;

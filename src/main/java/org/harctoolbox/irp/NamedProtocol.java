@@ -20,6 +20,8 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -29,6 +31,7 @@ import org.w3c.dom.Element;
  *
  */
 public class NamedProtocol extends Protocol {
+    private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
     public static Document toDocument(Iterable<NamedProtocol> protocols) {
         Document document = XmlUtils.newDocument();
@@ -47,8 +50,10 @@ public class NamedProtocol extends Protocol {
     private final double absoluteTolerance;
     private final double relativeTolerance;
     private final double frequencyTolerance;
+    private final boolean recognizable;
 
-    public NamedProtocol(String name, String irp, String documentation, String frequencyTolerance, String absoluteTolerance, String relativeTolerance)
+    public NamedProtocol(String name, String irp, String documentation, String frequencyTolerance,
+            String absoluteTolerance, String relativeTolerance, String recognizable)
             throws IrpSemanticException, InvalidNameException, UnassignedException {
         super(irp);
         this.irp = irp;
@@ -57,20 +62,26 @@ public class NamedProtocol extends Protocol {
         this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : IrCoreUtils.invalid;
         this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : IrCoreUtils.invalid;
         this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : IrCoreUtils.invalid;
+        this.recognizable = recognizable == null || Boolean.parseBoolean(recognizable);
     }
 
     public NamedProtocol(String name, String irp, String documentation) throws IrpSemanticException, InvalidNameException, UnassignedException {
-        this(name, irp, documentation, null, null, null);
+        this(name, irp, documentation, null, null, null, null);
     }
 
     public NamedProtocol(Map<String, String> map) throws IrpSemanticException, InvalidNameException, UnassignedException {
         this(map.get(IrpDatabase.nameName), map.get(IrpDatabase.irpName), map.get(IrpDatabase.documentationName),
-                map.get(IrpDatabase.frequencyToleranceName), map.get(IrpDatabase.absoluteToleranceName), map.get(IrpDatabase.relativeToleranceName));
+                map.get(IrpDatabase.frequencyToleranceName), map.get(IrpDatabase.absoluteToleranceName), map.get(IrpDatabase.relativeToleranceName),
+                map.get(IrpDatabase.recognizableName));
     }
 
     @Override
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted, boolean checkFrequency,
             double fallbackFrequencyTolerance, double fallbackAbsoluteTolerance, double fallbackRelativeTolerance) {
+        if (!isRecognizeable()) {
+            logger.log(Level.FINE, "Protocol {0} is not recogizeable, skipped", getName());
+            return null;
+        }
         return super.recognize(irSignal, keepDefaulted, checkFrequency,
                 getFrequencyTolerance(fallbackFrequencyTolerance),
                 getAbsoluteTolerance(fallbackAbsoluteTolerance), getRelativeTolerance(fallbackRelativeTolerance));
@@ -118,6 +129,10 @@ public class NamedProtocol extends Protocol {
 
     public String getIrp() {
         return irp;
+    }
+
+    public boolean isRecognizeable() {
+        return recognizable;
     }
 
     private double getDoubleWithSubstitute(double value, double fallback) {

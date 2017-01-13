@@ -113,7 +113,8 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         return unit.equals(other.unit)
                 && IrCoreUtils.approximatelyEquals(us, other.us)
                 && IrCoreUtils.approximatelyEquals(time_periods, other.time_periods)
-                && IrCoreUtils.approximatelyEquals(time_units, other.time_units);
+                && IrCoreUtils.approximatelyEquals(time_units, other.time_units)
+                && nameOrNumber.equals(other.nameOrNumber);
     }
 
     private void compute(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {

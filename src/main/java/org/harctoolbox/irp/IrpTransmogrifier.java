@@ -29,11 +29,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -158,9 +158,6 @@ public class IrpTransmogrifier {
         CommandList commandList = new CommandList();
         argumentParser.addCommand(commandList);
 
-        CommandRecognize commandRecognize = new CommandRecognize();
-        argumentParser.addCommand(commandRecognize);
-
         CommandRender commandRenderer = new CommandRender();
         argumentParser.addCommand(commandRenderer);
 
@@ -253,9 +250,6 @@ public class IrpTransmogrifier {
                     break;
                 case "list":
                     instance.list(commandList, commandLineArgs);
-                    break;
-                case "recognize":
-                    instance.recognize(commandRecognize, commandLineArgs);
                     break;
                 case "render":
                     instance.render(commandRenderer, commandLineArgs);
@@ -442,64 +436,24 @@ public class IrpTransmogrifier {
     }
 
     private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException, IrpException, UsageException {
-        IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
-        Analyzer analyzer = new Analyzer(irSignal, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         setupDatabase(commandLineArgs);
-        Set<String> list = this.irpDatabase.getNames();
-        for (String protocolName : list) {
-            NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-            NameEngine testNameEngine = new NameEngine();
+        List<String> protocolNames = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
+        List<String> list = irpDatabase.evaluateProtocols(protocolNames, commandLineArgs.sort, commandLineArgs.regexp);
+        if (list.isEmpty())
+            throw new UsageException("No protocol given or matched.");
 
-            Map<String, Long> parameters = protocol.recognize(irSignal, commandDecode.keepDefaultedParameters,
-                    true, commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-
-            if (parameters != null)
-                out.println(protocolName + SEPARATOR + parameters);
-            else
-                logger.log(Level.FINE, "Protocol {0} did not decode", protocolName);
-        }
+        Decoder decoder = new Decoder(irpDatabase, list, commandDecode.keepDefaultedParameters,
+                commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
+        Map<String, Map<String, Long>> decodes = decoder.decode(irSignal);
+        decodes.entrySet().forEach((kvp) -> {
+            out.println(kvp.getKey() + ": " + kvp.getValue().toString());
+        });
     }
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
         if (protocol != null)
             out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
-    }
-
-    private void recognize(CommandRecognize commandRecognize, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, InvalidArgumentException {
-        setupDatabase(commandLineArgs);
-        List<String> list = irpDatabase.evaluateProtocols(commandRecognize.protocol, commandLineArgs.sort, commandLineArgs.regexp);
-        if (list.isEmpty())
-            throw new UsageException("No protocol given or matched.");
-        if (IrpUtils.numberTrue(commandRecognize.random, !commandRecognize.nameEngine.isEmpty(), !commandRecognize.args.isEmpty()) != 1)
-                throw new UsageException("Must either use --random or --nameengine, or have arguments.");
-
-        for (String protocolName : list) {
-            NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-            NameEngine testNameEngine = new NameEngine();
-            IrSignal irSignal;
-            try {
-                if (commandRecognize.args.isEmpty()) {
-                    testNameEngine = commandRecognize.random ? new NameEngine(protocol.randomParameters()) : commandRecognize.nameEngine;
-                    irSignal = protocol.toIrSignal(testNameEngine.clone());
-                } else {
-                    irSignal = IrSignal.parse(commandRecognize.args, commandRecognize.frequency, false);
-                }
-            } catch (DomainViolationException | OddSequenceLenghtException ex) {
-                throw new ThisCannotHappenException(ex);
-            }
-
-            Map<String, Long> parameters = protocol.recognize(irSignal, commandRecognize.args.isEmpty() || commandRecognize.keepDefaultedParameters,
-                    true, commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-
-            out.print(protocolName + SEPARATOR);
-            if (commandRecognize.args.isEmpty()) {
-                out.print(testNameEngine + SEPARATOR);
-                out.println((parameters != null && testNameEngine.numericallyEquals(parameters)) ? "success" : "fail");
-            } else if (parameters != null)
-                out.println(parameters);
-            else
-                out.println("no decode");
-        }
     }
 
     private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws FileNotFoundException, UnassignedException {
@@ -589,7 +543,7 @@ public class IrpTransmogrifier {
     private final static class CommandLineArgs {
 
         @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
-        private double absoluteTolerance = 50;
+        private double absoluteTolerance = IrCoreUtils.defaultAbsoluteTolerance;
 
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
         private String configFile = null;
@@ -597,8 +551,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")
         private String encoding = "UTF-8";
 
-        @Parameter(names = {"-f", "--frequencytolerance"}, description = "Absolute tolerance in microseconds")
-        private double frequencyTolerance = 1000;
+        @Parameter(names = {"-f", "--frequencytolerance"}, description = "Frequency tolerance in Hz. Negative disables frequency check")
+        private double frequencyTolerance = IrCoreUtils.defaultFrequencyTolerance;
 
         @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message (deprecated; use command help instead)")
         private boolean helpRequested = false;
@@ -623,7 +577,7 @@ public class IrpTransmogrifier {
         private String output = null;
 
         @Parameter(names = {"-r", "--relativetolerance"}, description = "Relative tolerance as a number < 1 (NOT: percent)")
-        private double relativeTolerance = 0.04;
+        private double relativeTolerance = IrCoreUtils.defaultRelativeTolerance;
 
         @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions")
         private boolean regexp = false;
@@ -728,11 +682,14 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
         private double frequency = IrCoreUtils.invalid;
 
-        @Parameter(names = { "-k", "--keep-defaulted"}, description = "Normally parameters equal to their default are removed; this option keeps them")
+        @Parameter(names = { "-k", "--keep-defaulted"}, description = "Keep parameters equal to their defaults")
         private boolean keepDefaultedParameters = false;
 
-        @Parameter(description = "durations in microseconds, or pronto hex", required = true)
-        private List<String> args;
+        @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try decode (default all)")
+        private String protocol = null;
+
+        @Parameter(description = "durations in micro seconds, or pronto hex", required = true)
+        private List<String> args = new ArrayList<>(64);
     }
 
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
@@ -784,28 +741,6 @@ public class IrpTransmogrifier {
 
         @Parameter(description = "List of protocols (default all)")
         private List<String> protocols = new ArrayList<>(8);
-    }
-
-    @Parameters(commandNames = {"recognize"}, commandDescription = "Recognize signal")
-    private static class CommandRecognize {
-
-        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency (ignored for pronto hex signals)")
-        private double frequency = ModulatedIrSequence.defaultFrequency;
-
-        @Parameter(names = { "-k", "--keep-defaulted"}, description = "Normally parameters equal to their default are removed; this option keeps them")
-        private boolean keepDefaultedParameters = false;
-
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to generate test signal", converter = NameEngineParser.class)
-        private NameEngine nameEngine = new NameEngine();
-
-        @Parameter(names = { "-p", "--protocol"}, variableArity = true, required = true, description = "Protocol to decode against (default all)")
-        private List<String> protocol = null;
-
-        @Parameter(names = { "-r", "--random"}, description = "Generate a random parameter signal to test")
-        private boolean random = false;
-
-        @Parameter(description = "durations in micro seconds, or pronto hex")
-        private List<String> args = new ArrayList<>(16);
     }
 
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal")

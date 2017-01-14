@@ -53,6 +53,7 @@ public class Protocol extends IrpObject {
     private NameEngine definitions;
     private NameEngine memoryVariables;
     private IrpParser parser = null;
+    private Boolean interleavingOkCached = null;
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree) {
@@ -280,7 +281,9 @@ public class Protocol extends IrpObject {
     }
 
     public boolean interleavingOk() {
-        return bitspecIrstream.interleavingOk(definitions, generalSpec);
+        if (interleavingOkCached == null)
+            interleavingOkCached = bitspecIrstream.interleavingOk(definitions, generalSpec);
+        return interleavingOkCached;
     }
 
     public boolean isRPlus() {
@@ -360,15 +363,15 @@ public class Protocol extends IrpObject {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) {
-        return recognize(irSignal, keepDefaulted, true, IrCoreUtils.defaultFrequencyTolerance, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return recognize(irSignal, keepDefaulted, IrCoreUtils.defaultFrequencyTolerance, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted, boolean checkFrequency,
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance) {
         IrpUtils.entering(logger, Level.FINE, "recognize", this);
         Map<String, Long> names = new HashMap<>(8);
 
-        boolean success = (!checkFrequency || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
+        boolean success = (frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
         if (success)
             success = process(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance);
         if (success)
@@ -409,6 +412,7 @@ public class Protocol extends IrpObject {
         boolean success = false;
         try {
             success = bitspecIrstream.recognize(recognizeData, pass, new ArrayList<>(0));
+            success = success && recognizeData.isFinished();
         } catch (NameConflictException | InvalidNameException | IrpSemanticException | ArithmeticException ex) {
             logger.log(Level.FINE, ex.getMessage());
         }

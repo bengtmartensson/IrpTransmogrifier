@@ -300,4 +300,8 @@ public class RecognizeData implements Cloneable {
     void setDanglingBitFieldData() {
         danglingBitFieldData = new BitwiseParameter();
     }
+
+    public boolean isFinished() {
+        return position == irSequence.getLength();
+    }
 }

@@ -311,9 +311,12 @@ public class IrpDatabase {
         return prot == null ? null : prot.getIrp();
     }
 
-
     public final Set<String> getNames() {
         return protocols.keySet();
+    }
+
+    public final int size() {
+        return protocols.size();
     }
 
     public List<String> getMatchingNamesRegexp(String regexp) {

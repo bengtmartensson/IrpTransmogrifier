@@ -76,13 +76,13 @@ public class NamedProtocol extends Protocol {
     }
 
     @Override
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted, boolean checkFrequency,
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
             double fallbackFrequencyTolerance, double fallbackAbsoluteTolerance, double fallbackRelativeTolerance) {
         if (!isRecognizeable()) {
             logger.log(Level.FINE, "Protocol {0} is not recogizeable, skipped", getName());
             return null;
         }
-        return super.recognize(irSignal, keepDefaulted, checkFrequency,
+        return super.recognize(irSignal, keepDefaulted,
                 getFrequencyTolerance(fallbackFrequencyTolerance),
                 getAbsoluteTolerance(fallbackAbsoluteTolerance), getRelativeTolerance(fallbackRelativeTolerance));
 
@@ -111,6 +111,11 @@ public class NamedProtocol extends Protocol {
                 && documentation.equals(other.documentation)
                 && Double.compare(absoluteTolerance, other.absoluteTolerance) == 0
                 && Double.compare(relativeTolerance, other.relativeTolerance) == 0;
+    }
+
+    @Override
+    public String toString() {
+        return name + ": " + super.toString();
     }
 
     /**

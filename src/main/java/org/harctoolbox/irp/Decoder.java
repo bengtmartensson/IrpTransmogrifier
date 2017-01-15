@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
@@ -83,46 +82,65 @@ public class Decoder {
         });
     }
 
-    public Map<String, Map<String, Long>> decode(IrSignal irSignal) {
-        Map<String, Map<String, Long>> output = new HashMap<>(4);
+    public Map<String, Decode> decode(IrSignal irSignal, boolean noPreferredDecodes) {
+        Map<String, Decode> output = new HashMap<>(4);
         //Analyzer analyzer = new Analyzer(irSignal, true /* repeatFinder*/, absoluteTolerance, relativeTolerance);
         parsedProtocols.values().parallelStream().forEach((namedProtocol) -> {
             Map<String, Long> parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
                     frequencyTolerance, absoluteTolerance, relativeTolerance);
             if (parameters != null)
-                output.put(namedProtocol.getName(), parameters);
+                output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
             else
                 logger.log(Level.FINE, "Protocol {0} did not decode", namedProtocol.getName());
         });
+
+        if (!noPreferredDecodes) {
+            List<String> protocols = new ArrayList<>(output.keySet());
+            protocols.forEach((name) -> {
+                NamedProtocol prot = output.get(name).getNamedProtocol();
+                if (prot != null) {
+                    List<String> preferreds = prot.getPreferredDecode();
+                    if (preferreds != null)
+                        preferreds.stream().filter((pref) -> (output.containsKey(pref))).forEachOrdered((_item) -> {
+                            output.remove(name);
+                        });
+                }
+            });
+        }
+
         return output;
     }
 
-    public void decodePrint(IrSignal irSignal, PrintStream out) {
-        Map<String, Map<String, Long>> result = decode(irSignal);
+    public void decodePrint(IrSignal irSignal, boolean noPreferredDecodes, PrintStream out) {
+        Map<String, Decode> result = decode(irSignal, noPreferredDecodes);
         result.entrySet().forEach((kvp) -> {
             out.println(kvp.getKey() + ": " + kvp.getValue().toString());
         });
     }
 
-    public void decodePrint(String str) throws InvalidArgumentException {
+    public void decodePrint(String str, boolean noPreferredDecodes) throws InvalidArgumentException {
         IrSignal irSignal = new IrSignal(str);
-        decodePrint(irSignal, System.out);
+        decodePrint(irSignal, noPreferredDecodes, System.out);
     }
 
-    public static class Result {
+    public void decodePrint(String str) throws InvalidArgumentException {
+        decodePrint(str, false);
+    }
+
+    public static class Decode {
         private final NamedProtocol namedProtocol;
         private final NameEngine nameEngine;
         private final String notes;
 
-        public Result(NamedProtocol namedProtocol, Map<String, Long> map) {
+        public Decode(NamedProtocol namedProtocol, Map<String, Long> map) {
             this(namedProtocol, new NameEngine(map), null);
         }
 
-        public Result(NamedProtocol namedProtocol, NameEngine nameEngine) {
+        public Decode(NamedProtocol namedProtocol, NameEngine nameEngine) {
             this(namedProtocol, nameEngine, null);
         }
 
-        public Result(NamedProtocol namedProtocol, NameEngine nameEngine, String notes) {
+        public Decode(NamedProtocol namedProtocol, NameEngine nameEngine, String notes) {
             this.namedProtocol = namedProtocol;
             this.nameEngine = nameEngine;
             this.notes = notes == null ? "" : notes;

@@ -68,10 +68,11 @@ public class IrpDatabase {
     public static final String usableName = "usable";
     public static final String documentationName = "documentation";
     public static final String parameterName = "parameter";
-    public static final String recognizableName = "recognizable";
+    public static final String decodableName = "decodable";
     public static final String frequencyToleranceName = "frequencyTolerance";
     public static final String relativeToleranceName = "relativeTolerance";
     public static final String absoluteToleranceName = "absoluteTolerance";
+    public static final String preferredDecodeName = "preferred-decode";
 
     public static boolean isKnown(String protocolsPath, String protocol) throws IOException, IrpException {
         try {
@@ -205,12 +206,15 @@ public class IrpDatabase {
     public IrpDatabase(Reader reader) throws IOException, SAXException {
         this(XmlUtils.openXmlReader(reader, (Schema) null, true, true));
     }
+
     public IrpDatabase(InputStream inputStream) throws IOException, SAXException {
         this(XmlUtils.openXmlStream(inputStream, null, true, true));
     }
+
     public IrpDatabase(File file) throws IOException, SAXException {
         this(XmlUtils.openXmlFile(file, (Schema) null, true, true));
     }
+
     public IrpDatabase(String file) throws IOException, SAXException {
         this(IrpUtils.getInputSteam(file));
     }
@@ -254,8 +258,9 @@ public class IrpDatabase {
     public Document toDocument() {
         Document doc = emptyDocument();
         Element root = doc.getDocumentElement();
-        for (UnparsedProtocol protocol : this.protocols.values())
+        protocols.values().forEach((protocol) -> {
             root.appendChild(protocol.toElement(doc));
+        });
 
         return doc;
     }
@@ -265,7 +270,7 @@ public class IrpDatabase {
         Element root = document.createElement("NamedProtocols");
         document.appendChild(root);
 
-        for (String protocolName : protocolNames)
+        protocolNames.forEach((protocolName) -> {
             try {
                 NamedProtocol protocol = getNamedProtocol(protocolName);
                 Element element = protocol.toElement(document);
@@ -273,6 +278,7 @@ public class IrpDatabase {
             } catch (IrpException | ArithmeticException ex) {
                 logger.log(Level.WARNING, "{0}; protocol ignored", ex.getMessage());
             }
+        });
 
         return document;
     }
@@ -349,9 +355,9 @@ public class IrpDatabase {
         return prot == null ? null : prot.getDocumentation();
     }
 
-    public String getProperty(String name, String key) {
+    public String getFirstProperty(String name, String key) {
         UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
-        return prot == null ? null : prot.getProperty(key);
+        return prot == null ? null : prot.getFirstProperty(key);
     }
 
     public NamedProtocol getNamedProtocol(String name) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {
@@ -391,7 +397,7 @@ public class IrpDatabase {
                         : ancestor.getIrp().substring(0, ancestor.getIrp().lastIndexOf('['));
                 // Debug.debugConfigfile("Protocol " + name + ": `" + p_name + "' replaced by `" + replacement + "'.");
                 logger.log(Level.FINEST, "Protocol {0}: `{1}'' replaced by `{2}''.", new Object[]{name, p_name, replacement});
-                p.setProperty(irpName, p.getIrp().replaceAll(p_name, replacement));
+                p.setUniqueProperty(irpName, p.getIrp().replaceAll(p_name, replacement));
                 protocols.put(name, p);
                 if (depth < maxRecursionDepth)
                     expand(depth + 1, name);
@@ -422,12 +428,58 @@ public class IrpDatabase {
     private static class UnparsedProtocol {
         public static final int APRIORI_SIZE = 4;
 
-        private static HashMap<String, String> parseElement(Element element) {
-            HashMap<String, String> map = new HashMap<>(APRIORI_SIZE);
-            map.put(nameName, element.getAttribute(nameName));
+        private Map<String, List<String>> map;
+
+        UnparsedProtocol() {
+            map = new HashMap<>(APRIORI_SIZE);
+        }
+
+        UnparsedProtocol(String irp) {
+            this(unnamed, irp, null);
+        }
+
+        UnparsedProtocol(String name, String irp, String documentation) {
+            this();
+            addProperty(nameName, name);
+            addProperty(irpName, irp);
+            addProperty(documentationName, documentation);
+        }
+
+        UnparsedProtocol(Map<String, String> map) {
+            this();
+            map.entrySet().forEach((kvp) -> {
+                addProperty(kvp.getKey(), kvp.getValue());
+            });
+        }
+
+        UnparsedProtocol(Element element) {
+            this();
+            parseElement(element);
+        }
+
+        private void addProperty(String key, String value) {
+            if (!map.containsKey(key))
+                map.put(key, new ArrayList<>(1));
+            List<String> list = map.get(key);
+            list.add(value);
+        }
+
+        private void setUniqueProperty(String key, String value) {
+            List<String> list = new ArrayList<>(1);
+            list.add(value);
+            map.put(key, list);
+        }
+
+        private String getFirstProperty(String key) {
+            List<String> list = map.get(key);
+            return list == null ? null : list.get(0);
+        }
+
+        private void parseElement(Element element) {
+            addProperty(nameName, element.getAttribute(nameName));
             String usable = element.getAttribute(usableName);
             if (!usable.isEmpty())
-                map.put(usableName, usable);
+                addProperty(usableName, usable);
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -436,73 +488,45 @@ public class IrpDatabase {
                 Element e = (Element) node;
                 switch (e.getLocalName()) {
                     case irpName:
-                        map.put(irpName, e.getTextContent().replaceAll("\\s+", ""));
+                        addProperty(irpName, e.getTextContent().replaceAll("\\s+", ""));
                         break;
                     case documentationName:
-                        map.put(documentationName, e.getTextContent());
+                        addProperty(documentationName, e.getTextContent());
                         break;
                     case parameterName:
-                        map.put(e.getAttribute("name"), e.getTextContent());
+                        addProperty(e.getAttribute("name"), e.getTextContent());
                         break;
                     default:
                         throw new ThisCannotHappenException("unknown tag: " + e.getTagName());
                 }
             }
-            return map;
         }
 
-        private Map<String, String> map;
-
-        UnparsedProtocol(String irp) {
-            this(unnamed, irp, null);
-        }
-
-        UnparsedProtocol(String name, String irp, String documentation) {
-            this();
-            map.put(nameName, name);
-            map.put(irpName, irp);
-            map.put(documentationName, documentation);
-        }
-
-        UnparsedProtocol() {
-            map = new HashMap<>(APRIORI_SIZE);
-        }
-
-        UnparsedProtocol(Map<String, String> map) {
-            this.map = map;
-        }
-
-        UnparsedProtocol(Element element) {
-            this(parseElement(element));
-        }
-
-        String getProperty(String key) {
+        List<String> getProperties(String key) {
             return map.get(key);
         }
 
-        void setProperty(String key, String value) {
-            map.put(key, value);
-        }
-
         String getName() {
-            return map.get(nameName);
+            return getFirstProperty(nameName);
         }
 
         String getIrp() {
-            return map.get(irpName);
+            return getFirstProperty(irpName);
         }
 
         String getDocumentation() {
-            return map.get(documentationName);
+            return getFirstProperty(documentationName);
         }
 
         boolean isUsable() {
-            String str = map.get(usableName);
+            String str = getFirstProperty(usableName);
             return str == null || Boolean.parseBoolean(str) || str.equalsIgnoreCase("yes");
         }
 
         NamedProtocol toNamedProtocol() throws IrpSemanticException, InvalidNameException, UnassignedException {
-            return new NamedProtocol(map);
+            return new NamedProtocol(getName(), getIrp(), getDocumentation(),
+                    getFirstProperty(frequencyToleranceName), getFirstProperty(absoluteToleranceName), getFirstProperty(relativeToleranceName),
+                    getFirstProperty(decodableName), getProperties(preferredDecodeName));
         }
 
         @Override
@@ -512,18 +536,18 @@ public class IrpDatabase {
 
         Element toElement(Document doc) {
             Element element = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":" + protocolName);
-            for (Map.Entry<String, String> kvp : map.entrySet()) {
+            for (Map.Entry<String, List<String>> kvp : map.entrySet()) {
                 switch (kvp.getKey()) {
                     case nameName:
-                        element.setAttribute(nameName, kvp.getValue());
-                        element.setAttribute(cNameName, IrpUtils.toCName(kvp.getValue()));
+                        element.setAttribute(nameName, kvp.getValue().get(0));
+                        element.setAttribute(cNameName, IrpUtils.toCName(kvp.getValue().get(0)));
                         break;
                     case usableName:
-                        element.setAttribute(usableName, Boolean.toString(!kvp.getValue().equals("no")));
+                        element.setAttribute(usableName, Boolean.toString(!kvp.getValue().get(0).equals("no")));
                         break;
                     case irpName: {
                         Element irp = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":" + irpName);
-                        irp.appendChild(doc.createCDATASection(kvp.getValue()));
+                        irp.appendChild(doc.createCDATASection(kvp.getValue().get(0)));
                         element.appendChild(irp);
                     }
                     break;
@@ -534,14 +558,18 @@ public class IrpDatabase {
                             Element root = miniDoc.getDocumentElement();
                             element.appendChild(doc.adoptNode(root));
                         } catch (SAXException ex) {
-                            logger.log(Level.WARNING, "{0} {1}", new Object[]{kvp.getValue(), ex.getMessage()});
+                            logger.log(Level.WARNING, "{0} {1}", new Object[]{kvp.getValue().get(0), ex.getMessage()});
                         }
                         break;
                     default: {
-                        Element param = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":" + parameterName);
-                        param.setAttribute(nameName, kvp.getKey());
-                        param.setTextContent(kvp.getValue());
+                        kvp.getValue().stream().map((s) -> {
+                            Element param = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":" + parameterName);
+                            param.setAttribute(nameName, kvp.getKey());
+                            param.setTextContent(s);
+                        return param;
+                    }).forEachOrdered((param) -> {
                         element.appendChild(param);
+                    });
                     }
                 }
             }

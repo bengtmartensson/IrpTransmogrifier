@@ -227,9 +227,9 @@ public class IrpTransmogrifier {
             if (command == null)
                 usage(IrpUtils.exitUsageError);
 
-            assert(command != null); // for FindBugs
+            assert (command != null); // for FindBugs
 
-          switch (command) {
+            switch (command) {
                 case "analyze":
                     instance.analyze(commandAnalyze, commandLineArgs);
                     break;
@@ -445,7 +445,7 @@ public class IrpTransmogrifier {
         Decoder decoder = new Decoder(irpDatabase, list, commandDecode.keepDefaultedParameters,
                 commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
-        Map<String, Map<String, Long>> decodes = decoder.decode(irSignal);
+        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferredDecodes);
         decodes.entrySet().forEach((kvp) -> {
             out.println(kvp.getKey() + ": " + kvp.getValue().toString());
         });
@@ -678,6 +678,9 @@ public class IrpTransmogrifier {
 
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode given IR signal")
     private static class CommandDecode {
+
+        @Parameter(names = { "-a", "--all", "--no-preferred-decodes"}, description = "Output all decodes; ignore preferred-decode")
+        private boolean noPreferredDecodes = false;
 
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
         private double frequency = IrCoreUtils.invalid;

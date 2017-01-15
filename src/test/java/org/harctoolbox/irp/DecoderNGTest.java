@@ -1,7 +1,6 @@
 package org.harctoolbox.irp;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -48,8 +47,8 @@ public class DecoderNGTest {
         System.out.println("decode");
         IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
 
-        Map<String, Map<String, Long>> result = decoder.decode(irSignal);
-        assertEquals(result.size(), 3);
-        assertEquals(result.get("NEC1").toString(), "{S=34, D=12, F=56}");
+        Map<String, Decoder.Decode> result = decoder.decode(irSignal, false);
+        assertEquals(result.size(), 2);
+        assertEquals(result.get("NEC1").toString(), "NEC1: {S=34,D=12,F=56}");
     }
 }

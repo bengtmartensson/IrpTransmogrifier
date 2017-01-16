@@ -48,7 +48,7 @@ public class DecoderNGTest {
         IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
 
         Map<String, Decoder.Decode> result = decoder.decode(irSignal, false);
-        assertEquals(result.size(), 2);
+        assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {S=34,D=12,F=56}");
     }
 }

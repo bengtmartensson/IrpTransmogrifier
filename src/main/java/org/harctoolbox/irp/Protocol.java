@@ -398,10 +398,11 @@ public class Protocol extends IrpObject {
         try {
             recognizeData.transferToNamesMap(names);
             recognizeData.checkConsistency(names);
+            checkDomain(names);
         } catch (NameConflictException ex) {
             return false;
-        } catch (UnassignedException ex) {
-            logger.log(Level.SEVERE, null, ex);
+        } catch (UnassignedException | DomainViolationException ex) {
+            logger.log(Level.FINE, null, ex);
             return false;
         }
         return recognizeData.isSuccess();
@@ -461,5 +462,13 @@ public class Protocol extends IrpObject {
         str.append(hasVariation() ? "variation\t" : "\t");
         str.append(isRPlus() ? "R+" : "");
         return str.toString();
+    }
+
+    private void checkDomain(Map<String, Long> names) throws DomainViolationException {
+        for (Map.Entry<String, Long> kvp : names.entrySet()) {
+            ParameterSpec parameterSpec = parameterSpecs.getParameterSpec(kvp.getKey());
+            if (parameterSpec != null)
+                parameterSpec.checkDomain(kvp.getValue());
+        }
     }
 }

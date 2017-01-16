@@ -46,9 +46,11 @@ public class ProtocolNGTest {
     private final Protocol iodatan;
     private final Protocol velodyne;
     private final Protocol xmp1;
+    private final Protocol tivo;
 
     public ProtocolNGTest() throws IrpSemanticException, IrpSyntaxException, UnsupportedRepeatException, ArithmeticException, InvalidArgumentException, UnassignedException {
         nec1 = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
+        tivo = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,U:4,~F:4:4,1,-78,(16,-4,1,-173)*)[D:133..133=133,S:48..48=48,F:0..255,U:0..15]");
         rc5 = new Protocol("{36k,msb,889}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[D:0..31,F:0..127,T@:0..1=0]");
         rc6 = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]");
         nokia32 = new Protocol("{36k,1p,msb}<6,-10|6,-16|6,-22|6,-28>((15,-10,D:8,S:8,T:1,X:7,F:8,6,^100m)*,T=1-T) [D:0..255,S:0..255,F:0..255,T@:0..1=0,X:0..127]");
@@ -371,6 +373,22 @@ public class ProtocolNGTest {
             Map<String, Long> recognizeData = nec1.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | InvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Test of recognize method, of class Protocol.
+     */
+    @Test
+    // Tests domain test
+    public void testRecognizeTivo() {
+        System.out.println("recognize");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
+            Map<String, Long> recognizeData = tivo.recognize(irSignal);
+            assertTrue(recognizeData == null);
+        } catch (InvalidArgumentException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

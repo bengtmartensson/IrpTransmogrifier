@@ -126,9 +126,17 @@ public class ParameterSpec extends IrpObject {
         long value = nameEngine.get(name.getName()).toNumber(nameEngine);
         if (value == IrCoreUtils.invalid && deflt == null)
             throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
-        if (!isOk(value))
-            throw new DomainViolationException("Parameter " + name + " outside of the allowed domain: "
+        checkDomain(value);
+    }
+
+    public void checkDomain(long value) throws DomainViolationException {
+        if (!isWithinDomain(value))
+            throw new DomainViolationException("Parameter " + name + " = " + value + " is outside of the allowed domain: "
                     + domainAsString());
+    }
+
+    public boolean isWithinDomain(long x) {
+        return min.toNumber() <= x && x <= max.toNumber();
     }
 
     @Override
@@ -144,10 +152,6 @@ public class ParameterSpec extends IrpObject {
             def.appendChild(deflt.toElement(document));
         }
         return el;
-    }
-
-    public boolean isOk(long x) {
-        return min.toNumber() <= x && x <= max.toNumber();
     }
 
     public String domainAsString() {

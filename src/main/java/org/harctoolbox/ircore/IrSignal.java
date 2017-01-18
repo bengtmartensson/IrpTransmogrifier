@@ -43,12 +43,18 @@ import java.util.logging.Logger;
 public class IrSignal implements Cloneable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
 
-    public static IrSignal parse(List<String> args, double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+    public static IrSignal parse(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+        IrSignal irSignal = null;
         try {
-            return Pronto.parse(args);
+            irSignal = Pronto.parse(args);
         } catch (InvalidArgumentException ex) {
         }
-        return parseRaw(args, frequency, fixOddSequences);
+        if (irSignal != null) {
+            if (frequency != null)
+                throw new InvalidArgumentException("Must not use explicit frequency with a Pronto type signal.");
+            return irSignal;
+        }
+        return parseRaw(args, frequency != null ? frequency : ModulatedIrSequence.defaultFrequency, fixOddSequences);
     }
 
     public static IrSignal parseRaw(List<String> args, double frequency, boolean fixOddSequences) throws InvalidArgumentException {

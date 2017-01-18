@@ -40,8 +40,8 @@ See [this issue](https://github.com/bengtmartensson/IrpTransmogrifier/issues/7).
 
 _Ambition level: should grok almost all of the existing protocols in IrpProtocols, but not necessarily be "complete".
 Status: Three protocols declared un-doable (zenith (bitfield width as parameter), entone, fujitsu_aircon (would require non-trivial equation solving)).
-All other protocols recognizable. Most protocol sort-of works, but as a-priori given protocol, not like DecodeIR.
-Remains: top-level algorithm for deciding what protocols to try, parameter tuning, testing, test framework_
+All other protocols recognizable. 
+Remains: Speeding up by using different techniques, parameter tuning, testing, test framework_
 
 ### Code generation for rendering and/or decoding
 For a particular protocol, generate target code (C, C++, Java, Python,...) that can render or decode signals
@@ -84,6 +84,8 @@ per default called `IrpProtocols.xml`. The XML format
 is defined by the schema [irp-protocols](http://www.harctoolbox.org/schemas/irp-protocols.xsd), and has the name space 
 `http://www.harctoolbox.org/irp-protocols`. This format has many advantages in 
 comparison with the previous, more primitive, format, for example, it can contain embedded XHTLM fragments.
+It also can contain different parameters that can be used by different programs, for example, tolerance parameters
+for decoding.
 
 The program is capable of reading and translating the old format.
 
@@ -94,55 +96,60 @@ Using from the command line, this is a command with subcommands
       Options:
 	-a, --absolutetolerance
 	   Absolute tolerance in microseconds
-	   Default: 50
 	-c, --configfile
 	   Pathname of IRP database file in XML format
 	-e, --encoding
 	   Encoding used for generating output
 	   Default: UTF-8
 	-f, --frequencytolerance
-	   Absolute tolerance in microseconds
-	   Default: 1000.0
+	   Frequency tolerance in Hz. Negative disables frequency check
 	-h, --help, -?
-	   Display help message
+	   Display help message (deprecated; use command help instead)
 	   Default: false
 	-i, --ini, --inifile
 	   Pathname of IRP database file in ini format
+	--logclasses
+	   List of (fully qualified) classes and their log levels.
+	   Default: <empty string>
+	-L, --logfile
+	   Log file. If empty, log to stderr.
+	-F, --logformat
+	   Log format, see class SimpleFormatter.
+	   Default: %4$s(%2$s): %5$s%n
 	-l, --loglevel
 	   Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING
 	   }
 	   Default: INFO
 	-o, --output
 	   Name of output file (default stdout)
-	--regex, --regexp
-	   Interpret protocol arguments as regular expressions
+	--regexp
+	   Interpret protocol/decoder argument as regular expressions
 	   Default: false
 	-r, --relativetolerance
 	   Relative tolerance as a number < 1 (NOT: percent)
-	   Default: 0.04
 	--seed
 	   Set seed for pseudo random number generation (default: random)
 	-s, --sort
 	   Sort the protocols alphabetically
 	   Default: false
 	-v, --version
-	   Report version
+	   Report version (deprecated; use command version instead)
 	   Default: false
-	--xmlFile
-	   Generate XML and write to file argument
+	-x, --xmllog
+	   Log in XML format.
+	   Default: false
       Commands:
 	analyze      Analyze signal
 	  Usage: analyze [options] durations in microseconds, or pronto hex
 	    Options:
-	      -c, --clean
-		 Invoke the cleaner
-		 Default: false
+	      --decoder
+		 Use only the decoders matching argument (regular expression).
+		 Mainly for debugging.
 	      -e, --extent
 		 Output last gap as extent
 		 Default: false
 	      -f, --frequency
 		 Modulation frequency
-		 Default: 38000.0
 	      -i, --invert
 		 Invert order in bitspec
 		 Default: false
@@ -168,7 +175,7 @@ Using from the command line, this is a command with subcommands
 		 Invoke the repeatfinder
 		 Default: false
 	      -s, --statistics
-		 Print some statistics on the analyzed signal
+		 Print some statistics
 		 Default: false
 	      -t, --timebase
 		 Force timebase, in microseconds, or in periods (with ending "p")
@@ -185,24 +192,34 @@ Using from the command line, this is a command with subcommands
 	      -n, --nameengine
 		 Name Engine to use
 		 Default: {}
+	      --xml
+		 Generate XML and write to file argument
 
 	code      Generate code
-	  Usage: code [options] Protocol
+	  Usage: code [options] protocol
 	    Options:
 	      -d, --directory
 		 Directory to generate output files, if not using the --output
 		 option.
 	      --inspect
-		 Fire up strintemplate inspector on generated code
-		 Default: false
-	      -i, --intermediates
-		 Dump intermediate results to files (unless using --stringtemplate)
-		 Default: false
-	      -s, --st, --stringtemplate
-		 Use stringtemplate
+		 Fire up stringtemplate inspector on generated code (if sensible)
 		 Default: false
 	    * -t, --target
 		 Target for code generation
+
+	decode      Decode given IR signal
+	  Usage: decode [options] durations in micro seconds, or pronto hex
+	    Options:
+	      -f, --frequency
+		 Modulation frequency
+	      -k, --keep-defaulted
+		 Keep parameters equal to their defaults
+		 Default: false
+	      -a, --all, --no-prefer-over
+		 Output all decodes; ignore prefer-over
+		 Default: false
+	      -p, --protocol
+		 Comma separated list of protocols to try decode (default all)
 
 	expression      Evaluate expression
 	  Usage: expression [options] expression
@@ -216,6 +233,8 @@ Using from the command line, this is a command with subcommands
 	      --stringtree
 		 Produce stringtree
 		 Default: false
+	      --xml
+		 Generate XML and write to file argument
 
 	help      Report usage
 	  Usage: help [options]
@@ -238,33 +257,11 @@ Using from the command line, this is a command with subcommands
 	      --is
 		 test toIrpString
 		 Default: false
-	      -p, --parse
-		 Test parse the protocol(s)
-		 Default: false
 	      --stringtree
 		 Produce stringtree
 		 Default: false
 	      -w, --weight
 		 Compute weight
-		 Default: false
-
-	recognize      Recognize signal
-	  Usage: recognize [options] durations in micro seconds, or pronto hex
-	    Options:
-	      -f, --frequency
-		 Modulation frequency (ignored for pronto hex signals)
-		 Default: 38000.0
-	      -k, --keep-defaulted
-		 Normally parameters equal to their default are removed; this option
-		 keeps them
-		 Default: false
-	      -n, --nameengine
-		 Name Engine to generate test signal
-		 Default: {}
-	      -p, --protocol
-		 Protocol to decode against (default all)
-	      -r, --random
-		 Generate a random parameter signal to test
 		 Default: false
 
 	render      Render signal
@@ -279,7 +276,7 @@ Using from the command line, this is a command with subcommands
 		 Generate Pronto hex
 		 Default: false
 	      --random
-		 Generate random paraneters
+		 Generate random, but valid, parameters
 		 Default: false
 	      -r, --raw
 		 Generate raw form

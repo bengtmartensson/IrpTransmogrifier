@@ -135,7 +135,10 @@ public class Assignment extends IrStreamItem implements Numerical {
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
         if (recognizeData.getState() == pass)
-            recognizeData.getParameterCollector().overwrite(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+            //recognizeData.getParameterCollector().overwrite(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+            //recognizeData.toNameEngine().define(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+            //recognizeData.putVariable(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+            recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
 
         return true;
     }

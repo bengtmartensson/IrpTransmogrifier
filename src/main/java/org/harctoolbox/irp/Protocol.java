@@ -19,7 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -369,54 +369,49 @@ public class Protocol extends IrpObject {
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance) {
         IrpUtils.entering(logger, Level.FINE, "recognize", this);
-        Map<String, Long> names = new HashMap<>(8);
+        Map<String, Long> result;
+        try {
+            ParameterCollector names = new ParameterCollector();
 
-        boolean success = (frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
-        if (success)
-            success = process(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance);
-        if (success)
-            success = process(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance);
-        if (success)
-            success = process(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance);
-        if (!success) {
-            IrpUtils.exiting(logger, "recognize", "fail");
-            return null;
+            boolean success = (frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
+            if (success)
+                success = process(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance);
+            if (success)
+                success = process(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance);
+            if (success)
+                success = process(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance);
+            if (!success) {
+                IrpUtils.exiting(logger, "recognize", "fail");
+                return null;
+            }
+            result = names.collectedNames();
+            parameterSpecs.reduceNamesMap(result, keepDefaulted);
+        } catch (UnassignedException | NameConflictException | DomainViolationException | IrpSyntaxException | IrpSemanticException ex) {
+            logger.log(Level.FINE, ex.getMessage());
+            result = null;
         }
 
-        parameterSpecs.reduceNamesMap(names, keepDefaulted);
-
-        IrpUtils.entering(logger, Level.FINE, "recognize", names);
-        return names;
+        IrpUtils.entering(logger, Level.FINE, "recognize", result != null ? result : "");
+        return result;
     }
 
-    private boolean process(Map<String, Long> names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) {
+    private boolean process(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) throws DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
         RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names, absoluteTolerance, relativeTolerance);
         boolean status = recognize(recognizeData, pass);
         if (!status)
             return false;
 
-        try {
-            recognizeData.transferToNamesMap(names);
-            recognizeData.checkConsistency(names);
-            checkDomain(names);
-        } catch (NameConflictException ex) {
-            return false;
-        } catch (UnassignedException | DomainViolationException ex) {
-            logger.log(Level.FINE, null, ex);
-            return false;
-        }
+        recognizeData.checkConsistency();
+        checkDomain(names);
         return recognizeData.isSuccess();
     }
 
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass) {
+    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass) throws NameConflictException, InvalidNameException, IrpSemanticException {
         IrpUtils.entering(logger, "recognize " + pass, this);
-        boolean success = false;
-        try {
-            success = bitspecIrstream.recognize(recognizeData, pass, new ArrayList<>(0));
-            success = success && recognizeData.isFinished();
-        } catch (NameConflictException | InvalidNameException | IrpSemanticException | ArithmeticException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-        }
+        boolean success = bitspecIrstream.recognize(recognizeData, pass, new ArrayList<>(0))
+                    && recognizeData.isSuccess()
+                    && recognizeData.isFinished();
+
         IrpUtils.exiting(logger, "recognize " + pass, success ? "pass" : "fail");
         return success;
     }
@@ -464,11 +459,11 @@ public class Protocol extends IrpObject {
         return str.toString();
     }
 
-    private void checkDomain(Map<String, Long> names) throws DomainViolationException {
-        for (Map.Entry<String, Long> kvp : names.entrySet()) {
-            ParameterSpec parameterSpec = parameterSpecs.getParameterSpec(kvp.getKey());
+    private void checkDomain(ParameterCollector names) throws DomainViolationException {
+        for (String kvp : names.getNames()) {
+            ParameterSpec parameterSpec = parameterSpecs.getParameterSpec(kvp);
             if (parameterSpec != null)
-                parameterSpec.checkDomain(kvp.getValue());
+                parameterSpec.checkDomain(names.getValue(kvp));
         }
     }
 }

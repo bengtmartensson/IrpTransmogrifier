@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,13 +69,26 @@ public class ParameterCollector implements Cloneable {
         add(name, new BitwiseParameter(value, bitmask));
     }
 
-    void overwrite(String name, BitwiseParameter parameter) {
+    private void overwrite(String name, BitwiseParameter parameter) {
         logger.log(Level.FINER, "Overwriting {0} = {1}", new Object[]{name, parameter});
         map.put(name, parameter);
     }
 
-    public void overwrite(String name, long value) {
-        overwrite(name, new BitwiseParameter(value));
+//    public void overwrite(String name, long value) {
+//        overwrite(name, new BitwiseParameter(value));
+//    }
+
+    void setExpected(String name, long value) {
+        logger.log(Level.FINER, "Set expected {0} = {1}", new Object[]{name, value});
+        BitwiseParameter oldParameter = map.get(name);
+        if (oldParameter != null)
+            oldParameter.setExpected(value);
+        else
+            map.put(name, new BitwiseParameter(0L, 0L, value));
+    }
+
+    public Set<String> getNames() {
+        return map.keySet();
     }
 
     BitwiseParameter get(String name) {
@@ -85,15 +99,24 @@ public class ParameterCollector implements Cloneable {
         return map.containsKey(name) ? map.get(name).getValue() : INVALID;
     }
 
-    NameEngine toNameEngine() throws InvalidNameException {
+    public NameEngine toNameEngine() throws InvalidNameException {
         NameEngine nameEngine = new NameEngine();
         for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
-            String name = kvp.getKey();
             BitwiseParameter parameter = kvp.getValue();
             if (!parameter.isEmpty())
-                nameEngine.define(name, parameter.getValue());
+                nameEngine.define(kvp.getKey(), parameter.getValuePreferExpected());
         }
         return nameEngine;
+    }
+
+    public Map<String, Long> collectedNames() throws InvalidNameException {
+        Map<String, Long> names = new HashMap<>(map.size());
+        map.entrySet().forEach((kvp) -> {
+            BitwiseParameter parameter = kvp.getValue();
+            if (!parameter.isEmpty())
+                names.put(kvp.getKey(), parameter.getValue());
+        });
+        return names;
     }
 
     void transferToNamesMap(Map<String, Long> nameEngine) {

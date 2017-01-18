@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -30,8 +31,17 @@ public class BitwiseParameter implements Cloneable {
     public final static long NOBITS = 0L;
     private final static Logger logger = Logger.getLogger(BitwiseParameter.class.getName());
 
+    private static String toString(long value, long bitmask, Long expected) {
+        return Long.toString(value) + "&" + Long.toBinaryString(bitmask)
+                + (expected != null ? (" (" + expected + ")") : "");
+    }
+
     private static String toString(long value, long bitmask) {
-        return Long.toString(value) + "&" + Long.toBinaryString(bitmask);
+        return toString(value, bitmask, null);
+    }
+
+    private static boolean isConsistent(long x, long y, long bitmask) {
+        return ((x ^ y) & bitmask) == 0L;
     }
 
     private long value;
@@ -41,7 +51,7 @@ public class BitwiseParameter implements Cloneable {
      */
     private long bitmask;
 
-    //private boolean needsChecking;
+    private Long expected;
 
     public BitwiseParameter(long value) {
         this(value, ALLBITS);
@@ -51,10 +61,18 @@ public class BitwiseParameter implements Cloneable {
         this(0L, NOBITS);
     }
 
-    public BitwiseParameter(long value, long bitmask) {
+    public BitwiseParameter(long value, long bitmask, Long expected) {
         this.value = value & bitmask;
         this.bitmask = bitmask;
-        //this.needsChecking = false;
+        this.expected = expected;
+    }
+
+    public BitwiseParameter(long value, long bitmask) {
+        this(value, bitmask, null);
+    }
+
+    public void setExpected(Long expected) {
+        this.expected = expected;
     }
 
     boolean isEmpty() {
@@ -66,18 +84,23 @@ public class BitwiseParameter implements Cloneable {
     }
 
     public boolean isConsistent(BitwiseParameter parameter) {
-        return ((value ^ parameter.value) & bitmask & parameter.bitmask) == 0L;
+        return parameter.expected != null ? isConsistent(parameter.expected)
+                : expected != null ? parameter.isConsistent(this)
+                : isConsistent(value, parameter.value, bitmask & parameter.bitmask);
     }
 
     public boolean isConsistent(long val) {
-        return ((value ^ val) & bitmask) == 0L;
+        return isConsistent(expected != null ? expected : value, val, bitmask);
     }
 
     public void aggregate(BitwiseParameter parameter) {
         parameter.canonicalize();
         logger.log(Level.FINEST, "Changing {0} to {1}", new Object[] { toString(), toString(value | parameter.value, bitmask | parameter.bitmask)});
-        value |= parameter.value;
+        value &= ~parameter.bitmask;
+        value |= parameter.getValue();
         bitmask |= parameter.bitmask;
+        canonicalize();
+        expected = null;
     }
 
     @Override
@@ -88,20 +111,23 @@ public class BitwiseParameter implements Cloneable {
             return false;
         BitwiseParameter other = (BitwiseParameter) obj;
         return bitmask == other.bitmask
+                && ((expected == null && other.expected == null)
+                    || ((expected != null && other.expected != null) && (expected.equals(other.expected))))
                 && ((value ^ other.value) & bitmask) == 0L;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + (int) (this.value ^ (this.value >>> 32));
-        hash = 37 * hash + (int) (this.bitmask ^ (this.bitmask >>> 32));
+        hash = 41 * hash + (int) (this.value ^ (this.value >>> 32));
+        hash = 41 * hash + (int) (this.bitmask ^ (this.bitmask >>> 32));
+        hash = 41 * hash + Objects.hashCode(this.expected);
         return hash;
     }
 
     @Override
     public String toString() {
-        return toString(value, bitmask);
+        return toString(value, bitmask, expected);
     }
 
 
@@ -132,5 +158,11 @@ public class BitwiseParameter implements Cloneable {
     public void assign(long value) {
         this.value = value;
         bitmask = ALLBITS;
+        expected = null;
     }
+
+    public long getValuePreferExpected() {
+        return expected != null ? expected : getValue();
+    }
+
 }

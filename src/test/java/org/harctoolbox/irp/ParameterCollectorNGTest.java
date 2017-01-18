@@ -1,7 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
@@ -136,7 +134,6 @@ public class ParameterCollectorNGTest {
         try {
             instance.add(name, value);
         } catch (NameConflictException ex) {
-            Logger.getLogger(ParameterCollectorNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             instance.add(name, anotherValue);
@@ -145,8 +142,6 @@ public class ParameterCollectorNGTest {
             // should go here
         }
         assertEquals(instance.getValue(name), value);
-        instance.overwrite(name, anotherValue);
-        assertEquals(instance.getValue(name), anotherValue);
     }
 
     /**

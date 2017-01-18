@@ -69,10 +69,10 @@ public class IrpDatabase {
     public static final String documentationName = "documentation";
     public static final String parameterName = "parameter";
     public static final String decodableName = "decodable";
-    public static final String frequencyToleranceName = "frequencyTolerance";
-    public static final String relativeToleranceName = "relativeTolerance";
-    public static final String absoluteToleranceName = "absoluteTolerance";
-    public static final String preferredDecodeName = "preferred-decode";
+    public static final String frequencyToleranceName = "frequency-tolerance";
+    public static final String relativeToleranceName = "relative-tolerance";
+    public static final String absoluteToleranceName = "absolute-tolerance";
+    public static final String preferOverName = "prefer-over";
 
     public static boolean isKnown(String protocolsPath, String protocol) throws IOException, IrpException {
         try {
@@ -526,7 +526,7 @@ public class IrpDatabase {
         NamedProtocol toNamedProtocol() throws IrpSemanticException, InvalidNameException, UnassignedException {
             return new NamedProtocol(getName(), getIrp(), getDocumentation(),
                     getFirstProperty(frequencyToleranceName), getFirstProperty(absoluteToleranceName), getFirstProperty(relativeToleranceName),
-                    getFirstProperty(decodableName), getProperties(preferredDecodeName));
+                    getFirstProperty(decodableName), getProperties(preferOverName));
         }
 
         @Override

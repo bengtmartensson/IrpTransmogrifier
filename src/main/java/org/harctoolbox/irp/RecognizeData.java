@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.Map;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -39,13 +38,13 @@ public class RecognizeData implements Cloneable {
     private final double relativeTolerance;
     private BitwiseParameter danglingBitFieldData;
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, Map<String, Long> nameMap,
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
             double absoulteTolerance, double relativeTolerance) {
-        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, new ParameterCollector(nameMap), interleaving, nameMap, absoulteTolerance, relativeTolerance);
+        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, nameMap, interleaving, absoulteTolerance, relativeTolerance);
     }
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
-            ParameterCollector parameterCollector, boolean interleaving, Map<String, Long> nameMap, double absoluteTolerance, double relativeTolerance) {
+            ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance) {
         success = true;
         danglingBitFieldData = new BitwiseParameter();
         this.generalSpec = generalSpec;
@@ -251,13 +250,8 @@ public class RecognizeData implements Cloneable {
         return ! interleaving;
     }
 
-    void transferToNamesMap(Map<String, Long> nameEngine) {
-        parameterCollector.transferToNamesMap(nameEngine);
-    }
-
-    void checkConsistency(Map<String, Long> nameMap) throws NameConflictException, UnassignedException {
-        NameEngine nameEngine = new NameEngine(nameMap);
-        nameEngine.add(definitions);
+    void checkConsistency() throws NameConflictException, UnassignedException, InvalidNameException {
+        NameEngine nameEngine = this.toNameEngine();
         needsChecking.checkConsistency(nameEngine, definitions);
         needsChecking = new ParameterCollector();
     }

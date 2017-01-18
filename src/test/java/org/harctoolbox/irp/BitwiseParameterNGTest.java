@@ -53,6 +53,9 @@ public class BitwiseParameterNGTest {
         instance.aggregate(parameter);
         assertEquals(instance.getValue(), 0x1234L);
         assertEquals(instance.getBitmask(), 0xFFFFL);
+        instance.aggregate(new BitwiseParameter(0x11200, 0xFFF0F));
+        assertEquals(instance.getValue(), 0x11230L);
+        assertEquals(instance.getBitmask(), 0xFFFFFL);
     }
 
     /**
@@ -87,5 +90,47 @@ public class BitwiseParameterNGTest {
         BitwiseParameter instance = new BitwiseParameter(0x1234,0xF0CF);
         BitwiseParameter result = instance.clone();
         assertEquals(result, instance);
+    }
+
+    /**
+     * Test of isEmpty method, of class BitwiseParameter.
+     */
+    @Test
+    public void testIsEmpty() {
+        System.out.println("isEmpty");
+        BitwiseParameter instance = new BitwiseParameter();
+        assertTrue(instance.isEmpty());
+        instance = new BitwiseParameter(123);
+        assertFalse(instance.isEmpty());
+    }
+
+    /**
+     * Test of isConsistent method, of class BitwiseParameter.
+     */
+    @Test
+    public void testIsConsistent_BitwiseParameter() {
+        System.out.println("isConsistent");
+        BitwiseParameter parameter = null;
+        BitwiseParameter instance = new BitwiseParameter(3, 3);
+        assertTrue(instance.isConsistent(new BitwiseParameter(1023)));
+        assertFalse(instance.isConsistent(new BitwiseParameter(1024)));
+        instance.setExpected(0L);
+        assertFalse(instance.isConsistent(new BitwiseParameter(1023)));
+        assertFalse(instance.isConsistent(new BitwiseParameter(1024)));
+        assertTrue(instance.isConsistent(new BitwiseParameter(0L)));
+    }
+
+    /**
+     * Test of isConsistent method, of class BitwiseParameter.
+     */
+    @Test
+    public void testIsConsistent_long() {
+        System.out.println("isConsistent");
+        BitwiseParameter instance = new BitwiseParameter(3, 3);
+        assertTrue(instance.isConsistent(1023));
+        assertFalse(instance.isConsistent(1024));
+        instance.setExpected(0L);
+        assertFalse(instance.isConsistent(1023));
+        assertTrue(instance.isConsistent(1024));
     }
 }

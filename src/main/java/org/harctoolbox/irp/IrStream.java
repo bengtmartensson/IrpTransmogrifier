@@ -112,7 +112,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     @Override
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
         return hasVariation(false) ? pass
-                : (pass == IrSignal.Pass.repeat && isInfiniteRepeat()) ? IrSignal.Pass.repeat
+                : (pass == IrSignal.Pass.repeat || pass == IrSignal.Pass.ending) && isInfiniteRepeat() ? IrSignal.Pass.repeat
                 : null;
     }
 

@@ -255,8 +255,6 @@ public class BareIrStream extends IrStreamItem {
             IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
             if (newState != null)
                 recognizeData.setState(newState);
-            if (recognizeData.getState() != pass)
-                continue;
 
             if (recognizeData.getState() == pass) {
                 boolean success = false;

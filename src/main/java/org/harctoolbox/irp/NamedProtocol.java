@@ -51,12 +51,12 @@ public class NamedProtocol extends Protocol {
     private final double absoluteTolerance;
     private final double relativeTolerance;
     private final double frequencyTolerance;
-    private final boolean recognizable;
-    private final List<String> preferredDecode;
+    private final boolean decodable;
+    private final List<String> preferOver;
 
     public NamedProtocol(String name, String irp, String documentation, String frequencyTolerance,
-            String absoluteTolerance, String relativeTolerance, String recognizable,
-            List<String> preferredDecode)
+            String absoluteTolerance, String relativeTolerance, String decodable,
+            List<String> preferOver)
             throws IrpSemanticException, InvalidNameException, UnassignedException {
         super(irp);
         this.irp = irp;
@@ -65,8 +65,8 @@ public class NamedProtocol extends Protocol {
         this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : IrCoreUtils.invalid;
         this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : IrCoreUtils.invalid;
         this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : IrCoreUtils.invalid;
-        this.recognizable = recognizable == null || Boolean.parseBoolean(recognizable);
-        this.preferredDecode = preferredDecode;
+        this.decodable = decodable == null || Boolean.parseBoolean(decodable);
+        this.preferOver = preferOver;
     }
 
     public NamedProtocol(String name, String irp, String documentation) throws IrpSemanticException, InvalidNameException, UnassignedException {
@@ -79,16 +79,16 @@ public class NamedProtocol extends Protocol {
 //                map.get(IrpDatabase.decodableName));
 //    }
 
-    @Override
+    //@Override
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
-            double fallbackFrequencyTolerance, double fallbackAbsoluteTolerance, double fallbackRelativeTolerance) {
-        if (!isRecognizeable()) {
-            logger.log(Level.FINE, "Protocol {0} is not recogizeable, skipped", getName());
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) {
+        if (!isDecodeable()) {
+            logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             return null;
         }
         return super.recognize(irSignal, keepDefaulted,
-                getFrequencyTolerance(fallbackFrequencyTolerance),
-                getAbsoluteTolerance(fallbackAbsoluteTolerance), getRelativeTolerance(fallbackRelativeTolerance));
+                getFrequencyTolerance(userFrequencyTolerance),
+                getAbsoluteTolerance(userAbsoluteTolerance), getRelativeTolerance(userRelativeTolerance));
 
     }
 
@@ -140,28 +140,30 @@ public class NamedProtocol extends Protocol {
         return irp;
     }
 
-    public boolean isRecognizeable() {
-        return recognizable;
+    public boolean isDecodeable() {
+        return decodable;
     }
 
-    private double getDoubleWithSubstitute(double value, double fallback) {
-        return value >= 0 ? value : fallback;
+    private double getDoubleWithSubstitute(Double userValue, double standardValue, double fallback) {
+        return userValue != null ? userValue
+                : standardValue >= 0 ? standardValue
+                : fallback;
     }
 
-    public double getRelativeTolerance(double fallback) throws NumberFormatException {
-        return getDoubleWithSubstitute(relativeTolerance, fallback);
+    public double getRelativeTolerance(Double userValue) throws NumberFormatException {
+        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public double getAbsoluteTolerance(double fallback) throws NumberFormatException {
-        return getDoubleWithSubstitute(absoluteTolerance, fallback);
+    public double getAbsoluteTolerance(Double userValue) throws NumberFormatException {
+        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.defaultAbsoluteTolerance);
     }
 
-    public double getFrequencyTolerance(double fallback) throws NumberFormatException {
-        return getDoubleWithSubstitute(frequencyTolerance, fallback);
+    public double getFrequencyTolerance(Double userValue) throws NumberFormatException {
+        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.defaultFrequencyTolerance);
     }
 
-    public List<String> getPreferredDecode() {
-        return preferredDecode;
+    List<String> getPreferOver() {
+        return preferOver;
     }
 
     @Override

@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.xml.sax.SAXException;
 
@@ -37,34 +39,54 @@ public class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
 
     public static void main(String[] args) {
+        ParameterSpec.initRandom(1);
+        IrpDatabase irp = null;
+        Decoder decoder = null;
+        Collection<String> protocolNames = null;
         try {
-            IrpDatabase irp = new IrpDatabase("src/main/config/IrpProtocols.xml");
+            irp = new IrpDatabase("src/main/config/IrpProtocols.xml");
             irp.expand();
-            Decoder decoder = new Decoder(irp);
-            decoder.decodePrint("0000 0073 0000 000D 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0CC8");
-            decoder.decodePrint("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
-            decoder.decodePrint("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
-            decoder.decodePrint("0000 0068 0000 0015 0060 0018 0018 0018 0018 0018 0018 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0240");
-            decoder.decodePrint("0000 0068 0044 0022 0169 00B4 0017 0017 0017 0044 0017 0044 0017 0044 0017 0017 0017 0017 0017 0044 0017 0017 0017 0044 0017 0017 0017 0017 0017 0017 0017 0044 0017 0044 0017 0017 0017 0044 0017 0017 0017 0017 0017 0017 0017 0044 0017 0044 0017 0044 0017 0017 0017 0017 0017 0044 0017 0044 0017 0044 0017 0017 0017 0017 0017 0017 0017 0044 0017 0044 0017 0636 0169 00B4 0017 0017 0017 0017 0017 0044 0017 0044 0017 0017 0017 0017 0017 0017 0017 0017 0017 0044 0017 0044 0017 0017 0017 0017 0017 0044 0017 0044 0017 0044 0017 0044 0017 0017 0017 0044 0017 0017 0017 0017 0017 0017 0017 0044 0017 0017 0017 0017 0017 0044 0017 0017 0017 0044 0017 0044 0017 0044 0017 0017 0017 0044 0017 0044 0017 0636 0169 00B4 0017 0017 0017 0017 0017 0044 0017 0044 0017 0017 0017 0017 0017 0017 0017 0017 0017 0044 0017 0044 0017 0017 0017 0017 0017 0044 0017 0044 0017 0044 0017 0044 0017 0017 0017 0044 0017 0017 0017 0017 0017 0017 0017 0044 0017 0017 0017 0017 0017 0044 0017 0017 0017 0044 0017 0044 0017 0044 0017 0017 0017 0044 0017 0044 0017 0636");
-        } catch (InvalidArgumentException | IOException | SAXException | IrpSyntaxException ex) {
+            protocolNames = (args.length == 0) ? irp.getNames() : Arrays.asList(args);
+            decoder = new Decoder(irp, args.length == 0 ? null : protocolNames);
+        } catch (IOException | SAXException | IrpSyntaxException ex) {
             Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
+        for (String protocolName : protocolNames) {
+            NamedProtocol protocol;
+            IrSignal irSignal = null;
+            try {
+                protocol = irp.getNamedProtocol(protocolName);
+                if (!protocol.isDecodeable())
+                    continue;
+                NameEngine nameEngine = new NameEngine(protocol.randomParameters());
+                if (args.length > 0)
+                    System.out.println(nameEngine);
+                irSignal = protocol.toIrSignal(nameEngine);
+            } catch (UnknownProtocolException | IrpSemanticException | InvalidNameException | UnassignedException | DomainViolationException | OddSequenceLenghtException ex) {
+                Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
+                System.exit(2);
+            }
+            decoder.decodePrint(irSignal);
         }
     }
 
-    private final IrpDatabase irpDatabase;
     private final boolean keepDefaultedParameters;
-    private final double frequencyTolerance;
-    private final double absoluteTolerance;
-    private final double relativeTolerance;
+    private final Double frequencyTolerance;
+    private final Double absoluteTolerance;
+    private final Double relativeTolerance;
     private final Map<String, NamedProtocol> parsedProtocols;
 
     public Decoder(IrpDatabase irpDatabase) {
         this(irpDatabase, null, true, IrCoreUtils.defaultFrequencyTolerance, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public Decoder(IrpDatabase irpDatabase, List<String> names, boolean keepDefaultedParameters,
-            double frequencyTolerance, double absoluteTolerance, double relativeTolerance) {
-        this.irpDatabase = irpDatabase;
+    public Decoder(IrpDatabase irpDatabase, Collection<String> names) {
+        this(irpDatabase, names, true, null, null, null);
+    }
+
+    public Decoder(IrpDatabase irpDatabase, Collection<String> names, boolean keepDefaultedParameters,
+            Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance) {
         this.keepDefaultedParameters = keepDefaultedParameters;
         this.frequencyTolerance = frequencyTolerance;
         this.absoluteTolerance = absoluteTolerance;
@@ -85,25 +107,28 @@ public class Decoder {
     public Map<String, Decode> decode(IrSignal irSignal, boolean noPreferredDecodes) {
         Map<String, Decode> output = new HashMap<>(4);
         //Analyzer analyzer = new Analyzer(irSignal, true /* repeatFinder*/, absoluteTolerance, relativeTolerance);
-        parsedProtocols.values().parallelStream().forEach((namedProtocol) -> {
+        for (NamedProtocol namedProtocol :  parsedProtocols.values()) {
             Map<String, Long> parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
                     frequencyTolerance, absoluteTolerance, relativeTolerance);
             if (parameters != null)
                 output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
             else
                 logger.log(Level.FINE, "Protocol {0} did not decode", namedProtocol.getName());
-        });
+        }
 
         if (!noPreferredDecodes) {
             List<String> protocols = new ArrayList<>(output.keySet());
             protocols.forEach((name) -> {
-                NamedProtocol prot = output.get(name).getNamedProtocol();
-                if (prot != null) {
-                    List<String> preferreds = prot.getPreferredDecode();
-                    if (preferreds != null)
-                        preferreds.stream().filter((pref) -> (output.containsKey(pref))).forEachOrdered((_item) -> {
-                            output.remove(name);
-                        });
+                Decode decode = output.get(name);
+                if (decode != null) {
+                    NamedProtocol prot = output.get(name).getNamedProtocol();
+                    if (prot != null) {
+                        List<String> preferOvers = prot.getPreferOver();
+                        if (preferOvers != null)
+                            preferOvers.forEach((protName) -> {
+                                output.remove(protName);
+                            });
+                    }
                 }
             });
         }
@@ -113,8 +138,10 @@ public class Decoder {
 
     public void decodePrint(IrSignal irSignal, boolean noPreferredDecodes, PrintStream out) {
         Map<String, Decode> result = decode(irSignal, noPreferredDecodes);
-        result.entrySet().forEach((kvp) -> {
-            out.println(kvp.getKey() + ": " + kvp.getValue().toString());
+        if (result.size() != 1)
+            System.out.println(result.size());
+        result.values().forEach((kvp) -> {
+            out.println(kvp.toString());
         });
     }
 
@@ -125,6 +152,10 @@ public class Decoder {
 
     public void decodePrint(String str) throws InvalidArgumentException {
         decodePrint(str, false);
+    }
+
+    public void decodePrint(IrSignal irSignal) {
+        decodePrint(irSignal, false, System.out);
     }
 
     public static class Decode {

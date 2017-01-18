@@ -47,9 +47,7 @@ import org.harctoolbox.IrpMaster.IrpMasterException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.ircore.InvalidArgumentException;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -264,7 +262,8 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (IrpException | IrpMasterException | InvalidArgumentException | UnsupportedOperationException | ParseCancellationException | SAXException | IOException | UsageException ex) {
+        } catch (IrpException | IrpMasterException | InvalidArgumentException | UnsupportedOperationException
+                | ParseCancellationException | SAXException | IOException | UsageException | NumberFormatException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
@@ -445,7 +444,7 @@ public class IrpTransmogrifier {
         Decoder decoder = new Decoder(irpDatabase, list, commandDecode.keepDefaultedParameters,
                 commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
-        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferredDecodes);
+        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver);
         decodes.entrySet().forEach((kvp) -> {
             out.println(kvp.getKey() + ": " + kvp.getValue().toString());
         });
@@ -543,7 +542,7 @@ public class IrpTransmogrifier {
     private final static class CommandLineArgs {
 
         @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
-        private double absoluteTolerance = IrCoreUtils.defaultAbsoluteTolerance;
+        private Double absoluteTolerance = null;
 
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
         private String configFile = null;
@@ -552,7 +551,7 @@ public class IrpTransmogrifier {
         private String encoding = "UTF-8";
 
         @Parameter(names = {"-f", "--frequencytolerance"}, description = "Frequency tolerance in Hz. Negative disables frequency check")
-        private double frequencyTolerance = IrCoreUtils.defaultFrequencyTolerance;
+        private Double frequencyTolerance = null;
 
         @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message (deprecated; use command help instead)")
         private boolean helpRequested = false;
@@ -577,7 +576,7 @@ public class IrpTransmogrifier {
         private String output = null;
 
         @Parameter(names = {"-r", "--relativetolerance"}, description = "Relative tolerance as a number < 1 (NOT: percent)")
-        private double relativeTolerance = IrCoreUtils.defaultRelativeTolerance;
+        private Double relativeTolerance = null;
 
         @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions")
         private boolean regexp = false;
@@ -602,7 +601,7 @@ public class IrpTransmogrifier {
         private boolean extent = false;
 
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
-        private double frequency = ModulatedIrSequence.defaultFrequency;
+        private Double frequency = null;
 
         @Parameter(names = { "-i", "--invert"}, description = "Invert order in bitspec")
         private boolean invert = false;
@@ -679,11 +678,11 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode given IR signal")
     private static class CommandDecode {
 
-        @Parameter(names = { "-a", "--all", "--no-preferred-decodes"}, description = "Output all decodes; ignore preferred-decode")
-        private boolean noPreferredDecodes = false;
+        @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
+        private boolean noPreferOver = false;
 
         @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
-        private double frequency = IrCoreUtils.invalid;
+        private Double frequency = null;
 
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "Keep parameters equal to their defaults")
         private boolean keepDefaultedParameters = false;

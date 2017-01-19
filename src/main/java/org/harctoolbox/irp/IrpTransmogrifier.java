@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -525,6 +526,20 @@ public class IrpTransmogrifier {
         }
     }
 
+    public static class LessThanOne implements IParameterValidator { // MUST be public
+
+        @Override
+        public void validate(String name, String value) throws ParameterException {
+            try {
+            double d = Double.parseDouble(value);
+            if (d < 0 || d >= 1)
+                throw new ParameterException("Parameter " + name + " must be  be between 0 and 1 (found " + value +")");
+            } catch (NumberFormatException ex) {
+                throw new ParameterException("Parameter " + name + " must be a double (found " + value +")");
+            }
+        }
+    }
+
     public static class NameEngineParser implements IStringConverter<NameEngine> { // MUST be public
 
         @Override
@@ -575,7 +590,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-o", "--output" }, description = "Name of output file (default stdout)")
         private String output = null;
 
-        @Parameter(names = {"-r", "--relativetolerance"}, description = "Relative tolerance as a number < 1 (NOT: percent)")
+        @Parameter(names = {"-r", "--relativetolerance"}, validateWith = LessThanOne.class,
+                description = "Relative tolerance as a number < 1 (NOT: percent)")
         private Double relativeTolerance = null;
 
         @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions")
@@ -677,7 +693,7 @@ public class IrpTransmogrifier {
 
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode given IR signal")
     private static class CommandDecode {
-
+        // TODO: presently no sensible way to input raw sequences/signals
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
         private boolean noPreferOver = false;
 

@@ -128,29 +128,21 @@ public class IrpTransmogrifier {
      * @param args program args
      * @param printStream overrides normal print output
      */
+    @SuppressWarnings("null")
     private static void main(String[] args, PrintStream printStream) {
         CommandLineArgs commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(Version.appName);
         argumentParser.setAllowAbbreviatedOptions(true);
 
-        CommandAnalyze commandAnalyze = new CommandAnalyze();
-        argumentParser.addCommand(commandAnalyze);
-
-        CommandBitField commandBitField = new CommandBitField();
-        argumentParser.addCommand(commandBitField);
-
-        CommandCode commandCode = new CommandCode();
-        argumentParser.addCommand(commandCode);
-
-        CommandDecode commandDecode = new CommandDecode();
-        argumentParser.addCommand(commandDecode);
-
-        CommandExpression commandExpression = new CommandExpression();
-        argumentParser.addCommand(commandExpression);
-
+        // The ordering in the following lines is the order the commands
+        // will be listed in the help. Keep this order in a logical order.
+        // In the rest of the file, these are ordered alphabetically.
         CommandHelp commandHelp = new CommandHelp();
         argumentParser.addCommand(commandHelp);
+
+        CommandVersion commandVersion = new CommandVersion();
+        argumentParser.addCommand(commandVersion);
 
         CommandList commandList = new CommandList();
         argumentParser.addCommand(commandList);
@@ -158,8 +150,20 @@ public class IrpTransmogrifier {
         CommandRender commandRenderer = new CommandRender();
         argumentParser.addCommand(commandRenderer);
 
-        CommandVersion commandVersion = new CommandVersion();
-        argumentParser.addCommand(commandVersion);
+        CommandDecode commandDecode = new CommandDecode();
+        argumentParser.addCommand(commandDecode);
+
+        CommandAnalyze commandAnalyze = new CommandAnalyze();
+        argumentParser.addCommand(commandAnalyze);
+
+        CommandCode commandCode = new CommandCode();
+        argumentParser.addCommand(commandCode);
+
+        CommandBitField commandBitField = new CommandBitField();
+        argumentParser.addCommand(commandBitField);
+
+        CommandExpression commandExpression = new CommandExpression();
+        argumentParser.addCommand(commandExpression);
 
         CommandWriteConfig commandWriteConfig = new CommandWriteConfig();
         argumentParser.addCommand(commandWriteConfig);
@@ -223,8 +227,6 @@ public class IrpTransmogrifier {
 
             if (command == null)
                 usage(IrpUtils.exitUsageError);
-
-            assert (command != null); // for FindBugs
 
             switch (command) {
                 case "analyze":
@@ -416,7 +418,7 @@ public class IrpTransmogrifier {
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
 
         if (commandAnalyze.statistics)
-            analyzer.printStatistics(out); // FIXME
+            analyzer.printStatistics(out);
         Protocol protocol = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
         printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
     }
@@ -539,6 +541,7 @@ public class IrpTransmogrifier {
         }
     }
 
+    // The reaining classes are ordered alphabetically
     private final static class CommandLineArgs {
 
         @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
@@ -595,19 +598,19 @@ public class IrpTransmogrifier {
         private boolean xmlLog = false;
     }
 
-    @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal")
+    @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters")
     private static class CommandAnalyze {
 
         @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
         private boolean extent = false;
 
-        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
+        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency of raw signal")
         private Double frequency = null;
 
         @Parameter(names = { "-i", "--invert"}, description = "Invert order in bitspec")
         private boolean invert = false;
 
-        @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the analyzer")
+        @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the parameters")
         private boolean lsb = false;
 
         @Parameter(names = { "-m", "--maxunits" }, description = "Maximal multiplier of time unit in durations")
@@ -631,7 +634,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"--radix" }, description = "Radix of parameter output")
         private int radix = 16;
 
-        @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics") // FIXME
+        @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics")
         private boolean statistics = false;
 
         @Parameter(names = {"-t", "--timebase"}, description = "Force timebase, in microseconds, or in periods (with ending \"p\")")
@@ -641,7 +644,7 @@ public class IrpTransmogrifier {
         private List<String> args;
     }
 
-    @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield")
+    @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield given as argument")
     private static class CommandBitField {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
@@ -660,7 +663,7 @@ public class IrpTransmogrifier {
         private List<String> bitField;
     }
 
-    @Parameters(commandNames = {"code"}, commandDescription = "Generate code")
+    @Parameters(commandNames = {"code"}, commandDescription = "Generate code for the target given")
     private static class CommandCode {
 
         @Parameter(names = { "-d", "--directory" }, description = "Directory to generate output files, if not using the --output option.")
@@ -676,7 +679,7 @@ public class IrpTransmogrifier {
         private List<String> protocols;
     }
 
-    @Parameters(commandNames = {"decode"}, commandDescription = "Decode given IR signal")
+    @Parameters(commandNames = {"decode"}, commandDescription = "Decode IR signal given as argument")
     private static class CommandDecode {
         // TODO: presently no sensible way to input raw sequences/signals, issue #14
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
@@ -688,14 +691,14 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "Keep parameters equal to their defaults")
         private boolean keepDefaultedParameters = false;
 
-        @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try decode (default all)")
+        @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all)")
         private String protocol = null;
 
         @Parameter(description = "durations in micro seconds, or pronto hex", required = true)
-        private List<String> args = new ArrayList<>(64);
+        private List<String> args;
     }
 
-    @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression")
+    @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression given as argument")
     private static class CommandExpression {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
@@ -714,11 +717,12 @@ public class IrpTransmogrifier {
         private List<String> expressions;
     }
 
-    @Parameters(commandNames = {"help"}, commandDescription = "Report usage")
+    @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands")
+    @SuppressWarnings("ClassMayBeInterface")
     private static class CommandHelp {
     }
 
-    @Parameters(commandNames = {"list"}, commandDescription = "List the protocols known")
+    @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")
     private static class CommandList {
 
         @Parameter(names = { "-c", "--classify"}, description = "Classify the protocols")
@@ -769,10 +773,12 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"version"}, commandDescription = "Report version")
+    @SuppressWarnings("ClassMayBeInterface")
     private static class CommandVersion {
     }
 
-    @Parameters(commandNames = {"writeconfig"}, commandDescription = "Write a new config file in XML format, using the --inifile argument")
+    @Parameters(commandNames = {"writeconfig"}, commandDescription = "Generate a new config file in XML format from the --inifile argument")
+    @SuppressWarnings("ClassMayBeInterface")
     private static class CommandWriteConfig {
     }
 

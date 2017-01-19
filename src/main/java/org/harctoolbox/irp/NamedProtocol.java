@@ -152,6 +152,7 @@ public class NamedProtocol extends Protocol {
         return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.defaultFrequencyTolerance);
     }
 
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     List<String> getPreferOver() {
         return preferOver;
     }

@@ -284,9 +284,9 @@ public class BitSpec extends IrpObject implements AggregateLister {
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
         if (noDurations() > 0)
             element.setAttribute("noDurations", Integer.toString(noDurations()));
-        //element.setAttribute("numberBareDurations", Integer.toString(numberOfBitspecDurations()));
-        for (BareIrStream bitCode : bitCodes)
+        bitCodes.forEach((bitCode) -> {
             element.appendChild(bitCode.toElement(document));
+        });
         return element;
     }
 

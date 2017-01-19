@@ -331,8 +331,9 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     @Override
     public Element toElement(Document document) {
         Element root = document.createElement("Definitions"); // do not use super!
-        for (Map.Entry<String, Expression> definition : map.entrySet())
+        map.entrySet().forEach((definition) -> {
             root.appendChild(mkElement(document, definition));
+        });
         return root;
     }
 
@@ -378,12 +379,14 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     public String code(CodeGenerator codeGenerator) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
         List<String> list = new ArrayList<>(map.size());
-        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+        map.entrySet().stream().map((kvp) -> {
             ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("NameDefinition");
             st.addAttribute("name", kvp.getKey());
             st.addAttribute("expression", kvp.getValue().code(true, codeGenerator));
+            return st;
+        }).forEachOrdered((st) -> {
             list.add(st.render());
-        }
+        });
         template.addAttribute("definitions", list);
         return template.render();
     }
@@ -394,12 +397,14 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         result.put("kind", this.getClass().getSimpleName());
         List<Map<String, Object>> list = new ArrayList<>(map.size());
         result.put("list", list);
-        for (Map.Entry<String, Expression> kvp : map.entrySet()) {
+        map.entrySet().stream().map((kvp) -> {
             Map<String, Object> m = new HashMap<>(2);
             m.put("name", kvp.getKey());
             m.put("expression", kvp.getValue().propertiesMap(true, generalSpec, nameEngine));
+            return m;
+        }).forEachOrdered((m) -> {
             list.add(m);
-        }
+        });
         return result;
     }
 }

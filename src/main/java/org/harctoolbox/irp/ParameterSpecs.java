@@ -120,8 +120,9 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     public Element toElement(Document document) {
         Element el = super.toElement(document);
         //el.appendChild(document.createComment(toString()));
-        for (ParameterSpec parameterSpec : map.values())
+        map.values().forEach((parameterSpec) -> {
             el.appendChild(parameterSpec.toElement(document));
+        });
         return el;
     }
 
@@ -173,18 +174,17 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     private void remoteDefaulteds(Map<String, Long> namesMap) {
         NameEngine nameEngine = new NameEngine(namesMap);
         List<String> names = new ArrayList<>(namesMap.keySet());
-        for (String name : names) {
+        names.forEach((name) -> {
             Expression expression = map.get(name).getDefault();
-            if (expression == null)
-                continue;
-            try {
-                long deflt = expression.toNumber(nameEngine);
-                if (namesMap.get(name) == deflt)
-                    namesMap.remove(name);
-            } catch (UnassignedException ex) {
-                throw new ThisCannotHappenException();
-            }
-        }
+            if (!(expression == null))
+                try {
+                    long deflt = expression.toNumber(nameEngine);
+                    if (namesMap.get(name) == deflt)
+                        namesMap.remove(name);
+                } catch (UnassignedException ex) {
+                    throw new ThisCannotHappenException();
+                }
+        });
     }
 
     private void removeNotInParameterSpec(Map<String, Long> namesMap) {

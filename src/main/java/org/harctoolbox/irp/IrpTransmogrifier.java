@@ -580,7 +580,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-L", "--logfile"}, description = "Log file. If empty, log to stderr.")
         private String logfile = null;
 
-        @Parameter(names = {"-F", "--logformat"}, description = "Log format, see class SimpleFormatter.")
+        @Parameter(names = {"-F", "--logformat"}, description = "Log format, as in class java.util.logging.SimpleFormatter.")
         private String logformat = "%4$s(%2$s): %5$s%n";
 
         @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
@@ -591,7 +591,7 @@ public class IrpTransmogrifier {
         private String output = null;
 
         @Parameter(names = {"-r", "--relativetolerance"}, validateWith = LessThanOne.class,
-                description = "Relative tolerance as a number < 1 (NOT: percent)")
+                description = "Relative tolerance as a number < 1")
         private Double relativeTolerance = null;
 
         @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions")

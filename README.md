@@ -76,7 +76,7 @@ This corresponds to the Analyzer and the RepeatFinder in
 ([Java translation](https://sourceforge.net/p/controlremote/code/HEAD/tree/trunk/exchangeir/)).
 
 _Status: (`org.harctoolbox.analyze.`)`Repeatfinder` and `Cleaner` completed (essentially adapted from recent
-IrpMaster). Decoders: BiphaseDecoder, Pwm4Decoder, Pwm4Decoder, TrivialDecoder written, remains Pwm16 (XMP). Remains: testing and tuning._ 
+IrpMaster). Decoders: BiphaseDecoder, Pwm4Decoder, Pwm4Decoder, TrivialDecoder, XmpDecoder. Remains: testing and tuning._ 
 
 ## Protocol Data Base
 The "ini"-file `IrpProtocols.ini` of IrpMaster (and thus IrScrutinizer) has been replaced by an XML file,

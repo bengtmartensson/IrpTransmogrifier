@@ -52,10 +52,9 @@ public class BareIrStream extends IrStreamItem {
 
     private static List<IrStreamItem> parse(List<IrpParser.Irstream_itemContext> list) {
         List<IrStreamItem> irStreamItems = new ArrayList<>(list.size());
-        for (IrpParser.Irstream_itemContext item : list) {
-            IrStreamItem irStreamItem = newIrStreamItem(item);
+        list.stream().map((item) -> newIrStreamItem(item)).forEachOrdered((irStreamItem) -> {
             irStreamItems.add(irStreamItem);
-        }
+        });
         return irStreamItems;
     }
 
@@ -215,8 +214,9 @@ public class BareIrStream extends IrStreamItem {
         } catch (UnassignedException ex) {
             // numberOfBits has no meaninful value
         }
-        for (IrStreamItem item : this.irStreamItems)
+        this.irStreamItems.forEach((item) -> {
             element.appendChild(item.toElement(document));
+        });
         return element;
     }
 

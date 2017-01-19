@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.xml.sax.SAXException;
 
@@ -40,33 +39,29 @@ public class Decoder {
 
     public static void main(String[] args) {
         ParameterSpec.initRandom(1);
-        IrpDatabase irp = null;
-        Decoder decoder = null;
-        Collection<String> protocolNames = null;
         try {
-            irp = new IrpDatabase("src/main/config/IrpProtocols.xml");
-            irp.expand();
-            protocolNames = (args.length == 0) ? irp.getNames() : Arrays.asList(args);
-            decoder = new Decoder(irp, args.length == 0 ? null : protocolNames);
-        } catch (IOException | SAXException | IrpSyntaxException ex) {
+            decode(Arrays.asList(args), "src/main/config/IrpProtocols.xml");
+        } catch (IOException | SAXException | IrpException ex) {
             Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
+    }
+
+    public static void decode(List<String> protocols, String irpDatabasePath) throws IOException, SAXException, IrpException {
+        IrpDatabase irp = new IrpDatabase(irpDatabasePath);
+        irp.expand();
+        Collection<String> protocolNames = protocols.isEmpty() ? irp.getNames() : protocols;
+        Decoder decoder = new Decoder(irp, protocolNames);
+
         for (String protocolName : protocolNames) {
-            NamedProtocol protocol;
-            IrSignal irSignal = null;
-            try {
-                protocol = irp.getNamedProtocol(protocolName);
-                if (!protocol.isDecodeable())
-                    continue;
-                NameEngine nameEngine = new NameEngine(protocol.randomParameters());
-                if (args.length > 0)
-                    System.out.println(nameEngine);
-                irSignal = protocol.toIrSignal(nameEngine);
-            } catch (UnknownProtocolException | IrpSemanticException | InvalidNameException | UnassignedException | DomainViolationException | OddSequenceLenghtException ex) {
-                Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
-                System.exit(2);
-            }
+            NamedProtocol protocol = irp.getNamedProtocol(protocolName);
+            if (!protocol.isDecodeable())
+                continue;
+            NameEngine nameEngine = new NameEngine(protocol.randomParameters());
+            if (!protocols.isEmpty())
+                System.out.println(nameEngine);
+            IrSignal irSignal = protocol.toIrSignal(nameEngine);
+
             decoder.decodePrint(irSignal);
         }
     }
@@ -107,14 +102,14 @@ public class Decoder {
     public Map<String, Decode> decode(IrSignal irSignal, boolean noPreferredDecodes) {
         Map<String, Decode> output = new HashMap<>(4);
         //Analyzer analyzer = new Analyzer(irSignal, true /* repeatFinder*/, absoluteTolerance, relativeTolerance);
-        for (NamedProtocol namedProtocol :  parsedProtocols.values()) {
+        parsedProtocols.values().forEach((namedProtocol) -> {
             Map<String, Long> parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
                     frequencyTolerance, absoluteTolerance, relativeTolerance);
             if (parameters != null)
                 output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
             else
                 logger.log(Level.FINE, "Protocol {0} did not decode", namedProtocol.getName());
-        }
+        });
 
         if (!noPreferredDecodes) {
             List<String> protocols = new ArrayList<>(output.keySet());
@@ -134,6 +129,10 @@ public class Decoder {
         }
 
         return output;
+    }
+
+    public Map<String, Decode> decode(IrSignal irSignal) {
+        return decode(irSignal, false);
     }
 
     public void decodePrint(IrSignal irSignal, boolean noPreferredDecodes, PrintStream out) {

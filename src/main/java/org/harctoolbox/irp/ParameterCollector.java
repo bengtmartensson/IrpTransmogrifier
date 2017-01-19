@@ -74,10 +74,6 @@ public class ParameterCollector implements Cloneable {
         map.put(name, parameter);
     }
 
-//    public void overwrite(String name, long value) {
-//        overwrite(name, new BitwiseParameter(value));
-//    }
-
     void setExpected(String name, long value) {
         logger.log(Level.FINER, "Set expected {0} = {1}", new Object[]{name, value});
         BitwiseParameter oldParameter = map.get(name);

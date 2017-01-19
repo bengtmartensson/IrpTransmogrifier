@@ -21,9 +21,6 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class FloatNumber extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
 
@@ -96,9 +93,4 @@ public class FloatNumber extends IrpObject implements Floatable {
         hash = 23 * hash + (int) (Double.doubleToLongBits(this.data) ^ (Double.doubleToLongBits(this.data) >>> 32));
         return hash;
     }
-
-//    @Override
-//    public String code(boolean eval, CodeGenerator codeGenerator) {
-//        return toString();
-//    }
 }

@@ -395,7 +395,6 @@ public class IrpDatabase {
             if (ancestor != null) {
                 String replacement = ancestor.getIrp().lastIndexOf('[') == -1 ? ancestor.getIrp()
                         : ancestor.getIrp().substring(0, ancestor.getIrp().lastIndexOf('['));
-                // Debug.debugConfigfile("Protocol " + name + ": `" + p_name + "' replaced by `" + replacement + "'.");
                 logger.log(Level.FINEST, "Protocol {0}: `{1}'' replaced by `{2}''.", new Object[]{name, p_name, replacement});
                 p.setUniqueProperty(irpName, p.getIrp().replaceAll(p_name, replacement));
                 protocols.put(name, p);

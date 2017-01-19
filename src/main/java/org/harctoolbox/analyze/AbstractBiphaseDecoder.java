@@ -156,7 +156,6 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                         items.add(isFlash ? newFlash(time)
                                 : useExtent ? newExtent(analyzer.getTotalDuration(beg, length-1) + time)
                                         : newGap(time));
-                        //state = BiphaseState.zero; // redundant...
                     }
                     break;
 

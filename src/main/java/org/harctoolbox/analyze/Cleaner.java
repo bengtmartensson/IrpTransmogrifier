@@ -32,9 +32,6 @@ import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
-/**
- *
- */
 public class Cleaner {
     private final static int numberOfTimingsCapacity = 20;
 

@@ -23,10 +23,6 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- *
- */
 public class ParameterSpec extends IrpObject {
     private static final int WEIGHT = 1;
     private static Random random;
@@ -38,32 +34,6 @@ public class ParameterSpec extends IrpObject {
         random = new Random(seed);
     }
 
-    // TODO: move stuff to test file
-    //public static void main(String[] args) {
-        /*        ParameterSpec dev = null;
-        ParameterSpec toggle = null;
-        ParameterSpec func = null;
-        try {
-        dev = new ParameterSpec("d", 0, 255, false, "255-s");
-        toggle = new ParameterSpec("t", 0, 1, true, 0);
-        func = new ParameterSpec("F", 0, 1, false, 0);
-        System.out.println(new ParameterSpec("Fx", 0, 1, false, 0));
-        System.out.println(new ParameterSpec("Fx", 0, 1, false));
-        System.out.println(new ParameterSpec("Fx", 0, 1));
-        System.out.println(new ParameterSpec("D:0..31"));
-        System.out.println(new ParameterSpec("D@:0..31=42"));
-        System.out.println(new ParameterSpec("D:0..31=42*3+33"));
-        System.out.println(dev);
-        System.out.println(toggle);
-        System.out.println(func);
-        System.out.println(dev.isOk(-1));
-        System.out.println(dev.isOk(0));
-        System.out.println(dev.isOk(255));
-        System.out.println(dev.isOk(256));
-        } catch (ParseException ex) {
-        System.out.println(ex.getMessage());
-        }*/
-    //}
     private Name name;
     private Number min;
     private Number max;

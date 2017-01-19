@@ -74,10 +74,6 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         this(4);
     }
 
-//    private NameEngine(HashMap<String, Expression> map) {
-//        this.map = map;
-//    }
-
     public NameEngine(String str) throws InvalidNameException {
         this();
         if (str != null && !str.isEmpty()) {
@@ -166,13 +162,8 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
                 String name = kvp.getKey();
                 long value = kvp.getValue().toNumber(this);
 
-                if (value != other.get(name)) {
-                    //logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
+                if (value != other.get(name))
                     return false;
-                }
-//            } catch (IrpSyntaxException ex) {
-//                Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
-//                return false;
             } catch (UnassignedException ex) {
                 logger.log(Level.SEVERE, null, ex);
                 return false;
@@ -362,9 +353,6 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
                         throw new NameConflictException(name);
                     }
                 } catch (UnassignedException ex) {
-//
-//                } catch (IrpSyntaxException | InvalidArgumentException ex) {
-//                    Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else
                 map.put(name, val);

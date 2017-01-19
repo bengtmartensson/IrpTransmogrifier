@@ -66,21 +66,6 @@
                                 </fileMapper>
                             </fileMappers>
                         </transformationSet>
-                        <!--transformationSet>
-                            <dir>src/main/xdocs</dir>
-                            <outputDir>
-                                ${project.build.directory}/generated-documents
-                            </outputDir>
-                            <includes>
-                                <include>Girr.xml</include>
-                            </includes>
-                            <stylesheet>../tools/xdoc2html.xsl</stylesheet>
-                            <fileMappers>
-                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
-                                    <targetExtension>.html</targetExtension>
-                                </fileMapper>
-                            </fileMappers>
-                        </transformationSet-->
                     </transformationSets>
                     <catalogs>
                         <catalog>../harctoolboxbundle/schemas/catalog.xml</catalog>
@@ -132,9 +117,6 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <!--descriptors>
-                        <descriptor>src/assembly/target.xml</descriptor>
-                    </descriptors-->
                 </configuration>
                 <executions>
                     <execution>
@@ -201,29 +183,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <!--groups>x</groups-->
                     <skipTests>false</skipTests>
                     <argLine>-Djava.library.path=/usr/local/lib64 -Dfile.encoding=${project.build.sourceEncoding}</argLine>
                 </configuration>
             </plugin>
-            <!--plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9.1</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/xml</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin-->
         </plugins>
     </build>
 
@@ -279,11 +242,6 @@
             <version>4.5.3</version>
             <type>jar</type>
         </dependency>
-        <!--dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>stringtemplate</artifactId>
-            <scope>compile</scope>
-        </dependency-->
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>ST4</artifactId>

@@ -22,9 +22,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class Number extends PrimaryItem {
     private final static int WEIGHT = 1;
 
@@ -127,11 +124,6 @@ public class Number extends PrimaryItem {
     public boolean isUnary() {
         return true;
     }
-
-//    @Override
-//    public String code(boolean eval, CodeGenerator codeGenerator) {
-//        return toString();
-//    }
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {

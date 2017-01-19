@@ -266,19 +266,13 @@ public class Expression extends PrimaryItem {
         switch (parseTree.children.size()) {
             case 1:
                 ParseTree child = parseTree.children.get(0);
-
-//                try {
-                    if (child instanceof IrpParser.Primary_itemContext)
-                        element.appendChild(newPrimaryItem((IrpParser.Primary_itemContext) child).toElement(document));
-                    else if (child instanceof IrpParser.BitfieldContext)
-                        element.appendChild(BitField.newBitField((IrpParser.BitfieldContext) child).toElement(document));
-                    else
+                if (child instanceof IrpParser.Primary_itemContext)
+                    element.appendChild(newPrimaryItem((IrpParser.Primary_itemContext) child).toElement(document));
+                else if (child instanceof IrpParser.BitfieldContext)
+                    element.appendChild(BitField.newBitField((IrpParser.BitfieldContext) child).toElement(document));
+                else
                         ;
-//                } catch (IrpSyntaxException ex) {
-//                    throw new ThisCannotHappenException(ex);
-//                }
                 break;
-
             case 2:
                 op = document.createElement("UnaryOperator");
                 op.setAttribute("kind", parseTree.children.get(0).getText());
@@ -318,19 +312,12 @@ public class Expression extends PrimaryItem {
         switch (parseTree.children.size()) {
             case 1:
                 ParseTree child = parseTree.children.get(0);
-
-//                try {
-                    if (child instanceof IrpParser.Primary_itemContext)
-                        return newPrimaryItem((IrpParser.Primary_itemContext) child).toIrpString(radix);
-                    else if (child instanceof IrpParser.BitfieldContext)
-                        return BitField.newBitField((IrpParser.BitfieldContext) child).toIrpString();
-                    else
-                        return null;
-//                } catch (IrpSyntaxException ex) {
-//                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//                break;
-
+                if (child instanceof IrpParser.Primary_itemContext)
+                    return newPrimaryItem((IrpParser.Primary_itemContext) child).toIrpString(radix);
+                else if (child instanceof IrpParser.BitfieldContext)
+                    return BitField.newBitField((IrpParser.BitfieldContext) child).toIrpString();
+                else
+                    return null;
             case 2:
                 return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
 
@@ -349,7 +336,6 @@ public class Expression extends PrimaryItem {
             default:
                 throw new ThisCannotHappenException("Unknown case in Expression.toElement");
         }
-//        return null;
     }
 
     @Override
@@ -359,7 +345,6 @@ public class Expression extends PrimaryItem {
         return weight;
     }
 
-    //@Override
     public String code(boolean eval, CodeGenerator codeGenerator) {
         if (parseTree == null)
             return "";
@@ -367,19 +352,12 @@ public class Expression extends PrimaryItem {
         switch (parseTree.children.size()) {
             case 1:
                 ParseTree child = parseTree.children.get(0);
-
-                //try {
-                    if (child instanceof IrpParser.Primary_itemContext)
-                        return null;//newPrimaryItem((IrpParser.Primary_itemContext) child).code(eval, codeGenerator);
-                    else if (child instanceof IrpParser.BitfieldContext)
-                        return null;//BitField.newBitField((IrpParser.BitfieldContext) child).code(eval, codeGenerator);
-                    else
-                        return "";
-//                } catch (IrpSyntaxException ex) {
-//                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//                break;
-
+                if (child instanceof IrpParser.Primary_itemContext)
+                    return null;
+                else if (child instanceof IrpParser.BitfieldContext)
+                    return null;
+                else
+                    return "";
             case 2: {
 
                 String operator = parseTree.children.get(0).getText();
@@ -392,8 +370,6 @@ public class Expression extends PrimaryItem {
                 String arg = new Expression(parseTree.expression(0)).code(eval, codeGenerator);
                 itemGenerator.addAttribute("arg", arg);
                 return itemGenerator.render();
-
-                //return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
             }
             case 3: {
                 String operator = parseTree.children.get(1).getText();
@@ -423,14 +399,7 @@ public class Expression extends PrimaryItem {
                 itemGenerator.addAttribute("arg1", arg1);
                 itemGenerator.addAttribute("arg2", arg2);
                 return itemGenerator.render();
-
-                //return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
             }
-//                return "("
-//                        + new Expression(parseTree.expression(0)).toIrpString(radix)
-//                        + parseTree.children.get(1).getText()
-//                        + new Expression(parseTree.expression(1)).toIrpString(radix)
-//                        + ")";
             case 5: {
                 ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator("Conditional");
                 String arg1 = new Expression(parseTree.expression(0)).code(eval, codeGenerator);
@@ -441,15 +410,9 @@ public class Expression extends PrimaryItem {
                 itemGenerator.addAttribute("arg3", arg3);
                 return itemGenerator.render();
             }
-//                return "("
-//                        + new Expression(parseTree.expression(0)).toIrpString(radix) + "?"
-//                        + new Expression(parseTree.expression(1)).toIrpString(radix) + ":"
-//                        + new Expression(parseTree.expression(2)).toIrpString(radix)
-//                        + ")";
             default:
                 throw new ThisCannotHappenException("Unknown case in Expression.toElement");
         }
-        //return "";
     }
 
     @Override
@@ -474,12 +437,8 @@ public class Expression extends PrimaryItem {
                         Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex); // FIXME
                     }
                 else
-                        ; //return "";
-//                } catch (IrpSyntaxException ex) {
-//                    Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex);
-//                }
+                        ;
                 break;
-
             case 2: {
 
                 String operator = parseTree.children.get(0).getText();
@@ -489,13 +448,8 @@ public class Expression extends PrimaryItem {
                         : operator.equals("#") ? "BitCount"
                         : "Error";
                 map.put("kind", type);
-                //ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(templateName);
                 Map<String, Object> arg = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine);
                 map.put("arg", arg);
-                //itemGenerator.addAttribute("arg", arg);
-                //return itemGenerator.render();
-
-                //return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
                 break;
             }
             case 3: {
@@ -521,40 +475,22 @@ public class Expression extends PrimaryItem {
                         : operator.equals("||") ? "Or"
                         : "Error";
                 map.put("kind", type);
-                //ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(templateName);
                 Map<String, Object> arg1 = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine);
                 map.put("arg1", arg1);
                 Map<String, Object> arg2 = new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec, nameEngine);
                 map.put("arg2", arg2);
-                //itemGenerator.addAttribute("arg1", arg1);
-                //itemGenerator.addAttribute("arg2", arg2);
-                //return itemGenerator.render();
-
-                //return "(" + parseTree.children.get(0).getText() + new Expression(parseTree.expression(0)).toIrpString() + ")";
             }
             break;
-//                return "("
-//                        + new Expression(parseTree.expression(0)).toIrpString(radix)
-//                        + parseTree.children.get(1).getText()
-//                        + new Expression(parseTree.expression(1)).toIrpString(radix)
-//                        + ")";
             case 5: {
-                //ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator("Conditional");
                 map.put("kind", "ConditionalOp");
                 map.put("arg1", new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine));
                 map.put("arg2", new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec, nameEngine));
                 map.put("arg3", new Expression(parseTree.expression(2)).propertiesMap(eval, generalSpec, nameEngine));
                 break;
             }
-//                return "("
-//                        + new Expression(parseTree.expression(0)).toIrpString(radix) + "?"
-//                        + new Expression(parseTree.expression(1)).toIrpString(radix) + ":"
-//                        + new Expression(parseTree.expression(2)).toIrpString(radix)
-//                        + ")";
             default:
                 throw new ThisCannotHappenException("Unknown case in Expression.propertiesMap");
         }
-        //return "";
         return map;
     }
 }

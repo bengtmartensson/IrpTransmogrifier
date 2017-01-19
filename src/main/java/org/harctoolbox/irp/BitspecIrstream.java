@@ -30,9 +30,6 @@ import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class BitspecIrstream extends IrStreamItem {
     private static final Logger logger = Logger.getLogger(BitspecIrstream.class.getName());
 
@@ -265,18 +262,6 @@ public class BitspecIrstream extends IrStreamItem {
     public IrStream getIrStream() {
         return irStream;
     }
-
-//    @Override
-//    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
-//        throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
-//    }
-
-//    public String code(GeneralSpec generalSpec, CodeGenerator codeGenerator) {
-//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator(this);
-//        st.addAttribute("arg1", bitSpec.code(generalSpec, null, codeGenerator));
-//        st.addAttribute("arg2", irStream.code(generalSpec, null, codeGenerator));
-//        return st.render();
-//    }
 
     @Override
     public Set<String> assignmentVariables() {

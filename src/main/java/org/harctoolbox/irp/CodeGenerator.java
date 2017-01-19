@@ -64,12 +64,7 @@ public abstract class CodeGenerator {
 
         for (String protocolName : protocolNames) {
             NamedProtocol protocol;
-//            try {
-                protocol = irpDatabase.getNamedProtocol(protocolName);
-//            } catch (IrpException | ArithmeticException | InvalidArgumentException ex) {
-//                logger.log(Level.WARNING, "{0}, ignoring protocol {1}", new Object[] { ex, protocolName });
-//                continue;
-//            }
+            protocol = irpDatabase.getNamedProtocol(protocolName);
             String filename = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + fileSuffix()).getCanonicalPath();
             try (PrintStream out = IrpUtils.getPrintSteam(filename)) {
                 generate(protocol, out, true, inspect);

@@ -138,9 +138,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     @Override
     public Element toElement(Document document) {
-        //Element element = document.createElement(getClass().getSimpleName());
         Element element = super.toElement(document);
-        //element.appendChild(bareIrStream);
         if (repeatMarker.getMin() != 1)
             element.setAttribute("repeatMin", Integer.toString(repeatMarker.getMin()));
         if (repeatMarker.getMax() != 1)
@@ -154,43 +152,6 @@ public class IrStream extends BareIrStream implements AggregateLister {
             // computation of numberOfBits not meaningful
         }
         element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
-//        for (IrStreamItem item : irStreamItems)
-//            element.appendChild(item.toElement(document));
-
-        //Element intro = document.createElement("Intro");
-        //element.appendChild(intro);
-        //Element repeat = document.createElement("Repeat");
-        //element.appendChild(repeat);
-        //Element ending = document.createElement("Ending");
-        //element.appendChild(ending);
-
-//        if (!isRepeatSequence()) {
-//            Element current = intro;
-//            int bareDurations = 0;
-//            int bits = 0;
-//            for (IrStreamItem item : irStreamItems) {
-//                if (item instanceof IrStream && ((IrStream) item).isRepeatSequence()) {
-//                    intro.setAttribute("numberOfBits", Integer.toString(bits));
-//                    intro.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
-//                    bits = 0;
-//                    bareDurations = 0;
-//                    repeat.appendChild(item.toElement(document));
-//                    repeat.setAttribute("numberOfBareDurations", Integer.toString(item.numberOfBareDurations()));
-//                    repeat.setAttribute("numberOfBits", Integer.toString(item.numberOfBits()));
-//                    current = ending;
-//
-//                } else {
-//                    current.appendChild(item.toElement(document));
-//                    bareDurations += item.numberOfBareDurations();
-//                    bits += item.numberOfBits();
-//                }
-//            }
-//            ending.setAttribute("numberOfBits", Integer.toString(bits));
-//            ending.setAttribute("numberOfBareDurations", Integer.toString(bareDurations));
-//        } else {
-//            for (IrStreamItem item : irStreamItems)
-//                repeat.appendChild(item.toElement(document));
-//        }
 
         if (!repeatMarker.isTrivial())
             element.appendChild(repeatMarker.toElement(document));
@@ -200,11 +161,6 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     public Element toElement(Document document, Pass pass) {
         Element element = super.toElement(document);
-//        boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
-//        int repetitions = evaluateTheRepeat ? 1 : getMinRepeats();
-//        if (evaluateTheRepeat)
-//            recognizeData.setState(IrSignal.Pass.repeat);
-//        boolean status = recognize(recognizeData, pass, bitSpecs, repetitions);
         return element;
     }
 
@@ -237,7 +193,6 @@ public class IrStream extends BareIrStream implements AggregateLister {
     @Override
     public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws NameConflictException, InvalidNameException, IrpSemanticException {
         IrpUtils.entering(logger, "recognize " + pass, this);
-        //boolean evaluateTheRepeat = pass == IrSignal.Pass.repeat && isInfiniteRepeat();
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         if (evaluateTheRepeat(pass))
             recognizeData.setState(IrSignal.Pass.repeat);
@@ -264,79 +219,6 @@ public class IrStream extends BareIrStream implements AggregateLister {
     public int weight() {
         return super.weight() + repeatMarker.weight();
     }
-/*
-    @Override
-    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
-        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
-        if (repetitions == 0)
-            return null;
-        List<String> body = super.codeList(state, pass, codeGenerator);
-
-        //if (repetitions == 1)
-        //    return template.render();
-        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(repetitions == 1 ? "SetOfStatements" : "Repeat");
-        for (String s : body)
-            //template.addAttribute("body", s);
-            template.addAttribute("body", s);
-        if (repetitions > 1)
-            template.addAttribute("repeats", repetitions);
-        return template.render();
-    }*/
-
-//    public List<String> codeList(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-//        //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
-//        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
-//        if (repetitions == 0)
-//            return new ArrayList<>(0);
-//
-//        String body = super.code(state, pass, codeGenerator);
-//        template.addAttribute("body", body);
-//        if (repetitions == 1)
-//            return template.render();
-//
-//        ItemCodeGenerator repeatTemplate = codeGenerator.newItemCodeGenerator("Repeat");
-//        repeatTemplate.addAttribute("body", template.render());
-//        repeatTemplate.addAttribute("repeats", repetitions);
-//        return repeatTemplate.render();
-//    }
-/*
-    public String code(Pass pass, CodeGenerator codeGenerator) {
-        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("FunctionBody");
-        Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
-        String body = code(state, pass, codeGenerator);
-        if (body != null && !body.isEmpty())
-            template.addAttribute("body", body);
-        if (body != null && !body.isEmpty() && hasExtent())
-            template.addAttribute("reset", hasExtent());
-        return template.render();
-    }
-
-    public Map<String, Object> codeMap(Pass pass, CodeGenerator codeGenerator) {
-        //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("FunctionBody");
-        Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
-        String body = code(state, pass, codeGenerator);
-        Map<String, Object> map = new HashMap<>(2);
-        if (body != null && !body.isEmpty())
-            map.put("body", body);
-            //template.addAttribute("body", body);
-        if (body != null && !body.isEmpty() && hasExtent())
-            //template.addAttribute("reset", hasExtent());
-            map.put("reset", hasExtent());
-        return map;
-        //return template.render();
-    }*/
-
-//    public List<String> codeList(Pass pass, CodeGenerator codeGenerator) {
-//        // ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("FunctionBody");
-//        Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
-//        List<String> body = codeList(state, pass, codeGenerator);
-////        template.addAttribute("body", body);
-////        if (!body.isEmpty() && hasExtent())
-////            template.addAttribute("reset", hasExtent());
-////        return template.render();
-//        return body;
-//    }
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
@@ -354,32 +236,18 @@ public class IrStream extends BareIrStream implements AggregateLister {
         Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
         Map<String, Object> body = propertiesMap(state, pass, generalSpec, nameEngine);
         m.put("irStream", body);
-//        template.addAttribute("body", body);
-//        if (!body.isEmpty() && hasExtent())
-//            template.addAttribute("reset", hasExtent());
-//        return template.render();
-        //if (!body.isEmpty() && hasExtent())
         m.put("reset", hasExtent());
         return m;
     }
 
     @Override
     public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        //ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("SetOfStatements");
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         if (repetitions == 0)
             return new HashMap<>(0);
 
         Map<String, Object> m = new HashMap<>(2);
-        //m.put("kind", "Repeat");
         Map<String, Object> body = super.propertiesMap(state, pass, generalSpec, nameEngine);
-//        template.addAttribute("body", body);
-//        if (repetitions == 1)
-//            return template.render();
-        //ItemCodeGenerator repeatTemplate = codeGenerator.newItemCodeGenerator("Repeat");
-//        m.put("repeatBody", body);
-//        if (repetitions > 1)
-//            m.put("repeats", repetitions);
         List<Map<String, Object>> items = (List<Map<String,Object>>) body.get("items");
         m.put("kind", body.get("kind"));
         ArrayList<Map<String, Object>> repeatedList = new ArrayList<>(repetitions*items.size());

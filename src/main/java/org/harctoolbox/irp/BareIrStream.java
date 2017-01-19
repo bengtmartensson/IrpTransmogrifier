@@ -64,7 +64,6 @@ public class BareIrStream extends IrStreamItem {
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) {
         this(parse(ctx.irstream_item()));
         parseTree = ctx;
-        //this(toList(ctx, env), env);
     }
 
     public BareIrStream() {
@@ -322,43 +321,6 @@ public class BareIrStream extends IrStreamItem {
     public List<IrStreamItem> getIrStreamItems() {
         return Collections.unmodifiableList(irStreamItems);
     }
-/*
-    public List<String> codeList(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        List<String> list = new ArrayList<>(irStreamItems.size());
-        for (IrStreamItem item : irStreamItems) {
-//            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
-//                IrStream irs = (IrStream) item;
-//                if (irs.getRepeatMarker().isInfinite())
-//                    state = IrSignal.Pass.repeat;
-//            }
-            IrSignal.Pass nextState = item.stateWhenEntering(pass);
-            if (nextState != null)
-                state = nextState;
-            if (pass == null || pass == state) {
-                String s = item.code(state, pass, codeGenerator);
-                if (s != null && !s.isEmpty())
-                    list.add(s);
-            }
-
-//            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
-//                IrStream irs = (IrStream) item;
-//                if (irs.getRepeatMarker().isInfinite())
-//                    state = IrSignal.Pass.ending;
-//            }
-            nextState = item.stateWhenExiting(state);
-            if (nextState != null)
-                state = nextState;
-        }
-        return list;
-    }
-
-    @Override
-    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        List<String> list = codeList(state, pass, codeGenerator);
-        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
-        st.addAttribute("body", list);
-        return st.render();
-    }*/
 
     @Override
     public Set<String> assignmentVariables() {
@@ -373,13 +335,7 @@ public class BareIrStream extends IrStreamItem {
     @SuppressWarnings("AssignmentToMethodParameter")
     public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
-        //List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
         for (IrStreamItem item : irStreamItems) {
-//            if (item instanceof IrStream && state == IrSignal.Pass.intro) {
-//                IrStream irs = (IrStream) item;
-//                if (irs.getRepeatMarker().isInfinite())
-//                    state = IrSignal.Pass.repeat;
-//            }
             IrSignal.Pass nextState = item.stateWhenEntering(pass);
             if (nextState != null)
                 state = nextState;
@@ -391,22 +347,13 @@ public class BareIrStream extends IrStreamItem {
                     else
                         list.add(m);
                 }
-                    //list.add(item.propertiesMapList(state, pass, generalSpec).get(0));
-
             }
 
-//            if (item instanceof IrStream && state == IrSignal.Pass.repeat) {
-//                IrStream irs = (IrStream) item;
-//                if (irs.getRepeatMarker().isInfinite())
-//                    state = IrSignal.Pass.ending;
-//            }
             nextState = item.stateWhenExiting(state);
             if (nextState != null)
                 state = nextState;
         }
 
-//        ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("BareIrStream");
-//        st.addAttribute("body", list);
         Map<String, Object> result = new HashMap<>(2);
         result.put("kind", "BareIrStream"); // NOT this.getClass...
         result.put("items", list);

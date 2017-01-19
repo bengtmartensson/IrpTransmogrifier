@@ -510,7 +510,6 @@ public class IrpTransmogrifier {
         }
         if (expand) {
             irpDatabase.expand();
-            //irpDatabase.removeUnusables();
         }
     }
 
@@ -693,7 +692,7 @@ public class IrpTransmogrifier {
 
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode given IR signal")
     private static class CommandDecode {
-        // TODO: presently no sensible way to input raw sequences/signals
+        // TODO: presently no sensible way to input raw sequences/signals, issue #14
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
         private boolean noPreferOver = false;
 
@@ -779,12 +778,9 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--random" }, description = "Generate random, but valid, parameters")
         private boolean random = false;
 
-        // FIXME (to be removed)
+        // FIXME (to be removed, #15)
         @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
         private boolean test = false;
-
-        //@Parameter(names = { "--irpmaster" }, description = "Config for IrpMaster")
-        //private String irpMasterConfig = "/usr/local/share/irscrutinizer/IrpProtocols.ini";
 
         @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
         private List<String> protocols = new ArrayList<>(0);

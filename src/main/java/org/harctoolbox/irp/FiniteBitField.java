@@ -30,9 +30,6 @@ import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class FiniteBitField extends BitField {
 
     private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
@@ -300,40 +297,6 @@ public class FiniteBitField extends BitField {
     public int weight() {
         return super.weight() + width.weight();
     }
-/*
-    @Override
-    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-        ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
-        itemCodeGenerator.addAttribute("data", data.code(true, codeGenerator));
-        itemCodeGenerator.addAttribute("width", width.code(true, codeGenerator));
-        try {
-            long num = chop.toNumber(null);
-            if (num != 0)
-                itemCodeGenerator.addAttribute("chop", num);
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
-            itemCodeGenerator.addAttribute("chop", chop.code(true, codeGenerator));
-        }
-        itemCodeGenerator.addAttribute("complement", complement);
-        itemCodeGenerator.addAttribute("reverse", reverse);
-        return itemCodeGenerator.render();
-    }
-
-    @Override
-    public String code(boolean eval, CodeGenerator codeGenerator) {
-        ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator("FiniteBitFieldExpression");
-        itemCodeGenerator.addAttribute("data", data.code(true, codeGenerator));
-        itemCodeGenerator.addAttribute("width", width.code(true, codeGenerator));
-        try {
-            long num = chop.toNumber(null);
-            if (num != 0)
-                itemCodeGenerator.addAttribute("chop", num);
-        } catch (UnassignedException | IrpSyntaxException | IncompatibleArgumentException ex) {
-            itemCodeGenerator.addAttribute("chop", chop.code(true, codeGenerator));
-        }
-        itemCodeGenerator.addAttribute("complement", complement);
-        itemCodeGenerator.addAttribute("reverse", reverse);
-        return itemCodeGenerator.render();
-    }*/
 
     @Override
     public Set<String> assignmentVariables() {

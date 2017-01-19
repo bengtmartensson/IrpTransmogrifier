@@ -20,9 +20,6 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-/**
- *
- */
 public abstract class PrimaryItem extends IrpObject implements Numerical {
 
     public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) {
@@ -57,8 +54,6 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
     public abstract String toIrpString(int radix);
 
     public abstract boolean isUnary();
-
-    //public abstract String code(boolean eval, CodeGenerator codeGenerator);
 
     public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine);
 

@@ -185,11 +185,6 @@ class BitStream extends IrStreamItem implements Evaluatable {
         return false;
     }
 
-//    @Override
-//    public String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-
     @Override
     public Set<String> assignmentVariables() {
         return new HashSet<>(0);

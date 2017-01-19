@@ -20,9 +20,6 @@ package org.harctoolbox.irp;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public abstract class IrpObject implements XmlExport {
 
     public abstract String toIrpString();

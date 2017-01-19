@@ -36,9 +36,6 @@ import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.GeneralSpec;
 import org.harctoolbox.irp.Protocol;
 
-/**
- *
- */
 public class Analyzer extends Cleaner {
 
     private static final Logger logger = Logger.getLogger(Analyzer.class.getName());

@@ -38,8 +38,4 @@ public interface Floatable {
     public Element toElement(Document document);
 
     public String toIrpString();
-
-    //public String code(boolean eval, GeneralSpec generalSpec, STGroup stGroup);
-
-    //public String code(boolean eval, CodeGenerator codeGenerator);
 }

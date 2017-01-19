@@ -30,9 +30,6 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>,AggregateLister {
 
     private LinkedHashMap<String, ParameterSpec> map;
@@ -119,7 +116,6 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     @Override
     public Element toElement(Document document) {
         Element el = super.toElement(document);
-        //el.appendChild(document.createComment(toString()));
         map.values().forEach((parameterSpec) -> {
             el.appendChild(parameterSpec.toElement(document));
         });
@@ -205,27 +201,11 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return template.render();
     }
 
-//    void fillSTAttributes(ST template, String aggregateName) {
-//        for (ParameterSpec ps : map.values())
-//            template.addAggr(aggregateName + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
-//    }
-
     void XXfillAttributes(ItemCodeGenerator template, String parameterSpecsName) {
         map.values().stream().forEach((ps) -> {
             template.addAggregate(parameterSpecsName + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
-//            template.addAttribute(parameterSpecsName + ".name",   ps.getName());
-//            template.addAttribute(parameterSpecsName + ".min",    ps.getMin());
-//            template.addAttribute(parameterSpecsName + ".max",    ps.getMax());
-//            template.addAttribute(parameterSpecsName + ".memory", ps.hasMemory());
         });
     }
-
-//    @Override
-//    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
-//        map.values().stream().forEach((ps) -> {
-//            itemCodeGenerator.addAggregate(name + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
-//        });
-//    }
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {

@@ -47,8 +47,6 @@ public abstract class IrStreamItem extends IrpObject {
     }
 
     protected IrStreamItem() {
-        //environment = env;
-        //Debug.debugIrStreamItems(this.getClass().getSimpleName() + " constructed.");
     }
     public abstract boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
 
@@ -103,8 +101,6 @@ public abstract class IrStreamItem extends IrpObject {
             throws UnassignedException, InvalidNameException, NameConflictException, IrpSemanticException;
 
     public abstract boolean hasExtent();
-
-    //public abstract String code(IrSignal.Pass state, IrSignal.Pass pass, CodeGenerator codeGenerator);
 
     public abstract Set<String> assignmentVariables();
 

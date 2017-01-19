@@ -27,9 +27,6 @@ import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class Variation extends IrStreamItem {
     private static int numberOfInfiniteRepeats(BareIrStream bareIrStream) {
         return bareIrStream == null ? 0 : bareIrStream.numberOfInfiniteRepeats();
@@ -184,12 +181,6 @@ public class Variation extends IrStreamItem {
         return intro.hasExtent() || repeat.hasExtent() || ending.hasExtent();
     }
 
-//    @Override
-//    public String code(Pass state, Pass pass, CodeGenerator codeGenerator) {
-//        BareIrStream actual = select(pass);
-//        return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
-//    }
-
     @Override
     public Set<String> assignmentVariables() {
         Set<String> list = intro.assignmentVariables();
@@ -201,7 +192,6 @@ public class Variation extends IrStreamItem {
     @Override
     public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         BareIrStream actual = select(pass);
-        //return actual.isEmpty(codeGenerator.getNameEngine()) ? null : actual.code(state, pass, codeGenerator);
         return actual.propertiesMap(state, pass, generalSpec, nameEngine);
     }
 }

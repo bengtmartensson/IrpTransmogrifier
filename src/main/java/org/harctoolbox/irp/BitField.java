@@ -135,11 +135,8 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         return false;
     }
 
-    //public abstract String code(boolean eval, CodeGenerator codeGenerator);
-
     @Override
     public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
         Map<String, Object> map = IrpUtils.propertiesMap(6, this);
         map.put("data", data.propertiesMap(true, generalSpec, nameEngine));
         //map.put("width", width.propertiesMap(true, generalSpec));
@@ -151,7 +148,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
             map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         }
         map.put("complement", complement);
-        //map.put("reverse", reverse);
         return map;
     }
 

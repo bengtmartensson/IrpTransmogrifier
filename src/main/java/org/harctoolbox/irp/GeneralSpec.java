@@ -205,11 +205,6 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         return WEIGHT;
     }
 
-//    @Override
-//    public void listAggregates(String name, ItemCodeGenerator itemCodeGenerator) {
-//        itemCodeGenerator.addAggregateList(name, new String[] {"frequency", "dutyCycle"}, this.frequency, this.dutyCycle);
-//    }
-
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = new HashMap<>(2);

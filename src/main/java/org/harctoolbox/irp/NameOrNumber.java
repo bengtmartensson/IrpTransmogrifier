@@ -22,9 +22,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class NameOrNumber extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
 
@@ -94,9 +91,4 @@ public class NameOrNumber extends IrpObject implements Floatable {
         hash = 97 * hash + Objects.hashCode(this.thing);
         return hash;
     }
-
-//    @Override
-//    public String code(boolean eval, CodeGenerator codeGenerator) {
-//        return thing.code(eval, codeGenerator);
-//    }
 }

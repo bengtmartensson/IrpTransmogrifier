@@ -28,9 +28,6 @@ import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-/**
- *
- */
 public class NamedProtocol extends Protocol {
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
@@ -73,13 +70,6 @@ public class NamedProtocol extends Protocol {
         this(name, irp, documentation, null, null, null, null, null);
     }
 
-//    public NamedProtocol(Map<String, String> map) throws IrpSemanticException, InvalidNameException, UnassignedException {
-//        this(map.get(IrpDatabase.nameName), map.get(IrpDatabase.irpName), map.get(IrpDatabase.documentationName),
-//                map.get(IrpDatabase.frequencyToleranceName), map.get(IrpDatabase.absoluteToleranceName), map.get(IrpDatabase.relativeToleranceName),
-//                map.get(IrpDatabase.decodableName));
-//    }
-
-    //@Override
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
             Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) {
         if (!isDecodeable()) {
@@ -200,10 +190,6 @@ public class NamedProtocol extends Protocol {
 
     ItemCodeGenerator code(CodeGenerator codeGenerator) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
-//        template.addAttribute("protocolName", getName());
-//        template.addAttribute("cProtocolName", IrpUtils.toCIdentifier(getName()));
-//        template.addAttribute("irp", getIrp());
-//        template.addAttribute("documentation", IrCoreUtils.javaifyString(getDocumentation()));
         template.addAggregateList("metaData", metaDataPropertiesMap());
         template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec(), getDefinitions());
         template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec(), getDefinitions());
@@ -212,49 +198,11 @@ public class NamedProtocol extends Protocol {
         variables.removeAll(params);
         template.addAttribute("assignmentVariables", variables);
         template.addAggregateList("definitions", getDefinitions(), getGeneralSpec(), getDefinitions());
-//        template.addAttribute("hasExtent", hasExtent());
-
-//        if (hasExtent()) {
-//            ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("InstanceVariableDefinition");
-//            st.addAttribute("type", "microsecondsType");
-//            st.addAttribute("name", "sumOfDurations");
-//            template.addAttribute("instanceVariableDefinition", st.render());
-//        }
-//
-//        if (hasExtent()) {
-//            ItemCodeGenerator st = codeGenerator.newItemCodeGenerator("DefineFlashGapExtent");
-//            st.addAttribute("hasExtent", true);
-//            template.addAttribute("defineFlashGapExtent", st.render());
-//        }
 
         template.addAggregateList("code", getBitspecIrstream().getIrStream(), getGeneralSpec(), getDefinitions());
         template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec(), getDefinitions());
         return template;
-        //template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec());
-//        if (getBitspecIrstream().getBitSpec().getChunkSize() > 1)
-//            template.addAttribute("chunkSize", getBitspecIrstream().getBitSpec().getChunkSize());
-
-        //template.addAttribute("introCode", codeFunc(IrSignal.Pass.intro, codeGenerator));
-//        template.addAttribute("intro", getBitspecIrstream().getIrStream().code(IrSignal.Pass.intro, codeGenerator));
-//        Map<String, Object> map = getBitspecIrstream().getIrStream().codeMap(IrSignal.Pass.intro, codeGenerator);
-//        template.addAggregateList(name, aggregateLister, generalSpec);ttribute("intro.{reset, body}", map.get("reset"), map.get("body"));
-//        template.addAttribute("repeat", getBitspecIrstream().getIrStream().code(IrSignal.Pass.repeat, codeGenerator));
-//        template.addAttribute("ending", getBitspecIrstream().getIrStream().code(IrSignal.Pass.ending, codeGenerator));
-//        if (inspect)
-//            template.inspect();
-//        return template.render();
     }
-
-//    private String codeFunc(IrSignal.Pass pass, CodeGenerator codeGenerator) {
-//        ItemCodeGenerator template = codeGenerator.newItemCodeGenerator("XFunction");
-//        template.addAttribute("passName", pass.toString());
-//        //String parameterList = getParameterSpecs().code(codeGenerator);
-//        //template.addAttribute("parameterList", parameterList);
-//        String functionBody = getBitspecIrstream().getIrStream().code(pass, codeGenerator);
-//        template.addAttribute("functionBody", functionBody);
-//        //template.addAttribute("protocolName", IrpUtils.toCIdentifier(name));
-//        return template.render();
-//    }
 
     private Map<String, Object> metaDataPropertiesMap() {
         Map<String, Object> map = IrpUtils.propertiesMap(4, this);

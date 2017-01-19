@@ -86,7 +86,6 @@ public class Name extends PrimaryItem implements Floatable {
     }
 
     public Name(String name) {
-        //parse(name); // just to check validity
         this.name = name;
     }
 
@@ -166,14 +165,6 @@ public class Name extends PrimaryItem implements Floatable {
     public boolean isUnary() {
         return true;
     }
-
-//    @Override
-//    public String code(boolean eval, CodeGenerator codeGenerator) {
-//        ItemCodeGenerator itemGenerator = codeGenerator.newItemCodeGenerator(codeGenerator.getNameEngine().containsKey(name) ? "NameAsDefinition" : "Name");
-//        itemGenerator.addAttribute("name", name);
-//        itemGenerator.addAttribute("eval", eval);
-//        return itemGenerator.render();
-//    }
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {

@@ -78,50 +78,6 @@ public class IrSignal implements Cloneable {
         return new IrSignal(intro, repeat, ending, frequency);
     }
 
-    // TODO: move to test.
-    /**
-     * Just for testing. Invokes the IrSignal(String ProtocolsIniPath, int offset, String[] args)
-     * and tests the result.
-     *
-     * @param args
-     * /
-     * public static void main(String[] args) {
-     * if (args.length == 0) {
-     * int times[] = {
-     * -9024, -4512, -564, -1692, +564, -564, +564, -564, +564, -564, +564, -564, +564, -564,
-     * +564, -564, +564, -564, +564, -564, +564, -1692, +564, -564, +564, -564, +564, -564, +564, -564,
-     * +564, -564, +564, -564, +564, -1692, +564, -1692, +564, -564, +564, -564, +564, -564, +564, -564,
-     * +564, -564, +564, -564, +564, -564, +564, -564, +564, -1692, +564, -1692, +564, -1692, +564, -1692,
-     * +564, -1692, +564, -1692, +564, -43992,
-     * +9024, -2256, +564, -97572};
-     * try {
-     * IrSignal irSignal = new IrSignal(times, 34, 2, 38400);
-     * System.out.println(irSignal.ccfString());
-     * System.out.println(irSignal.toString(true));
-     * System.out.println(irSignal.toString(false));
-     * System.out.println(irSignal);
-     * } catch (IncompatibleArgumentException ex) {
-     * System.err.println(ex.getMessage());
-     * }
-     * } else {
-     * String protocolsIni = "data/IrpProtocols.ini";
-     * int arg_i = 0;
-     * if (args[arg_i].equals("-c")) {
-     * arg_i++;
-     * protocolsIni = args[arg_i++];
-     * }
-     * try {
-     * IrSignal irSignal = new IrSignal(protocolsIni, arg_i, args);
-     * System.out.println(irSignal);
-     * System.out.println(irSignal.ccfString());
-     * DecodeIR.invoke(irSignal);
-     * } catch (IrpMasterException | FileNotFoundException ex) {
-     * System.err.println(ex.getMessage());
-     * }
-     * }
-     * }*/
-
-
     /** Intro sequence, always sent once. Can be empty, but not null. */
     protected IrSequence introSequence;
 
@@ -639,6 +595,5 @@ public class IrSignal implements Cloneable {
         repeat,
         ending,
         finish
-        //cancel
     }
 }

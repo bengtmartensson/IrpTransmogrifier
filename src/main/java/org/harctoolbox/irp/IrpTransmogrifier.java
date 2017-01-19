@@ -44,13 +44,11 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import org.harctoolbox.IrpMaster.IrpMasterException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
-import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -263,7 +261,7 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (IrpException | IrpMasterException | InvalidArgumentException | UnsupportedOperationException
+        } catch (IrpException | InvalidArgumentException | UnsupportedOperationException
                 | ParseCancellationException | SAXException | IOException | UsageException | NumberFormatException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
@@ -371,7 +369,7 @@ public class IrpTransmogrifier {
         XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
     }
 
-    private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpException, OddSequenceLenghtException, IrpMasterException {
+    private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpException, OddSequenceLenghtException {
         NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
                 : commandRenderer.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();
@@ -383,19 +381,9 @@ public class IrpTransmogrifier {
             out.println(irSignal.toPrintString(true));
         if (commandRenderer.pronto)
             out.println(irSignal.ccfString());
-
-        // FIXME (to be removed)
-        if (commandRenderer.test) {
-            String protocolName = protocol.getName();
-            IrSignal irpMasterSignal = IrpMasterUtils.renderIrSignal(protocolName, nameEngine);
-            if (!irSignal.approximatelyEquals(irpMasterSignal)) {
-                out.println(Pronto.toPrintString(irpMasterSignal));
-                out.println("Error in " + protocolName);
-            }
-        }
     }
 
-    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, OddSequenceLenghtException, IrpMasterException {
+    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, OddSequenceLenghtException {
         if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
@@ -404,8 +392,6 @@ public class IrpTransmogrifier {
         if (commandRenderer.irp != null) {
             if (!commandRenderer.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
-            if (commandRenderer.test)
-                throw new UsageException("Cannot not use --irp together with --test");
             NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
             render(protocol, commandRenderer);
         } else {
@@ -777,10 +763,6 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "--random" }, description = "Generate random, but valid, parameters")
         private boolean random = false;
-
-        // FIXME (to be removed, #15)
-        @Parameter(names = { "--test" }, description = "Compare with IrpMaster")
-        private boolean test = false;
 
         @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
         private List<String> protocols = new ArrayList<>(0);

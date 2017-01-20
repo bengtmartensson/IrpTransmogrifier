@@ -115,6 +115,7 @@ public class ProtocolNGTest {
      * Test of numberOfInfiniteRepeats method, of class Protocol.
      */
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testNumberOfInfiniteRepeats() {
         System.out.println("numberOfInfiniteRepeats");
         try {

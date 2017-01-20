@@ -359,11 +359,29 @@ public class IrpTransmogrifier {
     }
 
     private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect) throws IOException, IrpException {
-        STCodeGenerator codeGenerator = new STCodeGenerator(target);
+        if (target.equals("?")) {
+            listTargets(out);
+            return;
+        }
+
+        STCodeGenerator codeGenerator;
+        try {
+            codeGenerator = new STCodeGenerator(target);
+        } catch (FileNotFoundException ex) {
+            System.err.println("Target " + target + " not available.  Available targets:");
+            listTargets(System.err);
+            return;
+        }
         if (directory != null)
             codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect);
         else
             codeGenerator.generate(protocolNames, irpDatabase, out, inspect);
+    }
+
+    private void listTargets(PrintStream printStream) throws IOException {
+        List<String> targets = STCodeGenerator.listTargets();
+        targets.add("xml");
+        printStream.println(String.join(" ", targets));
     }
 
     private void createXmlProtocols(List<String> protocolNames, String encoding) {
@@ -672,7 +690,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {       "--inspect" }, description = "Fire up stringtemplate inspector on generated code (if sensible)")
         private boolean inspect = false;
 
-        @Parameter(names = { "-t", "--target" }, required = true, description = "Target for code generation")
+        @Parameter(names = { "-t", "--target" }, required = true, description = "Target for code generation. Use ? for a list.")
         private String target = null;
 
         @Parameter(description = "protocol")

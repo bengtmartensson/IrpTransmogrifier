@@ -20,6 +20,8 @@ package org.harctoolbox.irp;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.stringtemplate.v4.ST;
@@ -40,6 +42,19 @@ public class STCodeGenerator extends CodeGenerator {
 
     public static void trackCreationEvents(boolean value) {
         STGroup.trackCreationEvents = value;
+    }
+
+    public static List<String> listTargets() throws IOException {
+        File[] candidates = new File(stDir).listFiles((File dir, String name) -> name.toLowerCase().endsWith(sTGroupFileExtension));
+        ArrayList<String> result = new ArrayList<>(candidates.length);
+        for (File file : candidates) {
+            if (!new STCodeGenerator(file).isAbstract()) {
+                String f = file.getName();
+                String name = f.substring(0, f.length() - 4);
+                result.add(name);
+            }
+        }
+        return result;
     }
 
     // STGroupFile(String) throws IllegalArgumentException (extends RuntimeException)

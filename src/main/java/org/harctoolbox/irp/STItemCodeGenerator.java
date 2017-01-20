@@ -44,7 +44,7 @@ public class STItemCodeGenerator extends ItemCodeGenerator {
 
     @Override
     public String render() {
-        return st.render(Locale.US);
+        return st != null ? st.render(Locale.US) : null;
     }
 
     @Override

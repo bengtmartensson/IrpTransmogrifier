@@ -25,9 +25,6 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLenghtException;
 
-/**
- *
- */
 public abstract class IrpRenderer {
 
     // functions evaluating BitFields in expressions

@@ -27,7 +27,6 @@ package org.harctoolbox.render;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.harctoolbox.ircore.IncompatibleArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.irp.*;
 import static org.testng.Assert.assertTrue;
@@ -55,7 +54,7 @@ ClassBody() ::= <<
 >>
 
 DeclareParameterlessConstructor() ::= <<
-public <ClassName()>() throws IOException, SAXException, IncompatibleArgumentException, IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidRepeatException, UnknownProtocolException, UnassignedException {
+public <ClassName()>() throws IOException, SAXException, IrpException {
     irpDatabase = new IrpDatabase(configFile);
     irpDatabase.expand();
     prot = irpDatabase.getNamedProtocol("<metaData.protocolName>");
@@ -76,7 +75,7 @@ public void testMap(Map\<String, Long> map) {
         IrSignal expResult = prot.toIrSignal(nameEngine);
         IrSignal result = <RendererClassName()>.newIrSignal(map);
         assertTrue(result.approximatelyEquals(expResult));
-    } catch (IncompatibleArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | IrpSyntaxException | DomainViolationException ex) {
+    } catch (IrpException | ArithmeticException ex) {
         fail();
     }
 }
@@ -93,6 +92,7 @@ public void testNewIrSignalExhaustive() {
 
 /**
  * Test of newIrSignal method, of class <RendererClassName()>.
+ * @throws org.harctoolbox.irp.IrpSyntaxException
  */
  @Test
  public void testNewIrSignal() throws IrpSyntaxException {

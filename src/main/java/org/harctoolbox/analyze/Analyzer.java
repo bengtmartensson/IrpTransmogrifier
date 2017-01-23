@@ -47,36 +47,37 @@ public class Analyzer extends Cleaner {
     private RepeatFinder.RepeatFinderData repeatfinderData;
     private double frequency;
 
-    public Analyzer(IrSignal irSignal, boolean invokeRepeatFinder, double absoluteTolerance, double relativeTolerance) {
+    public Analyzer(IrSignal irSignal, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
         this(irSignal.toModulatedIrSequence(1), invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(IrSequence irSequence, double frequency, boolean invokeRepeatFinder, double absoluteTolerance, double relativeTolerance) {
-        super(irSequence, absoluteTolerance, relativeTolerance);
+    public Analyzer(IrSequence irSequence, double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+        super(irSequence, absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.defaultAbsoluteTolerance,
+                relativeTolerance != null ? relativeTolerance : IrCoreUtils.defaultRelativeTolerance);
         this.frequency = frequency;
         repeatfinderData = getRepeatFinderData(invokeRepeatFinder, irSequence.getLength());
         createNormedTimings();
         createPairs();
     }
 
-    public Analyzer(ModulatedIrSequence irSequence, boolean invokeRepeatFinder, double absoluteTolerance, double relativeTolerance) {
+    public Analyzer(ModulatedIrSequence irSequence, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
         this(irSequence, irSequence.getFrequency(), invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
     public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) {
-        this(irSequence, IrCoreUtils.invalid, invokeRepeatFinder, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(irSequence, IrCoreUtils.invalid, invokeRepeatFinder, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public Analyzer(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+    public Analyzer(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
         this(irSequence, IrCoreUtils.invalid, false, absoluteTolerance, relativeTolerance);
     }
 
     public Analyzer(IrSequence irSequence) {
-        this(irSequence, IrCoreUtils.invalid, false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(irSequence, IrCoreUtils.invalid, false, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
     public Analyzer(int[] data) throws OddSequenceLenghtException {
-        this(new IrSequence(data), IrCoreUtils.invalid, false, (int) IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(new IrSequence(data), IrCoreUtils.invalid, false, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
     private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int length) {

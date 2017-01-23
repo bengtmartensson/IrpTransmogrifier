@@ -171,6 +171,7 @@ public class Name extends PrimaryItem implements Floatable {
         Map<String, Object> map = super.propertiesMap(4);
         map.put("name", name);
         map.put("eval", eval);
+        map.put("scalar", eval);
         map.put("isDefinition", nameEngine.containsKey(name));
         return map;
     }

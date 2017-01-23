@@ -137,8 +137,12 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     @Override
     public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
+        return propertiesMap(false, generalSpec, nameEngine);
+    }
+
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = IrpUtils.propertiesMap(6, this);
-        map.put("data", data.propertiesMap(true, generalSpec, nameEngine));
+        map.put("data", data.propertiesMap(eval, generalSpec, nameEngine));
         //map.put("width", width.propertiesMap(true, generalSpec));
         try {
             long num = chop.toNumber(null);
@@ -150,8 +154,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         map.put("complement", complement);
         return map;
     }
-
-    public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine);
 
     public TreeViewer toTreeViewer() {
         List<String> ruleNames = Arrays.asList(parser.getRuleNames());

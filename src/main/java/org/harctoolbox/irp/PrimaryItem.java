@@ -55,6 +55,13 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
 
     public abstract boolean isUnary();
 
+    /**
+     * Generate a map of the properties in the very object.
+     * @param eval If true, evaluate names.
+     * @param generalSpec
+     * @param nameEngine
+     * @return
+     */
     public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine);
 
     protected Map<String, Object> propertiesMap(int noProps) {

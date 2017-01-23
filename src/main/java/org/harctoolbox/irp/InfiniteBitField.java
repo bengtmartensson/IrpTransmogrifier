@@ -133,7 +133,8 @@ public class InfiniteBitField extends BitField {
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> map = propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
+        //Map<String, Object> map = propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
+        Map<String, Object> map = super.propertiesMap(eval, generalSpec, nameEngine);
         map.put("kind", "InfiniteBitFieldExpression");
         return map;
     }

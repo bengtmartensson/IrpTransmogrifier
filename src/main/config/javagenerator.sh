@@ -7,10 +7,10 @@ JAR=${IRPHOME}/${project.name}-${project.version}-jar-with-dependencies.jar
 CONFIG=${IRPHOME}/IrpProtocols.xml
 
 "${JAVA}" -jar "${JAR}" -c "${CONFIG}" \
-    code -s --target javarenderer \
+    code --target javarenderer \
     --directory ${IRPHOME}/../../JavaIrpProtocolTest/src/main/java/org/harctoolbox/render \
     "$@"
 "${JAVA}" -jar "${JAR}" -c "${CONFIG}" \
-    code -s --target javarendererngtest \
+    code --target javarendererngtest \
     --directory ${IRPHOME}/../../JavaIrpProtocolTest/src/test/java/org/harctoolbox/render \
     "$@"

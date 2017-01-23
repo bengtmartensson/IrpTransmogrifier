@@ -127,8 +127,6 @@ fujitsu_aircon \
 roku-official \
 nec-shirriff-32 \
 nokia32 \
-grundig16 \
-grundig16-30 \
 "humax 4phase" \
 
 # Hierarchical bitfields
@@ -144,3 +142,7 @@ grundig16-30 \
 # Parametrized width
 #nec-shirriff \
 #zenith \
+
+# Varying length bitspecs
+#grundig16 \
+#grundig16-30 \

@@ -73,10 +73,16 @@ private final <!if(parameter.memory)>static <endif!>BitwiseParameter <parameter.
 >>
 
 // Override from java.stg
+DeclareSimpleParameter(parameter) ::= <<
+private final BitwiseParameter <parameter>;
+>>
+
+// Override from java.stg
 DeclareParameterlessConstructor() ::= <<
 public <ClassName()>() {
     super();
     <parameterSpecs.list:{ps|<ps.name> = new BitwiseParameter();}; separator="\n">
+    <assignmentVariables:{var|<var> = new BitwiseParameter();}; separator="\n">
 }
 >>
 
@@ -225,6 +231,6 @@ Flash(arg)          ::= "seq.flash(<arg.microseconds><ImplementationType(\"micro
 Gap(arg)            ::= "seq.gap(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
 Extent(arg)         ::= "seq.extent(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
 
-Name(arg)           ::= "<arg.name><if(arg.scalar)>.getValue()<endif><if(arg.isDefinition)>()<endif>"
+Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<elseif(arg.scalar)>.getValue()<endif>"
 
 Exponentiate(arg1,arg2) ::= "IrpUtils.power(arg1,arg2)"

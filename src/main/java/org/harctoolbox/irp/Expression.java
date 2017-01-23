@@ -426,13 +426,13 @@ public class Expression extends PrimaryItem {
                 ParseTree child = parseTree.children.get(0);
 
                 if (child instanceof IrpParser.Primary_itemContext) {
-                    Map<String, Object> m = newPrimaryItem((IrpParser.Primary_itemContext) child).propertiesMap(eval, generalSpec, nameEngine);
+                    Map<String, Object> m = newPrimaryItem((IrpParser.Primary_itemContext) child).propertiesMap(true, generalSpec, nameEngine);
                     m.put("scalar", true);
                     return m;
                 } else if (child instanceof IrpParser.BitfieldContext)
                     try {
                         BitField bf = BitField.newBitField((IrpParser.BitfieldContext) child);
-                        map = bf.propertiesMap(eval, generalSpec, nameEngine);
+                        map = bf.propertiesMap(true, generalSpec, nameEngine);
                     } catch (/*IrpSyntax*/Exception ex) {
                         Logger.getLogger(Expression.class.getName()).log(Level.SEVERE, null, ex); // FIXME
                     }
@@ -448,7 +448,7 @@ public class Expression extends PrimaryItem {
                         : operator.equals("#") ? "BitCount"
                         : "Error";
                 map.put("kind", type);
-                Map<String, Object> arg = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine);
+                Map<String, Object> arg = new Expression(parseTree.expression(0)).propertiesMap(true, generalSpec, nameEngine);
                 map.put("arg", arg);
                 break;
             }
@@ -475,17 +475,17 @@ public class Expression extends PrimaryItem {
                         : operator.equals("||") ? "Or"
                         : "Error";
                 map.put("kind", type);
-                Map<String, Object> arg1 = new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine);
+                Map<String, Object> arg1 = new Expression(parseTree.expression(0)).propertiesMap(true, generalSpec, nameEngine);
                 map.put("arg1", arg1);
-                Map<String, Object> arg2 = new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec, nameEngine);
+                Map<String, Object> arg2 = new Expression(parseTree.expression(1)).propertiesMap(true, generalSpec, nameEngine);
                 map.put("arg2", arg2);
             }
             break;
             case 5: {
                 map.put("kind", "ConditionalOp");
-                map.put("arg1", new Expression(parseTree.expression(0)).propertiesMap(eval, generalSpec, nameEngine));
-                map.put("arg2", new Expression(parseTree.expression(1)).propertiesMap(eval, generalSpec, nameEngine));
-                map.put("arg3", new Expression(parseTree.expression(2)).propertiesMap(eval, generalSpec, nameEngine));
+                map.put("arg1", new Expression(parseTree.expression(0)).propertiesMap(true, generalSpec, nameEngine));
+                map.put("arg2", new Expression(parseTree.expression(1)).propertiesMap(true, generalSpec, nameEngine));
+                map.put("arg3", new Expression(parseTree.expression(2)).propertiesMap(true, generalSpec, nameEngine));
                 break;
             }
             default:

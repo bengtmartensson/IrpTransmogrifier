@@ -79,7 +79,7 @@ public void testMap(Map\<String, Long> map) throws IrpException {
  * Exhaustive test of newIrSignal method, of class <DecoderClassName()>.
  * @throws org.harctoolbox.irp.IrpException
  */
-//@Test
+@Test(enabled = false)
 public void testDecodeSignalExhaustive() throws IrpException {
     System.out.println("newDecodeSignalExhaustive");
     <parameterSpecs.list:{p|for (long <p.name> = <p.min><ImplementationType("parameterTypeSuffix")>; <p.name> \<= <p.max><ImplementationType("parameterTypeSuffix")>; <p.name>++)}; separator="\n">

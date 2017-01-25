@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -328,17 +330,42 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> map = new HashMap<>(8);
+        Map<String, Object> map = new HashMap<>(13);
         if (chunkSize > 1)
             map.put("chunkSize", chunkSize);
         map.put("bitMask", IrCoreUtils.ones(chunkSize));
         map.put("size", bitCodes.size());
-        map.put("standardPwm", isPWM(2, new NameEngine(), new GeneralSpec()));
-        map.put("standardBiPhase", isStandardBiPhase(new NameEngine(), new GeneralSpec()));
-        map.put("reverse", generalSpec.getBitDirection() == BitDirection.lsb);
+        if (isPWM(2, new NameEngine(), new GeneralSpec())) {
+            map.put("standardPwm", true);
+            try {
+                map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+                map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+                map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+            } catch (IrpException ex) {
+                Logger.getLogger(BitSpec.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (isStandardBiPhase(new NameEngine(), new GeneralSpec())) {
+            map.put("standardBiPhase", true);
+            try {
+                map.put("biPhaseHalfPeriod", averageDuration(nameEngine, generalSpec));
+            } catch (IrpException ex) {
+            }
+            map.put("biPhaseInverted", bitCodes.get(0).getIrStreamItems().get(0) instanceof Flash);
+        }
+        map.put("lsbFirst", generalSpec.getBitDirection() == BitDirection.lsb);
         if (noDurations() > 0)
             map.put("noDurations", noDurations());
         map.put("list", propertiesMap(false, generalSpec, nameEngine));
         return map;
+    }
+
+    double averageDuration(NameEngine nameEngine, GeneralSpec generalSpec) throws IrpException {
+        double sum = 0;
+        for (BareIrStream bitCode : bitCodes) {
+            sum += bitCode.averageDuration(nameEngine, generalSpec);
+        }
+        return sum / bitCodes.size();
     }
 }

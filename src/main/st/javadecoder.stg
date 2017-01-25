@@ -127,18 +127,35 @@ public <ImplementationType("dutyCycleType")> getDutyCycle() {
 >>
 
 DefineClassList() ::= <<
-private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.DecodeSequence {
+private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(bitSpec.standardBiPhase)>BiPhaseDecodeSequence<elseif(bitSpec.standardPwm)>Pwm2DecodeSequence<else>DecodeSequence<endif> {
 <if(bitSpec.chunkSize)>
     private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
     private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
 <endif>
-    private final static int chunkSize = <if(bitSpec.chunkSize)><bitSpec.chunkSize><else>1<endif>;
-    private final static boolean lsbFirst = <bitSpec.reverse>;
+    //private final static int chunkSize = <if(bitSpec.chunkSize)><bitSpec.chunkSize><else>1<endif>;
+    private final static boolean lsbFirst = <bitSpec.lsbFirst>;
+<if(bitSpec.standardBiPhase)>
+    private final static boolean inverted = <bitSpec.biPhaseInverted>;
+    private final static double halfPeriod = <bitSpec.biPhaseHalfPeriod>;
 
     private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
-        super(irSequence);
+        super(irSequence, lsbFirst, inverted, halfPeriod);
     }
+<elseif(bitSpec.standardPwm)>
+    private final static double zeroGap = <bitSpec.zeroGap>;
+    private final static double zeroFlash = <bitSpec.zeroFlash>;
+    private final static double oneGap = <bitSpec.oneGap>;
+    private final static double oneFlash = <bitSpec.oneFlash>;
 
+    private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
+        super(irSequence, lsbFirst, zeroGap, zeroFlash, oneGap, oneFlash);
+    }
+<else>
+???
+<endif>
+}
+>>
+/*
     private long parseData(long length) {
         long data = 0L;
         for (int i = 0; i \< (int) length; i += chunkSize) {
@@ -168,27 +185,7 @@ private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.D
             width = 0<ImplementationType("parameterTypeSuffix")>;
         }
         <endif!>
-    private BitwiseParameter parseData(long length, long chop, boolean complement, boolean reverse) {
-        long read = parseData(length);
-        long data = finiteBitField(read, length, chop, complement, reverse != lsbFirst);
-        return new BitwiseParameter(data, mkBitMask(length, chop));
-    }
-
-    protected boolean bitField(long expected, long length, long chop, boolean complement, boolean reverse) {
-        BitwiseParameter newParam = parseData(length, chop, complement, reverse);
-        return newParam.isConsistent(expected);
-    }
-
-    @Override
-    protected boolean bitField(BitwiseParameter parameter, long length, long chop, boolean complement, boolean reverse) {
-        BitwiseParameter newParam = parseData(length, chop, complement, reverse);
-        if (!parameter.isConsistent(newParam))
-            return false;
-        parameter.aggregate(newParam);
-        return true;
-    }
-}
->>
+*/
 
 BitSpecDecode(b, caseNo) ::= <<
 (<b.items:{item|duration(<item.microseconds>d, <i0>)}; separator=" && ">) ? <caseNo>L

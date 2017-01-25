@@ -307,4 +307,9 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
         map.put("multiplicator", multiplicator(generalSpec));
         return map;
     }
+
+    @Override
+    double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
+        return this.evaluate(nameEngine, generalSpec);
+    }
 }

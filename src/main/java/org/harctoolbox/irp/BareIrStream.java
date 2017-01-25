@@ -359,4 +359,12 @@ public class BareIrStream extends IrStreamItem {
         result.put("items", list);
         return result;
     }
+
+    double averageDuration(NameEngine nameEngine, GeneralSpec generalSpec) throws IrpException {
+        double sum = 0;
+        for (IrStreamItem item : irStreamItems) {
+            sum += item.microSeconds(nameEngine, generalSpec);
+        }
+        return sum / irStreamItems.size();
+    }
 }

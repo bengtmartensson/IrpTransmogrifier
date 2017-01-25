@@ -109,4 +109,8 @@ public abstract class IrStreamItem extends IrpObject {
     protected Map<String, Object> propertiesMap(int noProperites) {
         return IrpUtils.propertiesMap(noProperites, this);
     }
+
+    double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) throws IrpException {
+        throw new IrpException(this.getClass().getSimpleName() + " does not implement microSeconds()");
+    }
 }

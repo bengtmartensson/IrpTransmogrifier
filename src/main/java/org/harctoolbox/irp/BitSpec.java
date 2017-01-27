@@ -224,6 +224,16 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return true;
     }
 
+    boolean isSonyType(NameEngine nameEngine, GeneralSpec generalSpec) {
+        try {
+            return isPWM(nameEngine, generalSpec)
+                    && ! IrCoreUtils.approximatelyEquals(bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec),
+                            bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+        } catch (IrpException ex) {
+            return false;
+        }
+    }
+
     /**
      * Checks if the BitSpec is of type &lt;a,-a|-a,a&gt; (a != 0)
      * @param nameEngine
@@ -281,7 +291,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunkSize", Integer.toString(chunkSize));
         element.setAttribute("bitMask", Integer.toString(IrCoreUtils.ones(chunkSize)));
-        element.setAttribute("standardPwm", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
+        element.setAttribute("pwm2", Boolean.toString(isPWM(2, new NameEngine(), new GeneralSpec())));
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new NameEngine(), new GeneralSpec())));
         if (noDurations() > 0)
             element.setAttribute("noDurations", Integer.toString(noDurations()));
@@ -330,18 +340,21 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> map = new HashMap<>(13);
+        Map<String, Object> map = new HashMap<>(14);
         if (chunkSize > 1)
             map.put("chunkSize", chunkSize);
         map.put("bitMask", IrCoreUtils.ones(chunkSize));
         map.put("size", bitCodes.size());
         if (isPWM(2, new NameEngine(), new GeneralSpec())) {
-            map.put("standardPwm", true);
+            map.put("pwm2", true);
             try {
-                map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-                map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
-                map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-                map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+                map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+                map.put("flashesDiffer", !IrCoreUtils.approximatelyEquals(
+                        bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec),
+                        bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec)));
             } catch (IrpException ex) {
                 Logger.getLogger(BitSpec.class.getName()).log(Level.SEVERE, null, ex);
             }

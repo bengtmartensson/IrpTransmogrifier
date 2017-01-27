@@ -54,7 +54,8 @@ public abstract class CodeGenerator {
         return Boolean.parseBoolean(render("ManyProtocolsInOneFile"));
     }
 
-    public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, File directory, boolean inspect) throws IOException, IrpException {
+    public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, File directory, boolean inspect,
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IOException, IrpException {
         if (isAbstract())
             throw new IrpException("This target cannot generete code since it is declared abstract.");
         if (directory == null || !directory.isDirectory() || !directory.canWrite())
@@ -67,13 +68,14 @@ public abstract class CodeGenerator {
             protocol = irpDatabase.getNamedProtocol(protocolName);
             String filename = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + fileSuffix()).getCanonicalPath();
             try (PrintStream out = IrpUtils.getPrintSteam(filename)) {
-                generate(protocol, out, true, inspect);
+                generate(protocol, out, true, inspect, absoluteTolerance, relativeTolerance, frequencyTolerance);
                 logger.log(Level.INFO, "Wrote {0}", filename);
             }
         }
     }
 
-    public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect) throws IrpException {
+    public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect,
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpException {
         if (isAbstract())
             throw new IrpException("This target cannot generete code since it is declared abstract.");
         if (!manyProtocolsInOneFile() && protocolNames.size() > 1)
@@ -85,7 +87,7 @@ public abstract class CodeGenerator {
 
         protocolNames.stream().forEach((protocolName) -> {
             try {
-                generate(protocolName, irpDatabase, out, false, inspect);
+                generate(protocolName, irpDatabase, out, false, inspect, absoluteTolerance, relativeTolerance, frequencyTolerance);
             } catch (IrpException | ArithmeticException ex) {
                 logger.log(Level.WARNING, "{0}, ignoring this protol", ex);
             }
@@ -93,15 +95,17 @@ public abstract class CodeGenerator {
         out.print(render("FileEnd")); // not println
     }
 
-    private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect) throws UnknownProtocolException, IrpException {
+    private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect,
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws UnknownProtocolException, IrpException {
         NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-        generate(protocol, out, printPostAndPre, inspect);
+        generate(protocol, out, printPostAndPre, inspect, absoluteTolerance, relativeTolerance, frequencyTolerance);
     }
 
-    private void generate(NamedProtocol protocol, PrintStream out, boolean printPostAndPre, boolean inspect) {
+    private void generate(NamedProtocol protocol, PrintStream out, boolean printPostAndPre, boolean inspect,
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         if (printPostAndPre)
             out.println(render("FileBegin"));
-        ItemCodeGenerator code = protocol.code(this);// contains a trailing newline
+        ItemCodeGenerator code = protocol.code(this, absoluteTolerance, relativeTolerance, frequencyTolerance);// contains a trailing newline
         out.println(code.render());
         if (printPostAndPre)
             out.println(render("FileEnd"));

@@ -52,7 +52,8 @@ public class Protocol extends IrpObject {
     private NameEngine definitions;
     private NameEngine memoryVariables;
     private IrpParser parser = null;
-    private Boolean interleavingOkCached = null;
+    private Boolean interleavingFlash = null;
+    private Boolean interleavingGap = null;
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree) {
@@ -259,8 +260,8 @@ public class Protocol extends IrpObject {
         return memoryVariables.containsKey(name);
     }
 
-    public boolean isStandardPWM() {
-        return bitspecIrstream.isStandardPWM(definitions, generalSpec);
+    public boolean isPWM2() {
+        return bitspecIrstream.isPWM2(definitions, generalSpec);
     }
 
     public boolean isPWM4() {
@@ -280,9 +281,27 @@ public class Protocol extends IrpObject {
     }
 
     public boolean interleavingOk() {
-        if (interleavingOkCached == null)
-            interleavingOkCached = bitspecIrstream.interleavingOk(definitions, generalSpec);
-        return interleavingOkCached;
+       return interleavingFlashOk() && interleavingGapOk();
+    }
+
+    public boolean interleavingFlashOk() {
+        if (interleavingFlash == null)
+            interleavingFlash = bitspecIrstream.interleavingOk(DurationType.flash, definitions, generalSpec);
+        return interleavingFlash;
+    }
+
+    public boolean interleavingGapOk() {
+        if (interleavingGap == null)
+            interleavingGap = bitspecIrstream.interleavingOk(DurationType.gap, definitions, generalSpec);
+        return interleavingGap;
+    }
+
+    /**
+     * A protocol is Sonytype if it is PWM2 with different flashes, and has interleaving flashes.
+     * @return
+     */
+    public boolean isSonyType() {
+        return bitspecIrstream.isSonyType(definitions, generalSpec);
     }
 
     public boolean isRPlus() {
@@ -315,13 +334,16 @@ public class Protocol extends IrpObject {
         Element renderer = document.createElement(Protocol.class.getSimpleName());
         root.appendChild(renderer);
         XmlUtils.addBooleanAttributeIfTrue(renderer, "toggle", hasMemoryVariable("T"));
-        XmlUtils.addBooleanAttributeIfTrue(renderer, "standardPwm", isStandardPWM());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "pwm2", isPWM2());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "pwm4", isPWM4());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "pwm16", isPWM16());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "biphase", isBiphase());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "trivial", isTrivial(false));
         XmlUtils.addBooleanAttributeIfTrue(renderer, "invTrivial", isTrivial(true));
         XmlUtils.addBooleanAttributeIfTrue(renderer, "interleavingOk", interleavingOk());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "interleavingFlashOk", interleavingFlashOk());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "interleavingGapOk", interleavingGapOk());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "sonyType", isSonyType());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "startsWithDuration", startsWithDuration());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "hasVariation", hasVariation());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "rplus", isRPlus());
@@ -445,13 +467,16 @@ public class Protocol extends IrpObject {
         StringBuilder str = new StringBuilder(128);
         str.append((int) getFrequency());
         str.append("\t").append(hasMemoryVariable("T") ? "toggle\t" : "\t");
-        str.append(isStandardPWM() ? "PWM" : "");
+        str.append(isPWM2() ? "PWM2" : "");
         str.append(isPWM4() ? "PWM4" : "");
         str.append(isPWM16() ? "PWM16" : "");
         str.append(isBiphase() ? "Biphase" : "");
         str.append(isTrivial(false) ? "Trivial" : "");
         str.append(isTrivial(true) ? "invTrivial" : "");
         str.append("\t").append(interleavingOk() ? "interleaving\t" : "\t");
+        str.append("\t").append(interleavingFlashOk() ? "flashint\t" : "\t");
+        str.append("\t").append(interleavingGapOk() ? "gapint\t" : "\t");
+        str.append("\t").append(isSonyType() ? "sony\t" : "\t");
         str.append(startsWithDuration() ? "SWD\t" : "\t");
         str.append(hasVariation() ? "variation\t" : "\t");
         str.append(isRPlus() ? "R+" : "");

@@ -33,7 +33,7 @@ break;
 >>
 
 ShiftBitSpec(indexVariable,widthVariable) ::= <<
-<if(bitSpec.reverse)><indexVariable><else>(<widthVariable> - <indexVariable> - <if(bitSpec.chunkSize)><bitSpec.chunkSize><else>1<endif>)<endif>
+<if(bitSpec.lsbFirst)><indexVariable><else>(<widthVariable> - <indexVariable> - <if(bitSpec.chunkSize)><bitSpec.chunkSize><else>1<endif>)<endif>
 >>
 
 InitValue(v) ::= "<if(v)> = <v><endif>"

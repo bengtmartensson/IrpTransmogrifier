@@ -42,12 +42,21 @@ public class NamedProtocol extends Protocol {
         return document;
     }
 
+    private static void putParameter(Map<String, Object> map, String parameterName, Double userValue, Double databaseValue) {
+        if (userValue != null)
+            map.put(parameterName, userValue);
+        else if (databaseValue != null)
+            map.put(parameterName, databaseValue);
+        else
+            ;
+    }
+
     private final String irp; // original one on input, not canonicalized
     private final String name;
     private final String documentation;
-    private final double absoluteTolerance;
-    private final double relativeTolerance;
-    private final double frequencyTolerance;
+    private final Double absoluteTolerance;
+    private final Double relativeTolerance;
+    private final Double frequencyTolerance;
     private final boolean decodable;
     private final List<String> preferOver;
 
@@ -59,9 +68,9 @@ public class NamedProtocol extends Protocol {
         this.irp = irp;
         this.name = name;
         this.documentation = documentation;
-        this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : IrCoreUtils.invalid;
-        this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : IrCoreUtils.invalid;
-        this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : IrCoreUtils.invalid;
+        this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : null;
+        this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : null;
+        this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : null;
         this.decodable = decodable == null || Boolean.parseBoolean(decodable);
         this.preferOver = preferOver;
     }
@@ -134,9 +143,9 @@ public class NamedProtocol extends Protocol {
         return decodable;
     }
 
-    private double getDoubleWithSubstitute(Double userValue, double standardValue, double fallback) {
+    private double getDoubleWithSubstitute(Double userValue, Double standardValue, double fallback) {
         return userValue != null ? userValue
-                : standardValue >= 0 ? standardValue
+                : standardValue != null ? standardValue
                 : fallback;
     }
 
@@ -189,9 +198,9 @@ public class NamedProtocol extends Protocol {
         return root;
     }
 
-    ItemCodeGenerator code(CodeGenerator codeGenerator) {
+    ItemCodeGenerator code(CodeGenerator codeGenerator, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
-        template.addAggregateList("metaData", metaDataPropertiesMap());
+        template.addAggregateList("metaData", metaDataPropertiesMap(absoluteTolerance, relativeTolerance, frequencyTolerance));
         template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec(), getDefinitions());
         template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec(), getDefinitions());
         Set<String> variables = getBitspecIrstream().assignmentVariables();
@@ -205,12 +214,19 @@ public class NamedProtocol extends Protocol {
         return template;
     }
 
-    private Map<String, Object> metaDataPropertiesMap() {
-        Map<String, Object> map = IrpUtils.propertiesMap(4, this);
+    private Map<String, Object> metaDataPropertiesMap(Double userAbsoluteTolerance, Double userRelativeTolerance, Double userFrequencyTolerance) {
+        Map<String, Object> map = IrpUtils.propertiesMap(11, this);
         map.put("protocolName", getName());
         map.put("cProtocolName", IrpUtils.toCIdentifier(getName()));
         map.put("irp", getIrp());
         map.put("documentation", IrCoreUtils.javaifyString(getDocumentation()));
+        map.put("sonyType", isSonyType());
+        map.put("interleavingOk", interleavingOk());
+        map.put("interleavingFlashOk", interleavingFlashOk());
+        map.put("interleavingGapOk", interleavingGapOk());
+        putParameter(map, "relativeTolerance", userRelativeTolerance, relativeTolerance);
+        putParameter(map, "absoluteTolerance", userAbsoluteTolerance, absoluteTolerance);
+        putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);
         return map;
     }
 }

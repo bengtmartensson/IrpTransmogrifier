@@ -50,6 +50,10 @@ public class BareIrStream extends IrStreamItem {
         return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
     }
 
+    static boolean interleavingOk(DurationType toCheck, BareIrStream bareIrStream, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitspecs) {
+        return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
+    }
+
     private static List<IrStreamItem> parse(List<IrpParser.Irstream_itemContext> list) {
         List<IrStreamItem> irStreamItems = new ArrayList<>(list.size());
         list.stream().map((item) -> newIrStreamItem(item)).forEachOrdered((irStreamItem) -> {
@@ -297,6 +301,17 @@ public class BareIrStream extends IrStreamItem {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems) {
             if (!item.interleavingOk(nameEngine, generalSpec, current, gapFlashBitSpecs))
+                return false;
+            current = item.endingDurationType(last, gapFlashBitSpecs);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        DurationType current = last;
+        for (IrStreamItem item : irStreamItems) {
+            if (!item.interleavingOk(toCheck, nameEngine, generalSpec, current, gapFlashBitSpecs))
                 return false;
             current = item.endingDurationType(last, gapFlashBitSpecs);
         }

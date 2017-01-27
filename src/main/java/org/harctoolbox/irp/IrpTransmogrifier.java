@@ -355,10 +355,10 @@ public class IrpTransmogrifier {
         if (commandCode.target.equalsIgnoreCase("xml"))
             createXmlProtocols(protocolNames, commandLineArgs.encoding);
         else
-            codeST(protocolNames, commandCode.target, commandCode.directory, commandCode.inspect);
+            codeST(protocolNames, commandCode.target, commandCode.directory, commandCode.inspect, commandLineArgs);
     }
 
-    private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect) throws IOException, IrpException {
+    private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect, CommandLineArgs commandLineArgs) throws IOException, IrpException {
         if (target.equals("?")) {
             listTargets(out);
             return;
@@ -373,9 +373,11 @@ public class IrpTransmogrifier {
             return;
         }
         if (directory != null)
-            codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect);
+            codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect,
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
         else
-            codeGenerator.generate(protocolNames, irpDatabase, out, inspect);
+            codeGenerator.generate(protocolNames, irpDatabase, out, inspect,
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
     }
 
     private void listTargets(PrintStream printStream) throws IOException {

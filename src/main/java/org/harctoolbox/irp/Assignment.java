@@ -146,6 +146,11 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        return true;
+    }
+
+    @Override
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         return DurationType.none;
     }

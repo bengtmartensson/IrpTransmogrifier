@@ -191,8 +191,29 @@ public class BitspecIrstream extends IrStreamItem {
                 && irStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
     }
 
+    @Override
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        boolean flashGapBitspecs = bitSpec.interleaveOk(nameEngine, generalSpec, DurationType.gap, false);
+        boolean gapFlashBitspecs = bitSpec.interleaveOk(nameEngine, generalSpec, DurationType.flash, true);
+
+        return (flashGapBitspecs || gapFlashBitspecs)
+                && irStream.interleavingOk(toCheck, nameEngine, generalSpec, last, gapFlashBitspecs);
+    }
+
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last) {
+        boolean flashGapBitspecs = bitSpec.interleaveOk(nameEngine, generalSpec, DurationType.gap, false);
+        boolean gapFlashBitspecs = bitSpec.interleaveOk(nameEngine, generalSpec, DurationType.flash, true);
+
+        return (flashGapBitspecs || gapFlashBitspecs)
+                && irStream.interleavingOk(toCheck, nameEngine, generalSpec, last, gapFlashBitspecs);
+    }
+
     public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec) {
         return interleavingOk(nameEngine, generalSpec, DurationType.gap);
+    }
+
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec) {
+        return interleavingOk(toCheck, nameEngine, generalSpec, DurationType.gap);
     }
 
     @Override
@@ -205,7 +226,7 @@ public class BitspecIrstream extends IrStreamItem {
         return irStream.startingDuratingType(last, gapFlashBitSpecs);
     }
 
-    boolean isStandardPWM(NameEngine nameEngine, GeneralSpec generalSpec) {
+    boolean isPWM2(NameEngine nameEngine, GeneralSpec generalSpec) {
         return bitSpec.isPWM(2, nameEngine, generalSpec);
     }
 
@@ -227,6 +248,11 @@ public class BitspecIrstream extends IrStreamItem {
 
     boolean isRPlus() {
         return irStream.isRPlus();
+    }
+
+    boolean isSonyType(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return interleavingOk(DurationType.flash, nameEngine, generalSpec)
+                && bitSpec.isSonyType(nameEngine, generalSpec);
     }
 
     public DurationType startingDurationType(boolean gapFlashBitSpecs) {

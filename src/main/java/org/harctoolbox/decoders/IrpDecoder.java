@@ -23,12 +23,12 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BitwiseParameter;
+import org.harctoolbox.irp.IrpException;
 
 public abstract class IrpDecoder {
-    private static final double frequencyTolerance = 500d;
 
-    private static boolean isBetween(double actual, double lower, double upper) {
-            return actual >= lower && actual <= upper;
+    private static boolean isClose(double x, double y, double tolerance) {
+            return x >= y - tolerance && x <= y + tolerance;
     }
 
     // functions evaluating BitFields in expressions
@@ -72,6 +72,10 @@ public abstract class IrpDecoder {
         valid = false;
     }
 
+    protected double getFrequencyTolerance() {
+        return IrCoreUtils.defaultFrequencyTolerance;
+    }
+
     public final boolean isValid() {
         return valid;
     }
@@ -82,22 +86,32 @@ public abstract class IrpDecoder {
 
     public abstract Map<String, Long> getParameters();
 
-    public abstract boolean decodeAsIntro(IrSequence irSequence);
-
-    public abstract boolean decodeAsRepeat(IrSequence irSequence);
-
-    public abstract boolean decodeAsEnding(IrSequence irSequence);
-
-    protected final boolean decode(IrSignal irSignal) {
-        valid = checkFrequency(irSignal.getFrequency())
-                && decodeAsIntro(irSignal.getIntroSequence())
-                && decodeAsRepeat(irSignal.getRepeatSequence())
-                && decodeAsEnding(irSignal.getEndingSequence());
-        return valid;
+    public void decodeAsIntro(IrSequence irSequence) throws DecodeException {
+        if (!irSequence.isEmpty())
+           throw new DecodeException("Sequence expected to be empty");
     }
 
-    private boolean checkFrequency(double frequency) {
-        return isBetween(frequency, getFrequency() - frequencyTolerance, getFrequency() + frequencyTolerance);
+    public void decodeAsRepeat(IrSequence irSequence) throws DecodeException {
+        if (!irSequence.isEmpty())
+           throw new DecodeException("Sequence expected to be empty");
+    }
+
+    public void decodeAsEnding(IrSequence irSequence) throws DecodeException {
+        if (!irSequence.isEmpty())
+           throw new DecodeException("Sequence expected to be empty");
+    }
+
+    protected final void decode(IrSignal irSignal) throws DecodeException {
+        checkFrequency(irSignal.getFrequency());
+        decodeAsIntro(irSignal.getIntroSequence());
+        decodeAsRepeat(irSignal.getRepeatSequence());
+        decodeAsEnding(irSignal.getEndingSequence());
+        valid = true;
+    }
+
+    private void checkFrequency(double frequency) throws DecodeException {
+        if (!isClose(frequency, getFrequency(), getFrequencyTolerance()))
+            throw new DecodeException();
     }
 
     protected final boolean assign(BitwiseParameter bitwiseParameter, long value) {
@@ -108,21 +122,33 @@ public abstract class IrpDecoder {
     protected static abstract class DecodeSequence {
 
         // Assumes interleaving
-        protected final static int chunkSize = 1;
-        protected final static int bitSpecLength = 2;
+        private final static double largeDurationTolerance = 15000d;
+        private final static double largeDurationThreshold = 20000d;
 
-        protected static final double durationTolerance = 50d;
-        protected static final double extentTolerance = 1000d;
+        private final int chunkSize;
         private final boolean lsbFirst;
-        protected final IrSequence irSequence;
-        protected int extentBegin;
-        protected int index;
+        private final IrSequence irSequence;
+        private int extentBegin;
+        private int index;
 
-        DecodeSequence(IrSequence irSequence, boolean lsbFirst) {
+        DecodeSequence(IrSequence irSequence, boolean lsbFirst, int chunkSize) {
             this.lsbFirst = lsbFirst;
+            this.chunkSize = chunkSize;
             this.extentBegin = 0;
             this.irSequence = irSequence;
             index = 0;
+        }
+
+        protected double getAbsoluteTolerance() {
+            return IrCoreUtils.defaultAbsoluteTolerance;
+        }
+
+        protected double getRelativeTolerance() {
+            return IrCoreUtils.defaultRelativeTolerance;
+        }
+
+        private boolean acceptablyClose(double x, double y) {
+            return IrCoreUtils.approximatelyEquals(x, y, getAbsoluteTolerance(), getRelativeTolerance());
         }
 
         protected final boolean isFlash() {
@@ -143,36 +169,61 @@ public abstract class IrpDecoder {
             index += amount;
         }
 
-        protected boolean duration(double expected) {
-            double actual = Math.abs(irSequence.get(index));
+        protected final double actual() throws DecodeException {
+            return actual(0);
+        }
+
+        protected final double actual(int offset) throws DecodeException {
+            try {
+                return Math.abs(irSequence.get(index + offset));
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                throw new DecodeException(ex);
+            }
+        }
+
+        protected void duration(double expected) throws DecodeException {
+            boolean result = duration(expected, 0);
             index++;
-            return expected > 50000 ? isBetween(actual, expected - 10000, expected + 10000)
-                    : isBetween(actual, expected - durationTolerance, expected + durationTolerance);
+            if (!result)
+                throw new DecodeException();
         }
 
-        protected boolean duration(double expected, int peek) {
-            double actual = Math.abs(irSequence.get(index + peek));
-            return isBetween(actual, expected - durationTolerance, expected + durationTolerance);
+        protected boolean duration(double expected, int peek) throws DecodeException {
+            double actual = actual(peek);
+            return acceptablyClose(actual, expected);
+//            double  tolerance = expected > largeDurationThreshold ? largeDurationTolerance : durationTolerance;
+//            return isClose(actual, expected, tolerance);
+        }
+
+        protected final boolean durationLong(double expected, int peek) throws DecodeException {
+            double actual = actual(peek);
+            return actual >=  expected - getAbsoluteTolerance();
         }
 
         // override for non-interleaving
-        protected final boolean flash(double expected) {
-            return isFlash() && duration(expected);
+        protected final void flash(double expected) throws DecodeException {
+            if (!isFlash())
+                throw new DecodeException();
+            duration(expected);
         }
 
         // override for non-interleaving
-        protected final boolean flash(double expected, int peek) {
+        protected final boolean flash(double expected, int peek) throws DecodeException {
             return isFlash() && duration(expected, peek);
         }
 
         // override for non-interleaving
-        protected final boolean gap(double expected) {
-            return !isFlash() && duration(expected);
+        protected void gap(double expected) throws DecodeException {
+            if (isFlash())
+                throw new DecodeException();
+            duration(expected);
         }
 
         // override for non-interleaving
-        protected final boolean gap(double expected, int peek) {
-            return !isFlash() && duration(expected, peek);
+        protected final void gap(double expected, int peek) throws DecodeException {
+            if (isFlash())
+                throw new DecodeException();
+            duration(expected, peek);
         }
 
         // override for non-interleaving
@@ -182,29 +233,30 @@ public abstract class IrpDecoder {
             index++;
             double passed = irSequence.getDuration(extentBegin, index - extentBegin);
             extentBegin = index;
-            return isBetween(passed, expected - extentTolerance, expected + extentTolerance);
+            return acceptablyClose(passed, expected);
         }
 
-        protected abstract int parseChunk();
+        protected abstract int parseChunk() throws DecodeException;
 
         /**
          * Consumes data from the ir stream.
          * @param length
          * @return read data
+         * @throws org.harctoolbox.decoders.IrpDecoder.DecodeException
          */
-        protected final long parseData(long length) {
+        protected final long parseData(long length) throws DecodeException {
             long data = 0L;
             for (int i = 0; i < (int) length; i += chunkSize) {
                 int chunk = parseChunk();
-                if (chunk == -1)
-                    return -1L;
                 data = data << chunkSize | (long) chunk;
             }
             return data;
         }
 
-        protected final BitwiseParameter parseData(long length, long chop, boolean complement, boolean reverse) {
+        protected final BitwiseParameter parseData(long length, long chop, boolean complement, boolean reverse) throws DecodeException {
             long read = parseData(length);
+            if (read < 0)
+                return null;
             long data = invertFiniteBitField(read, length, chop, complement, reverse != lsbFirst);
             return new BitwiseParameter(data, mkBitMask(length, chop));
         }
@@ -217,8 +269,9 @@ public abstract class IrpDecoder {
          * @param complement
          * @param reverse
          * @return
+         * @throws org.harctoolbox.decoders.IrpDecoder.DecodeException
          */
-        protected final boolean bitField(long expected, long length, long chop, boolean complement, boolean reverse) {
+        protected final boolean bitField(long expected, long length, long chop, boolean complement, boolean reverse) throws DecodeException {
             BitwiseParameter newParam = parseData(length, chop, complement, reverse);
             return newParam.isConsistent(expected);
         }
@@ -231,33 +284,36 @@ public abstract class IrpDecoder {
          * @param complement
          * @param reverse
          * @return
+         * @throws org.harctoolbox.decoders.IrpDecoder.DecodeException
          */
-        protected final boolean bitField(BitwiseParameter parameter, long length, long chop, boolean complement, boolean reverse) {
+        protected final boolean bitField(BitwiseParameter parameter, long length, long chop, boolean complement, boolean reverse) throws DecodeException {
             BitwiseParameter newParam = parseData(length, chop, complement, reverse);
-            if (!parameter.isConsistent(newParam))
+            if (newParam == null || !parameter.isConsistent(newParam))
                 return false;
             parameter.aggregate(newParam);
             return true;
         }
 
-        protected final boolean bitField(BitwiseParameter parameter, long length, boolean complement, boolean reverse) {
+        protected final boolean bitField(BitwiseParameter parameter, long length, boolean complement, boolean reverse) throws DecodeException {
             return bitField(parameter, length, 0L, complement, reverse);
         }
 
-        protected final boolean bitField(BitwiseParameter parameter, long length, long chop, boolean complement) {
+        protected final boolean bitField(BitwiseParameter parameter, long length, long chop, boolean complement) throws DecodeException {
             return bitField(parameter, length, chop, complement, false);
         }
 
-        protected final boolean bitField(BitwiseParameter parameter, long length) {
+        protected final boolean bitField(BitwiseParameter parameter, long length) throws DecodeException {
             return bitField(parameter, length, 0L, false, false);
         }
 
-        protected final boolean bitField(BitwiseParameter parameter, long length, boolean complement) {
+        protected final boolean bitField(BitwiseParameter parameter, long length, boolean complement) throws DecodeException {
             return bitField(parameter, length, 0L, complement, false);
         }
     }
 
     protected static class Pwm2DecodeSequence extends IrpDecoder.DecodeSequence {
+        public static final int bitSpecLength = 2;
+        public static final int chunkSize = 1;
 
         private final double zeroGap;
         private final double zeroFlash;
@@ -266,7 +322,7 @@ public abstract class IrpDecoder {
 
         Pwm2DecodeSequence(IrSequence irSequence, boolean lsbFirst,
                 double zeroFlash, double zeroGap, double oneFlash, double oneGap) {
-            super(irSequence, lsbFirst);
+            super(irSequence, lsbFirst, chunkSize);
             this.zeroGap = zeroGap;
             this.zeroFlash = zeroFlash;
             this.oneGap = oneGap;
@@ -274,33 +330,122 @@ public abstract class IrpDecoder {
         }
 
         @Override
-        protected int parseChunk() {
+        protected int parseChunk() throws DecodeException {
             int result =
                       (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
                     : (duration(oneFlash, 0) && duration(oneGap, 1)) ? 1
                     : -1;
+            if (result == -1)
+                throw new DecodeException("parseChunk");
             pull(bitSpecLength);
+            return result;
+        }
+
+        /**
+         * @return the zeroGap
+         */
+        protected double getZeroGap() {
+            return zeroGap;
+        }
+
+        /**
+         * @return the zeroFlash
+         */
+        protected double getZeroFlash() {
+            return zeroFlash;
+        }
+
+        /**
+         * @return the oneGap
+         */
+        protected double getOneGap() {
+            return oneGap;
+        }
+
+        /**
+         * @return the oneFlash
+         */
+        protected double getOneFlash() {
+            return oneFlash;
+        }
+    }
+
+    protected static class SonyTypeDecodeSequence extends IrpDecoder.Pwm2DecodeSequence {
+        protected double excess;
+
+        SonyTypeDecodeSequence(IrSequence irSequence, boolean lsbFirst,
+                double zeroFlash, double zeroGap, double oneFlash, double oneGap) {
+            super(irSequence, lsbFirst,
+                zeroFlash, zeroGap, oneFlash, oneGap);
+            if (IrCoreUtils.approximatelyEquals(zeroFlash, oneFlash))
+                throw new ThisCannotHappenException();
+            excess = 0d;
+        }
+
+        @Override
+        protected void gap(double expected) throws DecodeException {
+            double stillExpected = expected + excess;
+            if (duration(stillExpected, 0)) {
+                pull(1);
+                excess = 0;
+            } else if (durationLong(stillExpected, 0)) {
+                excess = expected;
+            } else
+                throw new DecodeException();
+        }
+
+        @Override
+        protected int parseChunk() throws DecodeException {
+            int result;
+            boolean success;
+
+            if (duration(getZeroFlash(), 0)) {
+                pull(1);
+                result = 0;
+                gap(getZeroGap());
+            } else if (duration(getOneFlash(), 0)) {
+                pull(1);
+                result = 1;
+                gap(getOneGap());
+            } else
+                throw new DecodeException("");
+
             return result;
         }
     }
 
-    protected static class BiPhaseDecodeSequence extends IrpDecoder.DecodeSequence {
+    protected abstract static class NonInterlacedDecodeSequence extends IrpDecoder.DecodeSequence {
 
+        protected double consumed;
+
+        NonInterlacedDecodeSequence(IrSequence irSequence, boolean lsbFirst, int chunkSize) {
+            super(irSequence, lsbFirst, chunkSize);
+            consumed = 0d;
+        }
+
+        @Override
+        protected void duration(double expected) throws DecodeException {
+            double stillExpected = expected + consumed;
+            if (duration(stillExpected, 0)) {
+                pull(1);
+                consumed = 0;
+            } else if (durationLong(stillExpected, 0)) {
+                //excess = expected;
+                consumed += expected;
+            } else
+                throw new DecodeException();
+        }
+    }
+
+    protected static class BiPhaseDecodeSequence extends IrpDecoder.NonInterlacedDecodeSequence {
+        public final static int chunkSize = 1;
         private final double halfPeriod;
-        private final double fullPeriod;
-        private boolean between;
         private final boolean inverted; // not inverted; gap, flash -> 0 (e.g. RC6)
 
         BiPhaseDecodeSequence(IrSequence irSequence, boolean lsbFirst, boolean inverted, double halfPeriod) {
-            super(irSequence, lsbFirst);
+            super(irSequence, lsbFirst, chunkSize);
             this.halfPeriod = halfPeriod;
-            this.fullPeriod = 2*halfPeriod;
             this.inverted = inverted;
-            between = false;
-        }
-        protected boolean durationLong(double expected, int peek) {
-            double actual = Math.abs(irSequence.get(index + peek));
-            return actual >=  expected - durationTolerance;
         }
 
         public boolean isZero() {
@@ -308,31 +453,27 @@ public abstract class IrpDecoder {
         }
 
         @Override
-        protected boolean duration(double expected) {
-            if (duration(expected, 0)) {
-                pull(1);
-                between = false;
-                return true;
-            } else if (durationLong(expected, 0)) {
-                between = true;
-                return true;
-            } else
-                return false;
+        protected int parseChunk() throws DecodeException {
+            int result = isZero() ? 0 : 1;
+            duration(halfPeriod);
+            duration(halfPeriod);
+
+            return result;
+        }
+    }
+
+    protected static class DecodeException extends IrpException {
+
+        DecodeException(String message) {
+            super(message);
         }
 
-        @Override
-        protected int parseChunk() {
-            if (between) {
-                if (!(duration(fullPeriod, 0) && durationLong(halfPeriod, 1)))
-                    return -1;
-            } else {
-                if (!(duration(halfPeriod, 0) && durationLong(halfPeriod, 1)))
-                    return -1;
-            }
-            int result = isZero() ? 0 : 1;
-            between = !duration(halfPeriod, 1);
-            pull(between ? 1 : 2);
-            return result;
+        DecodeException(Throwable ex) {
+            super(ex);
+        }
+
+        DecodeException() {
+            super("");
         }
     }
 }

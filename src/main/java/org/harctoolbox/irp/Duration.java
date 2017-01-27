@@ -261,6 +261,12 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        DurationType current = DurationType.newDurationType(isOn());
+        return !(current == toCheck && last == current);
+    }
+
+    @Override
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         return DurationType.newDurationType(isOn());
     }

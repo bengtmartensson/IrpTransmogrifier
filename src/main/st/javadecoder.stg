@@ -89,7 +89,10 @@ public <ClassName()>() {
 DeclareOneParameterConstructor() ::= <<
 public <ClassName()>(IrSignal irSignal) {
     this();
-    decode(irSignal);
+    try {
+        decode(irSignal);
+    } catch (DecodeException ex) {
+    }
 }
 >>
 
@@ -127,12 +130,11 @@ public <ImplementationType("dutyCycleType")> getDutyCycle() {
 >>
 
 DefineClassList() ::= <<
-private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(bitSpec.standardBiPhase)>BiPhaseDecodeSequence<elseif(bitSpec.standardPwm)>Pwm2DecodeSequence<else>DecodeSequence<endif> {
+private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(bitSpec.standardBiPhase)>BiPhase<elseif(metaData.sonyType)>SonyType<elseif(bitSpec.pwm2)>Pwm2<endif>DecodeSequence {
 <if(bitSpec.chunkSize)>
     private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
     private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
 <endif>
-    //private final static int chunkSize = <if(bitSpec.chunkSize)><bitSpec.chunkSize><else>1<endif>;
     private final static boolean lsbFirst = <bitSpec.lsbFirst>;
 <if(bitSpec.standardBiPhase)>
     private final static boolean inverted = <bitSpec.biPhaseInverted>;
@@ -141,17 +143,38 @@ private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<
     private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
         super(irSequence, lsbFirst, inverted, halfPeriod);
     }
-<elseif(bitSpec.standardPwm)>
+<elseif(bitSpec.pwm2)>
     private final static double zeroGap = <bitSpec.zeroGap>;
     private final static double zeroFlash = <bitSpec.zeroFlash>;
     private final static double oneGap = <bitSpec.oneGap>;
     private final static double oneFlash = <bitSpec.oneFlash>;
 
     private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
-        super(irSequence, lsbFirst, zeroGap, zeroFlash, oneGap, oneFlash);
+        super(irSequence, lsbFirst, zeroFlash, zeroGap, oneFlash, oneGap);
     }
 <else>
 ???
+<endif>
+<if(metaData.absoluteTolerance)>
+
+    @Override
+    protected double getAbsoluteTolerance() {
+        return <metaData.absoluteTolerance>d;
+    }
+<endif>
+<if(metaData.relativeTolerance)>
+
+    @Override
+    protected double getRelativeTolerance() {
+        return <metaData.relativeTolerance>d;
+    }
+<endif>
+<if(metaData.frequencyTolerance)>
+ 
+    @Override
+    protected double getFrequencyTolerance() {
+        return <metaData.frequencyTolerance>d;
+    }
 <endif>
 }
 >>
@@ -192,20 +215,17 @@ BitSpecDecode(b, caseNo) ::= <<
 >>
 
 TopFunction(passName, functionBody) ::= <<
-@Override
-public boolean decodeAs<passName>(IrSequence irSequence) {
 <if(functionBody.irStream.items)>
+@Override
+public void decodeAs<passName>(IrSequence irSequence) throws DecodeException {
     <metaData.cProtocolName>DecodeSequence seq = new <metaData.cProtocolName>DecodeSequence(irSequence);
     <TopFunctionBody(functionBody)>;
-<else>
-    return irSequence.isEmpty();
-<endif>
 }
+<endif>
 >>
 
 BareIrStream(body) ::= <<
-return
-    <body.items:{ s | <(s.kind)(s)>}; separator="\n&& ">
+<body.items:{ s | <(s.kind)(s)>}; separator=";\n">
 >>
 
 ResetDurationCounter() ::= ""
@@ -222,7 +242,7 @@ FiniteBitFieldExpression(arg) ::= <<
 finiteBitField(<(arg.data.kind)(arg.data)>, <(arg.width.kind)(arg.width)>, <if(arg.chop)><(arg.chop.kind)(arg.chop)><else>0L<endif>, <arg.complement>, <arg.reverse>)
 >>
 
-Assignment(arg)     ::= "assign(<(arg.name.kind)(arg.name)>,<(arg.expression.kind)(arg.expression)>)"
+Assignment(arg)     ::= "assign(<(arg.name.kind)(arg.name)>, <(arg.expression.kind)(arg.expression)>)"
 
 Flash(arg)          ::= "seq.flash(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
 Gap(arg)            ::= "seq.gap(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"

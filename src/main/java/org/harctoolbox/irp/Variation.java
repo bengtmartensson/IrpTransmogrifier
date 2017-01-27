@@ -134,6 +134,13 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+         return BareIrStream.interleavingOk(toCheck, intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(toCheck, intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(toCheck, intro, nameEngine, generalSpec, last, gapFlashBitSpecs);
+    }
+
+    @Override
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         return BareIrStream.endingDurationType(intro, last, gapFlashBitSpecs)
                 .combine(BareIrStream.endingDurationType(repeat, last, gapFlashBitSpecs))

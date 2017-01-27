@@ -284,6 +284,11 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        return true; // ????
+    }
+
+    @Override
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         return gapFlashBitSpecs ? DurationType.flash : DurationType.gap;
     }

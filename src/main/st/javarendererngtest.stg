@@ -83,7 +83,7 @@ public void testMap(Map\<String, Long> map) {
 /**
  * Exhaustive test of newIrSignal method, of class <RendererClassName()>.
  */
-//@Test
+@Test(enabled = false)
 public void testNewIrSignalExhaustive() {
     System.out.println("newIrSignalExhaustive");
     <parameterSpecs.list:{p|for (long <p.name> = <p.min><ImplementationType("parameterTypeSuffix")>; <p.name> \<= <p.max><ImplementationType("parameterTypeSuffix")>; <p.name>++)}; separator="\n">
@@ -94,7 +94,7 @@ public void testNewIrSignalExhaustive() {
  * Test of newIrSignal method, of class <RendererClassName()>.
  * @throws org.harctoolbox.irp.IrpSyntaxException
  */
- @Test
+ @Test(enabled = true)
  public void testNewIrSignal() throws IrpSyntaxException {
     System.out.println("newIrSignal@<metaData.protocolName>");
     for (int i = 0; i \< noRandomTests; i++)

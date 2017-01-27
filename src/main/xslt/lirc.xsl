@@ -242,7 +242,7 @@ end remote
         <xsl:comment>
             <xsl:text> Protocol </xsl:text>
             <xsl:value-of select="@name"/>
-            <xsl:text> omitted: not one of the simple types (pwm, pwm4, biphase) </xsl:text>
+            <xsl:text> omitted: not one of the simple types (pwm2, pwm4, biphase) </xsl:text>
         </xsl:comment>
     </xsl:template>
 

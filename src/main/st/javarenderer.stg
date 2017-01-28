@@ -25,7 +25,6 @@ FilePreamble() ::= <<
 package org.harctoolbox.render;
 
 import java.util.Map;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 
 >>
@@ -150,7 +149,7 @@ protected <metaData.cProtocolName>IrList setup<passName>() {
 ResetDurationCounter() ::= ""
 
 FiniteBitField(fbf) ::= <<
-list.bitField(<if(fbf.complement)>~<endif><if(fbf.reverse)>IrCoreUtils.reverse<endif>(<(fbf.data.kind)(fbf.data)><if(fbf.reverse)>, (<ImplementationType("intType")>)<(fbf.width.kind)(fbf.width)><endif>)<Chop(fbf.chop)>, <(fbf.width.kind)(fbf.width)>)
+list.bitField(<if(fbf.complement)>~<endif><if(fbf.reverse)>org.harctoolbox.ircore.IrCoreUtils.reverse<endif>(<(fbf.data.kind)(fbf.data)><if(fbf.reverse)>, (<ImplementationType("intType")>)<(fbf.width.kind)(fbf.width)><endif>)<Chop(fbf.chop)>, <(fbf.width.kind)(fbf.width)>)
 >>
 
 InfiniteBitFieldExpression(arg) ::= <<

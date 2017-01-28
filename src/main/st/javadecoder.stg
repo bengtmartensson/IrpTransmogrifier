@@ -130,11 +130,7 @@ public <ImplementationType("dutyCycleType")> getDutyCycle() {
 >>
 
 DefineClassList() ::= <<
-private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(bitSpec.standardBiPhase)>BiPhase<elseif(metaData.sonyType)>SonyType<elseif(bitSpec.pwm2)>Pwm2<endif>DecodeSequence {
-<if(bitSpec.chunkSize)>
-    private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
-    private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
-<endif>
+private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(bitSpec.standardBiPhase)>BiPhase<elseif(metaData.sonyType)>SonyType<elseif(bitSpec.pwm2)>Pwm2<elseif(bitSpec.pwm4)>Pwm4<endif>DecodeSequence {
     private final static boolean lsbFirst = <bitSpec.lsbFirst>;
 <if(bitSpec.standardBiPhase)>
     private final static boolean inverted = <bitSpec.biPhaseInverted>;
@@ -152,8 +148,21 @@ private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<
     private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
         super(irSequence, lsbFirst, zeroFlash, zeroGap, oneFlash, oneGap);
     }
+<elseif(bitSpec.pwm4)>
+    private final static double zeroGap = <bitSpec.zeroGap>;
+    private final static double zeroFlash = <bitSpec.zeroFlash>;
+    private final static double oneGap = <bitSpec.oneGap>;
+    private final static double oneFlash = <bitSpec.oneFlash>;
+    private final static double twoGap = <bitSpec.twoGap>;
+    private final static double twoFlash = <bitSpec.twoFlash>;
+    private final static double threeGap = <bitSpec.threeGap>;
+    private final static double threeFlash = <bitSpec.threeFlash>;
+
+    private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
+        super(irSequence, lsbFirst, zeroFlash, zeroGap, oneFlash, oneGap, twoFlash, twoGap, threeFlash, threeGap);
+    }
 <else>
-???
+    *** Cannot generate code for this protocol. ***
 <endif>
 <if(metaData.absoluteTolerance)>
 
@@ -178,37 +187,6 @@ private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<
 <endif>
 }
 >>
-/*
-    private long parseData(long length) {
-        long data = 0L;
-        for (int i = 0; i \< (int) length; i += chunkSize) {
-            long chunk =
-            <bitSpec.list:{b|<BitSpecDecode(b,i0)>}; separator="\n: ">
-            : -1L;
-            
-            if (chunk == -1L)
-                return -1;
-            data = data \<\< chunkSize | chunk;
-            pull(<bitSpec.noDurations>);
-        }
-        return data;
-    }
-
-        <!if(bitSpec.chunkSize)>
-        if (pendingBits > 0<ImplementationType("parameterTypeSuffix")>) {
-            // This code is valid for msb only
-            data &= (1<ImplementationType("parameterTypeSuffix")> \<\< width) - 1<ImplementationType("parameterTypeSuffix")>;
-            data |= pendingData \<\< width;
-            width += pendingBits;
-            pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
-        }
-        if (width % <bitSpec.chunkSize><ImplementationType("parameterTypeSuffix")> != 0<ImplementationType("parameterTypeSuffix")>) {
-            pendingData = data;
-            pendingBits = width;
-            width = 0<ImplementationType("parameterTypeSuffix")>;
-        }
-        <endif!>
-*/
 
 BitSpecDecode(b, caseNo) ::= <<
 (<b.items:{item|duration(<item.microseconds>d, <i0>)}; separator=" && ">) ? <caseNo>L

@@ -90,7 +90,7 @@ public void testDecodeSignalExhaustive() throws IrpException {
  * Test of newIrSignal method, of class <DecoderClassName()>.
  * @throws org.harctoolbox.irp.IrpException
  */
- @Test
+ @Test(enabled = true)
  public void testDecodeSignal() throws IrpException {
     System.out.println("decodeSignal@<metaData.protocolName>");
     for (int i = 0; i \< noRandomTests; i++) {

@@ -139,6 +139,10 @@ public abstract class IrpDecoder {
             index = 0;
         }
 
+        protected boolean getLsbFirst() {
+            return lsbFirst;
+        }
+
         protected double getAbsoluteTolerance() {
             return IrCoreUtils.defaultAbsoluteTolerance;
         }
@@ -244,7 +248,7 @@ public abstract class IrpDecoder {
          * @return read data
          * @throws org.harctoolbox.decoders.IrpDecoder.DecodeException
          */
-        protected final long parseData(long length) throws DecodeException {
+        protected long parseData(long length) throws DecodeException {
             long data = 0L;
             for (int i = 0; i < (int) length; i += chunkSize) {
                 int chunk = parseChunk();
@@ -410,6 +414,78 @@ public abstract class IrpDecoder {
             } else
                 throw new DecodeException("");
 
+            return result;
+        }
+    }
+
+    protected static class Pwm4DecodeSequence extends IrpDecoder.DecodeSequence {
+
+        public static final int bitSpecLength = 2;
+        public static final int chunkSize = 2;
+
+        private final double zeroGap;
+        private final double zeroFlash;
+        private final double oneGap;
+        private final double oneFlash;
+        private final double twoGap;
+        private final double twoFlash;
+        private final double threeGap;
+        private final double threeFlash;
+
+        private int pendingBits;
+        private long pendingData;
+
+        Pwm4DecodeSequence(IrSequence irSequence, boolean lsbFirst, double zeroFlash, double zeroGap, double oneFlash, double oneGap,
+                double twoFlash, double twoGap, double threeFlash, double threeGap) {
+            super(irSequence, lsbFirst, chunkSize);
+            this.zeroGap = zeroGap;
+            this.zeroFlash = zeroFlash;
+            this.oneGap = oneGap;
+            this.oneFlash = oneFlash;
+            this.twoGap = twoGap;
+            this.twoFlash = twoFlash;
+            this.threeGap = threeGap;
+            this.threeFlash = threeFlash;
+            pendingBits = 0;
+            pendingData = 0L;
+        }
+
+        @Override
+        protected long parseData(long length) throws DecodeException {
+            long data = 0L;
+            int width = 0;
+            if (pendingBits > 0) {
+                // This code is valid for msb first only
+                assert(!getLsbFirst());
+                data = pendingData;
+                width = pendingBits;
+                pendingBits = 0;
+            }
+
+            while (width < (int) length) {
+                long chunk = parseChunk();
+                data = data << chunkSize | chunk;
+                width += chunkSize;
+            }
+            if (length != width) {
+                pendingData = IrCoreUtils.maskTo(data, width - length);
+                pendingBits = width - (int) length;
+                data >>= width - (int) length;
+            }
+            return data;
+        }
+
+        @Override
+        protected int parseChunk() throws DecodeException {
+            int result =
+                      (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
+                    : (duration(oneFlash, 0) && duration(oneGap, 1)) ? 1
+                    : (duration(twoFlash, 0) && duration(twoGap, 1)) ? 2
+                    : (duration(threeFlash, 0) && duration(threeGap, 1)) ? 3
+                    : -1;
+            if (result == -1)
+                throw new DecodeException("parseChunk");
+            pull(bitSpecLength);
             return result;
         }
     }

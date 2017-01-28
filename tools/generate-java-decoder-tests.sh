@@ -106,8 +106,13 @@ x10 \
 x10.n \
 zaptor-36 \
 zaptor-56 \
+nokia \
+bryston \
+directv \
+nokia12 \
+nokia32 \
 
-# nokia \
+# "humax 4phase" \
 # solidtek16 \
 # pid-0083 \
 # velodyne \
@@ -119,11 +124,7 @@ zaptor-56 \
 # xmpff-1 \
 # xmpff-2 \
 # xmpmeta \
-#"humax 4phase" \
-#bryston \
-#directv \
-#nokia12 \
-#nokia32 \
+
 # rs200 \
 
 

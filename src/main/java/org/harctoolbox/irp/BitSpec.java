@@ -340,7 +340,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> map = new HashMap<>(14);
+        Map<String, Object> map = new HashMap<>(17);
         if (chunkSize > 1)
             map.put("chunkSize", chunkSize);
         map.put("bitMask", IrCoreUtils.ones(chunkSize));
@@ -355,6 +355,21 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 map.put("flashesDiffer", !IrCoreUtils.approximatelyEquals(
                         bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec),
                         bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec)));
+            } catch (IrpException ex) {
+                Logger.getLogger(BitSpec.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (isPWM(4, new NameEngine(), new GeneralSpec())) {
+            map.put("pwm4", true);
+            try {
+                map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+                map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+                map.put("twoGap",    bitCodes.get(2).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("twoFlash",  bitCodes.get(2).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+                map.put("threeGap",  bitCodes.get(3).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+                map.put("threeFlash",bitCodes.get(3).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
             } catch (IrpException ex) {
                 Logger.getLogger(BitSpec.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -111,6 +111,8 @@ bryston \
 directv \
 nokia12 \
 nokia32 \
+lumagen \
+apple
 
 # "humax 4phase" \
 # solidtek16 \
@@ -146,9 +148,6 @@ nokia32 \
 #grundig16 \
     #grundig16-30 \
 
-#
-#apple \
-# lumagen \
 #gwts \
 
 # fujitsu_aircon \

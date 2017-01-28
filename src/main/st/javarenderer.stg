@@ -105,11 +105,30 @@ public <ImplementationType("dutyCycleType")> getDutyCycle() {
 >>
 
 DefineClassList() ::= <<
-private static class <metaData.cProtocolName>IrList extends IrpRenderer.IrList {
+private static class <metaData.cProtocolName>IrList extends IrpRenderer.<if(bitSpec.pwm2)>Pwm2<elseif(bitSpec.pwm4)>Pwm4<elseif(bitSpec.standardBiPhase)>BiPhase<endif>IrList {
+
+<if(bitSpec.pwm2)>
+    <metaData.cProtocolName>IrList() {
+        super(<bitSpec.lsbFirst>, <bitSpec.zeroFlash>d, <bitSpec.zeroGap>d, <bitSpec.oneFlash>d, <bitSpec.oneGap>d);
+    }
+<elseif(bitSpec.pwm4)>
+    <metaData.cProtocolName>IrList() {
+        super(<bitSpec.lsbFirst>, <bitSpec.zeroFlash>d, <bitSpec.zeroGap>d, <bitSpec.oneFlash>d, <bitSpec.oneGap>d,
+              <bitSpec.twoFlash>d, <bitSpec.twoGap>d, <bitSpec.threeFlash>d, <bitSpec.threeGap>d);
+    }
+<elseif(bitSpec.standardBiPhase)>
+    <metaData.cProtocolName>IrList() {
+        super(<bitSpec.lsbFirst>, <bitSpec.biPhaseInverted>, <bitSpec.biPhaseHalfPeriod>d);
+    }
+<else>
 <if(bitSpec.chunkSize)>
     private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
     private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
 <endif>
+
+    <metaData.cProtocolName>IrList() {
+        super(<bitSpec.lsbFirst>);
+    }
 
     @Override
     void bitField(<ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
@@ -134,6 +153,7 @@ private static class <metaData.cProtocolName>IrList extends IrpRenderer.IrList {
             }
         }
     }
+<endif>
 }
 >>
 

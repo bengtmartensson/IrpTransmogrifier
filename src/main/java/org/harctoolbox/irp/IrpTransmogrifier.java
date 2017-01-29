@@ -350,12 +350,16 @@ public class IrpTransmogrifier {
 
         setupDatabase(commandLineArgs);
         List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
+        if (protocolNames.isEmpty())
+            throw new UsageException("No protocols matched");
 
-        // Hardcoded selection of technologies for different targets
-        if (commandCode.target.equalsIgnoreCase("xml"))
-            createXmlProtocols(protocolNames, commandLineArgs.encoding);
-        else
-            codeST(protocolNames, commandCode.target, commandCode.directory, commandCode.inspect, commandLineArgs);
+        //String[] targets = commandCode.target.split(MULTIPLEARGSSEPARATOR);
+        for (String target : commandCode.target)
+            // Hardcoded selection of technologies for different targets
+            if (target.equalsIgnoreCase("xml"))
+                createXmlProtocols(protocolNames, commandLineArgs.encoding);
+            else
+                codeST(protocolNames, target, commandCode.directory, commandCode.inspect, commandLineArgs);
     }
 
     private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect, CommandLineArgs commandLineArgs) throws IOException, IrpException {
@@ -692,8 +696,8 @@ public class IrpTransmogrifier {
         @Parameter(names = {       "--inspect" }, description = "Fire up stringtemplate inspector on generated code (if sensible)")
         private boolean inspect = false;
 
-        @Parameter(names = { "-t", "--target" }, required = true, description = "Target for code generation. Use ? for a list.")
-        private String target = null;
+        @Parameter(names = { "-t", "--target" }, variableArity = true, required = true, description = "Target(s) for code generation. Use ? for a list.")
+        private List<String> target = new ArrayList<>(4);
 
         @Parameter(description = "protocol")
         private List<String> protocols;

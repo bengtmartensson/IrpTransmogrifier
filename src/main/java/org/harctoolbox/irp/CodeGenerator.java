@@ -76,6 +76,8 @@ public abstract class CodeGenerator {
 
     public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect,
             Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpException {
+        if (protocolNames == null || protocolNames.isEmpty())
+            throw new IrpException("protocolNames cannot be null or empty");
         if (isAbstract())
             throw new IrpException("This target cannot generete code since it is declared abstract.");
         if (!manyProtocolsInOneFile() && protocolNames.size() > 1)
@@ -85,7 +87,7 @@ public abstract class CodeGenerator {
 
         out.println(render("FileBegin"));
 
-        protocolNames.stream().forEach((protocolName) -> {
+        protocolNames.forEach((protocolName) -> {
             try {
                 generate(protocolName, irpDatabase, out, false, inspect, absoluteTolerance, relativeTolerance, frequencyTolerance);
             } catch (IrpException | ArithmeticException ex) {

@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -270,6 +271,18 @@ public class IrpTransmogrifier {
                 ex.printStackTrace();
         }
     }
+    
+    private static Map<String, String> assembleParameterMap(List<String> paramStrings) throws UsageException {
+        HashMap<String, String> result = new HashMap<>(paramStrings.size());
+        for (String s : paramStrings) {
+            String[] kvp = s.split(":");
+            if (kvp.length != 2)
+                throw new UsageException("Wrong syntax for parameter:value");
+
+            result.put(kvp[0], kvp[1]);
+        }
+        return result;
+    }
 
     private PrintStream out = null;
     private IrpDatabase irpDatabase;
@@ -359,10 +372,10 @@ public class IrpTransmogrifier {
             if (target.equalsIgnoreCase("xml"))
                 createXmlProtocols(protocolNames, commandLineArgs.encoding);
             else
-                codeST(protocolNames, target, commandCode.directory, commandCode.inspect, commandLineArgs);
+                codeST(protocolNames, target, commandCode.directory, commandCode.inspect, assembleParameterMap(commandCode.parameters), commandLineArgs);
     }
 
-    private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect, CommandLineArgs commandLineArgs) throws IOException, IrpException {
+    private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect, Map<String, String> parameters, CommandLineArgs commandLineArgs) throws IOException, IrpException {
         if (target.equals("?")) {
             listTargets(out);
             return;
@@ -377,10 +390,10 @@ public class IrpTransmogrifier {
             return;
         }
         if (directory != null)
-            codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect,
+            codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect, parameters,
                     commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
         else
-            codeGenerator.generate(protocolNames, irpDatabase, out, inspect,
+            codeGenerator.generate(protocolNames, irpDatabase, out, inspect, parameters,
                     commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
     }
 
@@ -565,6 +578,7 @@ public class IrpTransmogrifier {
         }
     }
 
+
     // The reaining classes are ordered alphabetically
     private final static class CommandLineArgs {
 
@@ -695,6 +709,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = {       "--inspect" }, description = "Fire up stringtemplate inspector on generated code (if sensible)")
         private boolean inspect = false;
+
+        @Parameter(names = { "-p", "--parameter" }, variableArity = true, description = "Specify target dependent parameters to the code generators")
+        private List<String> parameters = new ArrayList<>(4);
 
         @Parameter(names = { "-t", "--target" }, variableArity = true, required = true, description = "Target(s) for code generation. Use ? for a list.")
         private List<String> target = new ArrayList<>(4);

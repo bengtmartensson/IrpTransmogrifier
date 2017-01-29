@@ -198,9 +198,9 @@ public class NamedProtocol extends Protocol {
         return root;
     }
 
-    ItemCodeGenerator code(CodeGenerator codeGenerator, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
+    ItemCodeGenerator code(CodeGenerator codeGenerator, Map<String, String> parameters, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
-        template.addAggregateList("metaData", metaDataPropertiesMap(absoluteTolerance, relativeTolerance, frequencyTolerance));
+        template.addAggregateList("metaData", metaDataPropertiesMap(parameters, absoluteTolerance, relativeTolerance, frequencyTolerance));
         template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec(), getDefinitions());
         template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec(), getDefinitions());
         Set<String> variables = getBitspecIrstream().assignmentVariables();
@@ -214,8 +214,8 @@ public class NamedProtocol extends Protocol {
         return template;
     }
 
-    private Map<String, Object> metaDataPropertiesMap(Double userAbsoluteTolerance, Double userRelativeTolerance, Double userFrequencyTolerance) {
-        Map<String, Object> map = IrpUtils.propertiesMap(11, this);
+    private Map<String, Object> metaDataPropertiesMap(Map<String, String> parameters, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userFrequencyTolerance) {
+        Map<String, Object> map = IrpUtils.propertiesMap(parameters.size() + 11, this);
         map.put("protocolName", getName());
         map.put("cProtocolName", IrpUtils.toCIdentifier(getName()));
         map.put("irp", getIrp());
@@ -227,6 +227,7 @@ public class NamedProtocol extends Protocol {
         putParameter(map, "relativeTolerance", userRelativeTolerance, relativeTolerance);
         putParameter(map, "absoluteTolerance", userAbsoluteTolerance, absoluteTolerance);
         putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);
+        map.putAll(parameters);
         return map;
     }
 }

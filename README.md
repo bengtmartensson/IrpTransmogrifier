@@ -51,18 +51,23 @@ For a particular protocol, generate target code (C, C++, Java, Python,...) that 
 (rc6*, replay, arctech, entone), protocols with bitspec lenght as parameter (zenith, nec1-shirrif). Also default are not implemented, e.g. NEC1 has to be
 called with 3 parameters.
 
-Two mechanisms are available: XSLT and [Stringtemplate](http://www.stringtemplate.org/).
-The program invokes either one (or many) XSLT2 transformations  on an XML representation of the protocol,
-or invokes Stringtemplate. In both cases, the program just invokes the stylesheet or template, without caring what it does; if it generates a renderer or decoder.
-The user is instead governs this by invoking the style sheets or templates (s)he want using the --target option to the `code` sub subcommand.
+Two mechanisms are available: XML and [Stringtemplate](http://www.stringtemplate.org/).
+The present version of the program does not come with an XSLT engine, so this has to be invoked independently on the XML export. 
+The program just invokes the template, without caring what it does; if it generates a renderer or decoder.
+The user is instead governs this by invoking the style sheets or templates (s)he want using the `--target` (`-t`) option to the `code` sub subcommand.
 (For this reason, there is no `--renderer` or `--decoder` option to the `code` sub command.)
+It is also possible to pass
+target-specific parameters to the code generators using the `--parameter` (`-p`) argument. 
 
 Targets:
-* [Lircd.conf](http://lirc.org/html/lircd.conf.html) generation from IrScrutinizer. This is based on an XSLT-transformation (lirc.xsd) and generates
- [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/harctoolboxbundle/blob/master/IrScrutinizer/src/main/config/exportformats.d/lirc.xml)
+* [Lircd.conf](http://lirc.org/html/lircd.conf.html) generation from IrScrutinizer. This is based on an XSLT-transformation (`lirc.xsd`) and generates
+ [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/harctoolboxbundle/blob/master/IrScrutinizer/src/main/config/exportformats.d/lirc.xml).
 Handling of definitions as well as expressions as bitfields not implemented, as well as a few other things (search for "omitted" in the above file),
 otherwise works. "90% complete", see [this issue](https://github.com/bengtmartensson/IrpTransmogrifier/issues/6).
-* Java. Essentially for testing. This is essentially working for rendering, including a test rig (see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest).
+To create: see (or execute) the shell script `tools/generate-lirc.sh`. In short, this generates the xml export, and then invokes
+xslt transformations on that xml file.
+* Java. Essentially for testing. This is essentially working both for rendering and decoding, including a generated test rig
+(see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest)). Targets: `javadecoder javadecoderngtest javarenderer javarendererngtest`.
 * C++ ([Infrared4Arduino](https://github.com/bengtmartensson/Infrared4Arduino)).
 * [IRremote](https://github.com/z3t0/Arduino-IRremote)
 * Linux kernel modules in [linux/drivers/media/rc](https://github.com/torvalds/linux/tree/master/drivers/media/rc) (decoding only).
@@ -86,6 +91,9 @@ is defined by the schema [irp-protocols](http://www.harctoolbox.org/schemas/irp-
 comparison with the previous, more primitive, format, for example, it can contain embedded XHTLM fragments.
 It also can contain different parameters that can be used by different programs, for example, tolerance parameters
 for decoding.
+
+There is also an XSLT stylesheet, which technically translates the XML to HTML, allowing for a user
+friendly reading of IrpProtocols.xml in the browser.
 
 The program is capable of reading and translating the old format.
 
@@ -114,7 +122,7 @@ Using from the command line, this is a command with subcommands
 	-L, --logfile
 	   Log file. If empty, log to stderr.
 	-F, --logformat
-	   Log format, see class SimpleFormatter.
+	   Log format, as in class java.util.logging.SimpleFormatter.
 	   Default: %4$s(%2$s): %5$s%n
 	-l, --loglevel
 	   Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING
@@ -126,7 +134,7 @@ Using from the command line, this is a command with subcommands
 	   Interpret protocol/decoder argument as regular expressions
 	   Default: false
 	-r, --relativetolerance
-	   Relative tolerance as a number < 1 (NOT: percent)
+	   Relative tolerance as a number < 1
 	--seed
 	   Set seed for pseudo random number generation (default: random)
 	-s, --sort
@@ -139,107 +147,13 @@ Using from the command line, this is a command with subcommands
 	   Log in XML format.
 	   Default: false
       Commands:
-	analyze      Analyze signal
-	  Usage: analyze [options] durations in microseconds, or pronto hex
-	    Options:
-	      --decoder
-		 Use only the decoders matching argument (regular expression).
-		 Mainly for debugging.
-	      -e, --extent
-		 Output last gap as extent
-		 Default: false
-	      -f, --frequency
-		 Modulation frequency
-	      -i, --invert
-		 Invert order in bitspec
-		 Default: false
-	      -l, --lsb
-		 Force lsb-first bitorder for the analyzer
-		 Default: false
-	      -u, --maxmicroseconds
-		 Maximal duration to be expressed as micro seconds
-		 Default: 10000.0
-	      --maxroundingerror
-		 Maximal rounding errors for expressing as multiple of time unit
-		 Default: 0.3
-	      -m, --maxunits
-		 Maximal multiplier of time unit in durations
-		 Default: 30.0
-	      -w, --parameterwidths
-		 Comma separated list of parameter widths
-		 Default: []
-	      --radix
-		 Radix of parameter output
-		 Default: 16
-	      -r, --repeatfinder
-		 Invoke the repeatfinder
-		 Default: false
-	      -s, --statistics
-		 Print some statistics
-		 Default: false
-	      -t, --timebase
-		 Force timebase, in microseconds, or in periods (with ending "p")
-
-	bitfield      Evaluate bitfield
-	  Usage: bitfield [options] bitfield
-	    Options:
-	      --gui, --display
-		 Display parse diagram
-		 Default: false
-	      -l, --lsb
-		 Least significant bit first
-		 Default: false
-	      -n, --nameengine
-		 Name Engine to use
-		 Default: {}
-	      --xml
-		 Generate XML and write to file argument
-
-	code      Generate code
-	  Usage: code [options] protocol
-	    Options:
-	      -d, --directory
-		 Directory to generate output files, if not using the --output
-		 option.
-	      --inspect
-		 Fire up stringtemplate inspector on generated code (if sensible)
-		 Default: false
-	    * -t, --target
-		 Target for code generation
-
-	decode      Decode given IR signal
-	  Usage: decode [options] durations in micro seconds, or pronto hex
-	    Options:
-	      -f, --frequency
-		 Modulation frequency
-	      -k, --keep-defaulted
-		 Keep parameters equal to their defaults
-		 Default: false
-	      -a, --all, --no-prefer-over
-		 Output all decodes; ignore prefer-over
-		 Default: false
-	      -p, --protocol
-		 Comma separated list of protocols to try decode (default all)
-
-	expression      Evaluate expression
-	  Usage: expression [options] expression
-	    Options:
-	      --gui, --display
-		 Display parse diagram
-		 Default: false
-	      -n, --nameengine
-		 Name Engine to use
-		 Default: {}
-	      --stringtree
-		 Produce stringtree
-		 Default: false
-	      --xml
-		 Generate XML and write to file argument
-
-	help      Report usage
+	help      Describe the syntax of program and commands
 	  Usage: help [options]
 
-	list      List the protocols known
+	version      Report version
+	  Usage: version [options]
+
+	list      List protocols and their properites
 	  Usage: list [options] List of protocols (default all)
 	    Options:
 	      -c, --classify
@@ -281,12 +195,107 @@ Using from the command line, this is a command with subcommands
 	      -r, --raw
 		 Generate raw form
 		 Default: false
-	      --test
-		 Compare with IrpMaster
+
+	decode      Decode IR signal given as argument
+	  Usage: decode [options] durations in micro seconds, or pronto hex
+	    Options:
+	      -f, --frequency
+		 Modulation frequency
+	      -k, --keep-defaulted
+		 Keep parameters equal to their defaults
 		 Default: false
+	      -a, --all, --no-prefer-over
+		 Output all decodes; ignore prefer-over
+		 Default: false
+	      -p, --protocol
+		 Comma separated list of protocols to try match (default all)
 
-	version      Report version
-	  Usage: version [options]
+	analyze      Analyze signal: tries to find an IRP form with parameters
+	  Usage: analyze [options] durations in microseconds, or pronto hex
+	    Options:
+	      --decoder
+		 Use only the decoders matching argument (regular expression).
+		 Mainly for debugging.
+	      -e, --extent
+		 Output last gap as extent
+		 Default: false
+	      -f, --frequency
+		 Modulation frequency of raw signal
+	      -i, --invert
+		 Invert order in bitspec
+		 Default: false
+	      -l, --lsb
+		 Force lsb-first bitorder for the parameters
+		 Default: false
+	      -u, --maxmicroseconds
+		 Maximal duration to be expressed as micro seconds
+		 Default: 10000.0
+	      --maxroundingerror
+		 Maximal rounding errors for expressing as multiple of time unit
+		 Default: 0.3
+	      -m, --maxunits
+		 Maximal multiplier of time unit in durations
+		 Default: 30.0
+	      -w, --parameterwidths
+		 Comma separated list of parameter widths
+		 Default: []
+	      --radix
+		 Radix of parameter output
+		 Default: 16
+	      -r, --repeatfinder
+		 Invoke the repeatfinder
+		 Default: false
+	      -s, --statistics
+		 Print some statistics
+		 Default: false
+	      -t, --timebase
+		 Force timebase, in microseconds, or in periods (with ending "p")
 
-	writeconfig      Write a new config file in XML format, using the --inifile argument
+	code      Generate code for the target given
+	  Usage: code [options] protocol
+	    Options:
+	      -d, --directory
+		 Directory to generate output files, if not using the --output
+		 option.
+	      --inspect
+		 Fire up stringtemplate inspector on generated code (if sensible)
+		 Default: false
+	      -p, --parameter
+		 Parameters for the code generators
+		 Default: []
+	    * -t, --target
+		 Target(s) for code generation. Use ? for a list.
+		 Default: []
+
+	bitfield      Evaluate bitfield given as argument
+	  Usage: bitfield [options] bitfield
+	    Options:
+	      --gui, --display
+		 Display parse diagram
+		 Default: false
+	      -l, --lsb
+		 Least significant bit first
+		 Default: false
+	      -n, --nameengine
+		 Name Engine to use
+		 Default: {}
+	      --xml
+		 Generate XML and write to file argument
+
+	expression      Evaluate expression given as argument
+	  Usage: expression [options] expression
+	    Options:
+	      --gui, --display
+		 Display parse diagram
+		 Default: false
+	      -n, --nameengine
+		 Name Engine to use
+		 Default: {}
+	      --stringtree
+		 Produce stringtree
+		 Default: false
+	      --xml
+		 Generate XML and write to file argument
+
+	writeconfig      Generate a new config file in XML format from the --inifile argument
 	  Usage: writeconfig [options]

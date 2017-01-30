@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,7 +88,7 @@ public abstract class CodeGenerator {
 
         STCodeGenerator.trackCreationEvents(inspect); // ???
 
-        out.println(render("FileBegin"));
+        generateFileBegin(out);
 
         protocolNames.forEach((protocolName) -> {
             try {
@@ -98,6 +100,15 @@ public abstract class CodeGenerator {
         out.print(render("FileEnd")); // not println
     }
 
+    private void generateFileBegin(PrintStream out) {
+        ItemCodeGenerator itemCodeGenerator = newItemCodeGenerator("FileBegin");
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("date", new Date().toString());
+        map.put("userName", System.getProperty("user.name"));
+        itemCodeGenerator.addAggregateList("GenerateData", map);
+        out.println(itemCodeGenerator.render());
+    }
+
     private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
             Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws UnknownProtocolException, IrpException {
         NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
@@ -107,7 +118,7 @@ public abstract class CodeGenerator {
     private void generate(NamedProtocol protocol, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
             Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         if (printPostAndPre)
-            out.println(render("FileBegin"));
+            generateFileBegin(out);
         ItemCodeGenerator code = protocol.code(this, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);// contains a trailing newline
         out.println(code.render());
         if (printPostAndPre)

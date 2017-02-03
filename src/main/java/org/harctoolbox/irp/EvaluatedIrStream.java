@@ -47,6 +47,11 @@ class EvaluatedIrStream {
         state = null;
     }
 
+    EvaluatedIrStream(EvaluatedIrStream evaluatedIrStream) {
+        this(evaluatedIrStream.nameEngine, evaluatedIrStream.generalSpec, evaluatedIrStream.pass);
+        state = evaluatedIrStream.state;
+    }
+
     IrSequence toIrSequence() throws UnassignedException, IrpSemanticException, OddSequenceLenghtException {
         IrpUtils.entering(logger, "toIrSequence", this);
         List<Double>times = new ArrayList<>(elements.size()*10);
@@ -94,6 +99,14 @@ class EvaluatedIrStream {
         }
     }
 
+    void add(BitStream bitStream) {
+        int lastIndex = elements.size() - 1;
+        if (lastIndex >= 0 && elements.get(lastIndex) instanceof BitStream)
+            squeezeBitStreams(bitStream);
+        else
+            elements.add(bitStream);
+    }
+
     public void reduce(BitSpec bitSpec) throws UnassignedException, InvalidNameException {
         int index = 0;
         while (index < elements.size()) {
@@ -113,7 +126,11 @@ class EvaluatedIrStream {
         return length;
     }
 
-    void add(Evaluatable evaluatable) {
+//    void add(Evaluatable evaluatable) {
+//        elements.add(evaluatable);
+//    }
+
+    void add(Duration evaluatable) {
         elements.add(evaluatable);
     }
 

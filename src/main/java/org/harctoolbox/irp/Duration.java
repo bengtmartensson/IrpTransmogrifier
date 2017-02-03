@@ -194,6 +194,17 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
+    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+        renderData.add(this);
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        //recognizeData.preprocess(this, pass, bitSpecs);
+        recognizeData.postprocess(this, pass, bitSpecs);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("unit", unit);
@@ -212,7 +223,7 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    int numberOfBareDurations() {
+    int numberOfBareDurations(boolean recursive) {
         return 1;
     }
 
@@ -227,29 +238,47 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, InvalidNameException, UnassignedException, IrpSemanticException {
         IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         if (!recognizeData.check(isOn())) {
             IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
-            return false;
+            throw new IrpSignalParseException("Found flash when gap expected, or vice versa");
         }
         double actual = recognizeData.get();
         double wanted = toFloat(recognizeData.toNameEngine(), recognizeData.getGeneralSpec());
-        boolean success = recognize(recognizeData, actual, wanted);
-        IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", wanted, actual);
-        return success;
+        //boolean success =
+        recognize(recognizeData, actual, wanted);
+        //IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", wanted, actual);
+        //return success;
     }
 
-    protected boolean recognize(RecognizeData recognizeData, double actual, double wanted) {
+//    @Override
+//    public boolean traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+//        IrpUtils.entering(logger, Level.FINEST, "traverse", this);
+////        if (!recognizeData.check(isOn())) {
+////            IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
+////            return false;
+////        }
+////        double actual = recognizeData.get();
+////        double wanted = toFloat(recognizeData.toNameEngine(), recognizeData.getGeneralSpec());
+////        recognizeData.consume();
+//        boolean success = true;//recognize(recognizeData, actual, wanted);
+//        //IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", wanted, actual);
+//        IrpUtils.exiting(logger, Level.FINEST, "traverse", "TODOf");
+//        return success;
+//    }
+
+    protected void recognize(RecognizeData recognizeData, double actual, double wanted) throws IrpSignalParseException {
         boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted, recognizeData.getAbsoluteTolerance(), recognizeData.getRelativeTolerance());
         if (equals) {
             recognizeData.consume();
         } else if (actual > wanted && recognizeData.allowChopping()) {
             recognizeData.consume(wanted);
         } else
-            recognizeData.setSuccess(false);
+            throw new IrpSignalParseException("Duration does not parse");
+            //recognizeData.setSuccess(false);
 
-        return recognizeData.isSuccess();
+        //return recognizeData.isSuccess();
     }
 
 

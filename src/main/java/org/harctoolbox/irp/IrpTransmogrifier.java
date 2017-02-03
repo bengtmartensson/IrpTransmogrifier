@@ -271,7 +271,7 @@ public class IrpTransmogrifier {
                 ex.printStackTrace();
         }
     }
-    
+
     private static Map<String, String> assembleParameterMap(List<String> paramStrings) throws UsageException {
         HashMap<String, String> result = new HashMap<>(paramStrings.size());
         for (String s : paramStrings) {
@@ -415,7 +415,9 @@ public class IrpTransmogrifier {
         if (commandRenderer.random)
             logger.log(Level.INFO, nameEngine.toString());
 
-        IrSignal irSignal = protocol.toIrSignal(nameEngine.clone());
+        if (!commandRenderer.pronto && !commandRenderer.raw)
+            logger.warning("No output requested, use either --raw or --pronto go get output.");
+        IrSignal irSignal = protocol.toIrSignal(nameEngine);
         if (commandRenderer.raw)
             out.println(irSignal.toPrintString(true));
         if (commandRenderer.pronto)
@@ -436,7 +438,7 @@ public class IrpTransmogrifier {
         } else {
             List<String> list = irpDatabase.evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp);
             for (String proto : list) {
-                logger.info(proto);
+                //logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
                 render(protocol, commandRenderer);
             }
@@ -462,12 +464,12 @@ public class IrpTransmogrifier {
 
     private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException, IrpException, UsageException {
         setupDatabase(commandLineArgs);
-        List<String> protocolNames = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
-        List<String> list = irpDatabase.evaluateProtocols(protocolNames, commandLineArgs.sort, commandLineArgs.regexp);
-        if (list.isEmpty())
+        List<String> protocolNamePatterns = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
+        List<String> protocolsNames = irpDatabase.evaluateProtocols(protocolNamePatterns, commandLineArgs.sort, commandLineArgs.regexp);
+        if (protocolsNames.isEmpty())
             throw new UsageException("No protocol given or matched.");
 
-        Decoder decoder = new Decoder(irpDatabase, list, commandDecode.keepDefaultedParameters,
+        Decoder decoder = new Decoder(irpDatabase, protocolsNames, commandDecode.keepDefaultedParameters,
                 commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
         Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver);

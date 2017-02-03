@@ -1,11 +1,10 @@
 package org.harctoolbox.irp;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.OddSequenceLenghtException;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -144,8 +143,8 @@ public class ProtocolNGTest {
             nameEngine = new NameEngine("{D=12,F=56}");
             result = nec1.toIrSignal(nameEngine);
             assertTrue(result.approximatelyEquals(Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C")));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+            fail();
         }
     }
 
@@ -179,7 +178,7 @@ public class ProtocolNGTest {
             assertEquals(nameEngine.get("T").toNumber(), 1L);
             assertEquals(rc5.getMemoryVariable("T"), 1L);
             assertTrue(result.approximatelyEquals(rc5D12F56T0));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -190,8 +189,9 @@ public class ProtocolNGTest {
         try {
             IrSignal rc6D12F34 = Pronto.parse("0000 0073 0000 0013 0060 0020 0010 0020 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0020 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0020 0020 0010 0BCD");
             IrSignal result = rc6.toIrSignal(new NameEngine("{D=12,F=34}"));
+            System.out.println(result);
             assertTrue(result.approximatelyEquals(rc6D12F34));
-        } catch (InvalidArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -204,7 +204,7 @@ public class ProtocolNGTest {
             IrSignal result = nokia32.toIrSignal(new NameEngine("{D=12,S=56,F=34,T=0,X=78}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(nokia32D12S56F34T0X78));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -223,7 +223,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,S=56,F=34,T=1,X=73}");
             Map<String, Long> recognizeData = nokia32.recognize(signal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
             fail();
         }
     }
@@ -236,7 +236,7 @@ public class ProtocolNGTest {
             IrSignal result = amino.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(aminoD12F34));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -249,7 +249,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,F=34}");
             Map<String, Long> recognizeData = amino.recognize(aminoD12F34);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
             fail();
         }
     }
@@ -259,10 +259,13 @@ public class ProtocolNGTest {
         System.out.println("recognizeErroneousAmino");
         try {
             IrSignal aminoD12F34Err = Pronto.parse("0000 006F 001C 001C 0046 003C 0028 000A 000A 0014 000A 000A 0014 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 0B83 0046 003C 0028 000A 000A 0014 000A 000A 0014 0014 000A 000A 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 000A 000A 0B83");
-            Map<String, Long> recognizeData = amino.recognize(aminoD12F34Err);
-            assertTrue(recognizeData == null);
-        } catch (InvalidArgumentException | ArithmeticException ex) {
+            System.out.print("Expect parse error from FiniteBitField: ");
+            amino.recognize(aminoD12F34Err);
             fail();
+        } catch (InvalidArgumentException | ArithmeticException | DomainViolationException | NameConflictException | UnassignedException | InvalidNameException | IrpSemanticException ex) {
+            fail();
+        } catch (IrpSignalParseException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -274,7 +277,7 @@ public class ProtocolNGTest {
             IrSignal result = arctech.toIrSignal(new NameEngine("{D=12,S=9,F=0}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(irSignal));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -287,7 +290,7 @@ public class ProtocolNGTest {
             IrSignal result = xmp.toIrSignal(new NameEngine("{D=12,S=56,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(xmpD12S56F34));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -300,7 +303,7 @@ public class ProtocolNGTest {
             IrSignal result = directv.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(directvD12F34));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -313,8 +316,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,F=34}");
             Map<String, Long> recognizeData = directv.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -373,8 +376,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,S=34,F=56}");
             Map<String, Long> recognizeData = nec1.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -387,10 +390,13 @@ public class ProtocolNGTest {
         System.out.println("recognize");
         try {
             IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
-            Map<String, Long> recognizeData = tivo.recognize(irSignal);
-            assertTrue(recognizeData == null);
-        } catch (InvalidArgumentException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.print("Expect DomainViolationException: ");
+            tivo.recognize(irSignal);
+            fail();
+        } catch (InvalidArgumentException | IrpSignalParseException | NameConflictException | UnassignedException | InvalidNameException | IrpSemanticException ex) {
+            fail();
+        } catch (DomainViolationException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -409,8 +415,8 @@ public class ProtocolNGTest {
             nameEngine = new NameEngine("{D=12,F=56,T=0}");
             recognizeData = rc5.recognize(irSignal,true);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -425,8 +431,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,S=3,F=56}");
             Map<String, Long> recognizeData = denonK.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -440,7 +446,6 @@ public class ProtocolNGTest {
             Map<String, Long> recognizeData = adnotam.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpException | InvalidArgumentException | ArithmeticException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }
     }
@@ -453,8 +458,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=31,F=30,T=1}");
             Map<String, Long> recognizeData = rc6.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
             fail();
         }
     }
@@ -467,8 +471,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=11,S=4,F=0}");
             Map<String, Long> recognizeData = arctechsimplified.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
             fail();
         }
     }
@@ -481,8 +484,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,S=5,F=0}");
             Map<String, Long> recognizeData = arctech.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
             fail();
         }
     }
@@ -502,8 +504,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,F=34,PairID=123}");
             Map<String, Long> recognizeData = apple.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
             fail();
         }
     }
@@ -520,11 +521,13 @@ public class ProtocolNGTest {
                     + " 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016"
                     + " 0016 0622"
                     + " 015B 0057 0016 0E6C");
-            Map<String, Long> recognizeData = apple.recognize(irSignal);
-            assertTrue(recognizeData == null);
-        } catch (InvalidArgumentException | ArithmeticException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.print("Expect NameConflictException: ");
+            apple.recognize(irSignal);
             fail();
+        } catch (InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | UnassignedException | InvalidNameException | IrpSemanticException ex) {
+            fail();
+        } catch (NameConflictException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -554,8 +557,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,F=34,S=56}");
             Map<String, Long> recognizeData = anthem.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -569,8 +572,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{M=5, C=806354200, T=1}");
             Map<String, Long> recognizeData = rc6M56.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -582,8 +585,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12, S=56, F=34, T=1}");
             Map<String, Long> recognizeData = mce.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -595,8 +598,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=28, S=106, F=15}");
             Map<String, Long> recognizeData = rc5x.recognize(irSignal, false);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -608,8 +611,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=3, F=2, H1=1, H2=2, H3=3, H4=4}");
             Map<String, Long> recognizeData = rs200.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -621,8 +624,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12, F=23}");
             Map<String, Long> recognizeData = solidtek16.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -637,10 +640,13 @@ public class ProtocolNGTest {
             Map<String, Long> recognizeData = zaptor.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
             IrSignal silly = new IrSignal(repeat, repeat, repeat, 36000f);
-            recognizeData = zaptor.recognize(silly);
-            assertTrue(recognizeData == null);
-        } catch (InvalidNameException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.print("Expect IrpSignalParseException: ");
+            zaptor.recognize(silly);
+            fail();
+        } catch (InvalidNameException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
+        } catch (IrpSignalParseException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -652,8 +658,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12, F=23, S=34}");
             Map<String, Long> recognizeData = iodatan.recognize(irSignal, false);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -665,8 +671,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=5, F=65, S=215}");
             Map<String, Long> recognizeData = velodyne.recognize(irSignal, false, 500f, 50f, 0.02);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -678,8 +684,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=110, F=14478, S=246, OEM=239}");
             Map<String, Long> recognizeData = xmp.recognize(irSignal, false, 500f, 50f, 0.02);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 
@@ -691,8 +697,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=110, F=144, S=246}");
             Map<String, Long> recognizeData = xmp1.recognize(irSignal, false, 500f, 50f, 0.02);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | IrpSyntaxException ex) {
-            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException ex) {
+            fail();
         }
     }
 }

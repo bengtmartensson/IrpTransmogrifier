@@ -129,7 +129,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
     }
 
     @Override
-    int numberOfBareDurations() {
+    int numberOfBareDurations(boolean recursive) {
         return (int) length;
     }
 
@@ -139,8 +139,13 @@ class BitStream extends IrStreamItem implements Evaluatable {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+        throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -197,6 +202,11 @@ class BitStream extends IrStreamItem implements Evaluatable {
 
     @Override
     public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

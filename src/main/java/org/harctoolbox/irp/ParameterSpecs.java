@@ -220,7 +220,9 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
             m.put("min", ps.getMin());
             m.put("max", ps.getMax());
             m.put("memory", ps.hasMemory());
-            m.put("default", ps.getDefault());
+            Expression dflt = ps.getDefault();
+            if (dflt != null)
+                m.put("default", dflt);
         });
         return result;
     }

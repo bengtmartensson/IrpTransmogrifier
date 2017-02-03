@@ -110,6 +110,19 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
+    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
+        NameEngine nameEngine = renderData.getNameEngine();
+        long val = value.toNumber(nameEngine);
+        nameEngine.define(name, val);
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        //recognizeData.preprocess(this, pass, bitSpecs);
+        recognizeData.postprocess(this, pass, bitSpecs);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.appendChild(name.toElement(document));
@@ -123,7 +136,7 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    int numberOfBareDurations() {
+    int numberOfBareDurations(boolean recursive) {
         return 0;
     }
 
@@ -133,11 +146,9 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException {
         if (recognizeData.getState() == pass)
             recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
-
-        return true;
     }
 
     @Override

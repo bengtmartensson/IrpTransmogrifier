@@ -59,6 +59,11 @@ public class Variation extends IrStreamItem {
         return actual.isEmpty(nameEngine) ? null : actual.evaluate(state, pass, nameEngine, generalSpec);
     }
 
+    @Override
+    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
+
+    }
+
     private BareIrStream select(IrSignal.Pass pass) {
         return pass == Pass.intro ? intro
                 : pass == Pass.repeat ? repeat
@@ -92,7 +97,7 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    int numberOfBareDurations() {
+    int numberOfBareDurations(boolean recursive) {
         return -999999999;
     }
 
@@ -122,8 +127,15 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) throws NameConflictException, InvalidNameException, IrpSemanticException {
-        return select(pass).recognize(recognizeData, pass, bitSpecs);
+    public void recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) {
+        select(pass).recognize(recognizeData, pass, bitSpecs);
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        recognizeData.preprocess(this, pass, bitSpecs);
+        select(pass).traverse(recognizeData, pass, bitSpecs);
+        recognizeData.postprocess(this, pass, bitSpecs);
     }
 
     @Override

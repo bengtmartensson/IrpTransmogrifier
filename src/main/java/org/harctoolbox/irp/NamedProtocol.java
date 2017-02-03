@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
@@ -80,11 +79,12 @@ public class NamedProtocol extends Protocol {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) {
-        if (!isDecodeable()) {
-            logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
-            return null;
-        }
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException, ProtocolNotDecodableException {
+        if (!isDecodeable())
+            //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
+            //return null;
+            throw new ProtocolNotDecodableException();
+
         return super.recognize(irSignal, keepDefaulted,
                 getFrequencyTolerance(userFrequencyTolerance),
                 getAbsoluteTolerance(userAbsoluteTolerance), getRelativeTolerance(userRelativeTolerance));
@@ -229,5 +229,12 @@ public class NamedProtocol extends Protocol {
         putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);
         map.putAll(parameters);
         return map;
+    }
+
+    public static class ProtocolNotDecodableException extends IrpException {
+
+        public ProtocolNotDecodableException() {
+            super("Protocol not decodable");
+        }
     }
 }

@@ -138,7 +138,7 @@ public class ShortPronto extends Pronto {
             } catch (DomainViolationException ex) {
                 logger.log(Level.SEVERE, "{0}", ex.getMessage());
                 throw new InvalidArgumentException(ex);
-            } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException ex) {
+            } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
                 throw new ThisCannotHappenException(ex);
             }
         }

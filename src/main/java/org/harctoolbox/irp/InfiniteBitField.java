@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -102,12 +103,22 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    int numberOfBareDurations() {
-        return -99999;
+    int numberOfBareDurations(boolean recursive) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+        throw new ThisCannotHappenException("Not supported.");
+    }
+
+    @Override
+    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
         throw new UnsupportedOperationException("Not supported.");
     }
 

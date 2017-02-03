@@ -27,6 +27,10 @@ public class IrpException extends Exception {
         super(message);
     }
 
+    public IrpException() {
+        super();
+    }
+
     public IrpException(Throwable ex) {
         super(ex);
     }

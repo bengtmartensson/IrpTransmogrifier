@@ -27,7 +27,7 @@ import org.harctoolbox.ircore.IrSignal;
 /**
  * This class is an abstract superclass of the things that make up an IRStream (see "Directly known subclasses").
  *
- * @author Bengt Martensson
+ * This should rather be an interface.
  */
 public abstract class IrStreamItem extends IrpObject {
     public static IrStreamItem newIrStreamItem(String str) {
@@ -87,7 +87,7 @@ public abstract class IrStreamItem extends IrpObject {
 
     abstract int numberOfBits() throws UnassignedException;
 
-    abstract int numberOfBareDurations();
+    abstract int numberOfBareDurations(boolean recursive);
 
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
         return null;
@@ -99,8 +99,15 @@ public abstract class IrStreamItem extends IrpObject {
 
     abstract ParserRuleContext getParseTree();
 
-    public abstract boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs)
-            throws UnassignedException, InvalidNameException, NameConflictException, IrpSemanticException;
+    public abstract void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException;
+
+    @SuppressWarnings("NoopMethodInAbstractClass")
+    void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+    }
+
+    public abstract void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException;
+
+    public abstract void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException;
 
     public abstract boolean hasExtent();
 

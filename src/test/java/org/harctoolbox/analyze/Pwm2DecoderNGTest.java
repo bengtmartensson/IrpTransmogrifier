@@ -72,6 +72,7 @@ public class Pwm2DecoderNGTest {
         }
         System.out.println(result.toIrpString(16, false));
         try {
+            System.out.println("Expect warnings for missing parameterspec");
             Protocol expResult = new Protocol("{38.4k,564,msb}<1,-1|1,-3>(16,-8,A:32,1,^108m){A=0x30441ce3}");
             assertEquals(result, expResult);
         } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException ex) {

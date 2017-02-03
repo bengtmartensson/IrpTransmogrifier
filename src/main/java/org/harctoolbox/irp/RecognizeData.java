@@ -17,16 +17,17 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.List;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
-public class RecognizeData implements Cloneable {
+public class RecognizeData extends Traverser implements Cloneable {
 
-    private boolean success;
+    //private boolean success;
     private int position;
     private double hasConsumed;
-    private IrSignal.Pass state;
+    //private IrSignal.Pass state;
     private ParameterCollector parameterCollector;
     private final IrSequence irSequence;
     private final GeneralSpec generalSpec;
@@ -43,9 +44,10 @@ public class RecognizeData implements Cloneable {
         this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, nameMap, interleaving, absoulteTolerance, relativeTolerance);
     }
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
+    private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
             ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance) {
-        success = true;
+        super(state);
+        //success = true;
         danglingBitFieldData = new BitwiseParameter();
         this.generalSpec = generalSpec;
         this.definitions = definitions;
@@ -53,7 +55,7 @@ public class RecognizeData implements Cloneable {
         this.hasConsumed = 0.0;
         //this.restIsFlash = false;
         this.irSequence = irSequence;
-        this.state = state;
+        //this.state = state;
         this.parameterCollector = parameterCollector;
         this.extentStart = 0;
         ////this.lookAheadItem = null;
@@ -80,13 +82,13 @@ public class RecognizeData implements Cloneable {
         result.setParameterCollector(getParameterCollector().clone());
         return result;
     }
-
-    /**
-     * @return the state
-     */
-    public IrSignal.Pass getState() {
-        return state;
-    }
+//
+//    /**
+//     * @return the state
+//     */
+//    public IrSignal.Pass getState() {
+//        return state;
+//    }
 
     /**
      * @return the irSequence
@@ -95,12 +97,12 @@ public class RecognizeData implements Cloneable {
         return irSequence;
     }
 
-    /**
-     * @param state the state to set
-     */
-    public void setState(IrSignal.Pass state) {
-        this.state = state;
-    }
+//    /**
+//     * @param state the state to set
+//     */
+//    public void setState(IrSignal.Pass state) {
+//        this.state = state;
+//    }
 
     /**
      * @return the position
@@ -160,19 +162,19 @@ public class RecognizeData implements Cloneable {
         add(name, new BitwiseParameter(value));
     }
 
-    /**
-     * @return the success
-     */
-    public boolean isSuccess() {
-        return success;
-    }
+//    /**
+//     * @return the success
+//     */
+//    public boolean isSuccess() {
+//        return success;
+//    }
 
-    /**
-     * @param success the success to set
-     */
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
+//    /**
+//     * @param success the success to set
+//     */
+//    public void setSuccess(boolean success) {
+//        this.success = success;
+//    }
 
     /**
      * @return the generalSpec
@@ -295,7 +297,23 @@ public class RecognizeData implements Cloneable {
         danglingBitFieldData = new BitwiseParameter();
     }
 
+    @Override
     public boolean isFinished() {
         return position == irSequence.getLength();
+    }
+
+//    @Override
+//    public void process(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+//        item.recognize(this, pass, bitSpecs);
+//    }
+
+    @Override
+    public void preprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+        //item.prerecognize(this, pass, bitSpecs);
+    }
+
+    @Override
+    public void postprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+        item.recognize(this, pass, bitSpecs);
     }
 }

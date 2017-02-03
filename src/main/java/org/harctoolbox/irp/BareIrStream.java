@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
@@ -210,7 +209,7 @@ public class BareIrStream extends IrStreamItem {
     @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
-        element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations()));
+        element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations(false)));
         try {
             if (numberOfBits() >= 0)
                 element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
@@ -224,9 +223,9 @@ public class BareIrStream extends IrStreamItem {
     }
 
     @Override
-    int numberOfBareDurations() {
+    int numberOfBareDurations(boolean recursive) {
         int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfBareDurations()).reduce(sum, Integer::sum);
+        sum = irStreamItems.stream().map((item) -> item.numberOfBareDurations(recursive)).reduce(sum, Integer::sum);
         return sum;
     }
 
@@ -245,14 +244,56 @@ public class BareIrStream extends IrStreamItem {
         return parseTree;
     }
 
+//    @Override
+//    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack) throws NameConflictException, InvalidNameException, IrpSemanticException {
+//        IrpUtils.entering(logger, "recognize " + pass, this);
+//        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat()) {
+//            IrpUtils.exiting(logger, "recognize " + pass, "pass (since variation with intro equals repeat)");
+//            return true;
+//        }
+//
+//        for (int itemNr = 0; itemNr < irStreamItems.size(); itemNr++) {
+//            IrStreamItem irStreamItem = irStreamItems.get(itemNr);
+//            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
+//            if (newState != null)
+//                recognizeData.setState(newState);
+//
+//            if (recognizeData.getState() == pass) {
+//                boolean success = false;
+//                try {
+//                    success = irStreamItem.recognize(recognizeData, pass, bitSpecStack);
+//                } catch (ArithmeticException | UnassignedException | IrpSyntaxException ex) {
+//                    logger.log(Level.SEVERE, ex.getMessage());
+//                }
+//                if (!success) {
+//                    IrpUtils.exiting(logger, "recognize", "fail");
+//                    return false;
+//                }
+//            }
+//            IrSignal.Pass next = irStreamItem.stateWhenExiting(recognizeData.getState());
+//            if (next != null)
+//                recognizeData.setState(next);
+//
+//            if (next == IrSignal.Pass.finish)
+//                break;
+//        }
+//        IrpUtils.exiting(logger, "recognize " + pass, "pass");
+//        return true;
+//    }
+
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack) throws NameConflictException, InvalidNameException, IrpSemanticException {
-        IrpUtils.entering(logger, "recognize " + pass, this);
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        IrpUtils.entering(logger, "traverse " + pass, this);
         if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat()) {
-            IrpUtils.exiting(logger, "recognize " + pass, "pass (since variation with intro equals repeat)");
-            return true;
+            IrpUtils.exiting(logger, "traverse " + pass, "pass (since variation with intro equals repeat)");
+            return;
         }
 
+        recognizeData.preprocess(this, pass, bitSpecStack);
         for (int itemNr = 0; itemNr < irStreamItems.size(); itemNr++) {
             IrStreamItem irStreamItem = irStreamItems.get(itemNr);
             IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
@@ -260,16 +301,17 @@ public class BareIrStream extends IrStreamItem {
                 recognizeData.setState(newState);
 
             if (recognizeData.getState() == pass) {
-                boolean success = false;
-                try {
-                    success = irStreamItem.recognize(recognizeData, pass, bitSpecStack);
-                } catch (ArithmeticException | UnassignedException | IrpSyntaxException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage());
-                }
-                if (!success) {
-                    IrpUtils.exiting(logger, "recognize", "fail");
-                    return false;
-                }
+//                boolean success = false;
+//                try {
+                    /*success =*/
+                    irStreamItem.traverse(recognizeData, pass, bitSpecStack);
+//                } catch (Exception ex) { // FIXME
+//                    logger.log(Level.SEVERE, ex.getMessage());
+//                }
+//                if (!success) {
+//                    IrpUtils.exiting(logger, "traverse", "fail");
+//                    return false;
+//                }
             }
             IrSignal.Pass next = irStreamItem.stateWhenExiting(recognizeData.getState());
             if (next != null)
@@ -278,8 +320,9 @@ public class BareIrStream extends IrStreamItem {
             if (next == IrSignal.Pass.finish)
                 break;
         }
-        IrpUtils.exiting(logger, "recognize " + pass, "pass");
-        return true;
+        recognizeData.postprocess(this, pass, bitSpecStack);
+        IrpUtils.exiting(logger, "traverse " + pass, "pass");
+        //return true;
     }
 
     @Override
@@ -381,5 +424,9 @@ public class BareIrStream extends IrStreamItem {
             sum += item.microSeconds(nameEngine, generalSpec);
         }
         return sum / irStreamItems.size();
+    }
+
+    @Override
+    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
     }
 }

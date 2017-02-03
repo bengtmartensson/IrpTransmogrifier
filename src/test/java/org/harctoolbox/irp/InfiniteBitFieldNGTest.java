@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -129,7 +130,10 @@ public class InfiniteBitFieldNGTest {
     @Test
     public void testNumberOfBareDurations() {
         System.out.println("numberOfBareDurations");
-        int result = instance.numberOfBareDurations();
-        assertTrue(result < 0L);
+        try {
+            instance.numberOfBareDurations(true);
+            fail();
+        } catch (UnsupportedOperationException ex) {
+        }
     }
 }

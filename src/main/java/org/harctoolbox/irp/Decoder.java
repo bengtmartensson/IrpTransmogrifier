@@ -103,12 +103,18 @@ public class Decoder {
         Map<String, Decode> output = new HashMap<>(4);
         //Analyzer analyzer = new Analyzer(irSignal, true /* repeatFinder*/, absoluteTolerance, relativeTolerance);
         parsedProtocols.values().forEach((namedProtocol) -> {
-            Map<String, Long> parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
-                    frequencyTolerance, absoluteTolerance, relativeTolerance);
-            if (parameters != null)
+            Map<String, Long> parameters;
+            try {
+                logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
+
+                parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
+                        frequencyTolerance, absoluteTolerance, relativeTolerance);
+                if (parameters == null)
+                    throw new ThisCannotHappenException(namedProtocol.getName());
                 output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
-            else
-                logger.log(Level.FINE, "Protocol {0} did not decode", namedProtocol.getName());
+            } catch (NamedProtocol.ProtocolNotDecodableException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | InvalidNameException | IrpSemanticException ex) {
+                logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
+            }
         });
 
         if (!noPreferredDecodes) {

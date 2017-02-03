@@ -149,8 +149,8 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    int numberOfBareDurations() {
-        return irStream.numberOfBareDurations();
+    int numberOfBareDurations(boolean recursive) {
+        return irStream.numberOfBareDurations(recursive);
     }
 
     @Override
@@ -164,14 +164,46 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs)
-            throws NameConflictException, InvalidNameException, IrpSemanticException {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs) {
         IrpUtils.entering(logger, "recognize " + pass, this);
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
-        boolean status = irStream.recognize(recognizeData, pass, stack);
-        IrpUtils.exiting(logger, "recognize " + pass, status ? "pass" : "fail"/*? recognizeData.toString() : ""*/);
-        return status;
+        irStream.recognize(recognizeData, pass, stack);
+        IrpUtils.exiting(logger, "recognize " + pass);
+    }
+
+    @Override
+    public void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+        renderData.push();
+    }
+
+    @Override
+    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
+        BitSpec lastBitSpec = bitSpecs.get(bitSpecs.size() - 1);
+        renderData.reduce(lastBitSpec);
+        renderData.pop();
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        IrpUtils.entering(logger, "traverse " + pass, this);
+        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
+        stack.add(bitSpec);
+        recognizeData.preprocess(this, pass, inheritedBitSpecs);
+        /*boolean status =*/
+
+        irStream.traverse(recognizeData, pass, stack);
+//        if (status)
+//            try {
+        /*status =*/
+        recognizeData.postprocess(this, pass, stack);
+//            } catch (NameConflictException | IrpSemanticException | InvalidNameException | UnassignedException ex) {
+//                status = false;
+//                Logger.getLogger(BitspecIrstream.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+        //IrpUtils.exiting(logger, "traverse " + pass, status ? "pass" : "fail"/*? recognizeData.toString() : ""*/);
+        IrpUtils.exiting(logger, "traverse " + pass);
+        //return status;
     }
 
     @Override

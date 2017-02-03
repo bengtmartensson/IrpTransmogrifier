@@ -177,6 +177,23 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
+    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
+        IrpUtils.entering(logger, "evaluate", this.toString());
+        //EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
+        //if (state == pass) {
+        BitStream bitStream = new BitStream(this, renderData.getNameEngine(), renderData.getGeneralSpec());
+        renderData.add(bitStream);
+        //}
+        IrpUtils.exiting(logger, "evaluate", true);
+    }
+
+    @Override
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        //recognizeData.preprocess(this, pass, bitSpecs);
+        recognizeData.postprocess(this, pass, bitSpecs);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("reverse", Boolean.toString(reverse));
@@ -199,12 +216,12 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    int numberOfBareDurations() {
+    int numberOfBareDurations(boolean recursive) {
         return 0;
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, NameConflictException, IrpSemanticException {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack) throws InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException, IrpSemanticException {
         IrpUtils.entering(logger, "recognize", this);
         BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
         int chunkSize = bitSpec.getChunkSize();
@@ -227,16 +244,19 @@ public class FiniteBitField extends BitField {
                 List<BitSpec> poppedStack = new ArrayList<>(bitSpecStack);
                 poppedStack.remove(poppedStack.size()-1);
 
-                boolean success = bitSpec.get(bareIrStreamNo).recognize(inData, pass, poppedStack);
-                if (success)
+                try {
+                    bitSpec.get(bareIrStreamNo).traverse(inData, pass, poppedStack);
+                    // match!
                     break;
+                } catch (IrpSignalParseException ex) {
+                    // No match
+                }
             }
             assert(inData != null);
 
-            if (bareIrStreamNo == bitSpec.size()) {
-                inData.setSuccess(false);
-                return false;
-            }
+            if (bareIrStreamNo == bitSpec.size())
+                throw new IrpSignalParseException("FiniteBitField did not parse");
+
             recognizeData.setPosition(inData.getPosition());
             recognizeData.setHasConsumed(inData.getHasConsumed());
             payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
@@ -264,18 +284,12 @@ public class FiniteBitField extends BitField {
             else
                 recognizeData.add(name.toString(), data.invert(payload));
         } else {
-            try {
-                long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
-                if (expected != payload)
-                    return false;
-            } catch (UnassignedException ex) {
-                logger.log(Level.WARNING, ex.getMessage());
-                return false;
-            }
+            long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
+            if (expected != payload)
+                throw new IrpSignalParseException("FiniteBitField did not evaluated to expected value");//return false;
         }
 
         IrpUtils.exiting(logger, "recognize", payload);
-        return true;
     }
 
     @Override

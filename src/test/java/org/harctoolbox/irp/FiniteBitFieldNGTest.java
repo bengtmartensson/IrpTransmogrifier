@@ -170,7 +170,7 @@ public class FiniteBitFieldNGTest {
     public void testNumberOfBareDurations() {
         System.out.println("numberOfBareDurations");
         int expResult = 0;
-        int result = instance.numberOfBareDurations();
+        int result = instance.numberOfBareDurations(true);
         assertEquals(result, expResult);
     }
 }

@@ -155,16 +155,18 @@ public class Protocol extends IrpObject {
 
     /**
      *
-     * @param nameEngine
+     * @param nameEngine; may be changed
      * @return
      * @throws org.harctoolbox.irp.InvalidNameException
      * @throws IrpSemanticException
      * @throws ArithmeticException
      * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      * @throws UnassignedException
-     * @throws org.harctoolbox.irp.DomainViolationException
+     * @throws NameConflictException
+     * @throws IrpSignalParseException
+     * @throws DomainViolationException
      */
-    public IrSignal toIrSignal(NameEngine nameEngine) throws InvalidNameException, UnassignedException, DomainViolationException, IrpSemanticException, OddSequenceLenghtException {
+    public IrSignal toIrSignal(NameEngine nameEngine) throws InvalidNameException, UnassignedException, DomainViolationException, IrpSemanticException, OddSequenceLenghtException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "toIrSignal");
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
@@ -203,8 +205,10 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.ircore.OddSequenceLenghtException
      * @throws org.harctoolbox.irp.UnassignedException
+     * @throws org.harctoolbox.irp.NameConflictException
+     * @throws org.harctoolbox.irp.IrpSignalParseException
      */
-    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLenghtException {
+    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLenghtException, NameConflictException, IrpSignalParseException {
         return new ModulatedIrSequence(toIrSequence(nameEngine, pass), getFrequency(), getDutyCycle());
     }
 
@@ -219,10 +223,11 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.DomainViolationException
      */
-    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLenghtException {
+    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLenghtException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "toIrSequence", pass);
-        EvaluatedIrStream evaluatedIrStream = bitspecIrstream.evaluate(IrSignal.Pass.intro, pass, nameEngine, generalSpec);
-        IrSequence irSequence = evaluatedIrStream.toIrSequence();
+        RenderData renderData = new RenderData(nameEngine, generalSpec);
+        bitspecIrstream.traverse(renderData, pass, new ArrayList<>(0));
+        IrSequence irSequence = renderData.toIrSequence();
         IrpUtils.exiting(logger, "toIrSequence", pass);
         return irSequence;
     }
@@ -379,62 +384,51 @@ public class Protocol extends IrpObject {
         return parameterSpecs.random();
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal) {
+    public Map<String, Long> recognize(IrSignal irSignal) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
         return recognize(irSignal, true);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) {
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
         return recognize(irSignal, keepDefaulted, IrCoreUtils.defaultFrequencyTolerance, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
-            double frequencyTolerance, double absoluteTolerance, double relativeTolerance) {
+            double frequencyTolerance, double absoluteTolerance, double relativeTolerance)
+            throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
         IrpUtils.entering(logger, Level.FINE, "recognize", this);
-        Map<String, Long> result;
-        try {
-            ParameterCollector names = new ParameterCollector();
+        checkFrequency(irSignal.getFrequency(), frequencyTolerance);
+        ParameterCollector names = new ParameterCollector();
 
-            boolean success = (frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequency(), irSignal.getFrequency(), frequencyTolerance, 0.0));
-            if (success)
-                success = process(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance);
-            if (success)
-                success = process(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance);
-            if (success)
-                success = process(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance);
-            if (!success) {
-                IrpUtils.exiting(logger, "recognize", "fail");
-                return null;
-            }
-            result = names.collectedNames();
-            parameterSpecs.reduceNamesMap(result, keepDefaulted);
-        } catch (UnassignedException | NameConflictException | DomainViolationException | IrpSyntaxException | IrpSemanticException ex) {
-            logger.log(Level.FINE, ex.getMessage());
-            result = null;
-        }
+        decode(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance);
+        decode(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance);
+        decode(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance);
 
-        IrpUtils.entering(logger, Level.FINE, "recognize", result != null ? result : "");
+        Map<String, Long> result = names.collectedNames();
+        parameterSpecs.reduceNamesMap(result, keepDefaulted);
+        IrpUtils.entering(logger, Level.FINE, "recognize", result);
         return result;
     }
 
-    private boolean process(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) throws DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
-        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names, absoluteTolerance, relativeTolerance);
-        boolean status = recognize(recognizeData, pass);
-        if (!status)
-            return false;
-
-        recognizeData.checkConsistency();
-        checkDomain(names);
-        return recognizeData.isSuccess();
+    private void checkFrequency(double frequency, double frequencyTolerance) throws IrpSignalParseException {
+        boolean success = frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequency(), frequency, frequencyTolerance, 0.0);
+        if (!success)
+            throw new IrpSignalParseException("Frequency does not match");
     }
 
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass) throws NameConflictException, InvalidNameException, IrpSemanticException {
-        IrpUtils.entering(logger, "recognize " + pass, this);
-        boolean success = bitspecIrstream.recognize(recognizeData, pass, new ArrayList<>(0))
-                    && recognizeData.isSuccess()
-                    && recognizeData.isFinished();
+    private void decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) throws DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException, IrpSignalParseException {
+        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names, absoluteTolerance, relativeTolerance);
+        traverse(recognizeData, pass);
+        recognizeData.checkConsistency();
+        checkDomain(names);
+    }
 
-        IrpUtils.exiting(logger, "recognize " + pass, success ? "pass" : "fail");
-        return success;
+    public void traverse(Traverser recognizeData, IrSignal.Pass pass) throws NameConflictException, InvalidNameException, IrpSemanticException, UnassignedException, IrpSignalParseException {
+        IrpUtils.entering(logger, "traverse " + pass, this);
+        bitspecIrstream.traverse(recognizeData, pass, new ArrayList<>(0));
+        if (!recognizeData.isFinished())
+            throw new IrpSignalParseException("IrSequence not fully matched");
+
+        IrpUtils.exiting(logger, "traverse " + pass);
     }
 
     @Override

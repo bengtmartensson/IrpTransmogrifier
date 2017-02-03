@@ -61,7 +61,7 @@ public class DecoderNGTest {
      */
     @Test(enabled = true)
     public void testDecode_List_String() {
-        System.out.println("decode");
+        System.out.println("decode_list_string");
         List<String> protocols = new ArrayList<>(0);
         String irpDatabasePath = "src/main/config/IrpProtocols.xml";
         try {
@@ -77,7 +77,7 @@ public class DecoderNGTest {
     @Test
     public void testDecode_IrSignal_boolean() {
         try {
-            System.out.println("decode");
+            System.out.println("decode_boolean");
             IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
             Map<String, Decoder.Decode> result = decoder.decode(irSignal, false);
             assertEquals(result.size(), 1);

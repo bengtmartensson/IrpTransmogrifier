@@ -69,14 +69,13 @@ public class Extent extends Duration {
     }
 
     @Override
-    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, IrpSemanticException {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, IrpSemanticException, IrpSignalParseException {
         IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         double physical = recognizeData.getExtentDuration();
         double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
         recognizeData.markExtentStart();
-        boolean success = recognize(recognizeData, physical, theoretical);
-        IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", theoretical, physical);
-        return success;
+        recognize(recognizeData, physical, theoretical);
+        //IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", theoretical, physical);
     }
 
     @Override

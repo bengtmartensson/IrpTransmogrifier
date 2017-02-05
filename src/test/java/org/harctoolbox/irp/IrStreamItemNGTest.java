@@ -57,7 +57,7 @@ public class IrStreamItemNGTest {
         assertTrue(result instanceof Assignment);
         result = IrStreamItem.newIrStreamItem("(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
         assertTrue(result instanceof IrStream);
-        result = IrStream.newIrStreamItem("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
+        result = IrStreamItem.newIrStreamItem("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");
         assertTrue(result instanceof BitspecIrstream);
         System.out.println(result);
     }

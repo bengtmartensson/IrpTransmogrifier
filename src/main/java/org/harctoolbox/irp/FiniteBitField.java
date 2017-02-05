@@ -30,9 +30,15 @@ import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class FiniteBitField extends BitField {
+public class FiniteBitField extends BitField implements IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
+
+    public static IrStreamItem newFiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
+        FiniteBitField instance = new FiniteBitField(ctx);
+        instance.parseTree = ctx;
+        return instance;
+    }
 
     private PrimaryItem width;
     private boolean reverse;
@@ -199,13 +205,12 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    int numberOfBits() throws UnassignedException {
-        return (int) getWidth(new NameEngine());
-    }
-
-    @Override
-    int numberOfBareDurations(boolean recursive) {
-        return 0;
+    public Integer numberOfBits() {
+        try {
+            return (int) getWidth(new NameEngine());
+        } catch (UnassignedException ex) {
+            return null;
+        }
     }
 
     @Override
@@ -313,7 +318,7 @@ public class FiniteBitField extends BitField {
     @Override
     public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
-        Map<String, Object> map = super.propertiesMap(state, pass, generalSpec, nameEngine);
+        Map<String, Object> map = super.propertiesMap(true/*state, pass*/, generalSpec, nameEngine);
         map.put("width", width.propertiesMap(true, generalSpec, nameEngine));
         map.put("reverse", reverse);
         return map;

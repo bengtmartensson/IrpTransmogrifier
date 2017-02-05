@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -225,13 +223,9 @@ public class BitSpec extends IrpObject implements AggregateLister {
     }
 
     boolean isSonyType(NameEngine nameEngine, GeneralSpec generalSpec) {
-        try {
-            return isPWM(nameEngine, generalSpec)
-                    && ! IrCoreUtils.approximatelyEquals(bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec),
-                            bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-        } catch (IrpException ex) {
-            return false;
-        }
+        return isPWM(nameEngine, generalSpec)
+                && ! IrCoreUtils.approximatelyEquals(bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec),
+                        bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
     }
 
     /**
@@ -347,32 +341,24 @@ public class BitSpec extends IrpObject implements AggregateLister {
         map.put("size", bitCodes.size());
         if (isPWM(2, new NameEngine(), new GeneralSpec())) {
             map.put("pwm2", true);
-            try {
-                map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
-                map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-                map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
-                map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-                map.put("flashesDiffer", !IrCoreUtils.approximatelyEquals(
-                        bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec),
-                        bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec)));
-            } catch (IrpException ex) {
-                Logger.getLogger(BitSpec.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+            map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+            map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+            map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+            map.put("flashesDiffer", !IrCoreUtils.approximatelyEquals(
+                    bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec),
+                    bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec)));
         }
         if (isPWM(4, new NameEngine(), new GeneralSpec())) {
             map.put("pwm4", true);
-            try {
-                map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
-                map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-                map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
-                map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-                map.put("twoGap",    bitCodes.get(2).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
-                map.put("twoFlash",  bitCodes.get(2).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-                map.put("threeGap",  bitCodes.get(3).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
-                map.put("threeFlash",bitCodes.get(3).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
-            } catch (IrpException ex) {
-                Logger.getLogger(BitSpec.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+            map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+            map.put("oneGap",    bitCodes.get(1).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+            map.put("oneFlash",  bitCodes.get(1).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+            map.put("twoGap",    bitCodes.get(2).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+            map.put("twoFlash",  bitCodes.get(2).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
+            map.put("threeGap",  bitCodes.get(3).getIrStreamItems().get(1).microSeconds(nameEngine, generalSpec));
+            map.put("threeFlash",bitCodes.get(3).getIrStreamItems().get(0).microSeconds(nameEngine, generalSpec));
         }
         if (isStandardBiPhase(new NameEngine(), new GeneralSpec())) {
             map.put("standardBiPhase", true);

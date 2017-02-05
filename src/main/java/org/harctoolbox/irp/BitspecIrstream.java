@@ -29,7 +29,7 @@ import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class BitspecIrstream extends IrStreamItem {
+public class BitspecIrstream extends IrpObject implements IrStreamItem {
     private static final Logger logger = Logger.getLogger(BitspecIrstream.class.getName());
 
     private BitSpec bitSpec;
@@ -116,17 +116,17 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    int numberOfBitSpecs() {
+    public Integer numberOfBitSpecs() {
         return irStream.numberOfBitSpecs() + 1;
     }
 
     @Override
-    int numberOfBits() throws UnassignedException {
+    public Integer numberOfBits() {
         return irStream.numberOfBits();
     }
 
     @Override
-    int numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations(boolean recursive) {
         return irStream.numberOfBareDurations(recursive);
     }
 
@@ -136,7 +136,7 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    ParserRuleContext getParseTree() {
+    public ParserRuleContext getParseTree() {
         return parseTree;
     }
 
@@ -308,5 +308,10 @@ public class BitspecIrstream extends IrStreamItem {
     @Override
     public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
+    }
+
+    @Override
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return null;
     }
 }

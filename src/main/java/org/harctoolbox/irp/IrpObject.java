@@ -17,6 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.List;
+import java.util.Map;
+import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -52,5 +55,29 @@ public abstract class IrpObject implements XmlExport {
         Element element = toElement(document);
         document.appendChild(element);
         return document;
+    }
+
+    public Integer numberOfBits() {
+        return 0;
+    }
+
+    public Integer numberOfBitSpecs() {
+        return 0;
+    }
+
+    @SuppressWarnings("NoopMethodInAbstractClass")
+    public void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+    }
+
+    public Map<String, Object> propertiesMap(int noProperites) {
+        return IrpUtils.propertiesMap(noProperites, this);
+    }
+
+    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
+        return null;
+    }
+
+    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
+        return null;
     }
 }

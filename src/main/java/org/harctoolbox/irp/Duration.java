@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
  * Depends on its Protocol (GeneralSpec and NameEngine), except for this, it is immutable.
  */
 
-public abstract class Duration extends IrStreamItem implements Floatable, Evaluatable {
+public abstract class Duration extends IrpObject implements IrStreamItem, Floatable, Evaluatable {
 
     private static final Logger logger = Logger.getLogger(Duration.class.getName());
     private static final double DUMMYTIMEUNIT = 999;
@@ -212,17 +212,17 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    int numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations(boolean recursive) {
         return 1;
     }
 
     @Override
-    int numberOfBits() {
+    public Integer numberOfBits() {
         return 0;
     }
 
     @Override
-    ParserRuleContext getParseTree() {
+    public ParserRuleContext getParseTree() {
         return parseTree;
     }
 
@@ -333,7 +333,11 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
-        return this.evaluate(nameEngine, generalSpec);
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+        try {
+            return this.evaluate(nameEngine, generalSpec);
+        } catch (UnassignedException | IrpSemanticException ex) {
+            return null;
+        }
     }
 }

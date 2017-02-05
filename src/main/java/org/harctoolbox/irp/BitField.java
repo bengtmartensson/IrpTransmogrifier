@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This class implements Bitfields as described in Chapter 5, except for that it does not
@@ -33,7 +32,7 @@ import org.harctoolbox.ircore.IrSignal;
  *
  * @see BitStream
  */
-public abstract class BitField extends IrStreamItem implements Numerical {
+public abstract class BitField extends IrpObject implements Numerical {
 
     /**
      * Max length of a BitField in this implementation.
@@ -43,7 +42,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     public static BitField newBitField(String str) {
         BitField bitField = newBitField(new ParserDriver(str).getParser());
-        int last = bitField.getParseTree().getStop().getStopIndex();
+        int last = bitField.parseTree.getStop().getStopIndex();
         if (last != str.length() - 1)
             logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
         return bitField;
@@ -103,7 +102,6 @@ public abstract class BitField extends IrStreamItem implements Numerical {
 
     public abstract long getWidth(NameEngine nameEngine) throws UnassignedException;
 
-    @Override
     public boolean isEmpty(NameEngine nameEngine) {
         try {
             return getWidth(nameEngine) == 0;
@@ -120,8 +118,7 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         }
     }
 
-    @Override
-    ParserRuleContext getParseTree() {
+    public ParserRuleContext getParseTree() {
         return parseTree;
     }
 
@@ -130,15 +127,14 @@ public abstract class BitField extends IrStreamItem implements Numerical {
         return data.weight() + chop.weight();
     }
 
-    @Override
     public boolean hasExtent() {
         return false;
     }
 
-    @Override
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        return propertiesMap(false, generalSpec, nameEngine);
-    }
+//    @Override
+//    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
+//        return propertiesMap(false, generalSpec, nameEngine);
+//    }
 
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = IrpUtils.propertiesMap(6, this);
@@ -158,5 +154,13 @@ public abstract class BitField extends IrStreamItem implements Numerical {
     public TreeViewer toTreeViewer() {
         List<String> ruleNames = Arrays.asList(parser.getRuleNames());
         return new TreeViewer(ruleNames, parseTree);
+    }
+
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return null;
+    }
+
+    public Integer numberOfBareDurations(boolean recursive) {
+        return 0;
     }
 }

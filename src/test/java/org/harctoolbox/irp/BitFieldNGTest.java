@@ -114,15 +114,15 @@ public class BitFieldNGTest {
         assertEquals(result, expResult);
     }
 
-    /**
-     * Test of interleavingOk method, of class BitField.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     */
-    @Test
-    public void testInterleavingOk() throws IrpSyntaxException {
-        System.out.println("interleavingOk");
-        BitField instance = BitField.newBitField("~D:-6:2");
-        boolean result = instance.interleavingOk(null, null, DurationType.flash, false);
-        assertTrue(result);
-    }
+//    /**
+//     * Test of interleavingOk method, of class BitField.
+//     * @throws org.harctoolbox.irp.IrpSyntaxException
+//     */
+//    @Test
+//    public void testInterleavingOk() throws IrpSyntaxException {
+//        System.out.println("interleavingOk");
+//        BitField instance = BitField.newBitField("~D:-6:2");
+//        boolean result = instance.interleavingOk(null, null, DurationType.flash, false);
+//        assertTrue(result);
+//    }
 }

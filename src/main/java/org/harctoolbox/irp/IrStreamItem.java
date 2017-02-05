@@ -29,7 +29,8 @@ import org.harctoolbox.ircore.IrSignal;
  *
  * This should rather be an interface.
  */
-public abstract class IrStreamItem extends IrpObject {
+public interface IrStreamItem extends XmlExport {
+
     public static IrStreamItem newIrStreamItem(String str) {
         return newIrStreamItem((new ParserDriver(str)).getParser().irstream_item());
     }
@@ -37,7 +38,7 @@ public abstract class IrStreamItem extends IrpObject {
     public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) {
         ParseTree child = ctx.getChild(0);
         return (child instanceof IrpParser.VariationContext) ? new Variation(((IrpParser.VariationContext) child))
-                : (child instanceof IrpParser.BitfieldContext) ? BitField.newBitField((IrpParser.BitfieldContext) child)
+                : (child instanceof IrpParser.Finite_bitfieldContext) ? FiniteBitField.newFiniteBitField((IrpParser.Finite_bitfieldContext) child)
                 : (child instanceof IrpParser.AssignmentContext) ? new Assignment((IrpParser.AssignmentContext) child)
                 //: (child instanceof IrpParser.ExtentContext) ? new Extent((IrpParser.ExtentContext) child)
                 : (child instanceof IrpParser.DurationContext) ? Duration.newDuration((IrpParser.DurationContext) child)
@@ -46,14 +47,7 @@ public abstract class IrStreamItem extends IrpObject {
                 : null;
     }
 
-    protected IrStreamItem() {
-    }
-
-    public abstract boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
-
-    int numberOfBitSpecs() {
-        return 0;
-    }
+    public boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
 
     /**
      *
@@ -71,25 +65,22 @@ public abstract class IrStreamItem extends IrpObject {
 
     public abstract DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs);
 
-    abstract int numberOfBits() throws UnassignedException;
+    public abstract Integer numberOfBits();
 
-    abstract int numberOfBareDurations(boolean recursive);
+    public abstract Integer numberOfBareDurations(boolean recursive);
 
-    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
-        return null;
-    }
+    public abstract Integer numberOfBitSpecs();
 
-    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
-        return null;
-    }
+    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass);
+
+    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass);
 
     abstract ParserRuleContext getParseTree();
 
     public abstract void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException;
 
     @SuppressWarnings("NoopMethodInAbstractClass")
-    void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-    }
+    void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs);
 
     public abstract void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
 
@@ -101,11 +92,16 @@ public abstract class IrStreamItem extends IrpObject {
 
     public abstract Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine);
 
-    protected Map<String, Object> propertiesMap(int noProperites) {
-        return IrpUtils.propertiesMap(noProperites, this);
-    }
+    public Map<String, Object> propertiesMap(int noProperites);
+//    {
+//        return IrpUtils.propertiesMap(noProperites, this);
+//    }
 
-    double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) throws IrpException {
-        throw new IrpException(this.getClass().getSimpleName() + " does not implement microSeconds()");
-    }
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec);
+
+    public String toIrpString();
+
+    public int numberOfInfiniteRepeats();
+
+    public int weight();
 }

@@ -30,7 +30,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class BitStream extends IrStreamItem implements Evaluatable {
+class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
 
     private static final Logger logger = Logger.getLogger(BitStream.class.getName());
     private static final int WEIGHT = 2;
@@ -112,17 +112,12 @@ class BitStream extends IrStreamItem implements Evaluatable {
     }
 
     @Override
-    int numberOfBits() {
-        return 0;
-    }
-
-    @Override
-    int numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations(boolean recursive) {
         return (int) length;
     }
 
     @Override
-    ParserRuleContext getParseTree() {
+    public ParserRuleContext getParseTree() {
         return null;
     }
 
@@ -196,5 +191,10 @@ class BitStream extends IrStreamItem implements Evaluatable {
     @Override
     public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return null;
     }
 }

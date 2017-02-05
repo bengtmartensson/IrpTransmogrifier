@@ -27,7 +27,7 @@ import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Variation extends IrStreamItem {
+public class Variation extends IrpObject implements IrStreamItem {
     private static int numberOfInfiniteRepeats(BareIrStream bareIrStream) {
         return bareIrStream == null ? 0 : bareIrStream.numberOfInfiniteRepeats();
     }
@@ -91,13 +91,13 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    int numberOfBareDurations(boolean recursive) {
-        return -999999999;
+    public Integer numberOfBareDurations(boolean recursive) {
+        return null;
     }
 
     @Override
-    int numberOfBits() {
-        return -999999999;
+    public Integer numberOfBits() {
+        return null;
     }
 
     @Override
@@ -206,5 +206,10 @@ public class Variation extends IrStreamItem {
     public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         BareIrStream actual = select(pass);
         return actual.propertiesMap(state, pass, generalSpec, nameEngine);
+    }
+
+    @Override
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return null;
     }
 }

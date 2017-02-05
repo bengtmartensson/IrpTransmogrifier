@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * This class models assignments as defined in Chapter 11.
  */
-public class Assignment extends IrStreamItem implements Numerical {
+public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     public static long parse(String str, NameEngine nameEngine) throws UnassignedException {
         Assignment assignment = new Assignment(str);
         return assignment.toNumber(nameEngine);
@@ -121,17 +121,12 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    int numberOfBits() {
+    public Integer numberOfBareDurations(boolean recursive) {
         return 0;
     }
 
     @Override
-    int numberOfBareDurations(boolean recursive) {
-        return 0;
-    }
-
-    @Override
-    ParserRuleContext getParseTree() {
+    public ParserRuleContext getParseTree() {
         return parseTree;
     }
 
@@ -184,5 +179,10 @@ public class Assignment extends IrStreamItem implements Numerical {
         map.put("name", name.propertiesMap(false, generalSpec, nameEngine));
         map.put("expression", value.propertiesMap(true, generalSpec, nameEngine));
         return map;
+    }
+
+    @Override
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return 0.0;
     }
 }

@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.List;
+import java.util.Map;
 import org.harctoolbox.ircore.IrSignal;
 
 interface Evaluatable {
@@ -24,4 +26,10 @@ interface Evaluatable {
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass);
 
     public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass);
+
+    public Integer numberOfBitSpecs();
+
+    public void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs);
+
+    public Map<String, Object> propertiesMap(int noProperites);
 }

@@ -121,13 +121,13 @@ public class IrStream extends BareIrStream implements AggregateLister {
             element.setAttribute("repeatMax", repeatMarker.isInfinite() ? "infinite" : Integer.toString(repeatMarker.getMax()));
         element.setAttribute("isRepeat", Boolean.toString(isRepeatSequence()));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
-        try {
-            if (numberOfBits() >= 0)
-                element.setAttribute("numberOfBits", Integer.toString(numberOfBits()));
-        } catch (UnassignedException ex) {
-            // computation of numberOfBits not meaningful
-        }
-        element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations(false)));
+        Integer n = numberOfBits();
+        if (n != null)
+                element.setAttribute("numberOfBits", Integer.toString(n));
+
+        n = numberOfBareDurations(false);
+        if (n != null)
+            element.setAttribute("numberOfBareDurations", Integer.toString(n));
 
         if (!repeatMarker.isTrivial())
             element.appendChild(repeatMarker.toElement(document));
@@ -141,7 +141,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     @Override
-    int numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations(boolean recursive) {
         if (!recursive && isInfiniteRepeat())
             return 0;
 
@@ -151,10 +151,9 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     @Override
-    int numberOfBits() throws UnassignedException {
+    public Integer numberOfBits() {
         int sum = 0;
-        for (IrStreamItem item : getIrStreamItems())
-            sum += item.numberOfBits();
+        sum = getIrStreamItems().stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
         return sum;
     }
 

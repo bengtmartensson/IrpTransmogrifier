@@ -48,22 +48,8 @@ public abstract class IrStreamItem extends IrpObject {
 
     protected IrStreamItem() {
     }
-    public abstract boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
 
-    /**
-     *
-     * @param state
-     * @param pass
-     * @param nameEngine
-     * @param generalSpec
-     * @return EvaluatedIrStream or null if termination requested.
-     * @throws InvalidArgumentException
-     * @throws ArithmeticException
-     * @throws UnassignedException
-     * @throws IrpSyntaxException
-     */
-    abstract EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec)
-            throws UnassignedException, InvalidNameException;
+    public abstract boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
 
     int numberOfBitSpecs() {
         return 0;
@@ -105,7 +91,7 @@ public abstract class IrStreamItem extends IrpObject {
     void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
     }
 
-    public abstract void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException;
+    public abstract void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
 
     public abstract void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException;
 

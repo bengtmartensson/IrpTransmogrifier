@@ -100,16 +100,6 @@ public class Assignment extends IrStreamItem implements Numerical {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
-        if (state == pass) {
-            long val = value.toNumber(nameEngine);
-            nameEngine.define(name, val);
-        }
-
-        return new EvaluatedIrStream(nameEngine, generalSpec, pass);
-    }
-
-    @Override
     public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
         NameEngine nameEngine = renderData.getNameEngine();
         long val = value.toNumber(nameEngine);

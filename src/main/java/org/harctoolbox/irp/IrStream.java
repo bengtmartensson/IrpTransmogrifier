@@ -87,29 +87,6 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
-        IrpUtils.entering(logger, "evaluate", this);
-        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
-        EvaluatedIrStream result = evaluate(evaluateTheRepeat(pass) ? IrSignal.Pass.repeat : state, pass, nameEngine, generalSpec, repetitions);
-        IrpUtils.exiting(logger, "evaluate", result);
-        return result;
-    }
-
-    private EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, int repeats) throws UnassignedException, InvalidNameException {
-        IrSignal.Pass actualState = state;
-        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
-        for (int i = 0; i < repeats; i++) {
-            EvaluatedIrStream irSequence = super.evaluate(actualState, pass, nameEngine, generalSpec);
-            if (irSequence.getState() != null) {
-                actualState = irSequence.getState();
-                result.setState(actualState);
-            }
-            result.add(irSequence);
-        }
-        return result;
-    }
-
-    @Override
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
         return hasVariation(false) ? pass
                 : (pass == IrSignal.Pass.repeat || pass == IrSignal.Pass.ending) && isInfiniteRepeat() ? IrSignal.Pass.repeat
@@ -170,7 +147,6 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
         int sum = 0;
         sum = getIrStreamItems().stream().map((item) -> item.numberOfBareDurations(recursive)).reduce(sum, Integer::sum);
-        //sum = getIrStreamItems().stream().map((item) -> item.numberOfBareDurations()).reduce(sum, Integer::sum);
         return sum;
     }
 
@@ -193,17 +169,6 @@ public class IrStream extends BareIrStream implements AggregateLister {
         return pass == IrSignal.Pass.repeat && isInfiniteRepeat();
     }
 
-//    @Override
-//    public boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpException {
-//        IrpUtils.entering(logger, "recognize " + pass, this);
-//        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
-//        if (evaluateTheRepeat(pass))
-//            recognizeData.setState(IrSignal.Pass.repeat);
-//        boolean status = recognize(recognizeData, pass, bitSpecs, repetitions);
-//        IrpUtils.exiting(logger, "recognize " + pass, status ? "pass" : "fail");
-//        return status;
-//    }
-
     @Override
     public void traverse(Traverser traverseData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "traverse " + pass, this);
@@ -213,31 +178,9 @@ public class IrStream extends BareIrStream implements AggregateLister {
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         for (int i = 0; i < repetitions; i++)
             super.traverse(traverseData, pass, bitSpecs);
-        /*boolean status =*/ //traverse(recognizeData, pass, bitSpecs, repetitions);
-        //IrpUtils.exiting(logger, "traverse " + pass, status ? "pass" : "fail");
         traverseData.postprocess(this, pass, bitSpecs);
         IrpUtils.exiting(logger, "traverse " + pass);
-        //return status;
     }
-
-//    private boolean recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs, int repeats)
-//            throws NameConflictException, InvalidNameException, IrpSemanticException, IrpException {
-//        for (int i = 0; i < repeats; i++) {
-//            boolean status = super.recognize(recognizeData, pass, bitSpecs);
-//            if (!status)
-//                return false;
-//        }
-//        return true;
-//    }
-
-//    private void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs, int repeats) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-//        for (int i = 0; i < repeats; i++) {
-//            /*boolean status =*/ super.traverse(recognizeData, pass, bitSpecs);
-////            if (!status)
-////                return false;
-//        }
-////        return true;
-//    }
 
     boolean isRPlus() {
         return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true);

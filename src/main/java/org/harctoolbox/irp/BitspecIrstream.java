@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
@@ -117,28 +116,6 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
-        IrpUtils.entering(logger, "evaluate(4args)", this);
-        EvaluatedIrStream evaluatedIrStream = irStream.evaluate(state, pass, nameEngine, generalSpec);
-        evaluatedIrStream.reduce(bitSpec);
-        IrpUtils.exiting(logger, "evaluate(4args)", evaluatedIrStream);
-        return evaluatedIrStream;
-    }
-
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec,
-            BitSpec bitSpec) throws UnassignedException, InvalidNameException {
-        IrpUtils.entering(logger, "evaluate(5args)", this);
-        EvaluatedIrStream inner = evaluate(state, pass, nameEngine, generalSpec);
-        inner.reduce(bitSpec);
-        logger.log(Level.FINEST, "inner = {0}", inner);
-        EvaluatedIrStream outer = new EvaluatedIrStream(nameEngine, generalSpec, pass);
-        outer.add(inner);
-        logger.log(Level.FINEST, "outer = {0}", outer);
-        logger.exiting(BitspecIrstream.class.getName(), "evaluate(5args)");
-        return outer;
-    }
-
-    @Override
     int numberOfBitSpecs() {
         return irStream.numberOfBitSpecs() + 1;
     }
@@ -178,7 +155,7 @@ public class BitspecIrstream extends IrStreamItem {
     }
 
     @Override
-    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
+    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         BitSpec lastBitSpec = bitSpecs.get(bitSpecs.size() - 1);
         renderData.reduce(lastBitSpec);
         renderData.pop();

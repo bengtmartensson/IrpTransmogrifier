@@ -165,18 +165,6 @@ public class FiniteBitField extends BitField {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException {
-        IrpUtils.entering(logger, "evaluate", this.toString());
-        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
-        if (state == pass) {
-            BitStream bitStream = new BitStream(this, nameEngine, generalSpec);
-            result.add(bitStream);
-        }
-        IrpUtils.exiting(logger, "evaluate", result);
-        return result;
-    }
-
-    @Override
     public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
         IrpUtils.entering(logger, "evaluate", this.toString());
         //EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);

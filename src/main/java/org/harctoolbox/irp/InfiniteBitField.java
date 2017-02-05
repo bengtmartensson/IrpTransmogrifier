@@ -78,11 +78,6 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) {
-        throw new UnsupportedOperationException("Unsupported operation.");
-    }
-
-    @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("complement", Boolean.toString(complement));

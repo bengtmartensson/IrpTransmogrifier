@@ -107,7 +107,7 @@ class EvaluatedIrStream {
             elements.add(bitStream);
     }
 
-    public void reduce(BitSpec bitSpec) throws UnassignedException, InvalidNameException {
+    public void reduce(BitSpec bitSpec) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         int index = 0;
         while (index < elements.size()) {
             if (elements.get(index) instanceof BitStream)
@@ -117,7 +117,7 @@ class EvaluatedIrStream {
         }
     }
 
-    private int reduce(BitSpec bitSpec, int index) throws UnassignedException, InvalidNameException {
+    private int reduce(BitSpec bitSpec, int index) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         BitStream bitStream = (BitStream) elements.get(index);
         elements.remove(index);
         EvaluatedIrStream bitFieldDurations = bitStream.evaluate(pass, pass, nameEngine, generalSpec, bitSpec);
@@ -125,10 +125,6 @@ class EvaluatedIrStream {
         elements.addAll(index, bitFieldDurations.elements);
         return length;
     }
-
-//    void add(Evaluatable evaluatable) {
-//        elements.add(evaluatable);
-//    }
 
     void add(Duration evaluatable) {
         elements.add(evaluatable);

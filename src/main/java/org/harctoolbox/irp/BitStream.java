@@ -81,19 +81,7 @@ class BitStream extends IrStreamItem implements Evaluatable {
         return data.shiftRight(n*chunksize).and(BigInteger.valueOf(mask)).intValueExact();
     }
 
-
-    @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) {
-        IrpUtils.entering(logger, "evaluate", this);
-
-        EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);
-
-        list.add(this);
-        IrpUtils.exiting(logger, "evaluate", list);
-        return list;
-    }
-
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec) throws UnassignedException, InvalidNameException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "evaluate", this);
 
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);

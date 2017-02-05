@@ -121,29 +121,11 @@ public class BareIrStream extends IrStreamItem {
         return sum;
     }
 
-    @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
-        IrpUtils.entering(logger, "evaluate", this);
-        IrSignal.Pass actualState = state;
-        EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
-        for (IrStreamItem irStreamItem : irStreamItems) {
-            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
-            if (newState != null)
-                actualState = newState;
-            if (actualState.compareTo(pass) <= 0) {
-                EvaluatedIrStream irStream = irStreamItem.evaluate(actualState, pass, nameEngine, generalSpec);
-                if (irStream == null)
-                    break;
-
-                result.add(irStream);
-            }
-            IrSignal.Pass next = irStreamItem.stateWhenExiting(actualState);
-            if (next != null)
-                actualState = next;
-        }
-        result.setState(actualState);
-        IrpUtils.entering(logger, "evaluate", result);
-        return result;
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        RenderData renderData = new RenderData(nameEngine, generalSpec);
+        renderData.setState(state);
+        traverse(renderData, pass, new ArrayList<>(0));
+        return renderData.getEvaluatedIrStream();
     }
 
     public boolean startsWithDuration() {
@@ -300,19 +282,9 @@ public class BareIrStream extends IrStreamItem {
             if (newState != null)
                 recognizeData.setState(newState);
 
-            if (recognizeData.getState() == pass) {
-//                boolean success = false;
-//                try {
-                    /*success =*/
-                    irStreamItem.traverse(recognizeData, pass, bitSpecStack);
-//                } catch (Exception ex) { // FIXME
-//                    logger.log(Level.SEVERE, ex.getMessage());
-//                }
-//                if (!success) {
-//                    IrpUtils.exiting(logger, "traverse", "fail");
-//                    return false;
-//                }
-            }
+            if (recognizeData.getState() == pass)
+                irStreamItem.traverse(recognizeData, pass, bitSpecStack);
+
             IrSignal.Pass next = irStreamItem.stateWhenExiting(recognizeData.getState());
             if (next != null)
                 recognizeData.setState(next);
@@ -322,7 +294,6 @@ public class BareIrStream extends IrStreamItem {
         }
         recognizeData.postprocess(this, pass, bitSpecStack);
         IrpUtils.exiting(logger, "traverse " + pass, "pass");
-        //return true;
     }
 
     @Override

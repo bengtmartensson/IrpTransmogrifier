@@ -183,17 +183,6 @@ public abstract class Duration extends IrStreamItem implements Floatable, Evalua
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) {
-        EvaluatedIrStream evaluatedIrStream = new EvaluatedIrStream(nameEngine, generalSpec, pass);
-
-        if (state == pass)
-            evaluatedIrStream.add(this);
-
-        IrpUtils.exiting(logger, "evaluate", evaluatedIrStream);
-        return evaluatedIrStream;
-    }
-
-    @Override
     public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
         renderData.add(this);
     }

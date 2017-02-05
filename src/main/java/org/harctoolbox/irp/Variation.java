@@ -54,12 +54,6 @@ public class Variation extends IrStreamItem {
     }
 
     @Override
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, InvalidNameException {
-        BareIrStream actual = select(pass);
-        return actual.isEmpty(nameEngine) ? null : actual.evaluate(state, pass, nameEngine, generalSpec);
-    }
-
-    @Override
     public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
 
     }

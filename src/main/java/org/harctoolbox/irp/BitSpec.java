@@ -255,7 +255,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 if (! (IrCoreUtils.approximatelyEquals(a, on.get(0), 1, 0) && IrCoreUtils.approximatelyEquals(-a, on.get(1), 1, 0)))
                     return false;
                 a = -a;
-            } catch (UnassignedException | InvalidNameException | IrpSemanticException ex) {
+            } catch (UnassignedException | InvalidNameException | IrpSemanticException | NameConflictException | IrpSignalParseException ex) {
                 return false;
             }
         }
@@ -280,7 +280,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
             boolean sign = off.get(0) > 0;
             return IrCoreUtils.approximatelyEquals(on.get(0), -off.get(0)) && (sign == inverted);
-        } catch (UnassignedException | InvalidNameException | IrpSemanticException ex) {
+        } catch (UnassignedException | InvalidNameException | IrpSemanticException | NameConflictException | IrpSignalParseException ex) {
             return false;
         }
     }

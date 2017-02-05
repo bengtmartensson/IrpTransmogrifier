@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
@@ -49,14 +49,14 @@ public class ShortPronto extends Pronto {
      * Creates a new IrSignals by interpreting its argument as CCF signal.
      * @param ccf CCF signal
      * @return  IrSignal
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws InvalidArgumentException
      */
     public static IrSignal parse(int[] ccf) throws InvalidArgumentException {
         if (ccf.length < 4)
             throw new InvalidArgumentException("CCF is invalid since less than 4 numbers long.");
         if (ccf.length % 2 != 0)
-            throw new OddSequenceLenghtException("CCF is invalid since it has an odd number ("
+            throw new OddSequenceLengthException("CCF is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
         String irp = null;
         int dev = (int) IrpUtils.invalid;
@@ -138,7 +138,7 @@ public class ShortPronto extends Pronto {
             } catch (DomainViolationException ex) {
                 logger.log(Level.SEVERE, "{0}", ex.getMessage());
                 throw new InvalidArgumentException(ex);
-            } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+            } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
                 throw new ThisCannotHappenException(ex);
             }
         }

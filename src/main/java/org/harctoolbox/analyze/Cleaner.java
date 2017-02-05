@@ -29,7 +29,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class Cleaner {
@@ -182,7 +182,7 @@ public class Cleaner {
     public IrSequence toIrSequence() {
         try {
             return new IrSequence(toDurations());
-        } catch (OddSequenceLenghtException ex) {
+        } catch (OddSequenceLengthException ex) {
             assert(false);
             return null;
         }

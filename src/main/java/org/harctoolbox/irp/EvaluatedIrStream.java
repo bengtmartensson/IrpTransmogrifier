@@ -23,7 +23,7 @@ import java.util.StringJoiner;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 /**
@@ -52,7 +52,7 @@ class EvaluatedIrStream {
         state = evaluatedIrStream.state;
     }
 
-    IrSequence toIrSequence() throws UnassignedException, IrpSemanticException, OddSequenceLenghtException {
+    IrSequence toIrSequence() throws UnassignedException, IrpSemanticException, OddSequenceLengthException {
         IrpUtils.entering(logger, "toIrSequence", this);
         List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
@@ -138,7 +138,7 @@ class EvaluatedIrStream {
         return elements.isEmpty();
     }
 
-    public int getLenght() {
+    public int getLength() {
         return elements.size();
     }
 

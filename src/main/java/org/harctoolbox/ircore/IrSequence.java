@@ -94,20 +94,20 @@ public class IrSequence implements Cloneable {
     /**
      * Constructs an IrSequence from the parameter data.
      * @param data Array of durations. Is referenced, not copied.
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public IrSequence(double[] data) throws OddSequenceLenghtException {
+    public IrSequence(double[] data) throws OddSequenceLengthException {
         if (data.length % 2 != 0)
-            throw new OddSequenceLenghtException(data.length);
+            throw new OddSequenceLengthException(data.length);
         this.data = data;
     }
 
     /**
      * Constructs an IrSequence from the parameter data.
      * @param idata Array of durations. Data is copied.
-     * @throws OddSequenceLenghtException If data is not of even length.
+     * @throws OddSequenceLengthException If data is not of even length.
      */
-    public IrSequence(int[] idata) throws OddSequenceLenghtException {
+    public IrSequence(int[] idata) throws OddSequenceLengthException {
         this(idata, false);
     }
 
@@ -115,15 +115,15 @@ public class IrSequence implements Cloneable {
      * Constructs an IrSequence from the parameter data.
      * @param idata Array of durations. Data is copied.
      * @param acceptOdd If odd length: if true, force length even by ignoring the last, otherwise throw exception.
-     * @throws OddSequenceLenghtException
+     * @throws OddSequenceLengthException
      */
-    public IrSequence(int[] idata, boolean acceptOdd) throws OddSequenceLenghtException {
+    public IrSequence(int[] idata, boolean acceptOdd) throws OddSequenceLengthException {
         int length = idata.length;
         if (length % 2 != 0) {
             if (acceptOdd)
                 length--;
             else
-                throw new OddSequenceLenghtException(idata.length);
+                throw new OddSequenceLengthException(idata.length);
         }
 
         data = new double[length];
@@ -137,9 +137,9 @@ public class IrSequence implements Cloneable {
      * This version does not require flashes and gaps to be interleaved (signs alternating).
      * @param str String of durations, possibly using signed numbers.
      * @param fixOddSequences it true, odd sequences (ending with gap) are silently fixed by adding a dummy gap.
-     * @throws OddSequenceLenghtException If last duration is not a gap, and fixOddSequences false.
+     * @throws OddSequenceLengthException If last duration is not a gap, and fixOddSequences false.
      */
-    public IrSequence(String str, boolean fixOddSequences) throws OddSequenceLenghtException {
+    public IrSequence(String str, boolean fixOddSequences) throws OddSequenceLengthException {
         if (str == null || str.trim().isEmpty()) {
             data = new double[0];
         } else {
@@ -173,7 +173,7 @@ public class IrSequence implements Cloneable {
                 if (fixOddSequences)
                     tmplist[++index] = dummyGapDuration;
                 else
-                    throw new OddSequenceLenghtException();
+                    throw new OddSequenceLengthException();
             }
             data = new double[index+1];
             for (int i = 0; i < index+1; i++)
@@ -185,9 +185,9 @@ public class IrSequence implements Cloneable {
      * Constructs an IrSequence from the parameter data.
      * This version does not require flashes and gaps to be interleaved (signs alternating).
      * @param str String of durations, possibly using signed numbers.
-     * @throws OddSequenceLenghtException If last duration is not a gap.
+     * @throws OddSequenceLengthException If last duration is not a gap.
      */
-    public IrSequence(String str) throws OddSequenceLenghtException {
+    public IrSequence(String str) throws OddSequenceLengthException {
         this(str, false);
     }
 
@@ -196,13 +196,13 @@ public class IrSequence implements Cloneable {
      * @param idata Data
      * @param offset First index to be used
      * @param length Length of used subset of the idata array.
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     // @throws RuntimeException If data is contradictory or erroneous.
-    public IrSequence(int[] idata, int offset, int length) throws OddSequenceLenghtException, InvalidArgumentException {
+    public IrSequence(int[] idata, int offset, int length) throws OddSequenceLengthException, InvalidArgumentException {
         if (length % 2 != 0)
-            throw new OddSequenceLenghtException("IrSequence has odd length = " + length);
+            throw new OddSequenceLengthException("IrSequence has odd length = " + length);
         if (offset >= idata.length && length != 0)
             throw new InvalidArgumentException("IrSequence: offset beyond end.");
         if (offset + length > idata.length)
@@ -219,12 +219,12 @@ public class IrSequence implements Cloneable {
      * Leading gaps are discarded, while meaningless.
      * Consecutive gaps (flashes) are combined into one gap (flash).
      * @param list List of durations as Double, containing signs.
-     * @throws OddSequenceLenghtException If data ens with a flash, not a gap.
+     * @throws OddSequenceLengthException If data ens with a flash, not a gap.
      */
-    public IrSequence(List<Double>list) throws OddSequenceLenghtException {
+    public IrSequence(List<Double>list) throws OddSequenceLengthException {
         List<Double> normalized = normalize(list, true);
         if (normalized.size() % 2 != 0)
-            throw new OddSequenceLenghtException("IrSequence cannot end with a flash.");
+            throw new OddSequenceLengthException("IrSequence cannot end with a flash.");
         data = new double[normalized.size()];
         for (int i = 0; i < normalized.size(); i++)
             data[i] = normalized.get(i);
@@ -240,7 +240,7 @@ public class IrSequence implements Cloneable {
 
     public IrSequence(IrSequence src, int start, int length) throws InvalidArgumentException {
         if (start % 2 != 0 || length % 2 != 0)
-            throw new OddSequenceLenghtException("Start and length must be even");
+            throw new OddSequenceLengthException("Start and length must be even");
         if (start + length > src.data.length)
             throw new InvalidArgumentException("Selection extends beyond end.");
         data = new double[length];
@@ -331,7 +331,7 @@ public class IrSequence implements Cloneable {
             System.arraycopy(tail.data, 0, newData, data.length + r*tail.data.length, tail.data.length);
         try {
             return new IrSequence(newData);
-        } catch (OddSequenceLenghtException ex) {
+        } catch (OddSequenceLengthException ex) {
             throw new ThisCannotHappenException();
         }
     }
@@ -413,7 +413,7 @@ public class IrSequence implements Cloneable {
                 System.arraycopy(data, beg, arr, 0, i - beg + 1);
                 try {
                     arrayList.add(new IrSequence(arr));
-                } catch (OddSequenceLenghtException ex) {
+                } catch (OddSequenceLengthException ex) {
                     assert(false);
                 }
                 beg = i + 1;

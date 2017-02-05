@@ -21,7 +21,7 @@ import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class RepeatFinder {
@@ -116,7 +116,7 @@ public class RepeatFinder {
                 RepeatFinderData newCandidate;
                 try {
                     newCandidate = countRepeats(2*beginning, 2*length);
-                } catch (OddSequenceLenghtException ex) {
+                } catch (OddSequenceLengthException ex) {
                     throw new ThisCannotHappenException();
                 }
                 if (newCandidate.numberRepeats > 1
@@ -128,7 +128,7 @@ public class RepeatFinder {
         repeatFinderData = candidate;
     }
 
-    private RepeatFinderData countRepeats(int beginning, int length) throws OddSequenceLenghtException {
+    private RepeatFinderData countRepeats(int beginning, int length) throws OddSequenceLengthException {
         RepeatFinderData result = new RepeatFinderData(beginning, length, 0, 0);
         result.lastGap = Math.abs(irSequence.get(beginning + length - 1));
         if (result.lastGap < minRepeatLastGap)
@@ -213,9 +213,9 @@ public class RepeatFinder {
             setup(length, 0, 0, 0);
         }
 
-        public RepeatFinderData(int beginLength, int repeatLength, int numberRepeats, int endingLength) throws OddSequenceLenghtException {
+        public RepeatFinderData(int beginLength, int repeatLength, int numberRepeats, int endingLength) throws OddSequenceLengthException {
             if (beginLength % 2 != 0 || repeatLength % 2 != 0 || endingLength % 2 != 0)
-                throw new OddSequenceLenghtException("Lengths and start must be even");
+                throw new OddSequenceLengthException("Lengths and start must be even");
             setup(beginLength, repeatLength, numberRepeats, endingLength);
         }
 

@@ -151,10 +151,10 @@ public class IrSignal implements Cloneable {
      * @param introSequence
      * @param repeatSequence
      * @param endingSequence
-     * @throws OddSequenceLenghtException
+     * @throws OddSequenceLengthException
      */
     public IrSignal(String introSequence, String repeatSequence,
-            String endingSequence, double frequency, double dutyCycle) throws OddSequenceLenghtException {
+            String endingSequence, double frequency, double dutyCycle) throws OddSequenceLengthException {
         this(new IrSequence(introSequence), new IrSequence(repeatSequence),
                 new IrSequence(endingSequence), frequency, dutyCycle);
     }
@@ -582,11 +582,11 @@ public class IrSignal implements Cloneable {
     /**
      * Computes the CCF form, if possible. Since a CCF does not have an ending sequence,
      * a nonempty ending sequence will be ignored.
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @see Pronto
      * @return CCF as string.
      */
-    public final String ccfString() throws OddSequenceLenghtException {
+    public final String ccfString() throws OddSequenceLengthException {
         return Pronto.toPrintString(this);
     }
 

@@ -23,7 +23,7 @@ import java.util.Map;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public abstract class IrpRenderer {
@@ -107,7 +107,7 @@ public abstract class IrpRenderer {
                 array[i] = data.get(i);
             try {
                 return new IrSequence(array);
-            } catch (OddSequenceLenghtException ex) {
+            } catch (OddSequenceLengthException ex) {
                 // Programming error
                 throw new RuntimeException(ex);
             }

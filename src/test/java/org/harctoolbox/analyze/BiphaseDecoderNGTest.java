@@ -2,7 +2,7 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.IrpException;
 import org.harctoolbox.irp.Protocol;
@@ -39,7 +39,7 @@ public class BiphaseDecoderNGTest {
     private final Analyzer.AnalyzerParams paramsRc5;
     private final Analyzer.AnalyzerParams paramsRc6;
 
-    public BiphaseDecoderNGTest() throws OddSequenceLenghtException {
+    public BiphaseDecoderNGTest() throws OddSequenceLengthException {
         rc5 = new Analyzer(rc5_12_3_1);
         rc6 = new Analyzer(rc6_12_3_1);
         List<Integer> widths = new ArrayList<>(4);

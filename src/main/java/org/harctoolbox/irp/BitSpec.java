@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -217,7 +217,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 IrSequence irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec).toIrSequence();
                 if (irSequence.getLength() != 2)
                     return false;
-            } catch (IrpException | ArithmeticException | OddSequenceLenghtException ex) {
+            } catch (IrpException | ArithmeticException | OddSequenceLengthException ex) {
                 return false;
             }
         }
@@ -248,7 +248,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
         for (BareIrStream bitCode : bitCodes) {
             try {
                 EvaluatedIrStream on = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec);
-                if (on.getLenght() != 2)
+                if (on.getLength() != 2)
                     return false;
                 if (a == null)
                     a = on.get(0);
@@ -275,7 +275,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
         try {
             EvaluatedIrStream off = bitCodes.get(0).evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec);
             EvaluatedIrStream on = bitCodes.get(1).evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, nameEngine, generalSpec);
-            if (on.getLenght() != 1 || off.getLenght() != 1)
+            if (on.getLength() != 1 || off.getLength() != 1)
                 return false;
 
             boolean sign = off.get(0) > 0;

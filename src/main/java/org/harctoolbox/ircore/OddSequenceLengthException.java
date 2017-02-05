@@ -20,17 +20,17 @@ package org.harctoolbox.ircore;
 /**
  * Thrown when an IrSequence has a length that is not an even number.
  */
-public class OddSequenceLenghtException extends RuntimeException {
+public class OddSequenceLengthException extends RuntimeException {
 
-    public OddSequenceLenghtException(int length) {
+    public OddSequenceLengthException(int length) {
         super("IrSequence has odd length = " + Integer.toString(length));
     }
 
-    public OddSequenceLenghtException() {
+    public OddSequenceLengthException() {
         super("IrSequence has odd length");
     }
 
-    public OddSequenceLenghtException(String s) {
+    public OddSequenceLengthException(String s) {
         super(s);
     }
 }

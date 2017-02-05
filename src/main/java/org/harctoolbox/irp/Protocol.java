@@ -30,7 +30,7 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -160,13 +160,13 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.InvalidNameException
      * @throws IrpSemanticException
      * @throws ArithmeticException
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws UnassignedException
      * @throws NameConflictException
      * @throws IrpSignalParseException
      * @throws DomainViolationException
      */
-    public IrSignal toIrSignal(NameEngine nameEngine) throws InvalidNameException, UnassignedException, DomainViolationException, IrpSemanticException, OddSequenceLenghtException, NameConflictException, IrpSignalParseException {
+    public IrSignal toIrSignal(NameEngine nameEngine) throws InvalidNameException, UnassignedException, DomainViolationException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "toIrSignal");
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
@@ -203,12 +203,12 @@ public class Protocol extends IrpObject {
      * @return
      * @throws org.harctoolbox.irp.InvalidNameException
      * @throws org.harctoolbox.irp.IrpSemanticException
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws org.harctoolbox.irp.UnassignedException
      * @throws org.harctoolbox.irp.NameConflictException
      * @throws org.harctoolbox.irp.IrpSignalParseException
      */
-    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLenghtException, NameConflictException, IrpSignalParseException {
+    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
         return new ModulatedIrSequence(toIrSequence(nameEngine, pass), getFrequency(), getDutyCycle());
     }
 
@@ -223,7 +223,7 @@ public class Protocol extends IrpObject {
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.DomainViolationException
      */
-    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLenghtException, NameConflictException, IrpSignalParseException {
+    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "toIrSequence", pass);
         RenderData renderData = new RenderData(nameEngine, generalSpec);
         bitspecIrstream.traverse(renderData, pass, new ArrayList<>(0));

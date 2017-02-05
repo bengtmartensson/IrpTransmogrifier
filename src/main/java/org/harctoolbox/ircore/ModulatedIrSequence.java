@@ -77,9 +77,9 @@ public class ModulatedIrSequence extends IrSequence {
      * @param durations
      * @param frequency
      * @param dutyCycle
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public ModulatedIrSequence(int[] durations, double frequency, double dutyCycle) throws OddSequenceLenghtException {
+    public ModulatedIrSequence(int[] durations, double frequency, double dutyCycle) throws OddSequenceLengthException {
         this(new IrSequence(durations), frequency, dutyCycle);
     }
 
@@ -88,9 +88,9 @@ public class ModulatedIrSequence extends IrSequence {
      *
      * @param durations
      * @param frequency
-     * @throws OddSequenceLenghtException if duration has odd length.
+     * @throws OddSequenceLengthException if duration has odd length.
      */
-    public ModulatedIrSequence(int[] durations, double frequency) throws OddSequenceLenghtException {
+    public ModulatedIrSequence(int[] durations, double frequency) throws OddSequenceLengthException {
         this(new IrSequence(durations), frequency, unknownDutyCycle);
     }
 

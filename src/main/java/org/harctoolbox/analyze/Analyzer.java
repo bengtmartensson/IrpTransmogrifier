@@ -30,7 +30,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.GeneralSpec;
@@ -76,7 +76,7 @@ public class Analyzer extends Cleaner {
         this(irSequence, IrCoreUtils.invalid, false, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    public Analyzer(int[] data) throws OddSequenceLenghtException {
+    public Analyzer(int[] data) throws OddSequenceLengthException {
         this(new IrSequence(data), IrCoreUtils.invalid, false, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 

@@ -4,7 +4,7 @@ import java.util.Map;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -143,7 +143,7 @@ public class ProtocolNGTest {
             nameEngine = new NameEngine("{D=12,F=56}");
             result = nec1.toIrSignal(nameEngine);
             assertTrue(result.approximatelyEquals(Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C")));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -178,7 +178,7 @@ public class ProtocolNGTest {
             assertEquals(nameEngine.get("T").toNumber(), 1L);
             assertEquals(rc5.getMemoryVariable("T"), 1L);
             assertTrue(result.approximatelyEquals(rc5D12F56T0));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -191,7 +191,7 @@ public class ProtocolNGTest {
             IrSignal result = rc6.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(rc6D12F34));
-        } catch (InvalidArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -204,7 +204,7 @@ public class ProtocolNGTest {
             IrSignal result = nokia32.toIrSignal(new NameEngine("{D=12,S=56,F=34,T=0,X=78}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(nokia32D12S56F34T0X78));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -236,7 +236,7 @@ public class ProtocolNGTest {
             IrSignal result = amino.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(aminoD12F34));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -277,7 +277,7 @@ public class ProtocolNGTest {
             IrSignal result = arctech.toIrSignal(new NameEngine("{D=12,S=9,F=0}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(irSignal));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -290,7 +290,7 @@ public class ProtocolNGTest {
             IrSignal result = xmp.toIrSignal(new NameEngine("{D=12,S=56,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(xmpD12S56F34));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }
@@ -303,7 +303,7 @@ public class ProtocolNGTest {
             IrSignal result = directv.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(directvD12F34));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLenghtException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpSyntaxException | InvalidArgumentException | IrpSemanticException | ArithmeticException | UnassignedException | DomainViolationException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
             fail();
         }
     }

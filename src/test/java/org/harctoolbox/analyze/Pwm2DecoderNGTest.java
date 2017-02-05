@@ -3,7 +3,7 @@ package org.harctoolbox.analyze;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSequence;
-import org.harctoolbox.ircore.OddSequenceLenghtException;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.IrpSemanticException;
 import org.harctoolbox.irp.IrpSyntaxException;
@@ -44,7 +44,7 @@ public class Pwm2DecoderNGTest {
             Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400f, null, BitDirection.msb, true, null, false);
             analyzer = new Analyzer(irSequence);
             pwm = new Pwm2Decoder(analyzer, analyzerParams);
-        } catch (OddSequenceLenghtException ex) {
+        } catch (OddSequenceLengthException ex) {
             fail();
         }
     }

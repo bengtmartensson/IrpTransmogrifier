@@ -107,14 +107,14 @@ public class Pronto {
      * Creates a new IrSignals by interpreting its argument as CCF signal.
      * @param ccf CCF signal
      * @return  IrSignal
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws InvalidArgumentException
      */
-    public static IrSignal parse(int[] ccf) throws OddSequenceLenghtException, InvalidArgumentException {
+    public static IrSignal parse(int[] ccf) throws OddSequenceLengthException, InvalidArgumentException {
         if (ccf.length < 4)
             throw new InvalidArgumentException("CCF is invalid since less than 4 numbers long.");
         if (ccf.length % 2 != 0)
-            throw new OddSequenceLenghtException("CCF is invalid since it has an odd number ("
+            throw new OddSequenceLengthException("CCF is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
         int index = 0;
         int type = ccf[index++];
@@ -240,12 +240,12 @@ public class Pronto {
      * CCF array of complete signal, i.e. the CCF string before formatting, including the header.
      * @param irSignal
      * @return CCF array
-     * @throws OddSequenceLenghtException
+     * @throws OddSequenceLengthException
      */
-    public static int[] toArray(IrSignal irSignal) throws OddSequenceLenghtException {
+    public static int[] toArray(IrSignal irSignal) throws OddSequenceLengthException {
         if (irSignal.getIntroLength() % 2 != 0 || irSignal.getRepeatLength() % 2 != 0)
             // Probably forgot normalize() if I get here.
-            throw new OddSequenceLenghtException("IR Sequences must be of even length.");
+            throw new OddSequenceLengthException("IR Sequences must be of even length.");
         if (irSignal.getEndingLength() != 0)
             logger.log(Level.WARNING,
                     "When computing the Pronto representation, a (non-empty) ending sequence was ignored");
@@ -269,9 +269,9 @@ public class Pronto {
      * Computes the ("long", raw) CCF string
      * @param irSignal
      * @return CCF string
-     * @throws org.harctoolbox.ircore.OddSequenceLenghtException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public static String toPrintString(IrSignal irSignal) throws OddSequenceLenghtException {
+    public static String toPrintString(IrSignal irSignal) throws OddSequenceLengthException {
         return toPrintString(toArray(irSignal));
     }
 

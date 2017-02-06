@@ -24,16 +24,12 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class RecognizeData extends Traverser implements Cloneable {
 
-    //private boolean success;
     private int position;
     private double hasConsumed;
-    //private IrSignal.Pass state;
     private ParameterCollector parameterCollector;
     private final IrSequence irSequence;
-    private final GeneralSpec generalSpec;
     private int extentStart;
     private boolean interleaving;
-    private final NameEngine definitions;
     private ParameterCollector needsChecking;
     private final double absoluteTolerance;
     private final double relativeTolerance;
@@ -46,21 +42,14 @@ public class RecognizeData extends Traverser implements Cloneable {
 
     private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
             ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance) {
-        super(state);
-        //success = true;
+        super(state, definitions, generalSpec);
         danglingBitFieldData = new BitwiseParameter();
-        this.generalSpec = generalSpec;
-        this.definitions = definitions;
         this.position = position;
         this.hasConsumed = 0.0;
-        //this.restIsFlash = false;
         this.irSequence = irSequence;
-        //this.state = state;
         this.parameterCollector = parameterCollector;
         this.extentStart = 0;
-        ////this.lookAheadItem = null;
         this.interleaving = interleaving;
-        //this.nameMap = nameMap;
         this.needsChecking = new ParameterCollector();
         this.absoluteTolerance = absoluteTolerance;
         this.relativeTolerance = relativeTolerance;
@@ -82,13 +71,6 @@ public class RecognizeData extends Traverser implements Cloneable {
         result.setParameterCollector(getParameterCollector().clone());
         return result;
     }
-//
-//    /**
-//     * @return the state
-//     */
-//    public IrSignal.Pass getState() {
-//        return state;
-//    }
 
     /**
      * @return the irSequence
@@ -96,13 +78,6 @@ public class RecognizeData extends Traverser implements Cloneable {
     public IrSequence getIrSequence() {
         return irSequence;
     }
-
-//    /**
-//     * @param state the state to set
-//     */
-//    public void setState(IrSignal.Pass state) {
-//        this.state = state;
-//    }
 
     /**
      * @return the position
@@ -133,11 +108,10 @@ public class RecognizeData extends Traverser implements Cloneable {
     }
 
     void add(String name, BitwiseParameter parameter) throws NameConflictException, InvalidNameException {
-        //Expression expression = definitions.containsKey(name) ? definitions.get(name) : null;
-        if (definitions.containsKey(name)) {
+        if (getNameEngine().containsKey(name)) {
             Expression expression;
             try {
-                expression = definitions.get(name);
+                expression = getNameEngine().get(name);
             } catch (UnassignedException ex) {
                 throw new ThisCannotHappenException();
             }
@@ -160,27 +134,6 @@ public class RecognizeData extends Traverser implements Cloneable {
 
     void add(String name, long value) throws NameConflictException, InvalidNameException {
         add(name, new BitwiseParameter(value));
-    }
-
-//    /**
-//     * @return the success
-//     */
-//    public boolean isSuccess() {
-//        return success;
-//    }
-
-//    /**
-//     * @param success the success to set
-//     */
-//    public void setSuccess(boolean success) {
-//        this.success = success;
-//    }
-
-    /**
-     * @return the generalSpec
-     */
-    public GeneralSpec getGeneralSpec() {
-        return generalSpec;
     }
 
     void incrementPosition(int i) {
@@ -254,7 +207,7 @@ public class RecognizeData extends Traverser implements Cloneable {
 
     void checkConsistency() throws NameConflictException, UnassignedException, InvalidNameException {
         NameEngine nameEngine = this.toNameEngine();
-        needsChecking.checkConsistency(nameEngine, definitions);
+        needsChecking.checkConsistency(nameEngine, getNameEngine());
         needsChecking = new ParameterCollector();
     }
 
@@ -273,7 +226,7 @@ public class RecognizeData extends Traverser implements Cloneable {
     }
 
     NameEngine toNameEngine() throws InvalidNameException {
-        NameEngine nameEngine = definitions.clone();
+        NameEngine nameEngine = getNameEngine().clone();
         nameEngine.add(parameterCollector.toNameEngine());
         return nameEngine;
     }
@@ -302,14 +255,8 @@ public class RecognizeData extends Traverser implements Cloneable {
         return position == irSequence.getLength();
     }
 
-//    @Override
-//    public void process(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-//        item.recognize(this, pass, bitSpecs);
-//    }
-
     @Override
     public void preprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
-        //item.prerecognize(this, pass, bitSpecs);
     }
 
     @Override

@@ -24,14 +24,10 @@ import org.harctoolbox.ircore.IrSignal;
 
 public class RenderData extends Traverser {
 
-    private final NameEngine nameEngine;
-    private final GeneralSpec generalSpec;
     private final List<EvaluatedIrStream> evaluatedIrStreamList;
 
     public RenderData(NameEngine nameEngine, GeneralSpec generalSpec) {
-        super(IrSignal.Pass.intro);
-        this.nameEngine = nameEngine;
-        this.generalSpec = generalSpec;
+        super(IrSignal.Pass.intro, nameEngine, generalSpec);
         evaluatedIrStreamList = new ArrayList<>(2);
         push();
     }
@@ -58,7 +54,7 @@ public class RenderData extends Traverser {
 
     public final void push() {
         EvaluatedIrStream evalIrStream = evaluatedIrStreamList.isEmpty()
-                ? new EvaluatedIrStream(nameEngine, generalSpec, IrSignal.Pass.intro)
+                ? new EvaluatedIrStream(getNameEngine(), getGeneralSpec(), IrSignal.Pass.intro)
                 : new EvaluatedIrStream(currentEvaluatedIrStream());
         evaluatedIrStreamList.add(evalIrStream);
     }
@@ -69,20 +65,6 @@ public class RenderData extends Traverser {
             evaluatedIrStreamList.remove(evaluatedIrStreamList.size() - 1);
             currentEvaluatedIrStream().add(evalIrStream);
         }
-    }
-
-    /**
-     * @return the nameEngine
-     */
-    public NameEngine getNameEngine() {
-        return nameEngine;
-    }
-
-    /**
-     * @return the generalSpec
-     */
-    public GeneralSpec getGeneralSpec() {
-        return generalSpec;
     }
 
     void reduce(BitSpec bitStream) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {

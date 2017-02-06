@@ -23,9 +23,13 @@ import org.harctoolbox.ircore.IrSignal;
 public abstract class Traverser {
 
     private IrSignal.Pass state;
+    private final GeneralSpec generalSpec;
+    private final NameEngine nameEngine;
 
-    protected Traverser(IrSignal.Pass state) {
+    protected Traverser(IrSignal.Pass state, NameEngine nameEngine, GeneralSpec generalSpec) {
         this.state = state;
+        this.nameEngine = nameEngine;
+        this.generalSpec = generalSpec;
     }
 
     public abstract void preprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException;
@@ -48,5 +52,19 @@ public abstract class Traverser {
 
     boolean isFinished() {
         return true;
+    }
+
+    /**
+     * @return the generalSpec
+     */
+    public GeneralSpec getGeneralSpec() {
+        return generalSpec;
+    }
+
+    /**
+     * @return the nameEngine
+     */
+    public NameEngine getNameEngine() {
+        return nameEngine;
     }
 }

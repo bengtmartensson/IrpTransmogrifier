@@ -141,7 +141,8 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs) {
+    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs)
+            throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException {
         IrpUtils.entering(logger, "recognize " + pass, this);
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
@@ -167,20 +168,9 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         recognizeData.preprocess(this, pass, inheritedBitSpecs);
-        /*boolean status =*/
-
         irStream.traverse(recognizeData, pass, stack);
-//        if (status)
-//            try {
-        /*status =*/
         recognizeData.postprocess(this, pass, stack);
-//            } catch (NameConflictException | IrpSemanticException | InvalidNameException | UnassignedException ex) {
-//                status = false;
-//                Logger.getLogger(BitspecIrstream.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-        //IrpUtils.exiting(logger, "traverse " + pass, status ? "pass" : "fail"/*? recognizeData.toString() : ""*/);
         IrpUtils.exiting(logger, "traverse " + pass);
-        //return status;
     }
 
     @Override

@@ -101,8 +101,8 @@ extent:
 ;
 
 //  5.2
-// abstact class BitField extends IrStreamItem implements Numerical
-// class FiniteBitField extends BitField
+// abstact class BitField extends IrpObject implements Numerical
+// class FiniteBitField extends BitField implements IrStreamItem
 // class InfiniteBitField extends BitField
 bitfield:
     '~'? primary_item ':' '-'? primary_item (':' primary_item)? # finite_bitfield
@@ -118,20 +118,19 @@ primary_item:
 ;
 
 // 6.2
-// class IrStream extends BareIrStream
+// class IrStream
 irstream:
     '(' bare_irstream ')' repeat_marker?
 ;
 
-// class BareIrStream extends IrStreamItem
-// extension: the ?: form
+// class BareIrStream
 bare_irstream:
     /* Empty */
     | irstream_item (','  irstream_item)*
 ;
 
-// abstract class IrStreamItem
-// Note: extent was implicit within duration
+// interface IrStreamItem
+// Note: extent is implicit within duration
 irstream_item:
     variation
     | bitfield  // must come before duration!
@@ -142,7 +141,7 @@ irstream_item:
 ;
 
 // 7.4
-// class BitSpec extends IrStreamItem
+// class BitSpec implements IrStreamItem
 bitspec:
     '<'  bare_irstream ('|' bare_irstream)* '>'
 ;
@@ -177,8 +176,8 @@ expression:
     |               '-'             expression
     |               '#'             expression
     | <assoc=right> expression '**'                 expression
-    |               expression ('*' | '/' | '%')    expression
-    |               expression ('+' | '-')          expression
+    |               expression ('*'  | '/' | '%')   expression
+    |               expression ('+'  | '-')         expression
     |               expression ('<<' | '>>')        expression
     |               expression ('<=' | '>=' | '>' | '<') expression
     |               expression ('==' | '!=')        expression

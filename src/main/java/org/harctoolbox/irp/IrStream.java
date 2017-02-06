@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -32,25 +34,29 @@ import org.w3c.dom.Element;
  * This class implements Irstream as of Chapter 6.
  *
  */
-public class IrStream extends BareIrStream implements AggregateLister {
+public class IrStream extends IrpObject implements IrStreamItem,AggregateLister {
 
     private static final Logger logger = Logger.getLogger(IrStream.class.getName());
 
-    private RepeatMarker repeatMarker; // must not be null!
+    private final RepeatMarker repeatMarker; // must not be null!
+    private final BareIrStream bareIrStream;
+    private final ParserRuleContext parseTree;
 
     public IrStream(String str) {
         this(new ParserDriver(str).getParser().irstream());
     }
 
     public IrStream(IrpParser.IrstreamContext ctx) {
-        super(ctx.bare_irstream());
+        bareIrStream = new BareIrStream(ctx.bare_irstream());
         IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
         repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : new RepeatMarker();
+        parseTree = ctx;
     }
 
     public IrStream(List<IrStreamItem> irStreamItems, RepeatMarker repeatMarker) {
-        super(irStreamItems);
+        bareIrStream = new BareIrStream(irStreamItems);
         this.repeatMarker = repeatMarker;
+        parseTree = null;
     }
 
     public IrStream(List<IrStreamItem> irStreamItems) {
@@ -64,7 +70,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
         IrStream other = (IrStream) obj;
 
-        return super.equals(obj) && repeatMarker.equals(other.repeatMarker);
+        return bareIrStream.equals(other.bareIrStream) && repeatMarker.equals(other.repeatMarker);
     }
 
     @Override
@@ -105,7 +111,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     @Override
     public String toIrpString() {
-        return "(" + super.toIrpString() + ")" + repeatMarker.toIrpString();
+        return "(" + bareIrStream.toIrpString() + ")" + repeatMarker.toIrpString();
     }
 
     public boolean isRepeatSequence() {
@@ -114,7 +120,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     @Override
     public Element toElement(Document document) {
-        Element element = super.toElement(document);
+        Element element = bareIrStream.toElement(document);
         if (repeatMarker.getMin() != 1)
             element.setAttribute("repeatMin", Integer.toString(repeatMarker.getMin()));
         if (repeatMarker.getMax() != 1)
@@ -136,7 +142,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
     }
 
     public Element toElement(Document document, Pass pass) {
-        Element element = super.toElement(document);
+        Element element = bareIrStream.toElement(document);
         return element;
     }
 
@@ -145,21 +151,17 @@ public class IrStream extends BareIrStream implements AggregateLister {
         if (!recursive && isInfiniteRepeat())
             return 0;
 
-        int sum = 0;
-        sum = getIrStreamItems().stream().map((item) -> item.numberOfBareDurations(recursive)).reduce(sum, Integer::sum);
-        return sum;
+        return bareIrStream.numberOfBareDurations(recursive);
     }
 
     @Override
     public Integer numberOfBits() {
-        int sum = 0;
-        sum = getIrStreamItems().stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
-        return sum;
+        return bareIrStream.numberOfBits();
     }
 
     @Override
     public int numberOfInfiniteRepeats() {
-        int noir = super.numberOfInfiniteRepeats();
+        int noir = bareIrStream.numberOfInfiniteRepeats();
         return repeatMarker.isInfinite() ? noir + 1
                 : repeatMarker.getMin() * noir;
     }
@@ -176,9 +178,13 @@ public class IrStream extends BareIrStream implements AggregateLister {
             traverseData.setState(IrSignal.Pass.repeat);
         int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
         for (int i = 0; i < repetitions; i++)
-            super.traverse(traverseData, pass, bitSpecs);
+            bareIrStream.traverse(traverseData, pass, bitSpecs);
         traverseData.postprocess(this, pass, bitSpecs);
         IrpUtils.exiting(logger, "traverse " + pass);
+    }
+
+    public boolean hasVariation(boolean recursive) {
+        return bareIrStream.hasVariation(recursive);
     }
 
     boolean isRPlus() {
@@ -187,7 +193,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
 
     @Override
     public int weight() {
-        return super.weight() + repeatMarker.weight();
+        return bareIrStream.weight() + repeatMarker.weight();
     }
 
     @Override
@@ -217,7 +223,7 @@ public class IrStream extends BareIrStream implements AggregateLister {
             return new HashMap<>(0);
 
         Map<String, Object> m = new HashMap<>(2);
-        Map<String, Object> body = super.propertiesMap(state, pass, generalSpec, nameEngine);
+        Map<String, Object> body = bareIrStream.propertiesMap(state, pass, generalSpec, nameEngine);
         List<Map<String, Object>> items = (List<Map<String,Object>>) body.get("items");
         m.put("kind", body.get("kind"));
         ArrayList<Map<String, Object>> repeatedList = new ArrayList<>(repetitions*items.size());
@@ -225,5 +231,66 @@ public class IrStream extends BareIrStream implements AggregateLister {
         for (int r = 0; r < repetitions; r++)
             repeatedList.addAll(items);
         return m;
+    }
+
+    @Override
+    public boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+        return bareIrStream.isEmpty(nameEngine);
+    }
+
+    @Override
+    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitSpecs);
+    }
+
+    @Override
+    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.interleavingOk(toCheck, nameEngine, generalSpec, last, gapFlashBitSpecs);
+    }
+
+    @Override
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.endingDurationType(last, gapFlashBitSpecs);
+    }
+
+    @Override
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.startingDuratingType(last, gapFlashBitSpecs);
+    }
+
+    @Override
+    public ParserRuleContext getParseTree() {
+        return parseTree;
+    }
+
+    @Override
+    public void recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException {
+    }
+
+    @Override
+    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    }
+
+    @Override
+    public boolean hasExtent() {
+        return bareIrStream.hasExtent();
+    }
+
+    @Override
+    public Set<String> assignmentVariables() {
+        return bareIrStream.assignmentVariables();
+    }
+
+    @Override
+    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+        return repeatMarker.getMin() * bareIrStream.microSeconds(nameEngine, generalSpec);
+    }
+
+    boolean startsWithDuration() {
+        return bareIrStream.startsWithDuration();
+    }
+
+    boolean hasVariationWithIntroEqualsRepeat() {
+        return bareIrStream.hasVariationWithIntroEqualsRepeat();
     }
 }

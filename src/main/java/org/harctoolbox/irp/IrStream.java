@@ -120,20 +120,20 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
 
     @Override
     public Element toElement(Document document) {
-        Element element = bareIrStream.toElement(document);
+        Element element = bareIrStream.toElement(document, "IrStream");
         if (repeatMarker.getMin() != 1)
             element.setAttribute("repeatMin", Integer.toString(repeatMarker.getMin()));
         if (repeatMarker.getMax() != 1)
             element.setAttribute("repeatMax", repeatMarker.isInfinite() ? "infinite" : Integer.toString(repeatMarker.getMax()));
         element.setAttribute("isRepeat", Boolean.toString(isRepeatSequence()));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
-        Integer n = numberOfBits();
-        if (n != null)
-                element.setAttribute("numberOfBits", Integer.toString(n));
-
-        n = numberOfBareDurations(false);
-        if (n != null)
-            element.setAttribute("numberOfBareDurations", Integer.toString(n));
+//        Integer n = numberOfBits();
+//        if (n != null)
+//                element.setAttribute("numberOfBits", Integer.toString(n));
+//
+//        n = numberOfBareDurations(false);
+//        if (n != null)
+//            element.setAttribute("numberOfBareDurations", Integer.toString(n));
 
         if (!repeatMarker.isTrivial())
             element.appendChild(repeatMarker.toElement(document));
@@ -157,6 +157,11 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     @Override
     public Integer numberOfBits() {
         return bareIrStream.numberOfBits();
+    }
+
+    @Override
+    public Integer numberOfBitSpecs() {
+        return bareIrStream.numberOfBitSpecs();
     }
 
     @Override

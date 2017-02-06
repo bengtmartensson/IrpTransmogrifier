@@ -138,6 +138,8 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
                 return ((BitspecIrstream) irStreamItem).startsWithDuration();
             if (irStreamItem instanceof BareIrStream)
                 return ((BareIrStream) irStreamItem).startsWithDuration();
+            if (irStreamItem instanceof IrStream)
+                return ((IrStream) irStreamItem).startsWithDuration();
         }
         return false; // give up
     }
@@ -191,9 +193,21 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
-        element.setAttribute("numberOfBareDurations", Integer.toString(numberOfBareDurations(false)));
-        if (numberOfBits() >= 0)
-            element.setAttribute("numberOfBits", Integer.toString(numberOfBits())); // numberOfBits has no meaninful value
+        return fillElement(document, element);
+    }
+
+    public Element toElement(Document document, String tagName) {
+        Element element = document.createElement(tagName);
+        return fillElement(document, element);
+    }
+
+    private Element fillElement(Document document, Element element) {
+        Integer nobd = numberOfBareDurations(true);
+        if (nobd != null)
+           element.setAttribute("numberOfBareDurations", Integer.toString(nobd));
+        Integer nob = numberOfBits();
+        if (nob != null)
+            element.setAttribute("numberOfBits", Integer.toString(nob));
         this.irStreamItems.forEach((item) -> {
             element.appendChild(item.toElement(document));
         });
@@ -203,7 +217,12 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     @Override
     public Integer numberOfBareDurations(boolean recursive) {
         int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfBareDurations(recursive)).reduce(sum, Integer::sum);
+        for (IrStreamItem item : irStreamItems) {
+            Integer nobd = item.numberOfBareDurations(recursive);
+            if (nobd == null)
+                return null;
+            sum += nobd;
+        }
         return sum;
     }
 
@@ -211,7 +230,12 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     @Override
     public Integer numberOfBits() {
         int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfBits()).reduce(sum, Integer::sum);
+        for (IrStreamItem item : irStreamItems) {
+            Integer nob = item.numberOfBits();
+            if (nob == null)
+                return null;
+            sum += nob;
+        }
         return sum;
     }
 

@@ -596,7 +596,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-f", "--frequencytolerance"}, description = "Frequency tolerance in Hz. Negative disables frequency check")
         private Double frequencyTolerance = null;
 
-        @Parameter(names = {"-h", "--help", "-?"}, description = "Display help message (deprecated; use command help instead)")
+        @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message (deprecated; use command help instead)")
         private boolean helpRequested = false;
 
         @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
@@ -703,7 +703,7 @@ public class IrpTransmogrifier {
         private List<String> bitField;
     }
 
-    @Parameters(commandNames = {"code"}, commandDescription = "Generate code for the target given")
+    @Parameters(commandNames = {"code"}, commandDescription = "Generate code for the given target(s)")
     private static class CommandCode {
 
         @Parameter(names = { "-d", "--directory" }, description = "Directory to generate output files, if not using the --output option.")
@@ -715,7 +715,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-p", "--parameter" }, variableArity = true, description = "Specify target dependent parameters to the code generators")
         private List<String> parameters = new ArrayList<>(4);
 
-        @Parameter(names = { "-t", "--target" }, variableArity = true, required = true, description = "Target(s) for code generation. Use ? for a list.")
+        @Parameter(names = { "-t", "--target" }, required = true, description = "Target(s) for code generation. Use ? for a list.")
         private List<String> target = new ArrayList<>(4);
 
         @Parameter(description = "protocol")

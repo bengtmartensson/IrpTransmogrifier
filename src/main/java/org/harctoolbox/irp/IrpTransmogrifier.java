@@ -264,7 +264,7 @@ public class IrpTransmogrifier {
                     System.err.println("Unknown command: " + command);
                     System.exit(IrpUtils.exitSemanticUsageError);
             }
-        } catch (IrpException | InvalidArgumentException | UnsupportedOperationException
+        } catch (IrpException | InvalidArgumentException | UnsupportedOperationException | OddSequenceLengthException
                 | ParseCancellationException | SAXException | IOException | UsageException | NumberFormatException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())

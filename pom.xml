@@ -217,8 +217,8 @@
                                     <arguments>
                                         <argument>0755</argument>
                                         <argument>${project.nameLowercase}.sh</argument>
-                                        <argument>javagenerator.sh</argument>
-                                        <argument>javadecodergenerator.sh</argument>
+                                        <argument>java-renderer-generator.sh</argument>
+                                        <argument>java-decoder-generator.sh</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

@@ -1,4 +1,4 @@
-target/javadecodergenerator.sh \
+target/java-decoder-generator.sh \
 "gi rg" \
 "rca(old)" \
 "rca-38(old)" \

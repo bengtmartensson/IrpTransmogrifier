@@ -97,13 +97,6 @@ public <ImplementationType("frequencyType")> getFrequency() {
 }
 >>
 
-DeclareDutyCycle() ::= <<
-@Override
-public <ImplementationType("dutyCycleType")> getDutyCycle() {
-    return <generalSpec.dutyCycle><ImplementationType("dutyCycleTypeSuffix")>;
-}
->>
-
 DefineClassList() ::= <<
 private static class <metaData.cProtocolName>IrList extends IrpRenderer.<if(bitSpec.pwm2)>Pwm2<elseif(bitSpec.pwm4)>Pwm4<elseif(bitSpec.standardBiPhase)>BiPhase<endif>IrList {
 

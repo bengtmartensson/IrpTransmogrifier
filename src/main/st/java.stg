@@ -88,6 +88,13 @@ DeclareAssignmentVariables() ::= <<
 <assignmentVariables:DeclareSimpleParameter()>
 >>
 
+DeclareDutyCycle() ::= <<
+@Override
+public <ImplementationType("dutyCycleType")> getDutyCycle() {
+    return <if (generalSpec.dutyCycle)><generalSpec.dutyCycle><else>-1.0<endif><ImplementationType("dutyCycleTypeSuffix")>;
+}
+>>
+
 LocalAssignment(par) ::= <<
 this.<par.name> = <par.name>;
 >>

@@ -122,13 +122,6 @@ public <ImplementationType("frequencyType")> getFrequency() {
 }
 >>
 
-DeclareDutyCycle() ::= <<
-@Override
-public <ImplementationType("dutyCycleType")> getDutyCycle() {
-    return <generalSpec.dutyCycle><ImplementationType("dutyCycleTypeSuffix")>;
-}
->>
-
 DefineClassList() ::= <<
 private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(bitSpec.standardBiPhase)>BiPhase<elseif(metaData.sonyType)>SonyType<elseif(bitSpec.pwm2)>Pwm2<elseif(bitSpec.pwm4)>Pwm4<endif>DecodeSequence {
     private final static boolean lsbFirst = <bitSpec.lsbFirst>;

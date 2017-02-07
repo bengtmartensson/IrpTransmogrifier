@@ -1,4 +1,4 @@
-target/javagenerator.sh \
+target/java-renderer-generator.sh \
 48-nec1  \
 48-nec2 \
 adnotam \

@@ -213,6 +213,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     private Map<String, Object> propertiesMap(Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> m = new HashMap<>(3);
         m.put("kind", "FunktionBody");
+        //propertiesMapData = new PropertiesMapData(pass, generalSpec, nameEngine);
 
         Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
         Map<String, Object> body = propertiesMap(state, pass, generalSpec, nameEngine);

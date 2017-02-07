@@ -318,7 +318,7 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         //ItemCodeGenerator itemCodeGenerator = codeGenerator.newItemCodeGenerator(this);
-        Map<String, Object> map = super.propertiesMap(true/*state, pass*/, generalSpec, nameEngine);
+        Map<String, Object> map = super.propertiesMap(false/*state, pass*/, generalSpec, nameEngine);
         map.put("width", width.propertiesMap(true, generalSpec, nameEngine));
         map.put("reverse", reverse);
         return map;

@@ -67,7 +67,7 @@ otherwise works. "90% complete", see [this issue](https://github.com/bengtmarten
 To create: see (or execute) the shell script `tools/generate-lirc.sh`. In short, this generates the xml export, and then invokes
 xslt transformations on that xml file.
 * Java. Essentially for testing. This is essentially working both for rendering and decoding, including a generated test rig
-(see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest)). Targets: `javadecoder javadecoderngtest javarenderer javarendererngtest`.
+(see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest)). Targets: `java-decoder java-decoder-test java-renderer java-renderer-test`.
 * C++ ([Infrared4Arduino](https://github.com/bengtmartensson/Infrared4Arduino)).
 * [IRremote](https://github.com/z3t0/Arduino-IRremote)
 * Linux kernel modules in [linux/drivers/media/rc](https://github.com/torvalds/linux/tree/master/drivers/media/rc) (decoding only).

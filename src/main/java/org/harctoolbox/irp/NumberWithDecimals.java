@@ -60,7 +60,7 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
     }
 
     @Override
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) {
         return toFloat();
     }
 

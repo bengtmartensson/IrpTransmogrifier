@@ -33,7 +33,7 @@ public interface Floatable {
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.UnassignedException
      */
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException;
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
 
     public Element toElement(Document document);
 

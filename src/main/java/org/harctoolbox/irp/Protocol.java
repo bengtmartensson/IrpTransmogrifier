@@ -225,7 +225,7 @@ public class Protocol extends IrpObject {
      */
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "toIrSequence", pass);
-        RenderData renderData = new RenderData(nameEngine, generalSpec);
+        RenderData renderData = new RenderData(generalSpec, nameEngine);
         bitspecIrstream.traverse(renderData, pass, new ArrayList<>(0));
         IrSequence irSequence = renderData.toIrSequence();
         IrpUtils.exiting(logger, "toIrSequence", pass);
@@ -266,23 +266,23 @@ public class Protocol extends IrpObject {
     }
 
     public boolean isPWM2() {
-        return bitspecIrstream.isPWM2(definitions, generalSpec);
+        return bitspecIrstream.isPWM2(generalSpec, definitions);
     }
 
     public boolean isPWM4() {
-        return bitspecIrstream.isPWM4(definitions, generalSpec);
+        return bitspecIrstream.isPWM4(generalSpec, definitions);
     }
 
     boolean isPWM16() {
-        return bitspecIrstream.isPWM16(definitions, generalSpec);
+        return bitspecIrstream.isPWM16(generalSpec, definitions);
     }
 
     public boolean isBiphase() {
-        return bitspecIrstream.isBiphase(definitions, generalSpec);
+        return bitspecIrstream.isBiphase(generalSpec, definitions);
     }
 
     public boolean isTrivial(boolean inverted) {
-        return bitspecIrstream.isTrivial(definitions, generalSpec, inverted);
+        return bitspecIrstream.isTrivial(generalSpec, definitions, inverted);
     }
 
     public boolean interleavingOk() {
@@ -291,13 +291,13 @@ public class Protocol extends IrpObject {
 
     public boolean interleavingFlashOk() {
         if (interleavingFlash == null)
-            interleavingFlash = bitspecIrstream.interleavingOk(DurationType.flash, definitions, generalSpec);
+            interleavingFlash = bitspecIrstream.interleavingOk(DurationType.flash, generalSpec, definitions);
         return interleavingFlash;
     }
 
     public boolean interleavingGapOk() {
         if (interleavingGap == null)
-            interleavingGap = bitspecIrstream.interleavingOk(DurationType.gap, definitions, generalSpec);
+            interleavingGap = bitspecIrstream.interleavingOk(DurationType.gap, generalSpec, definitions);
         return interleavingGap;
     }
 
@@ -306,7 +306,7 @@ public class Protocol extends IrpObject {
      * @return
      */
     public boolean isSonyType() {
-        return bitspecIrstream.isSonyType(definitions, generalSpec);
+        return bitspecIrstream.isSonyType(generalSpec, definitions);
     }
 
     public boolean isRPlus() {

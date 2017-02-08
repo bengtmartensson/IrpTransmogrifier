@@ -117,8 +117,8 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
                 && nameOrNumber.equals(other.nameOrNumber);
     }
 
-    private void compute(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
-        double time = nameOrNumber.toFloat(nameEngine, generalSpec);
+    private void compute(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+        double time = nameOrNumber.toFloat(generalSpec, nameEngine);
 
         switch (unit) {
             case "p":
@@ -144,10 +144,10 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
 
-    public abstract double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException;
+    public abstract double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException;
 
-    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
-        compute(nameEngine, generalSpec);
+    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+        compute(generalSpec, nameEngine);
         if (time_periods != IrCoreUtils.invalid) {
             if (generalSpec == null)
                 return DUMMYTIMEUNIT;
@@ -168,18 +168,18 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         }
     }
 
-    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
-        return evaluate(nameEngine, generalSpec, 0);
+    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+        return evaluate(generalSpec, nameEngine, 0);
     }
 
     @Override
     public final boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
-        return evaluate(nameEngine, null, 0f) == 0;
+        return evaluate(null, nameEngine, 0f) == 0;
     }
 
     @Override
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
-        return evaluate(nameEngine, generalSpec, 0f);
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+        return evaluate(generalSpec, nameEngine, 0f);
     }
 
     @Override
@@ -217,6 +217,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
+    public Integer numberOfDurations(IrSignal.Pass pass) {
+        return 1;
+    }
+
+    @Override
     public Integer numberOfBits() {
         return 0;
     }
@@ -234,7 +239,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             throw new IrpSignalParseException("Found flash when gap expected, or vice versa");
         }
         double actual = recognizeData.get();
-        double wanted = toFloat(recognizeData.toNameEngine(), recognizeData.getGeneralSpec());
+        double wanted = toFloat(recognizeData.getGeneralSpec(), recognizeData.toNameEngine());
         //boolean success =
         recognize(recognizeData, actual, wanted);
         //IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", wanted, actual);
@@ -274,12 +279,12 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     protected abstract boolean isOn();
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         return last == DurationType.none || last == DurationType.newDurationType(!isOn());
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = DurationType.newDurationType(isOn());
         return !(current == toCheck && last == current);
     }
@@ -322,7 +327,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         Map<String, Object> map = new HashMap<>(3);
         map.put("kind", this.getClass().getSimpleName());
         try {
-            long num = Math.round(toFloat(null, generalSpec));
+            long num = Math.round(toFloat(generalSpec, null));
             map.put("microseconds", num);
             return map;
         } catch (ArithmeticException | UnassignedException | IrpSemanticException ex) {
@@ -332,10 +337,27 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return map;
     }
 
+//   @Override
+//    public void propertiesMap(PropertiesMapData propertiesMapData, GeneralSpec generalSpec) {
+//        Map<String, Object> map = new HashMap<>(2);
+//        propertiesMapData.getList().add(map);
+//        map.put("kind", this.getClass().getSimpleName());
+//        try {
+//            long num = Math.round(toFloat(generalSpec, null));
+//            map.put("microseconds", num);
+//            //return map;
+//        } catch (ArithmeticException | UnassignedException | IrpSemanticException ex) {
+//        }
+//        //map.put("name", nameOrNumber.toString());
+//        //map.put("multiplicator", multiplicator(generalSpec));
+//        propertiesMapData.incrementDurations();
+//        //return map;
+//    }
+
     @Override
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         try {
-            return this.evaluate(nameEngine, generalSpec);
+            return this.evaluate(generalSpec, nameEngine);
         } catch (UnassignedException | IrpSemanticException ex) {
             return null;
         }

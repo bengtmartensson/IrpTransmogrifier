@@ -51,16 +51,16 @@ public class Extent extends Duration {
     }
 
     @Override
-    public double evaluate(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
-        double time = super.evaluate(nameEngine, generalSpec, 0f) - elapsed;
+    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+        double time = super.evaluate(generalSpec, nameEngine, 0f) - elapsed;
         if (time < 0)
             throw new IrpSemanticException("Argument of extent smaller than actual duration.");
         return time;
     }
 
     @Override
-    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
-        return -evaluate(nameEngine, generalSpec, elapsed);
+    public double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+        return -evaluate(generalSpec, nameEngine, elapsed);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Extent extends Duration {
     public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, IrpSemanticException, IrpSignalParseException {
         IrpUtils.entering(logger, Level.FINEST, "recognize", this);
         double physical = recognizeData.getExtentDuration();
-        double theoretical = toFloat(/*recognizeData.getNameEngine()*/null, recognizeData.getGeneralSpec());
+        double theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null);
         recognizeData.markExtentStart();
         recognize(recognizeData, physical, theoretical);
         //IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", theoretical, physical);

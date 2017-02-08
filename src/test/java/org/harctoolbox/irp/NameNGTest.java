@@ -130,7 +130,7 @@ public class NameNGTest {
             NameEngine nameEngine = new NameEngine("{answer=42}");
             GeneralSpec generalSpec = new GeneralSpec();
             Name instance = new Name("answer");
-            assertEquals(instance.toFloat(nameEngine, generalSpec), 42f, 0.000001);
+            assertEquals(instance.toFloat(generalSpec, nameEngine), 42f, 0.000001);
         } catch (IrpSyntaxException | ArithmeticException | UnassignedException ex) {
             fail();
         }

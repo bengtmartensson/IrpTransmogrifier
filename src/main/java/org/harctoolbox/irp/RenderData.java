@@ -26,8 +26,8 @@ public class RenderData extends Traverser {
 
     private final List<EvaluatedIrStream> evaluatedIrStreamList;
 
-    public RenderData(NameEngine nameEngine, GeneralSpec generalSpec) {
-        super(IrSignal.Pass.intro, nameEngine, generalSpec);
+    public RenderData(GeneralSpec generalSpec, NameEngine nameEngine) {
+        super(IrSignal.Pass.intro, generalSpec, nameEngine);
         evaluatedIrStreamList = new ArrayList<>(2);
         push();
     }

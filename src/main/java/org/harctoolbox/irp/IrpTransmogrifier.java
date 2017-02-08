@@ -359,7 +359,9 @@ public class IrpTransmogrifier {
 
     private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws UsageException, IOException, IrpException, SAXException {
         if (commandCode.directory != null && commandLineArgs.output != null)
-                throw new UsageException("The --output and the --directory options are exclusive.");
+            throw new UsageException("The --output and the --directory options are mutually exclusive.");
+        if (commandCode.protocols == null)
+            throw new UsageException("At least one protocol needs to be given.");
 
         setupDatabase(commandLineArgs);
         List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);

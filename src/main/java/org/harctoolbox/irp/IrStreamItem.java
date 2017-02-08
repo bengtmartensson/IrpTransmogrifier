@@ -57,9 +57,9 @@ public interface IrStreamItem extends XmlExport {
      * @param gapFlashBitSpecs
      * @return
      */
-    public abstract boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs);
+    public abstract boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
 
-    public abstract boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs);
+    public abstract boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
 
     public abstract DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs);
 
@@ -68,6 +68,12 @@ public interface IrStreamItem extends XmlExport {
     public abstract Integer numberOfBits();
 
     public abstract Integer numberOfBareDurations(boolean recursive);
+
+    /**
+     * Upper limit of the number of (interleaving) durations in the rendered signal.
+     * @return
+     */
+    public abstract Integer numberOfDurations(IrSignal.Pass pass);
 
     public abstract Integer numberOfBitSpecs();
 
@@ -79,12 +85,13 @@ public interface IrStreamItem extends XmlExport {
 
     public abstract void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException;
 
-    @SuppressWarnings("NoopMethodInAbstractClass")
     void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs);
 
     public abstract void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
 
     public abstract void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException;
+
+    //public abstract void propertiesMap(PropertiesMapData propertiesMapData, GeneralSpec generalSpec);
 
     public abstract boolean hasExtent();
 
@@ -97,7 +104,7 @@ public interface IrStreamItem extends XmlExport {
 //        return IrpUtils.propertiesMap(noProperites, this);
 //    }
 
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec);
+    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine);
 
     public String toIrpString();
 

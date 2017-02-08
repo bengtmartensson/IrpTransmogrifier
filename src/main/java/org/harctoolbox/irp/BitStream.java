@@ -30,7 +30,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
+class BitStream extends IrpObject implements Evaluatable {
 
     private static final Logger logger = Logger.getLogger(BitStream.class.getName());
     private static final int WEIGHT = 2;
@@ -43,7 +43,7 @@ class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
         length = 0;
     }
 
-    BitStream(BitField bitField, NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException {
+    BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException {
         if (bitField instanceof InfiniteBitField)
             throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
 
@@ -63,7 +63,7 @@ class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    void add(BitStream bitStream, NameEngine nameEngine, GeneralSpec generalSpec) {
+    void add(BitStream bitStream, GeneralSpec generalSpec, NameEngine nameEngine) {
         data = data.shiftLeft((int)bitStream.length).or(bitStream.data);
         length += bitStream.length;
     }
@@ -81,7 +81,7 @@ class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
         return data.shiftRight(n*chunksize).and(BigInteger.valueOf(mask)).intValueExact();
     }
 
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec, BitSpec bitSpec) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine, BitSpec bitSpec) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "evaluate", this);
 
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);
@@ -93,7 +93,7 @@ class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
             for (int n = 0; n < noChunks; n++) {
                 int chunkNo = noChunks - n - 1;
                 BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
-                EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, nameEngine, generalSpec);
+                EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, generalSpec, nameEngine);
                 list.add(evaluatedIrStream);
             }
         }
@@ -101,55 +101,55 @@ class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
         return list;
     }
 
-    @Override
-    public boolean isEmpty(NameEngine nameEngine) {
-        return length == 0;
-    }
+//    @Override
+//    public boolean isEmpty(NameEngine nameEngine) {
+//        return length == 0;
+//    }
 
     @Override
     public Element toElement(Document document) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    @Override
-    public Integer numberOfBareDurations(boolean recursive) {
-        return (int) length;
-    }
+//    @Override
+//    public Integer numberOfBareDurations(boolean recursive) {
+//        return (int) length;
+//    }
+//
+//    @Override
+//    public ParserRuleContext getParseTree() {
+//        return null;
+//    }
 
-    @Override
-    public ParserRuleContext getParseTree() {
-        return null;
-    }
-
-    @Override
-    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-        throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-        return true;
-    }
-
-    @Override
-    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-        return true;
-    }
-
-    @Override
-    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
-        return DurationType.newDurationType(gapFlashBitSpecs);
-    }
-
-    @Override
-    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
-        return DurationType.newDurationType(!gapFlashBitSpecs);
-    }
+//    @Override
+//    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+//        throw new UnsupportedOperationException("Not supported yet.");
+//    }
+//
+//    @Override
+//    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
+//        throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
+//    }
+//
+//    @Override
+//    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+//        return true;
+//    }
+//
+//    @Override
+//    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
+//        return DurationType.newDurationType(gapFlashBitSpecs);
+//    }
+//
+//    @Override
+//    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
+//        return DurationType.newDurationType(!gapFlashBitSpecs);
+//    }
 
     @Override
     public int weight() {
@@ -173,28 +173,28 @@ class BitStream extends IrpObject implements IrStreamItem, Evaluatable {
         return hash;
     }
 
-    @Override
-    public boolean hasExtent() {
-        return false;
-    }
-
-    @Override
-    public Set<String> assignmentVariables() {
-        return new HashSet<>(0);
-    }
-
-    @Override
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return null;
-    }
+//    @Override
+//    public boolean hasExtent() {
+//        return false;
+//    }
+//
+//    @Override
+//    public Set<String> assignmentVariables() {
+//        return new HashSet<>(0);
+//    }
+//
+//    @Override
+//    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
+//
+//    @Override
+//    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
+//
+//    @Override
+//    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
+//        return null;
+//    }
 }

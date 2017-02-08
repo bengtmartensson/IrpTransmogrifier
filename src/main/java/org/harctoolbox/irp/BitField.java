@@ -156,7 +156,7 @@ public abstract class BitField extends IrpObject implements Numerical {
         return new TreeViewer(ruleNames, parseTree);
     }
 
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return null;
     }
 

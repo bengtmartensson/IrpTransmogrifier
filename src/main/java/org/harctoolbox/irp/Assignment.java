@@ -126,6 +126,11 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
+    public Integer numberOfDurations(IrSignal.Pass pass) {
+        return 0;
+    }
+
+    @Override
     public ParserRuleContext getParseTree() {
         return parseTree;
     }
@@ -137,12 +142,12 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         return true;
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         return true;
     }
 
@@ -182,7 +187,7 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return 0.0;
     }
 }

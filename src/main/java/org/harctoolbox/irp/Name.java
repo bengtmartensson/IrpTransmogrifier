@@ -135,7 +135,7 @@ public class Name extends PrimaryItem implements Floatable {
     }
 
     @Override
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException {
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException {
         return toNumber(nameEngine);
     }
 

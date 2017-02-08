@@ -40,7 +40,7 @@ public class GapNGTest {
     public void testEvaluateWithSign() throws Exception {
         System.out.println("evaluateWithSign");
         Gap instance = new Gap("-A");
-        double result = instance.evaluateWithSign(nameEngine, generalSpec, 0f);
+        double result = instance.evaluateWithSign(generalSpec, nameEngine, 0f);
         Assert.assertEquals(result, -123000f, 0.0);
     }
 

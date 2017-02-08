@@ -49,8 +49,8 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     @Override
-    public double toFloat(NameEngine nameEngine, GeneralSpec generalSpec) throws UnassignedException, IrpSemanticException {
-        return thing.toFloat(nameEngine, generalSpec);
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+        return thing.toFloat(generalSpec, nameEngine);
     }
 
     @Override

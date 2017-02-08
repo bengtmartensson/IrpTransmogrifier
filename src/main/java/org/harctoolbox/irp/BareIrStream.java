@@ -45,12 +45,12 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last, gapFlashBitSpecs);
     }
 
-    static boolean interleavingOk(BareIrStream bareIrStream, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitspecs) {
-        return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
+    static boolean interleavingOk(BareIrStream bareIrStream, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitspecs) {
+        return bareIrStream == null || bareIrStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitspecs);
     }
 
-    static boolean interleavingOk(DurationType toCheck, BareIrStream bareIrStream, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitspecs) {
-        return bareIrStream == null || bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitspecs);
+    static boolean interleavingOk(DurationType toCheck, BareIrStream bareIrStream, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitspecs) {
+        return bareIrStream == null || bareIrStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitspecs);
     }
 
     private static List<IrStreamItem> parse(List<IrpParser.Irstream_itemContext> list) {
@@ -121,8 +121,8 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return sum;
     }
 
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, NameEngine nameEngine, GeneralSpec generalSpec) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-        RenderData renderData = new RenderData(nameEngine, generalSpec);
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+        RenderData renderData = new RenderData(generalSpec, nameEngine);
         renderData.setState(state);
         traverse(renderData, pass, new ArrayList<>(0));
         return renderData.getEvaluatedIrStream();
@@ -278,6 +278,32 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public Integer numberOfDurations(IrSignal.Pass pass) {
+        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat())
+            return 0;
+
+        int sum = 0;
+        IrSignal.Pass state = IrSignal.Pass.intro;
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
+            if (newState != null)
+                state = newState;
+
+            if (state == pass)
+                sum += irStreamItem.numberOfDurations(pass);
+
+            IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
+            if (next != null)
+                state = next;
+
+            if (next == IrSignal.Pass.finish)
+                break;
+        }
+        //recognizeData.postprocess(this, pass, bitSpecStack);
+        return sum;
+    }
+
+    @Override
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems)
@@ -292,10 +318,10 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems) {
-            if (!item.interleavingOk(nameEngine, generalSpec, current, gapFlashBitSpecs))
+            if (!item.interleavingOk(generalSpec, nameEngine, current, gapFlashBitSpecs))
                 return false;
             current = item.endingDurationType(last, gapFlashBitSpecs);
         }
@@ -303,10 +329,10 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems) {
-            if (!item.interleavingOk(toCheck, nameEngine, generalSpec, current, gapFlashBitSpecs))
+            if (!item.interleavingOk(toCheck, generalSpec, nameEngine, current, gapFlashBitSpecs))
                 return false;
             current = item.endingDurationType(last, gapFlashBitSpecs);
         }
@@ -365,14 +391,14 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         }
 
         Map<String, Object> result = new HashMap<>(2);
-        result.put("kind", "BareIrStream"); // NOT this.getClass...
+        result.put("kind", getClass().getSimpleName());
         result.put("items", list);
         return result;
     }
 
-    double averageDuration(NameEngine nameEngine, GeneralSpec generalSpec) throws IrpException {
+    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpException {
         double sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.microSeconds(nameEngine, generalSpec)).reduce(sum, (accumulator, _item) -> accumulator + _item);
+        sum = irStreamItems.stream().map((item) -> item.microSeconds(generalSpec, nameEngine)).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum / irStreamItems.size();
     }
 
@@ -381,7 +407,16 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return null;
     }
+
+//    @Override
+//    public void propertiesMap(PropertiesMapData propertiesMapData, GeneralSpec generalSpec) {
+//        List<Map<String, Object>> items = propertiesMapData.getList();
+//        HashMap<String, Object> map = new HashMap<>(3);
+//        map.put("kind", getClass().getSimpleName());
+//        map.put("items", items);
+//        propertiesMapData.load(map);
+//    }
 }

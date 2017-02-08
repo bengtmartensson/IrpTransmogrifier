@@ -56,8 +56,8 @@ public class NameOrNumberNGTest {
     @Test
     public void testToFloat() throws Exception {
         System.out.println("toFloat");
-        assertTrue(IrCoreUtils.approximatelyEquals(a.toFloat(nameEngine, generalSpec), 123f, 0.000001, 0));
-        assertTrue(IrCoreUtils.approximatelyEquals(b.toFloat(nameEngine, generalSpec), 13.1415926, 0.000001, 0));
+        assertTrue(IrCoreUtils.approximatelyEquals(a.toFloat(generalSpec, nameEngine), 123f, 0.000001, 0));
+        assertTrue(IrCoreUtils.approximatelyEquals(b.toFloat(generalSpec, nameEngine), 13.1415926, 0.000001, 0));
     }
 
     /**

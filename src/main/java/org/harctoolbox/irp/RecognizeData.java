@@ -42,7 +42,7 @@ public class RecognizeData extends Traverser implements Cloneable {
 
     private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
             ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance) {
-        super(state, definitions, generalSpec);
+        super(state, generalSpec, definitions);
         danglingBitFieldData = new BitwiseParameter();
         this.position = position;
         this.hasConsumed = 0.0;

@@ -103,9 +103,9 @@ public class BitSpecNGTest {
         BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
         BitSpec rc5 = new BitSpec(RC5BitSpec);
         //BitSpec empty = new BitSpec();
-        assertTrue(nec1.isPWM(2, nameEngine, generalSpec));
-        assertFalse(nokia32.isPWM(2, nameEngine, generalSpec));
-        assertFalse(rc5.isPWM(nameEngine, generalSpec));
+        assertTrue(nec1.isPWM(2, generalSpec, nameEngine));
+        assertFalse(nokia32.isPWM(2, generalSpec, nameEngine));
+        assertFalse(rc5.isPWM(generalSpec, nameEngine));
         //assertEquals(result, expResult);
 
 
@@ -125,10 +125,10 @@ public class BitSpecNGTest {
             BitSpec rc5 = new BitSpec(RC5BitSpec);
             BitSpec rc6 = new BitSpec(RC6BitSpec);
             //BitSpec empty = new BitSpec();
-            assertFalse(nec1.isStandardBiPhase(nameEngine, generalSpec));
-            assertFalse(nokia32.isStandardBiPhase(nameEngine, generalSpec));
-            assertTrue(rc5.isStandardBiPhase(nameEngine, generalSpec));
-            assertTrue(rc6.isStandardBiPhase(nameEngine, generalSpec));
+            assertFalse(nec1.isStandardBiPhase(generalSpec, nameEngine));
+            assertFalse(nokia32.isStandardBiPhase(generalSpec, nameEngine));
+            assertTrue(rc5.isStandardBiPhase(generalSpec, nameEngine));
+            assertTrue(rc6.isStandardBiPhase(generalSpec, nameEngine));
         } catch (IrpException | ArithmeticException ex) {
             fail();
         }

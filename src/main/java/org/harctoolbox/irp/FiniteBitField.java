@@ -175,7 +175,7 @@ public class FiniteBitField extends BitField implements IrStreamItem {
         IrpUtils.entering(logger, "evaluate", this.toString());
         //EvaluatedIrStream result = new EvaluatedIrStream(nameEngine, generalSpec, pass);
         //if (state == pass) {
-        BitStream bitStream = new BitStream(this, renderData.getNameEngine(), renderData.getGeneralSpec());
+        BitStream bitStream = new BitStream(this, renderData.getGeneralSpec(), renderData.getNameEngine());
         renderData.add(bitStream);
         //}
         IrpUtils.exiting(logger, "evaluate", true);
@@ -286,12 +286,12 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         return true; // ????
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
         return true; // ????
     }
 
@@ -333,5 +333,10 @@ public class FiniteBitField extends BitField implements IrStreamItem {
         if (eval)
             map.put("kind", "FiniteBitFieldExpression");
         return map;
+    }
+
+    @Override
+    public Integer numberOfDurations(IrSignal.Pass pass) {
+        return 999;
     }
 }

@@ -133,17 +133,17 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-        return BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(intro, nameEngine, generalSpec, last, gapFlashBitSpecs);
+    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+        return BareIrStream.interleavingOk(intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(intro, generalSpec, nameEngine, last, gapFlashBitSpecs);
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-         return BareIrStream.interleavingOk(toCheck, intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(toCheck, intro, nameEngine, generalSpec, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(toCheck, intro, nameEngine, generalSpec, last, gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+         return BareIrStream.interleavingOk(toCheck, intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(toCheck, intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(toCheck, intro, generalSpec, nameEngine, last, gapFlashBitSpecs);
     }
 
     @Override
@@ -209,7 +209,12 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
+    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return null;
+    }
+
+    @Override
+    public Integer numberOfDurations(Pass pass) {
+        return select(pass).numberOfDurations(pass);
     }
 }

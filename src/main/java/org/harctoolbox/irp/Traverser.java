@@ -26,7 +26,7 @@ public abstract class Traverser {
     private final GeneralSpec generalSpec;
     private final NameEngine nameEngine;
 
-    protected Traverser(IrSignal.Pass state, NameEngine nameEngine, GeneralSpec generalSpec) {
+    protected Traverser(IrSignal.Pass state, GeneralSpec generalSpec, NameEngine nameEngine) {
         this.state = state;
         this.nameEngine = nameEngine;
         this.generalSpec = generalSpec;

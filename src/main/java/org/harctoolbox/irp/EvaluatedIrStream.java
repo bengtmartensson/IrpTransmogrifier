@@ -60,7 +60,7 @@ class EvaluatedIrStream {
             if (!(element instanceof Duration))
                 throw new IrpSemanticException("IrSequence cannot be (completely) evaluated");
             Duration duration = (Duration) element;
-            double time = duration.evaluateWithSign(nameEngine, generalSpec, elapsed);
+            double time = duration.evaluateWithSign(generalSpec, nameEngine, elapsed);
             if (Math.abs(time) < 0.0001)
                 logger.warning("Zero duration ignored");
             else {
@@ -120,7 +120,7 @@ class EvaluatedIrStream {
     private int reduce(BitSpec bitSpec, int index) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         BitStream bitStream = (BitStream) elements.get(index);
         elements.remove(index);
-        EvaluatedIrStream bitFieldDurations = bitStream.evaluate(pass, pass, nameEngine, generalSpec, bitSpec);
+        EvaluatedIrStream bitFieldDurations = bitStream.evaluate(pass, pass, generalSpec, nameEngine, bitSpec);
         int length = bitFieldDurations.elements.size();
         elements.addAll(index, bitFieldDurations.elements);
         return length;
@@ -146,14 +146,14 @@ class EvaluatedIrStream {
         Evaluatable object = elements.get(i);
         if (!(object instanceof Duration))
             throw new ThisCannotHappenException("Not numeric");
-        return ((Duration) object).evaluateWithSign(nameEngine, generalSpec, 0);
+        return ((Duration) object).evaluateWithSign(generalSpec, nameEngine, 0);
     }
 
     private void squeezeBitStreams(BitStream bitStream) {
         IrpUtils.entering(logger, "squeezeBitStreams", this.toString() + "+" + bitStream);
         int lastIndex = elements.size() - 1;
         BitStream old = (BitStream) elements.get(lastIndex);
-        old.add(bitStream, nameEngine, generalSpec);
+        old.add(bitStream, generalSpec, nameEngine);
         IrpUtils.exiting(logger, "squeezeBitStreams", this);
     }
 

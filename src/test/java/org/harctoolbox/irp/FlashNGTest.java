@@ -40,7 +40,7 @@ public class FlashNGTest {
     public void testEvaluateWithSign() throws Exception {
         System.out.println("evaluateWithSign");
         Flash instance = new Flash("A");
-        double result = instance.evaluateWithSign(nameEngine, generalSpec, 0f);
+        double result = instance.evaluateWithSign(generalSpec, nameEngine, 0f);
         Assert.assertEquals(result, 123000, 0.0);
     }
 

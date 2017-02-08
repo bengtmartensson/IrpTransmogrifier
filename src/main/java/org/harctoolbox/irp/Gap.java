@@ -47,8 +47,8 @@ public class Gap extends Duration {
     }
 
     @Override
-    public double evaluateWithSign(NameEngine nameEngine, GeneralSpec generalSpec, double elapsed) throws UnassignedException, IrpSemanticException {
-        return -evaluate(nameEngine, generalSpec, elapsed);
+    public double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+        return -evaluate(generalSpec, nameEngine, elapsed);
     }
 
     @Override

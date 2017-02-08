@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
@@ -175,17 +176,26 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         return pass == IrSignal.Pass.repeat && isInfiniteRepeat();
     }
 
+    private int numberRepetitions(IrSignal.Pass pass) {
+        return evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+    }
+
     @Override
     public void traverse(Traverser traverseData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "traverse " + pass, this);
         traverseData.preprocess(this, pass, bitSpecs);
         if (evaluateTheRepeat(pass))
             traverseData.setState(IrSignal.Pass.repeat);
-        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+        int repetitions = numberRepetitions(pass);
         for (int i = 0; i < repetitions; i++)
             bareIrStream.traverse(traverseData, pass, bitSpecs);
         traverseData.postprocess(this, pass, bitSpecs);
         IrpUtils.exiting(logger, "traverse " + pass);
+    }
+
+    @Override
+    public Integer numberOfDurations(Pass pass) {
+        return numberRepetitions(pass) * bareIrStream.numberOfDurations(pass);
     }
 
     public boolean hasVariation(boolean recursive) {
@@ -210,21 +220,24 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         return m;
     }
 
+    // Top level only, not called recursively
     private Map<String, Object> propertiesMap(Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> m = new HashMap<>(3);
+        Map<String, Object> m = new HashMap<>(4);
         m.put("kind", "FunktionBody");
+        //Map<String, Object> body = null;
         //propertiesMapData = new PropertiesMapData(pass, generalSpec, nameEngine);
 
         Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
         Map<String, Object> body = propertiesMap(state, pass, generalSpec, nameEngine);
         m.put("irStream", body);
         m.put("reset", hasExtent());
+        m.put("numberOfDurations", numberOfDurations(pass));
         return m;
     }
 
     @Override
     public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        int repetitions = evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+        int repetitions = numberRepetitions(pass);
         if (repetitions == 0)
             return new HashMap<>(0);
 
@@ -245,13 +258,13 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-        return bareIrStream.interleavingOk(nameEngine, generalSpec, last, gapFlashBitSpecs);
+    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitSpecs);
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-        return bareIrStream.interleavingOk(toCheck, nameEngine, generalSpec, last, gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.interleavingOk(toCheck, generalSpec, nameEngine, last, gapFlashBitSpecs);
     }
 
     @Override
@@ -288,8 +301,8 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public Double microSeconds(NameEngine nameEngine, GeneralSpec generalSpec) {
-        return repeatMarker.getMin() * bareIrStream.microSeconds(nameEngine, generalSpec);
+    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
+        return repeatMarker.getMin() * bareIrStream.microSeconds(generalSpec, nameEngine);
     }
 
     boolean startsWithDuration() {

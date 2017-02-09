@@ -163,17 +163,17 @@ public class Protocol extends IrpObject {
     }
 
     public Protocol normalFormProtocol() {
-        return mkProtocol(normalFormVariation);
+        List<IrStreamItem> list = new ArrayList<>(1);
+        list.add(normalFormVariation);
+        return mkProtocol(new BareIrStream(list));
     }
 
     public Protocol normalForm(IrSignal.Pass pass) {
         return mkProtocol(normalFormVariation.select(pass));
     }
 
-    private Protocol mkProtocol(IrStreamItem irStreamItem) {
-        List<IrStreamItem> list = new ArrayList<>(1);
-        list.add(irStreamItem);
-        IrStream irStream = new IrStream(list);
+    private Protocol mkProtocol(BareIrStream bareIrStream) {
+        IrStream irStream = new IrStream(bareIrStream);
         BitspecIrstream normalBitspecIrstream = new BitspecIrstream(bitspecIrstream.getBitSpec(), irStream);
         return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, parseTree);
     }
@@ -256,7 +256,8 @@ public class Protocol extends IrpObject {
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
         IrpUtils.entering(logger, "toIrSequence", pass);
         RenderData renderData = new RenderData(generalSpec, nameEngine);
-        bitspecIrstream.traverse(renderData, pass, new ArrayList<>(0));
+        Protocol reducedProtocol = normalForm(pass);
+        reducedProtocol.bitspecIrstream.render(renderData, new ArrayList<>(0));
         IrSequence irSequence = renderData.toIrSequence();
         IrpUtils.exiting(logger, "toIrSequence", pass);
         return irSequence;

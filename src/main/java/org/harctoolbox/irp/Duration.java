@@ -188,6 +188,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) {
+        renderData.add(this);
+    }
+
+    @Override
     public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
         //recognizeData.preprocess(this, pass, bitSpecs);
         recognizeData.postprocess(this, pass, bitSpecs);

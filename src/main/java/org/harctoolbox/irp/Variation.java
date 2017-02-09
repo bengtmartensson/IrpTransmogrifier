@@ -60,11 +60,6 @@ public class Variation extends IrpObject implements IrStreamItem {
         return intro.isEmpty(nameEngine) && repeat.isEmpty(nameEngine) && (ending == null || ending.isEmpty(nameEngine));
     }
 
-    @Override
-    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
-
-    }
-
     public BareIrStream select(IrSignal.Pass pass) {
         BareIrStream result;
         switch (pass) {
@@ -240,5 +235,14 @@ public class Variation extends IrpObject implements IrStreamItem {
     @Override
     public Integer numberOfDurations(Pass pass) {
         return select(pass).numberOfDurations(pass);
+    }
+
+    @Override
+    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    }
+
+    @Override
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

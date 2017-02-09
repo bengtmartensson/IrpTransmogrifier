@@ -90,6 +90,10 @@ public interface IrStreamItem extends XmlExport {
 
     public abstract void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
 
+    public abstract void render(RenderData renderData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
+
+    //public abstract void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException;
+
     public abstract void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException;
 
     //public abstract void propertiesMap(PropertiesMapData propertiesMapData, GeneralSpec generalSpec);

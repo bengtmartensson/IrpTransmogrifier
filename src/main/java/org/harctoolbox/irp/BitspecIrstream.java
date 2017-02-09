@@ -151,11 +151,6 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-        renderData.push();
-    }
-
-    @Override
     public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         BitSpec lastBitSpec = bitSpecs.get(bitSpecs.size() - 1);
         renderData.reduce(lastBitSpec);
@@ -174,8 +169,26 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
+        stack.add(bitSpec);
+        renderData.push();
+        irStream.render(renderData, stack);
+        renderData.reduce(bitSpec);
+        renderData.pop();
+    }
+
+    @Override
     public List<IrStreamItem> extractPass(Pass pass, Pass state) {
-        return irStream.extractPass(pass, state);
+        List<IrStreamItem> extractList = irStream.extractPass(pass, state);
+        IrStream reducedIrStream = new IrStream(extractList);
+        List<IrStreamItem> result = new ArrayList<>(1);
+        result.add(new BitspecIrstream(bitSpec, reducedIrStream));
+        return result;
+    }
+
+    public BareIrStream extractPass(IrSignal.Pass pass) {
+        return new BareIrStream(irStream.extractPass(pass, IrSignal.Pass.intro));
     }
 
     @Override
@@ -292,11 +305,6 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     public IrStream getIrStream() {
         return irStream;
     }
-
-    public BareIrStream extractPass(IrSignal.Pass pass) {
-        return new BareIrStream(getIrStream().extractPass(pass, IrSignal.Pass.intro));
-    }
-
 
     @Override
     public Set<String> assignmentVariables() {

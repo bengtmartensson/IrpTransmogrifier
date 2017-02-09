@@ -54,9 +54,17 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     public IrStream(List<IrStreamItem> irStreamItems, RepeatMarker repeatMarker) {
-        bareIrStream = new BareIrStream(irStreamItems);
+        this(new BareIrStream(irStreamItems), repeatMarker);
+    }
+
+    public IrStream(BareIrStream bareIrStream, RepeatMarker repeatMarker) {
+        this.bareIrStream = bareIrStream;
         this.repeatMarker = repeatMarker;
         parseTree = null;
+    }
+
+    public IrStream(BareIrStream bareIrStream) {
+        this(bareIrStream, new RepeatMarker());
     }
 
     public IrStream(List<IrStreamItem> irStreamItems) {
@@ -193,12 +201,20 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
+    @SuppressWarnings("AssignmentToMethodParameter")
     public List<IrStreamItem> extractPass(Pass pass, Pass state) {
         List<IrStreamItem> list = new ArrayList<>(8);
         int repetitions = numberRepetitions(pass);
+        if (evaluateTheRepeat(pass))
+            state = IrSignal.Pass.repeat;
         for (int i = 0; i < repetitions; i++)
             list.addAll(bareIrStream.extractPass(pass, state));
         return list;
+    }
+
+    @Override
+    public void render(RenderData traverseData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+        bareIrStream.render(traverseData, bitSpecs);
     }
 
     @Override

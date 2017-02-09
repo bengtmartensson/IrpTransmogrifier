@@ -182,6 +182,12 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws UnassignedException {
+        BitStream bitStream = new BitStream(this, renderData.getGeneralSpec(), renderData.getNameEngine());
+        renderData.add(bitStream);
+    }
+
+    @Override
     public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
         //recognizeData.preprocess(this, pass, bitSpecs);
         recognizeData.postprocess(this, pass, bitSpecs);

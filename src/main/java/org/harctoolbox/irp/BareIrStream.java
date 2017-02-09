@@ -278,6 +278,12 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+        for (IrStreamItem irStreamItem : irStreamItems)
+            irStreamItem.render(renderData, bitSpecs);
+    }
+
+    @Override
     @SuppressWarnings("AssignmentToMethodParameter")
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
         List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());

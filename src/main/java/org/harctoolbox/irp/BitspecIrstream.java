@@ -169,6 +169,16 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public void decode(RecognizeData recognizeData, List<BitSpec> inheritedBitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
+        stack.add(bitSpec);
+        IrSignal.Pass pass = null;
+        recognizeData.preprocess(this, pass, inheritedBitSpecs);
+        irStream.decode(recognizeData, stack);
+        recognizeData.postprocess(this, pass, stack);
+    }
+
+    @Override
     public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
@@ -325,6 +335,11 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     @Override
     public Integer numberOfDurations(Pass pass) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

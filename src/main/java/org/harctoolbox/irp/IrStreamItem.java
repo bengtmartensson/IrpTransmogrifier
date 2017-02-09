@@ -118,4 +118,8 @@ public interface IrStreamItem extends XmlExport {
     public int weight();
 
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state);
+
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
+
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
 }

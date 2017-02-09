@@ -448,7 +448,9 @@ public class Protocol extends IrpObject {
 
     private void decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) throws DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException, IrpSignalParseException {
         RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names, absoluteTolerance, relativeTolerance);
-        traverse(recognizeData, pass);
+        Protocol reducedProtocol = normalForm(pass);
+        //traverse(recognizeData, pass);
+        reducedProtocol.decode(recognizeData);
         recognizeData.checkConsistency();
         checkDomain(names);
     }
@@ -460,6 +462,12 @@ public class Protocol extends IrpObject {
             throw new IrpSignalParseException("IrSequence not fully matched");
 
         IrpUtils.exiting(logger, "traverse " + pass);
+    }
+
+    public void decode(RecognizeData recognizeData) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+        bitspecIrstream.decode(recognizeData, new ArrayList<>(0));
+        if (!recognizeData.isFinished())
+            throw new IrpSignalParseException("IrSequence not fully matched");
     }
 
     @Override

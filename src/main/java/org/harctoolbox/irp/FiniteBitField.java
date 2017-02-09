@@ -194,6 +194,12 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws UnassignedException {
+        BitStream bitStream = new BitStream(this, renderData.getGeneralSpec(), renderData.getNameEngine());
+        renderData.add(bitStream);
+    }
+
+    @Override
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
         return IrpUtils.mkIrStreamItemList(this);
     }
@@ -294,6 +300,75 @@ public class FiniteBitField extends BitField implements IrStreamItem {
         }
 
         IrpUtils.exiting(logger, "recognize", payload);
+    }
+
+    @Override
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+     BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
+        int chunkSize = bitSpec.getChunkSize();
+        long payload = 0L;
+        int numWidth = (int) width.toNumber(recognizeData.toNameEngine());
+        BitwiseParameter danglingData = recognizeData.getDanglingBitFieldData();
+        if (!danglingData.isEmpty()) {
+            payload = danglingData.getValue();
+            numWidth -= Long.bitCount(danglingData.getBitmask());
+            recognizeData.setDanglingBitFieldData();
+        }
+        int rest = numWidth % chunkSize;
+        int noChunks = rest == 0 ? numWidth/chunkSize : numWidth/chunkSize + 1;
+
+        for (int chunk = 0; chunk < noChunks; chunk++) {
+            RecognizeData inData = null;
+            int bareIrStreamNo;
+            for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
+                inData = recognizeData.clone();
+                List<BitSpec> poppedStack = new ArrayList<>(bitSpecStack);
+                poppedStack.remove(poppedStack.size()-1);
+
+                try {
+                    bitSpec.get(bareIrStreamNo).decode(inData, poppedStack);
+                    // match!
+                    break;
+                } catch (IrpSignalParseException ex) {
+                    // No match
+                }
+            }
+            assert(inData != null);
+
+            if (bareIrStreamNo == bitSpec.size())
+                throw new IrpSignalParseException("FiniteBitField did not parse");
+
+            recognizeData.setPosition(inData.getPosition());
+            recognizeData.setHasConsumed(inData.getHasConsumed());
+            payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
+        }
+
+        if (rest != 0) {
+            // this has been tested only with bitorder = msb.
+            int bitsToStore = chunkSize - rest;
+            int bitmask = IrCoreUtils.ones(bitsToStore);
+            recognizeData.setDanglingBitFieldData(payload, bitmask);
+            payload >>= bitsToStore;
+        }
+        if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
+            payload = IrCoreUtils.reverse(payload, noChunks);
+        if (this.complement)
+            payload = ~payload;
+        payload <<= (int) chop.toNumber(recognizeData.toNameEngine());
+        long bitmask = IrCoreUtils.ones(width.toNumber(recognizeData.toNameEngine())) << chop.toNumber(recognizeData.toNameEngine());
+        payload &= bitmask;
+        Name name = data.toName();
+        if (name != null) {
+            logger.log(Level.FINE, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(), payload, bitmask});
+            if (data.isUnary())
+                recognizeData.add(name.toString(), payload, bitmask);
+            else
+                recognizeData.add(name.toString(), data.invert(payload));
+        } else {
+            long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
+            if (expected != payload)
+                throw new IrpSignalParseException("FiniteBitField did not evaluated to expected value");//return false;
+        }
     }
 
     @Override

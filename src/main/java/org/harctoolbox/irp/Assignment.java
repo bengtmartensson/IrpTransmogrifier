@@ -120,6 +120,11 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
+
+    }
+
+    @Override
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
         return IrpUtils.mkIrStreamItemList(this);
     }
@@ -151,6 +156,11 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException {
         if (recognizeData.getState() == pass)
             recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+    }
+
+    @Override
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+        recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
     }
 
     @Override

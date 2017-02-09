@@ -140,6 +140,14 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+        Pass pass = null;
+        recognizeData.preprocess(this, pass, bitSpecs);
+        select(pass).decode(recognizeData, bitSpecs);
+        recognizeData.postprocess(this, pass, bitSpecs);
+    }
+
+    @Override
     public void traverse(Traverser recognizeData, Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
         recognizeData.preprocess(this, pass, bitSpecs);
         select(pass).traverse(recognizeData, pass, bitSpecs);
@@ -243,6 +251,11 @@ public class Variation extends IrpObject implements IrStreamItem {
 
     @Override
     public void render(RenderData renderData, List<BitSpec> bitSpecs) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

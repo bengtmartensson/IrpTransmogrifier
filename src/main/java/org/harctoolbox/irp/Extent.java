@@ -79,6 +79,24 @@ public class Extent extends Duration {
     }
 
     @Override
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+        //recognizeData.postprocess(this, null, bitSpecStack);
+//        if (!recognizeData.check(isOn())) {
+//            IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
+//            throw new IrpSignalParseException("Found flash when gap expected, or vice versa");
+//        }
+//        double actual = recognizeData.get();
+//        double wanted = toFloat(recognizeData.getGeneralSpec(), recognizeData.toNameEngine());
+//        //boolean success =
+//        recognize(recognizeData, actual, wanted);
+
+        double physical = recognizeData.getExtentDuration();
+        double theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null);
+        recognizeData.markExtentStart();
+        recognize(recognizeData, physical, theoretical);
+    }
+
+    @Override
     protected boolean isOn() {
         return false;
     }

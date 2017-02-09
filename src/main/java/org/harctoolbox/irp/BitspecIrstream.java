@@ -174,6 +174,11 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public List<IrStreamItem> extractPass(Pass pass, Pass state) {
+        return irStream.extractPass(pass, state);
+    }
+
+    @Override
     public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecsUnused) {
         boolean flashGapBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.gap, true);
         boolean gapFlashBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.flash, false);
@@ -287,6 +292,11 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     public IrStream getIrStream() {
         return irStream;
     }
+
+    public BareIrStream extractPass(IrSignal.Pass pass) {
+        return new BareIrStream(getIrStream().extractPass(pass, IrSignal.Pass.intro));
+    }
+
 
     @Override
     public Set<String> assignmentVariables() {

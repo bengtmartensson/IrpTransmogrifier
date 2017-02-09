@@ -278,6 +278,34 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    @SuppressWarnings("AssignmentToMethodParameter")
+    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+        List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());
+        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat()) {
+            IrpUtils.exiting(logger, "traverse " + pass, "pass (since variation with intro equals repeat)");
+            return list;
+        }
+
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
+
+            if (newState != null)
+                state = newState;
+
+            if (state == pass || pass == null)
+                list.addAll(irStreamItem.extractPass(pass, state));
+
+            IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
+            if (next != null)
+                state = next;
+
+            if (next == IrSignal.Pass.finish)
+                break;
+        }
+        return list;
+    }
+
+    @Override
     public Integer numberOfDurations(IrSignal.Pass pass) {
         if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat())
             return 0;

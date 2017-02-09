@@ -194,6 +194,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
+    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+        return IrpUtils.mkIrStreamItemList(this);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("unit", unit);

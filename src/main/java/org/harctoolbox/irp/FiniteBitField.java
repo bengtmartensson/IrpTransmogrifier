@@ -188,6 +188,11 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
+    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+        return IrpUtils.mkIrStreamItemList(this);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("reverse", Boolean.toString(reverse));

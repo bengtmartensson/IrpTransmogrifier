@@ -113,6 +113,11 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
+    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+        return IrpUtils.mkIrStreamItemList(this);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.appendChild(name.toElement(document));

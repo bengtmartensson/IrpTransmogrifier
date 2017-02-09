@@ -71,6 +71,7 @@ public interface IrStreamItem extends XmlExport {
 
     /**
      * Upper limit of the number of (interleaving) durations in the rendered signal.
+     * @param pass
      * @return
      */
     public abstract Integer numberOfDurations(IrSignal.Pass pass);
@@ -111,4 +112,6 @@ public interface IrStreamItem extends XmlExport {
     public int numberOfInfiniteRepeats();
 
     public int weight();
+
+    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state);
 }

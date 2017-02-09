@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
@@ -191,6 +190,15 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
             bareIrStream.traverse(traverseData, pass, bitSpecs);
         traverseData.postprocess(this, pass, bitSpecs);
         IrpUtils.exiting(logger, "traverse " + pass);
+    }
+
+    @Override
+    public List<IrStreamItem> extractPass(Pass pass, Pass state) {
+        List<IrStreamItem> list = new ArrayList<>(8);
+        int repetitions = numberRepetitions(pass);
+        for (int i = 0; i < repetitions; i++)
+            list.addAll(bareIrStream.extractPass(pass, state));
+        return list;
     }
 
     @Override

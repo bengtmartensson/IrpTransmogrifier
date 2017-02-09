@@ -318,6 +318,9 @@ public class IrpTransmogrifier {
             if (commandList.irp)
                 out.print(SEPARATOR + irpDatabase.getIrp(protocolName));
 
+            if (commandList.normalForm)
+                out.print(SEPARATOR + irpDatabase.getNormalFormIrp(protocolName));
+
             if (commandList.documentation)
                 out.print(SEPARATOR + irpDatabase.getDocumentation(protocolName));
 
@@ -773,6 +776,9 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-c", "--classify"}, description = "Classify the protocols")
         private boolean classify = false;
 
+        @Parameter(names = { "--documentation"}, description = "List documentation")
+        private boolean documentation = false;
+
         @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
         private boolean gui = false;
 
@@ -782,8 +788,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "--is"}, description = "test toIrpString")
         private boolean is = false;
 
-        @Parameter(names = { "--documentation"}, description = "List documentation")
-        private boolean documentation = false;
+        @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List normal form")
+        private boolean normalForm = false;
 
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;

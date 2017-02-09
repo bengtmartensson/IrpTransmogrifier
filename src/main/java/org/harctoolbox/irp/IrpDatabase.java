@@ -424,6 +424,11 @@ public class IrpDatabase {
         return new Protocol(getIrp(protocolName));
     }
 
+    public String getNormalFormIrp(String protocolName) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {
+        Protocol protocol = getProtocol(protocolName);
+        return protocol.normalFormIrpString();
+    }
+
     private static class UnparsedProtocol {
         public static final int APRIORI_SIZE = 4;
 

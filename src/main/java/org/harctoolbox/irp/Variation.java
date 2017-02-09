@@ -32,9 +32,9 @@ public class Variation extends IrpObject implements IrStreamItem {
         return bareIrStream == null ? 0 : bareIrStream.numberOfInfiniteRepeats();
     }
 
-    private BareIrStream intro;
-    private BareIrStream repeat;
-    private BareIrStream ending;
+    private final BareIrStream intro;
+    private final BareIrStream repeat;
+    private final BareIrStream ending;
     private final IrpParser.VariationContext parseTree;
 
     public Variation(String str) {
@@ -48,6 +48,13 @@ public class Variation extends IrpObject implements IrStreamItem {
         ending = variation.alternative().size() > 2 ? new BareIrStream(variation.alternative(2).bare_irstream()) : new BareIrStream();
     }
 
+    public Variation(BareIrStream intro, BareIrStream repeat, BareIrStream ending) {
+        this.intro = intro;
+        this.repeat = repeat;
+        this.ending = ending;
+        parseTree = null;
+    }
+
     @Override
     public boolean isEmpty(NameEngine nameEngine) {
         return intro.isEmpty(nameEngine) && repeat.isEmpty(nameEngine) && (ending == null || ending.isEmpty(nameEngine));
@@ -58,10 +65,22 @@ public class Variation extends IrpObject implements IrStreamItem {
 
     }
 
-    private BareIrStream select(IrSignal.Pass pass) {
-        return pass == Pass.intro ? intro
-                : pass == Pass.repeat ? repeat
-                : ending;
+    public BareIrStream select(IrSignal.Pass pass) {
+        BareIrStream result;
+        switch (pass) {
+            case intro:
+                result = intro;
+                break;
+            case repeat:
+                result = repeat;
+                break;
+            case ending:
+                result = ending;
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        return result;
     }
 
     @Override
@@ -130,6 +149,11 @@ public class Variation extends IrpObject implements IrStreamItem {
         recognizeData.preprocess(this, pass, bitSpecs);
         select(pass).traverse(recognizeData, pass, bitSpecs);
         recognizeData.postprocess(this, pass, bitSpecs);
+    }
+
+    @Override
+    public List<IrStreamItem> extractPass(Pass pass, Pass state) {
+        return select(pass).extractPass(pass, state);
     }
 
     @Override

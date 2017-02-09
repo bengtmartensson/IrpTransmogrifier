@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -369,6 +371,12 @@ public class IrpUtils {
 
     public static void exiting(Logger logger, String member) {
         exiting(logger, member, "<-");
+    }
+
+    static List<IrStreamItem> mkIrStreamItemList(IrStreamItem irStreamItem) {
+        List<IrStreamItem> list = new ArrayList<>(1);
+        list.add(irStreamItem);
+        return list;
     }
 
     private IrpUtils() {

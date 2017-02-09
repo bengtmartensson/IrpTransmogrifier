@@ -47,6 +47,7 @@ public class Protocol extends IrpObject {
     private GeneralSpec generalSpec;
     private ParameterSpecs parameterSpecs;
     private BitspecIrstream bitspecIrstream;
+    private Variation normalFormVariation;
     private IrpParser.ProtocolContext parseTree;
     private ParserDriver parseDriver;
     private NameEngine definitions;
@@ -61,7 +62,8 @@ public class Protocol extends IrpObject {
         this.generalSpec = generalSpec;
         this.bitspecIrstream = bitspecIrstream;
         this.definitions = definitions;
-        this.parameterSpecs = parameterSpecs != null ? parameterSpecs : new ParameterSpecs() ;
+        this.parameterSpecs = parameterSpecs != null ? parameterSpecs : new ParameterSpecs();
+        computeNormalForm();
     }
 
     /**
@@ -113,6 +115,13 @@ public class Protocol extends IrpObject {
         checkSanity();
     }
 
+    private void computeNormalForm() {
+        BareIrStream intro  = bitspecIrstream.extractPass(IrSignal.Pass.intro);
+        BareIrStream repeat = bitspecIrstream.extractPass(IrSignal.Pass.repeat);
+        BareIrStream ending = bitspecIrstream.extractPass(IrSignal.Pass.ending);
+        normalFormVariation = new Variation(intro, repeat, ending);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Protocol))
@@ -151,6 +160,27 @@ public class Protocol extends IrpObject {
 
     public IrpParser.ProtocolContext getParseTree() {
         return parseTree;
+    }
+
+    public Protocol normalFormProtocol() {
+        return mkProtocol(normalFormVariation);
+    }
+
+    public Protocol normalForm(IrSignal.Pass pass) {
+        return mkProtocol(normalFormVariation.select(pass));
+    }
+
+    private Protocol mkProtocol(IrStreamItem irStreamItem) {
+        List<IrStreamItem> list = new ArrayList<>(1);
+        list.add(irStreamItem);
+        IrStream irStream = new IrStream(list);
+        BitspecIrstream normalBitspecIrstream = new BitspecIrstream(bitspecIrstream.getBitSpec(), irStream);
+        return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, parseTree);
+    }
+
+    public String normalFormIrpString() {
+        Protocol normal = normalFormProtocol();
+        return normal.toIrpString();
     }
 
     /**

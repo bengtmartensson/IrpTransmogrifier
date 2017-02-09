@@ -17,9 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.List;
 import org.harctoolbox.ircore.IrSequence;
-import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class RecognizeData extends Traverser implements Cloneable {
@@ -37,12 +35,12 @@ public class RecognizeData extends Traverser implements Cloneable {
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
             double absoulteTolerance, double relativeTolerance) {
-        this(generalSpec, definitions, irSequence, 0, IrSignal.Pass.intro, nameMap, interleaving, absoulteTolerance, relativeTolerance);
+        this(generalSpec, definitions, irSequence, 0, nameMap, interleaving, absoulteTolerance, relativeTolerance);
     }
 
-    private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/, IrSignal.Pass state,
+    private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/,
             ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance) {
-        super(state, generalSpec, definitions);
+        super(generalSpec, definitions);
         danglingBitFieldData = new BitwiseParameter();
         this.position = position;
         this.hasConsumed = 0.0;
@@ -253,14 +251,5 @@ public class RecognizeData extends Traverser implements Cloneable {
     @Override
     public boolean isFinished() {
         return position == irSequence.getLength();
-    }
-
-    @Override
-    public void preprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
-    }
-
-    @Override
-    public void postprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
-        item.recognize(this, pass, bitSpecs);
     }
 }

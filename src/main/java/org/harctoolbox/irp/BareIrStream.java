@@ -123,8 +123,6 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
 
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
         RenderData renderData = new RenderData(generalSpec, nameEngine);
-        renderData.setState(state);
-        //traverse(renderData, pass, new ArrayList<>(0));
         evaluate(renderData, new ArrayList<>(0));
         return renderData.getEvaluatedIrStream();
     }
@@ -246,81 +244,16 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-    }
-
-    @Override
-    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecStack) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-        IrpUtils.entering(logger, "traverse " + pass, this);
-        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat()) {
-            IrpUtils.exiting(logger, "traverse " + pass, "pass (since variation with intro equals repeat)");
-            return;
-        }
-
-        recognizeData.preprocess(this, pass, bitSpecStack);
-        for (int itemNr = 0; itemNr < irStreamItems.size(); itemNr++) {
-            IrStreamItem irStreamItem = irStreamItems.get(itemNr);
-            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
-            if (newState != null)
-                recognizeData.setState(newState);
-
-            if (recognizeData.getState() == pass)
-                irStreamItem.traverse(recognizeData, pass, bitSpecStack);
-
-            IrSignal.Pass next = irStreamItem.stateWhenExiting(recognizeData.getState());
-            if (next != null)
-                recognizeData.setState(next);
-
-            if (next == IrSignal.Pass.finish)
-                break;
-        }
-        recognizeData.postprocess(this, pass, bitSpecStack);
-        IrpUtils.exiting(logger, "traverse " + pass, "pass");
-    }
-
-    @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
         IrSignal.Pass pass = null;
-        recognizeData.preprocess(this, pass, bitSpecStack);
-        for (IrStreamItem irStreamItem : irStreamItems) {
-//            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
-//            if (newState != null)
-//                recognizeData.setState(newState);
-//
-//            if (recognizeData.getState() == pass)
+        for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.decode(recognizeData, bitSpecStack);
-//
-//            IrSignal.Pass next = irStreamItem.stateWhenExiting(recognizeData.getState());
-//            if (next != null)
-//                recognizeData.setState(next);
-//
-//            if (next == IrSignal.Pass.finish)
-//                break;
-        }
-        recognizeData.postprocess(this, pass, bitSpecStack);
     }
 
     @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
-        IrSignal.Pass pass = null;
-        renderData.preprocess(this, pass, bitSpecStack);
-        for (IrStreamItem irStreamItem : irStreamItems) {
-//            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
-//            if (newState != null)
-//                renderData.setState(newState);
-//
-//            if (renderData.getState() == pass)
-                irStreamItem.evaluate(renderData, bitSpecStack);
-
-//            IrSignal.Pass next = irStreamItem.stateWhenExiting(renderData.getState());
-//            if (next != null)
-//                renderData.setState(next);
-//
-//            if (next == IrSignal.Pass.finish)
-//                break;
-        }
-        renderData.postprocess(this, pass, bitSpecStack);
-        //return renderData.getEvaluatedIrStream();
+        for (IrStreamItem irStreamItem : irStreamItems)
+            irStreamItem.evaluate(renderData, bitSpecStack);
     }
 
     @Override
@@ -379,7 +312,6 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
             if (next == IrSignal.Pass.finish)
                 break;
         }
-        //recognizeData.postprocess(this, pass, bitSpecStack);
         return sum;
     }
 
@@ -483,20 +415,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
-    }
-
-    @Override
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return null;
     }
-
-//    @Override
-//    public void propertiesMap(PropertiesMapData propertiesMapData, GeneralSpec generalSpec) {
-//        List<Map<String, Object>> items = propertiesMapData.getList();
-//        HashMap<String, Object> map = new HashMap<>(3);
-//        map.put("kind", getClass().getSimpleName());
-//        map.put("items", items);
-//        propertiesMapData.load(map);
-//    }
 }

@@ -17,37 +17,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.List;
-import org.harctoolbox.ircore.IrSignal;
-
 public abstract class Traverser {
 
-    private IrSignal.Pass state;
     private final GeneralSpec generalSpec;
     private final NameEngine nameEngine;
 
-    protected Traverser(IrSignal.Pass state, GeneralSpec generalSpec, NameEngine nameEngine) {
-        this.state = state;
+    protected Traverser(GeneralSpec generalSpec, NameEngine nameEngine) {
         this.nameEngine = nameEngine;
         this.generalSpec = generalSpec;
-    }
-
-    public abstract void preprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException;
-
-    public abstract void postprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException;
-
-    /**
-     * @return the state
-     */
-    public IrSignal.Pass getState() {
-        return state;
-    }
-
-    /**
-     * @param state the state to set
-     */
-    public void setState(IrSignal.Pass state) {
-        this.state = state;
     }
 
     boolean isFinished() {

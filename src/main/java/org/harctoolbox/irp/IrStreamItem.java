@@ -84,19 +84,7 @@ public interface IrStreamItem extends XmlExport {
 
     abstract ParserRuleContext getParseTree();
 
-    public abstract void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException;
-
-    void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs);
-
-    public abstract void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
-
     public abstract void render(RenderData renderData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
-
-    //public abstract void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException;
-
-    public abstract void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException;
-
-    //public abstract void propertiesMap(PropertiesMapData propertiesMapData, GeneralSpec generalSpec);
 
     public abstract boolean hasExtent();
 
@@ -105,9 +93,6 @@ public interface IrStreamItem extends XmlExport {
     public abstract Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine);
 
     public Map<String, Object> propertiesMap(int noProperites);
-//    {
-//        return IrpUtils.propertiesMap(noProperites, this);
-//    }
 
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine);
 

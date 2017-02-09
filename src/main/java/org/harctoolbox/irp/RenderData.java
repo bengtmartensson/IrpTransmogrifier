@@ -27,7 +27,7 @@ public class RenderData extends Traverser {
     private final List<EvaluatedIrStream> evaluatedIrStreamList;
 
     public RenderData(GeneralSpec generalSpec, NameEngine nameEngine) {
-        super(IrSignal.Pass.intro, generalSpec, nameEngine);
+        super(generalSpec, nameEngine);
         evaluatedIrStreamList = new ArrayList<>(2);
         push();
     }
@@ -69,16 +69,6 @@ public class RenderData extends Traverser {
 
     void reduce(BitSpec bitStream) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
         currentEvaluatedIrStream().reduce(bitStream);
-    }
-
-    @Override
-    public void preprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-        //item.prerender(this, pass, bitSpecs);
-    }
-
-    @Override
-    public void postprocess(IrStreamItem item, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-        //item.render(this, pass, bitSpecs);
     }
 
     EvaluatedIrStream getEvaluatedIrStream() {

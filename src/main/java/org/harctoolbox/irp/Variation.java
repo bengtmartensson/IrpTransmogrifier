@@ -24,6 +24,7 @@ import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -135,23 +136,8 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) {
-        select(pass).recognize(recognizeData, pass, bitSpecs);
-    }
-
-    @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-        Pass pass = null;
-        recognizeData.preprocess(this, pass, bitSpecs);
-        select(pass).decode(recognizeData, bitSpecs);
-        recognizeData.postprocess(this, pass, bitSpecs);
-    }
-
-    @Override
-    public void traverse(Traverser recognizeData, Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-        recognizeData.preprocess(this, pass, bitSpecs);
-        select(pass).traverse(recognizeData, pass, bitSpecs);
-        recognizeData.postprocess(this, pass, bitSpecs);
+        throw new ThisCannotHappenException("decode cannot be called on a protocol with variation.");
     }
 
     @Override
@@ -246,16 +232,12 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-    }
-
-    @Override
     public void render(RenderData renderData, List<BitSpec> bitSpecs) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new ThisCannotHappenException();
     }
 
     @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new ThisCannotHappenException();
     }
 }

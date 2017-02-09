@@ -100,13 +100,6 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
-        NameEngine nameEngine = renderData.getNameEngine();
-        long val = value.toNumber(nameEngine);
-        nameEngine.define(name, val);
-    }
-
-    @Override
     public void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException {
         NameEngine nameEngine = renderData.getNameEngine();
         long val = value.toNumber(nameEngine);
@@ -114,14 +107,7 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-        //recognizeData.preprocess(this, pass, bitSpecs);
-        recognizeData.postprocess(this, pass, bitSpecs);
-    }
-
-    @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
-
     }
 
     @Override
@@ -150,12 +136,6 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     @Override
     public ParserRuleContext getParseTree() {
         return parseTree;
-    }
-
-    @Override
-    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException {
-        if (recognizeData.getState() == pass)
-            recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
     }
 
     @Override

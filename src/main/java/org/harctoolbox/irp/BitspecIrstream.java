@@ -141,41 +141,11 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs)
-            throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException {
-        IrpUtils.entering(logger, "recognize " + pass, this);
-        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
-        stack.add(bitSpec);
-        irStream.recognize(recognizeData, pass, stack);
-        IrpUtils.exiting(logger, "recognize " + pass);
-    }
-
-    @Override
-    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-        BitSpec lastBitSpec = bitSpecs.get(bitSpecs.size() - 1);
-        renderData.reduce(lastBitSpec);
-        renderData.pop();
-    }
-
-    @Override
-    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> inheritedBitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-        IrpUtils.entering(logger, "traverse " + pass, this);
-        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
-        stack.add(bitSpec);
-        recognizeData.preprocess(this, pass, inheritedBitSpecs);
-        irStream.traverse(recognizeData, pass, stack);
-        recognizeData.postprocess(this, pass, stack);
-        IrpUtils.exiting(logger, "traverse " + pass);
-    }
-
-    @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> inheritedBitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         IrSignal.Pass pass = null;
-        recognizeData.preprocess(this, pass, inheritedBitSpecs);
         irStream.decode(recognizeData, stack);
-        recognizeData.postprocess(this, pass, stack);
     }
 
     @Override

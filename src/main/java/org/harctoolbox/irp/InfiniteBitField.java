@@ -87,46 +87,6 @@ public class InfiniteBitField extends BitField {
         return element;
     }
 
-//    @Override
-//    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-//        throw new UnsupportedOperationException("Not supported.");
-//    }
-//
-//    @Override
-//    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-//        throw new ThisCannotHappenException("Not supported.");
-//    }
-//
-//    @Override
-//    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
-//        throw new UnsupportedOperationException("Not supported.");
-//    }
-//
-//    @Override
-//    public boolean interleavingOk(NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-//        throw new UnsupportedOperationException("Not supported.");
-//    }
-//
-//    @Override
-//    public boolean interleavingOk(DurationType toCheck, NameEngine nameEngine, GeneralSpec generalSpec, DurationType last, boolean gapFlashBitSpecs) {
-//        throw new UnsupportedOperationException("Not supported.");
-//    }
-//
-//    @Override
-//    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
-//        throw new UnsupportedOperationException("Not supported.");
-//    }
-//
-//    @Override
-//    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
-//        throw new UnsupportedOperationException("Not supported.");
-//    }
-//
-//    @Override
-//    public Set<String> assignmentVariables() {
-//        return new HashSet<>(0);
-//    }
-
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         //Map<String, Object> map = propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);

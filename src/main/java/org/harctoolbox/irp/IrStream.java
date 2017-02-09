@@ -188,28 +188,9 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public void traverse(Traverser traverseData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
-        IrpUtils.entering(logger, "traverse " + pass, this);
-        traverseData.preprocess(this, pass, bitSpecs);
-        if (evaluateTheRepeat(pass))
-            traverseData.setState(IrSignal.Pass.repeat);
-        int repetitions = numberRepetitions(pass);
-        for (int i = 0; i < repetitions; i++)
-            bareIrStream.traverse(traverseData, pass, bitSpecs);
-        traverseData.postprocess(this, pass, bitSpecs);
-        IrpUtils.exiting(logger, "traverse " + pass);
-    }
-
-    @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
         Pass pass = null;
-        recognizeData.preprocess(this, pass, bitSpecs);
-////        if (evaluateTheRepeat(pass))
-////            recognizeData.setState(IrSignal.Pass.repeat);
-////        int repetitions = numberRepetitions(pass);
-////        for (int i = 0; i < repetitions; i++)
         bareIrStream.decode(recognizeData, bitSpecs);
-        recognizeData.postprocess(this, pass, bitSpecs);
     }
 
     @Override
@@ -319,16 +300,8 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public void recognize(RecognizeData recognizeData, Pass pass, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, InvalidNameException, UnassignedException, IrpSemanticException {
-    }
-
-    @Override
-    public void render(RenderData renderData, Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-    }
-
-    @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

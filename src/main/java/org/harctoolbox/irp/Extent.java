@@ -18,9 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This class implements Extents as per Chapter 4.
@@ -69,27 +67,7 @@ public class Extent extends Duration {
     }
 
     @Override
-    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, IrpSemanticException, IrpSignalParseException {
-        IrpUtils.entering(logger, Level.FINEST, "recognize", this);
-        double physical = recognizeData.getExtentDuration();
-        double theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null);
-        recognizeData.markExtentStart();
-        recognize(recognizeData, physical, theoretical);
-        //IrpUtils.exiting(logger, Level.FINEST, "recognize", "%s; expected: %8.1f, was: %8.1f", success ? "pass" : "fail", theoretical, physical);
-    }
-
-    @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-        //recognizeData.postprocess(this, null, bitSpecStack);
-//        if (!recognizeData.check(isOn())) {
-//            IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
-//            throw new IrpSignalParseException("Found flash when gap expected, or vice versa");
-//        }
-//        double actual = recognizeData.get();
-//        double wanted = toFloat(recognizeData.getGeneralSpec(), recognizeData.toNameEngine());
-//        //boolean success =
-//        recognize(recognizeData, actual, wanted);
-
         double physical = recognizeData.getExtentDuration();
         double theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null);
         recognizeData.markExtentStart();

@@ -455,15 +455,6 @@ public class Protocol extends IrpObject {
         checkDomain(names);
     }
 
-    public void traverse(Traverser recognizeData, IrSignal.Pass pass) throws NameConflictException, InvalidNameException, IrpSemanticException, UnassignedException, IrpSignalParseException {
-        IrpUtils.entering(logger, "traverse " + pass, this);
-        bitspecIrstream.traverse(recognizeData, pass, new ArrayList<>(0));
-        if (!recognizeData.isFinished())
-            throw new IrpSignalParseException("IrSequence not fully matched");
-
-        IrpUtils.exiting(logger, "traverse " + pass);
-    }
-
     public void decode(RecognizeData recognizeData) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
         bitspecIrstream.decode(recognizeData, new ArrayList<>(0));
         if (!recognizeData.isFinished())

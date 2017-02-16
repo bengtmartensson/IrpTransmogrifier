@@ -134,7 +134,6 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         if (repeatMarker.getMax() != 1)
             element.setAttribute("repeatMax", repeatMarker.isInfinite() ? "infinite" : Integer.toString(repeatMarker.getMax()));
         element.setAttribute("isRepeat", Boolean.toString(isRepeatSequence()));
-        element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
 //        Integer n = numberOfBits();
 //        if (n != null)
 //                element.setAttribute("numberOfBits", Integer.toString(n));
@@ -146,11 +145,6 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         if (!repeatMarker.isTrivial())
             element.appendChild(repeatMarker.toElement(document));
 
-        return element;
-    }
-
-    public Element toElement(Document document, Pass pass) {
-        Element element = bareIrStream.toElement(document);
         return element;
     }
 

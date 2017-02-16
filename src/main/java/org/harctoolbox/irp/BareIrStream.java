@@ -207,6 +207,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         Integer nob = numberOfBits();
         if (nob != null)
             element.setAttribute("numberOfBits", Integer.toString(nob));
+        element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
         this.irStreamItems.forEach((item) -> {
             element.appendChild(item.toElement(document));
         });

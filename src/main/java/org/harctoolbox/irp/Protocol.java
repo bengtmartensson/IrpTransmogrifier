@@ -171,6 +171,9 @@ public class Protocol extends IrpObject {
     public Protocol normalForm(IrSignal.Pass pass) {
         return mkProtocol(normalFormVariation.select(pass));
     }
+    public BareIrStream normalBareIrStream(IrSignal.Pass pass) {
+        return normalFormVariation.select(pass);
+    }
 
     private Protocol mkProtocol(BareIrStream bareIrStream) {
         IrStream irStream = new IrStream(bareIrStream);
@@ -362,10 +365,6 @@ public class Protocol extends IrpObject {
 
     @Override
     public Element toElement(Document document) {
-        return toElement(document, false);
-    }
-
-    public Element toElement(Document document, boolean split) {
         Element root = super.toElement(document);
         Element renderer = document.createElement(Protocol.class.getSimpleName());
         root.appendChild(renderer);
@@ -385,12 +384,21 @@ public class Protocol extends IrpObject {
         XmlUtils.addBooleanAttributeIfTrue(renderer, "rplus", isRPlus());
         Element generalSpecElement = generalSpec.toElement(document);
         renderer.appendChild(generalSpecElement);
-        Element bitspecIrstreamElement = bitspecIrstream.toElement(document, split);
+        Element bitspecIrstreamElement = bitspecIrstream.toElement(document);
+        bitspecIrstreamElement.appendChild(normalFormElement(document));
         renderer.appendChild(bitspecIrstreamElement);
         Element definitionsElement = definitions.toElement(document);
         renderer.appendChild(definitionsElement);
         renderer.appendChild(parameterSpecs.toElement(document));
         return root;
+    }
+
+    public Element normalFormElement(Document document) {
+        Element element = document.createElement("NormalForm");
+        element.appendChild(normalBareIrStream(Pass.intro).toElement(document, "Intro"));
+        element.appendChild(normalBareIrStream(Pass.repeat).toElement(document, "Repeat"));
+        element.appendChild(normalBareIrStream(Pass.ending).toElement(document, "Ending"));
+        return element;
     }
 
     @Override

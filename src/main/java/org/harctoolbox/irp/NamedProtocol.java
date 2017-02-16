@@ -168,23 +168,14 @@ public class NamedProtocol extends Protocol {
 
     @Override
     public Document toDocument() {
-        return toDocument(false);
-    }
-
-    public Document toDocument(boolean split) {
         Document document = XmlUtils.newDocument();
-        document.appendChild(toElement(document, split));
+        document.appendChild(toElement(document));
         return document;
     }
 
     @Override
     public Element toElement(Document document) {
-        return toElement(document, false);
-    }
-
-    @Override
-    public Element toElement(Document document, boolean split) {
-        Element root = super.toElement(document, split);
+        Element root = super.toElement(document);
         root.setAttribute("name", getName());
 
         Element docu = document.createElement("Documentation");

@@ -199,7 +199,7 @@ end remote
         </xsl:comment>
     </xsl:template>
 
-    <!-- Protocol with assignments do not fit into Lirc -->
+    <!-- Protocols with assignments do not fit into Lirc -->
     <!--xsl:template match="NamedProtocol[Protocol/BitspecIrstream[@interleavingOk='false']]" priority="9">
         <xsl:comment>
             <xsl:text> Protocol </xsl:text>
@@ -227,16 +227,16 @@ end remote
     </xsl:template>
 
     <!-- Variations not implemented yet -->
-    <xsl:template match="NamedProtocol[.//Variation]">
+    <!--xsl:template match="NamedProtocol[.//Variation]">
         <xsl:comment>
             <xsl:text> Protocol </xsl:text>
             <xsl:value-of select="@name"/>
             <xsl:text> omitted: Variations not implemented yet </xsl:text>
         </xsl:comment>
-    </xsl:template>
+    </xsl:template-->
 
     <!-- Expressions as bitfields not implemented yet -->
-    <xsl:template match="NamedProtocol[Protocol[not(@standardPwm='true')
+    <xsl:template match="NamedProtocol[Protocol[not(@pwm2='true')
                                                 and not(@pwm4='true')
                                                 and not(@biphase='true')]]" priority="1">
         <xsl:comment>
@@ -247,13 +247,13 @@ end remote
     </xsl:template>
 
     <!-- Expressions as finitely repeating sequences not implemented -->
-    <xsl:template match="NamedProtocol[.//IrStream[number(@repeatMin) > 1]]">
+    <!--xsl:template match="NamedProtocol[.//IrStream[number(@repeatMin) > 1]]">
         <xsl:comment>
             <xsl:text> Protocol </xsl:text>
             <xsl:value-of select="@name"/>
             <xsl:text> omitted: finite repeats in IrSequences not implemented </xsl:text>
         </xsl:comment>
-    </xsl:template>
+    </xsl:template-->
 
     <xsl:template match="Protocol">
         <xsl:text xml:space="preserve">&#10;&#10;</xsl:text>
@@ -270,8 +270,8 @@ end remote
             <axsl:value-of select="../@name"/>
 <axsl:text>
 <xsl:apply-templates select="BitspecIrstream" mode="numberOfBits"/>
-&#9;flags&#9;&#9;<xsl:apply-templates select="@standardPwm"/><xsl:apply-templates select="@biphase"/>
-            <xsl:apply-templates select="BitspecIrstream/*[FiniteBitField][1]/Extent" mode="flags"/>
+&#9;flags&#9;&#9;<xsl:apply-templates select="@pwm2"/><xsl:apply-templates select="@biphase"/>
+            <xsl:apply-templates select="BitspecIrstream/NormalForm/*[FiniteBitField][1]/Extent" mode="flags"/>
 &#9;eps&#9;&#9;<xsl:value-of select="$eps"/>
 &#9;aeps&#9;&#9;<xsl:value-of select="$aeps"/>
 &#9;zero&#9;<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[1]/*"/>
@@ -279,9 +279,9 @@ end remote
 <xsl:apply-templates select="BitspecIrstream" mode="header"/>
 <xsl:apply-templates select="BitspecIrstream" mode="plead"/>
 <xsl:apply-templates select="BitspecIrstream" mode="ptrail"/>
-<xsl:apply-templates select="BitspecIrstream[Intro/*]/Repeat" mode="repeatFlag"/>
+<xsl:apply-templates select="BitspecIrstream[NormalForm/Intro/*]/NormalForm/Repeat" mode="repeatFlag"/>
 <xsl:apply-templates select="BitspecIrstream" mode="gapFlag"/>
-<xsl:apply-templates select="BitspecIrstream[../@toggle='true' and */FiniteBitField/Data[.='T']]" mode="toggle_bit"/> <!-- obsolete synonom: repeat_bit -->
+<xsl:apply-templates select="BitspecIrstream[../@toggle='true' and NormalForm/*/FiniteBitField/Data[.='T']]" mode="toggle_bit"/> <!-- obsolete synonom: repeat_bit -->
 &#9;frequency&#9;<xsl:value-of select="GeneralSpec/@frequency"/>
 &#9;begin codes
 </axsl:text>
@@ -300,7 +300,10 @@ end remote
             <axsl:value-of>
                 <xsl:attribute name="select">
                     <xsl:text>exporterutils:processBitFields(</xsl:text>
-                    <xsl:apply-templates select="BitspecIrstream/*/FiniteBitField" mode="inCode"/>
+                    <xsl:apply-templates select="BitspecIrstream/NormalForm/Intro/FiniteBitField" mode="inCode"/>
+                    <xsl:if test="not(BitspecIrstream/NormalForm/Intro/FiniteBitField)">
+                        <xsl:apply-templates select="BitspecIrstream/NormalForm/Repeat/FiniteBitField" mode="inCode"/>
+                    </xsl:if>
                     <xsl:text>)</xsl:text>
                 </xsl:attribute>
             </axsl:value-of>
@@ -308,19 +311,22 @@ end remote
 </axsl:text>
         </axsl:template>
 
-        <xsl:apply-templates select="BitspecIrstream/*[FiniteBitField and ../../ParameterSpecs/ParameterSpec/Default]" mode="withDefaults"/>
-        <xsl:apply-templates select="BitspecIrstream/Intro[FiniteBitField] | BitspecIrstream/Repeat[FiniteBitField]" mode="withoutDefaults"/>
-    </xsl:template>
+        <xsl:apply-templates select="BitspecIrstream/NormalForm/*[FiniteBitField and ../../../ParameterSpecs/ParameterSpec/Default]" mode="withDefaults"/>
+        <xsl:apply-templates select="BitspecIrstream/NormalForm/Intro[FiniteBitField]" mode="withoutDefaults"/>
+        <xsl:if test="not(BitspecIrstream/NormalForm/Intro[*])">
+            <xsl:apply-templates select="BitspecIrstream/NormalForm/Repeat[FiniteBitField]" mode="withoutDefaults"/>
+        </xsl:if>
+   </xsl:template>
 
     <xsl:template match="BitspecIrstream" mode="warnEnding"/>
 
-    <xsl:template match="BitspecIrstream[Ending[*]]" mode="warnEnding">
+    <xsl:template match="BitspecIrstream[NormalForm/Ending[*]]" mode="warnEnding">
         <axsl:text># Warning: Protocol contains ending that cannot be expressed in Lirc&#10;</axsl:text>
     </xsl:template>
 
     <xsl:template match="BitspecIrstream" mode="warnIntroAndRepeat"/>
 
-    <xsl:template match="BitspecIrstream[Intro/FiniteBitField and Repeat/FiniteBitField]" mode="warnIntroAndRepeat">
+    <xsl:template match="BitspecIrstream[NormalForm/Intro/FiniteBitField and NormalForm/Repeat/FiniteBitField]" mode="warnIntroAndRepeat">
         <axsl:text># Warning: Protocol contains repeat elements that cannot be expressed in Lirc&#10;</axsl:text>
     </xsl:template>
 
@@ -329,15 +335,15 @@ end remote
         <axsl:template>
             <xsl:attribute name="match" xml:space="skip">
                 <xsl:text>girr:command[girr:parameters/@protocol='</xsl:text>
-                <xsl:value-of select="lower-case(../../../@name)"/>
+                <xsl:value-of select="lower-case(../../../../@name)"/>
                 <xsl:text>'</xsl:text>
-            <xsl:apply-templates select="../../ParameterSpecs/ParameterSpec[Default]" mode="default-path"/>]</xsl:attribute>
+            <xsl:apply-templates select="../../../ParameterSpecs/ParameterSpec[Default]" mode="default-path"/>]</xsl:attribute>
             <axsl:call-template>
                 <xsl:attribute xml:space="skip" name="name">
                     <xsl:text>command-</xsl:text>
-                    <xsl:value-of xml:space="skip" select="harctoolbox:canonical-name(../../../@name)"/>
+                    <xsl:value-of xml:space="skip" select="harctoolbox:canonical-name(../../../../@name)"/>
                 </xsl:attribute>
-                <xsl:apply-templates select="../../ParameterSpecs/ParameterSpec" mode="inCodeWithoutDefaults"/>
+                <xsl:apply-templates select="../../../ParameterSpecs/ParameterSpec" mode="inCodeWithoutDefaults"/>
             </axsl:call-template>
         </axsl:template>
     </xsl:template>
@@ -345,13 +351,13 @@ end remote
     <xsl:template match="Intro|Repeat" mode="withDefaults">
         <xsl:comment> Version with defaults </xsl:comment>
         <axsl:template>
-            <xsl:attribute name="match">girr:command[girr:parameters/@protocol='<xsl:value-of select="lower-case(../../../@name)"/>']</xsl:attribute>
+            <xsl:attribute name="match">girr:command[girr:parameters/@protocol='<xsl:value-of select="lower-case(../../../../@name)"/>']</xsl:attribute>
             <axsl:call-template>
                 <xsl:attribute xml:space="skip" name="name">
                     <xsl:text>command-</xsl:text>
-                    <xsl:value-of xml:space="skip" select="harctoolbox:canonical-name(../../../@name)"/>
+                    <xsl:value-of xml:space="skip" select="harctoolbox:canonical-name(../../../../@name)"/>
                 </xsl:attribute>
-                <xsl:apply-templates select="../../ParameterSpecs/ParameterSpec" mode="inCodeWithDefaults"/>
+                <xsl:apply-templates select="../../../ParameterSpecs/ParameterSpec" mode="inCodeWithDefaults"/>
             </axsl:call-template>
         </axsl:template>
     </xsl:template>
@@ -509,13 +515,13 @@ end remote
 
     <xsl:template match="BitspecIrstream" mode="numberOfBits">
         <xsl:text xml:space="preserve">&#10;&#9;bits&#9;&#9;</xsl:text>
-        <xsl:value-of select="*[FiniteBitField][1]/@numberOfBits"/>
+        <xsl:value-of select="NormalForm/*[FiniteBitField][1]/@numberOfBits"/>
     </xsl:template>
 
     <xsl:template match="BitspecIrstream" mode="toggle_bit">
         <xsl:text xml:space="preserve">
 &#9;toggle_bit&#9;</xsl:text>
-        <xsl:apply-templates select="*/FiniteBitField[Data/Name[.='T']]" mode="toggle_bit_position"/>
+        <xsl:apply-templates select="NormalForm/*/FiniteBitField[Data/Name[.='T']]" mode="toggle_bit_position"/>
     </xsl:template>
 
     <xsl:template match="FiniteBitField" mode="toggle_bit_position">
@@ -523,9 +529,9 @@ end remote
     </xsl:template>
 
     <xsl:template match="BitspecIrstream" mode="header">
-        <xsl:apply-templates select="Intro[*]" mode="header"/>
-        <xsl:if test="not(Intro[*])">
-            <xsl:apply-templates select="Repeat" mode="header"/>
+        <xsl:apply-templates select="NormalForm/Intro[*]" mode="header"/>
+        <xsl:if test="not(NormalForm/Intro[*])">
+            <xsl:apply-templates select="NormalForm/Repeat" mode="header"/>
         </xsl:if>
     </xsl:template>
 
@@ -540,9 +546,9 @@ end remote
     </xsl:template>
 
     <xsl:template match="BitspecIrstream" mode="plead">
-        <xsl:apply-templates select="Intro" mode="plead"/>
-        <xsl:if test="not(Intro[*])">
-            <xsl:apply-templates select="Repeat" mode="plead"/>
+        <xsl:apply-templates select="NormalForm/Intro" mode="plead"/>
+        <xsl:if test="not(NormalForm/Intro[*])">
+            <xsl:apply-templates select="NormalForm/Repeat" mode="plead"/>
         </xsl:if>
     </xsl:template>
 
@@ -564,7 +570,7 @@ end remote
 
     <xsl:template match="Repeat" mode="repeatFlag"/>
 
-    <xsl:template match="Repeat[*[1][name()='Flash']  and  *[2][name()='Gap']]" mode="repeatFlag">
+    <xsl:template match="Repeat[*[1][name()='Flash']  and  *[2][name()='Gap'] and not(*[name()='FiniteBitField'])]" mode="repeatFlag">
         <xsl:text xml:space="preserve">
 &#9;repeat&#9;</xsl:text>
         <xsl:apply-templates select="Flash[1]"/>
@@ -572,9 +578,9 @@ end remote
     </xsl:template>
 
     <xsl:template match="BitspecIrstream" mode="gapFlag">
-        <xsl:apply-templates select="Intro" mode="gapFlag"/>
-        <xsl:if test="not(Intro[*])">
-            <xsl:apply-templates select="Repeat" mode="gapFlag"/>
+        <xsl:apply-templates select="NormalForm/Intro" mode="gapFlag"/>
+        <xsl:if test="not(NormalForm/Intro[*])">
+            <xsl:apply-templates select="NormalForm/Repeat" mode="gapFlag"/>
         </xsl:if>
     </xsl:template>
 
@@ -583,7 +589,7 @@ end remote
     <xsl:template match="Intro[Extent]|Repeat[Extent]" mode="gapFlag">
         <xsl:text xml:space="preserve">
 &#9;gap&#9;</xsl:text>
-        <xsl:apply-templates select="Extent" mode="gap"/>
+        <xsl:apply-templates select="Extent[1]" mode="gap"/>
     </xsl:template>
 
     <xsl:template match="Intro[*[position()=last()][name()='Gap']]
@@ -594,9 +600,9 @@ end remote
     </xsl:template>
 
     <xsl:template match="BitspecIrstream" mode="ptrail">
-        <xsl:apply-templates select="Intro" mode="ptrail"/>
-        <xsl:if test="not(Intro[*])">
-            <xsl:apply-templates select="Repeat" mode="ptrail"/>
+        <xsl:apply-templates select="NormalForm/Intro" mode="ptrail"/>
+        <xsl:if test="not(NormalForm/Intro[*])">
+            <xsl:apply-templates select="NormalForm/Repeat" mode="ptrail"/>
         </xsl:if>
     </xsl:template>
 
@@ -660,7 +666,7 @@ end remote
         <xsl:apply-templates select="node()"/>
     </xsl:template>
 
-    <xsl:template match="@standardPwm[.='true']">
+    <xsl:template match="@pwm2[.='true']">
         <xsl:text>SPACE_ENC</xsl:text>
     </xsl:template>
 

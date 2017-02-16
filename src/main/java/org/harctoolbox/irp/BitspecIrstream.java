@@ -88,14 +88,11 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     @Override
     public Element toElement(Document document) {
-        return toElement(document, false);
-    }
-
-    public Element toElement(Document document, boolean split) {
         Element root = super.toElement(document);
         root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null)));
         root.appendChild(bitSpec.toElement(document));
-        if (split) {
+        root.appendChild(irStream.toElement(document));
+        /*
             Element intro = document.createElement("Intro");
             root.appendChild(intro);
             intro.appendChild(irStream.toElement(document, Pass.intro));
@@ -105,8 +102,7 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
             Element ending = document.createElement("Ending");
             root.appendChild(ending);
             ending.appendChild(irStream.toElement(document, Pass.ending));
-        } else
-            root.appendChild(irStream.toElement(document));
+            */
         return root;
     }
 

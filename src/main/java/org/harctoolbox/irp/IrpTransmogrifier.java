@@ -377,29 +377,33 @@ public class IrpTransmogrifier {
             if (target.equalsIgnoreCase("xml"))
                 createXmlProtocols(protocolNames, commandLineArgs.encoding);
             else
-                codeST(protocolNames, target, commandCode.directory, commandCode.inspect, assembleParameterMap(commandCode.parameters), commandLineArgs);
+                codeST(protocolNames, target, commandCode, commandLineArgs);
     }
 
-    private void codeST(Collection<String> protocolNames, String target, String directory, boolean inspect, Map<String, String> parameters, CommandLineArgs commandLineArgs) throws IOException, IrpException {
-        if (target.equals("?")) {
-            listTargets(out);
-            return;
-        }
+    private void codeST(Collection<String> protocolNames, String target, CommandCode commandCode, CommandLineArgs commandLineArgs) throws IOException, IrpException, UsageException {
+        if (commandCode.stDir == null || !new File(commandCode.stDir).isDirectory())
+            throw new IOException("stdir must be an existing directory");
+        STCodeGenerator.setStDir(commandCode.stDir);
 
-        STCodeGenerator codeGenerator;
-        try {
-            codeGenerator = new STCodeGenerator(target);
-        } catch (FileNotFoundException ex) {
-            System.err.println("Target " + target + " not available.  Available targets:");
-            listTargets(System.err);
-            return;
+        if (target.equals("?"))
+            listTargets(out);
+        else {
+            STCodeGenerator codeGenerator;
+            try {
+                codeGenerator = new STCodeGenerator(target);
+            } catch (FileNotFoundException ex) {
+                System.err.println("Target " + target + " not available.  Available targets:");
+                listTargets(System.err);
+                return;
+            }
+            Map<String, String> parameters = assembleParameterMap(commandCode.parameters);
+            if (commandCode.directory != null)
+                codeGenerator.generate(protocolNames, irpDatabase, new File(commandCode.directory), commandCode.inspect, parameters,
+                        commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
+            else
+                codeGenerator.generate(protocolNames, irpDatabase, out, commandCode.inspect, parameters,
+                        commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
         }
-        if (directory != null)
-            codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect, parameters,
-                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
-        else
-            codeGenerator.generate(protocolNames, irpDatabase, out, inspect, parameters,
-                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
     }
 
     private void listTargets(PrintStream printStream) throws IOException {
@@ -719,6 +723,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-p", "--parameter" }, variableArity = true, description = "Specify target dependent parameters to the code generators")
         private List<String> parameters = new ArrayList<>(4);
+
+        @Parameter(names = { "-s", "--stdir", "--stdirectory" }, description = "Directory containing st files for code generation")
+        private String stDir = "src/main/st"; // FIXME
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target(s) for code generation. Use ? for a list.")
         private List<String> target = new ArrayList<>(4);

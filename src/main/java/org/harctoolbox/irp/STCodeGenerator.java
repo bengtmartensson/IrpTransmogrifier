@@ -34,7 +34,7 @@ public class STCodeGenerator extends CodeGenerator {
 
     private static final String sTGroupFileExtension = ".stg";
 
-    private static String stDir = "src/main/st";
+    private static String stDir = null;
 
     public static void setStDir(String newStDir) {
         stDir = newStDir;

@@ -721,7 +721,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {       "--inspect" }, description = "Fire up stringtemplate inspector on generated code (if sensible)")
         private boolean inspect = false;
 
-        @Parameter(names = { "-p", "--parameter" }, variableArity = true, description = "Specify target dependent parameters to the code generators")
+        @Parameter(names = { "-p", "--parameter" }, description = "Specify target dependent parameters to the code generators")
         private List<String> parameters = new ArrayList<>(4);
 
         @Parameter(names = { "-s", "--stdir", "--stdirectory" }, description = "Directory containing st files for code generation")

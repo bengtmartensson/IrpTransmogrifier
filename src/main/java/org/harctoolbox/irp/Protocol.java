@@ -19,9 +19,11 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
@@ -40,7 +42,7 @@ import org.w3c.dom.Element;
  * There are too many public functions in the API...
  *
  */
-public class Protocol extends IrpObject {
+public class Protocol extends IrpObject implements AggregateLister {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
@@ -535,5 +537,39 @@ public class Protocol extends IrpObject {
             if (parameterSpec != null)
                 parameterSpec.checkDomain(names.getValue(kvp));
         }
+    }
+
+    @Override
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
+        Map<String, Object> map = new HashMap<>(3);
+        addProperties(map, "generalSpec", getGeneralSpec());
+        addProperties(map, "parameterSpecs", getParameterSpecs());
+        Set<String> variables = getBitspecIrstream().assignmentVariables();
+        Set<String> params = getParameterSpecs().getNames();
+        variables.removeAll(params);
+        map.put("assignmentVariables", variables);
+        addProperties(map, "definitions", getDefinitions());
+        addProperties(map, "bitSpec", getBitspecIrstream().getBitSpec());
+
+        map.put("sonyType", isSonyType());
+        map.put("interleavingOk", interleavingOk());
+        map.put("interleavingFlashOk", interleavingFlashOk());
+        map.put("interleavingGapOk", interleavingGapOk());
+
+        addSequence(map, IrSignal.Pass.intro);
+        addSequence(map, IrSignal.Pass.repeat);
+        addSequence(map, IrSignal.Pass.ending);
+        return map;
+    }
+
+    private void addSequence(Map<String, Object> map, Pass pass) {
+        BareIrStream bareIrSequence = normalBareIrStream(pass);
+        Map<String, Object> propMap = bareIrSequence.topLevelPropertiesMap(generalSpec, definitions, bitspecIrstream.getBitSpec().numberOfDurations());
+        map.put(pass.toString(), propMap);
+    }
+
+    private void addProperties(Map<String, Object> map, String name, AggregateLister listener) {
+        Map<String, Object> props = listener.propertiesMap(generalSpec, definitions);
+        map.put(name, props);
     }
 }

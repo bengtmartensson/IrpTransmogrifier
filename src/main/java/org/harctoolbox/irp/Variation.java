@@ -216,9 +216,8 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        BareIrStream actual = select(pass);
-        return actual.propertiesMap(state, pass, generalSpec, nameEngine);
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override

@@ -230,36 +230,13 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> m = new HashMap<>(3);
-        m.put("intro", propertiesMap(IrSignal.Pass.intro, generalSpec, nameEngine));
-        m.put("repeat", propertiesMap(IrSignal.Pass.repeat, generalSpec, nameEngine));
-        m.put("ending", propertiesMap(IrSignal.Pass.ending, generalSpec, nameEngine));
-        return m;
-    }
-
-    // Top level only, not called recursively
-    private Map<String, Object> propertiesMap(Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> m = new HashMap<>(4);
-        m.put("kind", "FunctionBody");
-        //Map<String, Object> body = null;
-        //propertiesMapData = new PropertiesMapData(pass, generalSpec, nameEngine);
-
-        Pass state = stateWhenEntering(pass) != null ? stateWhenEntering(pass) : IrSignal.Pass.intro;
-        Map<String, Object> body = propertiesMap(state, pass, generalSpec, nameEngine);
-        m.put("irStream", body);
-        m.put("reset", hasExtent());
-        m.put("numberOfDurations", numberOfDurations());
-        return m;
-    }
-
-    @Override
-    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        int repetitions = numberRepetitions(pass);
+        int repetitions = getMinRepeats();//numberRepetitions(pass);
         if (repetitions == 0)
             return new HashMap<>(0);
 
         Map<String, Object> m = new HashMap<>(2);
-        Map<String, Object> body = bareIrStream.propertiesMap(state, pass, generalSpec, nameEngine);
+        Map<String, Object> body = bareIrStream.propertiesMap(generalSpec, nameEngine);
+        @SuppressWarnings("unchecked")
         List<Map<String, Object>> items = (List<Map<String,Object>>) body.get("items");
         m.put("kind", body.get("kind"));
         ArrayList<Map<String, Object>> repeatedList = new ArrayList<>(repetitions*items.size());

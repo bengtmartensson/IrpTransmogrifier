@@ -20,7 +20,6 @@ package org.harctoolbox.irp;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
@@ -192,16 +191,7 @@ public class NamedProtocol extends Protocol {
     ItemCodeGenerator code(CodeGenerator codeGenerator, Map<String, String> parameters, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
         template.addAggregateList("metaData", metaDataPropertiesMap(parameters, absoluteTolerance, relativeTolerance, frequencyTolerance));
-        template.addAggregateList("generalSpec", getGeneralSpec(), getGeneralSpec(), getDefinitions());
-        template.addAggregateList("parameterSpecs", getParameterSpecs(), getGeneralSpec(), getDefinitions());
-        Set<String> variables = getBitspecIrstream().assignmentVariables();
-        Set<String> params = getParameterSpecs().getNames();
-        variables.removeAll(params);
-        template.addAttribute("assignmentVariables", variables);
-        template.addAggregateList("definitions", getDefinitions(), getGeneralSpec(), getDefinitions());
-
-        template.addAggregateList("code", getBitspecIrstream().getIrStream(), getGeneralSpec(), getDefinitions());
-        template.addAggregateList("bitSpec", getBitspecIrstream().getBitSpec(), getGeneralSpec(), getDefinitions());
+        template.addAggregateList("protocol", this, getGeneralSpec(), getDefinitions());
         return template;
     }
 
@@ -211,10 +201,6 @@ public class NamedProtocol extends Protocol {
         map.put("cProtocolName", IrpUtils.toCIdentifier(getName()));
         map.put("irp", getIrp());
         map.put("documentation", IrCoreUtils.javaifyString(getDocumentation()));
-        map.put("sonyType", isSonyType());
-        map.put("interleavingOk", interleavingOk());
-        map.put("interleavingFlashOk", interleavingFlashOk());
-        map.put("interleavingGapOk", interleavingGapOk());
         putParameter(map, "relativeTolerance", userRelativeTolerance, relativeTolerance);
         putParameter(map, "absoluteTolerance", userAbsoluteTolerance, absoluteTolerance);
         putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);

@@ -381,28 +381,27 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return set;
     }
 
-    @Override
-    @SuppressWarnings("AssignmentToMethodParameter")
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-        List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
-        for (IrStreamItem item : irStreamItems) {
-            IrSignal.Pass nextState = item.stateWhenEntering(pass);
-            if (nextState != null)
-                state = nextState;
-            if (pass == null || pass == state) {
-                Map<String, Object> m = item.propertiesMap(state, pass, generalSpec, nameEngine);
-                if (!m.isEmpty()) {
-                    if (m.containsKey("items"))
-                        list.addAll((List<Map<String, Object>>)m.get("items"));
-                    else
-                        list.add(m);
-                }
-            }
+    // Top level only, not called recursively
+    public Map<String, Object> topLevelPropertiesMap(GeneralSpec generalSpec, NameEngine nameEngine, int bitSpecLength) {
+        Map<String, Object> map = new HashMap<>(4);
+        map.put("kind", "FunctionBody");
+        Map<String, Object> body = propertiesMap(generalSpec, nameEngine);
+        map.put("irStream", body);
+        map.put("reset", hasExtent());
+        map.put("numberOfDurations", numberOfDurations(bitSpecLength));
+        return map;
+    }
 
-            nextState = item.stateWhenExiting(state);
-            if (nextState != null)
-                state = nextState;
-        }
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
+        List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
+        irStreamItems.stream().map((item) -> item.propertiesMap(generalSpec, nameEngine)).filter((m) -> (!m.isEmpty())).forEachOrdered((m) -> {
+            if (m.containsKey("items"))
+                list.addAll((List<Map<String, Object>>) m.get("items"));
+            else
+                list.add(m);
+        });
 
         Map<String, Object> result = new HashMap<>(2);
         result.put("kind", getClass().getSimpleName());

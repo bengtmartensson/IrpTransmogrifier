@@ -24,18 +24,8 @@ IsAbstract() ::= "false"
 
 FileSuffix() ::= "Dump.txt"
 
-NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
+NamedProtocol(metaData, protocol) ::= <<
 metaData = <metaData>
 
-generalSpec = <generalSpec>
-
-parameterSpec = <parameterSpecs>
-
-assignmentVariables = <assignmentVariables>
-
-definitions = <definitions>
-
-bitSpec = <bitSpec>
-
-code = <code>
+protocol = <protocol>
 >>

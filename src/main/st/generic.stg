@@ -47,11 +47,11 @@ ProtocolNameComment(protocolName) ::= <<
 >>
 
 TopFunctions() ::= <<
-<TopFunction("Intro", code.intro)>
+<TopFunction("Intro", protocol.intro)>
     
-<TopFunction("Repeat", code.repeat)>
+<TopFunction("Repeat", protocol.repeat)>
     
-<TopFunction("Ending", code.ending)>
+<TopFunction("Ending", protocol.ending)>
 >>
 
 implementationTypes ::= [

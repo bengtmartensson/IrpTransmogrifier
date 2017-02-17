@@ -90,7 +90,7 @@ public interface IrStreamItem extends XmlExport {
 
     public Set<String> assignmentVariables();
 
-    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine);
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine);
 
     public Map<String, Object> propertiesMap(int noProperites);
 

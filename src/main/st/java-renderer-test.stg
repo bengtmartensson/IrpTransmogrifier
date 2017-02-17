@@ -39,7 +39,7 @@ import org.xml.sax.SAXException;
 RendererClassName() ::= "<metaData.cProtocolName>Renderer"
 ClassName() ::= "<RendererClassName()>NGTest"
 
-NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
+NamedProtocol(metaData, protocol) ::= <<
 public class <ClassName()> {
     <ClassBody()>
 }
@@ -62,9 +62,9 @@ public <ClassName()>() throws IOException, SAXException, IrpException {
 >>
 
 DeclareCompute() ::= <<
-private void testNewIrSignalParameters(<parameterSpecs.list:DeclareFormalParameter(); separator=", ">) {
-    Map\<String, Long> map = new HashMap\<>(<length(parameterSpecs.list)>);
-    <parameterSpecs.list:{p|map.put("<p.name>", <p.name>);}; separator="\n">
+private void testNewIrSignalParameters(<protocol.parameterSpecs.list:DeclareFormalParameter(); separator=", ">) {
+    Map\<String, Long> map = new HashMap\<>(<length(protocol.parameterSpecs.list)>);
+    <protocol.parameterSpecs.list:{p|map.put("<p.name>", <p.name>);}; separator="\n">
     testMap(map);
 }
 
@@ -86,8 +86,8 @@ public void testMap(Map\<String, Long> map) {
 @Test(enabled = false)
 public void testNewIrSignalExhaustive() {
     System.out.println("newIrSignalExhaustive");
-    <parameterSpecs.list:{p|for (long <p.name> = <p.min><ImplementationType("parameterTypeSuffix")>; <p.name> \<= <p.max><ImplementationType("parameterTypeSuffix")>; <p.name>++)}; separator="\n">
-        testNewIrSignalParameters(<parameterSpecs.list:{p|<p.name>}; separator=", ">);
+    <protocol.parameterSpecs.list:{p|for (long <p.name> = <p.min><ImplementationType("parameterTypeSuffix")>; <p.name> \<= <p.max><ImplementationType("parameterTypeSuffix")>; <p.name>++)}; separator="\n">
+        testNewIrSignalParameters(<protocol.parameterSpecs.list:{p|<p.name>}; separator=", ">);
 }
 
 /**

@@ -57,7 +57,7 @@ public <ClassName()>() {
 
 DefineNames() ::= <<
 // Local functions; corresponds to Definitions in the IRP.
-<definitions.list:{p|<NameDefinition(p)>}; separator="\n\n">
+<protocol.definitions.list:{p|<NameDefinition(p)>}; separator="\n\n">
 >>
 
 NameDefinition(def) ::= <<
@@ -68,7 +68,7 @@ private <ImplementationType("parameterType")> <def.name>() {
 
 DeclareParameters() ::= <<
 // Parameters as declared in ParameterSpec
-<parameterSpecs.list:{par | <DeclareParameter(par)>;}; separator="\n">
+<protocol.parameterSpecs.list:{par | <DeclareParameter(par)>;}; separator="\n">
 >>
 
 DeclareParameter(parameter) ::= <<
@@ -85,13 +85,13 @@ DeclareFormalParameter(parameter) ::= <<
 
 DeclareAssignmentVariables() ::= <<
 // Internal variables, not declared in ParameterSpec
-<assignmentVariables:DeclareSimpleParameter()>
+<protocol.assignmentVariables:DeclareSimpleParameter()>
 >>
 
 DeclareDutyCycle() ::= <<
 @Override
 public <ImplementationType("dutyCycleType")> getDutyCycle() {
-    return <if (generalSpec.dutyCycle)><generalSpec.dutyCycle><else>-1.0<endif><ImplementationType("dutyCycleTypeSuffix")>;
+    return <if (protocol.generalSpec.dutyCycle)><protocol.generalSpec.dutyCycle><else>-1.0<endif><ImplementationType("dutyCycleTypeSuffix")>;
 }
 >>
 

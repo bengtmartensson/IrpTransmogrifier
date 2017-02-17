@@ -292,7 +292,7 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(Pass state, Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
         throw new UnsupportedOperationException("Hierarchical BitSpecs not implemented yet.");
     }
 

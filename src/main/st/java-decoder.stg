@@ -34,7 +34,7 @@ import org.harctoolbox.irp.BitwiseParameter;
 
 ClassName() ::= "<metaData.cProtocolName>Decoder"
 
-NamedProtocol(metaData, generalSpec, parameterSpecs, assignmentVariables, definitions, bitSpec, code) ::= <<
+NamedProtocol(metaData, protocol) ::= <<
 public final class <ClassName()> extends IrpDecoder {
     <ClassBody()>
 }
@@ -81,8 +81,8 @@ private final BitwiseParameter <parameter>;
 DeclareParameterlessConstructor() ::= <<
 public <ClassName()>() {
     super();
-    <parameterSpecs.list:{ps|<ps.name> = new BitwiseParameter();}; separator="\n">
-    <assignmentVariables:{var|<var> = new BitwiseParameter();}; separator="\n">
+    <protocol.parameterSpecs.list:{ps|<ps.name> = new BitwiseParameter();}; separator="\n">
+    <protocol.assignmentVariables:{var|<var> = new BitwiseParameter();}; separator="\n">
 }
 >>
 
@@ -101,8 +101,8 @@ DeclareCompute() ::= <<
 public Map\<String, <ImplementationType("parameterTypeClass")>\> getParameters() {
     if (!isValid())
         return null;
-    HashMap\<String, Long> map = new HashMap\<>(<length(parameterSpecs.list)>);
-    <parameterSpecs.list:{p | map.put("<p.name>", <p.name>.getValue());}; separator="\n">
+    HashMap\<String, Long> map = new HashMap\<>(<length(protocol.parameterSpecs.list)>);
+    <protocol.parameterSpecs.list:{p | map.put("<p.name>", <p.name>.getValue());}; separator="\n">
     return map;
 }
 >>
@@ -118,38 +118,38 @@ public static Map\<String, Long> decodeSignal(IrSignal IrSignal) {
 DeclareFrequency() ::= <<
 @Override
 public <ImplementationType("frequencyType")> getFrequency() {
-    return <generalSpec.frequency><ImplementationType("frequencyTypeSuffix")>;
+    return <protocol.generalSpec.frequency><ImplementationType("frequencyTypeSuffix")>;
 }
 >>
 
 DefineClassList() ::= <<
-private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(bitSpec.standardBiPhase)>BiPhase<elseif(metaData.sonyType)>SonyType<elseif(bitSpec.pwm2)>Pwm2<elseif(bitSpec.pwm4)>Pwm4<endif>DecodeSequence {
-    private final static boolean lsbFirst = <bitSpec.lsbFirst>;
-<if(bitSpec.standardBiPhase)>
-    private final static boolean inverted = <bitSpec.biPhaseInverted>;
-    private final static double halfPeriod = <bitSpec.biPhaseHalfPeriod>;
+private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<if(protocol.bitSpec.standardBiPhase)>BiPhase<elseif(protocol.sonyType)>SonyType<elseif(protocol.bitSpec.pwm2)>Pwm2<elseif(protocol.bitSpec.pwm4)>Pwm4<endif>DecodeSequence {
+    private final static boolean lsbFirst = <protocol.bitSpec.lsbFirst>;
+<if(protocol.bitSpec.standardBiPhase)>
+    private final static boolean inverted = <protocol.bitSpec.biPhaseInverted>;
+    private final static double halfPeriod = <protocol.bitSpec.biPhaseHalfPeriod>;
 
     private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
         super(irSequence, lsbFirst, inverted, halfPeriod);
     }
-<elseif(bitSpec.pwm2)>
-    private final static double zeroGap = <bitSpec.zeroGap>;
-    private final static double zeroFlash = <bitSpec.zeroFlash>;
-    private final static double oneGap = <bitSpec.oneGap>;
-    private final static double oneFlash = <bitSpec.oneFlash>;
+<elseif(protocol.bitSpec.pwm2)>
+    private final static double zeroGap = <protocol.bitSpec.zeroGap>;
+    private final static double zeroFlash = <protocol.bitSpec.zeroFlash>;
+    private final static double oneGap = <protocol.bitSpec.oneGap>;
+    private final static double oneFlash = <protocol.bitSpec.oneFlash>;
 
     private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
         super(irSequence, lsbFirst, zeroFlash, zeroGap, oneFlash, oneGap);
     }
-<elseif(bitSpec.pwm4)>
-    private final static double zeroGap = <bitSpec.zeroGap>;
-    private final static double zeroFlash = <bitSpec.zeroFlash>;
-    private final static double oneGap = <bitSpec.oneGap>;
-    private final static double oneFlash = <bitSpec.oneFlash>;
-    private final static double twoGap = <bitSpec.twoGap>;
-    private final static double twoFlash = <bitSpec.twoFlash>;
-    private final static double threeGap = <bitSpec.threeGap>;
-    private final static double threeFlash = <bitSpec.threeFlash>;
+<elseif(protocol.bitSpec.pwm4)>
+    private final static double zeroGap = <protocol.bitSpec.zeroGap>;
+    private final static double zeroFlash = <protocol.bitSpec.zeroFlash>;
+    private final static double oneGap = <protocol.bitSpec.oneGap>;
+    private final static double oneFlash = <protocol.bitSpec.oneFlash>;
+    private final static double twoGap = <protocol.bitSpec.twoGap>;
+    private final static double twoFlash = <protocol.bitSpec.twoFlash>;
+    private final static double threeGap = <protocol.bitSpec.threeGap>;
+    private final static double threeFlash = <protocol.bitSpec.threeFlash>;
 
     private <metaData.cProtocolName>DecodeSequence(IrSequence irSequence) {
         super(irSequence, lsbFirst, zeroFlash, zeroGap, oneFlash, oneGap, twoFlash, twoGap, threeFlash, threeGap);

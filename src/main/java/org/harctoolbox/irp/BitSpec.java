@@ -317,7 +317,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     private List<Map<String, Object>> propertiesMap(boolean reverse, GeneralSpec generalSpec, NameEngine nameEngine) {
         List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
-        bitCodes.stream().map((bitCode) -> bitCode.propertiesMap(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine)).forEach((map) -> {
+        bitCodes.stream().map((bitCode) -> bitCode.propertiesMap(generalSpec, nameEngine)).forEach((map) -> {
             list.add(map);
         });
 

@@ -57,40 +57,40 @@ public interface IrStreamItem extends XmlExport {
      * @param gapFlashBitSpecs
      * @return
      */
-    public abstract boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
+    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
 
-    public abstract boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
 
-    public abstract DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs);
+    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs);
 
-    public abstract DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs);
+    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs);
 
-    public abstract Integer numberOfBits();
+    public Integer numberOfBits();
 
-    public abstract Integer numberOfBareDurations(boolean recursive);
+    public Integer numberOfBareDurations(boolean recursive);
 
     /**
      * Upper limit of the number of (interleaving) durations in the rendered signal.
      * Only intended to be used on intro/repeat/ending IrStreams.
      * @return number of durations (not necessarily interleaving), or null if not possible to determine.
      */
-    public abstract Integer numberOfDurations();
+    public Integer numberOfDurations();
 
-    public abstract Integer numberOfBitSpecs();
+    public Integer numberOfBitSpecs();
 
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass);
 
     public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass);
 
-    abstract ParserRuleContext getParseTree();
+    ParserRuleContext getParseTree();
 
-    public abstract void render(RenderData renderData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
 
-    public abstract boolean hasExtent();
+    public boolean hasExtent();
 
-    public abstract Set<String> assignmentVariables();
+    public Set<String> assignmentVariables();
 
-    public abstract Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine);
+    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine);
 
     public Map<String, Object> propertiesMap(int noProperites);
 

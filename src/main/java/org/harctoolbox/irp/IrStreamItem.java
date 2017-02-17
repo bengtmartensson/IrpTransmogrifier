@@ -71,10 +71,10 @@ public interface IrStreamItem extends XmlExport {
 
     /**
      * Upper limit of the number of (interleaving) durations in the rendered signal.
-     * @param pass
-     * @return
+     * Only intended to be used on intro/repeat/ending IrStreams.
+     * @return number of durations (not necessarily interleaving), or null if not possible to determine.
      */
-    public abstract Integer numberOfDurations(IrSignal.Pass pass);
+    public abstract Integer numberOfDurations();
 
     public abstract Integer numberOfBitSpecs();
 

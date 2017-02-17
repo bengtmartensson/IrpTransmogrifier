@@ -207,6 +207,9 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         Integer nob = numberOfBits();
         if (nob != null)
             element.setAttribute("numberOfBits", Integer.toString(nob));
+        Integer nod = numberOfDurations();
+        if (nod != null)
+            element.setAttribute("numberOfDurations", Integer.toString(nod));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
         this.irStreamItems.forEach((item) -> {
             element.appendChild(item.toElement(document));
@@ -292,28 +295,26 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfDurations(IrSignal.Pass pass) {
-        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat())
-            return 0;
-
+    public Integer numberOfDurations() {
         int sum = 0;
-        IrSignal.Pass state = IrSignal.Pass.intro;
         for (IrStreamItem irStreamItem : irStreamItems) {
-            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
-            if (newState != null)
-                state = newState;
-
-            if (state == pass)
-                sum += irStreamItem.numberOfDurations(pass);
-
-            IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
-            if (next != null)
-                state = next;
-
-            if (next == IrSignal.Pass.finish)
-                break;
+            Integer numberDurations = irStreamItem.numberOfDurations();
+            if (numberDurations == null)
+                return null;
+            else
+                sum += numberDurations;
         }
         return sum;
+    }
+
+    /**
+     * Fallback version of numberOfDurations().
+     * @param bitspecLength
+     * @return
+     */
+    Integer numberOfDurations(int bitspecLength) {
+        Integer nod = numberOfDurations();
+        return nod != null ? nod : numberOfBareDurations(true) + bitspecLength*numberOfBits();
     }
 
     @Override

@@ -84,15 +84,14 @@ public class BitSpec extends IrpObject implements AggregateLister {
         bitCodes = new ArrayList<>(2);
     }
 
-    public int noDurations() {
-        int result = -1;
+    public Integer numberOfDurations() {
+        int result = 0;
         for (BareIrStream bitCode : bitCodes) {
-            if (bitCode.numberOfBitSpecs() > 0)
-                return -1;
-            int curr = bitCode.numberOfBareDurations(true);
-            if (result > 0 && result != curr)
-                return -1;
-            result = curr;
+            Integer curr = bitCode.numberOfDurations();
+            if (curr == null)
+                return null;
+            if (curr > result)
+                result = curr;
         }
         return result;
     }
@@ -287,8 +286,9 @@ public class BitSpec extends IrpObject implements AggregateLister {
         element.setAttribute("bitMask", Integer.toString(IrCoreUtils.ones(chunkSize)));
         element.setAttribute("pwm2", Boolean.toString(isPWM(2, new GeneralSpec(), new NameEngine())));
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new GeneralSpec(), new NameEngine())));
-        if (noDurations() > 0)
-            element.setAttribute("noDurations", Integer.toString(noDurations()));
+        Integer nod = numberOfDurations();
+        if (nod != null)
+            element.setAttribute("numberOfDurations", Integer.toString(nod));
         bitCodes.forEach((bitCode) -> {
             element.appendChild(bitCode.toElement(document));
         });
@@ -369,8 +369,8 @@ public class BitSpec extends IrpObject implements AggregateLister {
             map.put("biPhaseInverted", bitCodes.get(0).getIrStreamItems().get(0) instanceof Flash);
         }
         map.put("lsbFirst", generalSpec.getBitDirection() == BitDirection.lsb);
-        if (noDurations() > 0)
-            map.put("noDurations", noDurations());
+        if (numberOfDurations() != null)
+            map.put("numberOfDurations", Integer.toString(numberOfDurations()));
         map.put("list", propertiesMap(false, generalSpec, nameEngine));
         return map;
     }

@@ -90,6 +90,8 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     public Element toElement(Document document) {
         Element root = super.toElement(document);
         root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null)));
+        if (numberOfDurations() != null)
+            root.setAttribute("numberOfDuration", Integer.toString(numberOfDurations()));
         root.appendChild(bitSpec.toElement(document));
         root.appendChild(irStream.toElement(document));
         /*
@@ -300,8 +302,8 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfDurations(Pass pass) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Integer numberOfDurations() {
+        return irStream.numberOfDurations(bitSpec.numberOfDurations());
     }
 
     @Override

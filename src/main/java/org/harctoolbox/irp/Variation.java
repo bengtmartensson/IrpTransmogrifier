@@ -227,8 +227,8 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfDurations(Pass pass) {
-        return select(pass).numberOfDurations(pass);
+    public Integer numberOfDurations() {
+        return null;
     }
 
     @Override

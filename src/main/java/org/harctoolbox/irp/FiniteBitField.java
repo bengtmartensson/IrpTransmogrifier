@@ -333,7 +333,7 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfDurations(IrSignal.Pass pass) {
-        return 999;
+    public Integer numberOfDurations() {
+        return null;
     }
 }

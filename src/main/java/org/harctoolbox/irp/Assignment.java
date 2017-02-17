@@ -129,7 +129,7 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public Integer numberOfDurations(IrSignal.Pass pass) {
+    public Integer numberOfDurations() {
         return 0;
     }
 

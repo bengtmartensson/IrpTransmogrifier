@@ -117,8 +117,11 @@ public class Protocol extends IrpObject {
 
     private void computeNormalForm() {
         BareIrStream intro  = bitspecIrstream.extractPass(IrSignal.Pass.intro);
+        //introDurations = bitspecIrstream.numberOfDurations(Pass.intro);
         BareIrStream repeat = bitspecIrstream.extractPass(IrSignal.Pass.repeat);
+        //repeatDurations = bitspecIrstream.numberOfDurations(IrSignal.Pass.repeat);
         BareIrStream ending = bitspecIrstream.extractPass(IrSignal.Pass.ending);
+        //endingDurations = bitspecIrstream.numberOfDurations(IrSignal.Pass.ending);
         normalFormVariation = new Variation(intro, repeat, ending);
     }
 
@@ -395,9 +398,20 @@ public class Protocol extends IrpObject {
 
     public Element normalFormElement(Document document) {
         Element element = document.createElement("NormalForm");
-        element.appendChild(normalBareIrStream(Pass.intro).toElement(document, "Intro"));
-        element.appendChild(normalBareIrStream(Pass.repeat).toElement(document, "Repeat"));
-        element.appendChild(normalBareIrStream(Pass.ending).toElement(document, "Ending"));
+        element.appendChild(mkElement(document, Pass.intro));
+        element.appendChild(mkElement(document, Pass.repeat));
+        element.appendChild(mkElement(document, Pass.ending));
+        return element;
+    }
+
+    private Element mkElement(Document document, IrSignal.Pass pass) {
+        BareIrStream stream = normalBareIrStream(pass);
+        String tagName = IrCoreUtils.capitalize(pass.toString());
+        Element element = stream.toElement(document, tagName);
+        int bitspecLength = bitspecIrstream.getBitSpec().numberOfDurations();
+        int noDurations = stream.numberOfDurations(bitspecLength);
+        element.setAttribute("numberOfDurations", Integer.toString(noDurations)); // overwriting is OK
+
         return element;
     }
 

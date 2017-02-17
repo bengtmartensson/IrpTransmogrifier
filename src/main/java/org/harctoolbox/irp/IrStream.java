@@ -205,8 +205,14 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public Integer numberOfDurations(Pass pass) {
-        return numberRepetitions(pass) * bareIrStream.numberOfDurations(pass);
+    public Integer numberOfDurations() {
+        return bareIrStream.numberOfDurations() != null
+                ? getMinRepeats() * bareIrStream.numberOfDurations()
+                : null;
+    }
+
+    public Integer numberOfDurations(int bitSpecLength) {
+        return getMinRepeats() * bareIrStream.numberOfDurations(bitSpecLength);
     }
 
     public boolean hasVariation(boolean recursive) {
@@ -234,7 +240,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     // Top level only, not called recursively
     private Map<String, Object> propertiesMap(Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> m = new HashMap<>(4);
-        m.put("kind", "FunktionBody");
+        m.put("kind", "FunctionBody");
         //Map<String, Object> body = null;
         //propertiesMapData = new PropertiesMapData(pass, generalSpec, nameEngine);
 
@@ -242,7 +248,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         Map<String, Object> body = propertiesMap(state, pass, generalSpec, nameEngine);
         m.put("irStream", body);
         m.put("reset", hasExtent());
-        m.put("numberOfDurations", numberOfDurations(pass));
+        m.put("numberOfDurations", numberOfDurations());
         return m;
     }
 

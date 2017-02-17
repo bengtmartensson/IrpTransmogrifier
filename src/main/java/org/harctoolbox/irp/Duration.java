@@ -232,7 +232,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public Integer numberOfDurations(IrSignal.Pass pass) {
+    public Integer numberOfDurations() {
         return 1;
     }
 

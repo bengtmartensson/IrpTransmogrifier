@@ -212,7 +212,8 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     public Integer numberOfDurations(int bitSpecLength) {
-        return getMinRepeats() * bareIrStream.numberOfDurations(bitSpecLength);
+        Integer nod = bareIrStream.numberOfDurations(bitSpecLength);
+        return nod != null ? getMinRepeats() * bareIrStream.numberOfDurations(bitSpecLength) : null;
     }
 
     public boolean hasVariation(boolean recursive) {

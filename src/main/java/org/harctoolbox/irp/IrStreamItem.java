@@ -65,6 +65,11 @@ public interface IrStreamItem extends XmlExport {
 
     public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs);
 
+    /**
+     * Computes the number of encoded bits, which may differ from the number of payload bits,
+     * in the case of redundancy.
+     * @return
+     */
     public Integer numberOfBits();
 
     public Integer numberOfBareDurations(boolean recursive);

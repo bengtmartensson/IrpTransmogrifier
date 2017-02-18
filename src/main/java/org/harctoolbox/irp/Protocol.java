@@ -411,8 +411,9 @@ public class Protocol extends IrpObject implements AggregateLister {
         String tagName = IrCoreUtils.capitalize(pass.toString());
         Element element = stream.toElement(document, tagName);
         int bitspecLength = bitspecIrstream.getBitSpec().numberOfDurations();
-        int noDurations = stream.numberOfDurations(bitspecLength);
-        element.setAttribute("numberOfDurations", Integer.toString(noDurations)); // overwriting is OK
+        Integer noDurations = stream.numberOfDurations(bitspecLength);
+        if (noDurations != null)
+            element.setAttribute("numberOfDurations", Integer.toString(noDurations)); // overwriting is OK
 
         return element;
     }

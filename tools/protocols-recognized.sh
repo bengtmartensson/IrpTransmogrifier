@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo Presently broken
+exit 1
+
 RUN="target/irptransmogrifier.sh -r 0.04 recog -r -p"
 
 ${RUN} 48-nec1

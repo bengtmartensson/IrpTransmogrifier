@@ -87,4 +87,9 @@ public class STCodeGenerator extends CodeGenerator {
             logger.log(Level.WARNING, "Template {0} was not found", name);
         return new STItemCodeGenerator(st);
     }
+
+    @Override
+    public void setInspect(boolean inspect) {
+         STCodeGenerator.trackCreationEvents(inspect);
+    }
 }

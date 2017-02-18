@@ -303,7 +303,8 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     @Override
     public Integer numberOfDurations() {
-        return irStream.numberOfDurations(bitSpec.numberOfDurations());
+        Integer bsnod = bitSpec.numberOfDurations();
+        return bsnod != null ? irStream.numberOfDurations(bsnod) : null;
     }
 
     @Override

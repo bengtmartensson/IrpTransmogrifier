@@ -270,8 +270,9 @@ public class IrpDatabase {
         Element root = document.createElement("NamedProtocols");
         document.appendChild(root);
 
-        protocolNames.forEach((protocolName) -> {
+        protocolNames.forEach((String protocolName) -> {
             try {
+                logger.log(Level.FINE, "Processing {0} ...", protocolName);
                 NamedProtocol protocol = getNamedProtocol(protocolName);
                 Element element = protocol.toElement(document);
                 root.appendChild(element);

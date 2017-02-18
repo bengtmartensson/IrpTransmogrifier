@@ -86,7 +86,7 @@ public abstract class CodeGenerator {
         if (!manyProtocolsInOneFile() && protocolNames.size() > 1)
             throw new IrpException("This target cannot generate more than one protocol in one file");
 
-        STCodeGenerator.trackCreationEvents(inspect); // ???
+        setInspect(inspect);
 
         generateFileBegin(out);
 
@@ -126,4 +126,6 @@ public abstract class CodeGenerator {
         if (inspect)
             code.inspect();
     }
+
+    public abstract void setInspect(boolean inspect);
 }

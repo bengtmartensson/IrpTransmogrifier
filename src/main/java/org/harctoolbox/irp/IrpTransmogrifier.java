@@ -369,7 +369,7 @@ public class IrpTransmogrifier {
         setupDatabase(commandLineArgs);
         List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
         if (protocolNames.isEmpty())
-            throw new UsageException("No protocols matched");
+            throw new UsageException("No protocols matched (forgot --regexp?)");
 
         //String[] targets = commandCode.target.split(MULTIPLEARGSSEPARATOR);
         for (String target : commandCode.target)
@@ -377,39 +377,48 @@ public class IrpTransmogrifier {
             if (target.equalsIgnoreCase("xml"))
                 createXmlProtocols(protocolNames, commandLineArgs.encoding);
             else
-                codeST(protocolNames, target, commandCode, commandLineArgs);
+                code(protocolNames, target, commandCode, commandLineArgs);
     }
 
-    private void codeST(Collection<String> protocolNames, String target, CommandCode commandCode, CommandLineArgs commandLineArgs) throws IOException, IrpException, UsageException {
+    private void code(Collection<String> protocolNames, String target, CommandCode commandCode, CommandLineArgs commandLineArgs) throws IOException, IrpException, UsageException {
         if (commandCode.stDir == null || !new File(commandCode.stDir).isDirectory())
-            throw new IOException("stdir must be an existing directory");
-        STCodeGenerator.setStDir(commandCode.stDir);
+            throw new IOException("Cannot find stdir = " + new File(commandCode.stDir).getCanonicalPath());
 
-        if (target.equals("?"))
+        STCodeGenerator.setStDir(commandCode.stDir);
+        if (target.equals("?")) {
             listTargets(out);
+            return;
+        }
+
+        CodeGenerator codeGenerator;
+        if (target.equals("dump"))
+            codeGenerator = new DumpCodeGenerator();
         else {
-            STCodeGenerator codeGenerator;
             try {
                 codeGenerator = new STCodeGenerator(target);
             } catch (FileNotFoundException ex) {
-                System.err.println("Target " + target + " not available.  Available targets:");
-                listTargets(System.err);
-                return;
+                 throw new UsageException("Target " + target + " not available.  Available targets: " + String.join(" ", listTargets()));
             }
-            Map<String, String> parameters = assembleParameterMap(commandCode.parameters);
-            if (commandCode.directory != null)
-                codeGenerator.generate(protocolNames, irpDatabase, new File(commandCode.directory), commandCode.inspect, parameters,
-                        commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
-            else
-                codeGenerator.generate(protocolNames, irpDatabase, out, commandCode.inspect, parameters,
-                        commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
         }
+        Map<String, String> parameters = assembleParameterMap(commandCode.parameters);
+        if (commandCode.directory != null)
+            codeGenerator.generate(protocolNames, irpDatabase, new File(commandCode.directory), commandCode.inspect, parameters,
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
+        else
+            codeGenerator.generate(protocolNames, irpDatabase, out, commandCode.inspect, parameters,
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
+
     }
 
-    private void listTargets(PrintStream printStream) throws IOException {
+    private List<String> listTargets() throws IOException {
         List<String> targets = STCodeGenerator.listTargets();
         targets.add("xml");
-        printStream.println(String.join(" ", targets));
+        targets.add("dump");
+        return targets;
+    }
+
+    private void listTargets(PrintStream stream) throws IOException {
+        stream.println(String.join(" ", listTargets()));
     }
 
     private void createXmlProtocols(List<String> protocolNames, String encoding) {
@@ -725,7 +734,7 @@ public class IrpTransmogrifier {
         private List<String> parameters = new ArrayList<>(4);
 
         @Parameter(names = { "-s", "--stdir", "--stdirectory" }, description = "Directory containing st files for code generation")
-        private String stDir = "src/main/st"; // FIXME
+        private String stDir = System.getenv("STDIR") != null ? System.getenv("STDIR") : "st"; // FIXME
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target(s) for code generation. Use ? for a list.")
         private List<String> target = new ArrayList<>(4);

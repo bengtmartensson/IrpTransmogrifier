@@ -1,4 +1,8 @@
-target/java-renderer-generator.sh \
+#!/bin/sh
+
+DIR=`dirname $0`/../target
+
+${DIR}/java-renderer-generator.sh \
 48-nec1  \
 48-nec2 \
 adnotam \

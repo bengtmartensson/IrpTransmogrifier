@@ -314,7 +314,12 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
      */
     Integer numberOfDurations(int bitspecLength) {
         Integer nod = numberOfDurations();
-        return nod != null ? nod : numberOfBareDurations(true) + bitspecLength*numberOfBits();
+        if (nod != null)
+            return nod;
+
+        Integer nobd = numberOfBareDurations(true);
+        Integer nob = numberOfBits();
+        return nobd != null && nob != null ? nobd + bitspecLength*nob : null;
     }
 
     @Override

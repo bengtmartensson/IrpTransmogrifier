@@ -381,7 +381,7 @@ public class IrpTransmogrifier {
     }
 
     private void code(Collection<String> protocolNames, String target, CommandCode commandCode, CommandLineArgs commandLineArgs) throws IOException, IrpException, UsageException {
-        if (commandCode.stDir == null || !new File(commandCode.stDir).isDirectory())
+        if (!new File(commandCode.stDir).isDirectory())
             throw new IOException("Cannot find stdir = " + new File(commandCode.stDir).getCanonicalPath());
 
         STCodeGenerator.setStDir(commandCode.stDir);
@@ -433,11 +433,13 @@ public class IrpTransmogrifier {
         if (commandRenderer.random)
             logger.log(Level.INFO, nameEngine.toString());
 
-        if (!commandRenderer.pronto && !commandRenderer.raw)
-            logger.warning("No output requested, use either --raw or --pronto go get output.");
+        if (!commandRenderer.pronto && !commandRenderer.raw && !commandRenderer.rawWithoutSigns)
+            logger.warning("No output requested, use either --raw, --raw-without-signs or --pronto go get output.");
         IrSignal irSignal = protocol.toIrSignal(nameEngine);
         if (commandRenderer.raw)
             out.println(irSignal.toPrintString(true));
+        if (commandRenderer.rawWithoutSigns)
+            out.println(irSignal.toPrintString(false, true, " "));
         if (commandRenderer.pronto)
             out.println(irSignal.ccfString());
     }
@@ -831,6 +833,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-r", "--raw" }, description = "Generate raw form")
         private boolean raw = false;
+
+        @Parameter(names = { "-R", "--raw-without-signs" }, description = "Generate raw form without signs")
+        private boolean rawWithoutSigns = false;
 
         @Parameter(names = { "--random" }, description = "Generate random, but valid, parameters")
         private boolean random = false;

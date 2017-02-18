@@ -629,10 +629,11 @@ public class IrSequence implements Cloneable {
      * Formats IR signal as sequence of durations, with alternating signs, ignoring all signs, or by preserving signs.
      * @param alternatingSigns if true, generate alternating signs (ignoring original signs).
      * @param noSigns remove all signs.
-     * @param separator
+     * @param separator CharSequence between the numbers
+     * @param brackets if true, enclose result in brackets.
      * @return Printable string.
      */
-    public String toPrintString(boolean alternatingSigns, boolean noSigns, String separator) {
+    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator, boolean brackets) {
         StringBuilder s = new StringBuilder(data.length * 6);
         if (alternatingSigns) {
             for (int i = 0; i < data.length; i++) {
@@ -649,7 +650,7 @@ public class IrSequence implements Cloneable {
                 s.append(String.format((i > 0 ? (separator + "%d") : "%d"), (int) Math.round(data[i])));
             }
         }
-        return s.toString();
+        return brackets ? s.insert(0, '[').append(']').toString() :  s.toString();
     }
 
     /**
@@ -659,7 +660,7 @@ public class IrSequence implements Cloneable {
      * @return Printable string.
      */
     public String toPrintString(boolean alternatingSigns, boolean noSigns) {
-        return toPrintString(alternatingSigns, noSigns, " ");
+        return toPrintString(alternatingSigns, noSigns, " ", true);
     }
 
     /**
@@ -676,7 +677,7 @@ public class IrSequence implements Cloneable {
      * @return Printable string.
      */
     public String toPrintString() {
-        return toPrintString(false, false, " ");
+        return toPrintString(false, false, " ", true);
     }
 
     /**

@@ -374,10 +374,14 @@ public class IrSignal implements Cloneable {
      *
      * @see IrSequence
      */
-    public String toPrintString(boolean alternatingSigns, boolean noSigns, String separator) {
-        return introSequence.toPrintString(alternatingSigns, noSigns, separator) + "\n"
-                + repeatSequence.toPrintString(alternatingSigns, noSigns, separator)
-                + (endingSequence.getLength() > 0 ? "\n" + endingSequence.toPrintString(alternatingSigns, noSigns, separator) : "");
+    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator) {
+        return introSequence.toPrintString(alternatingSigns, noSigns, separator, true)
+                + repeatSequence.toPrintString(alternatingSigns, noSigns, separator, true)
+                + (endingSequence.getLength() > 0 ? endingSequence.toPrintString(alternatingSigns, noSigns, separator, true) : "");
+    }
+
+    public String toPrintString(boolean alternatingSigns, boolean noSigns) {
+        return toPrintString(alternatingSigns, noSigns, " ");
     }
 
     public String toPrintString(boolean alternatingSigns) {

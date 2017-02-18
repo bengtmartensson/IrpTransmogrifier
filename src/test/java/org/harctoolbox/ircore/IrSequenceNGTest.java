@@ -212,15 +212,15 @@ public class IrSequenceNGTest {
     /**
      * Test of toPrintString method, of class IrSequence.
      */
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testToPrintString_3args() {
         System.out.println("toPrintString");
         boolean alternatingSigns = false;
         boolean noSigns = false;
         String separator = "";
         IrSequence instance = new IrSequence();
-        String expResult = "";
-        String result = instance.toPrintString(alternatingSigns, noSigns, separator);
+        String expResult = "[]";
+        String result = instance.toPrintString(alternatingSigns, noSigns, separator, true);
         assertEquals(result, expResult);
     }
 

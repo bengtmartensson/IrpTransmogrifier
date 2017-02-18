@@ -148,11 +148,12 @@ public class ModulatedIrSequence extends IrSequence {
      * @param alternatingSigns if true, generate alternating signs (ignoring original signs).
      * @param noSigns remove all signs.
      * @param separator
+     * @param brackets if true, enclose result in brackets.
      * @return Printable string.
      */
     @Override
-    public String toPrintString(boolean alternatingSigns, boolean noSigns, String separator) {
-        return toPrintString(alternatingSigns, noSigns, separator, true);
+    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator, boolean brackets) {
+        return toPrintString(alternatingSigns, noSigns, separator, brackets, true);
     }
 
     /**
@@ -160,12 +161,13 @@ public class ModulatedIrSequence extends IrSequence {
      * @param alternatingSigns if true, generate alternating signs (ignoring original signs).
      * @param noSigns remove all signs.
      * @param separator
+     * @param brackets if true, enclose result in brackets.
      * @param includeFrequency If true, include frequency information
      * @return Printable string.
      */
-    public String toPrintString(boolean alternatingSigns, boolean noSigns, String separator, boolean includeFrequency) {
+    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator, boolean brackets, boolean includeFrequency) {
         return ((isEmpty() || !includeFrequency) ?  "" : ("f=" + Long.toString(Math.round(frequency))  + separator))
-                + super.toPrintString(alternatingSigns, noSigns, separator);
+                + super.toPrintString(alternatingSigns, noSigns, separator, brackets);
     }
 
     /**
@@ -176,7 +178,7 @@ public class ModulatedIrSequence extends IrSequence {
      */
     @Override
     public String toPrintString(boolean alternatingSigns, boolean noSigns) {
-        return toPrintString(alternatingSigns, noSigns, " ");
+        return toPrintString(alternatingSigns, noSigns, " ", true);
     }
 
     /**
@@ -195,7 +197,7 @@ public class ModulatedIrSequence extends IrSequence {
      */
     @Override
     public String toPrintString() {
-        return toPrintString(false, false, " ");
+        return toPrintString(false, false, " ", true);
     }
 
     /**

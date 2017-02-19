@@ -1,4 +1,8 @@
-target/java-decoder-generator.sh \
+#!/bin/sh
+
+DIR=`dirname $0`/../target
+
+${DIR}/java-decoder-generator.sh \
 "gi rg" \
 "rca(old)" \
 "rca-38(old)" \

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.harctoolbox</groupId>
+    <artifactId>JavaIrpProtocolTest</artifactId>
+    <packaging>jar</packaging>
+    <version>0.0.0</version>
+    <name>JavaIrpProtocolTest</name>
+    <licenses>
+        <license>
+            <name>GPL 3+</name>
+            <url>https://www.gnu.org/licenses/gpl.html</url>
+        </license>
+    </licenses>
+    <description>Dummy project for testing generated IR protocols using Java as target language.</description>
+    <url>http://www.harctoolbox.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.harctoolbox</groupId>
+            <artifactId>IrpTransmogrifier</artifactId>
+            <version>0.0.1dev</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+
+    </dependencies>
+</project>

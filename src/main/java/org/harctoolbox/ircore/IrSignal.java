@@ -18,6 +18,7 @@ package org.harctoolbox.ircore;
 
 import java.util.EnumMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -54,6 +55,9 @@ public class IrSignal implements Cloneable {
                 throw new InvalidArgumentException("Must not use explicit frequency with a Pronto type signal.");
             return irSignal;
         }
+
+        if (frequency == null)
+            logger.log(Level.WARNING, "Unknown frequency, assuming default frequency = {0} Hz", ModulatedIrSequence.defaultFrequency);
         return parseRaw(args, frequency != null ? frequency : ModulatedIrSequence.defaultFrequency, fixOddSequences);
     }
 

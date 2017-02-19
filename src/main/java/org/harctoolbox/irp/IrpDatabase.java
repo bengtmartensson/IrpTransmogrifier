@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -322,6 +324,11 @@ public class IrpDatabase {
         return protocols.keySet();
     }
 
+    public final String getName(String name) {
+        UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
+        return prot == null ? null : prot.getName();
+    }
+
     public final int size() {
         return protocols.size();
     }
@@ -343,10 +350,16 @@ public class IrpDatabase {
         return result;
     }
 
-    public List<String> getMatchingNames(Iterable<String> iterable, boolean regexp) {
+    public List<String> getMatchingNames(Iterable<String> iterable, boolean regexp, boolean urlDecode) {
         List<String> result = new ArrayList<>(10);
-        for (String s : iterable)
-            result.addAll(regexp ? getMatchingNamesRegexp(s) : getMatchingNamesExact(s));
+        for (String str : iterable) {
+            try {
+                String s = urlDecode ? URLDecoder.decode(str, "US-ASCII") : str;
+                result.addAll(regexp ? getMatchingNamesRegexp(s) : getMatchingNamesExact(s));
+            } catch (UnsupportedEncodingException ex) {
+                throw new ThisCannotHappenException();
+            }
+        }
 
         return result;
     }
@@ -411,9 +424,9 @@ public class IrpDatabase {
         addProtocol(protocols, new UnparsedProtocol(current));
     }
 
-    public List<String> evaluateProtocols(List<String> protocols, boolean sort, boolean regexp) {
+    public List<String> evaluateProtocols(List<String> protocols, boolean sort, boolean regexp, boolean urlDecode) {
         List<String> list = (protocols == null || protocols.isEmpty())
-                ? new ArrayList<>(getNames()) : getMatchingNames(protocols, regexp);
+                ? new ArrayList<>(getNames()) : getMatchingNames(protocols, regexp, urlDecode);
         if (sort)
             Collections.sort(list);
         return list;

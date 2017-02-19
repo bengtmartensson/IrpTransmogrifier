@@ -298,7 +298,7 @@ public class IrpTransmogrifier {
 
     private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
         setupDatabase(commandLineArgs);
-        List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp);
+        List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
 
         for (String protocolName : list) {
             Protocol protocol;
@@ -313,7 +313,10 @@ public class IrpTransmogrifier {
                 continue;
             }
 
-            out.print(protocolName);
+            out.print(irpDatabase.getName(protocolName));
+
+            if (commandList.cName)
+                out.print(SEPARATOR + IrpUtils.toCIdentifier(irpDatabase.getName(protocolName)));
 
             if (commandList.irp)
                 out.print(SEPARATOR + irpDatabase.getIrp(protocolName));
@@ -367,7 +370,7 @@ public class IrpTransmogrifier {
 //            throw new UsageException("At least one protocol needs to be given.");
 
         setupDatabase(commandLineArgs);
-        List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp);
+        List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (protocolNames.isEmpty())
             throw new UsageException("No protocols matched (forgot --regexp?)");
 
@@ -456,7 +459,7 @@ public class IrpTransmogrifier {
             NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
             render(protocol, commandRenderer);
         } else {
-            List<String> list = irpDatabase.evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp);
+            List<String> list = irpDatabase.evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
             for (String proto : list) {
                 //logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
@@ -485,7 +488,7 @@ public class IrpTransmogrifier {
     private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException, IrpException, UsageException {
         setupDatabase(commandLineArgs);
         List<String> protocolNamePatterns = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
-        List<String> protocolsNames = irpDatabase.evaluateProtocols(protocolNamePatterns, commandLineArgs.sort, commandLineArgs.regexp);
+        List<String> protocolsNames = irpDatabase.evaluateProtocols(protocolNamePatterns, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (protocolsNames.isEmpty())
             throw new UsageException("No protocol given or matched.");
 
@@ -651,6 +654,9 @@ public class IrpTransmogrifier {
         @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random)")
         private Long seed = null;
 
+        @Parameter(names = {"-u", "--url-decode"}, description = "URL-decode protocol names, (understanding %20 for example)")
+        private boolean urlDecode = false;
+
         @Parameter(names = {"-v", "--version"}, description = "Report version (deprecated; use command version instead)")
         private boolean versionRequested = false;
 
@@ -793,6 +799,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-c", "--classify"}, description = "Classify the protocols")
         private boolean classify = false;
+
+        @Parameter(names = { "--cname"}, description = "List C name of the protocols")
+        private boolean cName = false;
 
         @Parameter(names = { "--documentation"}, description = "List documentation")
         private boolean documentation = false;

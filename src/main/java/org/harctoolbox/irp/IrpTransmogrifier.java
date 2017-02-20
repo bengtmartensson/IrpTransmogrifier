@@ -417,6 +417,7 @@ public class IrpTransmogrifier {
         List<String> targets = STCodeGenerator.listTargets();
         targets.add("xml");
         targets.add("dump");
+        targets.sort(String.CASE_INSENSITIVE_ORDER);
         return targets;
     }
 

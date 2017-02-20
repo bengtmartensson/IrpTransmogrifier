@@ -166,8 +166,8 @@ public class IrpTransmogrifier {
         CommandExpression commandExpression = new CommandExpression();
         argumentParser.addCommand(commandExpression);
 
-        CommandWriteConfig commandWriteConfig = new CommandWriteConfig();
-        argumentParser.addCommand(commandWriteConfig);
+        CommandConvertConfig commandConvertConfig = new CommandConvertConfig();
+        argumentParser.addCommand(commandConvertConfig);
 
         try {
             argumentParser.parse(args);
@@ -257,8 +257,8 @@ public class IrpTransmogrifier {
                 case "version":
                     instance.version(commandLineArgs.configFile, commandLineArgs);
                     break;
-                case "writeconfig":
-                    instance.writeConfig(commandWriteConfig, commandLineArgs);
+                case "convertconfig":
+                    instance.convertConfig(commandConvertConfig, commandLineArgs);
                     break;
                 default:
                     System.err.println("Unknown command: " + command);
@@ -356,9 +356,13 @@ public class IrpTransmogrifier {
         out.println(Version.licenseString);
     }
 
-    private void writeConfig(CommandWriteConfig commandWriteConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
-        setupDatabase(false, commandLineArgs);
-        XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
+    private void convertConfig(CommandConvertConfig commandConvertConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
+        setupDatabase(false, commandLineArgs); // checks exactly one of -c, -i given
+        if (commandLineArgs.iniFile != null)
+            XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
+        else
+            irpDatabase.printAsIni(out);
+
         if (commandLineArgs.output != null)
             logger.log(Level.INFO, "Wrote {0}", commandLineArgs.output);
     }
@@ -859,9 +863,9 @@ public class IrpTransmogrifier {
     private static class CommandVersion {
     }
 
-    @Parameters(commandNames = {"writeconfig"}, commandDescription = "Generate a new config file in XML format from the --inifile argument")
+    @Parameters(commandNames = {"convertconfig"}, commandDescription = "Convert an IrpProtocols.ini-file to an IrpProtocols.xml, or vice versa.")
     @SuppressWarnings("ClassMayBeInterface")
-    private static class CommandWriteConfig {
+    private static class CommandConvertConfig {
     }
 
     private static class UsageException extends Exception {

@@ -96,7 +96,7 @@ for decoding.
 There is also an XSLT stylesheet, which technically translates the XML to HTML, allowing for a user
 friendly reading of IrpProtocols.xml in the browser.
 
-The program is capable of reading and translating the old format.
+The program is capable of reading and translating to and from the old format.
 
 ## Usage
 Using from the command line, this is a command with subcommands

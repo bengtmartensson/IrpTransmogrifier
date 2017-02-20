@@ -1,3 +1,7 @@
+# NOTE: This Makefile is not required to build the program, for which maven
+# is used. Instead, it invokes the program for tests and for transforming the
+# output, for example to the lirc.xml file.
+
 MYDIR := $(dir $(firstword $(MAKEFILE_LIST)))
 	
 include $(MYDIR)/paths.mk

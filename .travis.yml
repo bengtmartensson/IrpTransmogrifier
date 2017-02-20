@@ -1,0 +1,11 @@
+sudo: required
+notifications:
+email: false
+language: java
+jdk:
+- oraclejdk8
+install:
+- sudo apt-get install -y --force-yes python-requests
+script:
+- mvn install -DskipTests=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
+- tools/travis2github.py target/*.zip

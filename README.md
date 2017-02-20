@@ -1,4 +1,5 @@
-# IrpTransmogrifier
+# IrpTransmogrifier [![Build Status](https://travis-ci.org/bengtmartensson/IrpTransmogrifier.svg?branch=master)](https://travis-ci.org/bengtmartensson/IrpTransmogrifier)
+
 Parser for IRP notation protocols, with rendering, code generation, recognition applications.
 
 This is a new program, written from scratch, that is intended to replace IrpMaster, DecodeIR, and (most of) ExchangeIR,

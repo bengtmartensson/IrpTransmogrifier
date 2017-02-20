@@ -52,16 +52,16 @@ javadecodertest: javadecodercodefiles javadecodertestfiles
 	
 
 javarendercodefiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_RENDERER_CODEDIR)
-	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_RENDERER_CODEDIR) --stdir $(IRPHOME)/st --target java-renderer $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS),"$(proto)")
+	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_RENDERER_CODEDIR) --stdir $(IRPHOME)/st --target java-renderer $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS),"$(proto)")
 
 javarendertestfiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_RENDERER_TESTDIR)
-	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_RENDERER_TESTDIR) --stdir $(IRPHOME)/st --target java-renderer-test $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS), "$(proto)")
+	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_RENDERER_TESTDIR) --stdir $(IRPHOME)/st --target java-renderer-test $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS), "$(proto)")
 
 javadecodercodefiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_DECODER_CODEDIR)
-	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_DECODER_CODEDIR) --stdir $(IRPHOME)/st --target java-decoder $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), "$(proto)")
+	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_DECODER_CODEDIR)  --stdir $(IRPHOME)/st --target java-decoder $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), "$(proto)")
 
 javadecodertestfiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_DECODER_TESTDIR)
-	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_DECODER_TESTDIR) --stdir $(IRPHOME)/st --target java-decoder-test $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), "$(proto)")
+	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_DECODER_TESTDIR)  --stdir $(IRPHOME)/st --target java-decoder-test $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), "$(proto)")
 
 $(JAVA_PROTOCOL_TEST)/pom.xml: $(JAVA_PROTOCOL_TEST)
 	cp $(MYDIR)/JavaIrpProtocolTest.pom.xml $@

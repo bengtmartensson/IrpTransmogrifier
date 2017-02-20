@@ -103,20 +103,28 @@
 
                 </executions>
             </plugin>
+
             <!-- Binary tarballs from src/assembly*/ files. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.0</version>
                 <configuration>
                     <archive>
                         <manifest>
                             <mainClass>org.harctoolbox.irp.IrpTransmogrifier</mainClass>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
+                    <!--finalName>${project.name}</finalName-->
+                    <!--appendAssemblyId>true</appendAssemblyId-->
+                    <descriptors>
+                        <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
+                        <descriptor>src/assembly/target.xml</descriptor>
+                    </descriptors>
+                    <!--descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                        <descriptorRef>bin</descriptorRef>
+                    </descriptorRefs-->
                 </configuration>
                 <executions>
                     <execution>
@@ -126,7 +134,7 @@
                             <goal>single</goal>
                         </goals>
                     </execution>
-                   </executions>
+                </executions>
             </plugin>
 
             <plugin>
@@ -249,8 +257,6 @@
                                     <arguments>
                                         <argument>0755</argument>
                                         <argument>${project.nameLowercase}.sh</argument>
-                                        <argument>java-renderer-generator.sh</argument>
-                                        <argument>java-decoder-generator.sh</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

@@ -262,6 +262,25 @@
     </profiles>
 
     <dependencies>
+        <!--
+        Note to maintainer 2017-02-20. Tried version 4.6, per
+
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>4.6</version>
+            <type>jar</type>
+        </dependency>
+
+        but the generated code says
+
+        // Generated from org/harctoolbox/irp/Irp.g4 by ANTLR 4.5.3
+
+        and the test target subsequently says
+
+        ANTLR Tool version 4.5.3 used for code generation does not match the current runtime version 4.6
+        -->
+
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
@@ -284,24 +303,12 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <scope>compile</scope>
-            <version>1.48</version>
+            <version>1.60</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.9.10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>1.3</version>
+            <version>6.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

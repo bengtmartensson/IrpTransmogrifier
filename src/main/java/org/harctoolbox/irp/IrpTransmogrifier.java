@@ -741,7 +741,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-p", "--parameter" }, description = "Specify target dependent parameters to the code generators")
         private List<String> parameters = new ArrayList<>(4);
 
-        @Parameter(names = { "-s", "--stdir", "--stdirectory" }, description = "Directory containing st files for code generation")
+        @Parameter(names = { "-s", "--stdirectory" }, description = "Directory containing st files for code generation")
         private String stDir = System.getenv("STDIR") != null ? System.getenv("STDIR") : "st"; // FIXME
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target(s) for code generation. Use ? for a list.")

@@ -1,0 +1,102 @@
+/*
+Copyright (C) 2017 Bengt Martensson.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/.
+*/
+
+import "clike.stg"
+
+implementationTypes ::= [
+"booleanType":              "boolean",
+"dutyCycleType":            "double",
+"dutyCycleTypeSuffix":      "",
+"frequencyType":            "frequency_t",
+"frequencyTypeSuffix":      "U",
+"intType":                  "unsigned int",
+"intTypeSuffix":            "U",
+"microsecondsType":         "microseconds_t",
+"microsecondsTypeSuffix":   "",
+"parameterType":            "unsigned int",
+"parameterTypeClass":       "xxxx",
+"parameterTypeSuffix":      "L",
+"staticConst":              "static const"
+]
+
+ImplementationType(type) ::= <<
+<implementationTypes.(type)>
+>>
+
+CodeFileExtension() ::= ".cpp"
+
+Irp() ::= "<metaData.irp>"
+
+Documentation() ::= "<metaData.documentation>"
+
+// Note: usable both for renderer and decoder
+HeaderFileName() ::= "<ClassName()>.h"
+
+ProtocolNameComment() ::= <<
+<beginComment()>ProtocolName: <metaData.protocolName> <endComment()>
+>>
+
+DeclareParameterlessConstructor() ::= <<
+<ClassName()>();
+>>
+
+DefineNames() ::= <<
+// Local functions; corresponds to Definitions in the IRP.
+<definitions.list:{p|<NameDefinition(p)>}; separator="\n\n">
+>>
+
+NameDefinition(def) ::= <<
+private <ImplementationType("parameterType")> <def.name>() {
+    return <(def.expression.kind)(def.expression)>;
+}
+>>
+
+DeclareParameters() ::= <<
+// Parameters as declared in ParameterSpec
+<parameterSpecs.list:{par | <DeclareParameter(par)>;}; separator="\n">
+>>
+
+DeclareParameter(parameter) ::= <<
+private <if(parameter.memory)>static <endif><ImplementationType("parameterType")> <parameter.name><if(parameter.memory)> = <parameter.default><endif>
+>>
+
+DeclareSimpleParameter(parameterName) ::= <<
+private <ImplementationType("parameterType")> <parameterName>;
+>>
+
+DeclareFormalParameter(parameter) ::= <<
+<ImplementationType("parameterType")> <parameter.name>
+>>
+
+DeclareAssignmentVariables() ::= <<
+// Internal variables, not declared in ParameterSpec
+<assignmentVariables:DeclareSimpleParameter()>
+>>
+
+LocalAssignment(par) ::= <<
+this.<par.name> = <par.name>;
+>>
+
+MapLocalAssignment(par) ::= <<
+<par.name> = map.get("<par.name>")
+>>
+
+BitCount(e)           ::= <<
+bitCount(<(e.arg.kind)(e.arg)>)
+>>
+
+Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"

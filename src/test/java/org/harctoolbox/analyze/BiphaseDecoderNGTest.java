@@ -47,8 +47,8 @@ public class BiphaseDecoderNGTest {
         widths.add(1);
         widths.add(1);
         widths.add(5);
-        paramsRc5 = new Analyzer.AnalyzerParams(36000f, null, BitDirection.msb, true, widths, true);
-        paramsRc6 = new Analyzer.AnalyzerParams(36000f, null, BitDirection.msb, true, null, false);
+        paramsRc5 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, widths, true);
+        paramsRc6 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, null, false);
     }
 
     @BeforeMethod
@@ -67,7 +67,7 @@ public class BiphaseDecoderNGTest {
         try {
             System.out.println("processRc5");
             BiphaseDecoder decoder = new BiphaseDecoder(rc5, paramsRc5);
-            Protocol result = decoder.parse();
+            Protocol result = decoder.parse()[0];
             System.out.println("Expect warning for missing parameterspec");
             Protocol expResult = new Protocol("{36k,msb,889}<1,-1|-1,1>(A:1,B:1,C:1,D:5,E:6,^114m){A=1,B=1,C=1,D=12,E=3}");
             assertEquals(result, expResult);
@@ -81,7 +81,7 @@ public class BiphaseDecoderNGTest {
         try {
             System.out.println("processRc6");
             AbstractBiphaseDecoder decoder = new BiphaseDecoder(rc6, paramsRc6);
-            Protocol result = decoder.parse();
+            Protocol result = decoder.parse()[0];
             System.out.println("Expect warning for missing parameterspec");
             Protocol expResult = new Protocol("{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:4,-2,2,B:16,^107m){A=8,B=30723}");
             assertEquals(result, expResult);

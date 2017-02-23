@@ -280,7 +280,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return generalSpec.getBitDirection();
     }
 
-    public double getFrequency() {
+    public Double getFrequency() {
         return generalSpec.getFrequency();
     }
 
@@ -288,7 +288,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return generalSpec.getUnit();
     }
 
-    public double getDutyCycle() {
+    public Double getDutyCycle() {
         return generalSpec.getDutyCycle();
     }
 
@@ -514,7 +514,7 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public String classificationString() {
         StringBuilder str = new StringBuilder(128);
-        str.append((int) getFrequency());
+        str.append((int) (getFrequency() != null ? getFrequency() : GeneralSpec.defaultFrequency));
         str.append("\t").append(hasMemoryVariable("T") ? "toggle\t" : "\t");
         str.append(isPWM2() ? "PWM2" : "");
         str.append(isPWM4() ? "PWM4" : "");

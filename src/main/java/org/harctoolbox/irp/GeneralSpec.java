@@ -34,20 +34,18 @@ import org.w3c.dom.Element;
  */
 public class GeneralSpec extends IrpObject implements AggregateLister {
     private final static int WEIGHT = 0;
-    public final static double defaultDutyCycle = ModulatedIrSequence.unknownDutyCycle;
     public final static BitDirection defaultBitDirection = BitDirection.lsb;
+    public final static double defaultFrequency = ModulatedIrSequence.defaultFrequency;
     public final static double defaultUnit = 1;
 
     /** Carrier frequency in Hz */
-    private double frequency = ModulatedIrSequence.defaultFrequency;
+    private Double frequency = null;
 
     /** Duty cycle in percent. IrpUtils.invalid (-1) is defined to denote "don't care". */
-    private double dutyCycle = defaultDutyCycle;
-
+    private Double dutyCycle = null;
 
     /** BitDirection */
     private BitDirection bitDirection = defaultBitDirection;
-
 
     /** Timing unit in us */
     private double unit = defaultUnit;
@@ -61,15 +59,15 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
      * @param frequency
      * @param dutyCycle
      */
-    public GeneralSpec(BitDirection bitDirection, double unit, /*double unit_pulses,*/ double frequency, double dutyCycle) {
+    public GeneralSpec(BitDirection bitDirection, double unit, Double frequency, Double dutyCycle) {
         this.bitDirection = bitDirection;
         this.unit = unit;
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
     }
 
-    public GeneralSpec(BitDirection bitDirection, double unit, double frequency) {
-        this(bitDirection, unit, frequency, ModulatedIrSequence.unknownDutyCycle);
+    public GeneralSpec(BitDirection bitDirection, double unit, Double frequency) {
+        this(bitDirection, unit, frequency, null);
     }
 
     /**
@@ -85,7 +83,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
 
     /** This constructor is intended for debugging and testing only */
     public GeneralSpec() {
-        this(defaultBitDirection, defaultUnit, ModulatedIrSequence.defaultFrequency, ModulatedIrSequence.unknownDutyCycle);
+        this(defaultBitDirection, defaultUnit, null, null);
     }
 
     public GeneralSpec(String str) throws IrpSemanticException {
@@ -101,7 +99,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
     }
 
     public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException {
-        double unitInPeriods = -1f;
+        Double unitInPeriods = null;
         for (IrpParser.Generalspec_itemContext node : ctx.generalspec_item()) {
             ParseTree item = node.getChild(0);
             if (item instanceof IrpParser.Frequency_itemContext) {
@@ -110,7 +108,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
             } else if (item instanceof IrpParser.Unit_itemContext) {
                 IrpParser.Unit_itemContext unitItem = (IrpParser.Unit_itemContext) item;
                 if (unitItem.getChildCount() == 1 || unitItem.getChild(1).getText().equals("u")) {
-                    unitInPeriods = -1f;
+                    unitInPeriods = null;
                     unit = NumberWithDecimals.parse(unitItem.number_with_decimals());
                 } else
                     unitInPeriods = NumberWithDecimals.parse(unitItem.number_with_decimals());
@@ -121,10 +119,10 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
                         ? BitDirection.lsb : BitDirection.msb;
             }
         }
-        if (unitInPeriods > 0) {
-            if (frequency == 0)
+        if (unitInPeriods != null) {
+            if (IrCoreUtils.approximatelyEquals(frequency, 0d, 0.0000001, 0))
                 throw new IrpSemanticException("Units in p and frequency == 0 do not go together.");
-            unit = IrCoreUtils.seconds2microseconds(unitInPeriods / frequency);
+            unit = IrCoreUtils.seconds2microseconds(unitInPeriods / (frequency != null ? frequency : defaultFrequency));
         }
     }
 
@@ -152,23 +150,28 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
 
     @Override
     public String toString() {
-        return "Frequency = " + frequency + "Hz, unit = " + unit + "us, " + bitDirection
-                + (dutyCycle > 0 ? (", Duty cycle = " + Math.round(IrCoreUtils.real2percent(dutyCycle)) + "%.") : ", Duty cycle: -.");
+        return (frequency != null ? "Frequency = " + frequency + "Hz, " : "")
+                + "unit = " + unit + "us, " + bitDirection
+                + (dutyCycle != null ? (", Duty cycle = " + Math.round(IrCoreUtils.real2percent(dutyCycle)) + "%.") : "");
     }
 
     public final BitDirection getBitDirection() {
         return bitDirection;
     }
 
-    public final double getFrequency() {
+    public final Double getFrequency() {
         return frequency;
+    }
+
+    public final double getFrequencyWitDefault() {
+        return frequency != null ? frequency : defaultFrequency;
     }
 
     public final double getUnit() {
         return unit;
     }
 
-    public final double getDutyCycle() {
+    public final Double getDutyCycle() {
         return dutyCycle;
     }
 
@@ -179,12 +182,13 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
 
     public String toIrpString(boolean usePeriods) {
         StringJoiner joiner = new StringJoiner(",", "{", "}");
-        joiner.add(String.format(Locale.US, "%2.1f", IrCoreUtils.hz2khz(getFrequency())) + "k");
-        joiner.add(usePeriods
+        if (getFrequency() != null)
+            joiner.add(String.format(Locale.US, "%2.1f", IrCoreUtils.hz2khz(getFrequency())) + "k");
+        joiner.add(usePeriods && getFrequency() != null
                 ? (Math.round(IrCoreUtils.us2Periods(unit, getFrequency())) + "p")
                 : Long.toString(Math.round(getUnit())));
         joiner.add(getBitDirection().toString());
-        if (getDutyCycle() > 0)
+        if (getDutyCycle() != null)
             joiner.add(Math.round(IrCoreUtils.real2percent(getDutyCycle())) + "%");
         return joiner.toString();
     }
@@ -195,7 +199,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         element.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
         element.setAttribute("bitDirection", getBitDirection().toString());
         element.setAttribute("unit", Long.toString(Math.round(getUnit())));
-        if (getDutyCycle() > 0)
+        if (getDutyCycle() != null)
             element.setAttribute("dutyCycle", Long.toString(100 * Math.round(getDutyCycle())));
         return element;
     }
@@ -210,7 +214,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         Map<String, Object> map = new HashMap<>(2);
         // bitDirection and unit deliberately left out
         map.put("frequency", Math.round(frequency));
-        if (dutyCycle > 0)
+        if (dutyCycle != null)
             map.put("dutyCycle", dutyCycle);
         return map;
     }

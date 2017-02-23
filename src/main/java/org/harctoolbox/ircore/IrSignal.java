@@ -18,6 +18,7 @@ package org.harctoolbox.ircore;
 
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,13 +56,14 @@ public class IrSignal implements Cloneable {
                 throw new InvalidArgumentException("Must not use explicit frequency with a Pronto type signal.");
             return irSignal;
         }
-
-        if (frequency == null)
-            logger.log(Level.WARNING, "Unknown frequency, assuming default frequency = {0} Hz", ModulatedIrSequence.defaultFrequency);
-        return parseRaw(args, frequency != null ? frequency : ModulatedIrSequence.defaultFrequency, fixOddSequences);
+        return parseRaw(args, frequency, fixOddSequences);
     }
 
-    public static IrSignal parseRaw(List<String> args, double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+    public static IrSignal parseRaw(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+        if (frequency == null)
+            logger.log(Level.WARNING, String.format(Locale.US, "Unknown frequency, assuming default frequency = %d Hz",
+                    (int) ModulatedIrSequence.defaultFrequency));
+
         String str = String.join(" ", args).trim();
 
         IrSequence intro;
@@ -95,11 +97,11 @@ public class IrSignal implements Cloneable {
     /** "Table" for mapping Pass to intro, repeat, or ending sequence. */
     protected EnumMap<Pass, IrSequence>map;
 
-    /** Modulation frequency in Hz. Use 0 for not modulated. */
-    protected double frequency;
+    /** Modulation frequency in Hz. Use 0 for not modulated, and null for defaulted. */
+    protected Double frequency;
 
-    /** Duty cycle of the modulation. Between 0 and 1. Use -1 for not assigned. */
-    protected double dutyCycle = ModulatedIrSequence.unknownDutyCycle;
+    /** Duty cycle of the modulation. Between 0 and 1. Use null for not assigned. */
+    protected Double dutyCycle = null;
 
     /**
      * Constructs an IrSignal from its arguments.
@@ -109,7 +111,7 @@ public class IrSignal implements Cloneable {
      * @param repeatSequence
      * @param endingSequence
      */
-    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, double frequency, double dutyCycle) {
+    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, Double frequency, Double dutyCycle) {
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
         // If the given intro sequence is identical to the repeat sequence, reject it.
@@ -131,8 +133,8 @@ public class IrSignal implements Cloneable {
      * @param repeatSequence
      * @param endingSequence
      */
-    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, double frequency) {
-        this(introSequence, repeatSequence, endingSequence, frequency, ModulatedIrSequence.unknownDutyCycle);
+    public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, Double frequency) {
+        this(introSequence, repeatSequence, endingSequence, frequency, null);
     }
 
     /**
@@ -144,8 +146,8 @@ public class IrSignal implements Cloneable {
      * @param frequency
      * @throws InvalidArgumentException
      */
-    public IrSignal(int[] durations, int noIntro, int noRepeat, int frequency) throws InvalidArgumentException {
-        this(durations, noIntro, noRepeat, frequency, ModulatedIrSequence.unknownDutyCycle);
+    public IrSignal(int[] durations, int noIntro, int noRepeat, Integer frequency) throws InvalidArgumentException {
+        this(durations, noIntro, noRepeat, Double.valueOf(frequency), null);
     }
     /**
      * Constructs an IrSignal from its arguments.
@@ -176,14 +178,14 @@ public class IrSignal implements Cloneable {
      * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public IrSignal(int[] durations, int noIntro, int noRepeat, double frequency, double dutyCycle) throws InvalidArgumentException {
+    public IrSignal(int[] durations, int noIntro, int noRepeat, Double frequency, Double dutyCycle) throws InvalidArgumentException {
         this(new IrSequence(durations, 0, noIntro),
                 new IrSequence(durations, noIntro, noRepeat),
                 new IrSequence(durations, noIntro + noRepeat, durations.length - (noIntro + noRepeat)),
                 frequency, dutyCycle);
     }
 
-    public IrSignal(IrSequence irSequence, int noIntro, int noRepeat, double frequency, double dutyCycle) throws InvalidArgumentException {
+    public IrSignal(IrSequence irSequence, int noIntro, int noRepeat, Double frequency, Double dutyCycle) throws InvalidArgumentException {
         this(irSequence.subSequence(0, noIntro),
                 irSequence.subSequence(noIntro, noRepeat),
                 irSequence.subSequence(noIntro + noRepeat, irSequence.getLength() - noIntro - noRepeat),
@@ -232,11 +234,11 @@ public class IrSignal implements Cloneable {
         copyFrom(Pronto.parse(ccf, begin));
     }
 
-    public final double getFrequency() {
+    public final Double getFrequency() {
         return frequency;
     }
 
-    public final double getDutyCycle() {
+    public final Double getDutyCycle() {
         return dutyCycle;
     }
 

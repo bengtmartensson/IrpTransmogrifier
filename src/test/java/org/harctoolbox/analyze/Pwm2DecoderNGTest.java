@@ -41,7 +41,7 @@ public class Pwm2DecoderNGTest {
         this.irSequence = null;
         try {
             irSequence = new IrSequence(nec12_34_56_durations);
-            Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400f, null, BitDirection.msb, true, null, false);
+            Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400d, null, BitDirection.msb, true, null, false);
             analyzer = new Analyzer(irSequence);
             pwm = new Pwm2Decoder(analyzer, analyzerParams);
         } catch (OddSequenceLengthException ex) {
@@ -65,7 +65,7 @@ public class Pwm2DecoderNGTest {
         System.out.println("process");
         Protocol result;
         try {
-            result = pwm.parse();
+            result = pwm.parse()[0];
         } catch (DecodeException ex) {
             fail();
             return;

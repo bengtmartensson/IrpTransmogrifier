@@ -79,6 +79,31 @@ public class IrSequence implements Cloneable {
         return x <= 0 && y <= 0 || x >= 0 && y >= 0;
     }
 
+    public static List<IrSequence> parse(String str, boolean fixOddSequences) {
+        String[] parts = str.trim().startsWith("[")
+                ? str.replace("[", "").split("\\]")
+                : new String[] { str };
+
+        ArrayList<IrSequence> result = new ArrayList<>(parts.length);
+        for (String s : parts)
+            result.add(new IrSequence(s, fixOddSequences));
+
+        return result;
+    }
+
+    public static int[] toInts(List<IrSequence> list) {
+        int length = 0;
+        length = list.stream().map((seq) -> seq.getLength()).reduce(length, Integer::sum);
+        int[] result = new int[length];
+        int index = 0;
+        for (IrSequence seq : list) {
+            int[] array = seq.toInts();
+            System.arraycopy(array, 0, result, index, array.length);
+            index += array.length;
+        }
+        return result;
+    }
+
     /**
      * Duration data, possibly with signs, which are ignored (by this class).
      */
@@ -561,11 +586,11 @@ public class IrSequence implements Cloneable {
     }
 
     /**
-     * Return last entry, or <code>-ModulatedIrSequence.unknownPulseTime</code> if the data is empty.
-     * @return last entry, or <code>-ModulatedIrSequence.unknownPulseTime</code> if the data is empty.
+     * Return last entry, or <code>null</code> if the data is empty.
+     * @return last entry, or <code>null</code> if the data is empty.
      */
-    public final double getGap() {
-        return data.length > 0 ? Math.abs(data[data.length - 1]) : ModulatedIrSequence.unknownPulseTime;
+    public final Double getGap() {
+        return data.length > 0 ? Math.abs(data[data.length - 1]) : null;
     }
 
     /**

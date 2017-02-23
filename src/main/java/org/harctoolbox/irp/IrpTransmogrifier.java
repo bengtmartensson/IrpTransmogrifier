@@ -48,8 +48,10 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLengthException;
+import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -478,16 +480,37 @@ public class IrpTransmogrifier {
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
 
-        IrSignal irSignal = IrSignal.parse(commandAnalyze.args, commandAnalyze.frequency, false);
-        Analyzer analyzer = new Analyzer(irSignal, commandAnalyze.repeatFinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer analyzer;
+        try {
+            IrSignal irSignal = Pronto.parse(commandAnalyze.args);
+            if (commandAnalyze.introRepeatEnding)
+                logger.warning("--intro.repeat-ending ignored when using a Pronto Hex signal.");
+            analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        } catch (InvalidArgumentException ex) {
+            if (commandAnalyze.introRepeatEnding) {
+                IrSignal irSignal = IrSignal.parseRaw(commandAnalyze.args, commandAnalyze.frequency, false);
+                analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            } else {
+                List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args), false);
+                analyzer = new Analyzer(sequences, commandAnalyze.frequency, commandAnalyze.repeatFinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            }
+        }
         Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
 
-        if (commandAnalyze.statistics)
-            analyzer.printStatistics(out);
-        Protocol protocol = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
-        printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
+        if (commandAnalyze.statistics) {
+            analyzer.printStatistics(out, params);
+            out.println();
+        }
+        List<Protocol> protocols = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
+        for (int i = 0; i < protocols.size(); i++) {
+            if (protocols.size() > 1)
+                out.print("Seq. #" + i + ": ");
+            if (commandAnalyze.statistics)
+                out.println(analyzer.toTimingsString(i));
+            printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
+        }
     }
 
     private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException, IrpException, UsageException {
@@ -680,6 +703,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-i", "--invert"}, description = "Invert order in bitspec")
         private boolean invert = false;
+
+        @Parameter(names = { "--ire", "--intro-repeat-ending"}, description = "Consider the argument as begin, repeat, and ending sequence")
+        private boolean introRepeatEnding = false;
 
         @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the parameters")
         private boolean lsb = false;

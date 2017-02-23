@@ -2,7 +2,6 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -44,14 +43,14 @@ public class GeneralSpecNGTest {
             System.out.println("toString");
             GeneralSpec instance = new GeneralSpec("{42%, 10p,msb,40k}");
             Assert.assertEquals(instance.toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 42%.");
-            assertEquals(new GeneralSpec("{ }").toString(), "Frequency = 38000.0Hz, unit = 1.0us, lsb, Duty cycle: -.");
-            assertEquals(new GeneralSpec("{38.4k,564}").toString(), "Frequency = 38400.0Hz, unit = 564.0us, lsb, Duty cycle: -.");
-            assertEquals(new GeneralSpec("{564,38.4k}").toString(), "Frequency = 38400.0Hz, unit = 564.0us, lsb, Duty cycle: -.");
-            assertEquals(new GeneralSpec("{22p,40k}").toString(), "Frequency = 40000.0Hz, unit = 550.0us, lsb, Duty cycle: -.");
-            assertEquals(new GeneralSpec("{msb, 889u}").toString(), "Frequency = 38000.0Hz, unit = 889.0us, msb, Duty cycle: -.");
+            assertEquals(new GeneralSpec("{ }").toString(), "unit = 1.0us, lsb");
+            assertEquals(new GeneralSpec("{38.4k,564}").toString(), "Frequency = 38400.0Hz, unit = 564.0us, lsb");
+            assertEquals(new GeneralSpec("{564,38.4k}").toString(), "Frequency = 38400.0Hz, unit = 564.0us, lsb");
+            assertEquals(new GeneralSpec("{22p,40k}").toString(), "Frequency = 40000.0Hz, unit = 550.0us, lsb");
+            assertEquals(new GeneralSpec("{msb, 889u}").toString(), "unit = 889.0us, msb");
             assertEquals(new GeneralSpec("{42%, 10p,msb,40k}").toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 42%.");
             assertEquals(new GeneralSpec("{msb ,40k , 33.33333% ,10p }").toString(), "Frequency = 40000.0Hz, unit = 250.0us, msb, Duty cycle = 33%.");
-            assertEquals(new GeneralSpec("{msb, 123u, 100k, 10p, 1000k}").toString(), "Frequency = 1000000.0Hz, unit = 10.0us, msb, Duty cycle: -.");
+            assertEquals(new GeneralSpec("{msb, 123u, 100k, 10p, 1000k}").toString(), "Frequency = 1000000.0Hz, unit = 10.0us, msb");
         } catch (ArithmeticException ex) {
             fail();
         }
@@ -91,8 +90,8 @@ public class GeneralSpecNGTest {
             System.out.println("getFrequency");
             GeneralSpec instance = new GeneralSpec("{msb, 12.3k, 33.33333% ,10p }");
             double result = instance.getFrequency();
-            Assert.assertEquals(result, 12300f, 0.0001);
-            Assert.assertEquals(new GeneralSpec("{msb, 33.33333% ,10p }").getFrequency(), ModulatedIrSequence.defaultFrequency, 0.0001);
+            Assert.assertEquals(result, 12300d, 0.0001);
+            Assert.assertTrue(new GeneralSpec("{msb, 33.33333% ,10p }").getFrequency() == null);
         } catch (ArithmeticException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }

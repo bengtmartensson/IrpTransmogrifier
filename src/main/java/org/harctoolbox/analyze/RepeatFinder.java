@@ -108,6 +108,9 @@ public class RepeatFinder {
         this(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
 
+    public RepeatFinder(int[] data) {
+        this(new IrSequence(data), defaultAbsoluteTolerance, defaultRelativeTolerance);
+    }
 
     private void analyze() {
         RepeatFinderData candidate = new RepeatFinderData(irSequence.getLength());
@@ -149,27 +152,6 @@ public class RepeatFinder {
             return false;
 
         return irSequence.approximatelyEquals(beginning, compareStart, length, absoluteTolerance, relativeTolerance, minRepeatLastGap);
-    }
-
-    /**
-     * @return the relativeTolerance
-     */
-    public double getRelativeTolerance() {
-        return relativeTolerance;
-    }
-
-    /**
-     * @return the absoluteTolerance
-     */
-    public double getAbsoluteTolerance() {
-        return absoluteTolerance;
-    }
-
-    /**
-     * @return the irSequence
-     */
-    public IrSequence getIrSequence() {
-        return irSequence;
     }
 
     /**

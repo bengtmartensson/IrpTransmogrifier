@@ -65,9 +65,9 @@ public class Pronto {
      * @param code Pronto frequency code
      * @return Frequency in Hz.
      */
-    public static double getFrequency(int code) {
+    public static Double getFrequency(int code) {
         return code == 0
-                ? ModulatedIrSequence.unknownFrequency // Invalid value
+                ? null // Invalid value
                 : 1000000.0 / (code * prontoConstant);
     }
 
@@ -76,9 +76,9 @@ public class Pronto {
      * @param code Pronto frequency code.
      * @return Duration of one pulse of the carrier in microseconds.
      */
-    public static double getPulseTime(int code) { // in microseconds
+    public static Double getPulseTime(int code) { // in microseconds
         return code == 0
-                ? ModulatedIrSequence.unknownPulseTime // Invalid value
+                ? null // Invalid value
                 : code * prontoConstant;
     }
 
@@ -135,7 +135,7 @@ public class Pronto {
                 IrSequence repeatSequence = new IrSequence(repeat);
                 irSignal = new IrSignal(introSequence, repeatSequence, null,
                         type == learnedCode ? getFrequency(frequencyCode) : 0,
-                        ModulatedIrSequence.unknownDutyCycle);
+                        null);
                 break;
 
             default:

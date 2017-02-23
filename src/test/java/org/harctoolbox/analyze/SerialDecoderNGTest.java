@@ -39,7 +39,7 @@ public class SerialDecoderNGTest {
         widths.add(1);
         widths.add(8);
         widths.add(8);
-        paramsPctv = new Analyzer.AnalyzerParams(38400f, null, BitDirection.lsb, false, widths, false);
+        paramsPctv = new Analyzer.AnalyzerParams(38400d, null, BitDirection.lsb, false, widths, false);
     }
 
     @BeforeMethod
@@ -57,10 +57,8 @@ public class SerialDecoderNGTest {
     public void testParse() {
         try {
             System.out.println("parse");
-            int beg = 0;
-            int length = 0;
             SerialDecoder decoder = new SerialDecoder(pctv, paramsPctv);
-            Protocol result = decoder.parse();
+            Protocol result = decoder.parse()[0];
             System.out.println("Expect warnings on missing ParameterSpec");
             Protocol expResult = new Protocol("{38.4k,832,lsb}<-1|1>(A:2,B:8,C:1,D:8,E:8,F:2,-100m){A=3,B=0,C=1,D=12,E=34,F=3}");
             assertEquals(result, expResult);

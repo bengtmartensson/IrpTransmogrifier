@@ -29,7 +29,6 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class Cleaner {
@@ -37,7 +36,7 @@ public class Cleaner {
 
     public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
-        return cleaner.toIrSequence();
+        return new IrSequence(cleaner.toDurations());
     }
 
     public static IrSequence clean(IrSequence irSequence) {
@@ -56,7 +55,7 @@ public class Cleaner {
     public static IrSignal clean(IrSignal irSignal, double absoluteTolerance, double relativeTolerance) throws InvalidArgumentException {
         ModulatedIrSequence irSequence = irSignal.toModulatedIrSequence(1);
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
-        IrSequence cleansed = cleaner.toIrSequence();
+        IrSequence cleansed = new IrSequence(cleaner.toDurations());
         return new IrSignal(cleansed, irSignal.getIntroLength(), irSignal.getRepeatLength(), irSignal.getFrequency(), irSignal.getDutyCycle());
     }
 
@@ -80,7 +79,11 @@ public class Cleaner {
     }
 
     public Cleaner(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
-        rawData = irSequence.toInts();
+        this(irSequence.toInts(), absoluteTolerance, relativeTolerance);
+    }
+
+    Cleaner(int[] data, double absoluteTolerance, double relativeTolerance) {
+        rawData = data;
         createRawHistogram();
         createDumbTimingsTable(absoluteTolerance, relativeTolerance);
         improveTimingsTable(absoluteTolerance, relativeTolerance);
@@ -106,7 +109,7 @@ public class Cleaner {
         Arrays.sort(sorted);
         int last = Integer.MIN_VALUE;
         for (int d : sorted) {
-            if (!IrCoreUtils.approximatelyEquals(d, last, absoluteTolerance, relativeTolerance)) {
+            if (!IrCoreUtils.approximatelyEquals(d, last, (int) absoluteTolerance, relativeTolerance)) {
                 dumbTimingsTable.add(d);
                 last = d;
             }
@@ -123,7 +126,7 @@ public class Cleaner {
             int terms = 0;
             int lastDuration = -1;
             while (indexInSortedTimings < sorted.length
-                    && IrCoreUtils.approximatelyEquals(dumbTiming, sorted[indexInSortedTimings], absoluteTolerance, relativeTolerance)) {
+                    && IrCoreUtils.approximatelyEquals(dumbTiming, sorted[indexInSortedTimings], (int) absoluteTolerance, relativeTolerance)) {
                 int duration = sorted[indexInSortedTimings++];
                 if (duration == lastDuration)
                     continue;
@@ -162,30 +165,30 @@ public class Cleaner {
     }
 
     private int[] toDurations() {
-        int[] data = new int[rawData.length];
-        for (int i = 0; i < rawData.length; i++)
-            data[i] = timings.get(indexData[i]);
+        return toDurations(0, rawData.length);
+    }
+
+    protected int[] toDurations(int beg, int length) {
+        int[] data = new int[length];
+        for (int i = 0; i < length; i++)
+            data[i] = timings.get(indexData[beg + i]);
         return data;
     }
 
-    public String toTimingsString() {
+    // FIXME
+    protected String toTimingsString(int beg, int length) {
         StringJoiner str = new StringJoiner(" ");
-        for (int i = 0; i < rawData.length; i += 2) {
+        for (int i = 0; i < length; i += 2) {
             StringBuilder s = new StringBuilder(2);
-            s.append(mkName(indexData[i]));
-            s.append(mkName(indexData[i+1]));
+            s.append(mkName(indexData[beg + i]));
+            s.append(mkName(indexData[beg + i + 1]));
             str.add(s);
         }
         return str.toString();
     }
 
-    public IrSequence toIrSequence() {
-        try {
-            return new IrSequence(toDurations());
-        } catch (OddSequenceLengthException ex) {
-            assert(false);
-            return null;
-        }
+    public String toTimingsString() {
+        return toTimingsString(0, rawData.length);
     }
 
     protected int getTotalDuration(int beg, int length) {

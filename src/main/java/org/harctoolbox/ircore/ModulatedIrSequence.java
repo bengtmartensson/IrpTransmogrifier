@@ -26,9 +26,6 @@ import java.util.Collection;
 public class ModulatedIrSequence extends IrSequence {
     private static final double allowedFrequencyDeviation = 0.05;
     private static final double zeroModulationLimit = 0.000001;
-    public static final double unknownFrequency = -1.0;
-    public static final double unknownDutyCycle = -1.0;
-    public static final double unknownPulseTime = -1.0;
     public static final double defaultFrequency = 38000.0;
     public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
@@ -38,12 +35,12 @@ public class ModulatedIrSequence extends IrSequence {
      * Modulation frequency in Hz. Use 0 for no modulation. Use
      * <code>unknownFrequency</code> for no information.
      */
-    protected double frequency = unknownFrequency;
+    protected Double frequency = null;
 
     /**
      * Duty cycle of the modulation, a number between 0 and 1. Use <code>unknownDutyCycle</code> for unassigned.
      */
-    protected double dutyCycle = unknownDutyCycle;
+    protected Double dutyCycle = null;
 
     private ModulatedIrSequence() {
     }
@@ -55,7 +52,7 @@ public class ModulatedIrSequence extends IrSequence {
      * @param frequency
      * @param dutyCycle
      */
-    public ModulatedIrSequence(IrSequence irSequence, double frequency, double dutyCycle) {
+    public ModulatedIrSequence(IrSequence irSequence, Double frequency, Double dutyCycle) {
         super(irSequence.data);
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
@@ -67,8 +64,8 @@ public class ModulatedIrSequence extends IrSequence {
      * @param irSequence irSequence to be copied from
      * @param frequency
      */
-    public ModulatedIrSequence(IrSequence irSequence, double frequency) {
-        this(irSequence, frequency, unknownDutyCycle);
+    public ModulatedIrSequence(IrSequence irSequence, Double frequency) {
+        this(irSequence, frequency, null);
     }
 
     /**
@@ -79,7 +76,7 @@ public class ModulatedIrSequence extends IrSequence {
      * @param dutyCycle
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public ModulatedIrSequence(int[] durations, double frequency, double dutyCycle) throws OddSequenceLengthException {
+    public ModulatedIrSequence(int[] durations, Double frequency, Double dutyCycle) throws OddSequenceLengthException {
         this(new IrSequence(durations), frequency, dutyCycle);
     }
 
@@ -90,8 +87,8 @@ public class ModulatedIrSequence extends IrSequence {
      * @param frequency
      * @throws OddSequenceLengthException if duration has odd length.
      */
-    public ModulatedIrSequence(int[] durations, double frequency) throws OddSequenceLengthException {
-        this(new IrSequence(durations), frequency, unknownDutyCycle);
+    public ModulatedIrSequence(int[] durations, Double frequency) throws OddSequenceLengthException {
+        this(new IrSequence(durations), frequency, null);
     }
 
     /**
@@ -113,7 +110,7 @@ public class ModulatedIrSequence extends IrSequence {
             cumulatedLength += seq.getLength();
         }
 
-        dutyCycle = mindc > 0 ? (mindc + maxdc)/2 : unknownDutyCycle;
+        dutyCycle = mindc > 0 ? (mindc + maxdc)/2 : null;
         frequency = minf > 0 ? (minf + maxf)/2 : 0.0;
         data = new double[cumulatedLength];
         int beginIndex = 0;
@@ -122,19 +119,24 @@ public class ModulatedIrSequence extends IrSequence {
             beginIndex += seq.data.length;
         }
     }
+
     /**
      *
      * @return modulation frequency in Hz.
      */
-    public final double getFrequency() {
+    public final Double getFrequency() {
         return frequency;
+    }
+
+    public final double getFrequencyWithDefault() {
+        return frequency != null ? frequency : defaultFrequency;
     }
 
     /**
      *
      * @return Duty cycle.
      */
-    public final double getDutyCycle() {
+    public final Double getDutyCycle() {
         return dutyCycle;
     }
 

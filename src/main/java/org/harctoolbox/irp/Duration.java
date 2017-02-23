@@ -137,12 +137,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     private double multiplicator(GeneralSpec generalSpec) {
-        return unit.equals("p") ? IrCoreUtils.seconds2microseconds(1/generalSpec.getFrequency())
+        return unit.equals("p") ? IrCoreUtils.seconds2microseconds(1/generalSpec.getFrequencyWitDefault())
                 : unit.equals("m") ? 1000
                 : unit.equals("u") ? 1
                 : time_units;
     }
-
 
     public abstract double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException;
 
@@ -151,8 +150,8 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         if (time_periods != IrCoreUtils.invalid) {
             if (generalSpec == null)
                 return DUMMYTIMEUNIT;
-            else if (generalSpec.getFrequency() > 0)
-                return IrCoreUtils.seconds2microseconds(time_periods/generalSpec.getFrequency());
+            else if (generalSpec.getFrequencyWitDefault()> 0)
+                return IrCoreUtils.seconds2microseconds(time_periods/generalSpec.getFrequencyWitDefault());
             else
                 throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
 

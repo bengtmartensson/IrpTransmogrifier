@@ -21,8 +21,10 @@ import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -39,23 +41,40 @@ import org.harctoolbox.irp.Protocol;
 public class Analyzer extends Cleaner {
 
     private static final Logger logger = Logger.getLogger(Analyzer.class.getName());
-    private static final int numberOfDecoders = 4;
 
     private int timebase;
     private int[] normedTimings;
     private List<Burst> pairs;
-    private RepeatFinder.RepeatFinderData repeatfinderData;
-    private double frequency;
+    private final RepeatFinder.RepeatFinderData[] repeatFinderData;
+    private Double frequency;
+    private int[] indices; // ending indicies
+    private boolean signalMode = false;
 
-    public Analyzer(IrSignal irSignal, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
-        this(irSignal.toModulatedIrSequence(1), invokeRepeatFinder, absoluteTolerance, relativeTolerance);
+    public Analyzer(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) {
+        this(irSignal.toModulatedIrSequence(true, 1, true), false, absoluteTolerance, relativeTolerance);
+        signalMode = true;
+        indices = new int[3];
+        indices[0] = irSignal.getIntroLength();
+        indices[1] = indices[0] + irSignal.getRepeatLength();
+        indices[2] = indices[1] + irSignal.getEndingLength();
     }
 
-    public Analyzer(IrSequence irSequence, double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
-        super(irSequence, absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.defaultAbsoluteTolerance,
+    public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+        this(Arrays.asList(irSequence), frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
+    }
+
+    public Analyzer(List<IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+        super(IrSequence.toInts(irSequenceList), absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.defaultAbsoluteTolerance,
                 relativeTolerance != null ? relativeTolerance : IrCoreUtils.defaultRelativeTolerance);
+        if (frequency == null)
+            logger.log(Level.FINE, String.format(Locale.US, "No frequency given, using default frequency = %d Hz", (int) ModulatedIrSequence.defaultFrequency));
         this.frequency = frequency;
-        repeatfinderData = getRepeatFinderData(invokeRepeatFinder, irSequence.getLength());
+        indices = new int[irSequenceList.size()];
+        for (int i = 0; i < irSequenceList.size(); i++)
+            indices[i] = irSequenceList.get(i).getLength() + (i > 0 ? indices[i - 1] : 0);
+        repeatFinderData = new RepeatFinder.RepeatFinderData[irSequenceList.size()];
+        for (int i = 0; i < irSequenceList.size(); i++)
+            repeatFinderData[i] = getRepeatFinderData(invokeRepeatFinder, i);
         createNormedTimings();
         createPairs();
     }
@@ -80,9 +99,15 @@ public class Analyzer extends Cleaner {
         this(new IrSequence(data), IrCoreUtils.invalid, false, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
     }
 
-    private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int length) {
-        return invokeRepeatFinder ? new RepeatFinder(toIrSequence()).getRepeatFinderData()
+    private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int number) {
+        int beg = getSequenceBegin(number);
+        int length = getSequenceLength(number);
+        return invokeRepeatFinder ? new RepeatFinder(toDurations(beg, length)).getRepeatFinderData()
                 : new RepeatFinder.RepeatFinderData(length);
+    }
+
+    RepeatFinder.RepeatFinderData getRepeatFinderData(int number) {
+        return repeatFinderData[number];
     }
 
     private void createNormedTimings() {
@@ -146,6 +171,10 @@ public class Analyzer extends Cleaner {
         return decoders;
     }
 
+    public int getNoSequences() {
+        return signalMode ? 1 : indices.length;
+    }
+
     /**
      * @return the timebase
      */
@@ -168,18 +197,26 @@ public class Analyzer extends Cleaner {
         return getNumberPairs(pair.getFlashDuration(), pair.getGapDuration());
     }
 
-    public double getFrequency() {
+    public Double getFrequency() {
         return frequency;
     }
 
-    public Protocol searchProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) {
+    public ArrayList<Protocol> searchProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) {
         List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern, regexp);
+        ArrayList<Protocol> result = new ArrayList<>(getNoSequences());
+        for (int i = 0; i < getNoSequences(); i++)
+            result.add(searchProtocol(decoders, i));
+
+        return result;
+    }
+
+    public Protocol searchProtocol(List<AbstractDecoder> decoders, int number) {
         Protocol bestSoFar = null;
         int weight = Integer.MAX_VALUE;
 
         for (AbstractDecoder decoder : decoders) {
             try {
-                Protocol protocol = decoder.parse();
+                Protocol protocol = decoder.parse(number, signalMode);
                 int protocolWeight = protocol.weight();
                 logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(), protocolWeight});
                 if (protocolWeight < weight) {
@@ -193,44 +230,57 @@ public class Analyzer extends Cleaner {
         return bestSoFar;
     }
 
+    public String toTimingsString(int nr) {
+        return toTimingsString(getSequenceBegin(nr), getSequenceLength(nr));
+    }
+
     public int getCleanedTime(int i) {
         return timings.get(indexData[i]);
     }
 
-    public RepeatFinder.RepeatFinderData getRepeatFinderData() {
-        return repeatfinderData;
-    }
-
-    public void printStatistics(PrintStream out) {
+    public void printStatistics(PrintStream out, AnalyzerParams params) {
         out.println("Gaps:");
         this.getGaps().stream().forEach((d) -> {
-            out.println(this.getName(d) + ":\t" + d + "\t" + this.getNumberGaps(d));
+            out.println(this.getName(d) + ":\t" + d + "\t" + multiplierString(d, params.getTimebase()) + "\t" + this.getNumberGaps(d));
         });
+        out.println();
 
         out.println("Flashes:");
         this.getFlashes().stream().forEach((d) -> {
-            out.println(this.getName(d) + ":\t" + d + "\t" + this.getNumberFlashes(d));
+            out.println(this.getName(d) + ":\t" + d + "\t" + multiplierString(d, params.getTimebase()) + "\t" + this.getNumberFlashes(d));
         });
+        out.println();
 
         out.println("Pairs:");
         this.getPairs().stream().forEach((pair) -> {
             out.println(this.getName(pair) + ":\t" + this.getNumberPairs(pair));
         });
+    }
 
-        out.println("Signal as sequence of pairs:");
-        out.println(this.toTimingsString());
+    private String multiplierString(int us, Double timebase) {
+        double tick = timebase != null ? timebase : timings.get(0);
+        Integer mult = Burst.multiplier(us, tick);
+        return mult != null ? "= " + mult.toString() + "*" + Long.toString(Math.round(tick)) + "  " : "\t";
+    }
+
+    int getSequenceLength(int n) {
+        return indices[n] - (n > 0 ? indices[n-1] : 0);
+    }
+
+    int getSequenceBegin(int n) {
+        return n == 0 ? 0 : indices[n - 1];
     }
 
     public static class AnalyzerParams {
-        private final double frequency;
-        private final double timebase;
+        private final Double frequency;
+        private final Double timebase;
         private final boolean preferPeriods;
         private final BitDirection bitDirection;
         private final boolean useExtents;
         private final boolean invert;
         private final List<Integer> parameterWidths;
 
-        public AnalyzerParams(double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) {
+        public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) {
             this.frequency = frequency;
             this.bitDirection = bitDirection;
             this.useExtents = useExtents;
@@ -238,7 +288,7 @@ public class Analyzer extends Cleaner {
             this.parameterWidths = parameterWidths == null ? new ArrayList<>(0) : parameterWidths;
 
             if (timeBaseString == null) {
-                timebase = IrCoreUtils.invalid;
+                timebase = null;
                 preferPeriods = false;
             } else {
                 preferPeriods = timeBaseString.endsWith("p");
@@ -286,7 +336,7 @@ public class Analyzer extends Cleaner {
         /**
          * @return the timebase
          */
-        public double getTimebase() {
+        public Double getTimebase() {
             return timebase;
         }
 

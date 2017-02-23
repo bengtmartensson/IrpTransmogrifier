@@ -26,7 +26,6 @@ import org.harctoolbox.irp.Extent;
 import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
-import org.harctoolbox.irp.IrpUtils;
 
 public class Burst {
     private static final double dafaultMaxRoundingError = 0.3f;
@@ -37,35 +36,44 @@ public class Burst {
     private static double maxUnits = defaultMaxUnits;
     private static double maxUs = defaultMaxUs;
 
-    private static Duration newFlashOrGap(boolean isFlash, double us, double timebase) {
-        double units = timebase > 0 ? us/timebase : IrpUtils.invalid;
+    static Integer multiplier(double us, Double timebase) {
+        if (timebase == null)
+            return null;
+
+        double units = us/timebase;
+        int rounded = (int) Math.round(units);
         double roundingError = Math.round(units) - units;
-        String unit = (units > 0 && units < maxUnits && Math.abs(roundingError) < maxRoundingError) ? ""
+        boolean ok = units < maxUnits && Math.abs(roundingError) < maxRoundingError;
+        return ok ? rounded : null;
+    }
+
+    private static Duration newFlashOrGap(boolean isFlash, double us, Double timebase) {
+        Integer mult = multiplier(us, timebase);
+        String unit = mult != null ? ""
                 : us < maxUs ? "u"
                 : "m";
-        double duration = unit.isEmpty() ? Math.round(units)
-                : unit.equals("m") ? Math.round(IrCoreUtils.microseconds2milliseconds(us))
+        double duration = mult != null ? mult.doubleValue()
+                : unit.equals("m") ? IrCoreUtils.microseconds2milliseconds(us)
                 : us;
         return isFlash ? new Flash(duration, unit) : new Gap(duration, unit);
     }
 
-    public static Extent newExtent(int us, double timebase) {
-        double units = us/timebase;
-        double roundingError = Math.round(units) - units;
-        String unit = (units < maxUnits && Math.abs(roundingError) < maxRoundingError) ? ""
+    public static Extent newExtent(int us, Double timebase) {
+        Integer mult = multiplier(us, timebase);
+        String unit = mult != null ? ""
                 : us < maxUs ? "u"
                 : "m";
-        double duration = unit.isEmpty() ? Math.round(units)
-                : unit.equals("m") ? Math.round(us/1000f)
+        double duration = unit.isEmpty() && mult != null ? mult.doubleValue()
+                : unit.equals("m") ? Math.round(IrCoreUtils.microseconds2milliseconds(us))
                 : us;
         return new Extent(duration, unit);
     }
 
-    public static Flash newFlash(double duration, double timebase) {
+    public static Flash newFlash(double duration, Double timebase) {
         return (Flash) newFlashOrGap(true, duration, timebase);
     }
 
-    public static Gap newGap(double duration, double timebase) {
+    public static Gap newGap(double duration, Double timebase) {
         return (Gap) newFlashOrGap(false, duration, timebase);
     }
 

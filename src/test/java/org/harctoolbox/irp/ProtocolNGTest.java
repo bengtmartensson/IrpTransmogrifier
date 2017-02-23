@@ -635,11 +635,11 @@ public class ProtocolNGTest {
             System.out.println("recognizeZaptor");
             IrSequence repeat = new IrSequence(new int[]{2640, 1980, 660, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 660, 660, 660, 660, 660, 330, 330, 330, 330, 660, 330, 330, 660, 660, 330, 330, 330, 330, 330, 330, 660, 660, 660, 660, 330, 330, 660, 660, 74330});
             IrSequence ending = new IrSequence(new int[]{2640, 1980, 660, 330, 660, 660, 330, 330, 660, 660, 330, 330, 660, 330, 330, 660, 660, 660, 660, 660, 660, 660, 330, 330, 330, 330, 660, 330, 330, 660, 660, 330, 330, 330, 330, 330, 330, 660, 660, 660, 330, 330, 660, 660, 660, 74330});
-            IrSignal irSignal = new IrSignal(repeat, repeat, ending, 36000f);
+            IrSignal irSignal = new IrSignal(repeat, repeat, ending, 36000d);
             NameEngine nameEngine = new NameEngine("{D=73, F=55, S=42, E=10}");
             Map<String, Long> recognizeData = zaptor.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-            IrSignal silly = new IrSignal(repeat, repeat, repeat, 36000f);
+            IrSignal silly = new IrSignal(repeat, repeat, repeat, 36000d);
             System.err.print("Expect IrpSignalParseException: ");
             zaptor.recognize(silly);
             fail();

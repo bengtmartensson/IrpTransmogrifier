@@ -64,27 +64,56 @@ public abstract class AbstractDecoder {
         this.nameEngine = null;
         this.analyzer = analyzer;
         this.params = params;
-        this.timebase = params.getTimebase() > 0 ? params.getTimebase() : analyzer.getTiming(0);
+        this.timebase = params.getTimebase() != null ? params.getTimebase() : analyzer.getTiming(0);
         this.bitSpec = new BitSpec();
     }
 
-    public Protocol parse() throws DecodeException {
+    public Protocol[] parse() throws DecodeException {
+        return parse(false);
+    }
+
+    public Protocol[] parse(boolean signalMode) throws DecodeException {
+        Protocol[] result = new Protocol[analyzer.getNoSequences()];
+        for (int i = 0; i < analyzer.getNoSequences(); i++)
+            result[i] = parse(i, signalMode);
+        return result;
+    }
+
+    Protocol parse(int number, boolean signalMode) throws DecodeException {
+        assert (!(signalMode && number > 0));
         nameEngine = new NameEngine();
-        noPayload = 0;
-        RepeatFinder.RepeatFinderData repeatfinderData = analyzer.getRepeatFinderData();
-        List<IrStreamItem> items = parse(0, repeatfinderData.getBeginLength());
-        List<IrStreamItem> repeatItems = parse(repeatfinderData.getBeginLength(), repeatfinderData.getRepeatLength());
-        List<IrStreamItem> endingItems = parse(repeatfinderData.getEndingStart(), repeatfinderData.getEndingLength());
         IrStream irStream;
-        RepeatMarker repeatMarker = new RepeatMarker(repeatfinderData.getNumberRepeats());
-        if (repeatfinderData.getBeginLength() == 0 && repeatfinderData.getEndingLength() == 0) {
-            irStream = new IrStream(repeatItems, repeatMarker);
+        if (signalMode) {
+            List<IrStreamItem> items       = parse(analyzer.getSequenceBegin(0), analyzer.getSequenceLength(0));
+            List<IrStreamItem> repeatItems = parse(analyzer.getSequenceBegin(1), analyzer.getSequenceLength(1));
+            List<IrStreamItem> endingItems = parse(analyzer.getSequenceBegin(2), analyzer.getSequenceLength(2));
+
+            RepeatMarker repeatMarker = new RepeatMarker("*");
+            if (analyzer.getSequenceLength(0) == 0 && analyzer.getSequenceLength(2) == 0) {
+                irStream = new IrStream(repeatItems, repeatMarker);
+            } else {
+                if (!repeatItems.isEmpty())
+                    items.add(new IrStream(repeatItems, repeatMarker));
+                if (!endingItems.isEmpty())
+                    items.add(new IrStream(endingItems));
+                irStream = new IrStream(items);
+            }
         } else {
-            if (!repeatItems.isEmpty())
-                items.add(new IrStream(repeatItems, repeatMarker));
-            if (!endingItems.isEmpty())
-                items.add(new IrStream(endingItems));
-            irStream = new IrStream(items);
+            int begin = analyzer.getSequenceBegin(number);
+            RepeatFinder.RepeatFinderData repeatfinderData = analyzer.getRepeatFinderData(number);
+            List<IrStreamItem> items = parse(begin, repeatfinderData.getBeginLength());
+            List<IrStreamItem> repeatItems = parse(begin + repeatfinderData.getBeginLength(), repeatfinderData.getRepeatLength());
+            List<IrStreamItem> endingItems = parse(begin + repeatfinderData.getEndingStart(), repeatfinderData.getEndingLength());
+            RepeatMarker repeatMarker = new RepeatMarker(repeatfinderData.getNumberRepeats());
+            if (repeatfinderData.getBeginLength() == 0 && repeatfinderData.getEndingLength() == 0) {
+                irStream = new IrStream(repeatItems, repeatMarker);
+            } else {
+                if (!repeatItems.isEmpty())
+                    items.add(new IrStream(repeatItems, repeatMarker));
+                if (!endingItems.isEmpty())
+                    items.add(new IrStream(endingItems));
+                irStream = new IrStream(items);
+            }
         }
         BitspecIrstream bitspecIrstream = new BitspecIrstream(bitSpec, irStream);
         Protocol protocol = new Protocol(params.getGeneralSpec(timebase), bitspecIrstream, nameEngine, null, null);

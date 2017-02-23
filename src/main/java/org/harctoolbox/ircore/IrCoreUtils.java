@@ -145,7 +145,12 @@ public class IrCoreUtils {
      * @param relativeTolerance
      * @return true if either absolute or relative requirement is satisfied.
      */
-    public static boolean approximatelyEquals(double x, double y, double absoluteTolerance, double relativeTolerance) {
+    public static boolean approximatelyEquals(Double x, Double y, double absoluteTolerance, double relativeTolerance) {
+        if (x == null && y == null)
+            return true;
+        if (x == null || y == null)
+            return false;
+        
         double absDiff = Math.abs(x - y);
         boolean absoluteOk = absDiff <= absoluteTolerance;
         if (absoluteOk)
@@ -156,7 +161,7 @@ public class IrCoreUtils {
         return relativeOk;
     }
 
-    public static boolean approximatelyEquals(double x, double y) {
+    public static boolean approximatelyEquals(Double x, Double y) {
         return approximatelyEquals(x, y, defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
 

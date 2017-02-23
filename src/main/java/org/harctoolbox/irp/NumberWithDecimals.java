@@ -70,7 +70,7 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
 
     @Override
     public String toString() {
-        return (IrCoreUtils.approximatelyEquals(data, (long)data, 0, 0.000001)
+        return (IrCoreUtils.approximatelyEquals(data, (double) (long)data, 0d, 0.01)
                 ? Long.toString((long)data)
                 : Double.toString(data));
     }

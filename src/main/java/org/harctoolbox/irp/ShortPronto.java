@@ -59,9 +59,9 @@ public class ShortPronto extends Pronto {
             throw new OddSequenceLengthException("CCF is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
         String irp = null;
-        int dev = (int) IrpUtils.invalid;
-        int subdev = (int) IrpUtils.invalid;
-        int cmd = (int) IrpUtils.invalid;
+        Integer dev = null;
+        Integer subdev = null;
+        Integer cmd = null;
 
         int index = 0;
         int type = ccf[index++];
@@ -125,7 +125,7 @@ public class ShortPronto extends Pronto {
             NameEngine nameEngine = new NameEngine(3);
             try {
                 nameEngine.define("D", dev);
-                if (subdev != (int) IrpUtils.invalid)
+                if (subdev != null)
                     nameEngine.define("S", subdev);
                 nameEngine.define("F", cmd);
             } catch (InvalidNameException ex) {
@@ -190,10 +190,10 @@ public class ShortPronto extends Pronto {
      * @return integer array of short CCF, or null om failure.
      * @throws InvalidArgumentException for paramters outside of its allowed domain.
      */
-    public static int[] shortCCF(String protocolName, int device, int subdevice, int command) throws InvalidArgumentException {
+    public static int[] shortCCF(String protocolName, Integer device, Integer subdevice, Integer command) throws InvalidArgumentException {
         int index = 0;
         if (protocolName.equalsIgnoreCase("rc5")) {
-            if (device > 31 || subdevice != (int) IrpUtils.invalid || command > 127)
+            if (device > 31 || subdevice != null || command > 127)
                 throw new InvalidArgumentException("Invalid parameters");
 
             int[] result = new int[6];
@@ -221,7 +221,7 @@ public class ShortPronto extends Pronto {
 
             return result;
         } else if (protocolName.equalsIgnoreCase("rc6")) {
-            if (device > 255 || subdevice != (int) IrpUtils.invalid || command > 255)
+            if (device > 255 || subdevice != null || command > 255)
                 throw new InvalidArgumentException("Invalid parameters");
 
             int[] result = new int[6];
@@ -242,7 +242,7 @@ public class ShortPronto extends Pronto {
             result[index++] = nec1Frequency;
             result[index++] = 0;
             result[index++] = 1;
-            result[index++] = (device << 8) + (subdevice != (int) IrpUtils.invalid ? subdevice : (0xff - device));
+            result[index++] = (device << 8) + (subdevice != null ? subdevice : (0xff - device));
             result[index++] = (command << 8) + (0xff - command);
 
             return result;

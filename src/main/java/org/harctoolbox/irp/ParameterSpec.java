@@ -93,8 +93,8 @@ public class ParameterSpec extends IrpObject {
                 throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
         }
 
-        long value = nameEngine.get(name.getName()).toNumber(nameEngine);
-        if (value == IrCoreUtils.invalid && deflt == null)
+        Long value = nameEngine.get(name.getName()).toNumber(nameEngine);
+        if (value == null && deflt == null)
             throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
         checkDomain(value);
     }

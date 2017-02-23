@@ -45,7 +45,7 @@ public class IrCoreUtils {
     /**
      * Default absolute tolerance for frequency comparison.
      */
-    public static final double invalid = -1f;
+    public static final double INVALID = -1f;
 
     /**
      * Convert its argument from seconds to microseconds.
@@ -150,7 +150,7 @@ public class IrCoreUtils {
             return true;
         if (x == null || y == null)
             return false;
-        
+
         double absDiff = Math.abs(x - y);
         boolean absoluteOk = absDiff <= absoluteTolerance;
         if (absoluteOk)

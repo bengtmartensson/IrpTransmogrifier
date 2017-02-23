@@ -71,9 +71,9 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return index % 2 == 0;
     }
 
-    protected double us = IrCoreUtils.invalid;
-    protected double time_periods = IrCoreUtils.invalid;
-    protected double time_units = IrCoreUtils.invalid;
+    protected Double us = null;
+    protected Double time_periods = null;
+    protected Double time_units = null;
     protected NameOrNumber nameOrNumber = null;
     protected String unit = null;
     protected ParserRuleContext parseTree = null;
@@ -147,7 +147,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
 
     public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
         compute(generalSpec, nameEngine);
-        if (time_periods != IrCoreUtils.invalid) {
+        if (time_periods != null) {
             if (generalSpec == null)
                 return DUMMYTIMEUNIT;
             else if (generalSpec.getFrequencyWitDefault()> 0)
@@ -155,7 +155,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             else
                 throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
 
-        } else if (time_units != IrCoreUtils.invalid) {
+        } else if (time_units != null) {
             if (generalSpec == null)
                 return time_units * DUMMYTIMEUNIT;
             if (generalSpec.getUnit() > 0)

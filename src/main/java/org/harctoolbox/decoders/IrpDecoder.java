@@ -240,7 +240,7 @@ public abstract class IrpDecoder {
             return acceptablyClose(passed, expected);
         }
 
-        protected abstract int parseChunk() throws DecodeException;
+        protected abstract Integer parseChunk() throws DecodeException;
 
         /**
          * Consumes data from the ir stream.
@@ -334,12 +334,12 @@ public abstract class IrpDecoder {
         }
 
         @Override
-        protected int parseChunk() throws DecodeException {
-            int result =
+        protected Integer parseChunk() throws DecodeException {
+            Integer result =
                       (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
                     : (duration(oneFlash, 0) && duration(oneGap, 1)) ? 1
-                    : -1;
-            if (result == -1)
+                    : null;
+            if (result == null)
                 throw new DecodeException("parseChunk");
             pull(bitSpecLength);
             return result;
@@ -399,7 +399,7 @@ public abstract class IrpDecoder {
         }
 
         @Override
-        protected int parseChunk() throws DecodeException {
+        protected Integer parseChunk() throws DecodeException {
             int result;
             boolean success;
 
@@ -476,14 +476,14 @@ public abstract class IrpDecoder {
         }
 
         @Override
-        protected int parseChunk() throws DecodeException {
-            int result =
+        protected Integer parseChunk() throws DecodeException {
+            Integer result =
                       (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
                     : (duration(oneFlash, 0) && duration(oneGap, 1)) ? 1
                     : (duration(twoFlash, 0) && duration(twoGap, 1)) ? 2
                     : (duration(threeFlash, 0) && duration(threeGap, 1)) ? 3
-                    : -1;
-            if (result == -1)
+                    : null;
+            if (result == null)
                 throw new DecodeException("parseChunk");
             pull(bitSpecLength);
             return result;
@@ -529,7 +529,7 @@ public abstract class IrpDecoder {
         }
 
         @Override
-        protected int parseChunk() throws DecodeException {
+        protected Integer parseChunk() throws DecodeException {
             int result = isZero() ? 0 : 1;
             duration(halfPeriod);
             duration(halfPeriod);

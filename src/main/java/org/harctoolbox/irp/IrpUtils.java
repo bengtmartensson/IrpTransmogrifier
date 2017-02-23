@@ -44,9 +44,9 @@ public class IrpUtils {
 
     public final static String dumbCharsetName = "US-ASCII";
 
-    public final static long invalid = -1L;
-    public final static long all = -2L;
-    public final static long some = -3L;
+    public final static long INVALID= -1L;
+    public final static long ALL = -2L;
+    public final static long SOME = -3L;
 
     // Symbolic names for exit statii
     public final static int exitSuccess             = 0;
@@ -244,11 +244,11 @@ public class IrpUtils {
      */
     public static long parseLong(String str, boolean special) /*throws NumberFormatException*/ {
         if (special && (str.startsWith("#") || str.contains(",")))
-            return some;
+            return SOME;
 
         String s = special ? str.replaceAll("[:.\\+<#].*$", "").trim() : str;
         if (special && (s.equals("*") || s.equals("'*'")))
-            return all; // Just to help Windows' victims, who cannot otherwise pass a *.
+            return ALL; // Just to help Windows' victims, who cannot otherwise pass a *.
         //s.equals("#") ? some :
         return s.startsWith("0x") ? Long.parseLong(s.substring(2), 16) :
                s.startsWith("0b") ? Long.parseLong(s.substring(2), 2) :
@@ -273,11 +273,11 @@ public class IrpUtils {
         if (s.length == 1)
             s = str.split(":");
 
-        return (s.length == 2) ? parseLong(s[1], false) : invalid;
+        return (s.length == 2) ? parseLong(s[1], false) : INVALID;
     }
 
     public static long variableGet(Map<String, Long> map, String name) {
-        return map.containsKey(name) ? map.get(name) :  invalid;
+        return map.containsKey(name) ? map.get(name) :  INVALID;
     }
 
     /**

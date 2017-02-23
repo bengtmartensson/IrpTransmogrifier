@@ -174,8 +174,8 @@ public class IrSignal implements Cloneable {
      * @param durations Integer array of durations. Signs of the entries are ignored,
      * @param noIntro Number of entries belonging to the intro sequence.
      * @param noRepeat Number of entries belonging to the repeat sequence.
-     * @param frequency Modulation frequency in Hz.
-     * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use -1 for not specified.
+     * @param frequency Modulation frequency in Hz. Use null for default
+     * @param dutyCycle Duty cycle of modulation pulse, between 0 and 1. Use null for not specified.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     public IrSignal(int[] durations, int noIntro, int noRepeat, Double frequency, Double dutyCycle) throws InvalidArgumentException {

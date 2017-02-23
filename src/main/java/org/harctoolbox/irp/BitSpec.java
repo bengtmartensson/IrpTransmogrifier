@@ -173,16 +173,16 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return bitCodes.isEmpty();
     }
 
-    public int numberOfBitspecDurations() {
-        int numberDurations = -1;
+    public Integer numberOfBitspecDurations() {
+        Integer numberDurations = null;
         for (BareIrStream bitCode : bitCodes) {
             int n = bitCode.numberOfBareDurations(true);
-            if (numberDurations == -1)
+            if (numberDurations == null)
                 numberDurations = n;
             else if (numberDurations == n) {
                 // ok
             } else {
-                return -1;
+                return null;
             }
         }
         return numberDurations;

@@ -234,7 +234,7 @@ public class ShortPronto extends Pronto {
 
             return result;
         } else if (protocolName.equalsIgnoreCase("nec1")) {
-            if (device > 255 || subdevice > 255 || command > 255)
+            if (device > 255 || (subdevice != null && subdevice > 255) || command > 255)
                 throw new InvalidArgumentException("Invalid parameters");
 
             int[] result = new int[6];

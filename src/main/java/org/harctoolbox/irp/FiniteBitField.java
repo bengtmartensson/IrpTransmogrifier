@@ -51,11 +51,11 @@ public class FiniteBitField extends BitField implements IrStreamItem {
                 logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
     }
 
-    public FiniteBitField(String name, int width) {
+    public FiniteBitField(String name, long width) {
         this(name, width, false);
     }
 
-    public FiniteBitField(String name, int width, boolean complement) {
+    public FiniteBitField(String name, long width, boolean complement) {
         this.complement = complement;
         data = new Name(name);
         this.width = new Number(width);

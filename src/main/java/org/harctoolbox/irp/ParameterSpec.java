@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import java.util.Objects;
 import java.util.Random;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -58,7 +57,7 @@ public class ParameterSpec extends IrpObject {
         this.deflt = deflt != null ? new Expression(deflt) : null;
     }
 
-    public ParameterSpec(String name, boolean memory, int min, int max, Expression deflt) {
+    public ParameterSpec(String name, boolean memory, long min, long max, Expression deflt) {
         this.memory = false;
         this.name = new Name(name);
         this.min = new Number(min);
@@ -67,9 +66,13 @@ public class ParameterSpec extends IrpObject {
         this.deflt = deflt;
     }
 
-    public ParameterSpec(String name, boolean memory, int min, int max) {
+    public ParameterSpec(String name, boolean memory, long min, long max) {
         this(name, memory, min, max, null);
         this.memory = false;
+    }
+
+    public ParameterSpec(String name, boolean memory, int length) {
+        this(name, memory, 0, (1 << length) - 1);
     }
 
     @Override
@@ -94,8 +97,6 @@ public class ParameterSpec extends IrpObject {
         }
 
         Long value = nameEngine.get(name.getName()).toNumber(nameEngine);
-        if (value == null && deflt == null)
-            throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
         checkDomain(value);
     }
 

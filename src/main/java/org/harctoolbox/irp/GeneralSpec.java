@@ -59,14 +59,14 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
      * @param frequency
      * @param dutyCycle
      */
-    public GeneralSpec(BitDirection bitDirection, double unit, Double frequency, Double dutyCycle) {
+    public GeneralSpec(BitDirection bitDirection, Double unit, Double frequency, Double dutyCycle) {
         this.bitDirection = bitDirection;
-        this.unit = unit;
+        this.unit = unit != null ? unit : defaultUnit;
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
     }
 
-    public GeneralSpec(BitDirection bitDirection, double unit, Double frequency) {
+    public GeneralSpec(BitDirection bitDirection, Double unit, Double frequency) {
         this(bitDirection, unit, frequency, null);
     }
 

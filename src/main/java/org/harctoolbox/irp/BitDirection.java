@@ -27,4 +27,8 @@ public enum BitDirection {
      * Most significant bit first
      */
     msb;
+
+    public static BitDirection newBitDirection(boolean reverse) {
+        return reverse ? lsb : msb;
+    }
 }

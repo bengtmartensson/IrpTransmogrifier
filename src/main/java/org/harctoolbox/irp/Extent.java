@@ -40,6 +40,10 @@ public class Extent extends Duration {
         super(d, unit);
     }
 
+    public Extent(double d) {
+        super(d);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Extent))

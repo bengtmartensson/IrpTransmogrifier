@@ -34,6 +34,10 @@ public class Flash extends Duration {
         super(d, unit);
     }
 
+    public Flash(double d) {
+        super(d);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Flash))

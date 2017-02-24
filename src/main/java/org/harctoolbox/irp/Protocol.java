@@ -58,6 +58,10 @@ public class Protocol extends IrpObject implements AggregateLister {
     private Boolean interleavingFlash = null;
     private Boolean interleavingGap = null;
 
+    public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs) {
+        this(generalSpec, bitspecIrstream, definitions, parameterSpecs, null);
+    }
+
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree) {
         this.parseTree = parseTree;

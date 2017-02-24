@@ -55,6 +55,13 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         }
     }
 
+    public ParameterSpecs(List<ParameterSpec> list) {
+        this();
+        list.forEach((ps) -> {
+            map.put(ps.getName(), ps);
+        });
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ParameterSpecs))

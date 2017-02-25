@@ -73,18 +73,13 @@ public class IrpTransmogrifier {
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
 
-    private static void usage() {
-        StringBuilder str = new StringBuilder(1000);
-        argumentParser.usage(str);
-
-        System.out.println(str);
-    }
-
-    private static void usage(int exitcode) {
-        StringBuilder str = new StringBuilder(1000);
-        argumentParser.usage(str);
-
-        (exitcode == IrpUtils.exitSuccess ? System.out : System.err).println(str);
+    private static void die(int exitcode, String message) {
+        PrintStream stream = exitcode == IrpUtils.exitSuccess ? System.out : System.err;
+        stream.println(message);
+        if (exitcode == IrpUtils.exitUsageError) {
+            stream.println();
+            stream.println("Use \"irptransmogrifier help\" for command syntax.");
+        }
         doExit(exitcode);
     }
 
@@ -174,8 +169,7 @@ public class IrpTransmogrifier {
         try {
             argumentParser.parse(args);
         } catch (ParameterException ex) {
-            logger.log(Level.SEVERE, ex.getMessage());
-            usage(IrpUtils.exitUsageError);
+            die(IrpUtils.exitUsageError, ex.getLocalizedMessage());
         }
 
         try {
@@ -229,43 +223,43 @@ public class IrpTransmogrifier {
                     : argumentParser.getParsedCommand();
 
             if (command == null)
-                usage(IrpUtils.exitUsageError);
-
-            switch (command) {
-                case "analyze":
-                    instance.analyze(commandAnalyze, commandLineArgs);
-                    break;
-                case "bitfield":
-                    instance.bitfield(commandBitField, commandLineArgs);
-                    break;
-                case "code":
-                    instance.code(commandCode, commandLineArgs);
-                    break;
-                case "decode":
-                    instance.decode(commandDecode, commandLineArgs);
-                    break;
-                case "expression":
-                    instance.expression(commandExpression, commandLineArgs);
-                    break;
-                case "help":
-                    instance.help();
-                    break;
-                case "list":
-                    instance.list(commandList, commandLineArgs);
-                    break;
-                case "render":
-                    instance.render(commandRenderer, commandLineArgs);
-                    break;
-                case "version":
-                    instance.version(commandLineArgs.configFile, commandLineArgs);
-                    break;
-                case "convertconfig":
-                    instance.convertConfig(commandConvertConfig, commandLineArgs);
-                    break;
-                default:
-                    System.err.println("Unknown command: " + command);
-                    System.exit(IrpUtils.exitSemanticUsageError);
-            }
+                die(IrpUtils.exitUsageError, "No command given");
+            else // For findbugs...
+                switch (command) {
+                    case "analyze":
+                        instance.analyze(commandAnalyze, commandLineArgs);
+                        break;
+                    case "bitfield":
+                        instance.bitfield(commandBitField, commandLineArgs);
+                        break;
+                    case "code":
+                        instance.code(commandCode, commandLineArgs);
+                        break;
+                    case "decode":
+                        instance.decode(commandDecode, commandLineArgs);
+                        break;
+                    case "expression":
+                        instance.expression(commandExpression, commandLineArgs);
+                        break;
+                    case "help":
+                        instance.help(commandHelp);
+                        break;
+                    case "list":
+                        instance.list(commandList, commandLineArgs);
+                        break;
+                    case "render":
+                        instance.render(commandRenderer, commandLineArgs);
+                        break;
+                    case "version":
+                        instance.version(commandLineArgs.configFile, commandLineArgs);
+                        break;
+                    case "convertconfig":
+                        instance.convertConfig(commandConvertConfig, commandLineArgs);
+                        break;
+                    default:
+                        System.err.println("Unknown command: " + command);
+                        System.exit(IrpUtils.exitSemanticUsageError);
+                }
         } catch (IrpException | InvalidArgumentException | UnsupportedOperationException | OddSequenceLengthException
                 | ParseCancellationException | SAXException | IOException | UsageException | NumberFormatException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
@@ -294,8 +288,27 @@ public class IrpTransmogrifier {
         this.out = out;
     }
 
-    private void help() {
-        usage();
+    private String usage(String command) {
+        StringBuilder stringBuilder = new StringBuilder(10000);
+        if (command == null || command.equals("help"))
+            argumentParser.usage(stringBuilder);
+        else
+            argumentParser.usage(command, stringBuilder);
+        return stringBuilder.toString();
+    }
+
+    private void help(CommandHelp commandHelp) {
+        if (commandHelp.shortForm)
+            throw new UnsupportedOperationException("not yet implemented"); // FIXME
+
+        if (commandHelp.commands != null) {
+            commandHelp.commands.forEach((command) -> {
+                out.println(usage(command));
+            });
+        } else {
+            String command = argumentParser.getParsedCommand();
+            out.println(usage(command));
+        }
     }
 
     private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
@@ -821,8 +834,13 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands")
-    @SuppressWarnings("ClassMayBeInterface")
     private static class CommandHelp {
+
+        @Parameter(names = { "-s", "--short" }, description = "TODO", hidden = true) // FIXME
+        private boolean shortForm = false;
+
+        @Parameter(description = "commands")
+        private List<String> commands = null;
     }
 
     @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")

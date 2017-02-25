@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +70,7 @@ public class IrpTransmogrifier {
     // No need to make these settable
     private static final String charSet = "UTF-8"; // Just for runMain
     private static final String SEPARATOR = "\t";
+    private static final String PROGRAMNAME = Version.appName;
 
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
@@ -78,7 +80,7 @@ public class IrpTransmogrifier {
         stream.println(message);
         if (exitcode == IrpUtils.exitUsageError) {
             stream.println();
-            stream.println("Use \"irptransmogrifier help\" for command syntax.");
+            stream.println("Use \"" + PROGRAMNAME + " help\" for command syntax.");
         }
         doExit(exitcode);
     }
@@ -130,7 +132,7 @@ public class IrpTransmogrifier {
     private static void main(String[] args, PrintStream printStream) {
         CommandLineArgs commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
-        argumentParser.setProgramName(Version.appName);
+        argumentParser.setProgramName(PROGRAMNAME);
         argumentParser.setAllowAbbreviatedOptions(true);
 
         // The ordering in the following lines is the order the commands
@@ -288,9 +290,9 @@ public class IrpTransmogrifier {
         this.out = out;
     }
 
-    private String usage(String command) {
+    private String usageString(String command) {
         StringBuilder stringBuilder = new StringBuilder(10000);
-        if (command == null || command.equals("help"))
+        if (command == null)
             argumentParser.usage(stringBuilder);
         else
             argumentParser.usage(command, stringBuilder);
@@ -298,17 +300,40 @@ public class IrpTransmogrifier {
     }
 
     private void help(CommandHelp commandHelp) {
-        if (commandHelp.shortForm)
-            throw new UnsupportedOperationException("not yet implemented"); // FIXME
-
-        if (commandHelp.commands != null) {
-            commandHelp.commands.forEach((command) -> {
-                out.println(usage(command));
-            });
-        } else {
-            String command = argumentParser.getParsedCommand();
-            out.println(usage(command));
+        if (commandHelp.shortForm) {
+            shortUsage();
+            return;
         }
+
+        if (commandHelp.commands != null)
+            commandHelp.commands.forEach((command) -> {
+                out.println(usageString(command));
+            });
+        else if (argumentParser.getParsedCommand().equals("help"))
+            out.println(usageString(null));
+        else
+            out.println(usageString(argumentParser.getParsedCommand()));
+    }
+
+    private void shortUsage() {
+        out.println("Usage: " + PROGRAMNAME + " [options] [command] [command_options]");
+        out.println("Commands:");
+
+        List<String> commands = new ArrayList<>(argumentParser.getCommands().keySet());
+        Collections.sort(commands);
+        commands.forEach((cmd) -> {
+            out.println("   " + padString(cmd) + argumentParser.getCommandDescription(cmd));
+        });
+
+        out.println();
+        out.println("Use \"" + PROGRAMNAME + " help [command]\" for the full syntax.");
+    }
+
+    private String padString(String name) {
+        StringBuilder stringBuilder = new StringBuilder(name);
+        while (stringBuilder.length() < 16)
+            stringBuilder.append(" ");
+        return stringBuilder.toString();
     }
 
     private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
@@ -840,7 +865,7 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands")
     private static class CommandHelp {
 
-        @Parameter(names = { "-s", "--short" }, description = "TODO", hidden = true) // FIXME
+        @Parameter(names = { "-s", "--short" }, description = "Produce a short usage message")
         private boolean shortForm = false;
 
         @Parameter(description = "commands")

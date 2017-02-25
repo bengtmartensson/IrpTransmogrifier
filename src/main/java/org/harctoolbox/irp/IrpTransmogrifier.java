@@ -251,7 +251,7 @@ public class IrpTransmogrifier {
                         instance.render(commandRenderer, commandLineArgs);
                         break;
                     case "version":
-                        instance.version(commandLineArgs.configFile, commandLineArgs);
+                        instance.version(commandLineArgs, commandVersion);
                         break;
                     case "convertconfig":
                         instance.convertConfig(commandConvertConfig, commandLineArgs);
@@ -361,14 +361,18 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void version(String filename, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException {
-        out.println(Version.versionString);
-        setupDatabase(commandLineArgs);
-        out.println("Database: " + filename + " version: " + irpDatabase.getConfigFileVersion());
+    private void version(CommandLineArgs commandLineArgs, CommandVersion commandVersion) throws UsageException, IOException, SAXException, IrpException {
+        if (commandVersion.shortForm)
+            out.println(Version.version);
+        else {
+            out.println(Version.versionString);
+            setupDatabase(commandLineArgs);
+            out.println("Database: " + commandLineArgs.configFile + " version: " + irpDatabase.getConfigFileVersion());
 
-        out.println("JVM: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("os.name") + "-" + System.getProperty("os.arch"));
-        out.println();
-        out.println(Version.licenseString);
+            out.println("JVM: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("os.name") + "-" + System.getProperty("os.arch"));
+            out.println();
+            out.println(Version.licenseString);
+        }
     }
 
     private void convertConfig(CommandConvertConfig commandConvertConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
@@ -903,8 +907,10 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"version"}, commandDescription = "Report version")
-    @SuppressWarnings("ClassMayBeInterface")
     private static class CommandVersion {
+
+        @Parameter(names = { "-s", "--short" }, description = "Issue only the version number of the program proper")
+        private boolean shortForm = false;
     }
 
     @Parameters(commandNames = {"convertconfig"}, commandDescription = "Convert an IrpProtocols.ini-file to an IrpProtocols.xml, or vice versa.")

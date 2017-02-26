@@ -304,15 +304,15 @@ public class IrpTransmogrifier {
             shortUsage();
             return;
         }
-
+        String cmd = argumentParser.getParsedCommand();
         if (commandHelp.commands != null)
             commandHelp.commands.forEach((command) -> {
                 out.println(usageString(command));
             });
-        else if (argumentParser.getParsedCommand().equals("help"))
+        else if (cmd == null || cmd.equals("help"))
             out.println(usageString(null));
         else
-            out.println(usageString(argumentParser.getParsedCommand()));
+            out.println(usageString(cmd));
     }
 
     private void shortUsage() {
@@ -517,26 +517,77 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
+    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, UsageException {
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
-
-        Analyzer analyzer;
         try {
-            IrSignal irSignal = Pronto.parse(commandAnalyze.args);
-            if (commandAnalyze.introRepeatEnding)
-                logger.warning("--intro.repeat-ending ignored when using a Pronto Hex signal.");
-            analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            analyzePronto(commandAnalyze, commandLineArgs);
         } catch (InvalidArgumentException ex) {
-            if (commandAnalyze.introRepeatEnding) {
-                IrSignal irSignal = IrSignal.parseRaw(commandAnalyze.args, commandAnalyze.frequency, false);
-                analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            } else {
-                List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args), false);
-                analyzer = new Analyzer(sequences, commandAnalyze.frequency, commandAnalyze.repeatFinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            }
+            analyzeRaw(commandAnalyze, commandLineArgs);
         }
+    }
+
+    private void analyzePronto(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
+        IrSignal irSignal = Pronto.parse(commandAnalyze.args);
+        if (commandAnalyze.introRepeatEnding)
+            logger.warning("--intro.repeat-ending ignored when using a Pronto Hex signal.");
+        if (commandAnalyze.chop != null)
+            logger.warning("--chop ignored when using a Pronto Hex signal.");
+        analyze(irSignal, commandAnalyze, commandLineArgs);
+    }
+
+    private void analyzeRaw(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, UsageException {
+        if (commandAnalyze.introRepeatEnding)
+            analyzeIntroRepeatEnding(commandAnalyze, commandLineArgs);
+        else
+            analyzeSequence(commandAnalyze, commandLineArgs);
+    }
+
+    private void analyzeIntroRepeatEnding(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException, InvalidArgumentException {
+        IrSignal irSignal;
+        if (commandAnalyze.chop != null) {
+            List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args), false);
+            if (sequences.size() > 1)
+                throw new UsageException("Cannot use --chop together with several IR seqeunces");
+            sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
+            switch (sequences.size()) {
+                case 2:
+                    irSignal = new IrSignal(sequences.get(0), sequences.get(1), null, commandAnalyze.frequency);
+                    break;
+                case 3:
+                    irSignal = new IrSignal(sequences.get(0), sequences.get(1), sequences.get(2), commandAnalyze.frequency);
+                    break;
+                default:
+                    throw new UsageException("Wrong number of parts after chop = " + sequences.size());
+            }
+        } else
+            irSignal = IrSignal.parseRaw(commandAnalyze.args, commandAnalyze.frequency, false);
+        analyze(irSignal, commandAnalyze, commandLineArgs);
+    }
+
+    private void analyzeSequence(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException {
+        List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args), false);
+        if (commandAnalyze.chop != null) {
+            if (sequences.size() > 1)
+                throw new UsageException("Cannot use --chop together with several IR seqeunces");
+            sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
+        }
+        analyze(sequences, commandAnalyze, commandLineArgs);
+    }
+
+    private void analyze(IrSignal irSignal, CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) {
+        Analyzer analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        analyze(analyzer, commandAnalyze, commandLineArgs);
+    }
+
+    private void analyze(List<IrSequence> irSequences, CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) {
+        Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        analyze(analyzer, commandAnalyze, commandLineArgs);
+    }
+
+
+    private void analyze(Analyzer analyzer, CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) {
         Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
@@ -736,6 +787,9 @@ public class IrpTransmogrifier {
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters")
     private static class CommandAnalyze {
+
+        @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument")
+        private Integer chop = null;
 
         @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
         private boolean extent = false;

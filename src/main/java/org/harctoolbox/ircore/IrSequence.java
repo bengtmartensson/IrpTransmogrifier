@@ -427,13 +427,13 @@ public class IrSequence implements Cloneable {
     /**
      * Chops a IrSequence in parts. Every gap of length &ge; threshold cause a cut.
      * @param threshold minimal gap in microseconds to cause a cut.
-     * @return Array of IrSequences
+     * @return List of IrSequences
      */
-    public IrSequence[] chop(double threshold) {
+    public List<IrSequence> chop(double threshold) {
         ArrayList<IrSequence> arrayList = new ArrayList<>(30);
         int beg = 0;
         for (int i = 1; i < data.length; i += 2) {
-            if (data[i] >= threshold || i == data.length - 1) {
+            if (Math.abs(data[i]) >= threshold || i == data.length - 1) {
                 double[] arr = new double[i - beg + 1];
                 System.arraycopy(data, beg, arr, 0, i - beg + 1);
                 try {
@@ -444,7 +444,7 @@ public class IrSequence implements Cloneable {
                 beg = i + 1;
             }
         }
-        return arrayList.toArray(new IrSequence[arrayList.size()]);
+        return arrayList;
     }
 
     /**

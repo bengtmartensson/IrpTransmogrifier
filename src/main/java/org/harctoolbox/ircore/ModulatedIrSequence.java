@@ -17,7 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A ModulatedIrSequence is an IrSequence with the additional properties of a modulation frequency and a duty cycle.
@@ -276,11 +278,12 @@ public class ModulatedIrSequence extends IrSequence {
     }
 
     @Override
-    public final ModulatedIrSequence[] chop(double amount) {
-        IrSequence[] irSequences = super.chop(amount);
-        ModulatedIrSequence[] mods = new ModulatedIrSequence[irSequences.length];
-        for (int i = 0; i < irSequences.length; i++)
-            mods[i] = new ModulatedIrSequence(irSequences[i], frequency, dutyCycle);
+    public final List<IrSequence> chop(double amount) {
+        List<IrSequence> irSequences = super.chop(amount);
+        List<IrSequence> mods = new ArrayList<>(irSequences.size());
+        irSequences.forEach((seq) -> {
+            mods.add(new ModulatedIrSequence(seq, frequency, dutyCycle));
+        });
         return mods;
     }
 

@@ -51,7 +51,7 @@ public class Mode2Parser {
                 System.out.println(irSequence.toPrintString(false));
             else {
                 double threshold = Double.parseDouble(args[1]);
-                IrSequence[] parts = irSequence.chop(threshold);
+                List<IrSequence> parts = irSequence.chop(threshold);
                 int i = 0;
                 for (IrSequence part : parts)
                     System.out.println("signal_" + i++ + ":" + part.toPrintString(false)); // Easy to parse for IrScrutinizer

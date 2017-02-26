@@ -33,6 +33,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class Cleaner {
     private final static int numberOfTimingsCapacity = 20;
+    private static final int NO_LETTERS = 26;
 
     public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
@@ -60,7 +61,10 @@ public class Cleaner {
     }
 
     public static String mkName(Integer n) {
-        return n == null ? "?" : new String(new char[]{(char) ('A' + n)});
+        if (n == null || n < 0)
+            throw new IllegalArgumentException("mkName requires a non-negative argument");
+        return n >= NO_LETTERS ? (mkName(n / NO_LETTERS) + mkName(n % NO_LETTERS))
+                : new String(new char[]{(char) ('A' + n)});
     }
 
     private int rawData[];

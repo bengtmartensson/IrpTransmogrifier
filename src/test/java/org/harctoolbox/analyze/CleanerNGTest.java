@@ -1,11 +1,14 @@
 package org.harctoolbox.analyze;
 
+import java.util.HashMap;
+import java.util.List;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -113,5 +116,30 @@ public class CleanerNGTest {
         ModulatedIrSequence expResult = null;
         ModulatedIrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
         Assert.assertTrue(result.approximatelyEquals(irSequence));
+    }
+
+    /**
+     * Test of mkName method, of class Cleaner.
+     */
+    @Test
+    public void testMkName() {
+        System.out.println("mkName");
+        try {
+            assertEquals(Cleaner.mkName(null), "?");
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
+        try {
+            assertEquals(Cleaner.mkName(-1), "?");
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
+        assertEquals(Cleaner.mkName(0), "A");
+        assertEquals(Cleaner.mkName(25), "Z");
+        assertEquals(Cleaner.mkName(26), "BA");
+        assertEquals(Cleaner.mkName(27), "BB");
+        assertEquals(Cleaner.mkName(1000), "BMM");
+        assertEquals(Cleaner.mkName(10000), "OUQ");
+        assertEquals(Cleaner.mkName(26*26*26*26), "BAAAA");
     }
 }

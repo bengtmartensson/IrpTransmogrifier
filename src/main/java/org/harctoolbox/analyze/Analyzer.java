@@ -48,7 +48,7 @@ public class Analyzer extends Cleaner {
     private final RepeatFinder.RepeatFinderData[] repeatFinderData;
     private Double frequency;
     private int[] indices; // ending indicies
-    private boolean signalMode = false;
+    private boolean signalMode;
 
     public Analyzer(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) {
         this(irSignal.toModulatedIrSequence(true, 1, true), false, absoluteTolerance, relativeTolerance);
@@ -66,6 +66,7 @@ public class Analyzer extends Cleaner {
     public Analyzer(List<IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
         super(IrSequence.toInts(irSequenceList), absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.defaultAbsoluteTolerance,
                 relativeTolerance != null ? relativeTolerance : IrCoreUtils.defaultRelativeTolerance);
+        this.signalMode = false;
         if (frequency == null)
             logger.log(Level.FINE, String.format(Locale.US, "No frequency given, using default frequency = %d Hz", (int) ModulatedIrSequence.defaultFrequency));
         this.frequency = frequency;

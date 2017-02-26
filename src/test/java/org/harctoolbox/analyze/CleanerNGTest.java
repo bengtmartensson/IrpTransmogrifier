@@ -1,14 +1,11 @@
 package org.harctoolbox.analyze;
 
-import java.util.HashMap;
-import java.util.List;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;

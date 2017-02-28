@@ -24,7 +24,7 @@ $(IRP_TRANSMOGRIFIER_JAR):
 all-protocols.xml: $(IRP_TRANSMOGRIFIER_JAR)
 	$(IRPTRANSMOGRIFIER) -o $@ code --target xml
 
-lirc.xml: all-protocols.xml
+lirc.xml: all-protocols.xml ${LIRC_TRANSFORM}
 	$(SAXON) -s:$< -xsl:${LIRC_TRANSFORM} -o:$@
 	
 

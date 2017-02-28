@@ -225,15 +225,6 @@ end remote
         </xsl:comment>
     </xsl:template-->
 
-    <!-- Protocol pwm4 -->
-    <xsl:template match="NamedProtocol[Protocol[@pwm4='true']]">
-        <xsl:comment>
-            <xsl:text> Protocol </xsl:text>
-            <xsl:value-of select="@name"/>
-            <xsl:text> omitted: pwm4 not yet implemented </xsl:text>
-        </xsl:comment>
-    </xsl:template>
-
     <!-- Expressions as bitfields not implemented yet -->
     <xsl:template match="NamedProtocol[.//Data/Expression]">
         <xsl:comment>
@@ -287,12 +278,14 @@ end remote
             <axsl:value-of select="translate(../@name, ' ', '_')"/>
 <axsl:text>
 <xsl:apply-templates select="BitspecIrstream" mode="numberOfBits"/>
-&#9;flags&#9;&#9;<xsl:apply-templates select="@pwm2"/><xsl:apply-templates select="@biphase"/>
+&#9;flags&#9;&#9;<xsl:apply-templates select="@pwm2"/><xsl:apply-templates select="@pwm4"/><xsl:apply-templates select="@biphase"/>
             <xsl:apply-templates select="BitspecIrstream/NormalForm/*[FiniteBitField][1]/Extent" mode="flags"/>
 &#9;eps&#9;&#9;<xsl:value-of select="$eps"/>
 &#9;aeps&#9;&#9;<xsl:value-of select="$aeps"/>
-&#9;zero&#9;<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[1]/*"/>
-&#9;one&#9;<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[2]/*"/>
+<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[1]" mode="define-zero"/>
+<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[2]" mode="define-one"/>
+<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[3]" mode="define-two"/>
+<xsl:apply-templates select="BitspecIrstream/BitSpec/BareIrStream[4]" mode="define-three"/>
 <xsl:apply-templates select="BitspecIrstream" mode="header"/>
 <xsl:apply-templates select="BitspecIrstream" mode="plead"/>
 <xsl:apply-templates select="BitspecIrstream" mode="ptrail"/>
@@ -337,7 +330,7 @@ end remote
 
     <xsl:template match="BitspecIrstream" mode="warnEnding"/>
 
-    <xsl:template match="BitspecIrstream[NormalForm/Ending[*]]" mode="warnEnding">
+    <xsl:template match="BitspecIrstream[NormalForm/Ending[* and not(Assignment)]]" mode="warnEnding">
         <axsl:text># Warning: Protocol contains ending that cannot be expressed in Lirc&#10;</axsl:text>
     </xsl:template>
 
@@ -638,6 +631,26 @@ end remote
         <xsl:value-of select="round(number($x)*number($y))"/>
     </xsl:template>
 
+    <xsl:template match="BareIrStream" mode="define-zero">
+        <xsl:text xml:space="preserve">&#10;&#9;zero&#9;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="BareIrStream" mode="define-one">
+        <xsl:text xml:space="preserve">&#10;&#9;one&#9;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="BareIrStream" mode="define-two">
+        <xsl:text xml:space="preserve">&#10;&#9;two&#9;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
+    <xsl:template match="BareIrStream" mode="define-three">
+        <xsl:text xml:space="preserve">&#10;&#9;three&#9;</xsl:text>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+
     <xsl:template match="Flash[@unit='']|Gap[@unit='']">
         <xsl:text>&#9;</xsl:text>
         <xsl:call-template name="multiply">
@@ -690,6 +703,10 @@ end remote
 
     <xsl:template match="@pwm2[.='true']">
         <xsl:text>SPACE_ENC</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="@pwm4[.='true']">
+        <xsl:text>RCMM</xsl:text>
     </xsl:template>
 
     <xsl:template match="@biphase[.='true']">

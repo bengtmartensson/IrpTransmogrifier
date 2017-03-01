@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -54,6 +55,10 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.harctoolbox.lirc.LircConfigFile;
+import org.harctoolbox.lirc.LircCommand;
+import org.harctoolbox.lirc.LircIrp;
+import org.harctoolbox.lirc.LircRemote;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -165,6 +170,9 @@ public class IrpTransmogrifier {
         CommandExpression commandExpression = new CommandExpression();
         argumentParser.addCommand(commandExpression);
 
+        CommandLirc commandLirc = new CommandLirc();
+        argumentParser.addCommand(commandLirc);
+
         CommandConvertConfig commandConvertConfig = new CommandConvertConfig();
         argumentParser.addCommand(commandConvertConfig);
 
@@ -246,6 +254,9 @@ public class IrpTransmogrifier {
                     case "help":
                         instance.help(commandHelp);
                         break;
+                    case "lirc":
+                        instance.lirc(commandLirc, commandLineArgs);
+                        break;
                     case "list":
                         instance.list(commandList, commandLineArgs);
                         break;
@@ -307,7 +318,11 @@ public class IrpTransmogrifier {
         String cmd = argumentParser.getParsedCommand();
         if (commandHelp.commands != null)
             commandHelp.commands.forEach((command) -> {
+                try {
                 out.println(usageString(command));
+                } catch (ParameterException ex) {
+                    out.println("No such command: " + command);
+                }
             });
         else if (cmd == null || cmd.equals("help"))
             out.println(usageString(null));
@@ -665,6 +680,37 @@ public class IrpTransmogrifier {
             IrpUtils.showTreeViewer(bitfield.toTreeViewer(), text + "=" + result);
     }
 
+    private void lirc(CommandLirc commandLirc, CommandLineArgs commandLineArgs) throws IOException {
+        List<LircRemote> list;
+        if (commandLirc.files.isEmpty())
+            list = LircConfigFile.readRemotes(new InputStreamReader(System.in, commandLineArgs.encoding));
+        else {
+            list = new ArrayList<>(commandLirc.files.size());
+            for (String f : commandLirc.files) {
+                list.addAll(LircConfigFile.readRemotes(f, commandLineArgs.encoding));
+            }
+        }
+
+        for (LircRemote rem : list) {
+            out.print(rem.getName() + ":\t");
+            try {
+                out.println(LircIrp.toProtocol(rem).toIrpString(commandLirc.radix, false));
+            } catch (LircIrp.RawRemoteException ex) {
+                out.println("raw remote");
+            } catch (LircIrp.LircCodeRemoteException ex) {
+                out.println("lirc code remote");
+            }
+            if (commandLirc.commands) {
+                for (LircCommand cmd : rem.getCommands()) {
+                    out.print(cmd.getName() + ":\t");
+                    cmd.getCodes().forEach((x) -> {
+                        out.print(Long.toString(x, commandLirc.radix) + " ");
+                    });
+                    out.println();
+                }
+            }
+        }
+    }
 
     private void setupDatabase(CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
         setupDatabase(true, commandLineArgs);
@@ -914,6 +960,19 @@ public class IrpTransmogrifier {
 
         @Parameter(description = "expression", required = true)
         private List<String> expressions;
+    }
+
+    @Parameters(commandNames = { "lirc" }, commandDescription = "Convert Lirc configuration files to IRP form")
+    private static class CommandLirc {
+
+        @Parameter(names = { "-c", "--commands" }, description = "List the commands in the remotes")
+        private boolean commands = false;
+
+        @Parameter(names = { "-r", "--radix"}, description = "Radix for outputting result") // Too much...?
+        private int radix = 16;
+
+        @Parameter(description = "Lirc config files (or directories)", required = false)
+        private List<String> files = new ArrayList<>(0);
     }
 
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands")

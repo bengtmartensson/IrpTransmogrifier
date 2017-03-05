@@ -64,8 +64,8 @@ public class Analyzer extends Cleaner {
     }
 
     public Analyzer(List<IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
-        super(IrSequence.toInts(irSequenceList), absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.defaultAbsoluteTolerance,
-                relativeTolerance != null ? relativeTolerance : IrCoreUtils.defaultRelativeTolerance);
+        super(IrSequence.toInts(irSequenceList), absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.DEFAULTABSOLUTETOLERANCE,
+                relativeTolerance != null ? relativeTolerance : IrCoreUtils.DEFAULTRELATIVETOLERANCE);
         this.signalMode = false;
         if (frequency == null)
             logger.log(Level.FINE, String.format(Locale.US, "No frequency given, using default frequency = %d Hz", (int) ModulatedIrSequence.defaultFrequency));
@@ -85,7 +85,7 @@ public class Analyzer extends Cleaner {
     }
 
     public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) {
-        this(irSequence, null, invokeRepeatFinder, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(irSequence, null, invokeRepeatFinder, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public Analyzer(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
@@ -93,18 +93,22 @@ public class Analyzer extends Cleaner {
     }
 
     public Analyzer(IrSequence irSequence) {
-        this(irSequence, null, false, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(irSequence, null, false, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public Analyzer(int[] data) throws OddSequenceLengthException {
-        this(new IrSequence(data), null, false, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(new IrSequence(data), null, false, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int number) {
         int beg = getSequenceBegin(number);
         int length = getSequenceLength(number);
-        return invokeRepeatFinder ? new RepeatFinder(toDurations(beg, length)).getRepeatFinderData()
-                : new RepeatFinder.RepeatFinderData(length);
+        try {
+            return invokeRepeatFinder ? new RepeatFinder(toDurations(beg, length)).getRepeatFinderData()
+                    : new RepeatFinder.RepeatFinderData(length);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     RepeatFinder.RepeatFinderData getRepeatFinderData(int number) {

@@ -16,19 +16,18 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.ircore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
- * This class models an IR Sequence, which is a sequence of pulse pairs, often called "bursts".
+ * This class models an IR Sequence, which is a sequence of pulse pairs, sometimes called "bursts".
  *
- * <p>Intrinsically, it "is" an array of doubles, each representing a gap
+ * <p>It consists of a sequence of positive real numbers, each representing a gap
  * (for odd indices) or flash (for even indices).
- * The duration of each flash or gap is the absolute value of the entry in micro seconds.
- * Negative values are thus accepted, and preserved, but the sign ignored.
- * An application program is free to interpret the sign as it wishes.
- * The sign can therefore be viewed as "application specific information."
+ * The duration of each flash or gap is the value of the entry in micro seconds."
  *
  * <p>The length of the IrSequence (as reported by getLength()) is therefore always even.
  * To get the "length in bursts", divide by 2.
@@ -39,9 +38,10 @@ import java.util.List;
  * @see ModulatedIrSequence
  *
  */
-public class IrSequence implements Cloneable {
-    private static final double epsilon = 0.001;
-    private static final int dummyGapDuration = 50; // should not translate to 0000 in Pronto
+public class IrSequence implements Cloneable, Serializable {
+    private static final double EPSILON = 0.001;
+
+    public static final double DUMMYGAPDURATION = 50000d; // should not translate to 0000 in Pronto
 
     /**
      * Concatenates the elements in the argument.
@@ -56,44 +56,132 @@ public class IrSequence implements Cloneable {
         return s;
     }
 
-    private static List<Double> normalize(List<Double> list, boolean nukeLeadingZeros) {
-        if (list == null || list.isEmpty())
-            return list;
+    private static boolean isFlash(int i) {
+        return i % 2 == 0;
+    }
 
-        // Nuke leading gaps
-        while (nukeLeadingZeros && list.size() > 1 && list.get(0) <= 0)
-            list.remove(0);
+//    private static boolean isGap(int i) {
+//        return i % 2 != 0;
+//    }
 
-        for (int i = 0; i < list.size(); i++) {
-            while (i + 1 < list.size() && equalSign(list.get(i), list.get(i+1))) {
-                double val = list.get(i) + list.get(i+1);
-                list.remove(i);
-                list.remove(i);
-                list.add(i, val);
-            }
+//    private static void normalize(List<Double> list, boolean nukeLeadingZeros) {
+//        if (list == null || list.isEmpty())
+//            return;
+//
+//        // Nuke leading gaps
+//        while (nukeLeadingZeros && list.size() > 1 && list.get(0) <= 0d)
+//            list.remove(0);
+//
+//        for (int i = 0; i < list.size(); i++) {
+//            while (i + 1 < list.size() && equalSign(list.get(i), list.get(i+1))) {
+//                double val = list.get(i) + list.get(i+1);
+//                list.remove(i);
+//                list.remove(i);
+//                list.add(i, val);
+//            }
+//        }
+//    }
+
+    private static void checkFixOddLength(List<Double> list, boolean fixOddSequences) throws OddSequenceLengthException {
+        if (list.size() % 2 != 0) {
+            if (fixOddSequences)
+                list.add(DUMMYGAPDURATION);
+            else
+                throw new OddSequenceLengthException();
         }
-        return list;
     }
 
-    private static boolean equalSign(double x, double y) {
-        return x <= 0 && y <= 0 || x >= 0 && y >= 0;
+//    private static void checkInterleaving(Iterable<Number> iter) throws NonInterleavingException {
+//        Number previous = -1;
+//        for (Number num : iter) {
+//            if (equalSign(num, previous))
+//                throw new NonInterleavingException();
+//        }
+//    }
+
+//    private static void checkInterleaving(double[] iter) throws NonInterleavingException {
+//        double previous = -1;
+//        for (double num : iter) {
+//            if (equalSign(num, previous))
+//                throw new NonInterleavingException();
+//            previous = num;
+//        }
+//    }
+
+    private static List<Double> toInterleavingList(Collection<? extends Number> list) {
+        if (list == null || list.isEmpty())
+            return new ArrayList<>(0);
+
+        List<Double> result = new ArrayList<>(list.size());
+        Number previous = -1;
+        for (Number num : list) {
+            double value = num.doubleValue();
+            if (result.isEmpty() && value <= 0)   // Nuke leading gaps
+                continue;
+
+            if (value == 0d)
+                continue;
+
+            if (equalSign(value, previous))
+                result.set(result.size() - 1, result.get(result.size() - 1) + value);
+            else
+                result.add(value);
+            previous = value;
+        }
+        return result;
     }
 
-    public static List<IrSequence> parse(String str, boolean fixOddSequences) {
+    /**
+     * Factory method that generates an IrSequence also for non-interleaved, signed data,
+     * possibly starting with gaps.
+     * @param durations
+     * @param fixOdd It true, appends {@link DUMMYGAPDURATION} to sequences ending with a flash.
+     * @return
+     * @throws OddSequenceLengthException
+     */
+    public static IrSequence mkIrSequence(Collection<? extends Number> durations, boolean fixOdd) throws OddSequenceLengthException {
+        List<Double> interleaved = toInterleavingList(durations);
+        checkFixOddLength(interleaved, fixOdd);
+        return new IrSequence(interleaved);
+
+    }
+
+//    private static double[] toInterleavingArray(Collection<? extends Number> list, boolean fixOddData) throws OddSequenceLengthException {
+//        List<Double> newlist = toInterleavingList(list);
+//        double[] result = new double[newlist.size()];
+//        int i = 0;
+//        for (double d : newlist)
+//            result[i++] = d;
+//        return result;
+//    }
+
+    private static boolean equalSign(Number x, Number y) {
+        return x.doubleValue() <= 0 == y.doubleValue() <= 0;
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     * @throws OddSequenceLengthException
+     */
+    public static List<IrSequence> parse(String str) throws OddSequenceLengthException {
         String[] parts = str.trim().startsWith("[")
                 ? str.replace("[", "").split("\\]")
                 : new String[] { str };
 
         ArrayList<IrSequence> result = new ArrayList<>(parts.length);
         for (String s : parts)
-            result.add(new IrSequence(s, fixOddSequences));
+            result.add(new IrSequence(s));
 
         return result;
     }
 
-    public static int[] toInts(List<IrSequence> list) {
+    public static int[] toInts(Iterable<IrSequence> list) {
         int length = 0;
-        length = list.stream().map((seq) -> seq.getLength()).reduce(length, Integer::sum);
+        for (IrSequence seq : list)
+            length += seq.getLength();
+
         int[] result = new int[length];
         int index = 0;
         for (IrSequence seq : list) {
@@ -104,10 +192,57 @@ public class IrSequence implements Cloneable {
         return result;
     }
 
+    private static double[] toDoubles(Collection<? extends Number> collection) {
+        double[] result = new double[collection.size()];
+        int i = 0;
+        for (Number num : collection) {
+            result[i] = num.doubleValue();
+            i++;
+        }
+        return result;
+    }
+
+//    private static double[] stringsToDoubles(Collection<String> collection) {
+//        double[] result = new double[collection.size()];
+//        int i = 0;
+//        for (String str : collection)
+//            result[i++] = Double.parseDouble(str);
+//        return result;
+//    }
+
+    private static double[] stringsToDoubles(String[] collection) {
+        double[] result = new double[collection.length];
+        int i = 0;
+        for (String str : collection) {
+            result[i] = Double.parseDouble(str);
+            i++;
+        }
+        return result;
+    }
+
     /**
-     * Duration data, possibly with signs, which are ignored (by this class).
+     * Constructs an IrSequence from the parameter data.
+     * This version does not require flashes and gaps to be interleaved (signs alternating).
+     * @param str String of durations, possibly using signed numbers.
+     * @param fixOddSequences it true, odd sequences (ending with gap) are silently fixed by adding a dummy gap.
+     * @throws OddSequenceLengthException If last duration is not a gap, and fixOddSequences false.
      */
-    protected double[] data;
+    private static double[] toDoubles(String str) {
+        if (str == null || str.trim().isEmpty())
+            return new double[0];
+
+        String[] strings = str.trim().split("[\\s,;]+");
+        if (strings.length == 1)
+            // Instead, try to break at "+" and "-" chars, preserving these
+            strings = str.trim().split("(?=\\+)|(?=-)");
+        return stringsToDoubles(strings);
+    }
+
+    /**
+     * Duration data, all positive. Even indices are considered flashes, even ones gaps.
+     * By definition they are interleaving.
+     */
+    private double[] data;
 
     /**
      * Constructs an empty IrSequence,
@@ -118,102 +253,54 @@ public class IrSequence implements Cloneable {
 
     /**
      * Constructs an IrSequence from the parameter data.
-     * @param data Array of durations. Is referenced, not copied.
+     * The input data must be semantically compatible: the data at even indicies
+     * are denoting flash; the ones at odd indicies gaps.
+     * Signs on the input data are not evaluated, but disposed.
+     * There must be an even number of entries.
+     * @param inData Array of input durations.
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public IrSequence(double[] data) throws OddSequenceLengthException {
-        if (data.length % 2 != 0)
-            throw new OddSequenceLengthException(data.length);
-        this.data = data;
-    }
+    public IrSequence(double[] inData) throws OddSequenceLengthException {
+        int effectiveSize = inData.length;
+        if (effectiveSize % 2 != 0)
+            throw new OddSequenceLengthException(inData.length);
 
-    /**
-     * Constructs an IrSequence from the parameter data.
-     * @param idata Array of durations. Data is copied.
-     * @throws OddSequenceLengthException If data is not of even length.
-     */
-    public IrSequence(int[] idata) throws OddSequenceLengthException {
-        this(idata, false);
-    }
-
-    /**
-     * Constructs an IrSequence from the parameter data.
-     * @param idata Array of durations. Data is copied.
-     * @param acceptOdd If odd length: if true, force length even by ignoring the last, otherwise throw exception.
-     * @throws OddSequenceLengthException
-     */
-    public IrSequence(int[] idata, boolean acceptOdd) throws OddSequenceLengthException {
-        int length = idata.length;
-        if (length % 2 != 0) {
-            if (acceptOdd)
-                length--;
-            else
-                throw new OddSequenceLengthException(idata.length);
-        }
-
-        data = new double[length];
-        for (int i = 0; i < length; i++) {
-            data[i] = idata[i];
+        this.data = new double[effectiveSize];
+        int i = 0;
+        for (double d : inData) {
+            data[i] = Math.abs(d);
+            i++;
         }
     }
 
     /**
      * Constructs an IrSequence from the parameter data.
-     * This version does not require flashes and gaps to be interleaved (signs alternating).
-     * @param str String of durations, possibly using signed numbers.
-     * @param fixOddSequences it true, odd sequences (ending with gap) are silently fixed by adding a dummy gap.
-     * @throws OddSequenceLengthException If last duration is not a gap, and fixOddSequences false.
+     * @param inData
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public IrSequence(String str, boolean fixOddSequences) throws OddSequenceLengthException {
-        if (str == null || str.trim().isEmpty()) {
-            data = new double[0];
-        } else {
-            String[] strings = str.trim().split("[\\s,;]+");
-            if (strings.length == 1)
-                // Instead, try to break at "+" and "-" chars, preserving these
-                strings = str.trim().split("(?=\\+)|(?=-)");
-            boolean hasAlternatingSigns = false;
-            for (String string : strings) {
-                if (string.startsWith("-")) {
-                    hasAlternatingSigns = true;
-                    break;
-                }
-            }
+    public IrSequence(int[] inData) throws OddSequenceLengthException {
+        int effectiveSize = inData.length;
+        if (effectiveSize % 2 != 0)
+                throw new OddSequenceLengthException(inData.length);
 
-            int[] tmplist = new int[strings.length + 1];
-            int index = -1;
-            for (String string : strings) {
-                if (string.isEmpty())
-                    continue; // be on the safe side
-                int x = Integer.parseInt(string.replaceFirst("\\+", ""));
-                if (index == -1 && x < 0)
-                    continue; // Ignore silly leading gaps
-
-                if (hasAlternatingSigns && index >= 0 && sameSign(tmplist[index], x))
-                    tmplist[index] += x;
-                else
-                    tmplist[++index] = x;
-            }
-            if (index % 2 == 0) {
-                if (fixOddSequences)
-                    tmplist[++index] = dummyGapDuration;
-                else
-                    throw new OddSequenceLengthException();
-            }
-            data = new double[index+1];
-            for (int i = 0; i < index+1; i++)
-                data[i] = tmplist[i];
+        this.data = new double[effectiveSize];
+        int i = 0;
+        for (double d : inData) {
+            data[i] = Math.abs(d);
+            i++;
         }
     }
 
-    /**
-     * Constructs an IrSequence from the parameter data.
-     * This version does not require flashes and gaps to be interleaved (signs alternating).
-     * @param str String of durations, possibly using signed numbers.
-     * @throws OddSequenceLengthException If last duration is not a gap.
-     */
-    public IrSequence(String str) throws OddSequenceLengthException {
-        this(str, false);
+    public IrSequence(Collection<? extends Number> collection) throws OddSequenceLengthException {
+        this(toDoubles(collection));
+    }
+
+    public IrSequence(String[] strings) throws OddSequenceLengthException {
+        this(stringsToDoubles(strings));
+    }
+
+    public IrSequence(String string) throws OddSequenceLengthException {
+        this(toDoubles(string));
     }
 
     /**
@@ -224,10 +311,7 @@ public class IrSequence implements Cloneable {
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    // @throws RuntimeException If data is contradictory or erroneous.
-    public IrSequence(int[] idata, int offset, int length) throws OddSequenceLengthException, InvalidArgumentException {
-        if (length % 2 != 0)
-            throw new OddSequenceLengthException("IrSequence has odd length = " + length);
+    public IrSequence(int[] idata, int offset, int length) throws InvalidArgumentException {
         if (offset >= idata.length && length != 0)
             throw new InvalidArgumentException("IrSequence: offset beyond end.");
         if (offset + length > idata.length)
@@ -235,24 +319,7 @@ public class IrSequence implements Cloneable {
 
         data = new double[length];
         for (int i = 0; i < length; i++)
-            data[i] = idata[i+offset];
-    }
-
-    /**
-     * Constructs an IrSequence from the parameter data.
-     * The argument is supposed to use positive sign for flashes, and negative sign for gaps.
-     * Leading gaps are discarded, while meaningless.
-     * Consecutive gaps (flashes) are combined into one gap (flash).
-     * @param list List of durations as Double, containing signs.
-     * @throws OddSequenceLengthException If data ens with a flash, not a gap.
-     */
-    public IrSequence(List<Double>list) throws OddSequenceLengthException {
-        List<Double> normalized = normalize(list, true);
-        if (normalized.size() % 2 != 0)
-            throw new OddSequenceLengthException("IrSequence cannot end with a flash.");
-        data = new double[normalized.size()];
-        for (int i = 0; i < normalized.size(); i++)
-            data[i] = normalized.get(i);
+            data[i] = Math.abs(idata[i+offset]);
     }
 
     /**
@@ -263,6 +330,13 @@ public class IrSequence implements Cloneable {
         data = src.data.clone();
     }
 
+    /**
+     *
+     * @param src
+     * @param start
+     * @param length
+     * @throws InvalidArgumentException
+     */
     public IrSequence(IrSequence src, int start, int length) throws InvalidArgumentException {
         if (start % 2 != 0 || length % 2 != 0)
             throw new OddSequenceLengthException("Start and length must be even");
@@ -274,44 +348,41 @@ public class IrSequence implements Cloneable {
 
     /**
      * Returns the i'th value, a duration in micro seconds.
-     * If i is even, it is a flash (light on), if i is odd, a gal (light off).
+     * If i is even, it is a flash (light on), if i is odd, a gap (light off).
      * @param i index
-     * @return duration in microseconds, possibly with sign,
+     * @return duration in microseconds,
      */
     public final double get(int i) {
         return data[i];
     }
 
-    /**
-     * Returns the i'th value, the duration in micro seconds, rounded to integer.
-     * @param i index
-     * @return duration in microseconds, possibly with sign.
-     */
-    public final int iget(int i) {
-        return (int) Math.round(Math.abs(data[i]));
-    }
+//    /**
+//     * Returns the i'th value, the duration in micro seconds, rounded to integer.
+//     * @param i index
+//     * @return duration in microseconds, possibly with sign.
+//     */
+//    public final int iget(int i) {
+//        return (int) Math.round(Math.abs(data[i]));
+//    }
+
+//    /**
+//     * Returns an array of integers of durations.
+//     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
+//     * @return integer array of durations in micro seconds, all positive.
+//     */
+//    public final int[] toInts() {
+//        return toInts(false);
+//    }
 
     /**
      * Returns an array of integers of durations.
      * This is a copy of the original data, so it might be manipulated without affecting the original instance.
-     * @return integer array of durations in micro seconds, all positive.
-     */
-    public final int[] toInts() {
-        return toInts(false);
-    }
-
-    /**
-     * Returns an array of integers of durations.
-     * This is a copy of the original data, so it might be manipulated without affecting the original instance.
-     * @param alternatingSigns if true, all the durations with odd index are negative, otherwise, all are positive.
      * @return integer array of durations in micro seconds.
      */
-    public final int[] toInts(boolean alternatingSigns) {
+    public final int[] toInts() {
         int[] array = new int[data.length];
-        for (int i = 0; i < data.length; i++) {
-            int duration = (int) Math.round(Math.abs(data[i]));
-            array[i] = (alternatingSigns && (i % 2 != 0)) ? -duration : duration;
-        }
+        for (int i = 0; i < data.length; i++)
+            array[i] = (int) Math.round(data[i]);
 
         return array;
     }
@@ -325,22 +396,22 @@ public class IrSequence implements Cloneable {
         return data.clone();
     }
 
-    /**
-     * For the frequency given as argument, computes an array of durations in number of periods in the given frequency.
-     * @param frequency Frequency in Hz.
-     * @return integer array of durations in periods of frequency.
-     */
-    public final int[] toPulses(double frequency) {
-        int[] array = new int[data.length];
-        for (int i = 0; i < data.length; i++)
-            array[i] = (int) Math.round(Math.abs(frequency*data[i]/1000000.0));
+//    /**
+//     * For the frequency given as argument, computes an array of durations in number of periods in the given frequency.
+//     * @param frequency Frequency in Hz.
+//     * @return integer array of durations in periods of frequency.
+//     */
+//    public final int[] toPulses(double frequency) {
+//        int[] array = new int[data.length];
+//        for (int i = 0; i < data.length; i++)
+//            array[i] = (int) Math.round(Math.abs(frequency*data[i]/1000000.0));
+//
+//        return array;
+//    }
 
-        return array;
-    }
-
-    private boolean sameSign(int x, int y) {
-        return (x < 0) == (y < 0);
-    }
+//    private boolean sameSign(int x, int y) {
+//        return (x < 0) == (y < 0);
+//    }
 
     /**
      * Returns an IrSequence consisting of this sequence, with repetitions
@@ -381,7 +452,7 @@ public class IrSequence implements Cloneable {
         if (data.length == 0)
             throw new InvalidArgumentException("IrSequence is empty");
         IrSequence irSequence = new IrSequence(this);
-        irSequence.data[data.length-1] = -(Math.abs(data[data.length-1]) + Math.abs(delay));
+        irSequence.data[data.length-1] += delay;
         return irSequence;
     }
 
@@ -410,7 +481,11 @@ public class IrSequence implements Cloneable {
      * @throws InvalidArgumentException if length or start are not even.
      */
     public IrSequence subSequence(int start, int length) throws InvalidArgumentException {
-        return new IrSequence(this, start, length);
+        try {
+            return new IrSequence(this, start, length);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException();
+        }
     }
 
     /**
@@ -430,16 +505,16 @@ public class IrSequence implements Cloneable {
      * @return List of IrSequences
      */
     public List<IrSequence> chop(double threshold) {
-        ArrayList<IrSequence> arrayList = new ArrayList<>(30);
+        List<IrSequence> arrayList = new ArrayList<>(16);
         int beg = 0;
         for (int i = 1; i < data.length; i += 2) {
-            if (Math.abs(data[i]) >= threshold || i == data.length - 1) {
+            if (data[i] >= threshold || i == data.length - 1) {
                 double[] arr = new double[i - beg + 1];
                 System.arraycopy(data, beg, arr, 0, i - beg + 1);
                 try {
                     arrayList.add(new IrSequence(arr));
                 } catch (OddSequenceLengthException ex) {
-                    assert(false);
+                    throw new ThisCannotHappenException();
                 }
                 beg = i + 1;
             }
@@ -457,7 +532,7 @@ public class IrSequence implements Cloneable {
         IrSequence clone = clone();
 
         for (int i = 0; i < data.length; i += 2)
-            clone.data[i] += clone.data[i] > 0 ? amount : -amount;
+            clone.data[i] += amount;
 
         return clone;
     }
@@ -473,7 +548,7 @@ public class IrSequence implements Cloneable {
         IrSequence clone = clone();
 
         for (int i = 1; i < data.length; i += 2)
-            clone.data[i] += clone.data[i] > 0 ? amount : -amount;
+            clone.data[i] += amount;
 
         return clone;
     }
@@ -513,7 +588,7 @@ public class IrSequence implements Cloneable {
      * @return equality
      */
     public boolean approximatelyEquals(IrSequence irSequence) {
-        return IrSequence.this.approximatelyEquals(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return IrSequence.this.approximatelyEquals(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     /**
@@ -529,7 +604,7 @@ public class IrSequence implements Cloneable {
             return false;
 
         for (int i = 0; i < data.length; i++)
-            if (!IrCoreUtils.approximatelyEquals(Math.abs(data[i]), Math.abs(irSequence.data[i]), absoluteTolerance, relativeTolerance))
+            if (!IrCoreUtils.approximatelyEquals(data[i], irSequence.data[i], absoluteTolerance, relativeTolerance))
                 return false;
 
         return true;
@@ -549,14 +624,14 @@ public class IrSequence implements Cloneable {
     public boolean approximatelyEquals(int beginning, int compareStart, int length, double absoluteTolerance, double relativeTolerance, double lastLimit) {
         boolean specialTreatment = compareStart + length == data.length && lastLimit > 0;
         for (int i = 0; i < (specialTreatment ? length - 1 : length); i++) {
-            if (!IrCoreUtils.approximatelyEquals(Math.abs(data[beginning+i]), Math.abs(data[compareStart+i]), absoluteTolerance, relativeTolerance))
+            if (!IrCoreUtils.approximatelyEquals(data[beginning+i], data[compareStart+i], absoluteTolerance, relativeTolerance))
                 return false;
         }
 
         if (specialTreatment) {
             if (!(
-                    IrCoreUtils.approximatelyEquals(Math.abs(data[beginning+length-1]), Math.abs(data[compareStart+length-1]), absoluteTolerance, relativeTolerance)
-                    || (Math.abs(data[beginning+length-1]) >= lastLimit && Math.abs(data[compareStart+length-1]) >= lastLimit)))
+                    IrCoreUtils.approximatelyEquals(data[beginning+length-1], data[compareStart+length-1], absoluteTolerance, relativeTolerance)
+                    || (data[beginning+length-1] >= lastLimit && data[compareStart+length-1] >= lastLimit)))
                 return false;
         }
         return true;
@@ -589,8 +664,8 @@ public class IrSequence implements Cloneable {
      * Return last entry, or <code>null</code> if the data is empty.
      * @return last entry, or <code>null</code> if the data is empty.
      */
-    public final Double getGap() {
-        return data.length > 0 ? Math.abs(data[data.length - 1]) : null;
+    public final Double getLastGap() {
+        return data.length > 0 ? data[data.length - 1] : null;
     }
 
     /**
@@ -607,7 +682,7 @@ public class IrSequence implements Cloneable {
      */
     public final boolean containsZeros() {
         for (double t : data)
-            if (Math.abs(t) < epsilon)
+            if (t < EPSILON)
                 return true;
         return false;
     }
@@ -620,7 +695,7 @@ public class IrSequence implements Cloneable {
     public final boolean replaceZeros(double replacement) {
         boolean wasChanged = false;
         for (int i = 0; i < data.length; i++)
-            if (Math.abs(data[i]) < epsilon) {
+            if (data[i] < EPSILON) {
                 data[i] = replacement;
                 wasChanged = true;
             }
@@ -632,11 +707,8 @@ public class IrSequence implements Cloneable {
      *
      * @return Length of the IR sequence in microseconds.
      */
-    public final double getDuration() {
-        double sum = 0;
-        for (int i = 0; i < data.length; i++)
-            sum += Math.abs(data[i]);
-        return sum;
+    public final double getTotalDuration() {
+        return getTotalDuration(0, data.length);
     }
 
     /**
@@ -646,95 +718,92 @@ public class IrSequence implements Cloneable {
      * @param length length of subsequence.
      * @return Length of the IR sequence in microseconds.
      */
-    public double getDuration(int begin, int length) {
+    public double getTotalDuration(int begin, int length) {
         return IrCoreUtils.l1Norm(data, begin, length);
     }
 
-    /**
-     * Formats IR signal as sequence of durations, with alternating signs, ignoring all signs, or by preserving signs.
-     * @param alternatingSigns if true, generate alternating signs (ignoring original signs).
-     * @param noSigns remove all signs.
-     * @param separator CharSequence between the numbers
-     * @param brackets if true, enclose result in brackets.
-     * @return Printable string.
-     */
-    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator, boolean brackets) {
-        StringBuilder s = new StringBuilder(data.length * 6);
-        if (alternatingSigns) {
-            for (int i = 0; i < data.length; i++) {
-                int x = (int) Math.abs(Math.round(data[i]));
-                s.append(String.format((i % 2 == 0) ? (i > 0 ? (separator + "+%d") : "+%d") : (separator + "-%d"), x));
-            }
-        } else if (noSigns) {
-            for (int i = 0; i < data.length; i++) {
-                int x = (int) Math.abs(Math.round(data[i]));
-                s.append(String.format((i % 2 == 0) ? (i > 0 ? (separator + "%d") : "%d") : (separator + "%d"), x));
-            }
-        } else {
-            for (int i = 0; i < data.length; i++) {
-                s.append(String.format((i > 0 ? (separator + "%d") : "%d"), (int) Math.round(data[i])));
-            }
-        }
-        return brackets ? s.insert(0, '[').append(']').toString() :  s.toString();
-    }
+//    /**
+//     * Formats IR signal as sequence of durations, with alternating signs, ignoring all signs, or by preserving signs.
+//     * @param alternatingSigns if true, generate alternating signs (ignoring original signs).
+//     * @param noSigns remove all signs.
+//     * @param separator CharSequence between the numbers
+//     * @param brackets if true, enclose result in brackets.
+//     * @return Printable string.
+//     */
+//    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator, boolean brackets) {
+//        StringBuilder s = new StringBuilder(data.length * 6);
+//        if (alternatingSigns) {
+//            for (int i = 0; i < data.length; i++) {
+//                int x = (int) Math.round(data[i]);
+//                s.append(String.format((i % 2 == 0) ? (i > 0 ? (separator + "+%d") : "+%d") : (separator + "-%d"), x));
+//            }
+//        } else if (noSigns) {
+//            for (int i = 0; i < data.length; i++) {
+//                int x = (int) Math.round(data[i]);
+//                s.append(String.format((i % 2 == 0) ? (i > 0 ? (separator + "%d") : "%d") : (separator + "%d"), x));
+//            }
+//        } else {
+//            for (int i = 0; i < data.length; i++) {
+//                s.append(String.format((i > 0 ? (separator + "%d") : "%d"), (int) Math.round(data[i])));
+//            }
+//        }
+//        return brackets ? s.insert(0, '[').append(']').toString() :  s.toString();
+//    }
+//
+//    /**
+//     * Formats IR signal as sequence of durations, with alternating signs or by preserving signs.
+//     * @param alternatingSigns if true, generate alternating signs (ignoring original signs), otherwise preserve signs.
+//     * @param noSigns
+//     * @return Printable string.
+//     */
+//    public String toPrintString(boolean alternatingSigns, boolean noSigns) {
+//        return toPrintString(alternatingSigns, noSigns, " ", true);
+//    }
+//
+//    /**
+//     * Formats IR signal as sequence of durations, with alternating signs or by preserving signs.
+//     * @param alternatingSigns if true, generate alternating signs (ignoring original signs), otherwise preserve signs.
+//     * @return Printable string.
+//     */
+//    public String toPrintString(boolean alternatingSigns) {
+//        return toPrintString(alternatingSigns, false);
+//    }
+//
+//    /**
+//     * Formats IR signal as sequence of durations, by preserving signs.
+//     * @return Printable string.
+//     */
+//    public String toPrintString() {
+//        return toPrintString(false, false, " ", true);
+//    }
 
     /**
-     * Formats IR signal as sequence of durations, with alternating signs or by preserving signs.
-     * @param alternatingSigns if true, generate alternating signs (ignoring original signs), otherwise preserve signs.
-     * @param noSigns
-     * @return Printable string.
-     */
-    public String toPrintString(boolean alternatingSigns, boolean noSigns) {
-        return toPrintString(alternatingSigns, noSigns, " ", true);
-    }
-
-    /**
-     * Formats IR signal as sequence of durations, with alternating signs or by preserving signs.
-     * @param alternatingSigns if true, generate alternating signs (ignoring original signs), otherwise preserve signs.
-     * @return Printable string.
-     */
-    public String toPrintString(boolean alternatingSigns) {
-        return toPrintString(alternatingSigns, false);
-    }
-
-    /**
-     * Formats IR signal as sequence of durations, by preserving signs.
-     * @return Printable string.
-     */
-    public String toPrintString() {
-        return toPrintString(false, false, " ", true);
-    }
-
-    /**
-     * Generates a pretty string representing the object. Signs in the data are preserved.
+     * Generates a pretty string representing the object.
      * @return nice string.
      */
     @Override
     public String toString() {
-        if (data.length == 0)
-            return "[]";
-        StringBuilder result = new StringBuilder(data.length * 6);
-        result.append("[").append(Math.round(data[0]));
-        for (int i = 1; i < data.length; i++)
-            result.append(",").append(Math.round(data[i]));
+        return toString(false);
+    }
 
-        return result.append("]").toString();
+    public String toString(boolean alternatingSigns) {
+        return toString(alternatingSigns, ",", "[", "]");
     }
 
     /**
-     * Generates a pretty string representing the object. If argument true, generate string with alternating signs,
-     * otherwise remove signs. To preserve signs, use toString() instead.
-     * @param alternatingSigns if true, generate alternating signs, otherwise remove signs.
+     * Generates a pretty string representing the object. If argument true, generate string with alternating signs.
+     * @param alternatingSigns if true, generate alternating signs.
+     * @param separator
+     * @param prefix
+     * @param suffix
      * @return nice string.
      */
-    public String toString(boolean alternatingSigns) {
-        if (data.length == 0)
-            return "[]";
-        StringBuilder result = new StringBuilder(data.length * 6);
-        result.append("[").append(Math.round(Math.abs(data[0])));
-        for (int i = 1; i < data.length; i++)
-            result.append(",").append((alternatingSigns && (i % 2 != 0) ? "-" : "")).append(Math.round(Math.abs(data[i])));
-
-        return result.append("]").toString();
+    public String toString(boolean alternatingSigns, String separator, String prefix, String suffix) {
+        StringJoiner stringJoiner = new StringJoiner(separator, prefix, suffix);
+        for (int i = 0; i < data.length; i++) {
+            String sign = alternatingSigns ? (isFlash(i) ? "+" : "-") : "";
+            stringJoiner.add(sign + Long.toString(Math.round(data[i])));
+        }
+        return stringJoiner.toString();
     }
 }

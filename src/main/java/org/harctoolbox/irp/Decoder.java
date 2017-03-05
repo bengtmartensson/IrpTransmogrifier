@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.xml.sax.SAXException;
 
@@ -61,7 +62,6 @@ public class Decoder {
             if (!protocols.isEmpty())
                 System.out.println(nameEngine);
             IrSignal irSignal = protocol.toIrSignal(nameEngine);
-
             decoder.decodePrint(irSignal);
         }
     }
@@ -73,7 +73,7 @@ public class Decoder {
     private final Map<String, NamedProtocol> parsedProtocols;
 
     public Decoder(IrpDatabase irpDatabase) {
-        this(irpDatabase, null, true, IrCoreUtils.defaultFrequencyTolerance, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(irpDatabase, null, true, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public Decoder(IrpDatabase irpDatabase, Collection<String> names) {

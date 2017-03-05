@@ -49,10 +49,10 @@ public class DumpItemCodeGenerator extends ItemCodeGenerator {
             str.append("]");
         else {
             list.forEach((obj) -> {
-                str.append(IrCoreUtils.lineSeparator).append(prefix).append(render(obj, level + 1));
+                str.append(IrCoreUtils.LINESEPARATOR).append(prefix).append(render(obj, level + 1));
             });
 
-            str.append(IrCoreUtils.lineSeparator).append(mkPrefix(level - 1)).append(']');
+            str.append(IrCoreUtils.LINESEPARATOR).append(mkPrefix(level - 1)).append(']');
         }
         return str.toString();
     }
@@ -65,10 +65,10 @@ public class DumpItemCodeGenerator extends ItemCodeGenerator {
             str.append("}");
         else {
             map.entrySet().forEach((kvp) -> {
-                str.append(IrCoreUtils.lineSeparator).append(prefix).append(kvp.getKey()).append(" = ").append(render(kvp.getValue(), level + 1));
+                str.append(IrCoreUtils.LINESEPARATOR).append(prefix).append(kvp.getKey()).append(" = ").append(render(kvp.getValue(), level + 1));
             });
 
-            str.append(IrCoreUtils.lineSeparator).append(mkPrefix(level - 1)).append('}');
+            str.append(IrCoreUtils.LINESEPARATOR).append(mkPrefix(level - 1)).append('}');
         }
         return str.toString();
     }
@@ -115,6 +115,6 @@ public class DumpItemCodeGenerator extends ItemCodeGenerator {
 
     @Override
     public String render() {
-        return render(name, aggregates, 0) + IrCoreUtils.lineSeparator;
+        return render(name, aggregates, 0) + IrCoreUtils.LINESEPARATOR;
     }
 }

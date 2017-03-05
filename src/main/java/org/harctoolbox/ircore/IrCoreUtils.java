@@ -25,22 +25,22 @@ import java.util.Locale;
  */
 public class IrCoreUtils {
 
-    public static final String lineSeparator = System.getProperty("line.separator");
+    public static final String LINESEPARATOR = System.getProperty("line.separator");
 
     /**
      * Default absolute tolerance in micro seconds.
      */
-    public static final double defaultAbsoluteTolerance = 60;
+    public static final double DEFAULTABSOLUTETOLERANCE = 60;
 
     /**
      * Default relative tolerance as a number between 0 and 1.
      */
-    public static final double defaultRelativeTolerance = 0.1;
+    public static final double DEFAULTRELATIVETOLERANCE = 0.1;
 
     /**
      * Default absolute tolerance for frequency comparison.
      */
-    public static final double defaultFrequencyTolerance = 500;
+    public static final double DEFAULTFREQUENCYTOLERANCE = 500;
 
     /**
      * Default absolute tolerance for frequency comparison.
@@ -162,7 +162,7 @@ public class IrCoreUtils {
     }
 
     public static boolean approximatelyEquals(Double x, Double y) {
-        return approximatelyEquals(x, y, defaultAbsoluteTolerance, defaultRelativeTolerance);
+        return approximatelyEquals(x, y, DEFAULTABSOLUTETOLERANCE, DEFAULTRELATIVETOLERANCE);
     }
 
     /**

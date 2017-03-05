@@ -71,7 +71,7 @@ class EvaluatedIrStream {
                 elapsed += Math.abs(time);
             }
         }
-        IrSequence result = new IrSequence(times);
+        IrSequence result = IrSequence.mkIrSequence(times, false);
         IrpUtils.exiting(logger, "toIrSequence", result);
         return result;
     }
@@ -169,5 +169,13 @@ class EvaluatedIrStream {
      */
     public void setState(IrSignal.Pass state) {
         this.state = state;
+    }
+
+    boolean isFlash(int i) {
+        return elements.get(i) instanceof Flash;
+    }
+
+    boolean isGap(int i) {
+        return elements.get(i) instanceof Gap;
     }
 }

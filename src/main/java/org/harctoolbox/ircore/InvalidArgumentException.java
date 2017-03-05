@@ -30,4 +30,8 @@ public class InvalidArgumentException extends Exception {
     public InvalidArgumentException(Throwable ex) {
         super(ex);
     }
+
+    public InvalidArgumentException() {
+        super();
+    }
 }

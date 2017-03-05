@@ -28,13 +28,13 @@ import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
 
 public class Burst {
-    private static final double dafaultMaxRoundingError = 0.3f;
-    private static final double defaultMaxUnits = 30f;
-    private static final double defaultMaxUs = 10000f;
+    public static final double DEFAULTMAXROUNDINGERROR = 0.3f;
+    public static final double DEFAULTMAXUNITS = 30f;
+    public static final double DEFAULTMAXUS = 10000f;
 
-    private static double maxRoundingError = dafaultMaxRoundingError;
-    private static double maxUnits = defaultMaxUnits;
-    private static double maxUs = defaultMaxUs;
+    private static double maxRoundingError = DEFAULTMAXROUNDINGERROR;
+    private static double maxUnits = DEFAULTMAXUNITS;
+    private static double maxUs = DEFAULTMAXUS;
 
     static Integer multiplier(double us, Double timebase) {
         if (timebase == null)

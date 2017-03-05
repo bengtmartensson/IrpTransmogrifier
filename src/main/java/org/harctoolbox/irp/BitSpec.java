@@ -24,9 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.harctoolbox.ircore.IrCoreUtils;
-import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -204,17 +202,16 @@ public class BitSpec extends IrpObject implements AggregateLister {
      * @return
      */
     public boolean isPWM(int length, GeneralSpec generalSpec, NameEngine nameEngine) {
-        return bitCodes.size() == length && isTwoLengthGapFlash(generalSpec, nameEngine);
+        return bitCodes.size() == length && isTwoLengthFlashGap(generalSpec, nameEngine);
     }
 
-    private boolean isTwoLengthGapFlash(GeneralSpec generalSpec, NameEngine nameEngine) {
+    private boolean isTwoLengthFlashGap(GeneralSpec generalSpec, NameEngine nameEngine) {
         for (BareIrStream bitCode : bitCodes) {
             try {
-                // toIrSequence throws exception if not positive, negative
-                IrSequence irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine).toIrSequence();
-                if (irSequence.getLength() != 2)
+                EvaluatedIrStream irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
+                if (!(irSequence.getLength() == 2 && irSequence.isFlash(0) && irSequence.isGap(1)))
                     return false;
-            } catch (IrpException | ArithmeticException | OddSequenceLengthException ex) {
+            } catch (IrpException | ArithmeticException ex) {
                 return false;
             }
         }

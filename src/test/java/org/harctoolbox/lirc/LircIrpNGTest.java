@@ -7,7 +7,6 @@ package org.harctoolbox.lirc;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.irp.Protocol;

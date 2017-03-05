@@ -149,15 +149,15 @@ public class NamedProtocol extends Protocol {
     }
 
     public double getRelativeTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public double getAbsoluteTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.defaultAbsoluteTolerance);
+        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.DEFAULTABSOLUTETOLERANCE);
     }
 
     public double getFrequencyTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.defaultFrequencyTolerance);
+        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")

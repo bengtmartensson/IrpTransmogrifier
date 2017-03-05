@@ -52,6 +52,7 @@ public class ShortPronto extends Pronto {
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws InvalidArgumentException
      */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IrSignal parse(int[] ccf) throws InvalidArgumentException {
         if (ccf.length < 4)
             throw new InvalidArgumentException("CCF is invalid since less than 4 numbers long.");
@@ -138,7 +139,7 @@ public class ShortPronto extends Pronto {
             } catch (DomainViolationException ex) {
                 logger.log(Level.SEVERE, "{0}", ex.getMessage());
                 throw new InvalidArgumentException(ex);
-            } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException | OddSequenceLengthException | NameConflictException | IrpSignalParseException ex) {
+            } catch (IrpException | ArithmeticException ex) {
                 throw new ThisCannotHappenException(ex);
             }
         }
@@ -190,6 +191,7 @@ public class ShortPronto extends Pronto {
      * @return integer array of short CCF, or null om failure.
      * @throws InvalidArgumentException for paramters outside of its allowed domain.
      */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static int[] shortCCF(String protocolName, Integer device, Integer subdevice, Integer command) throws InvalidArgumentException {
         int index = 0;
         if (protocolName.equalsIgnoreCase("rc5")) {

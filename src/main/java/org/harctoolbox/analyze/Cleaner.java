@@ -29,19 +29,24 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class Cleaner {
-    private final static int numberOfTimingsCapacity = 20;
+    private final static int NUMBEROFINITIALTIMINGSCAPACITY = 20;
     private static final int NO_LETTERS = 26;
 
     public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
-        return new IrSequence(cleaner.toDurations());
+        try {
+            return new IrSequence(cleaner.toDurations());
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException();
+        }
     }
 
     public static IrSequence clean(IrSequence irSequence) {
-        return clean(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return clean(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
@@ -50,7 +55,7 @@ public class Cleaner {
     }
 
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
-        return clean(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return clean(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public static IrSignal clean(IrSignal irSignal, double absoluteTolerance, double relativeTolerance) throws InvalidArgumentException {
@@ -79,7 +84,7 @@ public class Cleaner {
     private List<Integer> flashesSortedAfterFrequency;
 
     public Cleaner(IrSequence irSequence) {
-        this(irSequence, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        this(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public Cleaner(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
@@ -97,7 +102,7 @@ public class Cleaner {
     }
 
     private void createRawHistogram() {
-        rawHistogram = new HashMap<>(numberOfTimingsCapacity);
+        rawHistogram = new HashMap<>(NUMBEROFINITIALTIMINGSCAPACITY);
         for (int i = 0; i < rawData.length; i++) {
             boolean isFlash = i % 2 == 0;
             int duration = rawData[i];
@@ -121,8 +126,8 @@ public class Cleaner {
     }
 
     private void improveTimingsTable(double absoluteTolerance, double relativeTolerance) {
-        lookDownTable = new HashMap<>(numberOfTimingsCapacity);
-        timings = new ArrayList<>(numberOfTimingsCapacity);
+        lookDownTable = new HashMap<>(NUMBEROFINITIALTIMINGSCAPACITY);
+        timings = new ArrayList<>(NUMBEROFINITIALTIMINGSCAPACITY);
         int indexInSortedTimings = 0;
         for (int timingsIndex = 0; timingsIndex < dumbTimingsTable.size(); timingsIndex++) {
             int dumbTiming = dumbTimingsTable.get(timingsIndex);
@@ -131,7 +136,8 @@ public class Cleaner {
             int lastDuration = -1;
             while (indexInSortedTimings < sorted.length
                     && IrCoreUtils.approximatelyEquals(dumbTiming, sorted[indexInSortedTimings], (int) absoluteTolerance, relativeTolerance)) {
-                int duration = sorted[indexInSortedTimings++];
+                int duration = sorted[indexInSortedTimings];
+                indexInSortedTimings++;
                 if (duration == lastDuration)
                     continue;
                 lastDuration = duration;
@@ -153,7 +159,7 @@ public class Cleaner {
     }
 
     private void createCleanHistogram() {
-        cleanedHistogram = new LinkedHashMap<>(numberOfTimingsCapacity);
+        cleanedHistogram = new LinkedHashMap<>(NUMBEROFINITIALTIMINGSCAPACITY);
         timings.stream().forEach((duration) -> {
             cleanedHistogram.put(duration, new HistoPair());
         });

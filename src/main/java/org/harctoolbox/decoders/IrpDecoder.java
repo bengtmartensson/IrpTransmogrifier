@@ -73,7 +73,7 @@ public abstract class IrpDecoder {
     }
 
     protected double getFrequencyTolerance() {
-        return IrCoreUtils.defaultFrequencyTolerance;
+        return IrCoreUtils.DEFAULTFREQUENCYTOLERANCE;
     }
 
     public final boolean isValid() {
@@ -122,8 +122,8 @@ public abstract class IrpDecoder {
     protected static abstract class DecodeSequence {
 
         // Assumes interleaving
-        private final static double largeDurationTolerance = 15000d;
-        private final static double largeDurationThreshold = 20000d;
+        //private final static double LARGEDURATIONTOLERANCE = 15000d;
+        //private final static double LARGEDURATIONTHRESHOLD = 20000d;
 
         private final int chunkSize;
         private final boolean lsbFirst;
@@ -144,11 +144,11 @@ public abstract class IrpDecoder {
         }
 
         protected double getAbsoluteTolerance() {
-            return IrCoreUtils.defaultAbsoluteTolerance;
+            return IrCoreUtils.DEFAULTABSOLUTETOLERANCE;
         }
 
         protected double getRelativeTolerance() {
-            return IrCoreUtils.defaultRelativeTolerance;
+            return IrCoreUtils.DEFAULTRELATIVETOLERANCE;
         }
 
         private boolean acceptablyClose(double x, double y) {
@@ -235,7 +235,7 @@ public abstract class IrpDecoder {
             if (isFlash())
                 return false;
             index++;
-            double passed = irSequence.getDuration(extentBegin, index - extentBegin);
+            double passed = irSequence.getTotalDuration(extentBegin, index - extentBegin);
             extentBegin = index;
             return acceptablyClose(passed, expected);
         }
@@ -316,8 +316,8 @@ public abstract class IrpDecoder {
     }
 
     protected static class Pwm2DecodeSequence extends IrpDecoder.DecodeSequence {
-        public static final int bitSpecLength = 2;
-        public static final int chunkSize = 1;
+        private static final int BITSPECLENGTH = 2;
+        private static final int CHUNKSIZE = 1;
 
         private final double zeroGap;
         private final double zeroFlash;
@@ -326,7 +326,7 @@ public abstract class IrpDecoder {
 
         Pwm2DecodeSequence(IrSequence irSequence, boolean lsbFirst,
                 double zeroFlash, double zeroGap, double oneFlash, double oneGap) {
-            super(irSequence, lsbFirst, chunkSize);
+            super(irSequence, lsbFirst, CHUNKSIZE);
             this.zeroGap = zeroGap;
             this.zeroFlash = zeroFlash;
             this.oneGap = oneGap;
@@ -337,11 +337,11 @@ public abstract class IrpDecoder {
         protected Integer parseChunk() throws DecodeException {
             Integer result =
                       (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
-                    : (duration(oneFlash, 0) && duration(oneGap, 1)) ? 1
+                    : (duration(oneFlash,  0) && duration(oneGap,  1)) ? 1
                     : null;
             if (result == null)
                 throw new DecodeException("parseChunk");
-            pull(bitSpecLength);
+            pull(BITSPECLENGTH);
             return result;
         }
 
@@ -479,9 +479,9 @@ public abstract class IrpDecoder {
         protected Integer parseChunk() throws DecodeException {
             Integer result =
                       (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
-                    : (duration(oneFlash, 0) && duration(oneGap, 1)) ? 1
-                    : (duration(twoFlash, 0) && duration(twoGap, 1)) ? 2
-                    : (duration(threeFlash, 0) && duration(threeGap, 1)) ? 3
+                    : (duration(oneFlash,  0) && duration(oneGap,  1)) ? 1
+                    : (duration(twoFlash,  0) && duration(twoGap,  1)) ? 2
+                    : (duration(threeFlash,0) && duration(threeGap,1)) ? 3
                     : null;
             if (result == null)
                 throw new DecodeException("parseChunk");

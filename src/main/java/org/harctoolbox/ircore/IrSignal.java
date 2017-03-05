@@ -75,11 +75,11 @@ public class IrSignal implements Cloneable {
             if (parts.length < 2) {
                 throw new InvalidArgumentException("Less than two parts");
             }
-            intro = new IrSequence(parts[0], fixOddSequences);
-            repeat = new IrSequence(parts[1], fixOddSequences);
-            ending = (parts.length >= 3) ? new IrSequence(parts[2], fixOddSequences) : null;
+            intro = new IrSequence(parts[0]);
+            repeat = new IrSequence(parts[1]);
+            ending = (parts.length >= 3) ? new IrSequence(parts[2]) : null;
         } else
-            intro = new IrSequence(str, fixOddSequences);
+            intro = new IrSequence(str);
 
         return new IrSignal(intro, repeat, ending, frequency);
     }
@@ -195,9 +195,10 @@ public class IrSignal implements Cloneable {
     /**
      * Constructs an IrSignal of zero length.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
     public IrSignal() throws InvalidArgumentException {
-        this(new int[0], 0, 0, (int) ModulatedIrSequence.defaultFrequency);
+        this(new int[0], 0, 0, ModulatedIrSequence.defaultFrequency, null);
     }
 
     /**
@@ -214,11 +215,12 @@ public class IrSignal implements Cloneable {
     /**
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @see Pronto
      *
      * @param ccf Integer array supposed to represent a valid CCF signal.
      */
-    public IrSignal(int[] ccf) throws InvalidArgumentException {
+    public IrSignal(int[] ccf) throws InvalidArgumentException, OddSequenceLengthException {
         copyFrom(Pronto.parse(ccf));
     }
 
@@ -268,22 +270,21 @@ public class IrSignal implements Cloneable {
 
     /**
      * Returns the data in the intro sequence, as a sequence of microsecond durations.
-     * @param alternatingSigns
      * @see IrSequence
      * @return integer sequence of durations in microseconds, possibly with sign.
      */
-    public final int[] getIntroInts(boolean alternatingSigns) {
-        return introSequence.toInts(alternatingSigns);
+    public final int[] getIntroInts() {
+        return introSequence.toInts();
     }
 
-    /**
-     * Returns the data in the intro sequence, as a sequence of pulses in the used frequency.
-     * @see IrSequence
-     * @return integer array of pulses
-     */
-    public final int[] getIntroPulses() {
-        return introSequence.toPulses(frequency);
-    }
+//    /**
+//     * Returns the data in the intro sequence, as a sequence of pulses in the used frequency.
+//     * @see IrSequence
+//     * @return integer array of pulses
+//     */
+//    public final int[] getIntroPulses() {
+//        return introSequence.toPulses(frequency);
+//    }
 
     /**
      * Returns the i'th data in the intro sequence, as double.
@@ -299,13 +300,13 @@ public class IrSignal implements Cloneable {
         return repeatSequence.getLength();
     }
 
-    public final int[] getRepeatInts(boolean alternatingSigns) {
-        return repeatSequence.toInts(alternatingSigns);
+    public final int[] getRepeatInts() {
+        return repeatSequence.toInts();
     }
 
-    public final int[] getRepeatPulses() {
-        return repeatSequence.toPulses(frequency);
-    }
+//    public final int[] getRepeatPulses() {
+//        return repeatSequence.toPulses(frequency);
+//    }
 
     public final double getRepeatDouble(int i) {
         return repeatSequence.get(i);
@@ -315,13 +316,13 @@ public class IrSignal implements Cloneable {
         return endingSequence.getLength();
     }
 
-    public final int[] getEndingInts(boolean alternatingSigns) {
-        return endingSequence.toInts(alternatingSigns);
+    public final int[] getEndingInts() {
+        return endingSequence.toInts();
     }
 
-    public final int[] getEndingPulses() {
-        return endingSequence.toPulses(frequency);
-    }
+//    public final int[] getEndingPulses() {
+//        return endingSequence.toPulses(frequency);
+//    }
 
     public final double getEndingDouble(int i) {
         return endingSequence.get(i);
@@ -332,8 +333,8 @@ public class IrSignal implements Cloneable {
      * one repeat sequence, plus the ending sequence.
      * @return duration in microseconds.
      */
-    public final double getDuration() {
-        return introSequence.getDuration() + repeatSequence.getDuration() + endingSequence.getDuration();
+    public final double getTotalDuration() {
+        return introSequence.getTotalDuration() + repeatSequence.getTotalDuration() + endingSequence.getTotalDuration();
     }
 
     /**
@@ -344,7 +345,7 @@ public class IrSignal implements Cloneable {
      * @return duration in microseconds.
      */
     public final double getDuration(int count) {
-        return introSequence.getDuration() + repeatsPerCountSemantic(count)*repeatSequence.getDuration() + endingSequence.getDuration();
+        return introSequence.getTotalDuration() + repeatsPerCountSemantic(count)*repeatSequence.getTotalDuration() + endingSequence.getTotalDuration();
     }
 
     public final double getDouble(Pass pass, int i) {
@@ -371,38 +372,38 @@ public class IrSignal implements Cloneable {
                 + repeatSequence.toString(alternatingSigns) + endingSequence.toString(alternatingSigns);
     }
 
-    /**
-     * Analog to the IrSequence toPrintString.
-     * @param alternatingSigns If true, generated signs will have alternating signs, ignoring original signs, otherwise signs are preserved.
-     * @param noSigns If true, suppress explict signs
-     * @param separator separator between the numbers
-     * @return Nicely formatted string.
-     *
-     * @see IrSequence
-     */
-    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator) {
-        return introSequence.toPrintString(alternatingSigns, noSigns, separator, true)
-                + repeatSequence.toPrintString(alternatingSigns, noSigns, separator, true)
-                + (endingSequence.getLength() > 0 ? endingSequence.toPrintString(alternatingSigns, noSigns, separator, true) : "");
-    }
+//    /**
+//     * Analog to the IrSequence toPrintString.
+//     * @param alternatingSigns If true, generated signs will have alternating signs, ignoring original signs, otherwise signs are preserved.
+//     * @param noSigns If true, suppress explict signs
+//     * @param separator separator between the numbers
+//     * @return Nicely formatted string.
+//     *
+//     * @see IrSequence
+//     */
+//    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator) {
+//        return introSequence.toPrintString(alternatingSigns, noSigns, separator, true)
+//                + repeatSequence.toPrintString(alternatingSigns, noSigns, separator, true)
+//                + (endingSequence.getLength() > 0 ? endingSequence.toPrintString(alternatingSigns, noSigns, separator, true) : "");
+//    }
+//
+//    public String toPrintString(boolean alternatingSigns, boolean noSigns) {
+//        return toPrintString(alternatingSigns, noSigns, " ");
+//    }
+//
+//    public String toPrintString(boolean alternatingSigns) {
+//        return toPrintString(alternatingSigns, false, " ");
+//    }
+//
+//    public String toPrintString() {
+//        return toPrintString(false);
+//    }
 
-    public String toPrintString(boolean alternatingSigns, boolean noSigns) {
-        return toPrintString(alternatingSigns, noSigns, " ");
-    }
-
-    public String toPrintString(boolean alternatingSigns) {
-        return toPrintString(alternatingSigns, false, " ");
-    }
-
-    public String toPrintString() {
-        return toPrintString(false);
-    }
-
-    // helper function for the next
-    private void append(int offset, int[] result, IrSequence seq) {
-        for (int i = 0; i < seq.getLength(); i++)
-            result[i+offset] = seq.iget(i);
-    }
+//    // helper function for the next
+//    private void append(int offset, int[] result, IrSequence seq) {
+//        for (int i = 0; i < seq.getLength(); i++)
+//            result[i+offset] = seq.iget(i);
+//    }
 
     /**
      * Returns the number of repetitions according to the count semantics.
@@ -413,39 +414,39 @@ public class IrSignal implements Cloneable {
         return introSequence.isEmpty() ? count : count - 1;
     }
 
-    /**
-     * Returns an integer array of one intro sequence, repeat number of repeat sequence, followed by one ending sequence.
-     * The sizes can be obtained with the get*Length()-functions.
-     * @param repetitions Number of times of to include the repeat sequence.
-     * @return integer array as copy.
-     */
-    public final int[] toIntArray(int repetitions) {
-        int[] result = new int[introSequence.getLength() + repetitions*repeatSequence.getLength() + endingSequence.getLength()];
-        append(0, result, introSequence);
-        for (int i = 0; i < repetitions; i++)
-            append(introSequence.getLength() + i*repeatSequence.getLength(), result, repeatSequence);
-        append(introSequence.getLength() + repetitions*repeatSequence.getLength(), result, endingSequence);
+//    /**
+//     * Returns an integer array of one intro sequence, repeat number of repeat sequence, followed by one ending sequence.
+//     * The sizes can be obtained with the get*Length()-functions.
+//     * @param repetitions Number of times of to include the repeat sequence.
+//     * @return integer array as copy.
+//     */
+//    public final int[] toIntArray(int repetitions) {
+//        int[] result = new int[introSequence.getLength() + repetitions*repeatSequence.getLength() + endingSequence.getLength()];
+//        append(0, result, introSequence);
+//        for (int i = 0; i < repetitions; i++)
+//            append(introSequence.getLength() + i*repeatSequence.getLength(), result, repeatSequence);
+//        append(introSequence.getLength() + repetitions*repeatSequence.getLength(), result, endingSequence);
+//
+//        return result;
+//    }
 
-        return result;
-    }
+//    /**
+//     * Equivalent to toIntArray(1)
+//     * @return array of ints.
+//     */
+//    public final int[] toIntArray() {
+//        return toIntArray(1);
+//    }
 
-    /**
-     * Equivalent to toIntArray(1)
-     * @return array of ints.
-     */
-    public final int[] toIntArray() {
-        return toIntArray(1);
-    }
-
-    /**
-     * Returns an integer array of one intro sequence, count or count-1 number of repeat sequence, dependent on if intro is empty or not, followed by one ending sequence.
-     * The sizes can be obtained with the get*Length()-functions.
-     * @param count Number of times of the "signal" to send, according to the count semantic.
-     * @return integer array as copy.
-     */
-    public final int[] toIntArrayCount(int count) {
-        return toIntArray(repeatsPerCountSemantic(count));
-    }
+//    /**
+//     * Returns an integer array of one intro sequence, count or count-1 number of repeat sequence, dependent on if intro is empty or not, followed by one ending sequence.
+//     * The sizes can be obtained with the get*Length()-functions.
+//     * @param count Number of times of the "signal" to send, according to the count semantic.
+//     * @return integer array as copy.
+//     */
+//    public final int[] toIntArrayCount(int count) {
+//        return toIntArray(repeatsPerCountSemantic(count));
+//    }
 
     /**
      *
@@ -490,7 +491,7 @@ public class IrSignal implements Cloneable {
      * @return max gap of intro- and repeat sequences.
      */
     public final double getGap() {
-        return Math.max(introSequence.getGap(), repeatSequence.getGap());
+        return Math.max(introSequence.getLastGap(), repeatSequence.getLastGap());
     }
 
 
@@ -525,7 +526,9 @@ public class IrSignal implements Cloneable {
     public final ModulatedIrSequence toModulatedIrSequence(boolean intro, int repetitions, boolean ending) {
         IrSequence seq1 = intro ? introSequence : new IrSequence();
         IrSequence seq2 = seq1.append(repeatSequence, repetitions);
-        return new ModulatedIrSequence(ending && !endingSequence.isEmpty() ? seq2.append(endingSequence) : seq2, frequency, dutyCycle);
+        IrSequence seq3 = seq2.append(endingSequence);
+
+        return new ModulatedIrSequence(seq3, frequency, dutyCycle);
     }
 
     /**
@@ -562,7 +565,7 @@ public class IrSignal implements Cloneable {
      * @return equality within tolerance.
      */
     public boolean approximatelyEquals(IrSignal irSignal) {
-        return approximatelyEquals(irSignal, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance, IrCoreUtils.defaultFrequencyTolerance);
+        return approximatelyEquals(irSignal, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
     }
 
     /**

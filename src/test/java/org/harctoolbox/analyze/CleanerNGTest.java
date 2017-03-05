@@ -19,9 +19,11 @@ public class CleanerNGTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
+
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
+
     private String nec_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
     private ModulatedIrSequence irSequence = null;
     private ModulatedIrSequence noisy = null;
@@ -56,12 +58,12 @@ public class CleanerNGTest {
         IrSequence verynoisy = irSequence.addNoise(60);
         IrSequence cleaned = Cleaner.clean(verynoisy);
         //Assert.assertFalse(irSequence.approximatelyEquals(verynoisy, IrCoreUtils.defaultAbsoluteTolerance, 0.1));
-        Assert.assertTrue(irSequence.approximatelyEquals(cleaned, IrCoreUtils.defaultAbsoluteTolerance, 0.1));
+        Assert.assertTrue(irSequence.approximatelyEquals(cleaned, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, 0.1));
 
         IrSequence reallynoisy = irSequence.addNoise(200);
         cleaned = Cleaner.clean(reallynoisy);
-        Assert.assertFalse(irSequence.approximatelyEquals(reallynoisy, IrCoreUtils.defaultAbsoluteTolerance, 0.1));
-        Assert.assertFalse(irSequence.approximatelyEquals(cleaned, IrCoreUtils.defaultAbsoluteTolerance, 0.1));
+        Assert.assertFalse(irSequence.approximatelyEquals(reallynoisy, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, 0.1));
+        Assert.assertFalse(irSequence.approximatelyEquals(cleaned, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, 0.1));
         Assert.assertFalse(irSequence.approximatelyEquals(cleaned));
     }
 
@@ -97,7 +99,6 @@ public class CleanerNGTest {
         System.out.println("clean");
         int absoluteTolerance = 60;
         double relativeTolerance = 0.2;
-        IrSequence expResult = null;
         IrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
         Assert.assertTrue(result.approximatelyEquals(irSequence));
     }

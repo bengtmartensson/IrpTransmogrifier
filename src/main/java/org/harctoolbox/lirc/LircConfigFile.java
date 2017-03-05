@@ -136,8 +136,10 @@ public final class LircConfigFile {
         values.forEach((irRemote) -> {
             String remoteName = irRemote.getName();
             int n = 1;
-            while (dictionary.containsKey(remoteName))
-                remoteName = irRemote.getName() + "$" + n++;
+            while (dictionary.containsKey(remoteName)) {
+                remoteName = irRemote.getName() + "$" + n;
+                n++;
+            }
 
             if (n > 1)
                 logger.log(Level.INFO, "Remote name {0} (source: {1}) already present, renaming to {2}",

@@ -55,8 +55,8 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
-import org.harctoolbox.lirc.LircConfigFile;
 import org.harctoolbox.lirc.LircCommand;
+import org.harctoolbox.lirc.LircConfigFile;
 import org.harctoolbox.lirc.LircIrp;
 import org.harctoolbox.lirc.LircRemote;
 import org.w3c.dom.Document;
@@ -273,7 +273,7 @@ public class IrpTransmogrifier {
                         System.err.println("Unknown command: " + command);
                         System.exit(IrpUtils.exitSemanticUsageError);
                 }
-        } catch (IrpException | InvalidArgumentException | UnsupportedOperationException | OddSequenceLengthException
+        } catch (IrpException | InvalidArgumentException | UnsupportedOperationException
                 | ParseCancellationException | SAXException | IOException | UsageException | NumberFormatException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
@@ -504,9 +504,9 @@ public class IrpTransmogrifier {
             logger.warning("No output requested, use either --raw, --raw-without-signs or --pronto go get output.");
         IrSignal irSignal = protocol.toIrSignal(nameEngine);
         if (commandRenderer.raw)
-            out.println(irSignal.toPrintString(true));
+            out.println(irSignal.toString(true));
         if (commandRenderer.rawWithoutSigns)
-            out.println(irSignal.toPrintString(false, true, " "));
+            out.println(irSignal.toString(false));
         if (commandRenderer.pronto)
             out.println(irSignal.ccfString());
     }
@@ -562,7 +562,7 @@ public class IrpTransmogrifier {
     private void analyzeIntroRepeatEnding(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException, InvalidArgumentException {
         IrSignal irSignal;
         if (commandAnalyze.chop != null) {
-            List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args), false);
+            List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args));
             if (sequences.size() > 1)
                 throw new UsageException("Cannot use --chop together with several IR seqeunces");
             sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
@@ -581,8 +581,8 @@ public class IrpTransmogrifier {
         analyze(irSignal, commandAnalyze, commandLineArgs);
     }
 
-    private void analyzeSequence(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException {
-        List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args), false);
+    private void analyzeSequence(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException, OddSequenceLengthException {
+        List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args));
         if (commandAnalyze.chop != null) {
             if (sequences.size() > 1)
                 throw new UsageException("Cannot use --chop together with several IR seqeunces");

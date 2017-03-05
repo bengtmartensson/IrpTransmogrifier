@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.analyze;
 
 import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -25,10 +26,10 @@ import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class RepeatFinder {
-
-    private static double defaultMinRepeatLastGap = AnalyzeUtils.defaultMinRepeatLastGap; // 20 milli seconds minimum for a repetition
-    private static double defaultRelativeTolerance = AnalyzeUtils.defaultRelativeTolerance;
-    private static double defaultAbsoluteTolerance = AnalyzeUtils.defaultAbsoluteTolerance;
+    public static final double DEFAULTMINREPEATLASTGAP = 20000; // 20 milli seconds minimum for a repetition
+    private static double defaultMinRepeatLastGap = DEFAULTMINREPEATLASTGAP;
+    private static double defaultRelativeTolerance = IrCoreUtils.DEFAULTRELATIVETOLERANCE;
+    private static double defaultAbsoluteTolerance = IrCoreUtils.DEFAULTABSOLUTETOLERANCE;
 
     /**
      * @return the defaultMinRepeatLastGap
@@ -108,7 +109,7 @@ public class RepeatFinder {
         this(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
 
-    public RepeatFinder(int[] data) {
+    public RepeatFinder(int[] data) throws OddSequenceLengthException {
         this(new IrSequence(data), defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
 
@@ -141,7 +142,7 @@ public class RepeatFinder {
             if (!hit) {
                 result.numberRepeats = hits;
                 result.endingLength = irSequence.getLength() - beginning - hits*length;
-                result.repeatsDuration = irSequence.getDuration(beginning, hits*length);
+                result.repeatsDuration = irSequence.getTotalDuration(beginning, hits*length);
                 return result;
             }
         }

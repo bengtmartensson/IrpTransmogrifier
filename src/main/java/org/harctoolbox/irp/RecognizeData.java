@@ -196,7 +196,7 @@ public class RecognizeData extends Traverser implements Cloneable {
 
     public double getExtentDuration() {
         int endPosition = position + 1;//IrCoreUtils.approximatelyEquals(hasConsumed, 0.0) ? position : position + 1;
-        return irSequence.getDuration(extentStart, endPosition - extentStart);
+        return irSequence.getTotalDuration(extentStart, endPosition - extentStart);
     }
 
     public boolean allowChopping() {

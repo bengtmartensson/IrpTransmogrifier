@@ -110,6 +110,7 @@ public class Pronto {
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws InvalidArgumentException
      */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IrSignal parse(int[] ccf) throws OddSequenceLengthException, InvalidArgumentException {
         if (ccf.length < 4)
             throw new InvalidArgumentException("CCF is invalid since less than 4 numbers long.");
@@ -117,6 +118,7 @@ public class Pronto {
             throw new OddSequenceLengthException("CCF is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
         int index = 0;
+
         int type = ccf[index++];
         int frequencyCode = ccf[index++];
         int introLength = ccf[index++];
@@ -242,6 +244,7 @@ public class Pronto {
      * @return CCF array
      * @throws OddSequenceLengthException
      */
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static int[] toArray(IrSignal irSignal) throws OddSequenceLengthException {
         if (irSignal.getIntroLength() % 2 != 0 || irSignal.getRepeatLength() % 2 != 0)
             // Probably forgot normalize() if I get here.

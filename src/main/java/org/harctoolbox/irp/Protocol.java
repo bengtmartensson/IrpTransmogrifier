@@ -33,6 +33,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -202,24 +203,27 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws org.harctoolbox.irp.InvalidNameException
      * @throws IrpSemanticException
      * @throws ArithmeticException
-     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws UnassignedException
      * @throws NameConflictException
      * @throws IrpSignalParseException
      * @throws DomainViolationException
      */
-    public IrSignal toIrSignal(NameEngine nameEngine) throws InvalidNameException, UnassignedException, DomainViolationException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
-        IrpUtils.entering(logger, "toIrSignal");
-        parameterSpecs.check(nameEngine);
-        fetchMemoryVariables(nameEngine);
-        nameEngine.add(definitions);
+    public IrSignal toIrSignal(NameEngine nameEngine) throws IrpException {
+        try {
+            IrpUtils.entering(logger, "toIrSignal");
+            parameterSpecs.check(nameEngine);
+            fetchMemoryVariables(nameEngine);
+            nameEngine.add(definitions);
 
-        IrSequence intro  = toIrSequence(nameEngine, Pass.intro);
-        IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
-        IrSequence ending = toIrSequence(nameEngine, Pass.ending);
-        saveMemoryVariables(nameEngine);
-        IrpUtils.entering(logger, "toIrSignal");
-        return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
+            IrSequence intro  = toIrSequence(nameEngine, Pass.intro);
+            IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
+            IrSequence ending = toIrSequence(nameEngine, Pass.ending);
+            saveMemoryVariables(nameEngine);
+            IrpUtils.entering(logger, "toIrSignal");
+            return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     private void fetchMemoryVariables(NameEngine nameEngine) throws InvalidNameException {
@@ -449,7 +453,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
-        return recognize(irSignal, keepDefaulted, IrCoreUtils.defaultFrequencyTolerance, IrCoreUtils.defaultAbsoluteTolerance, IrCoreUtils.defaultRelativeTolerance);
+        return recognize(irSignal, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,

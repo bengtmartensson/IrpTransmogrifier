@@ -1,5 +1,7 @@
 package org.harctoolbox.ircore;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -20,6 +22,8 @@ public class IrSequenceNGTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
+
+    private final String raw = " +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +1266 -7096 +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270  +422 -1270 +1266 -7096   ";
 
     //private final IrSignal nec1_123456;
 
@@ -57,7 +61,7 @@ public class IrSequenceNGTest {
 //        } catch (OddSequenceLenghtException e) {
 //            fail();
 //        }
-    }
+        }
 
     /**
      * Test of get method, of class IrSequence.
@@ -72,18 +76,18 @@ public class IrSequenceNGTest {
         assertEquals(result, expResult, 0.0);
     }
 
-    /**
-     * Test of iget method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testIget() {
-        System.out.println("iget");
-        int i = 0;
-        IrSequence instance = new IrSequence();
-        int expResult = 0;
-        int result = instance.iget(i);
-        assertEquals(result, expResult);
-    }
+//    /**
+//     * Test of iget method, of class IrSequence.
+//     */
+//    @Test(enabled = false)
+//    public void testIget() {
+//        System.out.println("iget");
+//        int i = 0;
+//        IrSequence instance = new IrSequence();
+//        int expResult = 0;
+//        int result = instance.iget(i);
+//        assertEquals(result, expResult);
+//    }
 
     /**
      * Test of approximatelyEquals method, of class IrSequence.
@@ -142,7 +146,7 @@ public class IrSequenceNGTest {
         System.out.println("getGap");
         IrSequence instance = new IrSequence();
         double expResult = 0.0;
-        double result = instance.getGap();
+        double result = instance.getLastGap();
         assertEquals(result, expResult, 0.0);
     }
 
@@ -191,7 +195,7 @@ public class IrSequenceNGTest {
         System.out.println("getDuration");
         IrSequence instance = new IrSequence();
         double expResult = 0.0;
-        double result = instance.getDuration();
+        double result = instance.getTotalDuration();
         assertEquals(result, expResult, 0.0);
     }
 
@@ -205,7 +209,7 @@ public class IrSequenceNGTest {
         int length = 0;
         IrSequence instance = new IrSequence();
         double expResult = 0.0;
-        double result = instance.getDuration(begin, length);
+        double result = instance.getTotalDuration(begin, length);
         assertEquals(result, expResult, 0.0);
     }
 
@@ -214,63 +218,9 @@ public class IrSequenceNGTest {
      */
     @Test(enabled = true)
     public void testToPrintString_3args() {
-        System.out.println("toPrintString");
-        boolean alternatingSigns = false;
-        boolean noSigns = false;
-        String separator = "";
-        IrSequence instance = new IrSequence();
-        String expResult = "[]";
-        String result = instance.toPrintString(alternatingSigns, noSigns, separator, true);
-        assertEquals(result, expResult);
-    }
-
-    /**
-     * Test of toPrintString method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testToPrintString_boolean_boolean() {
-        System.out.println("toPrintString");
-        boolean alternatingSigns = false;
-        boolean noSigns = false;
-        IrSequence instance = new IrSequence();
-        String expResult = "";
-        String result = instance.toPrintString(alternatingSigns, noSigns);
-        assertEquals(result, expResult);
-    }
-
-    /**
-     * Test of toPrintString method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testToPrintString_boolean() {
-        System.out.println("toPrintString");
-        boolean alternatingSigns = false;
-        IrSequence instance = new IrSequence();
-        String expResult = "";
-        String result = instance.toPrintString(alternatingSigns);
-        assertEquals(result, expResult);
-    }
-
-    /**
-     * Test of toPrintString method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testToPrintString_0args() {
-        System.out.println("toPrintString");
-        IrSequence instance = new IrSequence();
-        String expResult = "";
-        String result = instance.toPrintString();
-        assertEquals(result, expResult);
-    }
-
-    /**
-     * Test of toString method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testToString_0args() {
         System.out.println("toString");
         IrSequence instance = new IrSequence();
-        String expResult = "";
+        String expResult = "[]";
         String result = instance.toString();
         assertEquals(result, expResult);
     }
@@ -278,13 +228,29 @@ public class IrSequenceNGTest {
     /**
      * Test of toString method, of class IrSequence.
      */
-    @Test(enabled = false)
-    public void testToString_boolean() {
+    @Test(enabled = true)
+    public void testToString_0args() {
         System.out.println("toString");
-        boolean alternatingSigns = false;
         IrSequence instance = new IrSequence();
-        String expResult = "";
-        String result = instance.toString(alternatingSigns);
+        String expResult = "[]";
+        String result = instance.toString();
         assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of toString method, of class IrSequence.
+     */
+    @Test(enabled = true)
+    public void testToString_boolean() {
+        try {
+            System.out.println("toString");
+            IrSequence instance = new IrSequence(raw);
+            String result = instance.toString(true);
+            assertEquals(result, "[+1266,-426,+1266,-426,+422,-1270,+1266,-426,+1266,-426,+422,-1270,+422,-1270,+422,-1270,+422,-1270,+422,-1270,+422,-1270,+1266,-7096,+1266,-426,+1266,-426,+422,-1270,+1266,-426,+1266,-426,+422,-1270,+422,-1270,+422,-1270,+422,-1270,+422,-1270,+422,-1270,+1266,-7096]");
+            result = instance.toString(false);
+            assertEquals(result, "[1266,426,1266,426,422,1270,1266,426,1266,426,422,1270,422,1270,422,1270,422,1270,422,1270,422,1270,1266,7096,1266,426,1266,426,422,1270,1266,426,1266,426,422,1270,422,1270,422,1270,422,1270,422,1270,422,1270,1266,7096]");
+        } catch (OddSequenceLengthException ex) {
+            Logger.getLogger(IrSequenceNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

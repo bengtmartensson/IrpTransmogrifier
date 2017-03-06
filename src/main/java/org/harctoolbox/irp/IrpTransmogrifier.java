@@ -85,7 +85,7 @@ public class IrpTransmogrifier {
         stream.println(message);
         if (exitcode == IrpUtils.exitUsageError) {
             stream.println();
-            stream.println("Use \"" + PROGRAMNAME + " help\" for command syntax.");
+            stream.println("Use \"" + PROGRAMNAME + " help\" or \"" + PROGRAMNAME + " help --short\"\nfor command syntax.");
         }
         doExit(exitcode);
     }
@@ -233,7 +233,7 @@ public class IrpTransmogrifier {
                     : argumentParser.getParsedCommand();
 
             if (command == null)
-                die(IrpUtils.exitUsageError, "No command given");
+                die(IrpUtils.exitUsageError, "No command given.");
             else // For findbugs...
                 switch (command) {
                     case "analyze":
@@ -274,10 +274,12 @@ public class IrpTransmogrifier {
                         System.exit(IrpUtils.exitSemanticUsageError);
                 }
         } catch (IrpException | InvalidArgumentException | UnsupportedOperationException
-                | ParseCancellationException | SAXException | IOException | UsageException | NumberFormatException ex) {
+                | ParseCancellationException | SAXException | IOException | NumberFormatException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
+        } catch (UsageException ex) {
+            System.err.println(ex.getLocalizedMessage());
         }
     }
 
@@ -311,6 +313,10 @@ public class IrpTransmogrifier {
     }
 
     private void help(CommandHelp commandHelp) {
+        boolean finished = commandHelp.process(this);
+        if (finished)
+            return;
+
         if (commandHelp.shortForm) {
             shortUsage();
             return;
@@ -319,7 +325,7 @@ public class IrpTransmogrifier {
         if (commandHelp.commands != null)
             commandHelp.commands.forEach((command) -> {
                 try {
-                out.println(usageString(command));
+                    out.println(usageString(command));
                 } catch (ParameterException ex) {
                     out.println("No such command: " + command);
                 }
@@ -352,6 +358,10 @@ public class IrpTransmogrifier {
     }
 
     private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
+        boolean finished = commandList.process(this);
+        if (finished)
+            return;
+
         setupDatabase(commandLineArgs);
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
 
@@ -427,6 +437,10 @@ public class IrpTransmogrifier {
     }
 
     private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws UsageException, IOException, IrpException, SAXException {
+        boolean finished = commandCode.process(this);
+        if (finished)
+            return;
+
         if (commandCode.directory != null && commandLineArgs.output != null)
             throw new UsageException("The --output and the --directory options are mutually exclusive.");
 //        if (commandCode.protocols == null)
@@ -512,6 +526,10 @@ public class IrpTransmogrifier {
     }
 
     private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, OddSequenceLengthException {
+        boolean finished = commandRenderer.process(this);
+        if (finished)
+            return;
+
         if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
@@ -533,6 +551,10 @@ public class IrpTransmogrifier {
     }
 
     private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, UsageException {
+        boolean finished = commandAnalyze.process(this);
+        if (finished)
+            return;
+
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
@@ -622,6 +644,10 @@ public class IrpTransmogrifier {
     }
 
     private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException, IrpException, UsageException {
+        boolean finished = commandDecode.process(this);
+        if (finished)
+            return;
+
         setupDatabase(commandLineArgs);
         List<String> protocolNamePatterns = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
         List<String> protocolsNames = irpDatabase.evaluateProtocols(protocolNamePatterns, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
@@ -643,6 +669,10 @@ public class IrpTransmogrifier {
     }
 
     private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws FileNotFoundException, UnassignedException {
+        boolean finished = commandExpression.process(this);
+        if (finished)
+            return;
+
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
         Expression expression = new Expression(text);
@@ -660,7 +690,11 @@ public class IrpTransmogrifier {
             IrpUtils.showTreeViewer(expression.toTreeViewer(), text + "=" + result);
     }
 
-    private void bitfield(CommandBitField commandBitField, CommandLineArgs commandLineArgs) throws FileNotFoundException, UnassignedException {
+    private void bitfield(CommandBitField commandBitField, CommandLineArgs commandLineArgs) throws FileNotFoundException, UnassignedException, UsageException {
+        boolean finished = commandBitField.process(this);
+        if (finished)
+            return;
+
         NameEngine nameEngine = commandBitField.nameEngine;
         String text = String.join("", commandBitField.bitField).trim();
         BitField bitfield = BitField.newBitField(text);
@@ -681,6 +715,10 @@ public class IrpTransmogrifier {
     }
 
     private void lirc(CommandLirc commandLirc, CommandLineArgs commandLineArgs) throws IOException {
+        boolean finished = commandLirc.process(this);
+        if (finished)
+            return;
+
         List<LircRemote> list;
         if (commandLirc.files.isEmpty())
             list = LircConfigFile.readRemotes(new InputStreamReader(System.in, commandLineArgs.encoding));
@@ -770,7 +808,6 @@ public class IrpTransmogrifier {
         }
     }
 
-
     // The reaining classes are ordered alphabetically
     private final static class CommandLineArgs {
 
@@ -832,7 +869,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters")
-    private static class CommandAnalyze {
+    private static class CommandAnalyze extends MyCommand {
 
         @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument")
         private Integer chop = null;
@@ -884,7 +921,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield given as argument")
-    private static class CommandBitField {
+    private static class CommandBitField extends MyCommand {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
@@ -903,7 +940,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"code"}, commandDescription = "Generate code for the given target(s)")
-    private static class CommandCode {
+    private static class CommandCode extends MyCommand {
 
         @Parameter(names = { "-d", "--directory" }, description = "Directory to generate output files, if not using the --output option.")
         private String directory = null;
@@ -925,7 +962,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode IR signal given as argument")
-    private static class CommandDecode {
+    private static class CommandDecode extends MyCommand {
         // TODO: presently no sensible way to input raw sequences/signals, issue #14
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
         private boolean noPreferOver = false;
@@ -944,7 +981,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression given as argument")
-    private static class CommandExpression {
+    private static class CommandExpression extends MyCommand {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
@@ -963,7 +1000,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "lirc" }, commandDescription = "Convert Lirc configuration files to IRP form")
-    private static class CommandLirc {
+    private static class CommandLirc extends MyCommand {
 
         @Parameter(names = { "-c", "--commands" }, description = "List the commands in the remotes")
         private boolean commands = false;
@@ -976,7 +1013,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands")
-    private static class CommandHelp {
+    private static class CommandHelp extends MyCommand {
 
         @Parameter(names = { "-s", "--short" }, description = "Produce a short usage message")
         private boolean shortForm = false;
@@ -986,7 +1023,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")
-    private static class CommandList {
+    private static class CommandList extends MyCommand {
 
         @Parameter(names = { "-c", "--classify"}, description = "Classify the protocols")
         private boolean classify = false;
@@ -1020,7 +1057,7 @@ public class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal")
-    private static class CommandRender {
+    private static class CommandRender extends MyCommand {
 
         @Parameter(names = { "-i", "--irp" }, description = "IRP string to use as protocol definition")
         private String irp = null;
@@ -1042,6 +1079,11 @@ public class IrpTransmogrifier {
 
         @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
         private List<String> protocols = new ArrayList<>(0);
+
+        @Override
+        public String description() {
+            return "This command is used to compute an IR signal from a parametric description (\"render\" it).";
+        }
     }
 
     @Parameters(commandNames = {"version"}, commandDescription = "Report version")
@@ -1054,6 +1096,37 @@ public class IrpTransmogrifier {
     @Parameters(commandNames = {"convertconfig"}, commandDescription = "Convert an IrpProtocols.ini-file to an IrpProtocols.xml, or vice versa.")
     @SuppressWarnings("ClassMayBeInterface")
     private static class CommandConvertConfig {
+    }
+
+    private static abstract class MyCommand {
+        @Parameter(names = { "-h", "-?", "--help" }, help = true, description = "Print help for this command")
+        @SuppressWarnings("FieldMayBeFinal")
+        private boolean help = false;
+
+        @Parameter(names = { "--description" }, help = true, description = "Print a possibly longer documentation for the command")
+        @SuppressWarnings("FieldMayBeFinal")
+        private boolean description = false;
+
+        /**
+         * Returns a possibly longer documentation of the command.
+         * @return Documentation string;
+         */
+        // Please override!
+        public String description() {
+            return "Documentation for this command has not yet been written.\nUse --help for syntax of command.";
+        }
+
+        public boolean process(IrpTransmogrifier instance) {
+            if (help) {
+                instance.out.println(instance.usageString(this.getClass().getSimpleName().substring(7).toLowerCase(Locale.US)));
+                return true;
+            }
+            if (description) {
+                instance.out.println(description());
+                return true;
+            }
+            return false;
+        }
     }
 
     private static class UsageException extends Exception {

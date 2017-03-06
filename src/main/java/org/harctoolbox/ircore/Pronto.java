@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * and strings containing Pronto (CCF) form of the signal. It cannot be instantiated,
  * since there are no "Pronto"s, it is just IrSignals in "another coordinates".
  */
-public class Pronto {
+public abstract class Pronto {
     /** Number of characters in the hexadecimal digits of Pronto strings. */
     public final static int charsInDigit = 4;
 

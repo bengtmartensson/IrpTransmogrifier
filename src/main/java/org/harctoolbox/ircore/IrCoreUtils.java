@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Some useful static functions.
+ * Some useful static functions and constants.
  */
 public class IrCoreUtils {
 

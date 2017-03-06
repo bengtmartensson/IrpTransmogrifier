@@ -277,15 +277,6 @@ public class IrSignal implements Cloneable {
         return introSequence.toInts();
     }
 
-//    /**
-//     * Returns the data in the intro sequence, as a sequence of pulses in the used frequency.
-//     * @see IrSequence
-//     * @return integer array of pulses
-//     */
-//    public final int[] getIntroPulses() {
-//        return introSequence.toPulses(frequency);
-//    }
-
     /**
      * Returns the i'th data in the intro sequence, as double.
      * @see IrSequence
@@ -304,10 +295,6 @@ public class IrSignal implements Cloneable {
         return repeatSequence.toInts();
     }
 
-//    public final int[] getRepeatPulses() {
-//        return repeatSequence.toPulses(frequency);
-//    }
-
     public final double getRepeatDouble(int i) {
         return repeatSequence.get(i);
     }
@@ -319,10 +306,6 @@ public class IrSignal implements Cloneable {
     public final int[] getEndingInts() {
         return endingSequence.toInts();
     }
-
-//    public final int[] getEndingPulses() {
-//        return endingSequence.toPulses(frequency);
-//    }
 
     public final double getEndingDouble(int i) {
         return endingSequence.get(i);
@@ -372,39 +355,6 @@ public class IrSignal implements Cloneable {
                 + repeatSequence.toString(alternatingSigns) + endingSequence.toString(alternatingSigns);
     }
 
-//    /**
-//     * Analog to the IrSequence toPrintString.
-//     * @param alternatingSigns If true, generated signs will have alternating signs, ignoring original signs, otherwise signs are preserved.
-//     * @param noSigns If true, suppress explict signs
-//     * @param separator separator between the numbers
-//     * @return Nicely formatted string.
-//     *
-//     * @see IrSequence
-//     */
-//    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator) {
-//        return introSequence.toPrintString(alternatingSigns, noSigns, separator, true)
-//                + repeatSequence.toPrintString(alternatingSigns, noSigns, separator, true)
-//                + (endingSequence.getLength() > 0 ? endingSequence.toPrintString(alternatingSigns, noSigns, separator, true) : "");
-//    }
-//
-//    public String toPrintString(boolean alternatingSigns, boolean noSigns) {
-//        return toPrintString(alternatingSigns, noSigns, " ");
-//    }
-//
-//    public String toPrintString(boolean alternatingSigns) {
-//        return toPrintString(alternatingSigns, false, " ");
-//    }
-//
-//    public String toPrintString() {
-//        return toPrintString(false);
-//    }
-
-//    // helper function for the next
-//    private void append(int offset, int[] result, IrSequence seq) {
-//        for (int i = 0; i < seq.getLength(); i++)
-//            result[i+offset] = seq.iget(i);
-//    }
-
     /**
      * Returns the number of repetitions according to the count semantics.
      * @param count
@@ -413,40 +363,6 @@ public class IrSignal implements Cloneable {
     public final int repeatsPerCountSemantic(int count) {
         return introSequence.isEmpty() ? count : count - 1;
     }
-
-//    /**
-//     * Returns an integer array of one intro sequence, repeat number of repeat sequence, followed by one ending sequence.
-//     * The sizes can be obtained with the get*Length()-functions.
-//     * @param repetitions Number of times of to include the repeat sequence.
-//     * @return integer array as copy.
-//     */
-//    public final int[] toIntArray(int repetitions) {
-//        int[] result = new int[introSequence.getLength() + repetitions*repeatSequence.getLength() + endingSequence.getLength()];
-//        append(0, result, introSequence);
-//        for (int i = 0; i < repetitions; i++)
-//            append(introSequence.getLength() + i*repeatSequence.getLength(), result, repeatSequence);
-//        append(introSequence.getLength() + repetitions*repeatSequence.getLength(), result, endingSequence);
-//
-//        return result;
-//    }
-
-//    /**
-//     * Equivalent to toIntArray(1)
-//     * @return array of ints.
-//     */
-//    public final int[] toIntArray() {
-//        return toIntArray(1);
-//    }
-
-//    /**
-//     * Returns an integer array of one intro sequence, count or count-1 number of repeat sequence, dependent on if intro is empty or not, followed by one ending sequence.
-//     * The sizes can be obtained with the get*Length()-functions.
-//     * @param count Number of times of the "signal" to send, according to the count semantic.
-//     * @return integer array as copy.
-//     */
-//    public final int[] toIntArrayCount(int count) {
-//        return toIntArray(repeatsPerCountSemantic(count));
-//    }
 
     /**
      *

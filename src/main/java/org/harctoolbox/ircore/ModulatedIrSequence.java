@@ -35,12 +35,12 @@ public class ModulatedIrSequence extends IrSequence {
 
     /**
      * Modulation frequency in Hz. Use 0 for no modulation. Use
-     * <code>unknownFrequency</code> for no information.
+     * null for no information.
      */
     private Double frequency;
 
     /**
-     * Duty cycle of the modulation, a number between 0 and 1. Use <code>unknownDutyCycle</code> for unassigned.
+     * Duty cycle of the modulation, a number between 0 and 1. Use null for unassigned/unknown.
      */
     private Double dutyCycle;
 
@@ -118,35 +118,6 @@ public class ModulatedIrSequence extends IrSequence {
         this(durations, frequency, null);
     }
 
-//    /**
-//     * Concatenates the IrSequences in the argument to a new sequence.
-//     * Frequency and duty cycle are set to the average between minimum and maximum values by the components, if it makes sense.
-//     * @param seqs One or more ModulatedIrSequences
-//     */
-//    public ModulatedIrSequence(ModulatedIrSequence... seqs) {
-//        int cumulatedLength = 0;
-//        double minf = Double.MAX_VALUE;
-//        double maxf = Double.MIN_VALUE;
-//        double mindc = Double.MAX_VALUE;
-//        double maxdc = Double.MIN_VALUE;
-//        for (ModulatedIrSequence seq : seqs) {
-//            minf = Math.min(minf, seq.frequency);
-//            maxf = Math.max(maxf, seq.frequency);
-//            mindc = Math.min(mindc, seq.frequency);
-//            maxdc = Math.max(maxdc, seq.frequency);
-//            cumulatedLength += seq.getLength();
-//        }
-//
-//        dutyCycle = mindc > 0 ? (mindc + maxdc)/2 : null;
-//        frequency = minf > 0 ? (minf + maxf)/2 : 0.0;
-//        data = new double[cumulatedLength];
-//        int beginIndex = 0;
-//        for (ModulatedIrSequence seq : seqs) {
-//            System.arraycopy(seq.data, 0, data, beginIndex, seq.data.length);
-//            beginIndex += seq.data.length;
-//        }
-//    }
-
     /**
      *
      * @return modulation frequency in Hz.
@@ -179,63 +150,6 @@ public class ModulatedIrSequence extends IrSequence {
     public String toString() {
         return toString(false);
     }
-
-//    /**
-//     * Formats IR signal as sequence of durations, with alternating signs, ignoring all signs, or by preserving signs.
-//     * @param alternatingSigns if true, generate alternating signs (ignoring original signs).
-//     * @param noSigns remove all signs.
-//     * @param separator
-//     * @param brackets if true, enclose result in brackets.
-//     * @return Printable string.
-//     */
-//    @Override
-//    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator, boolean brackets) {
-//        return toPrintString(alternatingSigns, noSigns, separator, brackets, true);
-//    }
-
-//    /**
-//     * Formats IR signal as sequence of durations, with alternating signs, ignoring all signs, or by preserving signs.
-//     * @param alternatingSigns if true, generate alternating signs (ignoring original signs).
-//     * @param noSigns remove all signs.
-//     * @param separator
-//     * @param brackets if true, enclose result in brackets.
-//     * @param includeFrequency If true, include frequency information
-//     * @return Printable string.
-//     */
-//    public String toPrintString(boolean alternatingSigns, boolean noSigns, CharSequence separator, boolean brackets, boolean includeFrequency) {
-//        return ((isEmpty() || !includeFrequency) ?  "" : ("f=" + Long.toString(Math.round(frequency))  + separator))
-//                + super.toPrintString(alternatingSigns, noSigns, separator, brackets);
-//    }
-
-//    /**
-//     * Formats IR signal as sequence of durations, with alternating signs or by preserving signs.
-//     * @param alternatingSigns if true, generate alternating signs (ignoring original signs), otherwise preserve signs.
-//     * @param noSigns
-//     * @return Printable string.
-//     */
-//    @Override
-//    public String toPrintString(boolean alternatingSigns, boolean noSigns) {
-//        return toPrintString(alternatingSigns, noSigns, " ", true);
-//    }
-
-//    /**
-//     * Formats IR signal as sequence of durations, with alternating signs or by preserving signs.
-//     * @param alternatingSigns if true, generate alternating signs (ignoring original signs), otherwise preserve signs.
-//     * @return Printable string.
-//     */
-//    @Override
-//    public String toPrintString(boolean alternatingSigns) {
-//        return toPrintString(alternatingSigns, false);
-//    }
-
-//    /**
-//     * Formats IR signal as sequence of durations, by preserving signs.
-//     * @return Printable string.
-//     */
-//    @Override
-//    public String toPrintString() {
-//        return toPrintString(false, false, " ", true);
-//    }
 
     /**
      * Makes the current sequence into an IrSignal by considering the sequence as an intro sequence.

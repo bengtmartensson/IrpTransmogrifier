@@ -1008,8 +1008,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-r", "--radix"}, description = "Radix for outputting result") // Too much...?
         private int radix = 16;
 
-        @Parameter(description = "Lirc config files (or directories)", required = false)
-        private List<String> files = new ArrayList<>(0);
+        @Parameter(description = "Lirc config files/directories/URLs); empty for <stdin>", required = false)
+        private List<String> files = new ArrayList<>(8);
     }
 
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands")

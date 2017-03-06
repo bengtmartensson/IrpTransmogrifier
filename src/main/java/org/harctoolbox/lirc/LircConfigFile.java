@@ -21,11 +21,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,8 +118,23 @@ public final class LircConfigFile {
         return readRemotes(reader, null);
     }
 
-    public static List<LircRemote> readRemotes(String filename, String charSetName) throws IOException {
-        return Collections.unmodifiableList(new LircConfigFile(new File(filename),filename, charSetName).remotes);
+    public static List<LircRemote> readRemotes(String urlOrFilename, String charSetName) throws IOException {
+        List<LircRemote> rems;
+        try {
+            rems = readRemotesURL(urlOrFilename, charSetName);
+        } catch (MalformedURLException ex) {
+            rems = new LircConfigFile(new File(urlOrFilename), urlOrFilename, charSetName).remotes;
+        }
+        return Collections.unmodifiableList(rems);
+    }
+
+    public static List<LircRemote> readRemotesURL(String urlOrFilename, String charsetName) throws MalformedURLException, IOException {
+        URL url = new URL(urlOrFilename);
+        URLConnection urlConnection = url.openConnection();
+        try (InputStream inputStream = urlConnection.getInputStream()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charsetName);
+            return readRemotes(inputStreamReader, urlOrFilename);
+        }
     }
 
     static long parseLircNumber(String s) {

@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.ircore;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -445,6 +446,14 @@ public class IrSignal implements Cloneable {
         IrSequence seq3 = seq2.append(endingSequence);
 
         return new ModulatedIrSequence(seq3, frequency, dutyCycle);
+    }
+
+    public List<IrSequence> toIrSequences() {
+        List<IrSequence> list = new ArrayList<>(3);
+        list.add(introSequence);
+        list.add(repeatSequence);
+        list.add(endingSequence);
+        return list;
     }
 
     /**

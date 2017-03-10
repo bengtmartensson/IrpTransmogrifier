@@ -42,21 +42,29 @@ public class Analyzer extends Cleaner {
 
     private static final Logger logger = Logger.getLogger(Analyzer.class.getName());
 
+    public static int[] mkIndices(List<IrSequence> irSequenceList) {
+        int[] indices = new int[irSequenceList.size()];
+        for (int i = 0; i < irSequenceList.size(); i++)
+            indices[i] = irSequenceList.get(i).getLength() + (i > 0 ? indices[i - 1] : 0);
+        return indices;
+    }
+
+//    public static int[] mkIndices(IrSignal irSignal) {
+//        int[] indices = new int[3];
+//        indices[0] = irSignal.getIntroLength();
+//        indices[1] = indices[0] + irSignal.getRepeatLength();
+//        indices[2] = indices[1] + irSignal.getEndingLength();
+//        return indices;
+//    }
+
     private int timebase;
     private int[] normedTimings;
     private List<Burst> pairs;
     private final RepeatFinder.RepeatFinderData[] repeatFinderData;
     private Double frequency;
-    private int[] indices; // ending indicies
-    private boolean signalMode;
 
     public Analyzer(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) {
-        this(irSignal.toModulatedIrSequence(true, 1, true), false, absoluteTolerance, relativeTolerance);
-        signalMode = true;
-        indices = new int[3];
-        indices[0] = irSignal.getIntroLength();
-        indices[1] = indices[0] + irSignal.getRepeatLength();
-        indices[2] = indices[1] + irSignal.getEndingLength();
+        this(irSignal.toIrSequences(), mkIndices(irSignal.toIrSequences()), true, irSignal.getFrequency(), false, absoluteTolerance, relativeTolerance);
     }
 
     public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
@@ -64,15 +72,18 @@ public class Analyzer extends Cleaner {
     }
 
     public Analyzer(List<IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
-        super(IrSequence.toInts(irSequenceList), absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.DEFAULTABSOLUTETOLERANCE,
+        this(irSequenceList, mkIndices(irSequenceList), false, frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
+    }
+
+    public Analyzer(List<IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+        super(IrSequence.toInts(irSequenceList), indices, signalMode, absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.DEFAULTABSOLUTETOLERANCE,
                 relativeTolerance != null ? relativeTolerance : IrCoreUtils.DEFAULTRELATIVETOLERANCE);
-        this.signalMode = false;
         if (frequency == null)
             logger.log(Level.FINE, String.format(Locale.US, "No frequency given, using default frequency = %d Hz", (int) ModulatedIrSequence.defaultFrequency));
         this.frequency = frequency;
-        indices = new int[irSequenceList.size()];
-        for (int i = 0; i < irSequenceList.size(); i++)
-            indices[i] = irSequenceList.get(i).getLength() + (i > 0 ? indices[i - 1] : 0);
+//        indices = new int[irSequenceList.size()];
+//        for (int i = 0; i < irSequenceList.size(); i++)
+//            indices[i] = irSequenceList.get(i).getLength() + (i > 0 ? indices[i - 1] : 0);
         repeatFinderData = new RepeatFinder.RepeatFinderData[irSequenceList.size()];
         for (int i = 0; i < irSequenceList.size(); i++)
             repeatFinderData[i] = getRepeatFinderData(invokeRepeatFinder, i);
@@ -176,10 +187,6 @@ public class Analyzer extends Cleaner {
         return decoders;
     }
 
-    public int getNoSequences() {
-        return signalMode ? 1 : indices.length;
-    }
-
     /**
      * @return the timebase
      */
@@ -221,7 +228,7 @@ public class Analyzer extends Cleaner {
 
         for (AbstractDecoder decoder : decoders) {
             try {
-                Protocol protocol = decoder.parse(number, signalMode);
+                Protocol protocol = decoder.parse(number, isSignalMode());
                 int protocolWeight = protocol.weight();
                 logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(), protocolWeight});
                 if (protocolWeight < weight) {
@@ -233,14 +240,6 @@ public class Analyzer extends Cleaner {
             }
         }
         return bestSoFar;
-    }
-
-    public String toTimingsString(int nr) {
-        return toTimingsString(getSequenceBegin(nr), getSequenceLength(nr));
-    }
-
-    public int getCleanedTime(int i) {
-        return timings.get(indexData[i]);
     }
 
     public void printStatistics(PrintStream out, AnalyzerParams params) {
@@ -268,13 +267,6 @@ public class Analyzer extends Cleaner {
         return mult != null ? "= " + mult.toString() + "*" + Long.toString(Math.round(tick)) + "  " : "\t";
     }
 
-    int getSequenceLength(int n) {
-        return indices[n] - (n > 0 ? indices[n-1] : 0);
-    }
-
-    int getSequenceBegin(int n) {
-        return n == 0 ? 0 : indices[n - 1];
-    }
 
     public static class AnalyzerParams {
         private final Double frequency;

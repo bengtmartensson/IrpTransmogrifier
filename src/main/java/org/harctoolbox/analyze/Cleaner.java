@@ -33,6 +33,13 @@ import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class Cleaner {
+
+    /**
+     * @return the signalMode
+     */
+    public boolean isSignalMode() {
+        return signalMode;
+    }
     private final static int NUMBEROFINITIALTIMINGSCAPACITY = 20;
     private static final int NO_LETTERS = 26;
 
@@ -82,17 +89,21 @@ public class Cleaner {
     private HashMap<Integer, Integer> lookDownTable;
     private List<Integer> gapsSortedAfterFrequency;
     private List<Integer> flashesSortedAfterFrequency;
+    private int[] indices; // ending indicies
+    private boolean signalMode;
 
     public Cleaner(IrSequence irSequence) {
         this(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public Cleaner(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
-        this(irSequence.toInts(), absoluteTolerance, relativeTolerance);
+        this(irSequence.toInts(), new int[]{ irSequence.getLength() }, false, absoluteTolerance, relativeTolerance);
     }
 
-    Cleaner(int[] data, double absoluteTolerance, double relativeTolerance) {
+    protected Cleaner(int[] data, int[] indices, boolean signalMode, double absoluteTolerance, double relativeTolerance) {
         rawData = data;
+        this.indices = indices;
+        this.signalMode = signalMode;
         createRawHistogram();
         createDumbTimingsTable(absoluteTolerance, relativeTolerance);
         improveTimingsTable(absoluteTolerance, relativeTolerance);
@@ -286,6 +297,45 @@ public class Cleaner {
 
     public int getNumberOfFlashes() {
         return flashesSortedAfterFrequency.size();
+    }
+
+    protected int getSequenceBegin(int n) {
+        return n == 0 ? 0 : indices[n - 1];
+    }
+
+    protected int getSequenceLength(int n) {
+        return indices[n] - (n > 0 ? indices[n - 1] : 0);
+    }
+
+    public int[] toDurations(int nr) {
+        return toDurations(getSequenceBegin(nr), getSequenceLength(nr));
+    }
+
+    public IrSequence cleanedIrSequence(int nr) {
+        try {
+            return new IrSequence(toDurations(nr));
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
+    }
+
+    public List<IrSequence> cleanedIrSequences() {
+        List<IrSequence> list = new ArrayList<>(getNoSequences());
+        for (int i = 0; i < getNoSequences(); i++)
+            list.add(cleanedIrSequence(i));
+        return list;
+    }
+
+    public String toTimingsString(int nr) {
+        return toTimingsString(getSequenceBegin(nr), getSequenceLength(nr));
+    }
+
+    public int getCleanedTime(int i) {
+        return timings.get(indexData[i]);
+    }
+
+    public int getNoSequences() {
+        return signalMode ? 1 : indices.length;
     }
 
     private static class HistoPair {

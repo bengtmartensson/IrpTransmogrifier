@@ -633,13 +633,24 @@ public class IrpTransmogrifier {
             analyzer.printStatistics(out, params);
             out.println();
         }
-        List<Protocol> protocols = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
-        for (int i = 0; i < protocols.size(); i++) {
-            if (protocols.size() > 1)
-                out.print("Seq. #" + i + ": ");
-            if (commandAnalyze.statistics)
-                out.println(analyzer.toTimingsString(i));
-            printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
+
+        if (commandAnalyze.clean) {
+            for (int i = 0; i < analyzer.getNoSequences(); i++) {
+                if (analyzer.getNoSequences() > 1)
+                    out.print("Seq. #" + i + ": ");
+                out.println(analyzer.cleanedIrSequence(i).toString(true));
+                if (commandAnalyze.statistics)
+                    out.println(analyzer.toTimingsString(i));
+            }
+        } else {
+            List<Protocol> protocols = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
+            for (int i = 0; i < protocols.size(); i++) {
+                if (protocols.size() > 1)
+                    out.print("Seq. #" + i + ": ");
+                if (commandAnalyze.statistics)
+                    out.println(analyzer.toTimingsString(i));
+                printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
+            }
         }
     }
 
@@ -873,6 +884,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument")
         private Integer chop = null;
+
+        @Parameter(names = { "-C", "--clean" }, description = "Output only the cleaned sequence(s)")
+        private boolean clean = false;
 
         @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
         private boolean extent = false;

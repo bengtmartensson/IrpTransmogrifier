@@ -135,7 +135,7 @@ this program. If not, see http://www.gnu.org/licenses/.
             <a>
                 <xsl:attribute name="href">
                     <xsl:text>#</xsl:text>
-                    <xsl:value-of select="@c-name"/>
+                    <xsl:value-of select="@name"/>
                 </xsl:attribute>
                 <xsl:value-of select="@name"/>
             </a>
@@ -145,7 +145,7 @@ this program. If not, see http://www.gnu.org/licenses/.
     <xsl:template match="irp:protocol">
         <h2>
             <xsl:attribute name="id">
-                <xsl:value-of select="@c-name"/>
+                <xsl:value-of select="@name"/>
             </xsl:attribute>
             <xsl:value-of select="@name"/>
             <xsl:text> (</xsl:text>

@@ -443,7 +443,9 @@ Many Pioneer commands are sent as combinations of two different Pioneer signals.
     <irp:protocol c-name="RC6M32" name="RC6-M-32">
         <irp:parameter name="uei-executor">012A</irp:parameter>
         <irp:parameter name="EFC_translation">MSB</irp:parameter>
-        <irp:irp><![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,M:3,<-2,2|2,-2>(T:1),OEM1:8,OEM2:8,D:8,F:8,^107m)+,T=1-T)[OEM1:0..255,OEM2:0..255,D:0..255,F:0..255,M:0..7,T@:0..1=0]]]></irp:irp>
+        <irp:irp><![CDATA[
+{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,M:3,<-2,2|2,-2>(T:1),OEM1:8,OEM2:8,D:8,F:8,^107m)*,T=1-T)[OEM1:0..255,OEM2:0..255,D:0..255,F:0..255,M:0..7,T@:0..1=0]
+]]></irp:irp>
         <irp:documentation>This is the generic form for a decode of protocols in the RC6
 family, restricted to 32 bits. DecodeIr uses this form for all RC6 decodes, except RC6-0-16
 which is displayed as simply "RC6", RC6-6-24 which is displayed as

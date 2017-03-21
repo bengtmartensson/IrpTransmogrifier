@@ -327,7 +327,7 @@ public class ProtocolNGTest {
             samsung36 = irpDatabase.getNamedProtocol("samsung36");
             IrCoreUtils.approximatelyEquals(samsung36.getDutyCycle(), 0.33);
             Protocol sharp = irpDatabase.getNamedProtocol("sharp");
-            assertEquals(sharp.getDutyCycle(), null);
+            assertTrue(sharp.getDutyCycle() == null);
         } catch (UnknownProtocolException | IrpSemanticException | InvalidNameException | UnassignedException ex) {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }

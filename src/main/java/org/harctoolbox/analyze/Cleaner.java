@@ -34,12 +34,6 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class Cleaner {
 
-    /**
-     * @return the signalMode
-     */
-    public boolean isSignalMode() {
-        return signalMode;
-    }
     private final static int NUMBEROFINITIALTIMINGSCAPACITY = 20;
     private static final int NO_LETTERS = 26;
 
@@ -110,6 +104,13 @@ public class Cleaner {
         createCookedData();
         createCleanHistogram();
         createSortedGapsAndFlashes();
+    }
+    
+    /**
+     * @return the signalMode
+     */
+    public boolean isSignalMode() {
+        return signalMode;
     }
 
     private void createRawHistogram() {

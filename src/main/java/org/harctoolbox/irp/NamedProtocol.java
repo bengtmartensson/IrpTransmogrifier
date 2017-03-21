@@ -160,6 +160,12 @@ public class NamedProtocol extends Protocol {
         return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
     }
 
+    @Override
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
+        return recognize(irSignal, keepDefaulted, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
+                IrCoreUtils.getAbsoluteTolerance(absoluteTolerance), IrCoreUtils.getRelativeTolerance(relativeTolerance));
+    }
+
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     List<String> getPreferOver() {
         return preferOver;

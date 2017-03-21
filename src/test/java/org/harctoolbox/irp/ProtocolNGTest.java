@@ -524,6 +524,20 @@ public class ProtocolNGTest {
     }
 
     @Test(enabled = true)
+    public void testRecognizeRc6M32() {
+        try {
+            System.out.println("recognizeRc6M32");
+            IrSignal irSignal = Pronto.parse("0000 0073 0000 001E 0060 0020 0010 0020 0020 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0020 0020 0020 0020 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0020 0020 0020 0010 0010 0020 0020 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 09DD");
+            NameEngine nameEngine = new NameEngine("{D=11,T=1,M=3,OEM1=227,F=111,OEM2=215}");
+            NamedProtocol rc6M56 = irpDatabase.getNamedProtocol("rc6-M-32");
+            Map<String, Long> recognizeData = rc6M56.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+        } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException | UnknownProtocolException ex) {
+            fail();
+        }
+    }
+
+    @Test(enabled = true)
     public void testRecognizeRc6M56() {
         try {
             System.out.println("recognizeRc6M56");
@@ -652,7 +666,7 @@ public class ProtocolNGTest {
             IrSignal irSignal = Pronto.parse("0000 006D 0009 0009 0008 0060 0008 0051 0008 0041 0008 006A 0008 0037 0008 001D 0008 0032 0008 0022 0008 0BBA 0008 0060 0008 0027 0008 0041 0008 006A 0008 0037 0008 0046 0008 0032 0008 0022 0008 0BBA");
             NameEngine nameEngine = new NameEngine("{D=5, F=65, S=215}");
             NamedProtocol velodyne = irpDatabase.getNamedProtocol("velodyne");
-            Map<String, Long> recognizeData = velodyne.recognize(irSignal, false, 500f, 50f, 0.02);
+            Map<String, Long> recognizeData = velodyne.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException | UnknownProtocolException ex) {
             fail();

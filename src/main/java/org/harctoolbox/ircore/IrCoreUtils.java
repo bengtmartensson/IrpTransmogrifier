@@ -47,6 +47,22 @@ public class IrCoreUtils {
      */
     public static final double INVALID = -1f;
 
+    private static double getDoubleWithSubstitute(Double userValue, double fallback) {
+        return userValue != null ? userValue : fallback;
+    }
+
+    public static double getRelativeTolerance(Double userValue) {
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+    }
+
+    public static double getAbsoluteTolerance(Double userValue) {
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULTABSOLUTETOLERANCE);
+    }
+
+    public static double getFrequencyTolerance(Double userValue) {
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
+    }
+
     /**
      * Convert its argument from seconds to microseconds.
      * @param secs seconds

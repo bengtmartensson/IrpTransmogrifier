@@ -18,9 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,8 +27,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.xml.sax.SAXException;
 
@@ -39,68 +37,97 @@ public class Decoder {
 
     public static void main(String[] args) {
         ParameterSpec.initRandom(1);
+
         try {
-            decode(Arrays.asList(args), "src/main/config/IrpProtocols.xml");
-        } catch (IOException | SAXException | IrpException ex) {
+            if (args.length == 0)
+                decode("src/main/config/IrpProtocols.xml");
+            else {
+                IrSignal irSignal = Pronto.parse(args);
+                IrpDatabase database = new IrpDatabase("src/main/config/IrpProtocols.xml");
+                Decoder decoder = new Decoder(database);
+                Map<String, Decode> decodes = decoder.decode(irSignal, true, true);
+                decodes.entrySet().forEach((kvp) -> {
+                    System.out.println(kvp);
+                });
+            }
+        } catch (IOException | SAXException | IrpException | InvalidArgumentException ex) {
             Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
     }
 
-    public static void decode(List<String> protocols, String irpDatabasePath) throws IOException, SAXException, IrpException {
+    public static void decode(String irpDatabasePath) throws IOException, SAXException, IrpException {
         IrpDatabase irp = new IrpDatabase(irpDatabasePath);
         irp.expand();
-        Collection<String> protocolNames = protocols.isEmpty() ? irp.getNames() : protocols;
-        Decoder decoder = new Decoder(irp, protocolNames);
+        Decoder decoder = new Decoder(irp);
 
-        for (String protocolName : protocolNames) {
+        for (String protocolName : irp.getNames()) {
             NamedProtocol protocol = irp.getNamedProtocol(protocolName);
-            if (!protocol.isDecodeable())
-                continue;
-            NameEngine nameEngine = new NameEngine(protocol.randomParameters());
-            if (!protocols.isEmpty())
-                System.out.println(nameEngine);
-            IrSignal irSignal = protocol.toIrSignal(nameEngine);
-            decoder.decodePrint(irSignal);
+            if (protocol.isDecodeable()) {
+                NameEngine nameEngine = new NameEngine(protocol.randomParameters());
+                if (protocol.getName().equals("Velodyne"))
+                    System.out.println(nameEngine);
+                IrSignal irSignal = protocol.toIrSignal(nameEngine);
+                Map<String, Decode> decodes = decoder.decode(irSignal, true, true);
+                boolean success = false;
+                for (Decode decode : decodes.values()) {
+                    System.out.println(decode);
+                    if (decode.same(protocolName, nameEngine)) {
+                        success = true;
+                        break;
+                    }
+                }
+                if (!success) {
+                    System.out.println(">>>>>>>>> " + protocol.getName() + "\t" + nameEngine.toString());
+                }
+            }
         }
     }
 
-    private final boolean keepDefaultedParameters;
-    private final Double frequencyTolerance;
-    private final Double absoluteTolerance;
-    private final Double relativeTolerance;
     private final Map<String, NamedProtocol> parsedProtocols;
 
     public Decoder(IrpDatabase irpDatabase) {
-        this(irpDatabase, null, true, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        this(irpDatabase, null);
     }
 
+    /**
+     * This is the main constructor.
+     * @param irpDatabase will be expanded.
+     * @param names If non-null and non-empty, include only the protocols with these names.
+     */
     public Decoder(IrpDatabase irpDatabase, Collection<String> names) {
-        this(irpDatabase, names, true, null, null, null);
+        try {
+            irpDatabase.expand();
+            this.parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
+            Collection<String> list = names != null ? names : irpDatabase.getNames();
+            list.parallelStream().forEach((protocolName) -> {
+                try {
+                    NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(protocolName);
+                    if (namedProtocol.isDecodeable())
+                        parsedProtocols.put(protocolName, namedProtocol);
+                } catch (IrpException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
+            });
+        } catch (IrpSyntaxException ex) {
+            // Only happens when there are errors in the Irp database
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
-    public Decoder(IrpDatabase irpDatabase, Collection<String> names, boolean keepDefaultedParameters,
+    /**
+     * Deliver a Map of Decodes
+     * @param irSignal IrSignal to be decoded.
+     * @param allDecodes If true, output all possible decodes. Otherwise, remove decodes according to prefer-over.
+     * @param keepDefaultedParameters If false, remove parameters with value equals to their default.
+     * @param frequencyTolerance
+     * @param absoluteTolerance
+     * @param relativeTolerance
+     * @return Map of decodes with protocol name as key.
+     */
+    public Map<String, Decode> decode(IrSignal irSignal, boolean allDecodes, boolean keepDefaultedParameters,
             Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance) {
-        this.keepDefaultedParameters = keepDefaultedParameters;
-        this.frequencyTolerance = frequencyTolerance;
-        this.absoluteTolerance = absoluteTolerance;
-        this.relativeTolerance = relativeTolerance;
-        this.parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
-        Collection<String> list = names != null ? names : irpDatabase.getNames();
-        list.parallelStream().forEach((protocolName) -> {
-            try {
-                NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(protocolName);
-                parsedProtocols.put(protocolName, namedProtocol);
-            } catch (IrpException ex) {
-                // Only happens when there are errors in the Irp database
-                throw new ThisCannotHappenException(ex);
-            }
-        });
-    }
-
-    public Map<String, Decode> decode(IrSignal irSignal, boolean noPreferredDecodes) {
-        Map<String, Decode> output = new HashMap<>(4);
-        //Analyzer analyzer = new Analyzer(irSignal, true /* repeatFinder*/, absoluteTolerance, relativeTolerance);
+        Map<String, Decode> output = new HashMap<>(8);
         parsedProtocols.values().forEach((namedProtocol) -> {
             Map<String, Long> parameters;
             try {
@@ -111,12 +138,13 @@ public class Decoder {
                 if (parameters == null)
                     throw new ThisCannotHappenException(namedProtocol.getName());
                 output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
-            } catch (NamedProtocol.ProtocolNotDecodableException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | InvalidNameException | IrpSemanticException ex) {
+            } catch (IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | InvalidNameException | IrpSemanticException ex) {
                 logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
+            } catch (NamedProtocol.ProtocolNotDecodableException ex) {
             }
         });
 
-        if (!noPreferredDecodes) {
+        if (!allDecodes) {
             List<String> protocols = new ArrayList<>(output.keySet());
             protocols.forEach((name) -> {
                 Decode decode = output.get(name);
@@ -137,30 +165,13 @@ public class Decoder {
     }
 
     public Map<String, Decode> decode(IrSignal irSignal) {
-        return decode(irSignal, false);
+        return decode(irSignal, false, false, null, null, null);
     }
 
-    public void decodePrint(IrSignal irSignal, boolean noPreferredDecodes, PrintStream out) {
-        Map<String, Decode> result = decode(irSignal, noPreferredDecodes);
-        if (result.size() != 1)
-            System.out.println(result.size());
-        result.values().forEach((kvp) -> {
-            out.println(kvp.toString());
-        });
+    public Map<String, Decode> decode(IrSignal irSignal, boolean allDecodes, boolean keepDefaultedParameters) {
+        return decode(irSignal, allDecodes, keepDefaultedParameters, null, null, null);
     }
 
-    public void decodePrint(String str, boolean noPreferredDecodes) throws InvalidArgumentException {
-        IrSignal irSignal = new IrSignal(str);
-        decodePrint(irSignal, noPreferredDecodes, System.out);
-    }
-
-    public void decodePrint(String str) throws InvalidArgumentException {
-        decodePrint(str, false);
-    }
-
-    public void decodePrint(IrSignal irSignal) {
-        decodePrint(irSignal, false, System.out);
-    }
 
     public static class Decode {
         private final NamedProtocol namedProtocol;
@@ -179,6 +190,11 @@ public class Decoder {
             this.namedProtocol = namedProtocol;
             this.nameEngine = nameEngine;
             this.notes = notes == null ? "" : notes;
+        }
+
+        public boolean same(String protocolName, NameEngine nameEngine) {
+            return namedProtocol.getName().equalsIgnoreCase(protocolName)
+                    && nameEngine.numericallyEquals(nameEngine);
         }
 
         @Override

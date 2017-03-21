@@ -666,10 +666,11 @@ public class IrpTransmogrifier {
         if (protocolsNames.isEmpty())
             throw new UsageException("No protocol given or matched.");
 
-        Decoder decoder = new Decoder(irpDatabase, protocolsNames, commandDecode.keepDefaultedParameters,
-                commandLineArgs.frequencyTolerance, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Decoder decoder = new Decoder(irpDatabase, protocolsNames);
         IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
-        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver);
+        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver,
+                commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
+                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         decodes.entrySet().forEach((kvp) -> {
             out.println(kvp.getKey() + ": " + kvp.getValue().toString());
         });

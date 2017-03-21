@@ -853,7 +853,10 @@ Almost all examples we've seen start with "0E0F441A0" or "060F44120". But we've 
         <irp:documentation>This is the "RC6-?-?? protocol" made usable for the case of ??=56.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="entone" name="entone">
-        <irp:irp><![CDATA[RC6-M-56{M=6, C=64743191718391808|2**4*F}[F:0..255,T:0..1=0]]]></irp:irp>
+        <irp:parameter name="prefer-over">RC6-M-56</irp:parameter>
+        <irp:irp><![CDATA[
+{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,M:3,<-2,2|2,-2>(T:1),0xE60396FFFFF:44,F:8,0:4,-131.0m)*{M=6,T=0}[F:0..255]
+]]></irp:irp>
         <irp:documentation>A special case of the <a href="#RC6-M-56">RC6-M-56</a> protocol, used in the Entone Amulet, see <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=12561">this forum thread</a>.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="PioneerMix" name="Pioneer-Mix">

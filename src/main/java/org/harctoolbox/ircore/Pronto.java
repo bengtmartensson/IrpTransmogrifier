@@ -179,6 +179,16 @@ public abstract class Pronto {
 
     /**
      * Creates a new IrSignals by interpreting its argument as CCF string.
+     * @param array Strings representing hexadecimal numbers
+     * @return IrSignal
+     * @throws InvalidArgumentException
+     */
+    public static IrSignal parse(String[] array) throws InvalidArgumentException {
+        return parse(array, 0);
+    }
+
+    /**
+     * Creates a new IrSignals by interpreting its argument as CCF string.
      * @param list Strings representing hexadecimal numbers
      * @return IrSignal
      * @throws InvalidArgumentException

@@ -50,6 +50,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLengthException;
@@ -791,6 +792,16 @@ public class IrpTransmogrifier {
         }
     }
 
+    public static class FrequencyParser implements IStringConverter<Double> { // MUST be public
+
+        @Override
+        public Double convert(String value) {
+            return value.toLowerCase(Locale.US).endsWith("k")
+                    ? IrCoreUtils.khz2Hz(Double.parseDouble(value.substring(0, value.length() - 1)))
+                    : Double.parseDouble(value);
+        }
+    }
+
     public static class LessThanOne implements IParameterValidator { // MUST be public
 
         @Override
@@ -831,7 +842,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")
         private String encoding = "UTF-8";
 
-        @Parameter(names = {"-f", "--frequencytolerance"}, description = "Frequency tolerance in Hz. Negative disables frequency check")
+        @Parameter(names = {"-f", "--frequencytolerance"}, converter = FrequencyParser.class,
+                description = "Frequency tolerance in Hz. Negative disables frequency check")
         private Double frequencyTolerance = null;
 
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message (deprecated; use command help instead)")
@@ -891,7 +903,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
         private boolean extent = false;
 
-        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency of raw signal")
+        @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class,
+                description = "Modulation frequency of raw signal")
         private Double frequency = null;
 
         @Parameter(names = { "-i", "--invert"}, description = "Invert order in bitspec")
@@ -981,7 +994,7 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
         private boolean noPreferOver = false;
 
-        @Parameter(names = { "-f", "--frequency"}, description = "Modulation frequency")
+        @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency")
         private Double frequency = null;
 
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "Keep parameters equal to their defaults")

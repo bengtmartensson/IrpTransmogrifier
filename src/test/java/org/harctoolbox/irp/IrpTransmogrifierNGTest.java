@@ -43,4 +43,12 @@ public class IrpTransmogrifierNGTest {
         result = IrpTransmogrifier.runMain(args);
         assertEquals(result, "{573,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m,(16,-4,1,-96m)*){A=0x30441ce3}\tweight = 16" + IrCoreUtils.LINESEPARATOR);
     }
+
+    @Test(enabled = true)
+    public void testFrequencyParser() {
+        System.out.println("FrequencyParser");
+        IrpTransmogrifier.FrequencyParser frequencyParser = new IrpTransmogrifier.FrequencyParser();
+        assertEquals(frequencyParser.convert("38123"), 38123.0);
+        assertEquals(frequencyParser.convert("38.1k"), 38100.0);
+    }
 }

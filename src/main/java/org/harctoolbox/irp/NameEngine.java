@@ -85,7 +85,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     public NameEngine(Map<String, Long> numericalParameters) {
         this(numericalParameters.size());
         numericalParameters.entrySet().stream().forEach((entry) -> {
-            map.put(entry.getKey(), new Expression(entry.getValue()));
+            map.put(entry.getKey(), new IntegerExpression(entry.getValue()));
         });
     }
 
@@ -111,7 +111,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         boolean result = true;
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             String key = kvp.getKey();
-            if (!kvp.getValue().equals(other.map.get(key)))
+            if (!kvp.getValue().toIrpString().equals(other.map.get(key).toIrpString()))
                 result = false;
         }
 
@@ -204,7 +204,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     }
 
     public void define(String name, String value) throws InvalidNameException {
-        Expression exp = new Expression(value);
+        Expression exp = Expression.parse(value);
         define(name, exp.getParseTree());
     }
 
@@ -226,11 +226,11 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
     }
 
     public void define(String name, long value) throws InvalidNameException {
-        define(name, new Expression(value));
+        define(name, new IntegerExpression(value));
     }
 
     public void define(Name name, long value) throws InvalidNameException {
-        define(name, new Expression(value));
+        define(name, new IntegerExpression(value));
     }
 
     public void define(PrimaryItem data, long value) throws InvalidNameException {

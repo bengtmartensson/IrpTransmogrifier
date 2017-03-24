@@ -37,38 +37,62 @@ public class Expression extends PrimaryItem {
 
     private static final Logger logger = Logger.getLogger(Expression.class.getName());
 
-    private IrpParser.ExpressionContext parseTree;
-    private IrpParser parser;
+//    /**
+//     * Construct an Expression from the number supplied as argument.
+//     * @param value
+//     */
+//    public Expression(long value) { // FIXME: insanely inefficient
+//        this(new ParserDriver(Long.toString(value)));
+//    }
 
-    /**
-     * Construct an Expression from the number supplied as argument.
-     * @param value
-     */
-    public Expression(long value) { // FIXME: insanely inefficient
-        this(new ParserDriver(Long.toString(value)));
+    public static Expression parse(long value) {
+        return new IntegerExpression(value);
     }
 
     /**
      * Construct an Expression by parsing the argument.
      * @param str
+     * @return
      */
-    public Expression(String str) {
-        this(new ParserDriver(str));
-        int last = parseTree.getStop().getStopIndex();
-        if (last != str.length() - 1)
-            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
+    public static Expression parse(String str) {
+        try {
+            long number = Long.parseLong(str);
+            return new IntegerExpression(number);
+        } catch (NumberFormatException ex) {
+            ParserDriver parseDriver = new ParserDriver(str);
+            Expression exp = new Expression(parseDriver);
+            int last = exp.parseTree.getStop().getStopIndex();
+            if (last != str.length() - 1)
+                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
+            return exp;
+        }
     }
-//        IrpParser parser = new ParserDriver(text).getParser();
+
+    private static long throwNewRuntimeException() {
+        throw new ThisCannotHappenException();
+    }
+
+    private static long throwNewRuntimeException(String msg) {
+        throw new ThisCannotHappenException(msg);
+    }
+
+    private static long cBoolean(boolean x) {
+        return x ? 1L : 0L;
+    }
+
+    private IrpParser.ExpressionContext parseTree;
+    private IrpParser parser;
+
     Expression(ParserDriver parserDriver) {
         this(parserDriver.getParser().expression());
         parser = parserDriver.getParser();
     }
 
-    public Expression(IrpParser.Para_expressionContext ctx) {
+    Expression(IrpParser.Para_expressionContext ctx) {
         this(ctx.expression());
     }
 
-    public Expression(IrpParser.ExpressionContext ctx) {
+    Expression(IrpParser.ExpressionContext ctx) {
         this.parseTree = ctx;
     }
 
@@ -240,17 +264,6 @@ public class Expression extends PrimaryItem {
         return new Expression(ctrl != 0L ? trueExpContext : falseExpContext).toNumber(nameEngine);
     }
 
-    private long throwNewRuntimeException() {
-        throw new ThisCannotHappenException();
-    }
-
-    private long throwNewRuntimeException(String msg) {
-        throw new ThisCannotHappenException(msg);
-    }
-
-    private long cBoolean(boolean x) {
-        return x ? 1L : 0L;
-    }
 
     /**
      * @return the parseTree

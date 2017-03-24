@@ -42,7 +42,7 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
             return new Number(Long.parseLong(name));
         } catch (NumberFormatException ex) {
         }
-        return name.trim().startsWith("(") ? new Expression(name) : new Name(name);
+        return name.trim().startsWith("(") ? Expression.parse(name) : new Name(name);
     }
     protected PrimaryItem() {
     }

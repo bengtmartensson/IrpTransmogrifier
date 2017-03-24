@@ -459,7 +459,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance)
             throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
-        IrpUtils.entering(logger, Level.FINE, "recognize", this);
+        //IrpUtils.entering(logger, Level.FINE, "recognize", this);
         checkFrequency(irSignal.getFrequency(), frequencyTolerance);
         ParameterCollector names = new ParameterCollector();
 
@@ -469,7 +469,7 @@ public class Protocol extends IrpObject implements AggregateLister {
 
         Map<String, Long> result = names.collectedNames();
         parameterSpecs.reduceNamesMap(result, keepDefaulted);
-        IrpUtils.entering(logger, Level.FINE, "recognize", result);
+        //IrpUtils.exiting(logger, Level.FINE, "recognize", result);
         return result;
     }
 

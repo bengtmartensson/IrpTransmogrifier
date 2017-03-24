@@ -92,7 +92,7 @@ public class NameEngineNGTest {
         long value = 123L;
         NameEngine names = new NameEngine();
         try {
-        names.define(name, value);
+            names.define(name, value);
         } catch (InvalidNameException ex) {
             fail();
         }

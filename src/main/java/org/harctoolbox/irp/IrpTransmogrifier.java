@@ -688,7 +688,7 @@ public class IrpTransmogrifier {
 
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
-        Expression expression = new Expression(text);
+        Expression expression = Expression.parse(text);
         long result = expression.toNumber(nameEngine);
         out.println(result);
         if (commandExpression.stringTree)

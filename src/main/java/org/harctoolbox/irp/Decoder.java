@@ -56,7 +56,7 @@ public class Decoder {
         }
     }
 
-    public static void decode(String irpDatabasePath) throws IOException, SAXException, IrpException {
+    public static boolean decode(String irpDatabasePath) throws IOException, SAXException, IrpException {
         IrpDatabase irp = new IrpDatabase(irpDatabasePath);
         irp.expand();
         Decoder decoder = new Decoder(irp);
@@ -65,8 +65,6 @@ public class Decoder {
             NamedProtocol protocol = irp.getNamedProtocol(protocolName);
             if (protocol.isDecodeable()) {
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters());
-                if (protocol.getName().equals("Velodyne"))
-                    System.out.println(nameEngine);
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);
                 Map<String, Decode> decodes = decoder.decode(irSignal, true, true);
                 boolean success = false;
@@ -79,9 +77,11 @@ public class Decoder {
                 }
                 if (!success) {
                     System.out.println(">>>>>>>>> " + protocol.getName() + "\t" + nameEngine.toString());
+                    return false;
                 }
             }
         }
+        return true;
     }
 
     private final Map<String, NamedProtocol> parsedProtocols;

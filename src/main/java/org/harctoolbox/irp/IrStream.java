@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -40,17 +39,18 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
 
     private final RepeatMarker repeatMarker; // must not be null!
     private final BareIrStream bareIrStream;
-    private final ParserRuleContext parseTree;
+    //private final ParserRuleContext parseTree;
 
     public IrStream(String str) {
         this(new ParserDriver(str).getParser().irstream());
     }
 
     public IrStream(IrpParser.IrstreamContext ctx) {
+        super(ctx);
         bareIrStream = new BareIrStream(ctx.bare_irstream());
         IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
         repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : new RepeatMarker();
-        parseTree = ctx;
+        //parseTree = ctx;
     }
 
     public IrStream(List<IrStreamItem> irStreamItems, RepeatMarker repeatMarker) {
@@ -58,9 +58,10 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     public IrStream(BareIrStream bareIrStream, RepeatMarker repeatMarker) {
+        super(null);
         this.bareIrStream = bareIrStream;
         this.repeatMarker = repeatMarker;
-        parseTree = null;
+        //parseTree = null;
     }
 
     public IrStream(BareIrStream bareIrStream) {
@@ -112,14 +113,14 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         return isInfiniteRepeat() ? IrSignal.Pass.ending : null;
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     @Override
-    public String toIrpString() {
-        return "(" + bareIrStream.toIrpString() + ")" + repeatMarker.toIrpString();
+    public String toIrpString(int radix) {
+        return "(" + bareIrStream.toIrpString(radix) + ")" + repeatMarker.toIrpString(radix);
     }
 
     public boolean isRepeatSequence() {
@@ -127,7 +128,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = bareIrStream.toElement(document, "IrStream");
         if (repeatMarker.getMin() != 1)
             element.setAttribute("repeatMin", Integer.toString(repeatMarker.getMin()));
@@ -272,10 +273,10 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         return bareIrStream.startingDuratingType(last, gapFlashBitSpecs);
     }
 
-    @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
+//    @Override
+//    public ParserRuleContext getParseTree() {
+//        return parseTree;
+//    }
 
     @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {

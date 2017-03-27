@@ -13,24 +13,19 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
+ */
 
 package org.harctoolbox.irp;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 /**
- * Interface for classes that can produce XML code.
+ * Implements simple equation solving.
+ * this = rhs
+ * translates to leftHandSide() := invert(rhs)
+ *
  */
-public interface XmlExport {
-    /**
-     *
-     * @param document
-     * @return
-     * @throws org.harctoolbox.irp.IrpSemanticException
-     */
-    public Element toElement(Document document) throws IrpSemanticException;
 
-    public Document toDocument() throws IrpSemanticException;
+public interface EquationSolving {
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask);
+
+    public PrimaryItem leftHandSide();
 }

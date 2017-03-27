@@ -34,11 +34,13 @@ class BitStream extends IrpObject implements Evaluatable {
     private BigInteger data;
 
     BitStream() {
+        super(null);
         data = BigInteger.ZERO;
         length = 0;
     }
 
-    BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException {
+    BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+        super(null);
         if (bitField instanceof InfiniteBitField)
             throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
 
@@ -49,14 +51,15 @@ class BitStream extends IrpObject implements Evaluatable {
 
     }
     @Override
-    public String toString() {
-        return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
+    public String toIrpString(int radix) {
+        //return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
+        return "BitStream(" + data.toString(radix) + ":" + length + ")";
     }
 
-    @Override
-    public String toIrpString() {
-        throw new UnsupportedOperationException("Not supported.");
-    }
+//    @Override
+//    public String toIrpString() {
+//        throw new UnsupportedOperationException("Not supported.");
+//    }
 
     void add(BitStream bitStream, GeneralSpec generalSpec, NameEngine nameEngine) {
         data = data.shiftLeft((int)bitStream.length).or(bitStream.data);

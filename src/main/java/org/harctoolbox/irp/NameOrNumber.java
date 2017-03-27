@@ -32,6 +32,7 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     public NameOrNumber(IrpParser.Name_or_numberContext ctx) {
+        super(ctx);
         ParseTree child = ctx.getChild(0);
         if (child instanceof IrpParser.NameContext)
             thing = new Name(ctx.name());
@@ -40,13 +41,14 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     public NameOrNumber(double x) {
+        super(null);
         thing = new NumberWithDecimals(x);
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     @Override
     public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
@@ -54,15 +56,15 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         element.appendChild(thing.toElement(document));
         return element;
     }
 
     @Override
-    public String toIrpString() {
-        return thing.toIrpString();
+    public String toIrpString(int radix) {
+        return thing.toIrpString(radix);
     }
 
     double toRawNumber() throws IrpSemanticException {

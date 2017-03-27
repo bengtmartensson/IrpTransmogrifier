@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -34,21 +35,25 @@ public class FiniteBitField extends BitField implements IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
 
-    public static IrStreamItem newFiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
-        FiniteBitField instance = new FiniteBitField(ctx);
-        instance.parseTree = ctx;
-        return instance;
+    public static FiniteBitField newFiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
+        return new FiniteBitField(ctx);
+        //instance.parseTree = ctx;
+        //return instance;
     }
+
+//    public static Expression newExpression(IrpParser.Finite_bitfieldContext ctx) throws IrpSemanticException {
+//        return FiniteBitFieldExpression.newExpression(newFiniteBitField(ctx));
+//    }
 
     private PrimaryItem width;
     private boolean reverse;
 
     public FiniteBitField(String str) {
         this((IrpParser.Finite_bitfieldContext) new ParserDriver(str).getParser().bitfield());
-        this.parser = new ParserDriver(str).getParser();
-        int last = parseTree.getStop().getStopIndex();
-            if (last != str.length() - 1)
-                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
+//        this.parser = new ParserDriver(str).getParser();
+//        int last = parseTree.getStop().getStopIndex();
+//            if (last != str.length() - 1)
+//                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
     }
 
     public FiniteBitField(String name, long width) {
@@ -56,6 +61,7 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     public FiniteBitField(String name, long width, boolean complement) {
+        super(null);
         this.complement = complement;
         data = new Name(name);
         this.width = new Number(width);
@@ -64,12 +70,12 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     public FiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
+        super(ctx);
         int index = 0;
         if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext)) {
             complement = true;
             index++;
         }
-        parseTree = ctx;
         data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
         width = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
         chop = ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0);
@@ -142,7 +148,7 @@ public class FiniteBitField extends BitField implements IrStreamItem {
             try {
                 chopString =Long.toString(chop.toNumber(nameEngine));
             } catch (UnassignedException ex) {
-                chopString = chop.toIrpString();
+                chopString = chop.toIrpString(10);
             }
             chopString = ":" + chopString;
         }
@@ -151,23 +157,23 @@ public class FiniteBitField extends BitField implements IrStreamItem {
         try {
             dataString = Long.toString(data.toNumber(nameEngine));
         } catch (UnassignedException ex) {
-            dataString = data.toIrpString();
+            dataString = data.toIrpString(10);
         }
 
         String widthString;
         try {
             widthString = Long.toString(width.toNumber(nameEngine));
         } catch (UnassignedException ex) {
-            widthString = width.toIrpString();
+            widthString = width.toIrpString(10);
         }
 
         return (complement ? "~" : "") + dataString + ":" + (reverse ? "-" : "") + widthString + chopString;
     }
 
     @Override
-    public String toIrpString() {
-        return (complement ? "~" : "") + data.toIrpString() + ":" + (reverse ? "-" : "") + width.toIrpString()
-                + (hasChop() ? (":" + chop.toIrpString()) : "");
+    public String toIrpString(int radix) {
+        return (complement ? "~" : "") + data.toIrpString(radix) + ":" + (reverse ? "-" : "") + width.toIrpString(10)
+                + (hasChop() ? (":" + chop.toIrpString(10)) : "");
     }
 
     @Override
@@ -268,17 +274,44 @@ public class FiniteBitField extends BitField implements IrStreamItem {
         payload <<= (int) chop.toNumber(recognizeData.toNameEngine());
         long bitmask = IrCoreUtils.ones(width.toNumber(recognizeData.toNameEngine())) << chop.toNumber(recognizeData.toNameEngine());
         payload &= bitmask;
-        Name name = data.toName();
-        if (name != null) {
-            logger.log(Level.FINE, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(), payload, bitmask});
-            if (data.isUnary())
-                recognizeData.add(name.toString(), payload, bitmask);
-            else
-                recognizeData.add(name.toString(), data.invert(payload));
+
+        // We now have the "equation" data == payload, we are turning that into an assignment
+        PrimaryItem expression = data;
+        Long rhs = payload;
+
+        NameEngine nameEngine = recognizeData.toNameEngine();
+        while (expression != null && rhs != null && !((expression instanceof Name) || (expression instanceof Number))) {
+            rhs = expression.invert(rhs, nameEngine, bitmask);
+            //rhs &= bitmask;
+            expression = expression.leftHandSide();
+        }
+
+        if (expression != null && rhs != null) {
+            // equation solving succeeded!
+            if (expression instanceof Name) {
+                // perform assignment
+
+                Name name = (Name) expression;
+                //Name name = data.toName();
+                //if (name != null) {
+                logger.log(Level.FINE, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(10), payload, bitmask});
+                //Long inverted = data.invert(payload);
+                //if (inverted != null) {
+                if (data instanceof Name)
+                    recognizeData.add(name.toString(), rhs, bitmask);
+                else
+                    recognizeData.add(name.toString(), rhs);
+
+                //}
+            } else if (expression instanceof Number) {
+                // check, barf if not OK
+                long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
+                if (expected != rhs)
+                    throw new IrpSignalParseException("FiniteBitField did not evaluated to expected value");//return false;
+            } else
+                throw new ThisCannotHappenException();
         } else {
-            long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
-            if (expected != payload)
-                throw new IrpSignalParseException("FiniteBitField did not evaluated to expected value");//return false;
+            logger.log(Level.WARNING, "Unsolvable equation Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(10), payload, bitmask});
         }
     }
 

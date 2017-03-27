@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 public class NamedProtocol extends Protocol {
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
-    public static Document toDocument(Iterable<NamedProtocol> protocols) {
+    public static Document toDocument(Iterable<NamedProtocol> protocols) throws IrpSemanticException {
         Document document = XmlUtils.newDocument();
         Element root = document.createElement("NamedProtocols");
         document.appendChild(root);
@@ -172,14 +172,14 @@ public class NamedProtocol extends Protocol {
     }
 
     @Override
-    public Document toDocument() {
+    public Document toDocument() throws IrpSemanticException {
         Document document = XmlUtils.newDocument();
         document.appendChild(toElement(document));
         return document;
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element root = super.toElement(document);
         root.setAttribute("name", getName());
 
@@ -194,7 +194,7 @@ public class NamedProtocol extends Protocol {
         return root;
     }
 
-    ItemCodeGenerator code(CodeGenerator codeGenerator, Map<String, String> parameters, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
+    ItemCodeGenerator code(CodeGenerator codeGenerator, Map<String, String> parameters, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpSemanticException {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
         template.addAggregateList("metaData", metaDataPropertiesMap(parameters, absoluteTolerance, relativeTolerance, frequencyTolerance));
         template.addAggregateList("protocol", this, getGeneralSpec(), getDefinitions());

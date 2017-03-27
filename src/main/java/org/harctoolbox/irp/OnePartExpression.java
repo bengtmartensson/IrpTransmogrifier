@@ -13,24 +13,29 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
+ */
 
 package org.harctoolbox.irp;
 
-/**
- * This class is a superclass of the exceptions thrown in the package.
- */
-public class IrpException extends RuntimeException {
+import org.antlr.v4.runtime.tree.ParseTree;
 
-    public IrpException(String message) {
-        super(message);
+abstract class OnePartExpression extends Expression {
+
+    static Expression newExpression(ParseTree ctx) {
+        if (ctx instanceof IrpParser.Primary_itemContext)
+            return PrimaryItemExpression.newExpression((IrpParser.Primary_itemContext) ctx);
+        else if (ctx instanceof IrpParser.BitfieldContext)
+            return BitFieldExpression.newExpression((IrpParser.BitfieldContext) ctx);
+        else
+            throw new IrpSyntaxException("Unknown OneOpExpression");
     }
 
-    public IrpException() {
-        super();
+    protected OnePartExpression(ParseTree ctx) {
+        super(ctx);
     }
 
-    public IrpException(Throwable ex) {
-        super(ex);
+    @Override
+    public final int weight() {
+        return 1;
     }
 }

@@ -131,7 +131,7 @@ public class Burst {
 
     @Override
     public String toString() {
-        return toBareIrStream(0).toIrpString();
+        return toBareIrStream(0).toIrpString(10);
     }
 
     @Override

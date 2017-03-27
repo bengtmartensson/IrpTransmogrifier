@@ -40,24 +40,26 @@ public class ParameterSpec extends IrpObject {
     private boolean memory;
 
 
-    public ParameterSpec(String str) {
+    public ParameterSpec(String str) throws IrpSemanticException {
         this(new ParserDriver(str).getParser().parameter_spec());
     }
 
-    public ParameterSpec(IrpParser.Parameter_specContext ctx) {
+    public ParameterSpec(IrpParser.Parameter_specContext ctx) throws IrpSemanticException {
         this(ctx.name(), ctx.getChild(1).getText().equals("@"), ctx.number(0), ctx.number(1), ctx.expression());
     }
 
-    public ParameterSpec(IrpParser.NameContext name, boolean hasMemory, IrpParser.NumberContext min, IrpParser.NumberContext max, IrpParser.ExpressionContext deflt) {
+    public ParameterSpec(IrpParser.NameContext name, boolean hasMemory, IrpParser.NumberContext min, IrpParser.NumberContext max, IrpParser.ExpressionContext deflt) throws IrpSemanticException {
+        super(null);
         this.memory = false;
         this.name = new Name(name);
         this.memory = hasMemory;
         this.min = new Number(min);
         this.max = new Number(max);
-        this.deflt = deflt != null ? new Expression(deflt) : null;
+        this.deflt = deflt != null ? Expression.newExpression(deflt) : null;
     }
 
     public ParameterSpec(String name, boolean memory, long min, long max, Expression deflt) {
+        super(null);
         this.memory = false;
         this.name = new Name(name);
         this.min = new Number(min);
@@ -75,17 +77,17 @@ public class ParameterSpec extends IrpObject {
         this(name, memory, 0, (1 << length) - 1);
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     @Override
-    public String toIrpString() {
-        return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
+    public String toIrpString(int radix) {
+        return name + (memory ? "@" : "") + ":" + min.toIrpString(radix) + ".." + max.toIrpString(radix) + (deflt != null ? ("=" + deflt.toIrpString(radix)) : "");
     }
 
-    public void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException {
+    public void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException, IrpSemanticException {
         if (!nameEngine.containsKey(name.getName())) {
             if (this.hasMemory())
                 return;
@@ -111,7 +113,7 @@ public class ParameterSpec extends IrpObject {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element el = super.toElement(document);
         el.setAttribute("name", name.toString());
         el.setAttribute("min", min.toString());

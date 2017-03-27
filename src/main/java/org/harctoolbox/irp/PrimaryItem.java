@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-public abstract class PrimaryItem extends IrpObject implements Numerical {
+public abstract class PrimaryItem extends IrpObject implements Numerical, EquationSolving {
 
     public static PrimaryItem newPrimaryItem(IrpParser.Primary_itemContext ctx) {
         ParseTree child = ctx.getChild(0);
@@ -29,8 +29,8 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
                 : (child instanceof IrpParser.NumberContext)
                 ? new Number((IrpParser.NumberContext) child)
                 : (child instanceof IrpParser.Para_expressionContext)
-                ? new Expression((IrpParser.Para_expressionContext) child)
-                : new Name(child.getText());
+                ? Expression.newExpression((IrpParser.Para_expressionContext) child)
+                : null; // error new Name(child.getText());
     }
 
     public static PrimaryItem newPrimaryItem(long n) {
@@ -41,19 +41,18 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
         try {
             return new Number(Long.parseLong(name));
         } catch (NumberFormatException ex) {
+            return name.trim().startsWith("(") ? Expression.newExpression(name) : new Name(name);
         }
-        return name.trim().startsWith("(") ? Expression.parse(name) : new Name(name);
-    }
-    protected PrimaryItem() {
     }
 
-    public abstract Name toName();
+    protected PrimaryItem(ParseTree ctx) {
+        super(ctx);
+    }
 
-    public abstract long invert(long rhs) throws UnassignedException;
-
+    @Override
     public abstract String toIrpString(int radix);
 
-    public abstract boolean isUnary();
+//    public abstract boolean isUnary();
 
     /**
      * Generate a map of the properties in the very object.
@@ -63,4 +62,25 @@ public abstract class PrimaryItem extends IrpObject implements Numerical {
      * @return
      */
     public abstract Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine);
+
+    /**
+     * Default implementation, for non-invertible expressions.
+     * @param rhs
+     * @param nameEngine
+     * @param bitmask
+     * @return null
+     */
+    @Override
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+        return null;
+    }
+
+    /**
+     * Default implementation, for non-invertible expressions.
+     * @return null
+     */
+    @Override
+    public PrimaryItem leftHandSide() {
+        return null;
+    }
 }

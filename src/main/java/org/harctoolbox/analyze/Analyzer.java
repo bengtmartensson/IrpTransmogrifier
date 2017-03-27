@@ -230,7 +230,7 @@ public class Analyzer extends Cleaner {
             try {
                 Protocol protocol = decoder.parse(number, isSignalMode());
                 int protocolWeight = protocol.weight();
-                logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(), protocolWeight});
+                logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(10), protocolWeight});
                 if (protocolWeight < weight) {
                     bestSoFar = protocol;
                     weight = protocolWeight;

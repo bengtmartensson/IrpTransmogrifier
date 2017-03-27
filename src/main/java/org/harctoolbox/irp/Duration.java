@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -59,7 +58,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
                 : child instanceof IrpParser.GapContext
                 ? new Gap((IrpParser.GapContext) child)
                 : new Extent((IrpParser.ExtentContext) child);
-        instance.parseTree = (ParserRuleContext) child;
+        //instance.parseTree = (ParserRuleContext) child;
         return instance;
     }
 
@@ -76,9 +75,10 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     protected Double time_units = null;
     protected NameOrNumber nameOrNumber = null;
     protected String unit = null;
-    protected ParserRuleContext parseTree = null;
+    //protected ParserRuleContext parseTree = null;
 
     protected Duration(double d, String unit) {
+        super(null);
         nameOrNumber = new NameOrNumber(d);
         this.unit = unit != null ? unit : "";
     }
@@ -88,7 +88,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     protected Duration(IrpParser.Name_or_numberContext ctx, String unit) {
-        super();
+        super(ctx);
         nameOrNumber = new NameOrNumber(ctx);
         this.unit = unit != null ? unit : "";
     }
@@ -208,7 +208,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         element.setAttribute("unit", unit);
         element.appendChild(nameOrNumber.toElement(document));
@@ -216,14 +216,14 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public String toIrpString() {
-        return nameOrNumber.toIrpString() + unit;
+    public String toIrpString(int radix) {
+        return nameOrNumber.toIrpString(radix) + unit;
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     @Override
     public Integer numberOfBareDurations(boolean recursive) {
@@ -240,10 +240,10 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return 0;
     }
 
-    @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
+//    @Override
+//    public ParserRuleContext getParseTree() {
+//        return parseTree;
+//    }
 
     protected void recognize(RecognizeData recognizeData, double actual, double wanted) throws IrpSignalParseException {
         boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted, recognizeData.getAbsoluteTolerance(), recognizeData.getRelativeTolerance());

@@ -60,6 +60,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
      * @param dutyCycle
      */
     public GeneralSpec(BitDirection bitDirection, Double unit, Double frequency, Double dutyCycle) {
+        super(null);
         this.bitDirection = bitDirection;
         this.unit = unit != null ? unit : defaultUnit;
         this.frequency = frequency;
@@ -75,6 +76,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
      * @param src
      */
     private GeneralSpec(GeneralSpec src) {
+        super(src.getParseTree());
         this.bitDirection = src.bitDirection;
         this.unit = src.unit;
         this.frequency = src.frequency;
@@ -99,6 +101,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
     }
 
     public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException {
+        super(ctx);
         Double unitInPeriods = null;
         for (IrpParser.Generalspec_itemContext node : ctx.generalspec_item()) {
             ParseTree item = node.getChild(0);
@@ -148,12 +151,12 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         return hash;
     }
 
-    @Override
-    public String toString() {
-        return (frequency != null ? "Frequency = " + frequency + "Hz, " : "")
-                + "unit = " + unit + "us, " + bitDirection
-                + (dutyCycle != null ? (", Duty cycle = " + Math.round(IrCoreUtils.real2percent(dutyCycle)) + "%.") : "");
-    }
+//    @Override
+//    public String toString() {
+//        return (frequency != null ? "Frequency = " + frequency + "Hz, " : "")
+//                + "unit = " + unit + "us, " + bitDirection
+//                + (dutyCycle != null ? (", Duty cycle = " + Math.round(IrCoreUtils.real2percent(dutyCycle)) + "%.") : "");
+//    }
 
     public final BitDirection getBitDirection() {
         return bitDirection;
@@ -176,7 +179,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public String toIrpString() {
+    public String toIrpString(int radix) {
         return toIrpString(false);
     }
 
@@ -194,7 +197,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         element.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
         element.setAttribute("bitDirection", getBitDirection().toString());

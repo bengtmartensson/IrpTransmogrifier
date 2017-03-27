@@ -388,7 +388,7 @@ public class IrpTransmogrifier {
                 out.print(SEPARATOR + irpDatabase.getIrp(protocolName));
 
             if (commandList.normalForm)
-                out.print(SEPARATOR + irpDatabase.getNormalFormIrp(protocolName));
+                out.print(SEPARATOR + irpDatabase.getNormalFormIrp(protocolName, commandList.radix));
 
             if (commandList.documentation)
                 out.print(SEPARATOR + irpDatabase.getDocumentation(protocolName));
@@ -397,7 +397,7 @@ public class IrpTransmogrifier {
                 out.print(SEPARATOR + protocol.toStringTree());
 
             if (commandList.is)
-                out.print(SEPARATOR + protocol.toIrpString());
+                out.print(SEPARATOR + protocol.toIrpString(commandList.radix));
 
             if (commandList.gui)
                 IrpUtils.showTreeViewer(protocol.toTreeViewer(), "Parse tree for " + protocolName);
@@ -688,7 +688,7 @@ public class IrpTransmogrifier {
 
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
-        Expression expression = Expression.parse(text);
+        Expression expression = Expression.newExpression(text);
         long result = expression.toNumber(nameEngine);
         out.println(result);
         if (commandExpression.stringTree)
@@ -936,7 +936,7 @@ public class IrpTransmogrifier {
         private boolean repeatFinder = false;
 
         @Parameter(names = {"--radix" }, description = "Radix of parameter output")
-        private int radix = 16;
+        private int radix = 10;
 
         @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics")
         private boolean statistics = false;
@@ -1073,6 +1073,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List normal form")
         private boolean normalForm = false;
+
+        @Parameter(names = { "-r", "--radix" }, description = "Radix of parameter output")
+        private int radix = 16;
 
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;

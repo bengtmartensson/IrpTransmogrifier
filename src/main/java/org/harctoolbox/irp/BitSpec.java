@@ -68,18 +68,19 @@ public class BitSpec extends IrpObject implements AggregateLister {
     }
 
     public BitSpec(IrpParser.BitspecContext ctx) {
-        this(parse(ctx.bare_irstream()));
+        super(ctx);
+        bitCodes = parse(ctx.bare_irstream());
+        chunkSize = computeNoBits(bitCodes.size());
     }
 
-
     public BitSpec(List<BareIrStream> list) {
+        super(null);
         chunkSize = computeNoBits(list.size());
         bitCodes = list;
     }
 
     public BitSpec() {
-        chunkSize = 0;
-        bitCodes = new ArrayList<>(2);
+        this(new ArrayList<BareIrStream>(2));
     }
 
     public Integer numberOfDurations() {
@@ -139,25 +140,12 @@ public class BitSpec extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public String toString() {
-        if (bitCodes.isEmpty())
-            return "<null>";
-
-        StringBuilder s = new StringBuilder(bitCodes.size()*10);
-        s.append("<").append(bitCodes.get(0));
-        for (int i = 1; i < bitCodes.size(); i++) {
-            s.append("|").append(bitCodes.get(i));
-        }
-        return s.append(">").toString();
-    }
-
-    @Override
-    public String toIrpString() {
+    public String toIrpString(int radix) {
         StringBuilder s = new StringBuilder(bitCodes.size()*10);
         s.append("<");
         List<String> list = new ArrayList<>(bitCodes.size() * 20);
         bitCodes.stream().forEach((bitCode) -> {
-            list.add(bitCode.toIrpString());
+            list.add(bitCode.toIrpString(radix));
         });
 
         return s.append(String.join("|", list)).append(">").toString();
@@ -276,7 +264,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunkSize", Integer.toString(chunkSize));
@@ -374,9 +362,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
     double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpException {
         double sum = 0;
-        for (BareIrStream bitCode : bitCodes) {
-            sum += bitCode.averageDuration(generalSpec, nameEngine);
-        }
+        sum = bitCodes.stream().map((bitCode) -> bitCode.averageDuration(generalSpec, nameEngine)).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum / bitCodes.size();
     }
 }

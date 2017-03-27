@@ -116,7 +116,7 @@ public abstract class CodeGenerator {
     }
 
     private void generate(NamedProtocol protocol, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpSemanticException {
         if (printPostAndPre)
             generateFileBegin(out);
         ItemCodeGenerator code = protocol.code(this, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);// contains a trailing newline

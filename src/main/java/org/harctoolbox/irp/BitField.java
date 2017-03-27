@@ -16,14 +16,10 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.antlr.v4.gui.TreeViewer;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 /**
  * This class implements Bitfields as described in Chapter 5, except for that it does not
@@ -41,37 +37,48 @@ public abstract class BitField extends IrpObject implements Numerical {
     private static final Logger logger = Logger.getLogger(BitField.class.getName());
 
     public static BitField newBitField(String str) {
-        BitField bitField = newBitField(new ParserDriver(str).getParser());
-        int last = bitField.parseTree.getStop().getStopIndex();
-        if (last != str.length() - 1)
-            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
+        ParserDriver parseDriver = new ParserDriver(str);
+        IrpParser parser = parseDriver.getParser();
+        BitField bitField = newBitField(parser);
+//        int last = parser.bitfield().getStop().getStopIndex();
+//        if (last != str.length() - 1)
+//            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
         return bitField;
     }
 
     private static BitField newBitField(IrpParser parser) {
-        BitField instance = newBitField(parser.bitfield());
-        instance.parser = parser;
-        return instance;
+        return newBitField(parser.bitfield());
+        //instance.parser = parser;
+        //return instance;
     }
 
     public static BitField newBitField(IrpParser.BitfieldContext ctx) {
         BitField instance = (ctx instanceof IrpParser.Finite_bitfieldContext)
                 ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
                 : new InfiniteBitField((IrpParser.Infinite_bitfieldContext) ctx);
-        instance.parseTree = ctx;
+        //instance.parseTree = ctx;
         return instance;
     }
 
-    public static long parse(String str, NameEngine nameEngine) throws UnassignedException {
+    public static long parse(String str, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
         BitField bitField = newBitField(str);
         return bitField.toNumber(nameEngine);
     }
 
-    protected IrpParser.BitfieldContext parseTree = null;
-    protected IrpParser parser = null;
+    static Expression newExpression(IrpParser.BitfieldContext ctx) throws IrpSemanticException {
+        if (ctx instanceof IrpParser.Infinite_bitfieldContext)
+            throw new IrpSemanticException("Cannot use an infinite bitfield as expression");
+        return FiniteBitField.newExpression((IrpParser.Finite_bitfieldContext) ctx);
+    }
+
+    //protected IrpParser.BitfieldContext parseTree = null;
+    //protected IrpParser parser = null;
     protected boolean complement;
     protected PrimaryItem data;
     protected PrimaryItem chop;
+    protected BitField(ParseTree ctx) {
+        super(ctx);
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -93,10 +100,10 @@ public abstract class BitField extends IrpObject implements Numerical {
         return hash;
     }
 
-    @Override
-    public final String toString() {
-            return toString(new NameEngine());
-    }
+//    @Override
+//    public final String toString() {
+//        return toString(new NameEngine());
+//    }
 
     public abstract String toString(NameEngine nameEngine);
 
@@ -113,14 +120,14 @@ public abstract class BitField extends IrpObject implements Numerical {
     public boolean hasChop() {
         try {
             return chop.toNumber(null) != 0;
-        } catch (UnassignedException ex) {
+        } catch (UnassignedException | IrpSemanticException ex) {
             return true;
         }
     }
 
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
+//    public ParserRuleContext getParseTree() {
+//        return parseTree;
+//    }
 
     @Override
     public int weight() {
@@ -136,7 +143,7 @@ public abstract class BitField extends IrpObject implements Numerical {
 //        return propertiesMap(false, generalSpec, nameEngine);
 //    }
 
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
         Map<String, Object> map = IrpUtils.propertiesMap(6, this);
         map.put("data", data.propertiesMap(eval, generalSpec, nameEngine));
         //map.put("width", width.propertiesMap(true, generalSpec));
@@ -151,10 +158,10 @@ public abstract class BitField extends IrpObject implements Numerical {
         return map;
     }
 
-    public TreeViewer toTreeViewer() {
-        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
-        return new TreeViewer(ruleNames, parseTree);
-    }
+//    public TreeViewer toTreeViewer() {
+//        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+//        return new TreeViewer(ruleNames, parseTree);
+//    }
 
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return null;
@@ -163,4 +170,8 @@ public abstract class BitField extends IrpObject implements Numerical {
     public Integer numberOfBareDurations(boolean recursive) {
         return 0;
     }
+
+//    int numberOfNames() {
+//        return data.numberOfNames() + chop.numberOfNames();
+//    }
 }

@@ -33,6 +33,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     public RepeatMarker(IrpParser.Repeat_markerContext ctx) {
+        super(ctx);
         String ch = ctx.getChild(0).getText();
         switch (ch) {
             case "*":
@@ -54,6 +55,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     public RepeatMarker(int min, int max) {
+        super(null);
         this.min = min;
         this.max = max;
     }
@@ -98,7 +100,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     @Override
-    public String toString() {
+    public String toIrpString(int radix) {
         return
                 //(min == 1 && max == 1) ? ""
                   (min == 0 && max == Integer.MAX_VALUE) ? "*"
@@ -109,10 +111,10 @@ public class RepeatMarker extends IrpObject {
                 : "??";
     }
 
-    @Override
-    public String toIrpString() {
-        return toString();
-    }
+//    @Override
+//    public String toIrpString() {
+//        return toString();
+//    }
 
     /**
      * @return the min
@@ -129,7 +131,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         if (min > 0)
             element.setAttribute("min", Integer.toString(min));

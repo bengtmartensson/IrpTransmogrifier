@@ -442,9 +442,9 @@ public class IrpDatabase {
         return new Protocol(getIrp(protocolName));
     }
 
-    public String getNormalFormIrp(String protocolName) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public String getNormalFormIrp(String protocolName, int radix) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {
         Protocol protocol = getProtocol(protocolName);
-        return protocol.normalFormIrpString();
+        return protocol.normalFormIrpString(radix);
     }
 
     public void printAsIni(PrintStream out) {

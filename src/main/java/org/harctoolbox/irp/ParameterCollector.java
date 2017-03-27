@@ -154,7 +154,7 @@ public class ParameterCollector implements Cloneable {
         return param.isConsistent(value);
     }
 
-    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws NameConflictException, UnassignedException {
+    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws NameConflictException, UnassignedException, IrpSemanticException {
         for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
             String name = kvp.getKey();
             BitwiseParameter param = kvp.getValue();

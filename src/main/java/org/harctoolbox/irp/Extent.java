@@ -66,8 +66,8 @@ public class Extent extends Duration {
     }
 
     @Override
-    public String toIrpString() {
-        return "^" + super.toIrpString();
+    public String toIrpString(int radix) {
+        return "^" + super.toIrpString(radix);
     }
 
     @Override

@@ -18,7 +18,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.antlr.v4.gui.TreeViewer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -51,7 +49,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private ParameterSpecs parameterSpecs;
     private BitspecIrstream bitspecIrstream;
     private Variation normalFormVariation;
-    private IrpParser.ProtocolContext parseTree;
+    //private IrpParser.ProtocolContext parseTree;
     private ParserDriver parseDriver;
     private NameEngine definitions;
     private NameEngine memoryVariables;
@@ -65,7 +63,7 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree) {
-        this.parseTree = parseTree;
+        super(parseTree);
         this.generalSpec = generalSpec;
         this.bitspecIrstream = bitspecIrstream;
         this.definitions = definitions;
@@ -168,9 +166,9 @@ public class Protocol extends IrpObject implements AggregateLister {
         }
     }
 
-    public IrpParser.ProtocolContext getParseTree() {
-        return parseTree;
-    }
+//    public IrpParser.ProtocolContext getParseTree() {
+//        return parseTree;
+//    }
 
     public Protocol normalFormProtocol() {
         List<IrStreamItem> list = new ArrayList<>(1);
@@ -188,12 +186,12 @@ public class Protocol extends IrpObject implements AggregateLister {
     private Protocol mkProtocol(BareIrStream bareIrStream) {
         IrStream irStream = new IrStream(bareIrStream);
         BitspecIrstream normalBitspecIrstream = new BitspecIrstream(bitspecIrstream.getBitSpec(), irStream);
-        return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, parseTree);
+        return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, null);
     }
 
-    public String normalFormIrpString() {
+    public String normalFormIrpString(int radix) {
         Protocol normal = normalFormProtocol();
-        return normal.toIrpString();
+        return normal.toIrpString(radix);
     }
 
     /**
@@ -300,11 +298,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return generalSpec.getDutyCycle();
     }
 
-    public String toStringTree() {
-        return parseDriver != null ? parseTree.toStringTree(parseDriver.getParser()) : null;
-    }
-
-    long getMemoryVariable(String name) throws UnassignedException {
+    long getMemoryVariable(String name) throws UnassignedException, IrpSemanticException {
         return memoryVariables.get(name).toNumber();
     }
 
@@ -377,7 +371,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element root = super.toElement(document);
         Element renderer = document.createElement(Protocol.class.getSimpleName());
         root.appendChild(renderer);
@@ -406,7 +400,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return root;
     }
 
-    public Element normalFormElement(Document document) {
+    public Element normalFormElement(Document document) throws IrpSemanticException {
         Element element = document.createElement("NormalForm");
         element.appendChild(mkElement(document, Pass.intro));
         element.appendChild(mkElement(document, Pass.repeat));
@@ -414,7 +408,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return element;
     }
 
-    private Element mkElement(Document document, IrSignal.Pass pass) {
+    private Element mkElement(Document document, IrSignal.Pass pass) throws IrpSemanticException {
         BareIrStream stream = normalBareIrStream(pass);
         String tagName = IrCoreUtils.capitalize(pass.toString());
         Element element = stream.toElement(document, tagName);
@@ -427,22 +421,22 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public String toIrpString() {
-        return toIrpString(10, false);
+    public String toIrpString(int radix) {
+        return toIrpString(radix, false);
     }
 
     public String toIrpString(int radix, boolean usePeriods) {
         return
                 generalSpec.toIrpString(usePeriods)
-                + bitspecIrstream.toIrpString()
+                + bitspecIrstream.toIrpString(radix)
                 + definitions.toIrpString(radix)
-                + parameterSpecs.toIrpString();
+                + parameterSpecs.toIrpString(radix);
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     public Map<String, Long> randomParameters() {
         return parameterSpecs.random();
@@ -515,11 +509,6 @@ public class Protocol extends IrpObject implements AggregateLister {
         return definitions;
     }
 
-    public TreeViewer toTreeViewer() {
-        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
-        return new TreeViewer(ruleNames, parseTree);
-    }
-
     public String classificationString() {
         StringBuilder str = new StringBuilder(128);
         str.append((int) (getFrequency() != null ? getFrequency() : GeneralSpec.defaultFrequency));
@@ -549,7 +538,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
+    public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
         Map<String, Object> map = new HashMap<>(3);
         addProperties(map, "generalSpec", getGeneralSpec());
         addProperties(map, "parameterSpecs", getParameterSpecs());
@@ -577,7 +566,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         map.put(pass.toString(), propMap);
     }
 
-    private void addProperties(Map<String, Object> map, String name, AggregateLister listener) {
+    private void addProperties(Map<String, Object> map, String name, AggregateLister listener) throws IrpSemanticException {
         Map<String, Object> props = listener.propertiesMap(generalSpec, definitions);
         map.put(name, props);
     }

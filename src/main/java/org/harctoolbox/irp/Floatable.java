@@ -35,7 +35,7 @@ public interface Floatable {
      */
     public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
 
-    public Element toElement(Document document);
+    public Element toElement(Document document) throws IrpSemanticException;
 
-    public String toIrpString();
+    public String toIrpString(int radix);
 }

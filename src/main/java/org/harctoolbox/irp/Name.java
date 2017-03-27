@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,6 +29,7 @@ import org.w3c.dom.Element;
  */
 public class Name extends PrimaryItem implements Floatable {
     private static final int WEIGHT = 1;
+    private static Pattern namePattern = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
 
     /**
      * Check the syntactical correctness of the name.
@@ -62,15 +64,18 @@ public class Name extends PrimaryItem implements Floatable {
      * @return true iff the name is syntactically valid.
      */
     public static boolean validName(String name) {
-        try {
-            String nam = parse(name);
-            return nam.equals(name.trim());
-        } catch (InvalidNameException ex) {
-            return false;
-        }
+        return namePattern.matcher(name.trim()).matches();
+        //return predicate.test(name.trim());
+//        try {
+//            String nam = parse(name);
+//            return nam.equals(name.trim());
+//        } catch (InvalidNameException ex) {
+//            return false;
+//        }
     }
 
-    public static long toNumber(IrpParser.NameContext ctx, NameEngine nameEngine) throws UnassignedException {
+
+    public static long toNumber(IrpParser.NameContext ctx, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
         Expression exp = nameEngine.get(toString(ctx));
         return exp.toNumber(nameEngine);
     }
@@ -82,10 +87,12 @@ public class Name extends PrimaryItem implements Floatable {
     private final String name;
 
     public Name(IrpParser.NameContext ctx) {
+        super(ctx);
         name = ctx.getText();
     }
 
     public Name(String name) {
+        super(null);
         this.name = name;
     }
 
@@ -104,23 +111,23 @@ public class Name extends PrimaryItem implements Floatable {
         return hash;
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
+//    @Override
+//    public String toString() {
+//        return getName();
+//    }
 
-    @Override
-    public String toIrpString() {
-        return getName();
-    }
+//    @Override
+//    public String toIrpString() {
+//        return getName();
+//    }
 
     @Override
     public String toIrpString(int radix) {
-        return toIrpString();
+        return name;
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
         if (nameEngine == null)
             throw new UnassignedException(name);
         Expression expression = nameEngine.get(getName());
@@ -128,14 +135,14 @@ public class Name extends PrimaryItem implements Floatable {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         element.setTextContent(toString());
         return element;
     }
 
     @Override
-    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException {
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
         return toNumber(nameEngine);
     }
 
@@ -146,25 +153,25 @@ public class Name extends PrimaryItem implements Floatable {
         return name;
     }
 
-    @Override
-    public Name toName() {
-        return this;
-    }
+//    @Override
+//    public Name toName() {
+//        return this;
+//    }
 
     @Override
     public int weight() {
         return WEIGHT;
     }
 
-    @Override
-    public long invert(long rhs) {
-        return rhs;
-    }
+//    @Override
+//    public Long invert(long rhs) {
+//        return rhs;
+//    }
 
-    @Override
-    public boolean isUnary() {
-        return true;
-    }
+//    @Override
+//    public boolean isUnary() {
+//        return true;
+//    }
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
@@ -175,4 +182,24 @@ public class Name extends PrimaryItem implements Floatable {
         map.put("isDefinition", nameEngine.containsKey(name));
         return map;
     }
+
+//    @Override
+//    public int numberOfNames() {
+//        return 1;
+//    }
+
+    @Override
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+        return rhs;
+    }
+
+    @Override
+    public PrimaryItem leftHandSide() {
+        return this;
+    }
+
+//    @Override
+//    public boolean isName() {
+//        return true;
+//    }
 }

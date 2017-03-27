@@ -105,7 +105,7 @@ public class RecognizeData extends Traverser implements Cloneable {
         this.parameterCollector = parameterCollector;
     }
 
-    void add(String name, BitwiseParameter parameter) throws NameConflictException, InvalidNameException {
+    void add(String name, BitwiseParameter parameter) throws NameConflictException, InvalidNameException, IrpSemanticException {
         if (getNameEngine().containsKey(name)) {
             Expression expression;
             try {
@@ -126,11 +126,11 @@ public class RecognizeData extends Traverser implements Cloneable {
             parameterCollector.add(name, parameter);
     }
 
-    void add(String name, long value, long bitmask) throws NameConflictException, InvalidNameException {
+    void add(String name, long value, long bitmask) throws NameConflictException, InvalidNameException, IrpSemanticException {
         add(name, new BitwiseParameter(value, bitmask));
     }
 
-    void add(String name, long value) throws NameConflictException, InvalidNameException {
+    void add(String name, long value) throws NameConflictException, InvalidNameException, IrpSemanticException {
         add(name, new BitwiseParameter(value));
     }
 
@@ -203,7 +203,7 @@ public class RecognizeData extends Traverser implements Cloneable {
         return ! interleaving;
     }
 
-    void checkConsistency() throws NameConflictException, UnassignedException, InvalidNameException {
+    void checkConsistency() throws NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
         NameEngine nameEngine = this.toNameEngine();
         needsChecking.checkConsistency(nameEngine, getNameEngine());
         needsChecking = new ParameterCollector();

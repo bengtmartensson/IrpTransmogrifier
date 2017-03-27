@@ -417,7 +417,8 @@ public class ProtocolNGTest {
             NamedProtocol denonK = irpDatabase.getNamedProtocol("denon-k");
             Map<String, Long> recognizeData = denonK.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (IrpSyntaxException | InvalidArgumentException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException | UnknownProtocolException ex) {
+        } catch (Exception ex) {
+            ex.printStackTrace();
             fail();
         }
     }
@@ -461,6 +462,7 @@ public class ProtocolNGTest {
             Map<String, Long> recognizeData = arctech.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (IrpSyntaxException | InvalidArgumentException | ArithmeticException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException | UnknownProtocolException ex) {
+            ex.printStackTrace();
             fail();
         }
     }
@@ -605,6 +607,7 @@ public class ProtocolNGTest {
             Map<String, Long> recognizeData = rs200.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (InvalidArgumentException | IrpSyntaxException | IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | IrpSemanticException | UnknownProtocolException ex) {
+            System.err.println(ex.getLocalizedMessage());
             fail();
         }
     }

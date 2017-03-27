@@ -98,7 +98,7 @@ public class Decoder {
     public Decoder(IrpDatabase irpDatabase, Collection<String> names) {
         try {
             irpDatabase.expand();
-            this.parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
+            parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
             Collection<String> list = names != null ? names : irpDatabase.getNames();
             list.parallelStream().forEach((protocolName) -> {
                 try {
@@ -131,7 +131,7 @@ public class Decoder {
         parsedProtocols.values().forEach((namedProtocol) -> {
             Map<String, Long> parameters;
             try {
-                logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
+                //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
 
                 parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
                         frequencyTolerance, absoluteTolerance, relativeTolerance);

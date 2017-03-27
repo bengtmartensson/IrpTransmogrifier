@@ -20,7 +20,6 @@ package org.harctoolbox.irp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrSignal;
 
@@ -87,7 +86,7 @@ public interface IrStreamItem extends XmlExport {
 
     public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass);
 
-    ParserRuleContext getParseTree();
+    //ParserRuleContext getParseTree();
 
     public void render(RenderData renderData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
 
@@ -101,7 +100,7 @@ public interface IrStreamItem extends XmlExport {
 
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine);
 
-    public String toIrpString();
+    public String toIrpString(int radix);
 
     public int numberOfInfiniteRepeats();
 

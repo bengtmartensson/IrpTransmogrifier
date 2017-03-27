@@ -29,7 +29,7 @@ public abstract class ItemCodeGenerator {
 
     public abstract void addAggregate(String string, Object... args);
 
-   public void addAggregateList(String name, AggregateLister aggregateLister, GeneralSpec generalSpec, NameEngine nameEngine) {
+   public void addAggregateList(String name, AggregateLister aggregateLister, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
         Map<String, Object> map = aggregateLister.propertiesMap(generalSpec, nameEngine);
         addAggregateList(name, map);
     }

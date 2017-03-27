@@ -32,26 +32,28 @@ import org.w3c.dom.Element;
 
 public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>,AggregateLister {
 
-    private LinkedHashMap<String, ParameterSpec> map;
+    private Map<String, ParameterSpec> map = new LinkedHashMap<>(3);
 
     public ParameterSpecs() {
-        map = new LinkedHashMap<>(3);
+        super(null);
     }
 
-    public ParameterSpecs(String parameter_specs) {
+    public ParameterSpecs(String parameter_specs) throws IrpSemanticException {
         this(new ParserDriver(parameter_specs).getParser().parameter_specs());
     }
 
-    public ParameterSpecs(IrpParser.ProtocolContext ctx) {
+    public ParameterSpecs(IrpParser.ProtocolContext ctx) throws IrpSemanticException {
         this(ctx.parameter_specs());
     }
 
-    public ParameterSpecs(IrpParser.Parameter_specsContext t) {
-        this();
-        if (t != null) {
-            t.parameter_spec().stream().map((parameterSpec) -> new ParameterSpec(parameterSpec)).forEach((ps) -> {
-                map.put(ps.getName(), ps);
-            });
+    public ParameterSpecs(IrpParser.Parameter_specsContext ctx) throws IrpSemanticException {
+        super(ctx);
+        if (ctx == null)
+            return;
+
+        for (IrpParser.Parameter_specContext parameterSpec : ctx.parameter_spec()) {
+            ParameterSpec ps = new ParameterSpec(parameterSpec);
+            map.put(ps.getName(), ps);
         }
     }
 
@@ -101,12 +103,12 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     }
 
     @Override
-    public String toString() {
+    public String toIrpString(int radix) {
         if (isEmpty())
             return "";
         StringBuilder str = new StringBuilder("[");
         map.values().stream().forEach((ps) -> {
-            str.append(ps.toString()).append(",");
+            str.append(ps.toIrpString(radix)).append(",");
         });
 
         if (str.length() > 0)
@@ -115,13 +117,13 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return str.toString();
     }
 
-    @Override
-    public String toIrpString() {
-        return toString();
-    }
+//    @Override
+//    public String toIrpString() {
+//        return toString();
+//    }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element el = super.toElement(document);
         map.values().forEach((parameterSpec) -> {
             el.appendChild(parameterSpec.toElement(document));
@@ -129,7 +131,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return el;
     }
 
-    void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException {
+    void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException, IrpSemanticException {
         for (ParameterSpec parameter : map.values())
             parameter.check(nameEngine);
     }
@@ -184,7 +186,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
                     long deflt = expression.toNumber(nameEngine);
                     if (namesMap.get(name) == deflt)
                         namesMap.remove(name);
-                } catch (UnassignedException ex) {
+                } catch (UnassignedException | IrpSemanticException ex) {
                     throw new ThisCannotHappenException();
                 }
         });

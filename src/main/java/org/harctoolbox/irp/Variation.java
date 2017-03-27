@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -36,24 +35,24 @@ public class Variation extends IrpObject implements IrStreamItem {
     private final BareIrStream intro;
     private final BareIrStream repeat;
     private final BareIrStream ending;
-    private final IrpParser.VariationContext parseTree;
+    //private final IrpParser.VariationContext parseTree;
 
     public Variation(String str) {
         this((new ParserDriver(str)).getParser().variation());
     }
 
     public Variation(IrpParser.VariationContext variation) {
-        parseTree = variation;
+        super(variation);
         intro = new BareIrStream(variation.alternative(0).bare_irstream());
         repeat = new BareIrStream(variation.alternative(1).bare_irstream());
         ending = variation.alternative().size() > 2 ? new BareIrStream(variation.alternative(2).bare_irstream()) : new BareIrStream();
     }
 
     public Variation(BareIrStream intro, BareIrStream repeat, BareIrStream ending) {
+        super(null);
         this.intro = intro;
         this.repeat = repeat;
         this.ending = ending;
-        parseTree = null;
     }
 
     @Override
@@ -97,7 +96,7 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         element.appendChild(intro.toElement(document));
         element.appendChild(repeat.toElement(document));
@@ -116,24 +115,19 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public String toIrpString() {
+    public String toIrpString(int radix) {
         StringBuilder str = new StringBuilder(50);
-        str.append("[").append(intro.toIrpString()).append("]");
-        str.append("[").append(repeat.toIrpString()).append("]");
+        str.append("[").append(intro.toIrpString(radix)).append("]");
+        str.append("[").append(repeat.toIrpString(radix)).append("]");
         if (ending != null && !ending.isEmpty(null))
-            str.append("[").append(ending.toIrpString()).append("]");
+            str.append("[").append(ending.toIrpString(radix)).append("]");
         return str.toString();
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
-
-    @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
+//    @Override
+//    public ParserRuleContext getParseTree() {
+//        return parseTree;
+//    }
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {

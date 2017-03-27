@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -61,20 +60,20 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return irStreamItems;
     }
 
-    private List<IrStreamItem> irStreamItems = null;
-    private IrpParser.Bare_irstreamContext parseTree = null;
+    private List<IrStreamItem> irStreamItems;
+    //private IrpParser.Bare_irstreamContext parseTree = null;
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) {
-        this(parse(ctx.irstream_item()));
-        parseTree = ctx;
+        super(ctx);
+        irStreamItems = parse(ctx.irstream_item());
     }
 
     public BareIrStream() {
-        irStreamItems = new ArrayList<>(0);
-        parseTree = null;
+        this(new ArrayList<>(0));
     }
 
     public BareIrStream(List<IrStreamItem> list) {
+        super(null);
         this.irStreamItems = list;
     }
 
@@ -167,17 +166,17 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return false; // give up
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     @Override
-    public String toIrpString() {
+    public String toIrpString(int radix) {
         StringBuilder str = new StringBuilder(irStreamItems.size()*20);
         List<String> list = new ArrayList<>(irStreamItems.size());
         irStreamItems.stream().forEach((item) -> {
-            list.add(item.toIrpString());
+            list.add(item.toIrpString(radix));
         });
         return str.append(String.join(",", list)).toString();
     }
@@ -190,17 +189,17 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) {
+    public Element toElement(Document document) throws IrpSemanticException {
         Element element = super.toElement(document);
         return fillElement(document, element);
     }
 
-    public Element toElement(Document document, String tagName) {
+    public Element toElement(Document document, String tagName) throws IrpSemanticException {
         Element element = document.createElement(tagName);
         return fillElement(document, element);
     }
 
-    private Element fillElement(Document document, Element element) {
+    private Element fillElement(Document document, Element element) throws IrpSemanticException {
         Integer nobd = numberOfBareDurations(true);
         if (nobd != null)
            element.setAttribute("numberOfBareDurations", Integer.toString(nobd));
@@ -211,7 +210,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         if (nod != null)
             element.setAttribute("numberOfDurations", Integer.toString(nod));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
-        this.irStreamItems.forEach((item) -> {
+        irStreamItems.forEach((item) -> {
             element.appendChild(item.toElement(document));
         });
         return element;
@@ -242,10 +241,10 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return sum;
     }
 
-    @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
+//    @Override
+//    public ParserRuleContext getParseTree() {
+//        return parseTree;
+//    }
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {

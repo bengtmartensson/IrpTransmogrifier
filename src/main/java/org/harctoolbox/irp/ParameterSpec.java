@@ -49,15 +49,17 @@ public class ParameterSpec extends IrpObject {
     }
 
     public ParameterSpec(IrpParser.NameContext name, boolean hasMemory, IrpParser.NumberContext min, IrpParser.NumberContext max, IrpParser.ExpressionContext deflt) {
+        super(null);
         this.memory = false;
         this.name = new Name(name);
         this.memory = hasMemory;
         this.min = new Number(min);
         this.max = new Number(max);
-        this.deflt = deflt != null ? new Expression(deflt) : null;
+        this.deflt = deflt != null ? Expression.newExpression(deflt) : null;
     }
 
-    public ParameterSpec(String name, boolean memory, long min, long max, Expression deflt) {
+    public ParameterSpec(String name, boolean memory, long min, long max, Expression deflt) throws InvalidNameException {
+        super(null);
         this.memory = false;
         this.name = new Name(name);
         this.min = new Number(min);
@@ -66,26 +68,21 @@ public class ParameterSpec extends IrpObject {
         this.deflt = deflt;
     }
 
-    public ParameterSpec(String name, boolean memory, long min, long max) {
+    public ParameterSpec(String name, boolean memory, long min, long max) throws InvalidNameException {
         this(name, memory, min, max, null);
         this.memory = false;
     }
 
-    public ParameterSpec(String name, boolean memory, int length) {
+    public ParameterSpec(String name, boolean memory, int length) throws InvalidNameException {
         this(name, memory, 0, (1 << length) - 1);
     }
 
     @Override
-    public String toString() {
-        return toIrpString();
+    public String toIrpString(int radix) {
+        return name + (memory ? "@" : "") + ":" + min.toIrpString(radix) + ".." + max.toIrpString(radix) + (deflt != null ? ("=" + deflt.toIrpString(radix)) : "");
     }
 
-    @Override
-    public String toIrpString() {
-        return name + (memory ? "@" : "") + ":" + min + ".." + max + (deflt != null ? ("=" + deflt.toIrpString()) : "");
-    }
-
-    public void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException {
+    public void check(NameEngine nameEngine) throws InvalidNameException, DomainViolationException, NameUnassignedException {
         if (!nameEngine.containsKey(name.getName())) {
             if (this.hasMemory())
                 return;
@@ -93,7 +90,7 @@ public class ParameterSpec extends IrpObject {
             if (deflt != null)
                 nameEngine.define(name, deflt);
             else
-                throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+                throw new NameUnassignedException(name, true);
         }
 
         Long value = nameEngine.get(name.getName()).toNumber(nameEngine);
@@ -102,8 +99,7 @@ public class ParameterSpec extends IrpObject {
 
     public void checkDomain(long value) throws DomainViolationException {
         if (!isWithinDomain(value))
-            throw new DomainViolationException("Parameter " + name + " = " + value + " is outside of the allowed domain: "
-                    + domainAsString());
+            throw new DomainViolationException(this, value);
     }
 
     public boolean isWithinDomain(long x) {

@@ -41,6 +41,7 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
     }
 
     public NumberWithDecimals(IrpParser.Number_with_decimalsContext ctx) {
+        super(ctx);
         ParseTree child = ctx.getChild(0);
         data = (child instanceof IrpParser.Float_numberContext)
                 ? FloatNumber.parse((IrpParser.Float_numberContext) child)
@@ -48,15 +49,16 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
     }
 
     public NumberWithDecimals(double d) {
+        super(null);
         data = d;
     }
 
     public NumberWithDecimals(int i) {
-        data = i;
+        this((double) i);
     }
 
     public NumberWithDecimals(long n) {
-        data = n;
+        this((double) n);
     }
 
     @Override
@@ -69,16 +71,16 @@ public class NumberWithDecimals extends IrpObject implements Floatable {
     }
 
     @Override
-    public String toString() {
+    public String toIrpString(int radix) {
         return (IrCoreUtils.approximatelyEquals(data, (double) (long)data, 0d, 0.01)
                 ? Long.toString((long)data)
                 : Double.toString(data));
     }
 
-    @Override
-    public String toIrpString() {
-        return toString();
-    }
+//    @Override
+//    public String toIrpString() {
+//        return toString();
+//    }
 
 
     @Override

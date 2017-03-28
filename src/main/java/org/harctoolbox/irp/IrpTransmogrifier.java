@@ -134,7 +134,7 @@ public class IrpTransmogrifier {
      * @param args program args
      * @param printStream overrides normal print output
      */
-    @SuppressWarnings("null")
+    @SuppressWarnings({"null"})
     private static void main(String[] args, PrintStream printStream) {
         CommandLineArgs commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
@@ -274,13 +274,12 @@ public class IrpTransmogrifier {
                         System.err.println("Unknown command: " + command);
                         System.exit(IrpUtils.exitSemanticUsageError);
                 }
-        } catch (IrpException | InvalidArgumentException | UnsupportedOperationException
-                | ParseCancellationException | SAXException | IOException | NumberFormatException ex) {
+        } catch (UsageException ex) {
+            System.err.println(ex.getLocalizedMessage());
+        } catch (IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
-        } catch (UsageException ex) {
-            System.err.println(ex.getLocalizedMessage());
         }
     }
 
@@ -358,7 +357,7 @@ public class IrpTransmogrifier {
         return stringBuilder.toString();
     }
 
-    private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
+    private void list(CommandList commandList, CommandLineArgs commandLineArgs) throws IOException, SAXException, UsageException {
         boolean finished = commandList.process(this);
         if (finished)
             return;
@@ -374,7 +373,7 @@ public class IrpTransmogrifier {
             } catch (UnknownProtocolException ex) {
                 logger.log(Level.WARNING, "{0}", ex.getMessage());
                 continue;
-            } catch (IrpException ex) {
+            } catch (InvalidNameException | NameUnassignedException | IrpInvalidArgumentException | UnsupportedRepeatException ex) {
                 logger.log(Level.WARNING, "Unparsable protocol {0}", protocolName);
                 continue;
             }
@@ -388,7 +387,12 @@ public class IrpTransmogrifier {
                 out.print(SEPARATOR + irpDatabase.getIrp(protocolName));
 
             if (commandList.normalForm)
-                out.print(SEPARATOR + irpDatabase.getNormalFormIrp(protocolName));
+                try {
+                    // already checked it once...
+                    out.print(SEPARATOR + irpDatabase.getNormalFormIrp(protocolName, commandList.radix));
+                } catch (NameUnassignedException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
 
             if (commandList.documentation)
                 out.print(SEPARATOR + irpDatabase.getDocumentation(protocolName));
@@ -397,7 +401,7 @@ public class IrpTransmogrifier {
                 out.print(SEPARATOR + protocol.toStringTree());
 
             if (commandList.is)
-                out.print(SEPARATOR + protocol.toIrpString());
+                out.print(SEPARATOR + protocol.toIrpString(commandList.radix));
 
             if (commandList.gui)
                 IrpUtils.showTreeViewer(protocol.toTreeViewer(), "Parse tree for " + protocolName);
@@ -412,7 +416,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void version(CommandLineArgs commandLineArgs, CommandVersion commandVersion) throws UsageException, IOException, SAXException, IrpException {
+    private void version(CommandLineArgs commandLineArgs, CommandVersion commandVersion) throws UsageException, IOException, SAXException {
         if (commandVersion.shortForm)
             out.println(Version.version);
         else {
@@ -426,7 +430,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void convertConfig(CommandConvertConfig commandConvertConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
+    private void convertConfig(CommandConvertConfig commandConvertConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, UsageException {
         setupDatabase(false, commandLineArgs); // checks exactly one of -c, -i given
         if (commandLineArgs.iniFile != null)
             XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
@@ -437,7 +441,7 @@ public class IrpTransmogrifier {
             logger.log(Level.INFO, "Wrote {0}", commandLineArgs.output);
     }
 
-    private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws UsageException, IOException, IrpException, SAXException {
+    private void code(CommandCode commandCode, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         boolean finished = commandCode.process(this);
         if (finished)
             return;
@@ -461,7 +465,7 @@ public class IrpTransmogrifier {
                 code(protocolNames, target, commandCode, commandLineArgs);
     }
 
-    private void code(Collection<String> protocolNames, String target, CommandCode commandCode, CommandLineArgs commandLineArgs) throws IOException, IrpException, UsageException {
+    private void code(Collection<String> protocolNames, String target, CommandCode commandCode, CommandLineArgs commandLineArgs) throws IOException, UsageException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         if (!new File(commandCode.stDir).isDirectory())
             throw new IOException("Cannot find stdir = " + new File(commandCode.stDir).getCanonicalPath());
 
@@ -508,7 +512,7 @@ public class IrpTransmogrifier {
         XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
     }
 
-    private void render(NamedProtocol protocol, CommandRender commandRenderer) throws IrpException, OddSequenceLengthException {
+    private void render(NamedProtocol protocol, CommandRender commandRenderer) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException {
         NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
                 : commandRenderer.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();
@@ -526,7 +530,7 @@ public class IrpTransmogrifier {
             out.println(irSignal.ccfString());
     }
 
-    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, IrpException, OddSequenceLengthException {
+    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         boolean finished = commandRenderer.process(this);
         if (finished)
             return;
@@ -551,7 +555,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, UsageException {
+    private void analyze(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws IrpInvalidArgumentException, UsageException, InvalidArgumentException {
         boolean finished = commandAnalyze.process(this);
         if (finished)
             return;
@@ -566,7 +570,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void analyzePronto(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException {
+    private void analyzePronto(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, InvalidArgumentException {
         IrSignal irSignal = Pronto.parse(commandAnalyze.args);
         if (commandAnalyze.introRepeatEnding)
             logger.warning("--intro.repeat-ending ignored when using a Pronto Hex signal.");
@@ -575,14 +579,14 @@ public class IrpTransmogrifier {
         analyze(irSignal, commandAnalyze, commandLineArgs);
     }
 
-    private void analyzeRaw(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, UsageException {
+    private void analyzeRaw(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws IrpInvalidArgumentException, UsageException, OddSequenceLengthException, InvalidArgumentException {
         if (commandAnalyze.introRepeatEnding)
             analyzeIntroRepeatEnding(commandAnalyze, commandLineArgs);
         else
             analyzeSequence(commandAnalyze, commandLineArgs);
     }
 
-    private void analyzeIntroRepeatEnding(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException, InvalidArgumentException {
+    private void analyzeIntroRepeatEnding(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws UsageException, OddSequenceLengthException, InvalidArgumentException {
         IrSignal irSignal;
         if (commandAnalyze.chop != null) {
             List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args));
@@ -655,7 +659,7 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws InvalidArgumentException, IOException, SAXException, IrpException, UsageException {
+    private void decode(CommandDecode commandDecode, CommandLineArgs commandLineArgs) throws IrpInvalidArgumentException, IOException, SAXException, UsageException, InvalidArgumentException {
         boolean finished = commandDecode.process(this);
         if (finished)
             return;
@@ -681,14 +685,14 @@ public class IrpTransmogrifier {
             out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
     }
 
-    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws FileNotFoundException, UnassignedException {
+    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws FileNotFoundException, NameUnassignedException {
         boolean finished = commandExpression.process(this);
         if (finished)
             return;
 
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
-        Expression expression = new Expression(text);
+        Expression expression = Expression.newExpression(text);
         long result = expression.toNumber(nameEngine);
         out.println(result);
         if (commandExpression.stringTree)
@@ -703,7 +707,7 @@ public class IrpTransmogrifier {
             IrpUtils.showTreeViewer(expression.toTreeViewer(), text + "=" + result);
     }
 
-    private void bitfield(CommandBitField commandBitField, CommandLineArgs commandLineArgs) throws FileNotFoundException, UnassignedException, UsageException {
+    private void bitfield(CommandBitField commandBitField, CommandLineArgs commandLineArgs) throws FileNotFoundException, UsageException, NameUnassignedException {
         boolean finished = commandBitField.process(this);
         if (finished)
             return;
@@ -763,11 +767,11 @@ public class IrpTransmogrifier {
         }
     }
 
-    private void setupDatabase(CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
+    private void setupDatabase(CommandLineArgs commandLineArgs) throws IOException, SAXException, UsageException {
         setupDatabase(true, commandLineArgs);
     }
 
-    private void setupDatabase(boolean expand, CommandLineArgs commandLineArgs) throws IOException, SAXException, IrpException, UsageException {
+    private void setupDatabase(boolean expand, CommandLineArgs commandLineArgs) throws IOException, SAXException, UsageException {
         if (commandLineArgs.iniFile != null) {
             if (commandLineArgs.configFile != null)
                 throw new UsageException("configfile and inifile cannot both be specified");
@@ -825,7 +829,7 @@ public class IrpTransmogrifier {
                 return NameEngine.parseLoose(value);
             } catch (ParseCancellationException ex) {
                 throw new ParameterException("Parse error as name engine: \"" + value + "\"");
-            } catch (IllegalArgumentException | IrpSyntaxException ex) {
+            } catch (IllegalArgumentException | InvalidNameException ex) {
                 throw new ParameterException(ex);
             }
         }
@@ -936,7 +940,7 @@ public class IrpTransmogrifier {
         private boolean repeatFinder = false;
 
         @Parameter(names = {"--radix" }, description = "Radix of parameter output")
-        private int radix = 16;
+        private int radix = 10;
 
         @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics")
         private boolean statistics = false;
@@ -1073,6 +1077,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List normal form")
         private boolean normalForm = false;
+
+        @Parameter(names = { "-r", "--radix" }, description = "Radix of parameter output")
+        private int radix = 16;
 
         @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
         private boolean stringTree = false;

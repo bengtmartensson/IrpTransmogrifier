@@ -97,15 +97,14 @@ public class BitSpecNGTest {
     @Test
     public void testIsStandardPWM() {
         System.out.println("isStandardPWM");
-        NameEngine nameEngine = new NameEngine();
         GeneralSpec generalSpec = new GeneralSpec();
         BitSpec nec1 = new BitSpec(NEC1BitSpec);
         BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
         BitSpec rc5 = new BitSpec(RC5BitSpec);
         //BitSpec empty = new BitSpec();
-        assertTrue(nec1.isPWM(2, generalSpec, nameEngine));
-        assertFalse(nokia32.isPWM(2, generalSpec, nameEngine));
-        assertFalse(rc5.isPWM(generalSpec, nameEngine));
+        assertTrue(nec1.isPWM(2, generalSpec, NameEngine.empty));
+        assertFalse(nokia32.isPWM(2, generalSpec, NameEngine.empty));
+        assertFalse(rc5.isPWM(generalSpec, NameEngine.empty));
         //assertEquals(result, expResult);
 
 
@@ -118,18 +117,17 @@ public class BitSpecNGTest {
     public void testIsStandardBiPhase() {
         System.out.println("isStandardBiPhase");
         try {
-            NameEngine nameEngine = new NameEngine();
             GeneralSpec generalSpec = new GeneralSpec(NEC1GeneralSpec);
             BitSpec nec1 = new BitSpec(NEC1BitSpec);
             BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
             BitSpec rc5 = new BitSpec(RC5BitSpec);
             BitSpec rc6 = new BitSpec(RC6BitSpec);
             //BitSpec empty = new BitSpec();
-            assertFalse(nec1.isStandardBiPhase(generalSpec, nameEngine));
-            assertFalse(nokia32.isStandardBiPhase(generalSpec, nameEngine));
-            assertTrue(rc5.isStandardBiPhase(generalSpec, nameEngine));
-            assertTrue(rc6.isStandardBiPhase(generalSpec, nameEngine));
-        } catch (IrpException | ArithmeticException ex) {
+            assertFalse(nec1.isStandardBiPhase(generalSpec, NameEngine.empty));
+            assertFalse(nokia32.isStandardBiPhase(generalSpec, NameEngine.empty));
+            assertTrue(rc5.isStandardBiPhase(generalSpec, NameEngine.empty));
+            assertTrue(rc6.isStandardBiPhase(generalSpec, NameEngine.empty));
+        } catch (IrpInvalidArgumentException ex) {
             fail();
         }
     }

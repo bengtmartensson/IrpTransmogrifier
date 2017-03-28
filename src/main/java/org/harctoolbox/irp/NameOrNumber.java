@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,6 +33,7 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     public NameOrNumber(IrpParser.Name_or_numberContext ctx) {
+        super(ctx);
         ParseTree child = ctx.getChild(0);
         if (child instanceof IrpParser.NameContext)
             thing = new Name(ctx.name());
@@ -40,16 +42,12 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     public NameOrNumber(double x) {
+        super(null);
         thing = new NumberWithDecimals(x);
     }
 
     @Override
-    public String toString() {
-        return toIrpString();
-    }
-
-    @Override
-    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
         return thing.toFloat(generalSpec, nameEngine);
     }
 
@@ -61,13 +59,13 @@ public class NameOrNumber extends IrpObject implements Floatable {
     }
 
     @Override
-    public String toIrpString() {
-        return thing.toIrpString();
+    public String toIrpString(int radix) {
+        return thing.toIrpString(radix);
     }
 
-    double toRawNumber() throws IrpSemanticException {
+    double toRawNumber() {
         if (!(thing instanceof NumberWithDecimals))
-            throw new IrpSemanticException("Not a number");
+            throw new ThisCannotHappenException("NumberWithDecimals expected");
         return ((NumberWithDecimals) thing).toFloat();
     }
 

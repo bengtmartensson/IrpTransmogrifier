@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -31,29 +31,32 @@ import org.w3c.dom.Element;
  * This class models assignments as defined in Chapter 11.
  */
 public class Assignment extends IrpObject implements IrStreamItem, Numerical {
-    public static long parse(String str, NameEngine nameEngine) throws UnassignedException {
+
+    public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         Assignment assignment = new Assignment(str);
         return assignment.toNumber(nameEngine);
     }
 
     private Name name;
     private Expression value;
-    private IrpParser.AssignmentContext parseTree = null;
+    //private IrpParser.AssignmentContext parseTree = null;
 
     public Assignment(String str) {
         this((new ParserDriver(str)).getParser().assignment());
     }
 
     public Assignment(IrpParser.AssignmentContext assignment) {
-        this(assignment.name(), assignment.expression());
-        parseTree = assignment;
+        super(assignment);
+        name = new Name(assignment.name());
+        value = Expression.newExpression(assignment.expression());
     }
 
     public Assignment(IrpParser.NameContext name, IrpParser.ExpressionContext be) {
-        this(new Name(name), new Expression(be));
+        this(new Name(name), Expression.newExpression(be));
     }
 
     public Assignment(Name name, Expression expression) {
+        super(null);
         this.name = name;
         this.value = expression;
     }
@@ -81,8 +84,13 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         return value.toNumber(nameEngine);
+    }
+
+    @Override
+    public long toNumber() throws NameUnassignedException {
+        return toNumber(NameEngine.empty);
     }
 
     public String getName() {
@@ -90,20 +98,19 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public String toString() {
-        return name + "=" + value;
+    public String toIrpString(int radix) {
+        return name.toIrpString(radix) + "=" + value.toIrpString(radix);
     }
 
     @Override
-    public String toIrpString() {
-        return name.toIrpString() + "=" + value.toIrpString();
-    }
-
-    @Override
-    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException {
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException {
         NameEngine nameEngine = renderData.getNameEngine();
         long val = value.toNumber(nameEngine);
-        nameEngine.define(name, val);
+        try {
+            nameEngine.define(name, val);
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     @Override
@@ -134,13 +141,12 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
-
-    @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-        recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
+        try {
+            recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+        } catch (NameUnassignedException ex) {
+            throw new SignalRecognitionException(ex);
+        }
     }
 
     @Override

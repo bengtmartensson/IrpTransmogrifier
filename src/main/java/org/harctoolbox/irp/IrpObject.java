@@ -17,21 +17,67 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.antlr.v4.gui.TreeViewer;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class IrpObject implements XmlExport {
 
-    public abstract String toIrpString();
+    private final static int DEFAULT_RADIX = 10;
+
+    private final ParseTree parseTree;
+
+    protected IrpObject(ParseTree parseTree) {
+        this.parseTree = parseTree;
+    }
+
+    public final ParseTree getParseTree() {
+        return parseTree;
+    }
+
+    public abstract String toIrpString(int radix);
+
+    public final String toIrpString() {
+        return toIrpString(DEFAULT_RADIX);
+    }
+
+    @Override
+    public String toString() {
+        return toIrpString(10);
+    }
+
+    public final String toStringTree() {
+        return null;
+    }
+
+    public final String toStringTree(IrpParser parser) {
+        return parseTree.toStringTree(parser);
+    }
 
     @Override
     public abstract boolean equals(Object obj);
 
+    @Override
+    public abstract int hashCode();
+
     public int numberOfInfiniteRepeats() {
         return 0;
+    }
+
+    public final TreeViewer toTreeViewer(IrpParser parser) {
+        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+        return new TreeViewer(ruleNames, parseTree);
+    }
+
+    public final TreeViewer toTreeViewer() {
+        return null;
+        //List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+        //return new TreeViewer(ruleNames, parseTree);
     }
 
     /**
@@ -41,8 +87,8 @@ public abstract class IrpObject implements XmlExport {
      */
     public abstract int weight();
 
-    @Override
-    public abstract int hashCode();
+//    @Override
+//    public abstract int hashCode();
 
     @Override
     public Element toElement(Document document) {

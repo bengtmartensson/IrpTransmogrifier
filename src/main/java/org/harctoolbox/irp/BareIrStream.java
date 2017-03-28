@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -61,20 +60,19 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return irStreamItems;
     }
 
-    private List<IrStreamItem> irStreamItems = null;
-    private IrpParser.Bare_irstreamContext parseTree = null;
+    private List<IrStreamItem> irStreamItems;
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) {
-        this(parse(ctx.irstream_item()));
-        parseTree = ctx;
+        super(ctx);
+        irStreamItems = parse(ctx.irstream_item());
     }
 
     public BareIrStream() {
-        irStreamItems = new ArrayList<>(0);
-        parseTree = null;
+        this(new ArrayList<>(0));
     }
 
     public BareIrStream(List<IrStreamItem> list) {
+        super(null);
         this.irStreamItems = list;
     }
 
@@ -121,7 +119,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return sum;
     }
 
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
         RenderData renderData = new RenderData(generalSpec, nameEngine);
         evaluate(renderData, new ArrayList<>(0));
         return renderData.getEvaluatedIrStream();
@@ -168,16 +166,11 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public String toString() {
-        return toIrpString();
-    }
-
-    @Override
-    public String toIrpString() {
+    public String toIrpString(int radix) {
         StringBuilder str = new StringBuilder(irStreamItems.size()*20);
         List<String> list = new ArrayList<>(irStreamItems.size());
         irStreamItems.stream().forEach((item) -> {
-            list.add(item.toIrpString());
+            list.add(item.toIrpString(radix));
         });
         return str.append(String.join(",", list)).toString();
     }
@@ -211,7 +204,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         if (nod != null)
             element.setAttribute("numberOfDurations", Integer.toString(nod));
         element.setAttribute("numberOfBitSpecs", Integer.toString(numberOfBitSpecs()));
-        this.irStreamItems.forEach((item) -> {
+        irStreamItems.forEach((item) -> {
             element.appendChild(item.toElement(document));
         });
         return element;
@@ -243,25 +236,20 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
-
-    @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
         IrSignal.Pass pass = null;
         for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.decode(recognizeData, bitSpecStack);
     }
 
     @Override
-    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
         for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.evaluate(renderData, bitSpecStack);
     }
 
     @Override
-    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException {
         for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.render(renderData, bitSpecs);
     }
@@ -414,7 +402,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return result;
     }
 
-    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpException {
+    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) {
         double sum = 0;
         sum = irStreamItems.stream().map((item) -> item.microSeconds(generalSpec, nameEngine)).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum / irStreamItems.size();

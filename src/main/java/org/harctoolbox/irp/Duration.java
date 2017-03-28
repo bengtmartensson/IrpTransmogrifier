@@ -25,11 +25,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -59,7 +59,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
                 : child instanceof IrpParser.GapContext
                 ? new Gap((IrpParser.GapContext) child)
                 : new Extent((IrpParser.ExtentContext) child);
-        instance.parseTree = (ParserRuleContext) child;
+        //instance.parseTree = (ParserRuleContext) child;
         return instance;
     }
 
@@ -76,9 +76,10 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     protected Double time_units = null;
     protected NameOrNumber nameOrNumber = null;
     protected String unit = null;
-    protected ParserRuleContext parseTree = null;
+    //protected ParserRuleContext parseTree = null;
 
     protected Duration(double d, String unit) {
+        super(null);
         nameOrNumber = new NameOrNumber(d);
         this.unit = unit != null ? unit : "";
     }
@@ -88,7 +89,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     protected Duration(IrpParser.Name_or_numberContext ctx, String unit) {
-        super();
+        super(ctx);
         nameOrNumber = new NameOrNumber(ctx);
         this.unit = unit != null ? unit : "";
     }
@@ -117,7 +118,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
                 && nameOrNumber.equals(other.nameOrNumber);
     }
 
-    private void compute(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    private void compute(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
         double time = nameOrNumber.toFloat(generalSpec, nameEngine);
 
         switch (unit) {
@@ -143,9 +144,9 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
                 : time_units;
     }
 
-    public abstract double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException;
+    public abstract double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws NameUnassignedException, IrpInvalidArgumentException;
 
-    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws NameUnassignedException, IrpInvalidArgumentException {
         compute(generalSpec, nameEngine);
         if (time_periods != null) {
             if (generalSpec == null)
@@ -153,7 +154,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             else if (generalSpec.getFrequencyWitDefault()> 0)
                 return IrCoreUtils.seconds2microseconds(time_periods/generalSpec.getFrequencyWitDefault());
             else
-                throw new ArithmeticException("Units in p and frequency == 0 do not go together.");
+                throw new ThisCannotHappenException("Units in p and frequency == 0 do not go together.");
 
         } else if (time_units != null) {
             if (generalSpec == null)
@@ -161,23 +162,23 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             if (generalSpec.getUnit() > 0)
                 return time_units * generalSpec.getUnit();
             else
-                throw new ArithmeticException("Relative units and unit == 0 do not go together.");
+                throw new ThisCannotHappenException("Relative units and unit == 0 do not go together.");
         } else {
             return us;
         }
     }
 
-    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
         return evaluate(generalSpec, nameEngine, 0);
     }
 
     @Override
-    public final boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    public final boolean isEmpty(NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
         return evaluate(null, nameEngine, 0f) == 0;
     }
 
     @Override
-    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
         return evaluate(generalSpec, nameEngine, 0f);
     }
 
@@ -187,13 +188,18 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
         if (!recognizeData.check(isOn())) {
             IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
-            throw new IrpSignalParseException("Found flash when gap expected, or vice versa");
+            throw new SignalRecognitionException("Found flash when gap expected, or vice versa");
         }
         double actual = recognizeData.get();
-        double wanted = toFloat(recognizeData.getGeneralSpec(), recognizeData.toNameEngine());
+        double wanted;
+        try {
+            wanted = toFloat(recognizeData.getGeneralSpec(), recognizeData.toNameEngine());
+        } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
+            throw new SignalRecognitionException(ex);
+        }
         recognize(recognizeData, actual, wanted);
     }
 
@@ -216,13 +222,8 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public String toIrpString() {
-        return nameOrNumber.toIrpString() + unit;
-    }
-
-    @Override
-    public String toString() {
-        return toIrpString();
+    public String toIrpString(int radix) {
+        return nameOrNumber.toIrpString(radix) + unit;
     }
 
     @Override
@@ -240,19 +241,14 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return 0;
     }
 
-    @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
-
-    protected void recognize(RecognizeData recognizeData, double actual, double wanted) throws IrpSignalParseException {
+    protected void recognize(RecognizeData recognizeData, double actual, double wanted) throws SignalRecognitionException {
         boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted, recognizeData.getAbsoluteTolerance(), recognizeData.getRelativeTolerance());
-        if (equals) {
+        if (equals)
             recognizeData.consume();
-        } else if (actual > wanted && recognizeData.allowChopping()) {
+        else if (actual > wanted && recognizeData.allowChopping())
             recognizeData.consume(wanted);
-        } else
-            throw new IrpSignalParseException("Duration does not parse");
+        else
+            throw new SignalRecognitionException("Duration does not parse");
     }
 
 
@@ -288,7 +284,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return unit;
     }
 
-    public double getTimeInUnits() throws IrpSemanticException {
+    public double getTimeInUnits() {
         return nameOrNumber.toRawNumber();
     }
 
@@ -310,35 +306,18 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             long num = Math.round(toFloat(generalSpec, null));
             map.put("microseconds", num);
             return map;
-        } catch (ArithmeticException | UnassignedException | IrpSemanticException ex) {
+        } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
         }
         map.put("name", nameOrNumber.toString());
         map.put("multiplicator", multiplicator(generalSpec));
         return map;
     }
 
-//   @Override
-//    public void propertiesMap(PropertiesMapData propertiesMapData, GeneralSpec generalSpec) {
-//        Map<String, Object> map = new HashMap<>(2);
-//        propertiesMapData.getList().add(map);
-//        map.put("kind", this.getClass().getSimpleName());
-//        try {
-//            long num = Math.round(toFloat(generalSpec, null));
-//            map.put("microseconds", num);
-//            //return map;
-//        } catch (ArithmeticException | UnassignedException | IrpSemanticException ex) {
-//        }
-//        //map.put("name", nameOrNumber.toString());
-//        //map.put("multiplicator", multiplicator(generalSpec));
-//        propertiesMapData.incrementDurations();
-//        //return map;
-//    }
-
     @Override
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         try {
             return this.evaluate(generalSpec, nameEngine);
-        } catch (UnassignedException | IrpSemanticException ex) {
+        } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
             return null;
         }
     }

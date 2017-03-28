@@ -165,7 +165,7 @@ public class LircIrp {
         bitSpec = new BitSpec(list);
     }
 
-    private List<IrStreamItem> mkBitField(String name, String lengthName) {
+    private List<IrStreamItem> mkBitField(String name, String lengthName) throws InvalidNameException {
         List<IrStreamItem> result = new ArrayList<>(1);
         Long value = remote.getUnaryParameters(name);
         if (value != null)
@@ -182,68 +182,77 @@ public class LircIrp {
     }
 
     private void setupBody() {
-        List<IrStreamItem> list = new ArrayList<>(4);
-        list.addAll(lengthTwoBareIrStream("header"));
-        list.addAll(bareIrStreamFlash("plead"));
-        list.addAll(mkBitField("pre_data", "pre_data_bits"));
-        list.addAll(lengthTwoBareIrStream("pre"));
-        list.add(new FiniteBitField("F", remote.getUnaryParameters("bits")));
-        list.addAll(lengthTwoBareIrStream("post"));
-        list.addAll(mkBitField("post_data", "post_data_bits"));
-        list.addAll(bareIrStreamFlash("ptrail"));
-        list.addAll(lengthTwoBareIrStream("foot"));
-        list.addAll(ending());
+        try {
+            List<IrStreamItem> list = new ArrayList<>(4);
+            list.addAll(lengthTwoBareIrStream("header"));
+            list.addAll(bareIrStreamFlash("plead"));
+            list.addAll(mkBitField("pre_data", "pre_data_bits"));
+            list.addAll(lengthTwoBareIrStream("pre"));
+            list.add(new FiniteBitField("F", remote.getUnaryParameters("bits")));
+            list.addAll(lengthTwoBareIrStream("post"));
+            list.addAll(mkBitField("post_data", "post_data_bits"));
+            list.addAll(bareIrStreamFlash("ptrail"));
+            list.addAll(lengthTwoBareIrStream("foot"));
+            list.addAll(ending());
 
-        int outerRepeatMax = Integer.MAX_VALUE;
-        Long repeatMin = remote.getUnaryParameters("min_repeat");
-        LircRemote.Pair repeatPair = remote.getBinaryParameters("repeat");
-        RepeatMarker repeatMarker;
-        if (repeatPair != null || remote.hasFlag("NO_HEAD_REP") || remote.hasFlag("NO_FOOT_REP")) {
-            outerRepeatMax = repeatMin != null ? repeatMin.intValue() : 1;
-            List<IrStreamItem> repeatList = new ArrayList<>(4);
-            if (remote.hasFlag("REPEAT_HEADER"))
-                repeatList.addAll(lengthTwoBareIrStream("header"));
-            if (repeatPair != null)
-                repeatList.addAll(lengthTwoBareIrStream(repeatPair));
+            int outerRepeatMax = Integer.MAX_VALUE;
+            Long repeatMin = remote.getUnaryParameters("min_repeat");
+            LircRemote.Pair repeatPair = remote.getBinaryParameters("repeat");
+            RepeatMarker repeatMarker;
+            if (repeatPair != null || remote.hasFlag("NO_HEAD_REP") || remote.hasFlag("NO_FOOT_REP")) {
+                outerRepeatMax = repeatMin != null ? repeatMin.intValue() : 1;
+                List<IrStreamItem> repeatList = new ArrayList<>(4);
+                if (remote.hasFlag("REPEAT_HEADER"))
+                    repeatList.addAll(lengthTwoBareIrStream("header"));
+                if (repeatPair != null)
+                    repeatList.addAll(lengthTwoBareIrStream(repeatPair));
 
-            else
-                ;
-            repeatList.addAll(bareIrStreamFlash("ptrail"));
-            repeatList.addAll(ending());
+                else
+                    ;
+                repeatList.addAll(bareIrStreamFlash("ptrail"));
+                repeatList.addAll(ending());
 
-            IrStream repeat = new IrStream(new BareIrStream(repeatList), new RepeatMarker(0, Integer.MAX_VALUE));
-            list.add(repeat);
-            repeatMarker = new RepeatMarker();
-        } else {
-            repeatMarker = new RepeatMarker(repeatMin != null ? repeatMin.intValue() + 1 : 0, Integer.MAX_VALUE);
+                IrStream repeat = new IrStream(new BareIrStream(repeatList), new RepeatMarker(0, Integer.MAX_VALUE));
+                list.add(repeat);
+                repeatMarker = new RepeatMarker();
+            } else {
+                repeatMarker = new RepeatMarker(repeatMin != null ? repeatMin.intValue() + 1 : 0, Integer.MAX_VALUE);
+            }
+
+            BareIrStream stream = new BareIrStream(list);
+
+            body = new IrStream(stream, repeatMarker);
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
         }
-
-        BareIrStream stream = new BareIrStream(list);
-
-        body = new IrStream(stream, repeatMarker);
     }
 
     private void setupNameEngine() {
         nameEngine = new NameEngine(2);
-        appendName("pre_data");
-        appendName("post_data");
+        try {
+            appendName("pre_data");
+            appendName("post_data");
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
-    private void appendName(String name) {
-        try {
-            Long value = remote.getUnaryParameters(name);
-            if (value != null)
-                nameEngine.define(name, value);
-        } catch (InvalidNameException ex) {
-            throw new ThisCannotHappenException();
-        }
+    private void appendName(String name) throws InvalidNameException {
+        Long value = remote.getUnaryParameters(name);
+        if (value != null)
+            nameEngine.define(name, value);
     }
 
     private ParameterSpecs mkParameterSpecs() {
         List<ParameterSpec> list = new ArrayList<>(1);
-        ParameterSpec spec = new ParameterSpec("F", false, remote.getUnaryParameters("bits").intValue());
-        list.add(spec);
-        return new ParameterSpecs(list);
+        ParameterSpec spec;
+        try {
+            spec = new ParameterSpec("F", false, remote.getUnaryParameters("bits").intValue());
+            list.add(spec);
+            return new ParameterSpecs(list);
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     public static class RawRemoteException extends Exception {

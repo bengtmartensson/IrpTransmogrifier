@@ -52,13 +52,13 @@ class EvaluatedIrStream {
         state = evaluatedIrStream.state;
     }
 
-    IrSequence toIrSequence() throws UnassignedException, IrpSemanticException, OddSequenceLengthException {
+    IrSequence toIrSequence() throws NameUnassignedException, IrpInvalidArgumentException {
         IrpUtils.entering(logger, "toIrSequence", this);
         List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
         for (Evaluatable element : elements) {
             if (!(element instanceof Duration))
-                throw new IrpSemanticException("IrSequence cannot be (completely) evaluated");
+                throw new ThisCannotHappenException("EvaluatedIrSequence cannot be (completely) evaluated");
             Duration duration = (Duration) element;
             double time = duration.evaluateWithSign(generalSpec, nameEngine, elapsed);
             if (Math.abs(time) < 0.0001)
@@ -71,7 +71,12 @@ class EvaluatedIrStream {
                 elapsed += Math.abs(time);
             }
         }
-        IrSequence result = IrSequence.mkIrSequence(times, false);
+        IrSequence result;
+        try {
+            result = IrSequence.mkIrSequence(times, false);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
         IrpUtils.exiting(logger, "toIrSequence", result);
         return result;
     }
@@ -107,7 +112,7 @@ class EvaluatedIrStream {
             elements.add(bitStream);
     }
 
-    public void reduce(BitSpec bitSpec) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void reduce(BitSpec bitSpec) throws NameUnassignedException {
         int index = 0;
         while (index < elements.size()) {
             if (elements.get(index) instanceof BitStream)
@@ -117,7 +122,7 @@ class EvaluatedIrStream {
         }
     }
 
-    private int reduce(BitSpec bitSpec, int index) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    private int reduce(BitSpec bitSpec, int index) throws NameUnassignedException {
         BitStream bitStream = (BitStream) elements.get(index);
         elements.remove(index);
         EvaluatedIrStream bitFieldDurations = bitStream.evaluate(pass, pass, generalSpec, nameEngine, bitSpec);
@@ -142,7 +147,7 @@ class EvaluatedIrStream {
         return elements.size();
     }
 
-    public double get(int i) throws UnassignedException, IrpSemanticException {
+    public double get(int i) throws IrpInvalidArgumentException, NameUnassignedException {
         Evaluatable object = elements.get(i);
         if (!(object instanceof Duration))
             throw new ThisCannotHappenException("Not numeric");

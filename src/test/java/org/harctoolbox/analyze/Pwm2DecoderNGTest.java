@@ -1,14 +1,13 @@
 package org.harctoolbox.analyze;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
-import org.harctoolbox.irp.IrpSemanticException;
-import org.harctoolbox.irp.IrpSyntaxException;
+import org.harctoolbox.irp.InvalidNameException;
+import org.harctoolbox.irp.IrpInvalidArgumentException;
+import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.Protocol;
-import org.harctoolbox.irp.UnassignedException;
+import org.harctoolbox.irp.UnsupportedRepeatException;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -75,8 +74,8 @@ public class Pwm2DecoderNGTest {
             System.out.println("Expect warnings for missing parameterspec");
             Protocol expResult = new Protocol("{38.4k,564,msb}<1,-1|1,-3>(16,-8,A:32,1,^108m){A=0x30441ce3}");
             assertEquals(result, expResult);
-        } catch (IrpSemanticException | IrpSyntaxException | ArithmeticException | UnassignedException ex) {
-            Logger.getLogger(Pwm2DecoderNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IrpInvalidArgumentException | InvalidNameException | NameUnassignedException | UnsupportedRepeatException ex) {
+            fail();
         }
     }
 }

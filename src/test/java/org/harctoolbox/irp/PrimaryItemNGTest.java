@@ -1,7 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -22,7 +20,7 @@ public class PrimaryItemNGTest {
     public static void tearDownClass() throws Exception {
     }
     private final NameEngine nameEngine;
-    public PrimaryItemNGTest() throws IrpSyntaxException {
+    public PrimaryItemNGTest() throws InvalidNameException {
         nameEngine = new NameEngine("{A = 7, F=244, D=4}");
     }
 
@@ -43,7 +41,7 @@ public class PrimaryItemNGTest {
             System.out.println("newPrimaryItem");
             PrimaryItem result = PrimaryItem.newPrimaryItem(42);
             assertEquals(result.toNumber(nameEngine), 42);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
     }
@@ -52,6 +50,7 @@ public class PrimaryItemNGTest {
      * Test of newPrimaryItem method, of class PrimaryItem.
      */
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testNewPrimaryItem_String() {
         try {
             System.out.println("newPrimaryItem");
@@ -64,8 +63,8 @@ public class PrimaryItemNGTest {
             result = PrimaryItem.newPrimaryItem("(#A)");
             assertTrue(result instanceof Expression);
             assertEquals(result.toNumber(nameEngine), 3);
-        } catch (UnassignedException ex) {
-            Logger.getLogger(PrimaryItemNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidNameException | NameUnassignedException ex) {
+            fail();
         }
     }
 }

@@ -13,20 +13,19 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
+ */
 
 package org.harctoolbox.irp;
 
 /**
- * This class is thrown on syntactical error in Irps.
+ * Implements simple equation solving.
+ * this = rhs
+ * translates to leftHandSide() := invert(rhs)
+ *
  */
-public class IrpSyntaxException extends IrpException {
 
-    public IrpSyntaxException(String message) {
-        super(message);
-    }
+public interface EquationSolving {
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws NameUnassignedException;
 
-    public IrpSyntaxException(Throwable ex) {
-        super(ex);
-    }
+    public PrimaryItem leftHandSide();
 }

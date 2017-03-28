@@ -36,10 +36,12 @@ public class FloatNumber extends IrpObject implements Floatable {
     private final double data;
 
     public FloatNumber(double x) {
+        super(null);
         data = x;
     }
 
     public FloatNumber(IrpParser.Float_numberContext ctx) {
+        super(ctx);
         data = Double.parseDouble(ctx.getText());
     }
 
@@ -57,14 +59,14 @@ public class FloatNumber extends IrpObject implements Floatable {
     }
 
     @Override
-    public String toString() {
+    public String toIrpString(int radix) {
         return Double.toString(data);
     }
 
-    @Override
-    public String toIrpString() {
-        return toString();
-    }
+//    @Override
+//    public String toIrpString() {
+//        return toString();
+//    }
 
     @Override
     public Element toElement(Document document) {

@@ -1,7 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -34,9 +32,10 @@ public class NameNGTest {
     /**
      * Test of toString method, of class Name.
      *
+     * @throws org.harctoolbox.irp.InvalidNameException
      */
     @Test
-    public void testToString_0args() {
+    public void testToString_0args() throws InvalidNameException {
         System.out.println("toString");
         Name instance = new Name("godzilla");
         String expResult = "godzilla";
@@ -44,18 +43,18 @@ public class NameNGTest {
         assertEquals(result, expResult);
     }
 
-    /**
-     * Test of parseName method, of class Name.
-     * @throws org.harctoolbox.irp.InvalidNameException
-     */
-    @Test
-    public void testParseName() throws InvalidNameException {
-        System.out.println("parseName");
-        String name = "May the Schwarz be with you";
-        String expResult = "May";
-        String result = Name.parse(name);
-        assertEquals(result, expResult);
-    }
+//    /**
+//     * Test of parseName method, of class Name.
+//     * @throws org.harctoolbox.irp.InvalidNameException
+//     */
+//    @Test
+//    public void testParseName() {
+//        System.out.println("parseName");
+//        String name = "May the Schwarz be with you";
+//        String expResult = "May";
+//        String result = Name.parse(name);
+//        assertEquals(result, expResult);
+//    }
 
     /**
      * Test of validName method, of class Name.
@@ -90,7 +89,7 @@ public class NameNGTest {
             long expResult = 6L;
             long result = instance.toNumber(nameEngine);
             assertEquals(result, expResult);
-        } catch (IrpSyntaxException | UnassignedException ex) {
+        } catch (InvalidNameException | NameUnassignedException ex) {
             fail();
         }
     }
@@ -100,25 +99,29 @@ public class NameNGTest {
      */
     @Test
     public void testToIrpString() {
-        System.out.println("toIrpString");
-        Name instance = new Name("imhotep");
-        assertEquals(instance.toIrpString(), "imhotep");
+        try {
+            System.out.println("toIrpString");
+            Name instance = new Name("imhotep");
+            assertEquals(instance.toIrpString(), "imhotep");
+        } catch (InvalidNameException ex) {
+            fail();
+        }
     }
 
-    /**
-     * Test of parse method, of class Name.
-     */
-    @Test
-    public void testParse_String() {
-        System.out.println("parse");
-        String result = null;
-        try {
-            result = Name.parse("irscrutinizer");
-        } catch (InvalidNameException ex) {
-            Logger.getLogger(NameNGTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        assertEquals(result, "irscrutinizer");
-    }
+//    /**
+//     * Test of parse method, of class Name.
+//     */
+//    @Test
+//    public void testParse_String() {
+//        System.out.println("parse");
+//        String result = null;
+////        try {
+//            result = Name.parse("irscrutinizer");
+////        } catch (InvalidNameException ex) {
+////            Logger.getLogger(NameNGTest.class.getName()).log(Level.SEVERE, null, ex);
+////        }
+//        assertEquals(result, "irscrutinizer");
+//    }
 
     /**
      * Test of toFloat method, of class Name.
@@ -131,7 +134,7 @@ public class NameNGTest {
             GeneralSpec generalSpec = new GeneralSpec();
             Name instance = new Name("answer");
             assertEquals(instance.toFloat(generalSpec, nameEngine), 42f, 0.000001);
-        } catch (IrpSyntaxException | ArithmeticException | UnassignedException ex) {
+        } catch (InvalidNameException | NameUnassignedException ex) {
             fail();
         }
     }

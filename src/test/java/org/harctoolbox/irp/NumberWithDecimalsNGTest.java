@@ -20,7 +20,7 @@ public class NumberWithDecimalsNGTest {
     //private final NumberWithDecimals answer;
     private final NumberWithDecimals sheldon;
 
-    public NumberWithDecimalsNGTest() throws IrpSyntaxException {
+    public NumberWithDecimalsNGTest() {
         pi = new NumberWithDecimals("13.1415926");
         //e = new NumberWithDecimals(2.71);
         //answer = new NumberWithDecimals(42);

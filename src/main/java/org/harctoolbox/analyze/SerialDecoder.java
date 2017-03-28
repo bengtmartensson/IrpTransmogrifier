@@ -27,7 +27,6 @@ import org.harctoolbox.irp.Duration;
 import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
-import org.harctoolbox.irp.IrpSemanticException;
 
 public class SerialDecoder extends AbstractDecoder {
 
@@ -70,7 +69,7 @@ public class SerialDecoder extends AbstractDecoder {
                 int noBits;
                 try {
                     noBits = (int) Math.round(duration.getTimeInUnits());
-                } catch (IrpSemanticException ex) {
+                } catch (Exception ex) {
                     throw new ThisCannotHappenException(ex);
                 }
                 int amount = isFlash ? IrCoreUtils.ones(noBits) : 0;

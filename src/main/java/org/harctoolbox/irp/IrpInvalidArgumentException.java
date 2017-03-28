@@ -13,20 +13,25 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
+ */
 
 package org.harctoolbox.irp;
 
 /**
- * This exception is thrown when an Irp defined something impossible.
+ * Thrown for invalid arguments.
  */
-public class IrpSemanticException extends IrpException {
+@SuppressWarnings("serial")
+public class IrpInvalidArgumentException extends IrpException {
 
-    public IrpSemanticException(String message) {
-        super(message);
+    public IrpInvalidArgumentException(String string) {
+        super(string);
     }
 
-    public IrpSemanticException(Throwable ex) {
+    public IrpInvalidArgumentException(Throwable ex) {
         super(ex);
+    }
+
+    public IrpInvalidArgumentException() {
+        super();
     }
 }

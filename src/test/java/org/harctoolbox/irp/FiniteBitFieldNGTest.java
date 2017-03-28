@@ -19,7 +19,7 @@ public class FiniteBitFieldNGTest {
     private NameEngine nameEngine = null;
     private final FiniteBitField instance;
 
-    public FiniteBitFieldNGTest() throws IrpSyntaxException {
+    public FiniteBitFieldNGTest() throws InvalidNameException {
         nameEngine = new NameEngine("{A = 7, F=244, D=4}");
         instance = new FiniteBitField("~D:-6:2");
     }
@@ -45,14 +45,14 @@ public class FiniteBitFieldNGTest {
 //            assertEquals(instance.toNumber(nameEngine), 31L);
 //            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
             assertEquals(instance.toNumber(nameEngine), 31L);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
         try {
             FiniteBitField fbf = new FiniteBitField("~foobar:-6:2");
             fbf.toNumber(nameEngine);
             fail();
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
         }
     }
 
@@ -154,10 +154,9 @@ public class FiniteBitFieldNGTest {
 
     /**
      * Test of numberOfBits method, of class FiniteBitField.
-     * @throws org.harctoolbox.irp.UnassignedException
      */
     @Test
-    public void testNumberOfBits() throws UnassignedException {
+    public void testNumberOfBits() {
         System.out.println("numberOfBits");
         int result = instance.numberOfBits();
         assertEquals(result, 6);

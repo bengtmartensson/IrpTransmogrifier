@@ -61,10 +61,9 @@ public class ExtentNGTest {
 
     /**
      * Test of interleavingOk method, of class Flash.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
-    public void testInterleavingOk() throws IrpSyntaxException {
+    public void testInterleavingOk() {
         System.out.println("interleavingOk");
         Extent instance = new Extent("^Z");
         boolean result = instance.interleavingOk(null, null, DurationType.flash, false);

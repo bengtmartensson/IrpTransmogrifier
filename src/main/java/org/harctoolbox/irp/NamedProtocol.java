@@ -61,7 +61,7 @@ public class NamedProtocol extends Protocol {
     public NamedProtocol(String name, String irp, String documentation, String frequencyTolerance,
             String absoluteTolerance, String relativeTolerance, String decodable,
             List<String> preferOver)
-            throws IrpSemanticException, InvalidNameException, UnassignedException {
+            throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         super(irp);
         this.irp = irp;
         this.name = name;
@@ -73,12 +73,12 @@ public class NamedProtocol extends Protocol {
         this.preferOver = preferOver;
     }
 
-    public NamedProtocol(String name, String irp, String documentation) throws IrpSemanticException, InvalidNameException, UnassignedException {
+    public NamedProtocol(String name, String irp, String documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         this(name, irp, documentation, null, null, null, null, null);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException, ProtocolNotDecodableException {
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) throws DomainViolationException, SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             //return null;
@@ -161,7 +161,7 @@ public class NamedProtocol extends Protocol {
     }
 
     @Override
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws SignalRecognitionException {
         return recognize(irSignal, keepDefaulted, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
                 IrCoreUtils.getAbsoluteTolerance(absoluteTolerance), IrCoreUtils.getRelativeTolerance(relativeTolerance));
     }

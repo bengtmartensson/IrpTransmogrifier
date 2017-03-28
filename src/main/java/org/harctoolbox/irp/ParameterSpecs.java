@@ -32,10 +32,10 @@ import org.w3c.dom.Element;
 
 public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>,AggregateLister {
 
-    private LinkedHashMap<String, ParameterSpec> map;
+    private Map<String, ParameterSpec> map = new LinkedHashMap<>(3);
 
     public ParameterSpecs() {
-        map = new LinkedHashMap<>(3);
+        super(null);
     }
 
     public ParameterSpecs(String parameter_specs) {
@@ -46,13 +46,14 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         this(ctx.parameter_specs());
     }
 
-    public ParameterSpecs(IrpParser.Parameter_specsContext t) {
-        this();
-        if (t != null) {
-            t.parameter_spec().stream().map((parameterSpec) -> new ParameterSpec(parameterSpec)).forEach((ps) -> {
-                map.put(ps.getName(), ps);
-            });
-        }
+    public ParameterSpecs(IrpParser.Parameter_specsContext ctx) {
+        super(ctx);
+        if (ctx == null)
+            return;
+
+        ctx.parameter_spec().stream().map((parameterSpec) -> new ParameterSpec(parameterSpec)).forEachOrdered((ps) -> {
+            map.put(ps.getName(), ps);
+        });
     }
 
     public ParameterSpecs(List<ParameterSpec> list) {
@@ -101,12 +102,12 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     }
 
     @Override
-    public String toString() {
+    public String toIrpString(int radix) {
         if (isEmpty())
             return "";
         StringBuilder str = new StringBuilder("[");
         map.values().stream().forEach((ps) -> {
-            str.append(ps.toString()).append(",");
+            str.append(ps.toIrpString(radix)).append(",");
         });
 
         if (str.length() > 0)
@@ -115,10 +116,10 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return str.toString();
     }
 
-    @Override
-    public String toIrpString() {
-        return toString();
-    }
+//    @Override
+//    public String toIrpString() {
+//        return toString();
+//    }
 
     @Override
     public Element toElement(Document document) {
@@ -129,9 +130,13 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return el;
     }
 
-    void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException {
+    void check(NameEngine nameEngine) throws DomainViolationException {
         for (ParameterSpec parameter : map.values())
-            parameter.check(nameEngine);
+            try {
+                parameter.check(nameEngine);
+            } catch (NameUnassignedException | InvalidNameException ex) {
+                throw new ThisCannotHappenException(ex);
+            }
     }
 
     public Map<String, Long> random() {
@@ -177,14 +182,14 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     private void remoteDefaulteds(Map<String, Long> namesMap) {
         NameEngine nameEngine = new NameEngine(namesMap);
         List<String> names = new ArrayList<>(namesMap.keySet());
-        names.forEach((name) -> {
+        names.forEach((String name) -> {
             Expression expression = map.get(name).getDefault();
             if (!(expression == null))
                 try {
                     long deflt = expression.toNumber(nameEngine);
                     if (namesMap.get(name) == deflt)
                         namesMap.remove(name);
-                } catch (UnassignedException ex) {
+                } catch (NameUnassignedException ex) {
                     throw new ThisCannotHappenException();
                 }
         });

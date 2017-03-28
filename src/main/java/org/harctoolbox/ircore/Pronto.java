@@ -108,7 +108,6 @@ public abstract class Pronto {
      * @param ccf CCF signal
      * @return  IrSignal
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
-     * @throws InvalidArgumentException
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IrSignal parse(int[] ccf) throws OddSequenceLengthException, InvalidArgumentException {
@@ -162,7 +161,7 @@ public abstract class Pronto {
      * @param array Strings representing hexadecimal numbers
      * @param begin Starting index
      * @return IrSignal
-     * @throws InvalidArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     public static IrSignal parse(String[] array, int begin) throws InvalidArgumentException {
         int[] ccf;
@@ -191,7 +190,7 @@ public abstract class Pronto {
      * Creates a new IrSignals by interpreting its argument as CCF string.
      * @param list Strings representing hexadecimal numbers
      * @return IrSignal
-     * @throws InvalidArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     public static IrSignal parse(List<String> list) throws InvalidArgumentException {
         int[] ccf;
@@ -212,7 +211,7 @@ public abstract class Pronto {
      *
      * @param ccfString Input string, to be parsed/tested.
      * @return Integer array of numbers if successful, null if unsuccessful.
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.IrpInvalidArgumentException
      */
     static int[] parseAsInts(String ccfString) throws InvalidArgumentException {
         String[] array = ccfString.trim().split("\\s+");
@@ -226,7 +225,7 @@ public abstract class Pronto {
      * @param array Input strings, to be parsed/tested.
      * @param begin Starting index
      * @return Integer array of numbers if successful, null if unsuccessful (e.g. by NumberFormatException).
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.IrpInvalidArgumentException
      */
     static int[] parseAsInts(String[] array, int begin) throws InvalidArgumentException {
         int[] ccf = new int[array.length];

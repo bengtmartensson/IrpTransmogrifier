@@ -34,11 +34,13 @@ class BitStream extends IrpObject implements Evaluatable {
     private BigInteger data;
 
     BitStream() {
+        super(null);
         data = BigInteger.ZERO;
         length = 0;
     }
 
-    BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException {
+    BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
+        super(null);
         if (bitField instanceof InfiniteBitField)
             throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
 
@@ -49,13 +51,9 @@ class BitStream extends IrpObject implements Evaluatable {
 
     }
     @Override
-    public String toString() {
-        return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
-    }
-
-    @Override
-    public String toIrpString() {
-        throw new UnsupportedOperationException("Not supported.");
+    public String toIrpString(int radix) {
+        //return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
+        return "BitStream(" + data.toString(radix) + ":" + length + ")";
     }
 
     void add(BitStream bitStream, GeneralSpec generalSpec, NameEngine nameEngine) {
@@ -76,7 +74,7 @@ class BitStream extends IrpObject implements Evaluatable {
         return data.shiftRight(n*chunksize).and(BigInteger.valueOf(mask)).intValueExact();
     }
 
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine, BitSpec bitSpec) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine, BitSpec bitSpec) throws NameUnassignedException {
         IrpUtils.entering(logger, "evaluate", this);
 
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);

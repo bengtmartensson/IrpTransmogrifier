@@ -5,9 +5,10 @@ import java.util.List;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.InvalidNameException;
-import org.harctoolbox.irp.IrpSemanticException;
+import org.harctoolbox.irp.IrpInvalidArgumentException;
+import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.Protocol;
-import org.harctoolbox.irp.UnassignedException;
+import org.harctoolbox.irp.UnsupportedRepeatException;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -53,9 +54,10 @@ public class SerialDecoderNGTest {
 
     /**
      * Test of parse method, of class SerialDecoder.
+     * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      */
     @Test
-    public void testParse() {
+    public void testParse() throws IrpInvalidArgumentException {
         try {
             System.out.println("parse");
             SerialDecoder decoder = new SerialDecoder(pctv, paramsPctv);
@@ -63,7 +65,7 @@ public class SerialDecoderNGTest {
             System.out.println("Expect warnings on missing ParameterSpec");
             Protocol expResult = new Protocol("{38.4k,832,lsb}<-1|1>(A:2,B:8,C:1,D:8,E:8,F:2,-100m){A=3,B=0,C=1,D=12,E=34,F=3}");
             assertEquals(result, expResult);
-        } catch (DecodeException | UnassignedException | IrpSemanticException | InvalidNameException ex) {
+        } catch (DecodeException | InvalidNameException | NameUnassignedException | UnsupportedRepeatException ex) {
             fail();
         }
     }

@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
 
 public class BitFieldNGTest {
@@ -67,10 +68,9 @@ public class BitFieldNGTest {
 
     /**
      * Test of toString method, of class BitField.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
-    public void testToString_0args() throws IrpSyntaxException {
+    public void testToString_0args() {
         System.out.println("toString");
         BitField instance = BitField.newBitField("~D:-6:2");
         assertEquals(instance.toString(), "~D:-6:2");
@@ -103,15 +103,18 @@ public class BitFieldNGTest {
 
     /**
      * Test of isEmpty method, of class BitField.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
-    public void testIsEmpty() throws IrpSyntaxException {
-        System.out.println("isEmpty");
-        BitField instance = BitField.newBitField("~D:-6:2");
-        boolean expResult = false;
-        boolean result = instance.isEmpty(names);
-        assertEquals(result, expResult);
+    public void testIsEmpty() {
+        try {
+            System.out.println("isEmpty");
+            BitField instance = BitField.newBitField("~D:-6:2");
+            boolean expResult = false;
+            boolean result = instance.isEmpty(names);
+            assertEquals(result, expResult);
+        } catch (NameUnassignedException ex) {
+            fail();
+        }
     }
 
 //    /**

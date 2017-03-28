@@ -20,9 +20,9 @@ package org.harctoolbox.irp;
 /**
  * Unsupported repeat found, for example, more than one infinite repeat, or hierarchical repeats.
  */
-public class UnsupportedRepeatException extends IrpSemanticException {
+public class UnsupportedRepeatException extends IrpException {
 
-    public UnsupportedRepeatException(String string) {
-        super(string);
+    public UnsupportedRepeatException() {
+        super("More than one infinite repeat found. This is not supported.");
     }
 }

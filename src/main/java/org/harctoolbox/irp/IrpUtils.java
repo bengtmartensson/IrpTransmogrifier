@@ -318,8 +318,12 @@ public class IrpUtils {
     }
 
     static Map<String, Object> propertiesMap(int noProps, Object object) {
+        return propertiesMap(noProps, object.getClass().getSimpleName());
+    }
+
+    static Map<String, Object> propertiesMap(int noProps, String kind) {
         Map<String, Object> result = new HashMap<>(noProps + 1);
-        result.put("kind", object.getClass().getSimpleName());
+        result.put("kind", kind);
         return result;
     }
 

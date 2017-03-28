@@ -3,7 +3,6 @@ package org.harctoolbox.irp;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -32,7 +31,7 @@ public class RepeatMarkerNGTest {
     }
 
 
-    private void testit(String str, int min, int max) throws UnsupportedRepeatException {
+    private void testit(String str, int min, int max) {
         //RepeatMarker.reset();
         RepeatMarker rep = new RepeatMarker(str);
         assertEquals(rep.getMin(), min);
@@ -44,7 +43,7 @@ public class RepeatMarkerNGTest {
      */
     @Test
     public void testGetMax() {
-        try {
+//        try {
             System.out.println("getMax");
             testit("*", 0, Integer.MAX_VALUE);
             testit("+", 1, Integer.MAX_VALUE);
@@ -53,9 +52,9 @@ public class RepeatMarkerNGTest {
             testit("7", 7, 7);
             testit("17+", 17, Integer.MAX_VALUE);
             testit("\t7+   ", 7, Integer.MAX_VALUE);
-        } catch (UnsupportedRepeatException ex) {
-            fail();
-        }
+//        } catch (UnsupportedRepeatException ex) {
+//            fail();
+//        }
         RepeatMarker rep;
         rep = new RepeatMarker("*");
         assertEquals(rep.getMin(), 0);

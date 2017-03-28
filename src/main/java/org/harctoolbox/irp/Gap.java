@@ -47,13 +47,13 @@ public class Gap extends Duration {
     }
 
     @Override
-    public double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+    public double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws IrpInvalidArgumentException, NameUnassignedException {
         return -evaluate(generalSpec, nameEngine, elapsed);
     }
 
     @Override
-    public String toIrpString() {
-        return "-" + super.toIrpString();
+    public String toIrpString(int radix) {
+        return "-" + super.toIrpString(radix);
     }
 
     @Override

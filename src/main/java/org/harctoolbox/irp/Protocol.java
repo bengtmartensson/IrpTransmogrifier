@@ -18,7 +18,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +25,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.antlr.v4.gui.TreeViewer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,7 +48,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private ParameterSpecs parameterSpecs;
     private BitspecIrstream bitspecIrstream;
     private Variation normalFormVariation;
-    private IrpParser.ProtocolContext parseTree;
+    //private IrpParser.ProtocolContext parseTree;
     private ParserDriver parseDriver;
     private NameEngine definitions;
     private NameEngine memoryVariables;
@@ -65,7 +62,7 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree) {
-        this.parseTree = parseTree;
+        super(parseTree);
         this.generalSpec = generalSpec;
         this.bitspecIrstream = bitspecIrstream;
         this.definitions = definitions;
@@ -89,25 +86,30 @@ public class Protocol extends IrpObject implements AggregateLister {
      * Main constructor.
      *
      * @param irpString
-     * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.InvalidNameException
+     * @throws org.harctoolbox.irp.NameUnassignedException
      * @throws org.harctoolbox.irp.UnsupportedRepeatException
-     * @throws org.harctoolbox.irp.UnassignedException
+     * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      */
-    public Protocol(String irpString) throws IrpSemanticException, InvalidNameException, UnassignedException {
+    public Protocol(String irpString) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(new ParserDriver(irpString));
     }
 
-    public Protocol(ParserDriver parserDriver) throws IrpSemanticException, InvalidNameException, UnassignedException {
+    public Protocol(ParserDriver parserDriver) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(parserDriver.getParser().protocol());
         this.parser = parserDriver.getParser();
         this.parseDriver = parserDriver;
     }
 
-    public Protocol(IrpParser.ProtocolContext parseTree) throws IrpSemanticException, InvalidNameException, UnassignedException {
+    public Protocol(IrpParser.ProtocolContext parseTree) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(new GeneralSpec(parseTree), new BitspecIrstream(parseTree), new NameEngine(), new ParameterSpecs(parseTree), parseTree);
-        for (IrpParser.DefinitionsContext defs : parseTree.definitions())
-            definitions.parseDefinitions(defs);
+        parseTree.definitions().forEach((defs) -> {
+            try {
+                definitions.parseDefinitions(defs);
+            } catch (InvalidNameException ex) {
+                throw new ThisCannotHappenException(ex);
+            }
+        });
 
         parameterSpecs = new ParameterSpecs(parseTree);
         memoryVariables = new NameEngine();
@@ -154,23 +156,23 @@ public class Protocol extends IrpObject implements AggregateLister {
         return hash;
     }
 
-    private void checkSanity() throws UnsupportedRepeatException, IrpSemanticException {
-        if (numberOfInfiniteRepeats() > 1) {
-            throw new UnsupportedRepeatException("More than one infinite repeat found. The program does not handle this.");
-        }
+    private void checkSanity() throws UnsupportedRepeatException {
+        if (numberOfInfiniteRepeats() > 1)
+            throw new UnsupportedRepeatException();
 
         if (parameterSpecs.isEmpty()) {
             logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
             parameterSpecs = new ParameterSpecs();
         }
         if (generalSpec == null) {
-            throw new IrpSemanticException("GeneralSpec missing from protocol");
+            // should have been caught during initial parsing
+            throw new ThisCannotHappenException("GeneralSpec missing from protocol");
         }
     }
 
-    public IrpParser.ProtocolContext getParseTree() {
-        return parseTree;
-    }
+//    public IrpParser.ProtocolContext getParseTree() {
+//        return parseTree;
+//    }
 
     public Protocol normalFormProtocol() {
         List<IrStreamItem> list = new ArrayList<>(1);
@@ -188,57 +190,58 @@ public class Protocol extends IrpObject implements AggregateLister {
     private Protocol mkProtocol(BareIrStream bareIrStream) {
         IrStream irStream = new IrStream(bareIrStream);
         BitspecIrstream normalBitspecIrstream = new BitspecIrstream(bitspecIrstream.getBitSpec(), irStream);
-        return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, parseTree);
+        return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, null);
     }
 
-    public String normalFormIrpString() {
+    public String normalFormIrpString(int radix) {
         Protocol normal = normalFormProtocol();
-        return normal.toIrpString();
+        return normal.toIrpString(radix);
     }
 
     /**
      *
      * @param nameEngine; may be changed
      * @return
-     * @throws org.harctoolbox.irp.InvalidNameException
-     * @throws IrpSemanticException
      * @throws ArithmeticException
-     * @throws UnassignedException
-     * @throws NameConflictException
-     * @throws IrpSignalParseException
+     * @throws org.harctoolbox.irp.NameUnassignedException
+     * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      * @throws DomainViolationException
      */
-    public IrSignal toIrSignal(NameEngine nameEngine) throws IrpException {
-        try {
-            IrpUtils.entering(logger, "toIrSignal");
-            parameterSpecs.check(nameEngine);
-            fetchMemoryVariables(nameEngine);
-            nameEngine.add(definitions);
+    public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException {
+        IrpUtils.entering(logger, "toIrSignal");
+        parameterSpecs.check(nameEngine);
+        fetchMemoryVariables(nameEngine);
+        nameEngine.add(definitions);
 
-            IrSequence intro  = toIrSequence(nameEngine, Pass.intro);
-            IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
-            IrSequence ending = toIrSequence(nameEngine, Pass.ending);
-            saveMemoryVariables(nameEngine);
-            IrpUtils.entering(logger, "toIrSignal");
-            return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
-        } catch (OddSequenceLengthException ex) {
-            throw new ThisCannotHappenException(ex);
-        }
+        IrSequence intro = toIrSequence(nameEngine, Pass.intro);
+        IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
+        IrSequence ending = toIrSequence(nameEngine, Pass.ending);
+        saveMemoryVariables(nameEngine);
+        IrpUtils.entering(logger, "toIrSignal");
+        return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
     }
 
-    private void fetchMemoryVariables(NameEngine nameEngine) throws InvalidNameException {
+    private void fetchMemoryVariables(NameEngine nameEngine) {
         for (Map.Entry<String, Expression> kvp : memoryVariables) {
             String name = kvp.getKey();
             if (!nameEngine.containsKey(name)) {
-                nameEngine.define(name, kvp.getValue());
+                try {
+                    nameEngine.define(name, kvp.getValue());
+                } catch (InvalidNameException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
             }
         }
     }
 
-    private void saveMemoryVariables(NameEngine nameEngine) throws InvalidNameException, UnassignedException {
+    private void saveMemoryVariables(NameEngine nameEngine) {
         for (Map.Entry<String, Expression> kvp : memoryVariables) {
             String name = kvp.getKey();
-            memoryVariables.define(name, nameEngine.get(name));
+            try {
+                memoryVariables.define(name, nameEngine.get(name));
+            } catch (NameUnassignedException | InvalidNameException ex) {
+                throw new ThisCannotHappenException(ex);
+            }
         }
     }
 
@@ -247,14 +250,10 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @param nameEngine, NameEngine, may be altered.
      * @param pass
      * @return
-     * @throws org.harctoolbox.irp.InvalidNameException
-     * @throws org.harctoolbox.irp.IrpSemanticException
-     * @throws org.harctoolbox.ircore.OddSequenceLengthException
-     * @throws org.harctoolbox.irp.UnassignedException
-     * @throws org.harctoolbox.irp.NameConflictException
-     * @throws org.harctoolbox.irp.IrpSignalParseException
+     * @throws org.harctoolbox.irp.NameUnassignedException
+     * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      */
-    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
+    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException {
         return new ModulatedIrSequence(toIrSequence(nameEngine, pass), getFrequency(), getDutyCycle());
     }
 
@@ -269,7 +268,7 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.DomainViolationException
      */
-    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws UnassignedException, InvalidNameException, IrpSemanticException, OddSequenceLengthException, NameConflictException, IrpSignalParseException {
+    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException {
         IrpUtils.entering(logger, "toIrSequence", pass);
         RenderData renderData = new RenderData(generalSpec, nameEngine);
         Protocol reducedProtocol = normalForm(pass);
@@ -300,11 +299,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return generalSpec.getDutyCycle();
     }
 
-    public String toStringTree() {
-        return parseDriver != null ? parseTree.toStringTree(parseDriver.getParser()) : null;
-    }
-
-    long getMemoryVariable(String name) throws UnassignedException {
+    long getMemoryVariable(String name) throws NameUnassignedException {
         return memoryVariables.get(name).toNumber();
     }
 
@@ -427,39 +422,39 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public String toIrpString() {
-        return toIrpString(10, false);
+    public String toIrpString(int radix) {
+        return toIrpString(radix, false);
     }
 
     public String toIrpString(int radix, boolean usePeriods) {
         return
                 generalSpec.toIrpString(usePeriods)
-                + bitspecIrstream.toIrpString()
+                + bitspecIrstream.toIrpString(radix)
                 + definitions.toIrpString(radix)
-                + parameterSpecs.toIrpString();
+                + parameterSpecs.toIrpString(radix);
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     public Map<String, Long> randomParameters() {
         return parameterSpecs.random();
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
+    public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException {
         return recognize(irSignal, true);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws SignalRecognitionException {
         return recognize(irSignal, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance)
-            throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
-        IrpUtils.entering(logger, Level.FINE, "recognize", this);
+            throws SignalRecognitionException {
+        //IrpUtils.entering(logger, Level.FINE, "recognize", this);
         checkFrequency(irSignal.getFrequency(), frequencyTolerance);
         ParameterCollector names = new ParameterCollector();
 
@@ -469,29 +464,33 @@ public class Protocol extends IrpObject implements AggregateLister {
 
         Map<String, Long> result = names.collectedNames();
         parameterSpecs.reduceNamesMap(result, keepDefaulted);
-        IrpUtils.entering(logger, Level.FINE, "recognize", result);
+        //IrpUtils.exiting(logger, Level.FINE, "recognize", result);
         return result;
     }
 
-    private void checkFrequency(double frequency, double frequencyTolerance) throws IrpSignalParseException {
+    private void checkFrequency(double frequency, double frequencyTolerance) throws SignalRecognitionException {
         boolean success = frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequency(), frequency, frequencyTolerance, 0.0);
         if (!success)
-            throw new IrpSignalParseException("Frequency does not match");
+            throw new SignalRecognitionException("Frequency does not match");
     }
 
-    private void decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) throws DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException, IrpSignalParseException {
+    private void decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) throws SignalRecognitionException {
         RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names, absoluteTolerance, relativeTolerance);
         Protocol reducedProtocol = normalForm(pass);
         //traverse(recognizeData, pass);
         reducedProtocol.decode(recognizeData);
-        recognizeData.checkConsistency();
-        checkDomain(names);
+        try {
+            recognizeData.checkConsistency();
+            checkDomain(names);
+        } catch (DomainViolationException | NameUnassignedException ex) {
+            throw new SignalRecognitionException(ex);
+        }
     }
 
-    public void decode(RecognizeData recognizeData) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public void decode(RecognizeData recognizeData) throws SignalRecognitionException {
         bitspecIrstream.decode(recognizeData, new ArrayList<>(0));
         if (!recognizeData.isFinished())
-            throw new IrpSignalParseException("IrSequence not fully matched");
+            throw new SignalRecognitionException("IrSequence not fully matched");
     }
 
     @Override
@@ -513,11 +512,6 @@ public class Protocol extends IrpObject implements AggregateLister {
      */
     public NameEngine getDefinitions() {
         return definitions;
-    }
-
-    public TreeViewer toTreeViewer() {
-        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
-        return new TreeViewer(ruleNames, parseTree);
     }
 
     public String classificationString() {

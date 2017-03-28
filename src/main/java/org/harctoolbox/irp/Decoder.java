@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 public class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
 
+    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
     public static void main(String[] args) {
         ParameterSpec.initRandom(1);
 
@@ -50,13 +51,13 @@ public class Decoder {
                     System.out.println(kvp);
                 });
             }
-        } catch (IOException | SAXException | IrpException | InvalidArgumentException ex) {
+        } catch (IOException | InvalidArgumentException | IrpInvalidArgumentException | DomainViolationException | InvalidNameException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
             Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
     }
 
-    public static boolean decode(String irpDatabasePath) throws IOException, SAXException, IrpException {
+    public static boolean decode(String irpDatabasePath) throws IOException, SAXException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         IrpDatabase irp = new IrpDatabase(irpDatabasePath);
         irp.expand();
         Decoder decoder = new Decoder(irp);
@@ -96,23 +97,23 @@ public class Decoder {
      * @param names If non-null and non-empty, include only the protocols with these names.
      */
     public Decoder(IrpDatabase irpDatabase, Collection<String> names) {
-        try {
+//        try {
             irpDatabase.expand();
-            this.parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
+            parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
             Collection<String> list = names != null ? names : irpDatabase.getNames();
             list.parallelStream().forEach((protocolName) -> {
                 try {
                     NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(protocolName);
                     if (namedProtocol.isDecodeable())
                         parsedProtocols.put(protocolName, namedProtocol);
-                } catch (IrpException ex) {
+                } catch (NameUnassignedException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
                     throw new ThisCannotHappenException(ex);
                 }
             });
-        } catch (IrpSyntaxException ex) {
-            // Only happens when there are errors in the Irp database
-            throw new ThisCannotHappenException(ex);
-        }
+//        } catch (IrpSyntaxException ex) {
+//            // Only happens when there are errors in the Irp database
+//            throw new ThisCannotHappenException(ex);
+//        }
     }
 
     /**
@@ -131,14 +132,14 @@ public class Decoder {
         parsedProtocols.values().forEach((namedProtocol) -> {
             Map<String, Long> parameters;
             try {
-                logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
+                //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
 
                 parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
                         frequencyTolerance, absoluteTolerance, relativeTolerance);
                 if (parameters == null)
                     throw new ThisCannotHappenException(namedProtocol.getName());
                 output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
-            } catch (IrpSignalParseException | DomainViolationException | NameConflictException | UnassignedException | InvalidNameException | IrpSemanticException ex) {
+            } catch (DomainViolationException | SignalRecognitionException ex) {
                 logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
             } catch (NamedProtocol.ProtocolNotDecodableException ex) {
             }

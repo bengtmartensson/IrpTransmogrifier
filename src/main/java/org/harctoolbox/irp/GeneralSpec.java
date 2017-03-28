@@ -60,6 +60,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
      * @param dutyCycle
      */
     public GeneralSpec(BitDirection bitDirection, Double unit, Double frequency, Double dutyCycle) {
+        super(null);
         this.bitDirection = bitDirection;
         this.unit = unit != null ? unit : defaultUnit;
         this.frequency = frequency;
@@ -75,6 +76,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
      * @param src
      */
     private GeneralSpec(GeneralSpec src) {
+        super(src.getParseTree());
         this.bitDirection = src.bitDirection;
         this.unit = src.unit;
         this.frequency = src.frequency;
@@ -86,19 +88,25 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         this(defaultBitDirection, defaultUnit, null, null);
     }
 
-    public GeneralSpec(String str) throws IrpSemanticException {
+    public GeneralSpec(String str) throws IrpInvalidArgumentException {
         this(new ParserDriver(str).getParser().generalspec());
     }
 
-    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpSemanticException {
+    public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpInvalidArgumentException {
         this(ctx.generalspec());
     }
 
-    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpSemanticException {
+    public GeneralSpec(IrpParser.GeneralspecContext ctx) throws IrpInvalidArgumentException {
         this(ctx.generalspec_list());
     }
 
-    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpSemanticException {
+    /**
+     *
+     * @param ctx
+     * @throws org.harctoolbox.irp.IrpInvalidArgumentException
+     */
+    public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpInvalidArgumentException {
+        super(ctx);
         Double unitInPeriods = null;
         for (IrpParser.Generalspec_itemContext node : ctx.generalspec_item()) {
             ParseTree item = node.getChild(0);
@@ -120,8 +128,8 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
             }
         }
         if (unitInPeriods != null) {
-            if (IrCoreUtils.approximatelyEquals(frequency, 0d, 0.0000001, 0))
-                throw new IrpSemanticException("Units in p and frequency == 0 do not go together.");
+            if (IrCoreUtils.approximatelyEquals(frequency, 0d))
+                throw new IrpInvalidArgumentException("Units in p and frequency == 0 do not go together.");
             unit = IrCoreUtils.seconds2microseconds(unitInPeriods / (frequency != null ? frequency : defaultFrequency));
         }
     }
@@ -148,13 +156,6 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         return hash;
     }
 
-    @Override
-    public String toString() {
-        return (frequency != null ? "Frequency = " + frequency + "Hz, " : "")
-                + "unit = " + unit + "us, " + bitDirection
-                + (dutyCycle != null ? (", Duty cycle = " + Math.round(IrCoreUtils.real2percent(dutyCycle)) + "%.") : "");
-    }
-
     public final BitDirection getBitDirection() {
         return bitDirection;
     }
@@ -176,7 +177,7 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public String toIrpString() {
+    public String toIrpString(int radix) {
         return toIrpString(false);
     }
 

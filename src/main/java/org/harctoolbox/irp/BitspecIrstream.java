@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -34,14 +33,14 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     private BitSpec bitSpec;
     private IrStream irStream;
-    private final IrpParser.Bitspec_irstreamContext parseTree;
+    //private final IrpParser.Bitspec_irstreamContext parseTree;
 
     public BitspecIrstream(IrpParser.ProtocolContext ctx) {
         this(ctx.bitspec_irstream());
     }
 
     public BitspecIrstream(BitSpec bitSpec, IrStream irStream, IrpParser.Bitspec_irstreamContext ctx) {
-        parseTree = ctx;
+        super(ctx);
         this.bitSpec = bitSpec;
         this.irStream = irStream;
     }
@@ -77,14 +76,14 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public String toIrpString() {
-        return bitSpec.toIrpString() + irStream.toIrpString();
+    public String toIrpString(int radix) {
+        return bitSpec.toIrpString(radix) + irStream.toIrpString(radix);
     }
 
-    @Override
-    public String toString() {
-        return toIrpString();
-    }
+//    @Override
+//    public String toString() {
+//        return toIrpString();
+//    }
 
     @Override
     public Element toElement(Document document) {
@@ -133,21 +132,21 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
         return bitSpec.numberOfInfiniteRepeats() + irStream.numberOfInfiniteRepeats();
     }
 
-    @Override
-    public ParserRuleContext getParseTree() {
-        return parseTree;
-    }
+//    @Override
+//    public ParserRuleContext getParseTree() {
+//        return parseTree;
+//    }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> inheritedBitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
-        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
+    public void decode(RecognizeData recognizeData, List<BitSpec> inheritedBitSpecs) throws SignalRecognitionException {
+        List<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         IrSignal.Pass pass = null;
         irStream.decode(recognizeData, stack);
     }
 
     @Override
-    public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws NameUnassignedException {
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         renderData.push();

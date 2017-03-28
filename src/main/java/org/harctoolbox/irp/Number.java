@@ -26,16 +26,40 @@ public class Number extends PrimaryItem {
     private final static int WEIGHT = 1;
 
     public final static int SIZE = Long.SIZE;
-    static long parse(String str) {
-        return parse(new ParserDriver(str).getParser().number());
-    }
+
+//    static long parse(String str) {
+//        return parse(new ParserDriver(str).getParser().number());
+//    }
+
     static long parse(IrpParser.NumberContext ctx) {
         Number number = new Number(ctx);
         return number.toNumber();
     }
+
+    static Expression newExpression(IrpParser.NumberContext child) {
+        String str = child.getText();
+        long num = child.HEXINT() != null ? Long.parseLong(str.substring(2), 16)
+                : child.BININT() != null ? Long.parseLong(str.substring(2), 2)
+                : Long.parseLong(str);
+        return new NumberExpression(num);
+    }
+
+    public static long parse(String str) {
+        return str.equals("UINT8_MAX") ? 255L
+                : str.equals("UINT16_MAX") ? 65535L
+                : str.equals("UINT24_MAX") ? 16777215L
+                : str.equals("UINT32_MAX") ? 4294967295L
+                : str.equals("UINT64_MAX") ? -1L // FIXME: 18446744073709551615
+                : str.length() >= 3 && str.substring(0, 2).equals("0x") ? Long.parseLong(str.substring(2), 16)
+                : str.length() >= 3 && str.substring(0, 2).equals("0b") ? Long.parseLong(str.substring(2), 2)
+                : str.length() >= 1 && str.substring(0, 1).equals("0")  ? Long.parseLong(str, 8)
+                : Long.parseLong(str);
+    }
+
     private long data;
 
     public Number(long n) {
+        super(null);
         data = n;
     }
 
@@ -48,15 +72,7 @@ public class Number extends PrimaryItem {
     }
 
     public Number(String str) {
-        data = str.equals("UINT8_MAX") ? 255L
-                : str.equals("UINT16_MAX") ? 65535L
-                : str.equals("UINT24_MAX") ? 16777215L
-                : str.equals("UINT32_MAX") ? 4294967295L
-                : str.equals("UINT64_MAX") ? -1L // FIXME: 18446744073709551615
-                : str.length() >= 3 && str.substring(0, 2).equals("0x") ? Long.parseLong(str.substring(2), 16)
-                : str.length() >= 3 && str.substring(0, 2).equals("0b") ? Long.parseLong(str.substring(2), 2)
-                : str.length() >= 1 && str.substring(0, 1).equals("0")  ? Long.parseLong(str, 8)
-                : Long.parseLong(str);
+        this(parse(str));
     }
 
     @Override
@@ -79,23 +95,24 @@ public class Number extends PrimaryItem {
         return data;
     }
 
+    @Override
     public long toNumber() {
         return data;
     }
 
-    @Override
-    public String toString() {
-        return Long.toString(data);
-    }
+//    @Override
+//    public String toString() {
+//        return Long.toString(data);
+//    }
 
-    @Override
-    public String toIrpString() {
-        return Long.toString(data);
-    }
+//    @Override
+//    public String toIrpString() {
+//        return Long.toString(data);
+//    }
 
     @Override
     public String toIrpString(int radix) {
-        return Long.toString(data, radix);
+        return IrpUtils.radixPrefix(radix) + Long.toString(data, radix);
     }
 
     @Override
@@ -105,25 +122,25 @@ public class Number extends PrimaryItem {
         return element;
     }
 
-    @Override
-    public Name toName() {
-        return null;
-    }
+//    @Override
+//    public Name toName() {
+//        return null;
+//    }
 
     @Override
     public int weight() {
         return WEIGHT;
     }
 
-    @Override
-    public long invert(long rhs) {
-        return rhs;
-    }
+//    @Override
+//    public Long invert(long rhs) {
+//        return rhs;
+//    }
 
-    @Override
-    public boolean isUnary() {
-        return true;
-    }
+//    @Override
+//    public boolean isUnary() {
+//        return true;
+//    }
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
@@ -131,4 +148,24 @@ public class Number extends PrimaryItem {
         map.put("value", toString());
         return map;
     }
+
+//    @Override
+//    public int numberOfNames() {
+//        return 0;
+//    }
+
+    @Override
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+        return rhs;
+    }
+
+    @Override
+    public PrimaryItem leftHandSide() {
+        return this;
+    }
+
+//    @Override
+//    public boolean isName() {
+//        return false;
+//    }
 }

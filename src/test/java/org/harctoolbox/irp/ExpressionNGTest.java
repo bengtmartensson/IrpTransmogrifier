@@ -19,7 +19,7 @@ public class ExpressionNGTest {
     public static void tearDownClass() throws Exception {
     }
     private final NameEngine nameEngine;
-    public ExpressionNGTest() throws IrpSyntaxException {
+    public ExpressionNGTest() throws InvalidNameException {
         nameEngine = new NameEngine("{A=12,B=3,C=2}");
     }
 
@@ -38,22 +38,22 @@ public class ExpressionNGTest {
     public void testToNumber() {
         System.out.println("toNumber");
         try {
-            assertEquals(new Expression("A+2*B*C").toNumber(nameEngine), 24);
-        } catch (UnassignedException ex) {
+            assertEquals(Expression.newExpression("A+2*B*C").toNumber(nameEngine), 24);
+        } catch (NameUnassignedException ex) {
             fail();
         }
         try {
-            new Expression("A+2*B*C+").toNumber(nameEngine);
+            Expression.newExpression("A+2*B*C+").toNumber(nameEngine);
             fail();
         } catch (ParseCancellationException ex) {
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
 
         try {
-            assertEquals(new Expression("2**3").toNumber(), 8);
-            assertEquals(new Expression("2**3**3").toNumber(), 134217728);
-        } catch (UnassignedException ex) {
+            assertEquals(Expression.newExpression("2**3").toNumber(), 8);
+            assertEquals(Expression.newExpression("2**3**3").toNumber(), 134217728);
+        } catch (NameUnassignedException ex) {
             fail();
         }
     }
@@ -64,7 +64,7 @@ public class ExpressionNGTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        Expression instance = new Expression("A+2*B*C");
+        Expression instance = Expression.newExpression("A+2*B*C");
         String result = instance.toString();
         assertEquals(result, "(A+((2*B)*C))");
     }
@@ -104,11 +104,11 @@ public class ExpressionNGTest {
     @Test
     public void testToNumber_0args() {
         System.out.println("toNumber");
-        Expression instance = new Expression("A+2*B*C");
+        Expression instance = Expression.newExpression("A+2*B*C");
         try {
             instance.toNumber();
             fail();
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
         }
     }
 
@@ -119,10 +119,10 @@ public class ExpressionNGTest {
     public void testToNumber_NameEngine() {
         try {
             System.out.println("toNumber");
-            Expression instance = new Expression("A+2*B*C");
+            Expression instance = Expression.newExpression("A+2*B*C");
             long result = instance.toNumber(nameEngine);
             assertEquals(result, 24);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
     }
@@ -162,8 +162,17 @@ public class ExpressionNGTest {
     @Test
     public void testToIrpString() {
         System.out.println("toIrpString");
-        Expression instance = new Expression("A*#5+3*4");
+        Expression instance = Expression.newExpression("A*#5+3*4");
         String result = instance.toIrpString();
         assertEquals(result, "((A*(#5))+(3*4))");
+    }
+
+    @Test
+    public void testLong() {
+        System.out.println("testLong");
+        long answer = 42;
+        Expression instance = new NumberExpression(answer);
+        String result = instance.toIrpString();
+        assertEquals("42", result);
     }
 }

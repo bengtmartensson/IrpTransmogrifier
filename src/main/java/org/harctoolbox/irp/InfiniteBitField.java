@@ -28,6 +28,7 @@ public class InfiniteBitField extends BitField {
     }
 
     public InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx) {
+        super(ctx);
         if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext))
             complement = true;
         data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
@@ -35,7 +36,7 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         long x = data.toNumber(nameEngine) >>> chop.toNumber(nameEngine);
         if (complement)
             x = ~x;
@@ -53,23 +54,23 @@ public class InfiniteBitField extends BitField {
         String chopString;
         try {
             chopString = Long.toString(chop.toNumber(nameEngine));
-        } catch (UnassignedException ex) {
-            chopString = chop.toIrpString();
+        } catch (NameUnassignedException ex) {
+            chopString = chop.toIrpString(10);
         }
 
         String dataString;
         try {
             dataString = Long.toString(data.toNumber(nameEngine));
-        } catch (UnassignedException ex) {
-            dataString = data.toIrpString();
+        } catch (NameUnassignedException ex) {
+            dataString = data.toIrpString(10);
         }
 
         return (complement ? "~" : "") + dataString + "::" + chopString;
     }
 
     @Override
-    public String toIrpString() {
-        return (complement ? "~" : "") + data.toIrpString() + "::" + chop.toIrpString();
+    public String toIrpString(int radix) {
+        return (complement ? "~" : "") + data.toIrpString(radix) + "::" + chop.toIrpString(10);
     }
 
     @Override

@@ -50,7 +50,6 @@ public class ShortPronto extends Pronto {
      * @param ccf CCF signal
      * @return  IrSignal
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
-     * @throws InvalidArgumentException
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IrSignal parse(int[] ccf) throws InvalidArgumentException {
@@ -129,17 +128,12 @@ public class ShortPronto extends Pronto {
                 if (subdev != null)
                     nameEngine.define("S", subdev);
                 nameEngine.define("F", cmd);
-            } catch (InvalidNameException ex) {
-                Logger.getLogger(ShortPronto.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            try {
                 Protocol protocol = new Protocol(irp);
                 irSignal = protocol.toIrSignal(nameEngine);
             } catch (DomainViolationException ex) {
                 logger.log(Level.SEVERE, "{0}", ex.getMessage());
                 throw new InvalidArgumentException(ex);
-            } catch (IrpException | ArithmeticException ex) {
+            } catch (IrpInvalidArgumentException | NameUnassignedException | ArithmeticException | InvalidNameException | UnsupportedRepeatException ex) {
                 throw new ThisCannotHappenException(ex);
             }
         }
@@ -189,7 +183,7 @@ public class ShortPronto extends Pronto {
      * @param subdevice
      * @param command
      * @return integer array of short CCF, or null om failure.
-     * @throws InvalidArgumentException for paramters outside of its allowed domain.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static int[] shortCCF(String protocolName, Integer device, Integer subdevice, Integer command) throws InvalidArgumentException {

@@ -20,7 +20,6 @@ package org.harctoolbox.ircore;
 /**
  * Fatally incompatible arguments discovered.
  */
-@SuppressWarnings("serial")
 public class InvalidArgumentException extends Exception {
 
     public InvalidArgumentException(String string) {

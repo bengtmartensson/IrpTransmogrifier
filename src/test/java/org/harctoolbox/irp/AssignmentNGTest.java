@@ -19,7 +19,7 @@ public class AssignmentNGTest {
     public static void tearDownClass() throws Exception {
     }
     private final NameEngine nameEngine;
-    public AssignmentNGTest() throws IrpSyntaxException {
+    public AssignmentNGTest() throws InvalidNameException {
         nameEngine = new NameEngine("{answer=42, sheldon=73}");
     }
 
@@ -51,7 +51,7 @@ public class AssignmentNGTest {
             Assignment instance = new Assignment("x = answer*sheldon");
             long result = instance.toNumber(nameEngine);
             assertEquals(result, 42*73);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
     }

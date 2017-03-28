@@ -25,7 +25,9 @@ public interface Numerical {
      * Produces a numerical result.
      * @param nameEngine used to resolve names in expressions.
      * @return result, long.
-     * @throws UnassignedException
+     * @throws org.harctoolbox.irp.NameUnassignedException
      */
-    public long toNumber(NameEngine nameEngine) throws UnassignedException;
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException;
+
+    public long toNumber() throws NameUnassignedException;
 }

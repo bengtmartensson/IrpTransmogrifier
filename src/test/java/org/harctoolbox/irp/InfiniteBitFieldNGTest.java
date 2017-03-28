@@ -1,9 +1,8 @@
 package org.harctoolbox.irp;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -20,7 +19,7 @@ public class InfiniteBitFieldNGTest {
     private NameEngine nameEngine = null;
     private final InfiniteBitField instance;
 
-    public InfiniteBitFieldNGTest() throws IrpSyntaxException {
+    public InfiniteBitFieldNGTest() throws InvalidNameException {
         nameEngine = new NameEngine("{A = 7, F=244, D=4}");
         instance = new InfiniteBitField("~D::2");
     }
@@ -43,8 +42,8 @@ public class InfiniteBitFieldNGTest {
         long result = 0;
         try {
             result = instance.toNumber(nameEngine);
-        } catch (UnassignedException ex) {
-            Logger.getLogger(InfiniteBitFieldNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NameUnassignedException ex) {
+            fail();
         }
         assertEquals(result, -2L);
     }

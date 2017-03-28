@@ -1,6 +1,5 @@
 package org.harctoolbox.irp;
 
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -11,9 +10,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class NameOrNumberNGTest {
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
+
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
@@ -23,13 +24,12 @@ public class NameOrNumberNGTest {
     private final NameOrNumber a;
     private final NameOrNumber b;
 
-    public NameOrNumberNGTest() throws IrpSyntaxException, IrpSemanticException, ArithmeticException, InvalidArgumentException {
+    public NameOrNumberNGTest() throws InvalidNameException, IrpInvalidArgumentException {
         generalSpec = new GeneralSpec("{40k,1000u}");
         nameEngine = new NameEngine("{A=123, B=73}");
         a = new NameOrNumber("A");
         b = new NameOrNumber("13.1415926");
     }
-
 
     @BeforeMethod
     public void setUpMethod() throws Exception {

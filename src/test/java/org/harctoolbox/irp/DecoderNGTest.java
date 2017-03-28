@@ -26,7 +26,7 @@ public class DecoderNGTest {
 
     private final Decoder decoder;
 
-    public DecoderNGTest() throws IOException, SAXException, IrpSyntaxException {
+    public DecoderNGTest() throws IOException, SAXException {
         IrpDatabase irp = new IrpDatabase("src/main/config/IrpProtocols.xml");
         irp.expand();
         decoder = new Decoder(irp);

@@ -33,6 +33,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     public RepeatMarker(IrpParser.Repeat_markerContext ctx) {
+        super(ctx);
         String ch = ctx.getChild(0).getText();
         switch (ch) {
             case "*":
@@ -54,6 +55,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     public RepeatMarker(int min, int max) {
+        super(null);
         this.min = min;
         this.max = max;
     }
@@ -98,7 +100,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     @Override
-    public String toString() {
+    public String toIrpString(int radix) {
         return
                 //(min == 1 && max == 1) ? ""
                   (min == 0 && max == Integer.MAX_VALUE) ? "*"
@@ -107,11 +109,6 @@ public class RepeatMarker extends IrpObject {
                 : (min == max) ? Integer.toString(min)
                 : (max == Integer.MAX_VALUE) ? Integer.toString(min) + "+"
                 : "??";
-    }
-
-    @Override
-    public String toIrpString() {
-        return toString();
     }
 
     /**

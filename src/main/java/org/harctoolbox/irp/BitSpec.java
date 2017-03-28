@@ -68,18 +68,19 @@ public class BitSpec extends IrpObject implements AggregateLister {
     }
 
     public BitSpec(IrpParser.BitspecContext ctx) {
-        this(parse(ctx.bare_irstream()));
+        super(ctx);
+        bitCodes = parse(ctx.bare_irstream());
+        chunkSize = computeNoBits(bitCodes.size());
     }
 
-
     public BitSpec(List<BareIrStream> list) {
+        super(null);
         chunkSize = computeNoBits(list.size());
         bitCodes = list;
     }
 
     public BitSpec() {
-        chunkSize = 0;
-        bitCodes = new ArrayList<>(2);
+        this(new ArrayList<BareIrStream>(2));
     }
 
     public Integer numberOfDurations() {
@@ -139,25 +140,12 @@ public class BitSpec extends IrpObject implements AggregateLister {
     }
 
     @Override
-    public String toString() {
-        if (bitCodes.isEmpty())
-            return "<null>";
-
-        StringBuilder s = new StringBuilder(bitCodes.size()*10);
-        s.append("<").append(bitCodes.get(0));
-        for (int i = 1; i < bitCodes.size(); i++) {
-            s.append("|").append(bitCodes.get(i));
-        }
-        return s.append(">").toString();
-    }
-
-    @Override
-    public String toIrpString() {
+    public String toIrpString(int radix) {
         StringBuilder s = new StringBuilder(bitCodes.size()*10);
         s.append("<");
         List<String> list = new ArrayList<>(bitCodes.size() * 20);
         bitCodes.stream().forEach((bitCode) -> {
-            list.add(bitCode.toIrpString());
+            list.add(bitCode.toIrpString(radix));
         });
 
         return s.append(String.join("|", list)).append(">").toString();
@@ -211,7 +199,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 EvaluatedIrStream irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
                 if (!(irSequence.getLength() == 2 && irSequence.isFlash(0) && irSequence.isGap(1)))
                     return false;
-            } catch (IrpException | ArithmeticException ex) {
+            } catch (NameUnassignedException | ArithmeticException ex) {
                 return false;
             }
         }
@@ -245,7 +233,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 if (! (IrCoreUtils.approximatelyEquals(a, on.get(0), 1, 0) && IrCoreUtils.approximatelyEquals(-a, on.get(1), 1, 0)))
                     return false;
                 a = -a;
-            } catch (UnassignedException | InvalidNameException | IrpSemanticException | NameConflictException | IrpSignalParseException ex) {
+            } catch (NumberFormatException | NameUnassignedException | IrpInvalidArgumentException ex) {
                 return false;
             }
         }
@@ -270,7 +258,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
             boolean sign = off.get(0) > 0;
             return IrCoreUtils.approximatelyEquals(on.get(0), -off.get(0)) && (sign == inverted);
-        } catch (UnassignedException | InvalidNameException | IrpSemanticException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
             return false;
         }
     }
@@ -359,10 +347,10 @@ public class BitSpec extends IrpObject implements AggregateLister {
         }
         if (isStandardBiPhase(new GeneralSpec(), new NameEngine())) {
             map.put("standardBiPhase", true);
-            try {
+            //try {
                 map.put("biPhaseHalfPeriod", averageDuration(generalSpec, nameEngine));
-            } catch (IrpException ex) {
-            }
+            //} catch (IrpException ex) {
+            //}
             map.put("biPhaseInverted", bitCodes.get(0).getIrStreamItems().get(0) instanceof Flash);
         }
         map.put("lsbFirst", generalSpec.getBitDirection() == BitDirection.lsb);
@@ -372,11 +360,9 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return map;
     }
 
-    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpException {
+    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) {
         double sum = 0;
-        for (BareIrStream bitCode : bitCodes) {
-            sum += bitCode.averageDuration(generalSpec, nameEngine);
-        }
+        sum = bitCodes.stream().map((bitCode) -> bitCode.averageDuration(generalSpec, nameEngine)).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum / bitCodes.size();
     }
 }

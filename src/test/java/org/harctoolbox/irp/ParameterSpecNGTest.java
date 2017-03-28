@@ -38,6 +38,7 @@ public class ParameterSpecNGTest {
      * Test of check method, of class ParameterSpec.
      */
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testCheck() {
         System.out.println("check");
         ParameterSpec instance = new ParameterSpec("D:10..20");
@@ -45,15 +46,15 @@ public class ParameterSpecNGTest {
         try {
             instance.check(nameEngine);
             fail();
-        } catch (UnassignedException ex) {
-        } catch (IrpSyntaxException | DomainViolationException ex) {
+        } catch (NameUnassignedException ex) {
+        } catch (DomainViolationException | InvalidNameException ex) {
             fail();
         }
 
         try {
             nameEngine = new NameEngine("{D=15}");
             instance.check(nameEngine);
-        } catch (IrpSyntaxException | DomainViolationException | UnassignedException ex) {
+        } catch (DomainViolationException | InvalidNameException | NameUnassignedException ex) {
             fail();
         }
 
@@ -61,20 +62,19 @@ public class ParameterSpecNGTest {
             nameEngine = new NameEngine("{D=9}");
             instance.check(nameEngine);
             fail();
-        } catch (IrpSyntaxException | UnassignedException ex) {
-            fail();
         } catch (DomainViolationException ex) {
+        } catch (InvalidNameException | NameUnassignedException ex) {
+            fail();
         }
 
         try {
             nameEngine = new NameEngine("{D=21}");
             instance.check(nameEngine);
             fail();
-        } catch (IrpSyntaxException | UnassignedException ex) {
-            fail();
         } catch (DomainViolationException ex) {
+        } catch (InvalidNameException | NameUnassignedException ex) {
+            fail();
         }
-
     }
 
         // TODO: move stuff to test file

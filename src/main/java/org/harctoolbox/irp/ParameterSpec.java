@@ -40,15 +40,15 @@ public class ParameterSpec extends IrpObject {
     private boolean memory;
 
 
-    public ParameterSpec(String str) throws IrpSemanticException {
+    public ParameterSpec(String str) {
         this(new ParserDriver(str).getParser().parameter_spec());
     }
 
-    public ParameterSpec(IrpParser.Parameter_specContext ctx) throws IrpSemanticException {
+    public ParameterSpec(IrpParser.Parameter_specContext ctx) {
         this(ctx.name(), ctx.getChild(1).getText().equals("@"), ctx.number(0), ctx.number(1), ctx.expression());
     }
 
-    public ParameterSpec(IrpParser.NameContext name, boolean hasMemory, IrpParser.NumberContext min, IrpParser.NumberContext max, IrpParser.ExpressionContext deflt) throws IrpSemanticException {
+    public ParameterSpec(IrpParser.NameContext name, boolean hasMemory, IrpParser.NumberContext min, IrpParser.NumberContext max, IrpParser.ExpressionContext deflt) {
         super(null);
         this.memory = false;
         this.name = new Name(name);
@@ -58,7 +58,7 @@ public class ParameterSpec extends IrpObject {
         this.deflt = deflt != null ? Expression.newExpression(deflt) : null;
     }
 
-    public ParameterSpec(String name, boolean memory, long min, long max, Expression deflt) {
+    public ParameterSpec(String name, boolean memory, long min, long max, Expression deflt) throws InvalidNameException {
         super(null);
         this.memory = false;
         this.name = new Name(name);
@@ -68,26 +68,21 @@ public class ParameterSpec extends IrpObject {
         this.deflt = deflt;
     }
 
-    public ParameterSpec(String name, boolean memory, long min, long max) {
+    public ParameterSpec(String name, boolean memory, long min, long max) throws InvalidNameException {
         this(name, memory, min, max, null);
         this.memory = false;
     }
 
-    public ParameterSpec(String name, boolean memory, int length) {
+    public ParameterSpec(String name, boolean memory, int length) throws InvalidNameException {
         this(name, memory, 0, (1 << length) - 1);
     }
-
-//    @Override
-//    public String toString() {
-//        return toIrpString();
-//    }
 
     @Override
     public String toIrpString(int radix) {
         return name + (memory ? "@" : "") + ":" + min.toIrpString(radix) + ".." + max.toIrpString(radix) + (deflt != null ? ("=" + deflt.toIrpString(radix)) : "");
     }
 
-    public void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException, IrpSemanticException {
+    public void check(NameEngine nameEngine) throws InvalidNameException, DomainViolationException, NameUnassignedException {
         if (!nameEngine.containsKey(name.getName())) {
             if (this.hasMemory())
                 return;
@@ -95,7 +90,7 @@ public class ParameterSpec extends IrpObject {
             if (deflt != null)
                 nameEngine.define(name, deflt);
             else
-                throw new UnassignedException("Parameter " + name + " not assigned, and has no default");
+                throw new NameUnassignedException(name, true);
         }
 
         Long value = nameEngine.get(name.getName()).toNumber(nameEngine);
@@ -104,8 +99,7 @@ public class ParameterSpec extends IrpObject {
 
     public void checkDomain(long value) throws DomainViolationException {
         if (!isWithinDomain(value))
-            throw new DomainViolationException("Parameter " + name + " = " + value + " is outside of the allowed domain: "
-                    + domainAsString());
+            throw new DomainViolationException(this, value);
     }
 
     public boolean isWithinDomain(long x) {
@@ -113,7 +107,7 @@ public class ParameterSpec extends IrpObject {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element el = super.toElement(document);
         el.setAttribute("name", name.toString());
         el.setAttribute("min", min.toString());

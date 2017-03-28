@@ -151,10 +151,10 @@ public abstract class AbstractDecoder {
         noPayload++;
         try {
             nameEngine.define(name, parameterData.getData());
+            items.add(new FiniteBitField(name, parameterData.getNoBits()));
         } catch (InvalidNameException ex) {
             throw new ThisCannotHappenException();
         }
-        items.add(new FiniteBitField(name, parameterData.getNoBits()));
     }
 
     protected abstract List<IrStreamItem> parse(int beginStart, int beginLength) throws DecodeException;

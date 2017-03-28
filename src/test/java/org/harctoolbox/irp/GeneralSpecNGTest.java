@@ -34,11 +34,9 @@ public class GeneralSpecNGTest {
 
     /**
      * Test of getBitDirection method, of class GeneralSpec.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     * @throws org.harctoolbox.irp.IrpSemanticException
      */
     @Test
-    public void testGetBitDirection() throws IrpSyntaxException, IrpSemanticException {
+    public void testGetBitDirection() {
         try {
             System.out.println("getBitDirection");
             GeneralSpec instance = new GeneralSpec("{lsb, msb ,40k , 33.33333% ,10p }");
@@ -50,43 +48,39 @@ public class GeneralSpecNGTest {
             instance = new GeneralSpec("{40k , 33.33333% ,10p }");
             result = instance.getBitDirection();
             Assert.assertEquals(result, BitDirection.lsb);
-        } catch (ArithmeticException ex) {
+        } catch (IrpInvalidArgumentException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     /**
      * Test of getFrequency method, of class GeneralSpec.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     * @throws org.harctoolbox.irp.IrpSemanticException
      */
     @Test
-    public void testGetFrequency() throws IrpSyntaxException, IrpSemanticException {
+    public void testGetFrequency() {
         try {
             System.out.println("getFrequency");
             GeneralSpec instance = new GeneralSpec("{msb, 12.3k, 33.33333% ,10p }");
             double result = instance.getFrequency();
             Assert.assertEquals(result, 12300d, 0.0001);
             Assert.assertTrue(new GeneralSpec("{msb, 33.33333% ,10p }").getFrequency() == null);
-        } catch (ArithmeticException ex) {
+        } catch (IrpInvalidArgumentException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     /**
      * Test of getUnit method, of class GeneralSpec.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
-     * @throws org.harctoolbox.irp.IrpSemanticException
      */
     @Test
-    public void testGetUnit() throws IrpSyntaxException, IrpSemanticException {
+    public void testGetUnit() {
         try {
             System.out.println("getUnit");
             GeneralSpec instance = new GeneralSpec("{123u, msb ,40k , 33.33333% ,10p }"); // Do not remove the silly formatting!!
             double expResult = 250f;
             double result = instance.getUnit();
             Assert.assertEquals(result, expResult, 0.0001);
-        } catch (ArithmeticException ex) {
+        } catch (IrpInvalidArgumentException ex) {
             Logger.getLogger(GeneralSpecNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -102,7 +96,7 @@ public class GeneralSpecNGTest {
             double expResult = 0.73f;
             double result = instance.getDutyCycle();
             Assert.assertEquals(result, expResult, 0.0001);
-        } catch (ArithmeticException | IrpSemanticException ex) {
+        } catch (IrpInvalidArgumentException ex) {
             fail();
         }
     }
@@ -143,7 +137,7 @@ public class GeneralSpecNGTest {
             assertEquals(new GeneralSpec("{42%, 10p,msb,40k}").toIrpString(), "{40.0k,250,msb,42%}");
             assertEquals(new GeneralSpec("{msb ,40k , 33.33333% ,10p }").toIrpString(), "{40.0k,250,msb,33%}");
             assertEquals(new GeneralSpec("{msb, 123u, 100k, 10p, 1000k}").toIrpString(), "{1000.0k,10,msb}");
-        } catch (ArithmeticException ex) {
+        } catch (IrpInvalidArgumentException ex) {
             fail();
         }
     }

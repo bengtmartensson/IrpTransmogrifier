@@ -96,7 +96,7 @@ public abstract class IrpObject implements XmlExport {
     }
 
     @Override
-    public Document toDocument() throws IrpSemanticException {
+    public Document toDocument() {
         Document document = XmlUtils.newDocument();
         Element element = toElement(document);
         document.appendChild(element);

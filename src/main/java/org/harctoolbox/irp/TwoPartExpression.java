@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -39,12 +40,12 @@ class TwoPartExpression extends Expression {
     }
 
     @Override
-    public String toIrpString(int radix) throws IrpSemanticException {
+    public String toIrpString(int radix) {
         return "(" + operator + operand.toIrpString(radix) + ")";
     }
 
     @Override
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = super.propertiesMap(4);
         String kind = operator == '~' ? "BitInvert"
                 : operator == '!' ? "Negate"
@@ -85,7 +86,7 @@ class TwoPartExpression extends Expression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws IrpSemanticException, UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         long op = operand.toNumber(nameEngine);
 
         switch (operator) {
@@ -98,7 +99,7 @@ class TwoPartExpression extends Expression {
             case '~':
                 return ~op;
             default:
-                throw new IrpException("Unknown operator: " + operator);
+                throw new ThisCannotHappenException("Unknown operator: " + operator);
         }
     }
 
@@ -114,9 +115,14 @@ class TwoPartExpression extends Expression {
 
     @Override
     public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
-         return operator == '~' ? (~rhs) & bitmask
-                 : operator == '-' ? (-rhs) & bitmask
-                 : null;
+        switch (operator) {
+            case '~':
+                return (~rhs) & bitmask;
+            case '-':
+                return (-rhs) & bitmask;
+            default:
+                return null;
+        }
     }
 
     @Override

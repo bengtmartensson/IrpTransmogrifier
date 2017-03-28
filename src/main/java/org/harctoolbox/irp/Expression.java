@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -40,7 +41,6 @@ public abstract class Expression extends PrimaryItem {
      * Construct an Expression by parsing the argument.
      * @param str
      * @return
-     * @throws org.harctoolbox.irp.IrpSemanticException
      */
     public static Expression newExpression(String str) {
         try {
@@ -77,7 +77,7 @@ public abstract class Expression extends PrimaryItem {
             case 5:
                 return FivePartExpression.newExpression(children.get(0), children.get(1), children.get(2), children.get(3), children.get(4));
             default:
-                throw new IrpSyntaxException("Unknown expression type");
+                throw new ThisCannotHappenException("Unknown expression type");
         }
     }
 
@@ -89,8 +89,9 @@ public abstract class Expression extends PrimaryItem {
         super(ctx);
     }
 
-    public long toNumber() {
-        return toNumber(new NameEngine());
+    @Override
+    public long toNumber() throws NameUnassignedException {
+        return toNumber(NameEngine.empty);
     }
 
     @Override

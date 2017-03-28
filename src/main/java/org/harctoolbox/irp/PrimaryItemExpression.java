@@ -18,10 +18,11 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 
 abstract class PrimaryItemExpression extends OnePartExpression {
 
-    static Expression newExpression(IrpParser.Primary_itemContext ctx) throws IrpException {
+    static Expression newExpression(IrpParser.Primary_itemContext ctx) {
         ParseTree child = ctx.getChild(0);
         if (child instanceof IrpParser.NameContext)
             return NameExpression.newExpression((IrpParser.NameContext) child);
@@ -30,7 +31,7 @@ abstract class PrimaryItemExpression extends OnePartExpression {
         else if (child instanceof IrpParser.Para_expressionContext)
             return Expression.newExpression((IrpParser.Para_expressionContext) child);
         else
-            throw new IrpSemanticException("Unknown PrimaryItemExpression");
+            throw new ThisCannotHappenException("Unknown PrimaryItemExpression");
     }
 
     protected PrimaryItemExpression(ParseTree ctx) {

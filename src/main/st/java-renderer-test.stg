@@ -92,10 +92,10 @@ public void testNewIrSignalExhaustive() {
 
 /**
  * Test of newIrSignal method, of class <RendererClassName()>.
- * @throws org.harctoolbox.irp.IrpSyntaxException
+ * @throws org.harctoolbox.irp.IrpException
  */
  @Test(enabled = true)
- public void testNewIrSignal() throws IrpSyntaxException {
+ public void testNewIrSignal() throws IrpException {
     System.out.println("newIrSignal@<metaData.protocolName>");
     for (int i = 0; i \< noRandomTests; i++)
         testMap(prot.randomParameters());

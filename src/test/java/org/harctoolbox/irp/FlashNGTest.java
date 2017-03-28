@@ -61,10 +61,9 @@ public class FlashNGTest {
 
     /**
      * Test of interleavingOk method, of class Flash.
-     * @throws org.harctoolbox.irp.IrpSyntaxException
      */
     @Test
-    public void testInterleavingOk() throws IrpSyntaxException {
+    public void testInterleavingOk() {
         System.out.println("interleavingOk");
         Flash instance = new Flash("Z");
         boolean result = instance.interleavingOk(null, null, DurationType.gap, false);

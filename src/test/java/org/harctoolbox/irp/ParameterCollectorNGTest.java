@@ -28,7 +28,7 @@ public class ParameterCollectorNGTest {
             parameterCollector = new ParameterCollector();
             parameterCollector.add("answer", 42);
             parameterCollector.add("F", 5, IrpUtils.ones(5));
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
             fail();
         }
     }
@@ -52,13 +52,13 @@ public class ParameterCollectorNGTest {
             assertEquals(parameterCollector.getValue("F"), 1024|5);
             parameterCollector.add("F", 1L, 1L);
             assertEquals(parameterCollector.getValue("F"), 1024|5);
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
             fail();
         }
         try {
             parameterCollector.add("F", 0L, 1L);
             fail();
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
         }
     }
 
@@ -70,7 +70,7 @@ public class ParameterCollectorNGTest {
         System.out.println("add");
         try {
             parameterCollector.add("sheldon", 73);
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
             fail();
         }
         assertEquals(parameterCollector.getValue("sheldon"), 73);
@@ -78,7 +78,7 @@ public class ParameterCollectorNGTest {
         try {
             parameterCollector.add("sheldon", 43);
             fail();
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
         }
     }
 
@@ -104,7 +104,7 @@ public class ParameterCollectorNGTest {
         assertEquals(result.toString(), str);
         try {
             result.add("F", 2048L, 2048L);
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
             fail();
         }
         assertEquals(parameterCollector.toString(), str);
@@ -133,12 +133,12 @@ public class ParameterCollectorNGTest {
         ParameterCollector instance = parameterCollector.clone();
         try {
             instance.add(name, value);
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
         }
         try {
             instance.add(name, anotherValue);
             fail();
-        } catch (NameConflictException ex) {
+        } catch (ParameterInconsistencyException ex) {
             // should go here
         }
         assertEquals(instance.getValue(name), value);

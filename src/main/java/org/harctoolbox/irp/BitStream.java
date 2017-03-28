@@ -39,7 +39,7 @@ class BitStream extends IrpObject implements Evaluatable {
         length = 0;
     }
 
-    BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
         super(null);
         if (bitField instanceof InfiniteBitField)
             throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
@@ -55,11 +55,6 @@ class BitStream extends IrpObject implements Evaluatable {
         //return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
         return "BitStream(" + data.toString(radix) + ":" + length + ")";
     }
-
-//    @Override
-//    public String toIrpString() {
-//        throw new UnsupportedOperationException("Not supported.");
-//    }
 
     void add(BitStream bitStream, GeneralSpec generalSpec, NameEngine nameEngine) {
         data = data.shiftLeft((int)bitStream.length).or(bitStream.data);
@@ -79,7 +74,7 @@ class BitStream extends IrpObject implements Evaluatable {
         return data.shiftRight(n*chunksize).and(BigInteger.valueOf(mask)).intValueExact();
     }
 
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine, BitSpec bitSpec) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine, BitSpec bitSpec) throws NameUnassignedException {
         IrpUtils.entering(logger, "evaluate", this);
 
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);

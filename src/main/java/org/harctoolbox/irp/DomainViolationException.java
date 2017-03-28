@@ -22,12 +22,12 @@ package org.harctoolbox.irp;
  */
 public class DomainViolationException extends IrpException {
 
-    public DomainViolationException(String message) {
+    private DomainViolationException(String message) {
         super(message);
     }
 
-    public DomainViolationException(Throwable ex) {
-        super(ex);
+    public DomainViolationException(ParameterSpec parameterSpec, long value) {
+        this("Parameter " + parameterSpec.getName() + " = " + value + " is outside of the allowed domain: "
+                + parameterSpec.domainAsString());
     }
-
 }

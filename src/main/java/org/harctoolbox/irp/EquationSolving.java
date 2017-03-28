@@ -25,7 +25,7 @@ package org.harctoolbox.irp;
  */
 
 public interface EquationSolving {
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask);
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws NameUnassignedException;
 
     public PrimaryItem leftHandSide();
 }

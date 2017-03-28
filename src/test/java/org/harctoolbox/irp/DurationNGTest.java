@@ -70,7 +70,7 @@ public class DurationNGTest {
             result = Duration.newDuration("^A p");
             assertTrue(result instanceof Extent);
             assertEquals(result.toFloat(generalSpec, nameEngine), 3750f, 0.0001);
-        } catch (IrpSyntaxException | IrpSemanticException | ArithmeticException | UnassignedException ex) {
+        } catch (IrpInvalidArgumentException | InvalidNameException | NameUnassignedException ex) {
             fail();
         }
     }

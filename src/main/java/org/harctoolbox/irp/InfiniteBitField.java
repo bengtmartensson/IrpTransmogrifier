@@ -36,7 +36,7 @@ public class InfiniteBitField extends BitField {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         long x = data.toNumber(nameEngine) >>> chop.toNumber(nameEngine);
         if (complement)
             x = ~x;
@@ -54,14 +54,14 @@ public class InfiniteBitField extends BitField {
         String chopString;
         try {
             chopString = Long.toString(chop.toNumber(nameEngine));
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             chopString = chop.toIrpString(10);
         }
 
         String dataString;
         try {
             dataString = Long.toString(data.toNumber(nameEngine));
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             dataString = data.toIrpString(10);
         }
 

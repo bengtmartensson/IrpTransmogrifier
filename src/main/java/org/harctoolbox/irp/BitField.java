@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 
 /**
  * This class implements Bitfields as described in Chapter 5, except for that it does not
@@ -60,14 +61,14 @@ public abstract class BitField extends IrpObject implements Numerical {
         return instance;
     }
 
-    public static long parse(String str, NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         BitField bitField = newBitField(str);
         return bitField.toNumber(nameEngine);
     }
 
-    static Expression newExpression(IrpParser.BitfieldContext ctx) throws IrpSemanticException {
+    static Expression newExpression(IrpParser.BitfieldContext ctx) {
         if (ctx instanceof IrpParser.Infinite_bitfieldContext)
-            throw new IrpSemanticException("Cannot use an infinite bitfield as expression");
+            throw new ThisCannotHappenException("Cannot use an infinite bitfield as expression");
         return FiniteBitField.newExpression((IrpParser.Finite_bitfieldContext) ctx);
     }
 
@@ -100,6 +101,11 @@ public abstract class BitField extends IrpObject implements Numerical {
         return hash;
     }
 
+    @Override
+    public long toNumber() throws NameUnassignedException {
+        return toNumber(NameEngine.empty);
+    }
+
 //    @Override
 //    public final String toString() {
 //        return toString(new NameEngine());
@@ -107,20 +113,20 @@ public abstract class BitField extends IrpObject implements Numerical {
 
     public abstract String toString(NameEngine nameEngine);
 
-    public abstract long getWidth(NameEngine nameEngine) throws UnassignedException;
+    public abstract long getWidth(NameEngine nameEngine) throws NameUnassignedException;
 
-    public boolean isEmpty(NameEngine nameEngine) {
-        try {
+    public boolean isEmpty(NameEngine nameEngine) throws NameUnassignedException {
+//        try {
             return getWidth(nameEngine) == 0;
-        } catch (UnassignedException ex) {
-            return false;
-        }
+//        } catch (UnassignedException ex) {
+//            return false;
+//        }
     }
 
     public boolean hasChop() {
         try {
-            return chop.toNumber(null) != 0;
-        } catch (UnassignedException | IrpSemanticException ex) {
+            return chop.toNumber() != 0;
+        } catch (NameUnassignedException ex) {
             return true;
         }
     }
@@ -143,7 +149,7 @@ public abstract class BitField extends IrpObject implements Numerical {
 //        return propertiesMap(false, generalSpec, nameEngine);
 //    }
 
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = IrpUtils.propertiesMap(6, this);
         map.put("data", data.propertiesMap(eval, generalSpec, nameEngine));
         //map.put("width", width.propertiesMap(true, generalSpec));
@@ -151,7 +157,7 @@ public abstract class BitField extends IrpObject implements Numerical {
             long num = chop.toNumber(null);
             if (num != 0)
                 map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         }
         map.put("complement", complement);

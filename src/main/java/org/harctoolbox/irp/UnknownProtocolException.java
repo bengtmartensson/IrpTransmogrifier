@@ -23,6 +23,6 @@ package org.harctoolbox.irp;
 public class UnknownProtocolException extends IrpException {
 
     public UnknownProtocolException(String protocol) {
-        super("Protocol " + protocol + " not known.");
+        super("Protocol " + protocol + " not found.");
     }
 }

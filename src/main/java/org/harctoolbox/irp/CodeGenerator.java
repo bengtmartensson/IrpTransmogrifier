@@ -58,9 +58,9 @@ public abstract class CodeGenerator {
     }
 
     public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, File directory, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IOException, IrpException {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         if (isAbstract())
-            throw new IrpException("This target cannot generete code since it is declared abstract.");
+            throw new IrpInvalidArgumentException("This target cannot generete code since it is declared abstract.");
         if (directory == null || !directory.isDirectory() || !directory.canWrite())
             throw new IOException("directory must be a writeable directory");
 
@@ -78,13 +78,13 @@ public abstract class CodeGenerator {
     }
 
     public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpException {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpInvalidArgumentException {
         if (protocolNames == null || protocolNames.isEmpty())
-            throw new IrpException("protocolNames cannot be null or empty");
+            throw new IrpInvalidArgumentException("protocolNames cannot be null or empty");
         if (isAbstract())
-            throw new IrpException("This target cannot generete code since it is declared abstract.");
+            throw new IrpInvalidArgumentException("This target cannot generete code since it is declared abstract.");
         if (!manyProtocolsInOneFile() && protocolNames.size() > 1)
-            throw new IrpException("This target cannot generate more than one protocol in one file");
+            throw new IrpInvalidArgumentException("This target cannot generate more than one protocol in one file");
 
         setInspect(inspect);
 
@@ -93,7 +93,7 @@ public abstract class CodeGenerator {
         protocolNames.forEach((protocolName) -> {
             try {
                 generate(protocolName, irpDatabase, out, false, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);
-            } catch (IrpException | ArithmeticException ex) {
+            } catch (NameUnassignedException | UnknownProtocolException | ArithmeticException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}, ignoring this protol", ex);
             }
         });
@@ -110,13 +110,13 @@ public abstract class CodeGenerator {
     }
 
     private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws UnknownProtocolException, IrpException {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
         generate(protocol, out, printPostAndPre, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);
     }
 
     private void generate(NamedProtocol protocol, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpSemanticException {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         if (printPostAndPre)
             generateFileBegin(out);
         ItemCodeGenerator code = protocol.code(this, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);// contains a trailing newline

@@ -86,7 +86,7 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
 //    }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element root = super.toElement(document);
         root.setAttribute("interleavingOk", Boolean.toString(interleavingOk(null, null)));
         if (numberOfDurations() != null)
@@ -138,7 +138,7 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
 //    }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> inheritedBitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> inheritedBitSpecs) throws SignalRecognitionException {
         List<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         IrSignal.Pass pass = null;
@@ -146,7 +146,7 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws NameUnassignedException {
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         renderData.push();

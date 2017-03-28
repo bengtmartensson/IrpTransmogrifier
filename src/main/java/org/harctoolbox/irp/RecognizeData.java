@@ -105,19 +105,18 @@ public class RecognizeData extends Traverser implements Cloneable {
         this.parameterCollector = parameterCollector;
     }
 
-    void add(String name, BitwiseParameter parameter) throws NameConflictException, InvalidNameException, IrpSemanticException {
+    void add(String name, BitwiseParameter parameter) throws ParameterInconsistencyException {
         if (getNameEngine().containsKey(name)) {
             Expression expression;
             try {
                 expression = getNameEngine().get(name);
-            } catch (UnassignedException ex) {
+            } catch (NameUnassignedException ex) {
                 throw new ThisCannotHappenException();
             }
             try {
                 long expected = expression.toNumber(parameterCollector.toNameEngine());
-                if (!parameter.isConsistent(expected))
-                    throw new NameConflictException(name, parameter.getValue(), expected);
-            } catch (UnassignedException ex) {
+                parameter.checkConsistency(name, expected);
+            } catch (NameUnassignedException ex) {
                 // It has an expression, but is not presently checkable.
                 // mark for later checking.
                 needsChecking.add(name, parameter);
@@ -126,11 +125,11 @@ public class RecognizeData extends Traverser implements Cloneable {
             parameterCollector.add(name, parameter);
     }
 
-    void add(String name, long value, long bitmask) throws NameConflictException, InvalidNameException, IrpSemanticException {
+    void add(String name, long value, long bitmask) throws ParameterInconsistencyException {
         add(name, new BitwiseParameter(value, bitmask));
     }
 
-    void add(String name, long value) throws NameConflictException, InvalidNameException, IrpSemanticException {
+    void add(String name, long value) throws ParameterInconsistencyException {
         add(name, new BitwiseParameter(value));
     }
 
@@ -203,7 +202,7 @@ public class RecognizeData extends Traverser implements Cloneable {
         return ! interleaving;
     }
 
-    void checkConsistency() throws NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
+    void checkConsistency() throws NameUnassignedException, ParameterInconsistencyException {
         NameEngine nameEngine = this.toNameEngine();
         needsChecking.checkConsistency(nameEngine, getNameEngine());
         needsChecking = new ParameterCollector();
@@ -223,7 +222,7 @@ public class RecognizeData extends Traverser implements Cloneable {
         return relativeTolerance;
     }
 
-    NameEngine toNameEngine() throws InvalidNameException {
+    NameEngine toNameEngine() {
         NameEngine nameEngine = getNameEngine().clone();
         nameEngine.add(parameterCollector.toNameEngine());
         return nameEngine;

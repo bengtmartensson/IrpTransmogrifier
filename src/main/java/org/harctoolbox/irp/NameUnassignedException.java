@@ -18,15 +18,19 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- * Thrown when a name is assigned a value that fatally contradicts the current value.
+ * This exception is thrown when accessing a variable that has not been assigned.
  */
-public class NameConflictException extends IrpException {
+public class NameUnassignedException extends IrpException {
 
-    public NameConflictException(String name) {
-        super("Conflicting assignments of " + name);
+    public NameUnassignedException(String name) {
+        super("Name " + name + " not assigned");
     }
 
-    public NameConflictException(String name, long newValue, long oldValue) {
-        super("Conflicting assignments of " + name + ", new: " + newValue + ", old: " + oldValue);
+//    public NameUnassignedException(Throwable ex) {
+//        super(ex);
+//    }
+
+    NameUnassignedException(Name name, boolean nonDefaultedParameter) {
+        super(nonDefaultedParameter ? ("Name " + name + " not assigned") : ("Parameter " + name + " not assigned, and has no default"));
     }
 }

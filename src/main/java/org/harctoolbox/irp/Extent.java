@@ -53,15 +53,15 @@ public class Extent extends Duration {
     }
 
     @Override
-    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+    public double evaluate(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws NameUnassignedException, IrpInvalidArgumentException {
         double time = super.evaluate(generalSpec, nameEngine, 0f) - elapsed;
         if (time < 0)
-            throw new IrpSemanticException("Argument of extent smaller than actual duration.");
+            throw new IrpInvalidArgumentException("Argument of extent smaller than actual duration.");
         return time;
     }
 
     @Override
-    public double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws UnassignedException, IrpSemanticException {
+    public double evaluateWithSign(GeneralSpec generalSpec, NameEngine nameEngine, double elapsed) throws NameUnassignedException, IrpInvalidArgumentException {
         return -evaluate(generalSpec, nameEngine, elapsed);
     }
 
@@ -71,9 +71,14 @@ public class Extent extends Duration {
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
         double physical = recognizeData.getExtentDuration();
-        double theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null);
+        double theoretical;
+        try {
+            theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null);
+        } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
+            throw new SignalRecognitionException(ex);
+        }
         recognizeData.markExtentStart();
         recognize(recognizeData, physical, theoretical);
     }

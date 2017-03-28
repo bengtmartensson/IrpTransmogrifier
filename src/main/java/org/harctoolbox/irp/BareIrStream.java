@@ -61,7 +61,6 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     private List<IrStreamItem> irStreamItems;
-    //private IrpParser.Bare_irstreamContext parseTree = null;
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) {
         super(ctx);
@@ -120,7 +119,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return sum;
     }
 
-    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException, InvalidNameException, UnassignedException, NameConflictException, IrpSignalParseException {
+    EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
         RenderData renderData = new RenderData(generalSpec, nameEngine);
         evaluate(renderData, new ArrayList<>(0));
         return renderData.getEvaluatedIrStream();
@@ -166,11 +165,6 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return false; // give up
     }
 
-//    @Override
-//    public String toString() {
-//        return toIrpString();
-//    }
-
     @Override
     public String toIrpString(int radix) {
         StringBuilder str = new StringBuilder(irStreamItems.size()*20);
@@ -189,17 +183,17 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element element = super.toElement(document);
         return fillElement(document, element);
     }
 
-    public Element toElement(Document document, String tagName) throws IrpSemanticException {
+    public Element toElement(Document document, String tagName) {
         Element element = document.createElement(tagName);
         return fillElement(document, element);
     }
 
-    private Element fillElement(Document document, Element element) throws IrpSemanticException {
+    private Element fillElement(Document document, Element element) {
         Integer nobd = numberOfBareDurations(true);
         if (nobd != null)
            element.setAttribute("numberOfBareDurations", Integer.toString(nobd));
@@ -241,26 +235,21 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return sum;
     }
 
-//    @Override
-//    public ParserRuleContext getParseTree() {
-//        return parseTree;
-//    }
-
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
         IrSignal.Pass pass = null;
         for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.decode(recognizeData, bitSpecStack);
     }
 
     @Override
-    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
         for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.evaluate(renderData, bitSpecStack);
     }
 
     @Override
-    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException {
         for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.render(renderData, bitSpecs);
     }
@@ -413,7 +402,7 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return result;
     }
 
-    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpException {
+    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) {
         double sum = 0;
         sum = irStreamItems.stream().map((item) -> item.microSeconds(generalSpec, nameEngine)).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum / irStreamItems.size();

@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 
 abstract class OnePartExpression extends Expression {
 
@@ -27,7 +28,7 @@ abstract class OnePartExpression extends Expression {
         else if (ctx instanceof IrpParser.BitfieldContext)
             return BitFieldExpression.newExpression((IrpParser.BitfieldContext) ctx);
         else
-            throw new IrpSyntaxException("Unknown OneOpExpression");
+            throw new ThisCannotHappenException("Unknown OneOpExpression");
     }
 
     protected OnePartExpression(ParseTree ctx) {

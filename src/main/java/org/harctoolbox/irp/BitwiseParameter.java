@@ -93,6 +93,11 @@ public class BitwiseParameter implements Cloneable {
         return isConsistent(expected != null ? expected : value, val, bitmask);
     }
 
+    public void checkConsistency(String name, long val) throws ParameterInconsistencyException {
+        if (!isConsistent(val))
+            throw new ParameterInconsistencyException(name, getValue(), val);
+    }
+
     public void aggregate(BitwiseParameter parameter) {
         parameter.canonicalize();
         logger.log(Level.FINEST, "Changing {0} to {1}", new Object[] { toString(), toString(value | parameter.value, bitmask | parameter.bitmask)});
@@ -164,5 +169,4 @@ public class BitwiseParameter implements Cloneable {
     public long getValuePreferExpected() {
         return expected != null ? expected : getValue();
     }
-
 }

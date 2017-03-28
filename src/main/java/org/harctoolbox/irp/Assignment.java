@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -31,7 +32,7 @@ import org.w3c.dom.Element;
  */
 public class Assignment extends IrpObject implements IrStreamItem, Numerical {
 
-    public static long parse(String str, NameEngine nameEngine) {
+    public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         Assignment assignment = new Assignment(str);
         return assignment.toNumber(nameEngine);
     }
@@ -83,8 +84,13 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         return value.toNumber(nameEngine);
+    }
+
+    @Override
+    public long toNumber() throws NameUnassignedException {
+        return toNumber(NameEngine.empty);
     }
 
     public String getName() {
@@ -97,10 +103,14 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     }
 
     @Override
-    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException {
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException {
         NameEngine nameEngine = renderData.getNameEngine();
         long val = value.toNumber(nameEngine);
-        nameEngine.define(name, val);
+        try {
+            nameEngine.define(name, val);
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     @Override
@@ -130,14 +140,13 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
         return 0;
     }
 
-//    @Override
-//    public ParserRuleContext getParseTree() {
-//        return parseTree;
-//    }
-
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
-        recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
+        try {
+            recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
+        } catch (NameUnassignedException ex) {
+            throw new SignalRecognitionException(ex);
+        }
     }
 
     @Override

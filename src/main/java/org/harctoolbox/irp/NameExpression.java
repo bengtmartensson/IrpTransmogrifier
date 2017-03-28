@@ -19,18 +19,23 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import java.util.Objects;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 class NameExpression extends PrimaryItemExpression {
 
     static Expression newExpression(IrpParser.NameContext nameContext) {
-        return new NameExpression(nameContext.getText());
+        try {
+            return new NameExpression(nameContext.getText());
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     private final Name name;
 
-    private NameExpression(String text) {
+    private NameExpression(String text) throws InvalidNameException {
         super(null);
         name = new Name(text);
     }
@@ -67,7 +72,7 @@ class NameExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         return name.toNumber(nameEngine);
     }
 

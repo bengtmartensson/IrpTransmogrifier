@@ -37,7 +37,7 @@ public abstract class PrimaryItem extends IrpObject implements Numerical, Equati
         return new Number(n);
     }
 
-    public static PrimaryItem newPrimaryItem(String name) {
+    public static PrimaryItem newPrimaryItem(String name) throws InvalidNameException {
         try {
             return new Number(Long.parseLong(name));
         } catch (NumberFormatException ex) {
@@ -69,9 +69,10 @@ public abstract class PrimaryItem extends IrpObject implements Numerical, Equati
      * @param nameEngine
      * @param bitmask
      * @return null
+     * @throws org.harctoolbox.irp.NameUnassignedException
      */
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws NameUnassignedException {
         return null;
     }
 

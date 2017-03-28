@@ -111,11 +111,6 @@ public class RepeatMarker extends IrpObject {
                 : "??";
     }
 
-//    @Override
-//    public String toIrpString() {
-//        return toString();
-//    }
-
     /**
      * @return the min
      */
@@ -131,7 +126,7 @@ public class RepeatMarker extends IrpObject {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element element = super.toElement(document);
         if (min > 0)
             element.setAttribute("min", Integer.toString(min));

@@ -23,7 +23,7 @@ public class NameEngineNGTest {
     public static void tearDownClass() throws Exception {
     }
     private final NameEngine instance;
-    public NameEngineNGTest() throws IrpSyntaxException {
+    public NameEngineNGTest() throws InvalidNameException {
         instance = new NameEngine("{A=11,B=22,C=33,D=A-B,E=A-#(C-D),F=UINT8_MAX}");
     }
 
@@ -62,7 +62,7 @@ public class NameEngineNGTest {
             //System.out.println(instance.get(name));
             Assert.assertTrue(names.containsKey(name));
             Assert.assertEquals(names.toNumber(name), value);
-        } catch (IrpSyntaxException | UnassignedException ex) {
+        } catch (InvalidNameException | NameUnassignedException ex) {
             Assert.fail("testDefine valid failed.");
         }
     }
@@ -98,13 +98,13 @@ public class NameEngineNGTest {
         }
         try {
             assertEquals(names.get(name).toNumber(), value);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
         try {
             assertEquals(names.get("Z").toNumber(), value);
             fail();
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
         }
     }
 
@@ -146,7 +146,7 @@ public class NameEngineNGTest {
         try {
             result = instance.toNumber("F");
             assertEquals(result, 255);
-        } catch (UnassignedException | IrpSyntaxException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
     }

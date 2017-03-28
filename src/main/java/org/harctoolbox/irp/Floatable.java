@@ -29,13 +29,12 @@ public interface Floatable {
      * @param nameEngine
      * @param generalSpec
      * @return Floating representation of class.
-     * @throws ArithmeticException
-     * @throws org.harctoolbox.irp.IrpSemanticException
-     * @throws org.harctoolbox.irp.UnassignedException
+     * @throws org.harctoolbox.irp.IrpInvalidArgumentException
+     * @throws org.harctoolbox.irp.NameUnassignedException
      */
-    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
+    public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpInvalidArgumentException, NameUnassignedException;
 
-    public Element toElement(Document document) throws IrpSemanticException;
+    public Element toElement(Document document);
 
     public String toIrpString(int radix);
 }

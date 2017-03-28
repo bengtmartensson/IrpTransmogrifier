@@ -19,7 +19,7 @@ public class ExpressionNGTest {
     public static void tearDownClass() throws Exception {
     }
     private final NameEngine nameEngine;
-    public ExpressionNGTest() throws IrpSyntaxException {
+    public ExpressionNGTest() throws InvalidNameException {
         nameEngine = new NameEngine("{A=12,B=3,C=2}");
     }
 
@@ -39,21 +39,21 @@ public class ExpressionNGTest {
         System.out.println("toNumber");
         try {
             assertEquals(Expression.newExpression("A+2*B*C").toNumber(nameEngine), 24);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
         try {
             Expression.newExpression("A+2*B*C+").toNumber(nameEngine);
             fail();
         } catch (ParseCancellationException ex) {
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
 
         try {
             assertEquals(Expression.newExpression("2**3").toNumber(), 8);
             assertEquals(Expression.newExpression("2**3**3").toNumber(), 134217728);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
     }
@@ -108,7 +108,7 @@ public class ExpressionNGTest {
         try {
             instance.toNumber();
             fail();
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
         }
     }
 
@@ -122,7 +122,7 @@ public class ExpressionNGTest {
             Expression instance = Expression.newExpression("A+2*B*C");
             long result = instance.toNumber(nameEngine);
             assertEquals(result, 24);
-        } catch (UnassignedException ex) {
+        } catch (NameUnassignedException ex) {
             fail();
         }
     }

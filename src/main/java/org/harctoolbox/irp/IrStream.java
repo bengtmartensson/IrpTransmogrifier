@@ -128,7 +128,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element element = bareIrStream.toElement(document, "IrStream");
         if (repeatMarker.getMin() != 1)
             element.setAttribute("repeatMin", Integer.toString(repeatMarker.getMin()));
@@ -183,7 +183,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws IrpSignalParseException, NameConflictException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws SignalRecognitionException {
         Pass pass = null;
         bareIrStream.decode(recognizeData, bitSpecs);
     }
@@ -201,7 +201,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public void render(RenderData traverseData, List<BitSpec> bitSpecs) throws InvalidNameException, UnassignedException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void render(RenderData traverseData, List<BitSpec> bitSpecs) throws NameUnassignedException {
         bareIrStream.render(traverseData, bitSpecs);
     }
 
@@ -249,7 +249,7 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
     }
 
     @Override
-    public boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException {
+    public boolean isEmpty(NameEngine nameEngine) {
         return bareIrStream.isEmpty(nameEngine);
     }
 

@@ -76,13 +76,8 @@ public class IrpDatabase {
     public static final String absoluteToleranceName = "absolute-tolerance";
     public static final String preferOverName = "prefer-over";
 
-    public static boolean isKnown(String protocolsPath, String protocol) throws IOException, IrpException {
-        try {
-            return (new IrpDatabase(protocolsPath)).isKnown(protocol);
-        } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            throw new IrpException(ex);
-        }
+    public static boolean isKnown(String protocolsPath, String protocol) throws IOException, SAXException {
+        return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
 
     /**
@@ -278,8 +273,10 @@ public class IrpDatabase {
                 NamedProtocol protocol = getNamedProtocol(pname);
                 Element element = protocol.toElement(document);
                 root.appendChild(element);
-            } catch (IrpException | ArithmeticException ex) {
+            } catch (NameUnassignedException | ArithmeticException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}; protocol ignored", ex.getMessage());
+            } catch (UnknownProtocolException ex) {
+                throw new ThisCannotHappenException(ex);
             }
         });
 
@@ -378,7 +375,7 @@ public class IrpDatabase {
         return prot == null ? null : prot.getFirstProperty(key);
     }
 
-    public NamedProtocol getNamedProtocol(String name) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public NamedProtocol getNamedProtocol(String name) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         if (prot == null)
             throw new UnknownProtocolException(name);
@@ -387,25 +384,26 @@ public class IrpDatabase {
 
     public List<NamedProtocol> getNamedProtocol(Collection<String> protocolNames) {
         List<NamedProtocol> list = new ArrayList<>(protocolNames.size());
-        protocolNames.stream().forEach((protocolName) -> {
+        protocolNames.stream().forEach((pName) -> {
             try {
-                list.add(getNamedProtocol(protocolName));
-            } catch (IrpSemanticException | InvalidNameException | UnassignedException | UnknownProtocolException ex) {
+                list.add(getNamedProtocol(pName));
+            } catch (IrpInvalidArgumentException | InvalidNameException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
                 logger.log(Level.WARNING, null, ex);
             }
         });
         return list;
     }
 
-    public void expand() throws IrpSyntaxException {
-        for (String protocol : protocols.keySet())
+    public void expand() {
+        protocols.keySet().forEach((protocol) -> {
             expand(0, protocol);
+        });
     }
 
-    private void expand(int depth, String name) throws IrpSyntaxException {
+    private void expand(int depth, String name) {
         UnparsedProtocol p = protocols.get(name);
         if (!p.getIrp().contains("{"))
-            throw new IrpSyntaxException("IRP `" + p.getIrp() + "' does not contain `{'.");
+            throw new ThisCannotHappenException("IRP `" + p.getIrp() + "' does not contain `{'.");
 
         if (!p.getIrp().startsWith("{")) {
             String p_name = p.getIrp().substring(0, p.getIrp().indexOf('{')).trim();
@@ -436,13 +434,13 @@ public class IrpDatabase {
         return list;
     }
 
-    public Protocol getProtocol(String protocolName) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public Protocol getProtocol(String protocolName) throws UnknownProtocolException, UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         if (!isKnown(protocolName))
             throw new UnknownProtocolException(protocolName);
         return new Protocol(getIrp(protocolName));
     }
 
-    public String getNormalFormIrp(String protocolName, int radix) throws UnknownProtocolException, IrpSemanticException, InvalidNameException, UnassignedException {
+    public String getNormalFormIrp(String protocolName, int radix) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         Protocol protocol = getProtocol(protocolName);
         return protocol.normalFormIrpString(radix);
     }
@@ -573,7 +571,7 @@ public class IrpDatabase {
             return str == null || Boolean.parseBoolean(str) || str.equalsIgnoreCase("yes");
         }
 
-        NamedProtocol toNamedProtocol() throws IrpSemanticException, InvalidNameException, UnassignedException {
+        NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
             return new NamedProtocol(getName(), getIrp(), getDocumentation(),
                     getFirstProperty(frequencyToleranceName), getFirstProperty(absoluteToleranceName), getFirstProperty(relativeToleranceName),
                     getFirstProperty(decodableName), getProperties(preferOverName));

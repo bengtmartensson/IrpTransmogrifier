@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 public class NamedProtocol extends Protocol {
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
-    public static Document toDocument(Iterable<NamedProtocol> protocols) throws IrpSemanticException {
+    public static Document toDocument(Iterable<NamedProtocol> protocols) {
         Document document = XmlUtils.newDocument();
         Element root = document.createElement("NamedProtocols");
         document.appendChild(root);
@@ -61,7 +61,7 @@ public class NamedProtocol extends Protocol {
     public NamedProtocol(String name, String irp, String documentation, String frequencyTolerance,
             String absoluteTolerance, String relativeTolerance, String decodable,
             List<String> preferOver)
-            throws IrpSemanticException, InvalidNameException, UnassignedException {
+            throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         super(irp);
         this.irp = irp;
         this.name = name;
@@ -73,12 +73,12 @@ public class NamedProtocol extends Protocol {
         this.preferOver = preferOver;
     }
 
-    public NamedProtocol(String name, String irp, String documentation) throws IrpSemanticException, InvalidNameException, UnassignedException {
+    public NamedProtocol(String name, String irp, String documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         this(name, irp, documentation, null, null, null, null, null);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException, ProtocolNotDecodableException {
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance) throws DomainViolationException, SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             //return null;
@@ -161,7 +161,7 @@ public class NamedProtocol extends Protocol {
     }
 
     @Override
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws IrpSignalParseException, DomainViolationException, NameConflictException, UnassignedException, InvalidNameException, IrpSemanticException {
+    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws SignalRecognitionException {
         return recognize(irSignal, keepDefaulted, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
                 IrCoreUtils.getAbsoluteTolerance(absoluteTolerance), IrCoreUtils.getRelativeTolerance(relativeTolerance));
     }
@@ -172,14 +172,14 @@ public class NamedProtocol extends Protocol {
     }
 
     @Override
-    public Document toDocument() throws IrpSemanticException {
+    public Document toDocument() {
         Document document = XmlUtils.newDocument();
         document.appendChild(toElement(document));
         return document;
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element root = super.toElement(document);
         root.setAttribute("name", getName());
 
@@ -194,7 +194,7 @@ public class NamedProtocol extends Protocol {
         return root;
     }
 
-    ItemCodeGenerator code(CodeGenerator codeGenerator, Map<String, String> parameters, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpSemanticException {
+    ItemCodeGenerator code(CodeGenerator codeGenerator, Map<String, String> parameters, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
         template.addAggregateList("metaData", metaDataPropertiesMap(parameters, absoluteTolerance, relativeTolerance, frequencyTolerance));
         template.addAggregateList("protocol", this, getGeneralSpec(), getDefinitions());

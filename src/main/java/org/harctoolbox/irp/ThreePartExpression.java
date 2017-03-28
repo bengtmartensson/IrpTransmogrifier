@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,12 +42,12 @@ class ThreePartExpression extends Expression {
     }
 
     @Override
-    public String toIrpString(int radix) throws IrpSemanticException {
+    public String toIrpString(int radix) {
         return "(" + op1.toIrpString(radix) + operator + op2.toIrpString(radix) + ")";
     }
 
     @Override
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = super.propertiesMap(10);
         String type = operator.equals("**") ? "Exponentiate"
                 : operator.equals("+") ? "Add"
@@ -108,7 +109,7 @@ class ThreePartExpression extends Expression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws IrpException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         long left = op1.toNumber(nameEngine);
         long right = op2.toNumber(nameEngine);
 
@@ -153,7 +154,7 @@ class ThreePartExpression extends Expression {
             case "||":
                 return (left != 0 ? left : right);
             default:
-                throw new IrpException("Unknown operator: " + operator);
+                throw new ThisCannotHappenException("Unknown operator: " + operator);
         }
     }
 
@@ -169,7 +170,7 @@ class ThreePartExpression extends Expression {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws NameUnassignedException {
         switch (operator) {
             case "+":
                 return rhs - op2.toNumber(nameEngine);

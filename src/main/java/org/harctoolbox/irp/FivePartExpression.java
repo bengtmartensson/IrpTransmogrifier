@@ -39,7 +39,7 @@ class FivePartExpression extends Expression {
     }
 
     @Override
-    public String toIrpString(int radix) throws IrpSemanticException {
+    public String toIrpString(int radix) {
          return "("
                         + conditional.toIrpString(radix) + "?"
                         + trueExp.toIrpString(radix) + ":"
@@ -48,7 +48,7 @@ class FivePartExpression extends Expression {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = super.propertiesMap(4);
         map.put("kind", "ConditionalOp");
         map.put("arg1", conditional.propertiesMap(true, generalSpec, nameEngine));
@@ -88,7 +88,7 @@ class FivePartExpression extends Expression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         long ctrl = conditional.toNumber(nameEngine);
         return ctrl != 0L ? trueExp.toNumber(nameEngine) : falseExp.toNumber(nameEngine);
     }

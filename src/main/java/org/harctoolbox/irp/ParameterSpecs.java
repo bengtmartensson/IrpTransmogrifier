@@ -38,23 +38,22 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         super(null);
     }
 
-    public ParameterSpecs(String parameter_specs) throws IrpSemanticException {
+    public ParameterSpecs(String parameter_specs) {
         this(new ParserDriver(parameter_specs).getParser().parameter_specs());
     }
 
-    public ParameterSpecs(IrpParser.ProtocolContext ctx) throws IrpSemanticException {
+    public ParameterSpecs(IrpParser.ProtocolContext ctx) {
         this(ctx.parameter_specs());
     }
 
-    public ParameterSpecs(IrpParser.Parameter_specsContext ctx) throws IrpSemanticException {
+    public ParameterSpecs(IrpParser.Parameter_specsContext ctx) {
         super(ctx);
         if (ctx == null)
             return;
 
-        for (IrpParser.Parameter_specContext parameterSpec : ctx.parameter_spec()) {
-            ParameterSpec ps = new ParameterSpec(parameterSpec);
+        ctx.parameter_spec().stream().map((parameterSpec) -> new ParameterSpec(parameterSpec)).forEachOrdered((ps) -> {
             map.put(ps.getName(), ps);
-        }
+        });
     }
 
     public ParameterSpecs(List<ParameterSpec> list) {
@@ -123,7 +122,7 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
 //    }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element el = super.toElement(document);
         map.values().forEach((parameterSpec) -> {
             el.appendChild(parameterSpec.toElement(document));
@@ -131,9 +130,13 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return el;
     }
 
-    void check(NameEngine nameEngine) throws DomainViolationException, UnassignedException, InvalidNameException, IrpSemanticException {
+    void check(NameEngine nameEngine) throws DomainViolationException {
         for (ParameterSpec parameter : map.values())
-            parameter.check(nameEngine);
+            try {
+                parameter.check(nameEngine);
+            } catch (NameUnassignedException | InvalidNameException ex) {
+                throw new ThisCannotHappenException(ex);
+            }
     }
 
     public Map<String, Long> random() {
@@ -179,14 +182,14 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
     private void remoteDefaulteds(Map<String, Long> namesMap) {
         NameEngine nameEngine = new NameEngine(namesMap);
         List<String> names = new ArrayList<>(namesMap.keySet());
-        names.forEach((name) -> {
+        names.forEach((String name) -> {
             Expression expression = map.get(name).getDefault();
             if (!(expression == null))
                 try {
                     long deflt = expression.toNumber(nameEngine);
                     if (namesMap.get(name) == deflt)
                         namesMap.remove(name);
-                } catch (UnassignedException | IrpSemanticException ex) {
+                } catch (NameUnassignedException ex) {
                     throw new ThisCannotHappenException();
                 }
         });

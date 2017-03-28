@@ -95,6 +95,7 @@ public class Number extends PrimaryItem {
         return data;
     }
 
+    @Override
     public long toNumber() {
         return data;
     }
@@ -115,7 +116,7 @@ public class Number extends PrimaryItem {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setTextContent(toString());
         return element;

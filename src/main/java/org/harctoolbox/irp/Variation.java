@@ -96,7 +96,7 @@ public class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.appendChild(intro.toElement(document));
         element.appendChild(repeat.toElement(document));
@@ -130,7 +130,7 @@ public class Variation extends IrpObject implements IrStreamItem {
 //    }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) {
         throw new ThisCannotHappenException("decode cannot be called on a protocol with variation.");
     }
 

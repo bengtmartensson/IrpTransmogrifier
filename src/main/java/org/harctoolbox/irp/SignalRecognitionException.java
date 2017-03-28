@@ -17,17 +17,17 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-/**
- * This exception is thrown when accessing a variable that has not been assigned.
- */
-public class UnassignedException extends IrpException {
+public class SignalRecognitionException extends IrpException {
 
-    public UnassignedException(String message) {
-        super(message);
+    public SignalRecognitionException(String string) {
+        super(string);
     }
 
-    public UnassignedException(Throwable ex) {
+    public SignalRecognitionException() {
+        super();
+    }
+
+    SignalRecognitionException(Throwable ex) {
         super(ex);
     }
-
 }

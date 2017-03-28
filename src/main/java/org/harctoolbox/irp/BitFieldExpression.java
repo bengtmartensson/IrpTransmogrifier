@@ -36,17 +36,17 @@ class BitFieldExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws IrpSemanticException, UnassignedException {
+    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
         return rhs & bitmask;
     }
 
     @Override
-    public String toIrpString(int radix) throws IrpSemanticException {
+    public String toIrpString(int radix) {
         return bitField.toIrpString(radix);
     }
 
     @Override
-    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) throws IrpSemanticException {
+    public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = bitField.propertiesMap(true, generalSpec, nameEngine);
         //map.put("scalar", true);
         return map;
@@ -72,7 +72,7 @@ class BitFieldExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws IrpSemanticException, UnassignedException {
+    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
         return bitField.toNumber(nameEngine);
     }
 

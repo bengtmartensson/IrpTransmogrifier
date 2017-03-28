@@ -24,7 +24,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrSignal;
 
 /**
- * This class is an abstract superclass of the things that make up an IRStream (see "Directly known subclasses").
+ * This interface describes the things that make up an IRStream.
  *
  * This should rather be an interface.
  */
@@ -46,7 +46,7 @@ public interface IrStreamItem extends XmlExport {
                 : null;
     }
 
-    public boolean isEmpty(NameEngine nameEngine) throws UnassignedException, IrpSemanticException;
+    public boolean isEmpty(NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException;
 
     /**
      *
@@ -88,7 +88,7 @@ public interface IrStreamItem extends XmlExport {
 
     //ParserRuleContext getParseTree();
 
-    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException;
 
     public boolean hasExtent();
 
@@ -108,7 +108,7 @@ public interface IrStreamItem extends XmlExport {
 
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state);
 
-    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException;
 
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws UnassignedException, InvalidNameException, IrpSemanticException, NameConflictException, IrpSignalParseException;
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException;
 }

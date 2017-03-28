@@ -199,7 +199,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 EvaluatedIrStream irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
                 if (!(irSequence.getLength() == 2 && irSequence.isFlash(0) && irSequence.isGap(1)))
                     return false;
-            } catch (IrpException | ArithmeticException ex) {
+            } catch (NameUnassignedException | ArithmeticException ex) {
                 return false;
             }
         }
@@ -233,7 +233,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
                 if (! (IrCoreUtils.approximatelyEquals(a, on.get(0), 1, 0) && IrCoreUtils.approximatelyEquals(-a, on.get(1), 1, 0)))
                     return false;
                 a = -a;
-            } catch (UnassignedException | InvalidNameException | IrpSemanticException | NameConflictException | IrpSignalParseException ex) {
+            } catch (NumberFormatException | NameUnassignedException | IrpInvalidArgumentException ex) {
                 return false;
             }
         }
@@ -258,13 +258,13 @@ public class BitSpec extends IrpObject implements AggregateLister {
 
             boolean sign = off.get(0) > 0;
             return IrCoreUtils.approximatelyEquals(on.get(0), -off.get(0)) && (sign == inverted);
-        } catch (UnassignedException | InvalidNameException | IrpSemanticException | NameConflictException | IrpSignalParseException ex) {
+        } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
             return false;
         }
     }
 
     @Override
-    public Element toElement(Document document) throws IrpSemanticException {
+    public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunkSize", Integer.toString(chunkSize));
@@ -347,10 +347,10 @@ public class BitSpec extends IrpObject implements AggregateLister {
         }
         if (isStandardBiPhase(new GeneralSpec(), new NameEngine())) {
             map.put("standardBiPhase", true);
-            try {
+            //try {
                 map.put("biPhaseHalfPeriod", averageDuration(generalSpec, nameEngine));
-            } catch (IrpException ex) {
-            }
+            //} catch (IrpException ex) {
+            //}
             map.put("biPhaseInverted", bitCodes.get(0).getIrStreamItems().get(0) instanceof Flash);
         }
         map.put("lsbFirst", generalSpec.getBitDirection() == BitDirection.lsb);
@@ -360,7 +360,7 @@ public class BitSpec extends IrpObject implements AggregateLister {
         return map;
     }
 
-    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws IrpException {
+    double averageDuration(GeneralSpec generalSpec, NameEngine nameEngine) {
         double sum = 0;
         sum = bitCodes.stream().map((bitCode) -> bitCode.averageDuration(generalSpec, nameEngine)).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum / bitCodes.size();

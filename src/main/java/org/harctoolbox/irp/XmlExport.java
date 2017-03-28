@@ -28,9 +28,8 @@ public interface XmlExport {
      *
      * @param document
      * @return
-     * @throws org.harctoolbox.irp.IrpSemanticException
      */
-    public Element toElement(Document document) throws IrpSemanticException;
+    public Element toElement(Document document);
 
-    public Document toDocument() throws IrpSemanticException;
+    public Document toDocument();
 }

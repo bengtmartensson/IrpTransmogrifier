@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class ParameterCollector implements Cloneable {
 
@@ -41,12 +42,12 @@ public class ParameterCollector implements Cloneable {
         nameMap.entrySet().stream().forEach((kvp) -> {
             try {
                 add(kvp.getKey(), kvp.getValue());
-            } catch (NameConflictException ex) {
+            } catch (ParameterInconsistencyException ex) {
             }
         });
     }
 
-    void add(String name, BitwiseParameter parameter) throws NameConflictException {
+    void add(String name, BitwiseParameter parameter) throws ParameterInconsistencyException {
         logger.log(Level.FINER, "Assigning {0} = {1}", new Object[]{name, parameter});
         BitwiseParameter oldParameter = map.get(name);
         if (oldParameter != null) {
@@ -54,18 +55,18 @@ public class ParameterCollector implements Cloneable {
                 oldParameter.aggregate(parameter);
             } else {
                 logger.log(Level.FINE, "Name inconsistency: {0}, new value: {1}, old value: {2}", new Object[]{name, parameter.toString(), oldParameter.toString()});
-                throw new NameConflictException(name, parameter.getValue(), oldParameter.getValue());
+                throw new ParameterInconsistencyException(name, parameter.getValue(), oldParameter.getValue());
             }
         } else {
             overwrite(name, parameter);
         }
     }
 
-    final void add(String name, long value) throws NameConflictException {
+    final void add(String name, long value) throws ParameterInconsistencyException {
         add(name, new BitwiseParameter(value));
     }
 
-    void add(String name, long value, long bitmask) throws NameConflictException {
+    void add(String name, long value, long bitmask) throws ParameterInconsistencyException {
         add(name, new BitwiseParameter(value, bitmask));
     }
 
@@ -95,17 +96,21 @@ public class ParameterCollector implements Cloneable {
         return map.containsKey(name) ? map.get(name).getValue() : INVALID;
     }
 
-    public NameEngine toNameEngine() throws InvalidNameException {
-        NameEngine nameEngine = new NameEngine();
-        for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
+    public NameEngine toNameEngine() {
+        NameEngine nameEngine = new NameEngine(map.size());
+        map.entrySet().forEach((kvp) -> {
             BitwiseParameter parameter = kvp.getValue();
             if (!parameter.isEmpty())
-                nameEngine.define(kvp.getKey(), parameter.getValuePreferExpected());
-        }
+                try {
+                    nameEngine.define(kvp.getKey(), parameter.getValuePreferExpected());
+                } catch (InvalidNameException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
+        });
         return nameEngine;
     }
 
-    public Map<String, Long> collectedNames() throws InvalidNameException {
+    public Map<String, Long> collectedNames() {
         Map<String, Long> names = new HashMap<>(map.size());
         map.entrySet().forEach((kvp) -> {
             BitwiseParameter parameter = kvp.getValue();
@@ -154,14 +159,13 @@ public class ParameterCollector implements Cloneable {
         return param.isConsistent(value);
     }
 
-    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws NameConflictException, UnassignedException, IrpSemanticException {
+    void checkConsistency(NameEngine nameEngine, NameEngine definitions) throws NameUnassignedException, ParameterInconsistencyException {
         for (Map.Entry<String, BitwiseParameter> kvp : map.entrySet()) {
             String name = kvp.getKey();
             BitwiseParameter param = kvp.getValue();
             Expression expression = definitions.get(name);
             long expected = expression.toNumber(nameEngine);
-            if (!param.isConsistent(expected))
-                throw new NameConflictException(name, param.getValue(), expected);
+            param.checkConsistency(name, expected);
         }
     }
 }

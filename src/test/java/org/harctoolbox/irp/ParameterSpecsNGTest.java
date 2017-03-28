@@ -20,7 +20,7 @@ public class ParameterSpecsNGTest {
     private final ParameterSpecs rc5;
     private final ParameterSpecs nec1;
 
-    public ParameterSpecsNGTest() throws IrpSyntaxException {
+    public ParameterSpecsNGTest() {
         rc5 = new ParameterSpecs("[T@:0..1=0,D:0..31,F:0..127]");
         nec1 = new ParameterSpecs("[D:0..255,S:0..255=255-D,F:0..255]");
     }

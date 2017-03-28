@@ -23,7 +23,6 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BitwiseParameter;
-import org.harctoolbox.irp.IrpException;
 
 public abstract class IrpDecoder {
 
@@ -335,14 +334,14 @@ public abstract class IrpDecoder {
 
         @Override
         protected Integer parseChunk() throws DecodeException {
-            Integer result =
-                      (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
-                    : (duration(oneFlash,  0) && duration(oneGap,  1)) ? 1
-                    : null;
-            if (result == null)
+            if (duration(zeroFlash, 0) && duration(zeroGap, 1)) {
+                pull(BITSPECLENGTH);
+                return 0;
+            } else if (duration(oneFlash,  0) && duration(oneGap,  1)) {
+                pull(BITSPECLENGTH);
+                return 1;
+            } else
                 throw new DecodeException("parseChunk");
-            pull(BITSPECLENGTH);
-            return result;
         }
 
         /**
@@ -477,16 +476,20 @@ public abstract class IrpDecoder {
 
         @Override
         protected Integer parseChunk() throws DecodeException {
-            Integer result =
-                      (duration(zeroFlash, 0) && duration(zeroGap, 1)) ? 0
-                    : (duration(oneFlash,  0) && duration(oneGap,  1)) ? 1
-                    : (duration(twoFlash,  0) && duration(twoGap,  1)) ? 2
-                    : (duration(threeFlash,0) && duration(threeGap,1)) ? 3
-                    : null;
-            if (result == null)
+            if (duration(zeroFlash, 0) && duration(zeroGap, 1)) {
+                pull(bitSpecLength);
+                return 0;
+            } else if (duration(oneFlash,  0) && duration(oneGap,  1)) {
+                 pull(bitSpecLength);
+                 return 1;
+            } else if (duration(twoFlash,  0) && duration(twoGap,  1)) {
+                pull(bitSpecLength);
+                return 2;
+            } else if (duration(threeFlash,0) && duration(threeGap,1)) {
+                pull(bitSpecLength);
+                return 3;
+            } else
                 throw new DecodeException("parseChunk");
-            pull(bitSpecLength);
-            return result;
         }
     }
 
@@ -538,7 +541,7 @@ public abstract class IrpDecoder {
         }
     }
 
-    protected static class DecodeException extends IrpException {
+    protected static class DecodeException extends Exception {
 
         DecodeException(String message) {
             super(message);

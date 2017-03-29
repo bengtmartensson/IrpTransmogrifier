@@ -15,6 +15,8 @@ JAVA_RENDERER_TESTDIR := $(JAVA_PROTOCOL_TEST)/src/test/java/org/harctoolbox/ren
 JAVA_DECODER_CODEDIR := $(JAVA_PROTOCOL_TEST)/src/main/java/org/harctoolbox/decoder
 JAVA_DECODER_TESTDIR := $(JAVA_PROTOCOL_TEST)/src/test/java/org/harctoolbox/decoder
 
+IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml
+
 default: $(IRP_TRANSMOGRIFIER_JAR)
 	$(IRPTRANSMOGRIFIER) --help
 
@@ -28,7 +30,7 @@ lirc.xml: all-protocols.xml ${LIRC_TRANSFORM}
 	$(SAXON) -s:$< -xsl:${LIRC_TRANSFORM} -o:$@
 	
 
-javacodetest: javarendertest javadecodertest $(JAVA_PROTOCOL_TEST)/pom.xml $(JAVA_PROTOCOL_TEST)/src/main/config/IrpProtocols.xml
+javacodetest: javarendertest javadecodertest $(JAVA_PROTOCOL_TEST)/pom.xml $(IRPPROTOCOLS_XML)
 	(cd $(JAVA_PROTOCOL_TEST); mvn test)
 	
 javarendertest:  javarendercodefiles  javarendertestfiles 
@@ -70,11 +72,11 @@ javadecodertestfiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_DECODER_TESTDIR)
 $(JAVA_PROTOCOL_TEST)/pom.xml: $(JAVA_PROTOCOL_TEST)
 	cp $(MYDIR)/JavaIrpProtocolTest.pom.xml $@
 
-$(JAVA_PROTOCOL_TEST)/src/main/config/IrpProtocols.xml: | $(JAVA_PROTOCOL_TEST)/src/main/config
-	cp src/main/config/IrpProtocols.xml $@
+$(IRPPROTOCOLS_XML): | $(JAVA_PROTOCOL_TEST)/src/main/resources
+	cp src/main/resources/IrpProtocols.xml $@
 
 $(JAVA_PROTOCOL_TEST) \
-$(JAVA_PROTOCOL_TEST)/src/main/config \
+$(JAVA_PROTOCOL_TEST)/src/main/resources \
 $(JAVA_RENDERER_CODEDIR) $(JAVA_RENDERER_TESTDIR) $(JAVA_DECODER_CODEDIR) $(JAVA_DECODER_TESTDIR):
 	mkdir -p $@
 

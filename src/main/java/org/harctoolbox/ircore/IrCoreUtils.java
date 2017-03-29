@@ -229,7 +229,7 @@ public class IrCoreUtils {
     }
 
     public static String javaifyString(String s) {
-        return s.replaceAll("\\s\\s+", " ").replace("\"", "\\\"");
+        return s.replaceAll("\n\r?", " ").replaceAll("\\s\\s+", " ").replace("\"", "\\\"");
     }
 
     private IrCoreUtils() {

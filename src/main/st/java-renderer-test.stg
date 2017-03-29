@@ -103,7 +103,7 @@ public void testNewIrSignalExhaustive() {
 >>
 
 DeclareStatic() ::= <<
-private final static String configFile = "src/main/config/IrpProtocols.xml";
+private final static String configFile = "src/main/resources/IrpProtocols.xml";
 private final static int noRandomTests = 10;
 
 private final IrpDatabase irpDatabase;

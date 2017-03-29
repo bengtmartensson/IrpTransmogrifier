@@ -128,7 +128,8 @@ nec-shirriff-32 \
 nokia32 \
 grundig16 \
 grundig16-30 \
-humax%204phase
+humax%204phase \
+Xiaomi
 
 # Hierarchical bitfields
 #xmpfinalframemeta \

@@ -112,7 +112,8 @@ directv \
 nokia12 \
 nokia32 \
 lumagen \
-apple
+apple \
+Xiaomi
 
 # "humax 4phase" \
 # solidtek16 \

@@ -71,7 +71,7 @@ import org.xml.sax.SAXException;
  */
 public class IrpTransmogrifier {
     // TODO: make these user settable, reading environment vars, etc.
-    private static final String defaultConfigFile = "src/main/config/IrpProtocols.xml";
+    private static final String defaultConfigFile = "/IrpProtocols.xml";
 
     // No need to make these settable
     private static final String charSet = "UTF-8"; // Just for runMain
@@ -777,8 +777,9 @@ public class IrpTransmogrifier {
                 throw new UsageException("configfile and inifile cannot both be specified");
             irpDatabase = IrpDatabase.readIni(commandLineArgs.iniFile);
         } else {
-            configFilename = commandLineArgs.configFile != null ? commandLineArgs.configFile : defaultConfigFile;
-            irpDatabase = new IrpDatabase(configFilename);
+            irpDatabase = commandLineArgs.configFile == null
+                    ? new IrpDatabase(getClass().getResourceAsStream(defaultConfigFile))
+                    : new IrpDatabase(commandLineArgs.configFile);
         }
         if (expand) {
             irpDatabase.expand();
@@ -841,7 +842,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
         private Double absoluteTolerance = null;
 
-        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format")
+        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default in jar file.")
         private String configFile = null;
 
         @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")

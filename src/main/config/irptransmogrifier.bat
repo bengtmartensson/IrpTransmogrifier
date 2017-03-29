@@ -10,7 +10,6 @@ set APPLICATIONHOME=%~dp0
 
 REM Normally no need to change the rest of the file
 set JAR=%APPLICATIONHOME%\IrpTransmogrifier-${project.version}-jar-with-dependencies.jar
-set CONFIG=%APPLICATIONHOME%\IrpProtocols.xml
 set STDIR=%APPLICATIONHOME%\st
 
-"%JAVA%" -jar "%JAR%" -c "%CONFIG%" %*
+"%JAVA%" -jar "%JAR%" %*

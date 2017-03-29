@@ -2,8 +2,6 @@ package org.harctoolbox.irp;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import static org.testng.Assert.*;
@@ -27,7 +25,7 @@ public class DecoderNGTest {
     private final Decoder decoder;
 
     public DecoderNGTest() throws IOException, SAXException {
-        IrpDatabase irp = new IrpDatabase("src/main/config/IrpProtocols.xml");
+        IrpDatabase irp = new IrpDatabase("src/main/resources/IrpProtocols.xml");
         irp.expand();
         decoder = new Decoder(irp);
     }
@@ -65,7 +63,7 @@ public class DecoderNGTest {
     public void testDecode_String() {
         try {
             System.out.println("decode");
-            String irpDatabasePath = "src/main/config/IrpProtocols.xml";
+            String irpDatabasePath = "src/main/resources/IrpProtocols.xml";
             boolean expResult = true;
             boolean result = Decoder.decode(irpDatabasePath);
             assertEquals(result, expResult);

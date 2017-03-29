@@ -539,7 +539,7 @@ public class IrpDatabase {
                         addProperty(irpName, e.getTextContent().replaceAll("\\s+", ""));
                         break;
                     case documentationName:
-                        addProperty(documentationName, e.getTextContent());
+                        addProperty(documentationName, e.getTextContent().trim());
                         break;
                     case parameterName:
                         addProperty(e.getAttribute("name"), e.getTextContent());

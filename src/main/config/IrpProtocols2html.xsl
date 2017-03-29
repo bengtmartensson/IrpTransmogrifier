@@ -101,7 +101,7 @@ this program. If not, see http://www.gnu.org/licenses/.
                         <xsl:attribute name="id">spurious</xsl:attribute>
                         <xsl:text>spurious decodes</xsl:text>
                     </dt>
-                    <dd>An imperfectly measured signal that incorrectly matches a known protocol.</dd>
+                    <dd>An imperfectly measured signal that incorrectly matches a protocol.</dd>
                 </dl>
 
             </body>
@@ -148,15 +148,19 @@ this program. If not, see http://www.gnu.org/licenses/.
                 <xsl:value-of select="@name"/>
             </xsl:attribute>
             <xsl:value-of select="@name"/>
-            <xsl:text> (</xsl:text>
-            <code>
-            <xsl:value-of select="@c-name"/>
-            </code>
-            <xsl:text>)</xsl:text>
+            <xsl:apply-templates select="@c-name"/>
         </h2>
         <xsl:apply-templates select="irp:irp"/>
         <xsl:apply-templates select="irp:parameter"/>
         <xsl:apply-templates select="irp:documentation"/>
+    </xsl:template>
+
+    <xsl:template match="@c-name">
+        <xsl:text> (</xsl:text>
+        <code>
+            <xsl:value-of select="."/>
+        </code>
+        <xsl:text>)</xsl:text>
     </xsl:template>
 
     <xsl:template match="irp:irp">

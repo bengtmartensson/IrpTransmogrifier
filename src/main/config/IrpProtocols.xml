@@ -121,7 +121,9 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     <irp:protocol c-name="Dish_Network" name="Dish_Network">
         <irp:parameter name="uei-executor">0002</irp:parameter>
         <irp:irp><![CDATA[{57.6k,406}<1,-7|1,-4>(1,-15,(F:-6,S:5,D:5,1,-15)+) [F:0..63,S:0..31,D:0..31]]]></irp:irp>
-        <irp:documentation>This is not a robust protocol, so <A href="#spurious">spurious decodes</A> are likely.</irp:documentation>
+        <irp:documentation>This is not a robust protocol, so <A href="#spurious">spurious decodes</A> are likely.
+        See <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=13923">this thread</a> for a discussion.
+        </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Elan" name="Elan">
         <!--irp:parameter name="uei-executor">Unknown</irp:parameter-->
@@ -765,7 +767,8 @@ Almost all examples we've seen start with "0E0F441A0" or "060F44120". But we've 
             F=0 is the power off command, F=1 the power on command.
             The power on command is also used for dimming, both up and down.</p>
 
-                <p>In the URC-7781 the setup codes 2200,2201, up to 2215 correspond to this protocol, 2200 for house A etc. up to 2215 for house "P".</p>
+                <p>In some One for All remotes, for example the URC-7781,
+                    the setup codes 2200,2201, up to 2215 correspond to this protocol, 2200 for house "A", up to 2215 for house "P".</p>
         </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="arctech38" name="arctech-38">
@@ -885,5 +888,19 @@ Almost all examples we've seen start with "0E0F441A0" or "060F44120". But we've 
     <irp:protocol c-name="NECShirriff32" name="NEC-Shirriff-32">
         <irp:irp><![CDATA[{38.4k,msb,564}<1,-1|1,-3>(16,-8,data:32,1,-1) [data:0..UINT32_MAX]]]></irp:irp>
         <irp:documentation>Like <a href="#NEC1">NEC1</a> but without repeat, just one large parameter, and msb bit order, and no sensible ending silence..</irp:documentation>
+    </irp:protocol>
+    <irp:adminData>
+        <irp:creationData>Entered by Bengt on 2017-03-29. Source: thread quoted.</irp:creationData>
+        <irp:notes>repeat + changed to *</irp:notes>
+    </irp:adminData>
+    <irp:protocol name="Xiaomi">
+        <irp:irp><![CDATA[
+       {36k,290,msb}<2,-2|2,-3|2,-4|2,-5>(1000u,-2,D:8,F:8,C:4,2,^30m)* {C=(D:4:4^D:4^F:4:4^F:4)} [D:0..255,F:0..255]
+]]></irp:irp>
+<irp:documentation>
+    Protocol found in the Xiaomi Mi Box Streaming Android TV Device.
+    Defined and described in <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=100421">this thread</a>.
+</irp:documentation>
+<!-- another thread: http://www.remotecentral.com/cgi-bin/mboard/rc-harmony/thread.cgi?8164 -->
     </irp:protocol>
 </irp:protocols>

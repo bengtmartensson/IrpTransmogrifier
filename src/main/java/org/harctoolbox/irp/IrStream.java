@@ -298,11 +298,16 @@ public class IrStream extends IrpObject implements IrStreamItem,AggregateLister 
         return repeatMarker.getMin() * bareIrStream.microSeconds(generalSpec, nameEngine);
     }
 
-    boolean startsWithDuration() {
-        return bareIrStream.startsWithDuration();
+    boolean startsWithFlash() {
+        return bareIrStream.startsWithFlash();
     }
 
     boolean hasVariationWithIntroEqualsRepeat() {
         return bareIrStream.hasVariationWithIntroEqualsRepeat();
+    }
+
+    @Override
+    public boolean nonConstantBitFieldLength() {
+        return bareIrStream.nonConstantBitFieldLength();
     }
 }

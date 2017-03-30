@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 public class ProtocolNGTest {
-    private static final String irpDatabasePath = "src/main/resources/IrpProtocols.xml";
+    private static final String irpDatabasePath = "src/test/resources/IrpProtocols.xml";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -709,6 +709,116 @@ public class ProtocolNGTest {
             Map<String, Long> recognizeData = xmp1.recognize(irSignal, false, 500f, 50f, 0.02);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+            fail();
+        }
+    }
+
+    /**
+     * Test of warningFrequency method, of class Protocol.
+     */
+    @Test
+    public void testWarningFrequency() {
+        try {
+            System.out.println("warningFrequency");
+            Protocol nec1 = irpDatabase.getProtocol("nec1");
+            String expResult = "";
+            String result = nec1.warningFrequency();
+            assertEquals(result, expResult);
+            assertEquals(irpDatabase.getProtocol("Barco").warningFrequency(), "");
+            assertEquals(irpDatabase.getProtocol("NEC1-nofreq").warningFrequency().trim(), "Warning: Frequency is missing, using default frequency = 38000.0.");
+            assertEquals(irpDatabase.getProtocol("Blaupunkt").warningFrequency().trim(), "Warning: Uncommon frequency = 30300.");
+            assertEquals(irpDatabase.getProtocol("Elan").warningFrequency().trim(), "Warning: Uncommon frequency = 40200.");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    /**
+     * Test of warningStartsWithFlash method, of class Protocol.
+     */
+    @Test
+    public void testWarningStartsWithFlash() {
+        try {
+            System.out.println("warningStartsWithFlash");
+            assertEquals(irpDatabase.getProtocol("NEC1").warningStartsWithFlash(), "");
+            assertEquals(irpDatabase.getProtocol("Denon").warningStartsWithFlash().trim(), "Warning: Protocol does not start with a Duration/Flash.");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    /**
+     * Test of warningTrivialBitspec method, of class Protocol.
+     */
+    @Test
+    public void testWarningTrivialBitspec() {
+        System.out.println("warningTrivialBitspec");
+        try {
+            assertEquals(irpDatabase.getProtocol("NEC1").warningTrivialBitspec(), "");
+            assertEquals(irpDatabase.getProtocol("GwtS").warningTrivialBitspec().trim(), "Warning: Protocol uses trivial bitspec.");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    /**
+     * Test of warningRepeatPlus method, of class Protocol.
+     */
+    @Test
+    public void testWarningRepeatPlus() {
+        try {
+            System.out.println("warningRepeatPlus");
+            assertEquals(irpDatabase.getProtocol("NEC1").warningRepeatPlus(), "");
+            assertEquals(irpDatabase.getProtocol("Elanplus").warningRepeatPlus().trim(), "Warning: Protocol uses infinite repeat with min > 0.");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    /**
+     * Test of warningsInterleaving method, of class Protocol.
+     */
+    @Test
+    public void testWarningsInterleaving() {
+        try {
+            System.out.println("warningsInterleaving");
+            assertEquals(irpDatabase.getProtocol("NEC1").warningsInterleaving(), "");
+            assertEquals(irpDatabase.getProtocol("Sony20").warningsInterleaving().trim(), "Warning: Protocol not interleaving, but is Sony-like.");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    /**
+     * Test of warningNonConstantLengthBitFields method, of class Protocol.
+     */
+    @Test
+    public void testWarningNonConstantLengthBitFields() {
+        try {
+            System.out.println("warningNonConstantLengthBitFields");
+            assertEquals(irpDatabase.getProtocol("NEC1").warningNonConstantLengthBitFields(), "");
+            assertEquals(irpDatabase.getProtocol("Zenith").warningNonConstantLengthBitFields().trim(), "Warning: Protocol contains bitfields with non-constant lengths.");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Test of warningNoParameterSpecs method, of class Protocol.
+     */
+    @Test
+    public void testWarningNoParameterSpecs() {
+        try {
+            System.out.println("warningNoParameterSpecs");
+            assertEquals(irpDatabase.getProtocol("NEC1").warningNoParameterSpecs(), "");
+            assertEquals(irpDatabase.getProtocol("Aiwa").warningNoParameterSpecs().trim(), "Warning: ParameterSpecs missing from the protocol.");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }
     }

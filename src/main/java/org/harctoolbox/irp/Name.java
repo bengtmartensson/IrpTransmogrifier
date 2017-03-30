@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  */
 public class Name extends PrimaryItem implements Floatable {
     private static final int WEIGHT = 1;
-    private static Pattern namePattern = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
+    private static Pattern namePattern = Pattern.compile(IrpUtils.C_IDENTIFIER_REGEXP);
 
 //    /**
 //     * Check the syntactical correctness of the name.

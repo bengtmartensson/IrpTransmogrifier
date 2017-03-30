@@ -125,18 +125,22 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
         return renderData.getEvaluatedIrStream();
     }
 
-    public boolean startsWithDuration() {
+    public boolean startsWithFlash() {
         for (IrStreamItem irStreamItem : irStreamItems) {
-            if (irStreamItem instanceof Duration)
+            if (irStreamItem instanceof Flash)
                 return true;
+            if (irStreamItem instanceof Gap)
+                return false;
             if (irStreamItem instanceof BitField)
                 return false;
             if (irStreamItem instanceof BitspecIrstream)
-                return ((BitspecIrstream) irStreamItem).startsWithDuration();
+                return ((BitspecIrstream) irStreamItem).startsWithFlash();
             if (irStreamItem instanceof BareIrStream)
-                return ((BareIrStream) irStreamItem).startsWithDuration();
+                return ((BareIrStream) irStreamItem).startsWithFlash();
             if (irStreamItem instanceof IrStream)
-                return ((IrStream) irStreamItem).startsWithDuration();
+                return ((IrStream) irStreamItem).startsWithFlash();
+            if (irStreamItem instanceof Variation)
+                return ((Variation) irStreamItem).startsWithFlash();
         }
         return false; // give up
     }
@@ -280,6 +284,11 @@ public class BareIrStream extends IrpObject implements IrStreamItem {
                 break;
         }
         return list;
+    }
+
+    @Override
+    public boolean nonConstantBitFieldLength() {
+        return irStreamItems.stream().anyMatch((irStreamItem) -> (irStreamItem.nonConstantBitFieldLength()));
     }
 
     @Override

@@ -198,4 +198,9 @@ public class Assignment extends IrpObject implements IrStreamItem, Numerical {
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return 0.0;
     }
+
+    @Override
+    public boolean nonConstantBitFieldLength() {
+        return false;
+    }
 }

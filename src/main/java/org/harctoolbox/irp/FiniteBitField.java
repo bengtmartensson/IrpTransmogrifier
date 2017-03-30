@@ -373,4 +373,14 @@ public class FiniteBitField extends BitField implements IrStreamItem {
     public Integer numberOfDurations() {
         return null;
     }
+
+    @Override
+    public boolean nonConstantBitFieldLength() {
+        try {
+            width.toNumber();
+        } catch (NameUnassignedException ex) {
+            return true;
+        }
+        return false;
+    }
 }

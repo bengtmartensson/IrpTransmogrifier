@@ -233,4 +233,13 @@ public class Variation extends IrpObject implements IrStreamItem {
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
         throw new ThisCannotHappenException();
     }
+
+    public boolean startsWithFlash() {
+        return (!intro.isEmpty() ? intro : repeat).startsWithFlash();
+    }
+
+    @Override
+    public boolean nonConstantBitFieldLength() {
+        return intro.nonConstantBitFieldLength() || repeat.nonConstantBitFieldLength() || ending.nonConstantBitFieldLength();
+    }
 }

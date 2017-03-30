@@ -366,9 +366,9 @@ public class IrpTransmogrifier {
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
 
         for (String protocolName : list) {
-            Protocol protocol;
+            NamedProtocol protocol;
             try {
-                protocol = irpDatabase.getProtocol(protocolName);
+                protocol = irpDatabase.getNamedProtocol(protocolName);
                 logger.log(Level.FINE, "Protocol {0} parsed", protocolName);
             } catch (UnknownProtocolException ex) {
                 logger.log(Level.WARNING, "{0}", ex.getMessage());
@@ -378,6 +378,7 @@ public class IrpTransmogrifier {
                 continue;
             }
 
+            // Use one line for the first, relatively short items
             out.print(irpDatabase.getName(protocolName));
 
             if (commandList.cName)
@@ -409,10 +410,15 @@ public class IrpTransmogrifier {
             if (commandList.weight)
                 out.print(SEPARATOR + "Weight: " + protocol.weight());
 
-            if (commandList.classify)
-                out.print(SEPARATOR + protocol.classificationString());
-
             out.println();
+
+            // From here on, use full lines
+            if (commandList.classify) {
+                out.println(protocol.classificationString());
+            }
+
+            if (commandList.warnings)
+                out.println(protocol.warningsString()); // already ends with LINESEPARATOR
         }
     }
 
@@ -1087,6 +1093,9 @@ public class IrpTransmogrifier {
 
         @Parameter(names = { "-w", "--weight" }, description = "Compute weight")
         private boolean weight = false;
+
+        @Parameter(names = { "--warnings" }, description = "Issue warnings for some problematic IRP constructs")
+        private boolean warnings = false;
 
         @Parameter(description = "List of protocols (default all)")
         private List<String> protocols = new ArrayList<>(8);

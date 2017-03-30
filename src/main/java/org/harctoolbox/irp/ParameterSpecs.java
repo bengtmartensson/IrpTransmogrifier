@@ -213,11 +213,11 @@ public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>
         return template.render();
     }
 
-    void XXfillAttributes(ItemCodeGenerator template, String parameterSpecsName) {
-        map.values().stream().forEach((ps) -> {
-            template.addAggregate(parameterSpecsName + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
-        });
-    }
+//    void XXfillAttributes(ItemCodeGenerator template, String parameterSpecsName) {
+//        map.values().stream().forEach((ps) -> {
+//            template.addAggregate(parameterSpecsName + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
+//        });
+//    }
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {

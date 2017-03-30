@@ -257,8 +257,8 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
         return irStream.hasVariation(recursive);
     }
 
-    boolean startsWithDuration() {
-        return irStream.startsWithDuration();
+    boolean startsWithFlash() {
+        return irStream.startsWithFlash();
     }
 
     @Override
@@ -309,5 +309,10 @@ public class BitspecIrstream extends IrpObject implements IrStreamItem {
     @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean nonConstantBitFieldLength() {
+        return irStream.nonConstantBitFieldLength();
     }
 }

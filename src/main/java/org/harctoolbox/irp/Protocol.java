@@ -44,6 +44,21 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
+    private final static double LOWER_COMMON_FREQUENCY1 = 36000d;
+    private final static double UPPER_COMMON_FREQUENCY1 = 40000d;
+    private final static double LOWER_COMMON_FREQUENCY2 = 56000d;
+    private final static double UPPER_COMMON_FREQUENCY2 = 58000d;
+
+    private static String warn(String message) {
+        return "Warning: " + message + "." + IrCoreUtils.LINESEPARATOR;
+    }
+
+    private static boolean commonFrequency(double f) {
+        return IrCoreUtils.approximatelyEquals(f, 0d)
+                || (f >= LOWER_COMMON_FREQUENCY1) && (f <= UPPER_COMMON_FREQUENCY1)
+                || (f >= LOWER_COMMON_FREQUENCY2) && (f <= UPPER_COMMON_FREQUENCY2);
+    }
+
     private GeneralSpec generalSpec;
     private ParameterSpecs parameterSpecs;
     private BitspecIrstream bitspecIrstream;
@@ -355,8 +370,8 @@ public class Protocol extends IrpObject implements AggregateLister {
         return bitspecIrstream.isRPlus();
     }
 
-    public boolean startsWithDuration() {
-        return bitspecIrstream.startsWithDuration();
+    public boolean startsWithFlash() {
+        return bitspecIrstream.startsWithFlash();
     }
 
     public boolean hasVariation() {
@@ -387,7 +402,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         XmlUtils.addBooleanAttributeIfTrue(renderer, "interleavingFlashOk", interleavingFlashOk());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "interleavingGapOk", interleavingGapOk());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "sonyType", isSonyType());
-        XmlUtils.addBooleanAttributeIfTrue(renderer, "startsWithDuration", startsWithDuration());
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "startsWithFlash", startsWithFlash());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "hasVariation", hasVariation());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "rplus", isRPlus());
         Element generalSpecElement = generalSpec.toElement(document);
@@ -528,11 +543,62 @@ public class Protocol extends IrpObject implements AggregateLister {
         str.append("\t").append(interleavingFlashOk() ? "flashint\t" : "\t");
         str.append("\t").append(interleavingGapOk() ? "gapint\t" : "\t");
         str.append("\t").append(isSonyType() ? "sony\t" : "\t");
-        str.append(startsWithDuration() ? "SWD\t" : "\t");
+        str.append(startsWithFlash() ? "SWD\t" : "\t");
         str.append(hasVariation() ? "variation\t" : "\t");
         str.append(isRPlus() ? "R+" : "");
         return str.toString();
     }
+
+    /**
+     * This is sort-of a version of classificationString, but for another audience.
+     * @return
+     */
+    // TODO: check for equations we cannot solve.
+    public String warningsString() {
+        return warningFrequency()
+                + warningStartsWithFlash()
+                + warningTrivialBitspec()
+                + warningRepeatPlus()
+                + warningsInterleaving()
+                + warningNonConstantLengthBitFields()
+                + warningNoParameterSpecs()
+                ;
+    }
+
+    public String warningFrequency() {
+        Double frequency = getFrequency();
+        return frequency == null ? warn("Frequency is missing, using default frequency = " + GeneralSpec.defaultFrequency)
+                : (! commonFrequency(frequency)) ? warn("Uncommon frequency = " + frequency.longValue())
+                : "";
+    }
+
+    public String warningStartsWithFlash() {
+        return !startsWithFlash() ? warn("Protocol does not start with a Duration/Flash") : "";
+    }
+
+    public String warningTrivialBitspec() {
+        return (isTrivial(false) || isTrivial(true)) ? warn("Protocol uses trivial bitspec") : "";
+    }
+
+    public String warningRepeatPlus() {
+        return isRPlus() ? warn("Protocol uses infinite repeat with min > 0") : "";
+    }
+
+    public String warningsInterleaving() {
+        return interleavingOk() ? ""
+                : isBiphase() ? warn("Protocol not interleaving; is biphase")
+                : isSonyType() ? warn("Protocol not interleaving, but is Sony-like")
+                : warn("Protocol not interleaving");
+    }
+
+    public String warningNonConstantLengthBitFields() {
+        return nonConstantBitFieldLength() ? warn("Protocol contains bitfields with non-constant lengths") : "";
+    }
+
+    public String warningNoParameterSpecs() {
+        return getParameterSpecs().isEmpty() ? warn("ParameterSpecs missing from the protocol") : "";
+    }
+
 
     private void checkDomain(ParameterCollector names) throws DomainViolationException {
         for (String kvp : names.getNames()) {
@@ -574,5 +640,16 @@ public class Protocol extends IrpObject implements AggregateLister {
     private void addProperties(Map<String, Object> map, String name, AggregateLister listener) {
         Map<String, Object> props = listener.propertiesMap(generalSpec, definitions);
         map.put(name, props);
+    }
+
+    public boolean nonConstantBitFieldLength() {
+        return bitspecIrstream.nonConstantBitFieldLength();
+    }
+
+    public static class ProtocolNotDecodableException extends IrpException {
+
+        ProtocolNotDecodableException(String name) {
+            super("Protocol " + name + " not decodable");
+        }
     }
 }

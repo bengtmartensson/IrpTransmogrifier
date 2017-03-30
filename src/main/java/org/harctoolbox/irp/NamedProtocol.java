@@ -82,12 +82,20 @@ public class NamedProtocol extends Protocol {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             //return null;
-            throw new ProtocolNotDecodableException();
+            throw new ProtocolNotDecodableException(name);
 
         return super.recognize(irSignal, keepDefaulted,
                 getFrequencyTolerance(userFrequencyTolerance),
                 getAbsoluteTolerance(userAbsoluteTolerance), getRelativeTolerance(userRelativeTolerance));
 
+    }
+
+    @Override
+    public String warningsString() {
+        String str = super.warningsString();
+        if (!name.matches(IrpUtils.C_IDENTIFIER_REGEXP))
+            str = str + "WARNING: The name \"" + name + "\" is not a valid C name." + IrCoreUtils.LINESEPARATOR;
+        return str;
     }
 
     @Override
@@ -212,12 +220,5 @@ public class NamedProtocol extends Protocol {
         putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);
         map.putAll(parameters);
         return map;
-    }
-
-    public static class ProtocolNotDecodableException extends IrpException {
-
-        public ProtocolNotDecodableException() {
-            super("Protocol not decodable");
-        }
     }
 }

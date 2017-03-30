@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -39,8 +38,6 @@ import org.antlr.v4.gui.TreeViewer;
  * This class is a collection of useful utilities as static functions and constants.
  */
 public class IrpUtils {
-
-    public final static String defaultConfigfile = "data" + File.separator + "IrpProtocols.ini";
 
     public final static String dumbCharsetName = "US-ASCII";
 
@@ -65,6 +62,7 @@ public class IrpUtils {
     public final static String jp1WikiUrl = "http://www.hifi-remote.com/wiki/index.php?title=Main_Page";
     public final static String irpNotationUrl = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";
     public final static String decodeIrUrl = "http://www.hifi-remote.com/wiki/index.php?title=DecodeIR";
+    public final static String C_IDENTIFIER_REGEXP = "[A-Za-z_][A-Za-z0-9_]*";
 
     private final static Level enteringExitingLevel = Level.FINER;
 

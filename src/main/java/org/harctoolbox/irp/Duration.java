@@ -321,4 +321,9 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             return null;
         }
     }
+
+    @Override
+    public boolean nonConstantBitFieldLength() {
+        return false;
+    }
 }

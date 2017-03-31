@@ -74,6 +74,7 @@ public class IrpDatabase {
     public static final String frequencyToleranceName = "frequency-tolerance";
     public static final String relativeToleranceName = "relative-tolerance";
     public static final String absoluteToleranceName = "absolute-tolerance";
+    public static final String minimumLeadoutName = "minimum-leadout";
     public static final String preferOverName = "prefer-over";
 
     public static boolean isKnown(String protocolsPath, String protocol) throws IOException, SAXException {
@@ -574,7 +575,7 @@ public class IrpDatabase {
         NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
             return new NamedProtocol(getName(), getIrp(), getDocumentation(),
                     getFirstProperty(frequencyToleranceName), getFirstProperty(absoluteToleranceName), getFirstProperty(relativeToleranceName),
-                    getFirstProperty(decodableName), getProperties(preferOverName));
+                    getFirstProperty(minimumLeadoutName), getFirstProperty(decodableName), getProperties(preferOverName));
         }
 
         @Override

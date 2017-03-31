@@ -32,14 +32,15 @@ public class RecognizeData extends Traverser implements Cloneable {
     private final double absoluteTolerance;
     private final double relativeTolerance;
     private BitwiseParameter danglingBitFieldData;
+    private final double minimumLeadout;
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
-            double absoulteTolerance, double relativeTolerance) {
-        this(generalSpec, definitions, irSequence, 0, nameMap, interleaving, absoulteTolerance, relativeTolerance);
+            double absoulteTolerance, double relativeTolerance, double minimumLeadout) {
+        this(generalSpec, definitions, irSequence, 0, nameMap, interleaving, absoulteTolerance, relativeTolerance, minimumLeadout);
     }
 
     private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/,
-            ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance) {
+            ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance, double minimumLeadout) {
         super(generalSpec, definitions);
         danglingBitFieldData = new BitwiseParameter();
         this.position = position;
@@ -51,6 +52,7 @@ public class RecognizeData extends Traverser implements Cloneable {
         this.needsChecking = new ParameterCollector();
         this.absoluteTolerance = absoluteTolerance;
         this.relativeTolerance = relativeTolerance;
+        this.minimumLeadout = minimumLeadout;
     }
 
     /**
@@ -186,6 +188,10 @@ public class RecognizeData extends Traverser implements Cloneable {
      */
     public void setHasConsumed(double hasConsumed) {
         this.hasConsumed = hasConsumed;
+    }
+
+    public boolean leadoutOk() {
+        return (position == irSequence.getLength() - 1) && (get() >= minimumLeadout);
     }
 
     public boolean check(boolean on) {

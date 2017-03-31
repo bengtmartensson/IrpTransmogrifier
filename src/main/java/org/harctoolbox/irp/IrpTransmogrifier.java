@@ -680,7 +680,7 @@ public class IrpTransmogrifier {
         IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
         Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver,
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
-                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
         decodes.entrySet().forEach((kvp) -> {
             out.println(kvp.getKey() + ": " + kvp.getValue().toString());
         });
@@ -876,6 +876,9 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
         private Level logLevel = Level.INFO;
+
+        @Parameter(names = { "--min-leadout"}, description = "Threshold for leadout when decoding")
+        private Double minLeadout = null;
 
         @Parameter(names = { "-o", "--output" }, description = "Name of output file (default stdout)")
         private String output = null;

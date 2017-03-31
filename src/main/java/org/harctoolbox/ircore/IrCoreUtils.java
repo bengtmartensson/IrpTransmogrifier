@@ -47,6 +47,11 @@ public class IrCoreUtils {
      */
     public static final double INVALID = -1f;
 
+    /**
+     * Default threshold value for lead-out in microseconds.
+     */
+    public static final double DEFAULT_MINIMUM_LEADOUT = 20000;
+
     private static double getDoubleWithSubstitute(Double userValue, double fallback) {
         return userValue != null ? userValue : fallback;
     }
@@ -61,6 +66,10 @@ public class IrCoreUtils {
 
     public static double getFrequencyTolerance(Double userValue) {
         return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
+    }
+
+    public static double getMinimumLeadout(Double userValue) {
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
     /**

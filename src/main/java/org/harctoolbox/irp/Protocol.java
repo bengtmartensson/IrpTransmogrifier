@@ -306,6 +306,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         return generalSpec.getFrequency();
     }
 
+    private double getFrequencyWithDefault() {
+        return generalSpec.getFrequencyWitDefault();
+    }
+
     public double getUnit() {
         return generalSpec.getUnit();
     }
@@ -463,19 +467,20 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws SignalRecognitionException {
-        return recognize(irSignal, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        return recognize(irSignal, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE,
+                IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
-            double frequencyTolerance, double absoluteTolerance, double relativeTolerance)
+            double frequencyTolerance, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
             throws SignalRecognitionException {
         //IrpUtils.entering(logger, Level.FINE, "recognize", this);
         checkFrequency(irSignal.getFrequency(), frequencyTolerance);
         ParameterCollector names = new ParameterCollector();
 
-        decode(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance);
-        decode(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance);
-        decode(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance);
+        decode(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
+        decode(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
+        decode(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
 
         Map<String, Long> result = names.collectedNames();
         parameterSpecs.reduceNamesMap(result, keepDefaulted);
@@ -484,13 +489,15 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     private void checkFrequency(double frequency, double frequencyTolerance) throws SignalRecognitionException {
-        boolean success = frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequency(), frequency, frequencyTolerance, 0.0);
+        boolean success = frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0);
         if (!success)
             throw new SignalRecognitionException("Frequency does not match");
     }
 
-    private void decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance) throws SignalRecognitionException {
-        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names, absoluteTolerance, relativeTolerance);
+    private void decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
+            throws SignalRecognitionException {
+        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names,
+                absoluteTolerance, relativeTolerance, minimumLeadout);
         Protocol reducedProtocol = normalForm(pass);
         //traverse(recognizeData, pass);
         reducedProtocol.decode(recognizeData);

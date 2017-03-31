@@ -124,10 +124,11 @@ public class Decoder {
      * @param frequencyTolerance
      * @param absoluteTolerance
      * @param relativeTolerance
+     * @param minimumLeadout
      * @return Map of decodes with protocol name as key.
      */
     public Map<String, Decode> decode(IrSignal irSignal, boolean allDecodes, boolean keepDefaultedParameters,
-            Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance) {
+            Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
         Map<String, Decode> output = new HashMap<>(8);
         parsedProtocols.values().forEach((namedProtocol) -> {
             Map<String, Long> parameters;
@@ -135,7 +136,7 @@ public class Decoder {
                 //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
 
                 parameters = namedProtocol.recognize(irSignal, keepDefaultedParameters,
-                        frequencyTolerance, absoluteTolerance, relativeTolerance);
+                        frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
                 if (parameters == null)
                     throw new ThisCannotHappenException(namedProtocol.getName());
                 output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
@@ -166,11 +167,11 @@ public class Decoder {
     }
 
     public Map<String, Decode> decode(IrSignal irSignal) {
-        return decode(irSignal, false, false, null, null, null);
+        return decode(irSignal, false, false, null, null, null, null);
     }
 
     public Map<String, Decode> decode(IrSignal irSignal, boolean allDecodes, boolean keepDefaultedParameters) {
-        return decode(irSignal, allDecodes, keepDefaultedParameters, null, null, null);
+        return decode(irSignal, allDecodes, keepDefaultedParameters, null, null, null, null);
     }
 
 

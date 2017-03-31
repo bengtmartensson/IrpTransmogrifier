@@ -369,6 +369,53 @@ public class ProtocolNGTest {
      * Test of recognize method, of class Protocol.
      */
     @Test
+    @SuppressWarnings("UnusedAssignment")
+    public void testRecognizeNec1LongLeadout() {
+        System.out.println("recognizeLong");
+        try {
+            IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 1E6C");
+            NameEngine nameEngine = new NameEngine("{D=12,S=34,F=56}");
+            Protocol nec1 = irpDatabase.getNamedProtocol("nec1");
+            Map<String, Long> recognizeData = nec1.recognize(irSignal);
+            recognizeData = nec1.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+        } catch (SignalRecognitionException | InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+            ex.printStackTrace();
+            fail();
+        }
+    }
+
+    /**
+     * Test of recognize method, of class Protocol.
+     */
+    @Test
+    public void testRecognizeNec1ShortLeadout() {
+        System.out.println("recognizeLong");
+        try {
+            // 15ms final leadout
+            IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0240");
+            NameEngine nameEngine = new NameEngine("{D=12,S=34,F=56}");
+            Protocol nec1 = irpDatabase.getNamedProtocol("nec1");
+            Map<String, Long> recognizeData;
+            try {
+                recognizeData = nec1.recognize(irSignal);
+                fail();
+            } catch (SignalRecognitionException ex) {
+            }
+            Protocol nec1_10000 = irpDatabase.getNamedProtocol("nec1-10000");
+
+            recognizeData = nec1_10000.recognize(irSignal);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+        } catch (SignalRecognitionException | InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+            ex.printStackTrace();
+            fail();
+        }
+    }
+
+    /**
+     * Test of recognize method, of class Protocol.
+     */
+    @Test
     // Tests domain test
     public void testRecognizeTivo() {
         System.out.println("recognize");
@@ -394,7 +441,7 @@ public class ProtocolNGTest {
             IrSignal irSignal = Pronto.parse("0000 0073 0000 000B 0020 0020 0040 0020 0020 0040 0020 0020 0040 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0CC8");
             NameEngine nameEngine = new NameEngine("{D=12,F=56}");
             Protocol rc5 = irpDatabase.getNamedProtocol("rc5");
-            Map<String, Long> recognizeData = rc5.recognize(irSignal,false);
+            Map<String, Long> recognizeData = rc5.recognize(irSignal, false);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
             nameEngine = new NameEngine("{D=12,F=56,T=0}");
             recognizeData = rc5.recognize(irSignal,true);
@@ -691,7 +738,7 @@ public class ProtocolNGTest {
             IrSignal irSignal = Pronto.parse("0000 006D 0012 0012 0008 006A 0008 0056 0008 003C 0008 006A 0008 0065 0008 006A 0008 003C 0008 0065 0008 020C 0008 006A 0008 0051 0008 001D 0008 003C 0008 002C 0008 0046 0008 0046 0008 0065 0008 0BEF 0008 006A 0008 0056 0008 003C 0008 006A 0008 0065 0008 006A 0008 003C 0008 0065 0008 020C 0008 006A 0008 0027 0008 0046 0008 003C 0008 002C 0008 0046 0008 0046 0008 0065 0008 0BEF");
             NameEngine nameEngine = new NameEngine("{D=110, F=14478, S=246, OEM=239}");
             NamedProtocol xmp = irpDatabase.getNamedProtocol("xmp");
-            Map<String, Long> recognizeData = xmp.recognize(irSignal, false, 500f, 50f, 0.02);
+            Map<String, Long> recognizeData = xmp.recognize(irSignal, false, 500f, 50f, 0.02, 10000d);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
@@ -706,7 +753,7 @@ public class ProtocolNGTest {
             IrSignal irSignal = Pronto.parse("0000 006D 0012 0012 0008 006A 0008 001D 0008 003C 0008 006A 0008 0032 0008 0032 0008 003C 0008 0065 0008 020C 0008 006A 0008 0027 0008 001D 0008 003C 0008 004B 0008 001D 0008 001D 0008 001D 0008 0BEF 0008 006A 0008 001D 0008 003C 0008 006A 0008 0032 0008 0032 0008 003C 0008 0065 0008 020C 0008 006A 0008 0051 0008 0046 0008 003C 0008 004B 0008 001D 0008 001D 0008 001D 0008 0BEF");
             NameEngine nameEngine = new NameEngine("{D=110, F=144, S=246}");
             NamedProtocol xmp1 = irpDatabase.getNamedProtocol("xmp-1");
-            Map<String, Long> recognizeData = xmp1.recognize(irSignal, false, 500f, 50f, 0.02);
+            Map<String, Long> recognizeData = xmp1.recognize(irSignal, false, 500f, 50f, 0.02, 10000d);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
         } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();

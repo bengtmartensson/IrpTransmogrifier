@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 /**
  * This exception is thrown when accessing a variable that has not been assigned.
  */
-public class NameUnassignedException extends IrpException {
+public final class NameUnassignedException extends IrpException {
 
     public NameUnassignedException(String name) {
         super("Name " + name + " not assigned");

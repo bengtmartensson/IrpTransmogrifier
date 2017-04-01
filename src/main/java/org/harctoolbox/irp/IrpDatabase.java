@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  * This class is a data bases manager for the data base of IRP protocols.
  * It reads a configuration file containing definitions for IR format in the IRP-Notation.
  */
-public class IrpDatabase {
+public final class IrpDatabase {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
 
     public static final String irpProtocolNS = "http://www.harctoolbox.org/irp-protocols";
@@ -287,7 +287,7 @@ public class IrpDatabase {
     /**
      * @return the configFileVersion
      */
-    public final String getConfigFileVersion() {
+    public String getConfigFileVersion() {
         return configFileVersion;
     }
 
@@ -309,11 +309,11 @@ public class IrpDatabase {
         dump(IrpUtils.getPrintSteam(filename), name);
     }
 
-    public final boolean isKnown(String protocol) {
+    public boolean isKnown(String protocol) {
         return protocols.containsKey(protocol.toLowerCase(Locale.US));
     }
 
-    public final String getIrp(String name) {
+    public String getIrp(String name) {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         return prot == null ? null : prot.getIrp();
     }
@@ -322,16 +322,16 @@ public class IrpDatabase {
         return protocols.get(name.toLowerCase(Locale.US));
     }
 
-    public final Set<String> getNames() {
+    public Set<String> getNames() {
         return protocols.keySet();
     }
 
-    public final String getName(String name) {
+    public String getName(String name) {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         return prot == null ? null : prot.getName();
     }
 
-    public final int size() {
+    public int size() {
         return protocols.size();
     }
 
@@ -366,7 +366,7 @@ public class IrpDatabase {
         return result;
     }
 
-    public final String getDocumentation(String name) {
+    public String getDocumentation(String name) {
         UnparsedProtocol prot = protocols.get(name);
         return prot == null ? null : prot.getDocumentation();
     }

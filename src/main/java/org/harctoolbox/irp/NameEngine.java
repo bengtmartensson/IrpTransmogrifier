@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
 // TODO: There are probably too many accessing functions here.
 // Clean up by eliminating and making private.
 
-public class NameEngine extends IrpObject implements Cloneable, AggregateLister, Iterable<Map.Entry<String, Expression>> {
+public final class NameEngine extends IrpObject implements Cloneable, AggregateLister, Iterable<Map.Entry<String, Expression>> {
     private final static int WEIGHT = 0;
 
     private final static Logger logger = Logger.getLogger(NameEngine.class.getName());
@@ -244,7 +244,7 @@ public class NameEngine extends IrpObject implements Cloneable, AggregateLister,
         parseDefinitions(parserDriver.getParser().definitions());
     }
 
-    public final void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) throws InvalidNameException {
+    public void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) throws InvalidNameException {
         for (IrpParser.DefinitionContext definition : ctx.definitions_list().definition())
             parseDefinition(definition);
     }

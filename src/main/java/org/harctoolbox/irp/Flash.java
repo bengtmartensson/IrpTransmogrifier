@@ -21,7 +21,7 @@ package org.harctoolbox.irp;
  * This class implements Flash as per Chapter 3.
  *
  */
-public class Flash extends Duration {
+public final class Flash extends Duration {
 
     public Flash(String str) {
         this((new ParserDriver(str)).getParser().flash());

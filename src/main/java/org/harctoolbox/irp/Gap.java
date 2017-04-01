@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
  * This class implements Gap as per Chapter 3.
  *
  */
-public class Gap extends Duration {
+public final class Gap extends Duration {
 
     public Gap(String str) {
         this((new ParserDriver(str)).getParser().gap());

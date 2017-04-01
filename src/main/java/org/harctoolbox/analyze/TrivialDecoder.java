@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.harctoolbox.irp.IrStreamItem;
 
-public class TrivialDecoder extends AbstractDecoder {
+public final class TrivialDecoder extends AbstractDecoder {
 
     public TrivialDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
         super(analyzer, params);

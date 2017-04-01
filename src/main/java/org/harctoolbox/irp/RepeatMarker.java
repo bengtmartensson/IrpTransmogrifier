@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 /**
  * This class implements Repeatmarker as per Chapter 8.
  */
-public class RepeatMarker extends IrpObject {
+public final class RepeatMarker extends IrpObject {
 
     private int min;
     private int max;

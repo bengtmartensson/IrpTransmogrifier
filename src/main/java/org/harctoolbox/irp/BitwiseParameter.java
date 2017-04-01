@@ -25,7 +25,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 /**
  * This object represents a parameter, for which only some bit positions are known.
  */
-public class BitwiseParameter implements Cloneable {
+public final class BitwiseParameter implements Cloneable {
 
     public final static long ALLBITS = -1L;
     public final static long NOBITS = 0L;

@@ -25,7 +25,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class BitStream extends IrpObject implements Evaluatable {
+final class BitStream extends IrpObject implements Evaluatable {
 
     private static final Logger logger = Logger.getLogger(BitStream.class.getName());
     private static final int WEIGHT = 2;

@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
-public class ParameterCollector implements Cloneable {
+public final class ParameterCollector implements Cloneable {
 
     private final static Logger logger = Logger.getLogger(ParameterCollector.class.getName());
 
@@ -62,7 +62,7 @@ public class ParameterCollector implements Cloneable {
         }
     }
 
-    final void add(String name, long value) throws ParameterInconsistencyException {
+    void add(String name, long value) throws ParameterInconsistencyException {
         add(name, new BitwiseParameter(value));
     }
 

@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
-public class RecognizeData extends Traverser implements Cloneable {
+public final class RecognizeData extends Traverser implements Cloneable {
 
     private int position;
     private double hasConsumed;

@@ -28,7 +28,7 @@ import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
 
-public class SerialDecoder extends AbstractDecoder {
+public final class SerialDecoder extends AbstractDecoder {
 
     private static BitSpec mkBitSpec(boolean invert) {
         Flash on = new Flash(1f, null);

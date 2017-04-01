@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-class FivePartExpression extends Expression {
+final class FivePartExpression extends Expression {
 
     static FivePartExpression newExpression(ParseTree cond, ParseTree question, ParseTree trueExpression, ParseTree colon, ParseTree falseExpression) {
         return new FivePartExpression((IrpParser.ExpressionContext) cond, (IrpParser.ExpressionContext) trueExpression, (IrpParser.ExpressionContext) falseExpression);

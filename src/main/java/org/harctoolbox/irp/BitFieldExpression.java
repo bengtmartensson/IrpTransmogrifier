@@ -22,7 +22,7 @@ import java.util.Objects;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class BitFieldExpression extends PrimaryItemExpression {
+final class BitFieldExpression extends PrimaryItemExpression {
 
     static BitFieldExpression newExpression(IrpParser.BitfieldContext ctx) {
         return new BitFieldExpression(ctx);

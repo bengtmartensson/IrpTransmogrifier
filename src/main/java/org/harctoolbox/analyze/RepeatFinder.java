@@ -25,7 +25,7 @@ import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
-public class RepeatFinder {
+public final class RepeatFinder {
     public static final double DEFAULTMINREPEATLASTGAP = 20000; // 20 milli seconds minimum for a repetition
     private static double defaultMinRepeatLastGap = DEFAULTMINREPEATLASTGAP;
     private static double defaultRelativeTolerance = IrCoreUtils.DEFAULTRELATIVETOLERANCE;

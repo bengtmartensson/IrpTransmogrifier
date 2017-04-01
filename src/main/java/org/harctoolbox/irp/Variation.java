@@ -27,7 +27,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Variation extends IrpObject implements IrStreamItem {
+public final class Variation extends IrpObject implements IrStreamItem {
     private static int numberOfInfiniteRepeats(BareIrStream bareIrStream) {
         return bareIrStream == null ? 0 : bareIrStream.numberOfInfiniteRepeats();
     }

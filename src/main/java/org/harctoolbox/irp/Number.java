@@ -22,7 +22,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Number extends PrimaryItem {
+public final class Number extends PrimaryItem {
     private final static int WEIGHT = 1;
 
     public final static int SIZE = Long.SIZE;

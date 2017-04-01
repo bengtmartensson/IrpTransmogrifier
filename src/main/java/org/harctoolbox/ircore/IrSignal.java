@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  *
  */
 
-public class IrSignal implements Cloneable {
+public final class IrSignal implements Cloneable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
 
     public static IrSignal parse(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
@@ -89,23 +89,23 @@ public class IrSignal implements Cloneable {
     }
 
     /** Intro sequence, always sent once. Can be empty, but not null. */
-    protected IrSequence introSequence;
+    private IrSequence introSequence;
 
     /** Repeat sequence, sent after the intro sequence if the signal is repeating. Can be empty, but  not null. */
-    protected IrSequence repeatSequence;
+    private IrSequence repeatSequence;
 
     /** Ending sequence, sent at the end of transmission. Can be empty (but not null),
      * actually, most often is. */
-    protected IrSequence endingSequence;
+    private IrSequence endingSequence;
 
     /** "Table" for mapping Pass to intro, repeat, or ending sequence. */
-    protected EnumMap<Pass, IrSequence>map;
+    private EnumMap<Pass, IrSequence>map;
 
     /** Modulation frequency in Hz. Use 0 for not modulated, and null for defaulted. */
-    protected Double frequency;
+    private Double frequency;
 
     /** Duty cycle of the modulation. Between 0 and 1. Use null for not assigned. */
-    protected Double dutyCycle = null;
+    private Double dutyCycle = null;
 
     /**
      * Constructs an IrSignal from its arguments.
@@ -242,11 +242,11 @@ public class IrSignal implements Cloneable {
         copyFrom(Pronto.parse(ccf, begin));
     }
 
-    public final Double getFrequency() {
+    public Double getFrequency() {
         return frequency;
     }
 
-    public final Double getDutyCycle() {
+    public Double getDutyCycle() {
         return dutyCycle;
     }
 
@@ -270,7 +270,7 @@ public class IrSignal implements Cloneable {
      * @see IrSequence
      * @return length of intro
      */
-    public final int getIntroLength() {
+    public int getIntroLength() {
         return introSequence.getLength();
     }
 
@@ -279,7 +279,7 @@ public class IrSignal implements Cloneable {
      * @see IrSequence
      * @return integer sequence of durations in microseconds, possibly with sign.
      */
-    public final int[] getIntroInts() {
+    public int[] getIntroInts() {
         return introSequence.toInts();
     }
 
@@ -289,31 +289,31 @@ public class IrSignal implements Cloneable {
      * @param i index
      * @return duration, possibly with sign.
      */
-    public final double getIntroDouble(int i) {
+    public double getIntroDouble(int i) {
         return introSequence.get(i);
     }
 
-    public final int getRepeatLength() {
+    public int getRepeatLength() {
         return repeatSequence.getLength();
     }
 
-    public final int[] getRepeatInts() {
+    public int[] getRepeatInts() {
         return repeatSequence.toInts();
     }
 
-    public final double getRepeatDouble(int i) {
+    public double getRepeatDouble(int i) {
         return repeatSequence.get(i);
     }
 
-    public final int getEndingLength() {
+    public int getEndingLength() {
         return endingSequence.getLength();
     }
 
-    public final int[] getEndingInts() {
+    public int[] getEndingInts() {
         return endingSequence.toInts();
     }
 
-    public final double getEndingDouble(int i) {
+    public double getEndingDouble(int i) {
         return endingSequence.get(i);
     }
 
@@ -322,7 +322,7 @@ public class IrSignal implements Cloneable {
      * one repeat sequence, plus the ending sequence.
      * @return duration in microseconds.
      */
-    public final double getTotalDuration() {
+    public double getTotalDuration() {
         return introSequence.getTotalDuration() + repeatSequence.getTotalDuration() + endingSequence.getTotalDuration();
     }
 
@@ -333,15 +333,15 @@ public class IrSignal implements Cloneable {
      * @param count Uses count semantic.
      * @return duration in microseconds.
      */
-    public final double getDuration(int count) {
+    public double getDuration(int count) {
         return introSequence.getTotalDuration() + repeatsPerCountSemantic(count)*repeatSequence.getTotalDuration() + endingSequence.getTotalDuration();
     }
 
-    public final double getDouble(Pass pass, int i) {
+    public double getDouble(Pass pass, int i) {
         return map.get(pass).get(i);
     }
 
-    public final int getLength(Pass pass) {
+    public int getLength(Pass pass) {
         return map.get(pass).getLength();
     }
 
@@ -366,7 +366,7 @@ public class IrSignal implements Cloneable {
      * @param count
      * @return introSequence.isEmpty() ? count : count - 1
      */
-    public final int repeatsPerCountSemantic(int count) {
+    public int repeatsPerCountSemantic(int count) {
         return introSequence.isEmpty() ? count : count - 1;
     }
 
@@ -374,7 +374,7 @@ public class IrSignal implements Cloneable {
      *
      * @return Emptyness of the signal.
      */
-    public final boolean isEmpty() {
+    public boolean isEmpty() {
         return introSequence.isEmpty() && repeatSequence.isEmpty() && endingSequence.isEmpty();
     }
 
@@ -382,7 +382,7 @@ public class IrSignal implements Cloneable {
      * Returns true if and only if the sequence contains durations of zero length.
      * @return existence of zero durations.
      */
-    public final boolean containsZeros() {
+    public boolean containsZeros() {
         return introSequence.containsZeros() || repeatSequence.containsZeros() || endingSequence.containsZeros();
     }
 
@@ -390,7 +390,7 @@ public class IrSignal implements Cloneable {
      * Replace all zero durations. Changes the signal in-place.
      * @param replacement Duration in micro seconds to replace zero durations with.
      */
-    public final void replaceZeros(double replacement) {
+    public void replaceZeros(double replacement) {
         introSequence.replaceZeros(replacement);
         repeatSequence.replaceZeros(replacement);
         endingSequence.replaceZeros(replacement);
@@ -402,7 +402,7 @@ public class IrSignal implements Cloneable {
      * @param replacement Duration in pulses to replace zero durations with.
      * If frequency == 0, interpret as microseconds instead.
      */
-    public final void replaceZeros(int replacement) {
+    public void replaceZeros(int replacement) {
         replaceZeros(frequency > 0
                 ? IrCoreUtils.seconds2microseconds(replacement / frequency)
                 : replacement);
@@ -412,7 +412,7 @@ public class IrSignal implements Cloneable {
      * Returns max gap of intro- and repeat sequences.
      * @return max gap of intro- and repeat sequences.
      */
-    public final double getGap() {
+    public double getGap() {
         return Math.max(introSequence.getLastGap(), repeatSequence.getLastGap());
     }
 
@@ -433,7 +433,7 @@ public class IrSignal implements Cloneable {
      * @param count Number of times to send signal. Must be &gt; 0.
      * @return ModulatedIrSequence.
      */
-    public final ModulatedIrSequence toModulatedIrSequence(int count) {
+    public ModulatedIrSequence toModulatedIrSequence(int count) {
         return toModulatedIrSequence(true, this.repeatsPerCountSemantic(count), true);
     }
 
@@ -445,7 +445,7 @@ public class IrSignal implements Cloneable {
      * @param ending inclusion of ending sequence.
      * @return ModulatedIrSequence.
      */
-    public final ModulatedIrSequence toModulatedIrSequence(boolean intro, int repetitions, boolean ending) {
+    public ModulatedIrSequence toModulatedIrSequence(boolean intro, int repetitions, boolean ending) {
         IrSequence seq1 = intro ? introSequence : new IrSequence();
         IrSequence seq2 = seq1.append(repeatSequence, repetitions);
         IrSequence seq3 = seq2.append(endingSequence);
@@ -467,7 +467,7 @@ public class IrSignal implements Cloneable {
      * @param count Number of times to send signal. Must be &gt; 0.
      * @return IrSignal consisting of count repetitions (count semantic) as the intro sequence.
      */
-    public final IrSignal toOneShot(int count) {
+    public IrSignal toOneShot(int count) {
         return new IrSignal(toModulatedIrSequence(count), null, null, frequency, dutyCycle);
     }
 
@@ -502,7 +502,7 @@ public class IrSignal implements Cloneable {
      *
      * @return the intro sequence, as ModulatedIrSequence
      */
-    public final ModulatedIrSequence getIntroSequence() {
+    public ModulatedIrSequence getIntroSequence() {
         return new ModulatedIrSequence(introSequence, frequency, dutyCycle);
     }
 
@@ -510,7 +510,7 @@ public class IrSignal implements Cloneable {
      *
      * @return the repeat sequence, as ModulatedIrSequence
      */
-    public final ModulatedIrSequence getRepeatSequence() {
+    public ModulatedIrSequence getRepeatSequence() {
         return new ModulatedIrSequence(repeatSequence, frequency, dutyCycle);
     }
 
@@ -518,7 +518,7 @@ public class IrSignal implements Cloneable {
      *
      * @return the ending sequence, as ModulatedIrSequence
      */
-    public final ModulatedIrSequence getEndingSequence() {
+    public ModulatedIrSequence getEndingSequence() {
         return new ModulatedIrSequence(endingSequence, frequency, dutyCycle);
     }
 
@@ -528,7 +528,7 @@ public class IrSignal implements Cloneable {
      * @see Pronto
      * @return CCF as string.
      */
-    public final String ccfString() {
+    public String ccfString() {
         return Pronto.toPrintString(this);
     }
 

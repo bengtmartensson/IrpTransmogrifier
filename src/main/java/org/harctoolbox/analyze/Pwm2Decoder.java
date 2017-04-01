@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-public class Pwm2Decoder extends PwmDecoder {
+public final class Pwm2Decoder extends PwmDecoder {
 
     public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
         super(analyzer, params, mkBursts(zero, one));

@@ -28,7 +28,7 @@ import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class BitspecIrstream extends IrpObject implements IrStreamItem {
+public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     private static final Logger logger = Logger.getLogger(BitspecIrstream.class.getName());
 
     private BitSpec bitSpec;

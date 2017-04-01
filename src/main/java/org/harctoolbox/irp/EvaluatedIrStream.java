@@ -29,7 +29,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 /**
  *
  */
-class EvaluatedIrStream {
+final class EvaluatedIrStream {
 
     private final static Logger logger = Logger.getLogger(EvaluatedIrStream.class.getName());
 

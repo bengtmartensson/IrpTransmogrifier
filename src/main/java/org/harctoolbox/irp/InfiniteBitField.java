@@ -21,7 +21,7 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class InfiniteBitField extends BitField {
+public final class InfiniteBitField extends BitField {
 
     public InfiniteBitField(String str) {
         this((IrpParser.Infinite_bitfieldContext) (new ParserDriver(str)).getParser().bitfield());

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * This class implements Irstream as of Chapter 6.
  *
  */
-public class IrStream extends IrpObject implements IrStreamItem,AggregateLister {
+public final class IrStream extends IrpObject implements IrStreamItem,AggregateLister {
 
     private static final Logger logger = Logger.getLogger(IrStream.class.getName());
 

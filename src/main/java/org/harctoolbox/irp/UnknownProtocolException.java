@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
  * Thrown when trying to use an unknown protocol.
  *
  */
-public class UnknownProtocolException extends IrpException {
+public final class UnknownProtocolException extends IrpException {
 
     public UnknownProtocolException(String protocol) {
         super("Protocol " + protocol + " not found.");

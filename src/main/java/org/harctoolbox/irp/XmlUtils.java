@@ -50,7 +50,7 @@ import org.xml.sax.SAXParseException;
 /**
  * This class consists of a collection of useful static constants and functions.
  */
-public class XmlUtils {
+public final class XmlUtils {
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 

@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 /**
  * This class models assignments as defined in Chapter 11.
  */
-public class Assignment extends IrpObject implements IrStreamItem, Numerical {
+public final class Assignment extends IrpObject implements IrStreamItem, Numerical {
 
     public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         Assignment assignment = new Assignment(str);

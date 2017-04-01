@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-public class BiphaseWithStartbitDecoder extends AbstractBiphaseDecoder {
+public final class BiphaseWithStartbitDecoder extends AbstractBiphaseDecoder {
 
     public BiphaseWithStartbitDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
         super(analyzer, params, half, full);

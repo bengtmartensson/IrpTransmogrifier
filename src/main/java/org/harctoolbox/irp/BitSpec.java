@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * This class implements BitSpecs, as described in Chapter 7.
  *
  */
-public class BitSpec extends IrpObject implements AggregateLister {
+public final class BitSpec extends IrpObject implements AggregateLister {
 
     // Computes the upper integer part of the 2-logarithm of the integer n.
     // Treat n = 0 and n = 1 differently, since coding on a zero or one-letter alphaber is ... special.

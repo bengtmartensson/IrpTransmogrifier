@@ -24,7 +24,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class TwoPartExpression extends Expression {
+final class TwoPartExpression extends Expression {
 
     static Expression newExpression(ParseTree first, ParseTree second) {
         return new TwoPartExpression(first, second);

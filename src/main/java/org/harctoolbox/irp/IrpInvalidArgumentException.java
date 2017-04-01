@@ -21,7 +21,7 @@ package org.harctoolbox.irp;
  * Thrown for invalid arguments.
  */
 @SuppressWarnings("serial")
-public class IrpInvalidArgumentException extends IrpException {
+public final class IrpInvalidArgumentException extends IrpException {
 
     public IrpInvalidArgumentException(String string) {
         super(string);

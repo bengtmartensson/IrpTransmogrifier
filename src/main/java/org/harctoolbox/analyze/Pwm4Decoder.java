@@ -19,7 +19,7 @@ package org.harctoolbox.analyze;
 
 import java.util.List;
 
-public class Pwm4Decoder extends PwmDecoder {
+public final class Pwm4Decoder extends PwmDecoder {
 
     private final static int NO_BURSTS = 4;
 

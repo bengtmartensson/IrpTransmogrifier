@@ -26,7 +26,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class NamedProtocol extends Protocol {
+public final class NamedProtocol extends Protocol {
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
     public static Document toDocument(Iterable<NamedProtocol> protocols) {

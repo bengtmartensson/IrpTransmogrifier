@@ -105,7 +105,7 @@ public class Cleaner {
         createCleanHistogram();
         createSortedGapsAndFlashes();
     }
-    
+
     /**
      * @return the signalMode
      */

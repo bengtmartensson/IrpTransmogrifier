@@ -22,7 +22,7 @@ import java.util.Random;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class ParameterSpec extends IrpObject {
+public final class ParameterSpec extends IrpObject {
     private static final int WEIGHT = 1;
     private static Random random;
 

@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
 /**
  *
  */
-public class Name extends PrimaryItem implements Floatable {
+public final class Name extends PrimaryItem implements Floatable {
     private static final int WEIGHT = 1;
     private static Pattern namePattern = Pattern.compile(IrpUtils.C_IDENTIFIER_REGEXP);
 

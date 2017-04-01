@@ -23,7 +23,7 @@ import java.util.Locale;
 /**
  * Some useful static functions and constants.
  */
-public class IrCoreUtils {
+public final class IrCoreUtils {
 
     public static final String LINESEPARATOR = System.getProperty("line.separator");
 

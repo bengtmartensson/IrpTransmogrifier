@@ -49,7 +49,7 @@ import org.harctoolbox.irp.RepeatMarker;
 /**
  * This class generates an IRP {@link Protocol} from the {@link LircRemote} given as argument.
  */
-public class LircIrp {
+public final class LircIrp {
 
     /**
      * A little test/demo main that reads the files given as arguments,

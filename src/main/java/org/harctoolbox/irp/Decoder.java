@@ -32,7 +32,7 @@ import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.xml.sax.SAXException;
 
-public class Decoder {
+public final class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
 
     @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})

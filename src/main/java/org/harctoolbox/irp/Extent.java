@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * This class implements Extents as per Chapter 4.
  *
  */
-public class Extent extends Duration {
+public final class Extent extends Duration {
 
     private static final Logger logger = Logger.getLogger(Extent.class.getName());
 

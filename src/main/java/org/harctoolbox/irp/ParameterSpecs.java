@@ -30,7 +30,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>,AggregateLister {
+public final class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>,AggregateLister {
 
     private Map<String, ParameterSpec> map = new LinkedHashMap<>(3);
 

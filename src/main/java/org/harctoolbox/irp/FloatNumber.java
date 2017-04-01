@@ -21,7 +21,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class FloatNumber extends IrpObject implements Floatable {
+public final class FloatNumber extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
 
     public static double parse(String str) {

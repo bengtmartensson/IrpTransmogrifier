@@ -28,7 +28,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-public class STCodeGenerator extends CodeGenerator {
+public final class STCodeGenerator extends CodeGenerator {
 
     private static final Logger logger = Logger.getLogger(STCodeGenerator.class.getName());
 

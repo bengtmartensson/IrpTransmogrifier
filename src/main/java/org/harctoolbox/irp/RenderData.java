@@ -22,7 +22,7 @@ import java.util.List;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 
-public class RenderData extends Traverser {
+public final class RenderData extends Traverser {
 
     private final List<EvaluatedIrStream> evaluatedIrStreamList;
 
@@ -52,7 +52,7 @@ public class RenderData extends Traverser {
         currentEvaluatedIrStream().add(evalStream);
     }
 
-    public final void push() {
+    public void push() {
         EvaluatedIrStream evalIrStream = evaluatedIrStreamList.isEmpty()
                 ? new EvaluatedIrStream(getNameEngine(), getGeneralSpec(), IrSignal.Pass.intro)
                 : new EvaluatedIrStream(currentEvaluatedIrStream());

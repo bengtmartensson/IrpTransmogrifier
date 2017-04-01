@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-class DecodeException extends Exception {
+final class DecodeException extends Exception {
 
     DecodeException(int i) {
         super("Decode failed at token/duration #" + Integer.toString(i));

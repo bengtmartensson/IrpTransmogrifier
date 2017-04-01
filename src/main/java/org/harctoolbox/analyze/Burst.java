@@ -27,7 +27,7 @@ import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
 
-public class Burst {
+public final class Burst {
     public static final double DEFAULTMAXROUNDINGERROR = 0.3f;
     public static final double DEFAULTMAXUNITS = 30f;
     public static final double DEFAULTMAXUS = 10000f;

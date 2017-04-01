@@ -23,7 +23,7 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.misc.Aggregate;
 
-public class STItemCodeGenerator extends ItemCodeGenerator {
+public final class STItemCodeGenerator extends ItemCodeGenerator {
 
     private final ST st;
 

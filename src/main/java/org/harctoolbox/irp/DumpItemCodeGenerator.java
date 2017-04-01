@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import org.harctoolbox.ircore.IrCoreUtils;
 
-public class DumpItemCodeGenerator extends ItemCodeGenerator {
+public final class DumpItemCodeGenerator extends ItemCodeGenerator {
 
     private static String mkPrefix(int level) {
         StringBuilder s = new StringBuilder(level);

@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * This class implements GeneralSpec as given in Chapter 2 of Dixon: "Specification of IRP Notation", second draft.
  * This class is immutable; can only be build by the constructor, and not altered.
  */
-public class GeneralSpec extends IrpObject implements AggregateLister {
+public final class GeneralSpec extends IrpObject implements AggregateLister {
     private final static int WEIGHT = 0;
     public final static BitDirection defaultBitDirection = BitDirection.lsb;
     public final static double defaultFrequency = ModulatedIrSequence.defaultFrequency;
@@ -156,23 +156,23 @@ public class GeneralSpec extends IrpObject implements AggregateLister {
         return hash;
     }
 
-    public final BitDirection getBitDirection() {
+    public BitDirection getBitDirection() {
         return bitDirection;
     }
 
-    public final Double getFrequency() {
+    public Double getFrequency() {
         return frequency;
     }
 
-    public final double getFrequencyWitDefault() {
+    public double getFrequencyWitDefault() {
         return frequency != null ? frequency : defaultFrequency;
     }
 
-    public final double getUnit() {
+    public double getUnit() {
         return unit;
     }
 
-    public final Double getDutyCycle() {
+    public Double getDutyCycle() {
         return dutyCycle;
     }
 

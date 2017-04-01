@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 /**
  * This Exception is thrown when a protocol parameter is outside of its domain.
  */
-public class DomainViolationException extends IrpException {
+public final class DomainViolationException extends IrpException {
 
     private DomainViolationException(String message) {
         super(message);

@@ -69,7 +69,7 @@ import org.xml.sax.SAXException;
  * Basically, there should not be "too much" business logic here; we construct element and call its
  * member functions, defined elsewhere.
  */
-public class IrpTransmogrifier {
+public final class IrpTransmogrifier {
     // TODO: make these user settable, reading environment vars, etc.
     private static final String defaultConfigFile = "/IrpProtocols.xml";
 

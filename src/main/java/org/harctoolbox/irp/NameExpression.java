@@ -23,7 +23,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-class NameExpression extends PrimaryItemExpression {
+final class NameExpression extends PrimaryItemExpression {
 
     static Expression newExpression(IrpParser.NameContext nameContext) {
         try {

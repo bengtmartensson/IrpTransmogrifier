@@ -25,7 +25,7 @@ import java.util.List;
  * A ModulatedIrSequence is an IrSequence with the additional properties of a modulation frequency and a duty cycle.
  * The name is slightly misleading since the modulation frequency can be 0; it just needs to be present.
  */
-public class ModulatedIrSequence extends IrSequence {
+public final class ModulatedIrSequence extends IrSequence {
     private static final double allowedFrequencyDeviation = 0.05;
     private static final double zeroModulationLimit = 0.000001;
     public static final double defaultFrequency = 38000.0;
@@ -122,11 +122,11 @@ public class ModulatedIrSequence extends IrSequence {
      *
      * @return modulation frequency in Hz.
      */
-    public final Double getFrequency() {
+    public Double getFrequency() {
         return frequency;
     }
 
-    public final double getFrequencyWithDefault() {
+    public double getFrequencyWithDefault() {
         return frequency != null ? frequency : defaultFrequency;
     }
 
@@ -134,7 +134,7 @@ public class ModulatedIrSequence extends IrSequence {
      *
      * @return Duty cycle.
      */
-    public final Double getDutyCycle() {
+    public Double getDutyCycle() {
         return dutyCycle;
     }
 
@@ -155,7 +155,7 @@ public class ModulatedIrSequence extends IrSequence {
      * Makes the current sequence into an IrSignal by considering the sequence as an intro sequence.
      * @return IrSignal
      */
-    public final IrSignal toIrSignal() {
+    public IrSignal toIrSignal() {
         return new IrSignal(this, new IrSequence(), new IrSequence(), frequency, dutyCycle);
     }
 
@@ -200,7 +200,7 @@ public class ModulatedIrSequence extends IrSequence {
      *
      * @return true if and only iff the modulation frequency is zero (in numerical sense).
      */
-    public final boolean isZeroModulated() {
+    public boolean isZeroModulated() {
         return frequency < zeroModulationLimit;
     }
 
@@ -230,7 +230,7 @@ public class ModulatedIrSequence extends IrSequence {
     }
 
     @Override
-    public final List<IrSequence> chop(double amount) {
+    public List<IrSequence> chop(double amount) {
         List<IrSequence> irSequences = super.chop(amount);
         List<IrSequence> mods = new ArrayList<>(irSequences.size());
         irSequences.forEach((seq) -> {

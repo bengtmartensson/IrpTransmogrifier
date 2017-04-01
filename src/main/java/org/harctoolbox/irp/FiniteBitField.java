@@ -31,7 +31,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class FiniteBitField extends BitField implements IrStreamItem {
+public final class FiniteBitField extends BitField implements IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
 

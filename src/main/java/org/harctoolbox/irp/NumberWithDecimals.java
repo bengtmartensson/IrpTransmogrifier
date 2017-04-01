@@ -22,7 +22,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class NumberWithDecimals extends IrpObject implements Floatable {
+public final class NumberWithDecimals extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
     private static final double equalityTolerance = 1E-6;
 

@@ -19,7 +19,7 @@ package org.harctoolbox.analyze;
 
 import java.util.List;
 
-public class XmpDecoder extends PwmDecoder {
+public final class XmpDecoder extends PwmDecoder {
 
     private final static int NO_BURSTS = 16;
 

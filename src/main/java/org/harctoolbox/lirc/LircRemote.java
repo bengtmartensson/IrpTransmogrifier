@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Semantic-agnostic model of a Lirc remote. May be either raw or cooked.
  */
-public class LircRemote {
+public final class LircRemote {
 
     private final String name;
     private final List<String> flags;

@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 /**
  * This class implements Irstream as of Chapter 6.
  */
-public class BareIrStream extends IrpObject implements IrStreamItem {
+public final class BareIrStream extends IrpObject implements IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(BareIrStream.class.getName());
 

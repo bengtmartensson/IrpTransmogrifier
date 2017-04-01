@@ -23,7 +23,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class NameOrNumber extends IrpObject implements Floatable {
+public final class NameOrNumber extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
 
     private Floatable thing;

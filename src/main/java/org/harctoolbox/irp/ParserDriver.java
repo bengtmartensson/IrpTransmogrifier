@@ -23,7 +23,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 /**
  * This class encapsulates the IrpParser.
  */
-public class ParserDriver {
+public final class ParserDriver {
 
     private final IrpLexer lexer;
     private final CommonTokenStream tokens;

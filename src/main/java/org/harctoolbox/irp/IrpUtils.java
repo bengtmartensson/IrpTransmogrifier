@@ -37,7 +37,7 @@ import org.antlr.v4.gui.TreeViewer;
 /**
  * This class is a collection of useful utilities as static functions and constants.
  */
-public class IrpUtils {
+public final class IrpUtils {
 
     public final static String dumbCharsetName = "US-ASCII";
 

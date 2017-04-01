@@ -51,7 +51,7 @@ public class Decoder {
                     System.out.println(kvp);
                 });
             }
-        } catch (IOException | InvalidArgumentException | IrpInvalidArgumentException | DomainViolationException | InvalidNameException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
+        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | IrpInvalidArgumentException | DomainViolationException | InvalidNameException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
             Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }

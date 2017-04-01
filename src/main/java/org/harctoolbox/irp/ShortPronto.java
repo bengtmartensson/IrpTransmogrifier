@@ -16,7 +16,6 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
@@ -28,7 +27,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 /**
  * Extends org.harctoolbox.ircore with functions for handling short Pronto format for the protocols rc5, rc5x, rc6, and nec1.
  */
-public class ShortPronto extends Pronto {
+public final class ShortPronto extends Pronto {
     private final static int rc5Code = 0x5000;
     private final static int rc5xCode = 0x5001;
     private final static int rc6Code = 0x6000;
@@ -75,8 +74,8 @@ public class ShortPronto extends Pronto {
         IrSignal irSignal = null;
 
         switch (type) {
-            case learnedCode: // 0x0000
-            case learnedZeroFrequencyCode: // 0x0100
+            case LEARNED_CODE: // 0x0000
+            case LEARNED_UNMODULATED_CODE: // 0x0100
                 irSignal = Pronto.parse(ccf);
                 break;
 
@@ -141,24 +140,24 @@ public class ShortPronto extends Pronto {
     }
 
 
-    /**
-     * Creates a new IrSignals by interpreting its argument as CCF string.
-     * @param list Strings representing hexadecimal numbers
-     * @return IrSignal
-     * @throws InvalidArgumentException
-     */
-    public static IrSignal parse(List<String> list) throws InvalidArgumentException {
-        int[] ccf;
-        try {
-            ccf = Pronto.parseAsInts(list);
-        } catch (NumberFormatException ex) {
-            throw new InvalidArgumentException("Non-parseable CCF strings");
-        }
-        if (ccf == null)
-            throw new InvalidArgumentException("Invalid CCF strings");
-
-        return parse(ccf);
-    }
+//    /**
+//     * Creates a new IrSignals by interpreting its argument as CCF string.
+//     * @param list Strings representing hexadecimal numbers
+//     * @return IrSignal
+//     * @throws InvalidArgumentException
+//     */
+//    public static IrSignal parse(List<String> list) throws InvalidArgumentException {
+//        int[] ccf;
+//        try {
+//            ccf = Pronto.parseAsInts(list);
+//        } catch (NumberFormatException ex) {
+//            throw new InvalidArgumentException("Non-parseable CCF strings");
+//        }
+//        if (ccf == null)
+//            throw new InvalidArgumentException("Invalid CCF strings");
+//
+//        return parse(ccf);
+//    }
 
     /**
      * The string version of shortCCF(...).

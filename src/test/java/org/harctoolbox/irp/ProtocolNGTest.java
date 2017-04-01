@@ -95,7 +95,7 @@ public class ProtocolNGTest {
             nameEngine = new NameEngine("{D=12,F=56}");
             result = nec1.toIrSignal(nameEngine);
             assertTrue(result.approximatelyEquals(Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C")));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -131,7 +131,7 @@ public class ProtocolNGTest {
             assertEquals(nameEngine.get("T").toNumber(), 1L);
             assertEquals(rc5.getMemoryVariable("T"), 1L);
             assertTrue(result.approximatelyEquals(rc5D12F56T0));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -145,7 +145,7 @@ public class ProtocolNGTest {
             IrSignal result = rc6.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(rc6D12F34));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -159,7 +159,7 @@ public class ProtocolNGTest {
             IrSignal result = nokia32.toIrSignal(new NameEngine("{D=12,S=56,F=34,T=0,X=78}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(nokia32D12S56F34T0X78));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -179,7 +179,7 @@ public class ProtocolNGTest {
             NamedProtocol nokia32 = irpDatabase.getNamedProtocol("nokia32");
             Map<String, Long> recognizeData = nokia32.recognize(signal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -193,7 +193,7 @@ public class ProtocolNGTest {
             IrSignal result = amino.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(aminoD12F34));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -207,7 +207,7 @@ public class ProtocolNGTest {
             NamedProtocol amino = irpDatabase.getNamedProtocol("amino");
             Map<String, Long> recognizeData = amino.recognize(aminoD12F34);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -223,7 +223,7 @@ public class ProtocolNGTest {
             fail();
         } catch (SignalRecognitionException ex) {
             System.out.println(ex.getMessage());
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -237,7 +237,7 @@ public class ProtocolNGTest {
             IrSignal result = arctech.toIrSignal(new NameEngine("{D=12,S=9,F=0}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(irSignal));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -251,7 +251,7 @@ public class ProtocolNGTest {
             IrSignal result = xmp.toIrSignal(new NameEngine("{D=12,S=56,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(xmpD12S56F34));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -265,7 +265,7 @@ public class ProtocolNGTest {
             IrSignal result = directv.toIrSignal(new NameEngine("{D=12,F=34}"));
             System.out.println(result);
             assertTrue(result.approximatelyEquals(directvD12F34));
-        } catch (InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -279,7 +279,7 @@ public class ProtocolNGTest {
             Protocol directv = irpDatabase.getNamedProtocol("directv");
             Map<String, Long> recognizeData = directv.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -360,7 +360,7 @@ public class ProtocolNGTest {
             Protocol nec1 = irpDatabase.getNamedProtocol("nec1");
             Map<String, Long> recognizeData = nec1.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -377,9 +377,8 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,S=34,F=56}");
             Protocol nec1 = irpDatabase.getNamedProtocol("nec1");
             Map<String, Long> recognizeData = nec1.recognize(irSignal);
-            recognizeData = nec1.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (SignalRecognitionException | InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (Pronto.NonProntoFormatException | SignalRecognitionException | InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             ex.printStackTrace();
             fail();
         }
@@ -389,6 +388,7 @@ public class ProtocolNGTest {
      * Test of recognize method, of class Protocol.
      */
     @Test
+    @SuppressWarnings("UnusedAssignment")
     public void testRecognizeNec1ShortLeadout() {
         System.out.println("recognizeLong");
         try {
@@ -398,7 +398,7 @@ public class ProtocolNGTest {
             Protocol nec1 = irpDatabase.getNamedProtocol("nec1");
             Map<String, Long> recognizeData;
             try {
-                recognizeData = nec1.recognize(irSignal);
+                nec1.recognize(irSignal);
                 fail();
             } catch (SignalRecognitionException ex) {
             }
@@ -406,7 +406,7 @@ public class ProtocolNGTest {
 
             recognizeData = nec1_10000.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (SignalRecognitionException | InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (Pronto.NonProntoFormatException | SignalRecognitionException | InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             ex.printStackTrace();
             fail();
         }
@@ -425,7 +425,7 @@ public class ProtocolNGTest {
             Protocol tivo = irpDatabase.getNamedProtocol("tivo");
             tivo.recognize(irSignal);
             fail();
-        } catch (IrpInvalidArgumentException | InvalidArgumentException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | NameUnassignedException ex) {
+        } catch (IrpInvalidArgumentException | InvalidArgumentException | Pronto.NonProntoFormatException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | NameUnassignedException ex) {
             fail();
         } catch (SignalRecognitionException ex) {
         }
@@ -446,7 +446,7 @@ public class ProtocolNGTest {
             nameEngine = new NameEngine("{D=12,F=56,T=0}");
             recognizeData = rc5.recognize(irSignal,true);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -463,7 +463,7 @@ public class ProtocolNGTest {
             NamedProtocol denonK = irpDatabase.getNamedProtocol("denon-k");
             Map<String, Long> recognizeData = denonK.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             ex.printStackTrace();
             fail();
         }
@@ -479,7 +479,7 @@ public class ProtocolNGTest {
             NameEngine nameEngine = new NameEngine("{D=12,F=3}");
             Map<String, Long> recognizeData = adnotam.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnsupportedRepeatException ex) {
             ex.printStackTrace();
             fail();
         }
@@ -494,7 +494,7 @@ public class ProtocolNGTest {
             Protocol rc6 = irpDatabase.getNamedProtocol("rc6");
             Map<String, Long> recognizeData = rc6.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -508,7 +508,7 @@ public class ProtocolNGTest {
             Protocol arctech = irpDatabase.getNamedProtocol("arctech");
             Map<String, Long> recognizeData = arctech.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             ex.printStackTrace();
             fail();
         }
@@ -531,7 +531,7 @@ public class ProtocolNGTest {
             Protocol apple = irpDatabase.getNamedProtocol("apple");
             Map<String, Long> recognizeData = apple.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -554,7 +554,7 @@ public class ProtocolNGTest {
             fail();
         } catch (SignalRecognitionException ex) {
             System.out.println(ex.getMessage());
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -569,7 +569,7 @@ public class ProtocolNGTest {
             NamedProtocol anthem = irpDatabase.getNamedProtocol("anthem");
             Map<String, Long> recognizeData = anthem.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -584,7 +584,7 @@ public class ProtocolNGTest {
             NamedProtocol rc6M56 = irpDatabase.getNamedProtocol("rc6-M-32");
             Map<String, Long> recognizeData = rc6M56.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -601,7 +601,7 @@ public class ProtocolNGTest {
             NamedProtocol rc6M56 = irpDatabase.getNamedProtocol("rc6-M-56");
             Map<String, Long> recognizeData = rc6M56.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -616,7 +616,7 @@ public class ProtocolNGTest {
             NamedProtocol mce = irpDatabase.getNamedProtocol("mce");
             Map<String, Long> recognizeData = mce.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -630,7 +630,7 @@ public class ProtocolNGTest {
             NamedProtocol entone = irpDatabase.getNamedProtocol("entone");
             Map<String, Long> recognizeData = entone.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -644,7 +644,7 @@ public class ProtocolNGTest {
             NamedProtocol rc5x = irpDatabase.getNamedProtocol("rc5x");
             Map<String, Long> recognizeData = rc5x.recognize(irSignal, false);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -658,7 +658,7 @@ public class ProtocolNGTest {
             NamedProtocol rs200 = irpDatabase.getNamedProtocol("rs200");
             Map<String, Long> recognizeData = rs200.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             System.err.println(ex.getLocalizedMessage());
             fail();
         }
@@ -673,7 +673,7 @@ public class ProtocolNGTest {
             NamedProtocol solidtek16 = irpDatabase.getNamedProtocol("solidtek16");
             Map<String, Long> recognizeData = solidtek16.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -710,7 +710,7 @@ public class ProtocolNGTest {
             NamedProtocol iodatan = irpDatabase.getNamedProtocol("iodatan");
             Map<String, Long> recognizeData = iodatan.recognize(irSignal, false);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -725,7 +725,7 @@ public class ProtocolNGTest {
             NamedProtocol velodyne = irpDatabase.getNamedProtocol("velodyne");
             Map<String, Long> recognizeData = velodyne.recognize(irSignal);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -740,7 +740,7 @@ public class ProtocolNGTest {
             NamedProtocol xmp = irpDatabase.getNamedProtocol("xmp");
             Map<String, Long> recognizeData = xmp.recognize(irSignal, false, 500f, 50f, 0.02, 10000d);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }
@@ -755,7 +755,7 @@ public class ProtocolNGTest {
             NamedProtocol xmp1 = irpDatabase.getNamedProtocol("xmp-1");
             Map<String, Long> recognizeData = xmp1.recognize(irSignal, false, 500f, 50f, 0.02, 10000d);
             assertTrue(nameEngine.numericallyEquals(recognizeData));
-        } catch (InvalidArgumentException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
             fail();
         }
     }

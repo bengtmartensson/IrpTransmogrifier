@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -41,9 +42,10 @@ public class DecoderNGTest {
     /**
      * Test of decode method, of class Decoder.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
     @Test
-    public void testDecode() throws InvalidArgumentException {
+    public void testDecode() throws InvalidArgumentException, Pronto.NonProntoFormatException {
         System.out.println("decode");
         IrSignal irSignal = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C");
         Map<String, Decoder.Decode> result = decoder.decode(irSignal, false, true);

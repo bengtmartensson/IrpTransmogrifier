@@ -50,7 +50,10 @@ public class IrSignal implements Cloneable {
         IrSignal irSignal = null;
         try {
             irSignal = Pronto.parse(args);
-        } catch (InvalidArgumentException ex) {
+            // Do not catch InvalidArgumentException here, if that is thrown
+            // likely erroneous wanna-be Pronto
+        } catch (Pronto.NonProntoFormatException ex) {
+            // Signal does not look like Pronto, try it as raw
         }
         if (irSignal != null) {
             if (frequency != null)
@@ -147,8 +150,8 @@ public class IrSignal implements Cloneable {
      * @param frequency
      * @throws InvalidArgumentException
      */
-    public IrSignal(int[] durations, int noIntro, int noRepeat, Integer frequency) throws InvalidArgumentException {
-        this(durations, noIntro, noRepeat, Double.valueOf(frequency), null);
+    public IrSignal(int[] durations, int noIntro, int noRepeat, double frequency) throws InvalidArgumentException {
+        this(durations, noIntro, noRepeat, frequency, null);
     }
     /**
      * Constructs an IrSignal from its arguments.
@@ -205,11 +208,12 @@ public class IrSignal implements Cloneable {
     /**
      * Creates an IrSignal from a CCF string. Also some "short formats" of CCF are recognized.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      * @see Pronto
      *
      * @param ccf String supposed to represent a valid CCF signal.
      */
-    public IrSignal(String ccf) throws InvalidArgumentException {
+    public IrSignal(String ccf) throws InvalidArgumentException, Pronto.NonProntoFormatException {
         copyFrom(Pronto.parse(ccf));
     }
 
@@ -229,11 +233,12 @@ public class IrSignal implements Cloneable {
      * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
      * @param begin starting index
      * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      * @see Pronto
      *
      * @param ccf String array supposed to represent a valid CCF signal.
      */
-    public IrSignal(String[] ccf, int begin) throws InvalidArgumentException {
+    public IrSignal(String[] ccf, int begin) throws InvalidArgumentException, Pronto.NonProntoFormatException {
         copyFrom(Pronto.parse(ccf, begin));
     }
 
@@ -520,11 +525,10 @@ public class IrSignal implements Cloneable {
     /**
      * Computes the CCF form, if possible. Since a CCF does not have an ending sequence,
      * a nonempty ending sequence will be ignored.
-     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @see Pronto
      * @return CCF as string.
      */
-    public final String ccfString() throws OddSequenceLengthException {
+    public final String ccfString() {
         return Pronto.toPrintString(this);
     }
 

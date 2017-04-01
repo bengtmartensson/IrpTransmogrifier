@@ -571,12 +571,17 @@ public class IrpTransmogrifier {
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
         try {
             analyzePronto(commandAnalyze, commandLineArgs);
-        } catch (InvalidArgumentException ex) {
-            analyzeRaw(commandAnalyze, commandLineArgs);
+        } catch (Pronto.NonProntoFormatException ex) {
+            logger.log(Level.FINE, "Parsing as Pronto Hex failed, trying as raw.");
+            try {
+                analyzeRaw(commandAnalyze, commandLineArgs);
+            } catch (NumberFormatException e) {
+                throw new UsageException("Invalid signal, neither valid as Pronto nor as raw.");
+            }
         }
     }
 
-    private void analyzePronto(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, InvalidArgumentException {
+    private void analyzePronto(CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) throws InvalidArgumentException, InvalidArgumentException, Pronto.NonProntoFormatException {
         IrSignal irSignal = Pronto.parse(commandAnalyze.args);
         if (commandAnalyze.introRepeatEnding)
             logger.warning("--intro.repeat-ending ignored when using a Pronto Hex signal.");
@@ -955,7 +960,7 @@ public class IrpTransmogrifier {
         @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics")
         private boolean statistics = false;
 
-        @Parameter(names = {"-t", "--timebase"}, description = "Force timebase, in microseconds, or in periods (with ending \"p\")")
+        @Parameter(names = {"-t", "--timebase"}, description = "Force time unit , in microseconds (no suffix), or in periods (with suffix \"p\")")
         private String timeBase = null;
 
         @Parameter(description = "durations in microseconds, or pronto hex", required = true)
@@ -993,8 +998,8 @@ public class IrpTransmogrifier {
         @Parameter(names = { "-p", "--parameter" }, description = "Specify target dependent parameters to the code generators")
         private List<String> parameters = new ArrayList<>(4);
 
-        @Parameter(names = { "-s", "--stdirectory" }, description = "Directory containing st files for code generation")
-        private String stDir = System.getenv("STDIR") != null ? System.getenv("STDIR") : "st"; // FIXME
+        @Parameter(names = { "-s", "--stdirectory" }, description = "Directory containing st (string template) files for code generation")
+        private String stDir = System.getenv("STDIR") != null ? System.getenv("STDIR") : "st";
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target(s) for code generation. Use ? for a list.")
         private List<String> target = new ArrayList<>(4);

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,18 +27,37 @@ import java.util.logging.Logger;
  * since there are no "Pronto"s, it is just IrSignals in "another coordinates".
  */
 public abstract class Pronto {
-    /** Number of characters in the hexadecimal digits of Pronto strings. */
-    public final static int charsInDigit = 4;
 
-    /** Constant used for computing the frequency code from the frequency */
-    public final static double prontoConstant = 0.241246;
-    private final static double dummyFrequency = 100000.0/prontoConstant;
+    /**
+     * Number of characters in the hexadecimal digits of Pronto strings.
+     */
+    public final static int CHARS_IN_DIGIT = 4;
 
-    /** Format code used to format integers in the Pronto Hex. */
-    public final static String formattingCode = "%04X";
+    /**
+     * Constant used for computing the frequency code from the frequency
+     */
+    public final static double FREQUENCY_CONSTANT = 0.241246;
 
-    protected final static int learnedCode = 0x0000;
-    protected final static int learnedZeroFrequencyCode = 0x0100;
+    /**
+     * For non-modulated IR signals, use this as the second argument of the CCF
+     * form.
+     */
+    private final static int FREQUENCY_0_FALLBACK_FREQUNCY_CODE = 1;
+
+    /**
+     * Format code used to format integers in the Pronto Hex.
+     */
+    public final static String HEX_STRING_FORMAT = "%04X";
+
+    /**
+     * Constant denoting "learned", modulated signals.
+     */
+    protected final static int LEARNED_CODE = 0x0000;
+
+    /**
+     * Constant denoting "learned", non-modulated signals.
+     */
+    protected final static int LEARNED_UNMODULATED_CODE = 0x0100;
 
     private static final Logger logger = Logger.getLogger(Pronto.class.getName());
 
@@ -47,58 +67,75 @@ public abstract class Pronto {
      * @return Formatted string
      */
     public static String formatInteger(int n) {
-        return String.format(formattingCode, n);
+        return String.format(HEX_STRING_FORMAT, n);
     }
 
     /**
      * Returns frequency code from frequency in Hz (the second number in the CCF).
      *
-     * @param f Frequency in Hz.
+     * @param frequency Frequency in Hz.
      * @return code for the frequency.
      */
-    public static int getProntoCode(double f) {
-        return (int) Math.round(1000000.0 / ((f>0 ? f : dummyFrequency) * prontoConstant));
+    public static int frequencyCode(double frequency) {
+        return frequency > 0
+                ? (int) Math.round(1000000d / (frequency * FREQUENCY_CONSTANT))
+                : FREQUENCY_0_FALLBACK_FREQUNCY_CODE;
     }
 
     /**
      * Computes the carrier frequency in Hz.
      * @param code Pronto frequency code
      * @return Frequency in Hz.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public static Double getFrequency(int code) {
-        return code == 0
-                ? null // Invalid value
-                : 1000000.0 / (code * prontoConstant);
+    public static double frequency(int code) throws InvalidArgumentException {
+        return 1d / pulseTime(code);
     }
 
     /**
-     * Computes pulse time in microseconds.
+     * Computes pulse time in seconds.
      * @param code Pronto frequency code.
-     * @return Duration of one pulse of the carrier in microseconds.
+     * @return Duration of one pulse of the carrier in seconds.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public static Double getPulseTime(int code) { // in microseconds
-        return code == 0
-                ? null // Invalid value
-                : code * prontoConstant;
+    public static double pulseTime(int code) throws InvalidArgumentException { // in microseconds
+        if (code <= 0)
+            throw new InvalidArgumentException();
+
+        return IrCoreUtils.microseconds2seconds(code * FREQUENCY_CONSTANT);
     }
 
-    // TODO: fix for f=0,
     /**
      * Computes number of cycles of the carrier the first argument will require.
      *
-     * @param us duration in microseconds
+     * @param time duration in seconds
      * @param frequency
      * @return number of pulses
+     * @throws org.harctoolbox.ircore.InvalidArgumentException if frequency <= 0.
      */
-    public static int pulses(double us, double frequency) {
-        return Math.min((int)Math.round(Math.abs(us) * (frequency > 0 ? frequency : dummyFrequency)/1000000.0), 0xFFFF);
+    public static int pulses(double time, double frequency) throws InvalidArgumentException {
+        if (frequency <= 0)
+            throw new InvalidArgumentException("Frequency must be > 0");
+        return Math.min((int)Math.round(time * frequency), 0xFFFF);
     }
 
-    private static double[] usArray(int frequencyCode, int[] ccfArray, int beg, int end) {
-        double pulseTime = getPulseTime(frequencyCode);
+    /**
+     * Computes number of cycles of the carrier the first argument will require.
+     *
+     * @param time duration in micro seconds
+     * @param frequency
+     * @return number of pulses
+     * @throws org.harctoolbox.ircore.InvalidArgumentException if frequency <= 0.
+     */
+    public static int pulsesMicroSeconds(double time, double frequency) throws InvalidArgumentException {
+        return pulses(IrCoreUtils.microseconds2seconds(time), frequency);
+    }
+
+    private static double[] usArray(int frequencyCode, int[] ccfArray, int beg, int end) throws InvalidArgumentException {
+        double pulseTimeMicrosSeconds = IrCoreUtils.seconds2microseconds(pulseTime(frequencyCode));
         double[] data = new double[end - beg];
         for (int i = beg; i < end; i++)
-            data[i-beg] = pulseTime*ccfArray[i];
+            data[i-beg] = pulseTimeMicrosSeconds*ccfArray[i];
 
         return data;
     }
@@ -128,19 +165,20 @@ public abstract class Pronto {
         IrSignal irSignal = null;
 
         switch (type) {
-            case learnedCode: // 0x0000
-            case learnedZeroFrequencyCode: // 0x0100
+            case LEARNED_CODE: // 0x0000
+            case LEARNED_UNMODULATED_CODE: // 0x0100
                 double[] intro = usArray(frequencyCode, ccf, index, index + 2*introLength);
                 double[] repeat = usArray(frequencyCode, ccf, index + 2*introLength, ccf.length);
                 IrSequence introSequence = new IrSequence(intro);
                 IrSequence repeatSequence = new IrSequence(repeat);
                 irSignal = new IrSignal(introSequence, repeatSequence, null,
-                        type == learnedCode ? getFrequency(frequencyCode) : 0,
+                        type == LEARNED_CODE ? frequency(frequencyCode) : 0,
                         null);
                 break;
 
             default:
                 throw new InvalidArgumentException("CCF type 0x" + Integer.toHexString(type) + " not supported");
+                // ... but see the class org.harctoolbox.irp.ShortPronto...
         }
         return irSignal;
     }
@@ -150,8 +188,9 @@ public abstract class Pronto {
      * @param ccfString CCF signal
      * @return IrSignal
      * @throws InvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
-    public static IrSignal parse(String ccfString) throws InvalidArgumentException {
+    public static IrSignal parse(String ccfString) throws NonProntoFormatException, InvalidArgumentException {
         int[] ccf = parseAsInts(ccfString);
         return parse(ccf);
     }
@@ -161,18 +200,11 @@ public abstract class Pronto {
      * @param array Strings representing hexadecimal numbers
      * @param begin Starting index
      * @return IrSignal
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
-    public static IrSignal parse(String[] array, int begin) throws InvalidArgumentException {
-        int[] ccf;
-        try {
-            ccf = parseAsInts(array, begin);
-        } catch (NumberFormatException ex) {
-            throw new InvalidArgumentException("Non-parseable CCF strings");
-        }
-        if (ccf == null)
-            throw new InvalidArgumentException("Invalid CCF strings");
-
+    public static IrSignal parse(String[] array, int begin) throws NonProntoFormatException, InvalidArgumentException {
+        int[] ccf = parseAsInts(array, begin);
         return parse(ccf);
     }
 
@@ -181,8 +213,9 @@ public abstract class Pronto {
      * @param array Strings representing hexadecimal numbers
      * @return IrSignal
      * @throws InvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
-    public static IrSignal parse(String[] array) throws InvalidArgumentException {
+    public static IrSignal parse(String[] array) throws InvalidArgumentException, NonProntoFormatException {
         return parse(array, 0);
     }
 
@@ -191,17 +224,10 @@ public abstract class Pronto {
      * @param list Strings representing hexadecimal numbers
      * @return IrSignal
      * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
-    public static IrSignal parse(List<String> list) throws InvalidArgumentException {
-        int[] ccf;
-        try {
-            ccf = parseAsInts(list);
-        } catch (NumberFormatException ex) {
-            throw new InvalidArgumentException("Non-parseable CCF strings");
-        }
-        if (ccf == null)
-            throw new InvalidArgumentException("Invalid CCF strings");
-
+    public static IrSignal parse(List<String> list) throws InvalidArgumentException, NonProntoFormatException {
+        int[] ccf = parseAsInts(list);
         return parse(ccf);
     }
 
@@ -213,7 +239,7 @@ public abstract class Pronto {
      * @return Integer array of numbers if successful, null if unsuccessful.
      * @throws org.harctoolbox.ircore.IrpInvalidArgumentException
      */
-    static int[] parseAsInts(String ccfString) throws InvalidArgumentException {
+    static int[] parseAsInts(String ccfString) throws NonProntoFormatException {
         String[] array = ccfString.trim().split("\\s+");
         return parseAsInts(array, 0);
     }
@@ -227,22 +253,22 @@ public abstract class Pronto {
      * @return Integer array of numbers if successful, null if unsuccessful (e.g. by NumberFormatException).
      * @throws org.harctoolbox.ircore.IrpInvalidArgumentException
      */
-    static int[] parseAsInts(String[] array, int begin) throws InvalidArgumentException {
+    static int[] parseAsInts(String[] array, int begin) throws NonProntoFormatException {
         int[] ccf = new int[array.length];
 
         for (int i = begin; i < array.length; i++) {
-            if (array[i].length() != charsInDigit)
-                throw new InvalidArgumentException("Non-pronto format of " + array[i]);
+            if (array[i].length() != CHARS_IN_DIGIT)
+                throw new NonProntoFormatException(array[i]);
             try {
                 ccf[i] = Integer.parseInt(array[i], 16);
             } catch (NumberFormatException ex) {
-                throw new InvalidArgumentException(ex);
+                throw new NonProntoFormatException(ex);
             }
         }
         return ccf;
     }
 
-    protected static int[] parseAsInts(List<String> list) throws InvalidArgumentException {
+    protected static int[] parseAsInts(List<String> list) throws NonProntoFormatException {
         String[] x = list.toArray(new String[list.size()]);
         return parseAsInts(x, 0);
     }
@@ -254,25 +280,25 @@ public abstract class Pronto {
      * @throws OddSequenceLengthException
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-    public static int[] toArray(IrSignal irSignal) throws OddSequenceLengthException {
+    public static int[] toArray(IrSignal irSignal) throws OddSequenceLengthException, InvalidArgumentException {
         if (irSignal.getIntroLength() % 2 != 0 || irSignal.getRepeatLength() % 2 != 0)
             // Probably forgot normalize() if I get here.
-            throw new OddSequenceLengthException("IR Sequences must be of even length.");
+            throw new OddSequenceLengthException();
         if (irSignal.getEndingLength() != 0)
             logger.log(Level.WARNING,
                     "When computing the Pronto representation, a (non-empty) ending sequence was ignored");
 
         int[] data = new int[4 + irSignal.getIntroLength() + irSignal.getRepeatLength()];
         int index = 0;
-        data[index++] = irSignal.getFrequency() > 0 ? learnedCode : learnedZeroFrequencyCode;
-        data[index++] = getProntoCode(irSignal.getFrequency());
+        data[index++] = irSignal.getFrequency() > 0 ? LEARNED_CODE : LEARNED_UNMODULATED_CODE;
+        data[index++] = frequencyCode(irSignal.getFrequency());
         data[index++] = irSignal.getIntroLength()/2;
         data[index++] = irSignal.getRepeatLength()/2;
         for (int i = 0; i < irSignal.getIntroLength(); i++)
-            data[index++] = pulses(irSignal.getIntroDouble(i), irSignal.getFrequency());
+            data[index++] = pulsesMicroSeconds(irSignal.getIntroDouble(i), irSignal.getFrequency());
 
         for (int i = 0; i < irSignal.getRepeatLength(); i++)
-            data[index++] = pulses(irSignal.getRepeatDouble(i), irSignal.getFrequency());
+            data[index++] = pulsesMicroSeconds(irSignal.getRepeatDouble(i), irSignal.getFrequency());
 
         return data;
     }
@@ -281,10 +307,13 @@ public abstract class Pronto {
      * Computes the ("long", raw) CCF string
      * @param irSignal
      * @return CCF string
-     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public static String toPrintString(IrSignal irSignal) throws OddSequenceLengthException {
-        return toPrintString(toArray(irSignal));
+    public static String toPrintString(IrSignal irSignal) {
+        try {
+            return toPrintString(toArray(irSignal));
+        } catch (InvalidArgumentException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     /**
@@ -293,9 +322,9 @@ public abstract class Pronto {
      * @return CCF string.
      */
     public static String toPrintString(int[] array) {
-        StringBuilder s = new StringBuilder(array.length*5);
-        for (int i = 0; i < array.length; i++)
-            s.append(String.format((i > 0 ? " " : "") + formattingCode, array[i]));
+        StringJoiner s = new StringJoiner(" ");
+        for (int n : array)
+            s.add(String.format(HEX_STRING_FORMAT, n));
         return s.toString();
     }
 
@@ -305,23 +334,24 @@ public abstract class Pronto {
      */
     public static void main(String[] args) {
         try {
-            IrSignal irSignal;
-
-            if (args.length == 1) {
-                irSignal = parse(args[0]);
-            } else {
-                int[] ccf = new int[args.length];
-                for (int i = 0; i < args.length; i++) {
-                    ccf[i] = Integer.parseInt(args[i], 16);
-                }
-                irSignal = parse(ccf);
-            }
+            IrSignal irSignal = args.length == 1 ? parse(args[0]) : parse(args);
             System.out.println(irSignal);
-        } catch (InvalidArgumentException ex) {
+        } catch (InvalidArgumentException | NonProntoFormatException ex) {
             Logger.getLogger(Pronto.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     protected Pronto() {
+    }
+
+    public static class NonProntoFormatException extends Exception {
+
+        public NonProntoFormatException(String string) {
+            super("\"" + string + "\" is not a four digit hexadecimal string");
+        }
+
+        private NonProntoFormatException(NumberFormatException ex) {
+            super(ex);
+        }
     }
 }

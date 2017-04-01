@@ -222,7 +222,7 @@ public class IrCoreUtilsNGTest {
         double us = 1234;
         double expResult = 1.234;
         double result = IrCoreUtils.microseconds2milliseconds(us);
-        assertEquals(result, expResult, 0.0);
+        assertEquals(result, expResult, 0.00001);
     }
 
     /**
@@ -234,7 +234,7 @@ public class IrCoreUtilsNGTest {
         double frequency = 45678;
         double expResult = 45.678;
         double result = IrCoreUtils.hz2khz(frequency);
-        assertEquals(result, expResult, 0.0);
+        assertEquals(result, expResult, 0.00001);
     }
 
     /**
@@ -247,7 +247,7 @@ public class IrCoreUtilsNGTest {
         double frequency = 40000;
         double expResult = 42;
         double result = IrCoreUtils.us2Periods(us, frequency);
-        assertEquals(result, expResult, 0.0);
+        assertEquals(result, expResult, 0.0001);
     }
 //
 //    /**

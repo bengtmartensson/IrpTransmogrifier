@@ -35,7 +35,7 @@ public class CleanerNGTest {
             irSignal = Pronto.parse(nec_12_34_56);
             irSequence = irSignal.toModulatedIrSequence(5);
             noisy = irSequence.addNoise(60.0);
-        } catch (InvalidArgumentException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
             fail();
         }
     }

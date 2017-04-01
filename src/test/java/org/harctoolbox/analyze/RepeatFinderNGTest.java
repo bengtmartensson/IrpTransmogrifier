@@ -57,7 +57,7 @@ public class RepeatFinderNGTest {
             ModulatedIrSequence modulatedIrSequence = new ModulatedIrSequence(arr, 38400d);
             RepeatFinder repeatFinder = new RepeatFinder(modulatedIrSequence);
             assertEquals(repeatFinder.getRepeatFinderData().getNumberRepeats(), 3);
-        } catch (InvalidArgumentException ex) {
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
             assert(false);
         }
     }

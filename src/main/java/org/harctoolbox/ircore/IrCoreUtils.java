@@ -78,27 +78,27 @@ public class IrCoreUtils {
      * @return Argument converted to microseconds.
      */
     public static double seconds2microseconds(double secs) {
-        return 1000000f * secs;
+        return 1000000d * secs;
     }
 
     public static double milliseconds2microseconds(double ms) {
-        return 1000f * ms;
+        return 1000d * ms;
     }
 
     public static double microseconds2milliseconds(double us) {
         return 0.001 * us;
     }
 
-    private static double microseconds2seconds(double us) {
+    public static double microseconds2seconds(double us) {
         return 0.000001 * us;
     }
 
     public static double khz2Hz(double khz) {
-        return 1000f * khz;
+        return 1000d * khz;
     }
 
     public static double hz2khz(double frequency) {
-        return frequency/1000f;
+        return 0.001 * frequency;
     }
 
     public static double us2Periods(double us, double frequency) {
@@ -106,11 +106,11 @@ public class IrCoreUtils {
     }
 
     public static double percent2real(double percent) {
-        return 0.01f * percent;
+        return 0.01 * percent;
     }
 
     public static double real2percent(double x) {
-        return 100f * x;
+        return 100d * x;
     }
 
     public static double l1Norm(Double[] sequence) {

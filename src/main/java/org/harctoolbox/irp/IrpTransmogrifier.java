@@ -275,6 +275,12 @@ public final class IrpTransmogrifier {
                 }
         } catch (UsageException ex) {
             System.err.println(ex.getLocalizedMessage());
+        } catch (ParseCancellationException ex) {
+            // When we get here,
+            // Antlr has already written a somewhat sensible error message on
+            // stderr; that is good enough for now.
+            if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
+                ex.printStackTrace();
         } catch (IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())

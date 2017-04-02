@@ -17,6 +17,8 @@ public class DecoderNGTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        // Prefer reproducible results
+        ParameterSpec.initRandom(1111);
     }
 
     @AfterClass

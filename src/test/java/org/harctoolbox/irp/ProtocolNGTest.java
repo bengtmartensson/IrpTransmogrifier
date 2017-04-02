@@ -760,6 +760,20 @@ public class ProtocolNGTest {
         }
     }
 
+    @Test(enabled = true)
+    public void testRecognize48_nec1() {
+        try {
+            System.out.println("recognize48_nec1");
+            IrSignal irSignal = Pronto.parse("0000 006C 0032 0002 015B 00AD 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0016 0016 0016 0016 0041 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0190 015B 0057 0016 0E6C");
+            NameEngine nameEngine = new NameEngine("{D=110, F=41, E=17, S=118}");
+            NamedProtocol prot = irpDatabase.getNamedProtocol("48-nec1");
+            Map<String, Long> recognizeData = prot.recognize(irSignal, false, 500f, 50f, 0.02, 10000d);
+            assertTrue(nameEngine.numericallyEquals(recognizeData));
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException |InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | SignalRecognitionException | UnknownProtocolException | UnsupportedRepeatException ex) {
+            fail();
+        }
+    }
+
     /**
      * Test of warningFrequency method, of class Protocol.
      */

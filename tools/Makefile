@@ -3,10 +3,12 @@
 # output, for example to the lirc.xml file.
 
 MYDIR := $(dir $(firstword $(MAKEFILE_LIST)))
-	
+
 include $(MYDIR)/paths.mk
 include $(MYDIR)/java-test-renderer-protocols.mk
 include $(MYDIR)/java-test-decoder-protocols.mk
+
+IRP_TRANSMOGRIFIER_JAR := $(IRPHOME)/IrpTransmogrifier-$(VERSION)-jar-with-dependencies.jar
 
 JAVA_PROTOCOL_TEST := JavaTestProtocol
 
@@ -23,39 +25,21 @@ default: $(IRP_TRANSMOGRIFIER_JAR)
 $(IRP_TRANSMOGRIFIER_JAR):
 	mvn install -Dmaven.test.skip=true
 
+apidoc:
+	mvn javadoc:javadoc
+	$(BROWSE) target/site/apidocs/index.html
+
 all-protocols.xml: $(IRP_TRANSMOGRIFIER_JAR)
 	$(IRPTRANSMOGRIFIER) -o $@ code --target xml
 
 lirc.xml: all-protocols.xml ${LIRC_TRANSFORM}
 	$(SAXON) -s:$< -xsl:${LIRC_TRANSFORM} -o:$@
-	
 
 javacodetest: javarendertest javadecodertest $(JAVA_PROTOCOL_TEST)/pom.xml $(IRPPROTOCOLS_XML)
 	(cd $(JAVA_PROTOCOL_TEST); mvn test)
-	
+
 javarendertest:  javarendercodefiles  javarendertestfiles 
 javadecodertest: javadecodercodefiles javadecodertestfiles
-	
-#javarendercodefiles: $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS), $(JAVA_RENDERER_CODEDIR)/$(proto)Renderer.java)
-#
-#javarendertestfiles: $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS), $(JAVA_RENDERER_TESTDIR)/$(proto)RendererNGTest.java)
-#	
-#javadecodercodefiles: $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), $(JAVA_DECODER_CODEDIR)/$(proto)Decoder.java)
-#
-#javadecodertestfiles: $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), $(JAVA_DECODER_TESTDIR)/$(proto)DecoderNGTest.java)
-#	
-#$(JAVA_RENDERER_CODEDIR)/%Renderer.java: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_RENDERER_CODEDIR)
-#	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_RENDERER_CODEDIR) --stdir $(IRPHOME)/st --target java-renderer "$*"
-#
-#$(JAVA_RENDERER_TESTDIR)/%RendererNGTest.java: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_RENDERER_TESTDIR)
-#	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_RENDERER_TESTDIR) --stdir $(IRPHOME)/st --target java-renderer-test "$*"
-#	
-#$(JAVA_DECODER_CODEDIR)/%Decoder.java: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_DECODER_CODEDIR)
-#	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_DECODER_CODEDIR) --stdir $(IRPHOME)/st --target java-decoder "$*"
-#
-#$(JAVA_DECODER_TESTDIR)/%DecoderNGTest.java: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_DECODER_TESTDIR)
-#	$(IRPTRANSMOGRIFIER) --url-decode code --directory $(JAVA_DECODER_TESTDIR) --stdir $(IRPHOME)/st --target java-decoder-test "$*"
-	
 
 javarendercodefiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_RENDERER_CODEDIR)
 	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_RENDERER_CODEDIR) --stdir $(IRPHOME)/st --target java-renderer $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS),"$(proto)")
@@ -79,6 +63,18 @@ $(JAVA_PROTOCOL_TEST) \
 $(JAVA_PROTOCOL_TEST)/src/main/resources \
 $(JAVA_RENDERER_CODEDIR) $(JAVA_RENDERER_TESTDIR) $(JAVA_DECODER_CODEDIR) $(JAVA_DECODER_TESTDIR):
 	mkdir -p $@
+
+# Only for Ubix-like systems	
+install: $(IRP_TRANSMOGRIFIER_JAR)
+	-mkdir -p $(INSTALLDIR)
+	cp target/IrpTransmogrifier-$(VERSION)-bin.zip $(INSTALLDIR)
+	( cd $(INSTALLDIR); unzip IrpTransmogrifier-$(VERSION)-bin.zip; rm IrpTransmogrifier-$(VERSION)-bin.zip )
+	cp tools/Makefile tools/paths.mk $(INSTALLDIR)
+	ln -sf $(INSTALLDIR)/irptransmogrifier.sh $(BINLINK)
+	
+uninstall:
+	rm -rf $(INSTALLDIR)
+	rm $(BINLINK)
 
 clean:
 	mvn clean

@@ -46,49 +46,6 @@ public class ParameterSpecsNGTest {
         assertFalse(rc5.isEmpty());
     }
 
-//    /**
-//     * Test of getNames method, of class ParameterSpecs.
-//     */
-//    @Test
-//    public void testGetNames() {
-//        System.out.println("getNames");
-//        ParameterSpecs instance = new ParameterSpecs();
-//        Set expResult = null;
-//        Set result = instance.getNames();
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of getParams method, of class ParameterSpecs.
-//     */
-//    @Test
-//    public void testGetParams() {
-//        System.out.println("getParams");
-//        ParameterSpecs instance = new ParameterSpecs();
-//        Collection expResult = null;
-//        Collection result = instance.getParams();
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of getParameterSpec method, of class ParameterSpecs.
-//     */
-//    @Test
-//    public void testGetParameterSpec() {
-//        System.out.println("getParameterSpec");
-//        String name = "";
-//        ParameterSpecs instance = new ParameterSpecs();
-//        ParameterSpec expResult = null;
-//        ParameterSpec result = instance.getParameterSpec(name);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
     /**
      * Test of toString method, of class ParameterSpecs.
      */
@@ -113,21 +70,6 @@ public class ParameterSpecsNGTest {
         result = empty.toIrpString();
         assertEquals(result, "");
     }
-
-//    /**
-//     * Test of toElement method, of class ParameterSpecs.
-//     */
-//    @Test
-//    public void testToElement() {
-//        System.out.println("toElement");
-//        Document document = null;
-//        ParameterSpecs instance = new ParameterSpecs();
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
 
     /**
      * Test of check method, of class ParameterSpecs.

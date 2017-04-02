@@ -114,7 +114,7 @@ public final class LircIrp {
 
     private void setupGeneralSpec() {
         BitDirection bitDirection = BitDirection.newBitDirection(remote.hasFlag("REVERSE"));
-        Double frequency = remote.getUnaryParameters("frequency") != null ? remote.getUnaryParameters("frequency").doubleValue() : GeneralSpec.defaultFrequency;
+        Double frequency = remote.getUnaryParameters("frequency") != null ? remote.getUnaryParameters("frequency").doubleValue() : GeneralSpec.DEFAULT_FREQUENCY;
         Double dutyCycle = remote.getUnaryParameters("duty_cycle") != null ? IrCoreUtils.percent2real(remote.getUnaryParameters("duty_cycle")) : null;
         generalSpec = new GeneralSpec(bitDirection, null, frequency, dutyCycle);
     }

@@ -44,21 +44,6 @@ public class GapNGTest {
         Assert.assertEquals(result, -123000f, 0.0);
     }
 
-//    /**
-//     * Test of toElement method, of class Flash.
-//     */
-//    @Test
-//    public void testToElement() throws Exception {
-//        System.out.println("toElement");
-//        Document document = null;
-//        Flash instance = null;
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
     /**
      * Test of interleavingOk method, of class Flash.
      */
@@ -71,5 +56,4 @@ public class GapNGTest {
         result = instance.interleavingOk(null, null, DurationType.gap, false);
         Assert.assertFalse(result);
     }
-
 }

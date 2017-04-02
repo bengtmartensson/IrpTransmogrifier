@@ -249,33 +249,4 @@ public class IrCoreUtilsNGTest {
         double result = IrCoreUtils.us2Periods(us, frequency);
         assertEquals(result, expResult, 0.0001);
     }
-//
-//    /**
-//     * Test of l1Norm method, of class IrCoreUtils.
-//     */
-//    @Test
-//    public void testL1Norm_Iterable() {
-//        System.out.println("l1Norm");
-//        Iterable<Double> sequence = null;
-//        double expResult = 0.0;
-//        double result = IrCoreUtils.l1Norm(sequence);
-//        assertEquals(result, expResult, 0.0);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of approximatelyEquals method, of class IrCoreUtils.
-//     */
-//    @Test
-//    public void testApproximatelyEquals_double_double() {
-//        System.out.println("approximatelyEquals");
-//        double x = 0.0;
-//        double y = 0.0;
-//        boolean expResult = false;
-//        boolean result = IrCoreUtils.approximatelyEquals(x, y);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
 }

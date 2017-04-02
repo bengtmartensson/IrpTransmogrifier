@@ -36,9 +36,6 @@ import org.w3c.dom.Element;
  *
  */
 
-// TODO: There are probably too many accessing functions here.
-// Clean up by eliminating and making private.
-
 public final class NameEngine extends IrpObject implements Cloneable, AggregateLister, Iterable<Map.Entry<String, Expression>> {
     private final static int WEIGHT = 0;
 
@@ -135,14 +132,11 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
                 String name = kvp.getKey();
                 long value = kvp.getValue().toNumber(this);
                 Expression expr = other.get(name);
-//                if (expr == null)
-//                    return false;
                 if (value != expr.toNumber(other)) {
                     logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
                     return false;
                 }
             } catch (NameUnassignedException ex) {
-                //Logger.getLogger(NameEngine.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
         }
@@ -201,11 +195,6 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         return map.entrySet().iterator();
     }
 
-    public void define(String name, String value) throws InvalidNameException {
-        Expression exp = Expression.newExpression(value);
-        define(name, exp/*.getParseTree()*/);
-    }
-
     private void define(String name, IrpParser.ExpressionContext ctx) throws InvalidNameException {
         define(name, Expression.newExpression(ctx));
     }
@@ -215,23 +204,9 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         map.put(name, expression);
     }
 
-    public void define(Name name, Expression expression) throws InvalidNameException {
-        define(name.toString(), expression);
-    }
-
     public void define(String name, long value) throws InvalidNameException {
         define(name, new NumberExpression(value));
     }
-
-    public void define(Name name, long value) throws InvalidNameException {
-        define(name, new NumberExpression(value));
-    }
-
-//    public void define(PrimaryItem data, long value) throws InvalidNameException, IrpSemanticException {
-//        Name name = data.toName();
-//        if (name != null)
-//            define(name, value);
-//    }
 
     /**
      * Invoke the parser on the supplied argument, and stuff the result into the name engine.
@@ -280,14 +255,6 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         map.putAll(definitions.map);
     }
 
-    public String toString(IrpParser parser) {
-        StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
-        map.entrySet().forEach((kvp) -> {
-            stringJoiner.add(kvp.getKey() + "=" + kvp.getValue().toString());
-        });
-        return stringJoiner.toString();
-    }
-
     @Override
     public String toIrpString(int radix) {
         StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
@@ -329,12 +296,12 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
             Expression val = kvp.getValue();
             if (map.containsKey(name)) {
                 try {
-                    // FIXME
                     if (map.get(name).toNumber(this) != val.toNumber(nameEngine)) {
                         logger.log(Level.FINER, "Name conflict {0}", name);
                         throw new ParameterInconsistencyException(name, map.get(name).toNumber(this), val.toNumber(nameEngine));
                     }
                 } catch (NameUnassignedException ex) {
+                    throw new ThisCannotHappenException(ex);
                 }
             } else
                 map.put(name, val);

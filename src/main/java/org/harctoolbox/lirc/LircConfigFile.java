@@ -63,7 +63,7 @@ public final class LircConfigFile {
     /**
      * Default character set for the input files.
      */
-    public final static String defaultCharsetName = "WINDOWS-1252";
+    public final static String DEFAULT_CHARSET_NAME = "WINDOWS-1252";
 
     /**
      * Reads the file given as second argument and updates the dictionary of {@link LircRemote}s given as first argument.
@@ -97,7 +97,7 @@ public final class LircConfigFile {
     }
 
     public static void readConfig(Map<String, LircRemote> dictionary, File filename) throws IOException {
-        readConfig(dictionary, filename, defaultCharsetName);
+        readConfig(dictionary, filename, DEFAULT_CHARSET_NAME);
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
@@ -174,7 +174,7 @@ public final class LircConfigFile {
     private boolean raw;
 
     private LircConfigFile(File configFileName, String source, String charsetName) throws UnsupportedEncodingException, FileNotFoundException, IOException {
-        this(new InputStreamReader(new FileInputStream(configFileName), charsetName != null ? charsetName : defaultCharsetName), source);
+        this(new InputStreamReader(new FileInputStream(configFileName), charsetName != null ? charsetName : DEFAULT_CHARSET_NAME), source);
     }
 
     private LircConfigFile(Reader reader, String source) throws IOException {

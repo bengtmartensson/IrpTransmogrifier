@@ -70,6 +70,7 @@ public class DecoderNGTest {
             boolean result = Decoder.decode(irpDatabasePath);
             assertEquals(result, expResult);
         } catch (IOException | SAXException | IrpException ex) {
+            ex.printStackTrace();
             fail();
         }
     }

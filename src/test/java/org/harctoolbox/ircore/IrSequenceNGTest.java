@@ -125,20 +125,6 @@ public class IrSequenceNGTest {
     }
 
     /**
-     * Test of getLength method, of class IrSequence.
-     */
-    @Test(enabled = false)
-    public void testGetLength() {
-        System.out.println("getLength");
-        IrSequence instance = new IrSequence();
-        int expResult = 0;
-        int result = instance.getLength();
-        assertEquals(result, expResult);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of getGap method, of class IrSequence.
      */
     @Test(enabled = false)

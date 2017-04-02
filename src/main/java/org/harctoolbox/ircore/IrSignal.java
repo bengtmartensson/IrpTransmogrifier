@@ -66,7 +66,7 @@ public final class IrSignal implements Cloneable {
     public static IrSignal parseRaw(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
         if (frequency == null)
             logger.log(Level.WARNING, String.format(Locale.US, "Unknown frequency, assuming default frequency = %d Hz",
-                    (int) ModulatedIrSequence.defaultFrequency));
+                    (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
 
         String str = String.join(" ", args).trim();
 
@@ -202,7 +202,7 @@ public final class IrSignal implements Cloneable {
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
     public IrSignal() throws InvalidArgumentException {
-        this(new int[0], 0, 0, ModulatedIrSequence.defaultFrequency, null);
+        this(new int[0], 0, 0, ModulatedIrSequence.DEFAULT_FREQUENCY, null);
     }
 
     /**

@@ -34,7 +34,7 @@ public abstract class BitField extends IrpObject implements Numerical {
     /**
      * Max length of a BitField in this implementation.
      */
-    public static final int maxWidth = Long.SIZE - 1; // = 63
+    public static final int MAXWIDTH = Long.SIZE - 1; // = 63
     private static final Logger logger = Logger.getLogger(BitField.class.getName());
 
     public static BitField newBitField(String str) {
@@ -49,15 +49,12 @@ public abstract class BitField extends IrpObject implements Numerical {
 
     private static BitField newBitField(IrpParser parser) {
         return newBitField(parser.bitfield());
-        //instance.parser = parser;
-        //return instance;
     }
 
     public static BitField newBitField(IrpParser.BitfieldContext ctx) {
         BitField instance = (ctx instanceof IrpParser.Finite_bitfieldContext)
                 ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
                 : new InfiniteBitField((IrpParser.Infinite_bitfieldContext) ctx);
-        //instance.parseTree = ctx;
         return instance;
     }
 
@@ -72,8 +69,6 @@ public abstract class BitField extends IrpObject implements Numerical {
         return FiniteBitField.newExpression((IrpParser.Finite_bitfieldContext) ctx);
     }
 
-    //protected IrpParser.BitfieldContext parseTree = null;
-    //protected IrpParser parser = null;
     protected boolean complement;
     protected PrimaryItem data;
     protected PrimaryItem chop;
@@ -106,21 +101,12 @@ public abstract class BitField extends IrpObject implements Numerical {
         return toNumber(NameEngine.empty);
     }
 
-//    @Override
-//    public final String toString() {
-//        return toString(new NameEngine());
-//    }
-
     public abstract String toString(NameEngine nameEngine);
 
     public abstract long getWidth(NameEngine nameEngine) throws NameUnassignedException;
 
     public boolean isEmpty(NameEngine nameEngine) throws NameUnassignedException {
-//        try {
-            return getWidth(nameEngine) == 0;
-//        } catch (UnassignedException ex) {
-//            return false;
-//        }
+        return getWidth(nameEngine) == 0;
     }
 
     public boolean hasChop() {
@@ -131,10 +117,6 @@ public abstract class BitField extends IrpObject implements Numerical {
         }
     }
 
-//    public ParserRuleContext getParseTree() {
-//        return parseTree;
-//    }
-
     @Override
     public int weight() {
         return data.weight() + chop.weight();
@@ -143,11 +125,6 @@ public abstract class BitField extends IrpObject implements Numerical {
     public boolean hasExtent() {
         return false;
     }
-
-//    @Override
-//    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-//        return propertiesMap(false, generalSpec, nameEngine);
-//    }
 
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = IrpUtils.propertiesMap(6, this);
@@ -164,11 +141,6 @@ public abstract class BitField extends IrpObject implements Numerical {
         return map;
     }
 
-//    public TreeViewer toTreeViewer() {
-//        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
-//        return new TreeViewer(ruleNames, parseTree);
-//    }
-
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return null;
     }
@@ -176,8 +148,4 @@ public abstract class BitField extends IrpObject implements Numerical {
     public Integer numberOfBareDurations(boolean recursive) {
         return 0;
     }
-
-//    int numberOfNames() {
-//        return data.numberOfNames() + chop.numberOfNames();
-//    }
 }

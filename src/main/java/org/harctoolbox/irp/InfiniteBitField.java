@@ -46,7 +46,7 @@ public final class InfiniteBitField extends BitField {
 
     @Override
     public long getWidth(NameEngine nameEngine) {
-        return maxWidth;
+        return MAXWIDTH;
     }
 
     @Override

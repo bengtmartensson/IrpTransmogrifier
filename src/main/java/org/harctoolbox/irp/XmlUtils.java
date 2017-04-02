@@ -186,7 +186,7 @@ public final class XmlUtils {
     }
 
     public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException {
-        PrintStream xmlStream = IrpUtils.getPrintSteam(xmlFileName); // FIXME: should not use org.harctoolbox.irp
+        PrintStream xmlStream = IrpUtils.getPrintSteam(xmlFileName);
         printDOM(xmlStream, doc, encoding, cdataElements);
     }
 

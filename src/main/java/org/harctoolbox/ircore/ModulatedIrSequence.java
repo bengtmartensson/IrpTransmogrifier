@@ -26,9 +26,9 @@ import java.util.List;
  * The name is slightly misleading since the modulation frequency can be 0; it just needs to be present.
  */
 public final class ModulatedIrSequence extends IrSequence {
-    private static final double allowedFrequencyDeviation = 0.05;
-    private static final double zeroModulationLimit = 0.000001;
-    public static final double defaultFrequency = 38000.0;
+    private static final double ALLOWED_FREQUENCY_DEVIATION = 0.05;
+    private static final double ZEROMODULATION_LIMIT = 0.000001;
+    public static final double DEFAULT_FREQUENCY = 38000.0;
     public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
     }
@@ -127,7 +127,7 @@ public final class ModulatedIrSequence extends IrSequence {
     }
 
     public double getFrequencyWithDefault() {
-        return frequency != null ? frequency : defaultFrequency;
+        return frequency != null ? frequency : DEFAULT_FREQUENCY;
     }
 
     /**
@@ -201,7 +201,7 @@ public final class ModulatedIrSequence extends IrSequence {
      * @return true if and only iff the modulation frequency is zero (in numerical sense).
      */
     public boolean isZeroModulated() {
-        return frequency < zeroModulationLimit;
+        return frequency < ZEROMODULATION_LIMIT;
     }
 
     @Override
@@ -223,7 +223,7 @@ public final class ModulatedIrSequence extends IrSequence {
 
     public ModulatedIrSequence append(ModulatedIrSequence tail) throws InvalidArgumentException {
         if (isZeroModulated() ? (! tail.isZeroModulated())
-            : (Math.abs(frequency - tail.getFrequency())/frequency > allowedFrequencyDeviation))
+            : (Math.abs(frequency - tail.getFrequency())/frequency > ALLOWED_FREQUENCY_DEVIATION))
             throw new InvalidArgumentException("concationation not possible; modulation frequencies differ");
         IrSequence irSequence = super.append(tail);
         return new ModulatedIrSequence(irSequence, frequency, dutyCycle);

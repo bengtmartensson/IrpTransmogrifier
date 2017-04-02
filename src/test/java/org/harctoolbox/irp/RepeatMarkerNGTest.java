@@ -123,19 +123,4 @@ public class RepeatMarkerNGTest {
         assertEquals(result, expResult);
 
     }
-
-//    /**
-//     * Test of toElement method, of class RepeatMarker.
-//     */
-//    @Test
-//    public void testToElement() {
-//        System.out.println("toElement");
-//        Document document = null;
-//        RepeatMarker instance = new RepeatMarker();
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
 }

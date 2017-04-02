@@ -141,19 +141,4 @@ public class GeneralSpecNGTest {
             fail();
         }
     }
-
-//    /**
-//     * Test of toElement method, of class GeneralSpec.
-//     */
-//    @Test
-//    public void testToElement() {
-//        System.out.println("toElement");
-//        Document document = null;
-//        GeneralSpec instance = new GeneralSpec();
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
 }

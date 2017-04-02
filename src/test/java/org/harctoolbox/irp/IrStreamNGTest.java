@@ -90,21 +90,6 @@ public class IrStreamNGTest {
         assertFalse(result);
     }
 
-//    /**
-//     * Test of toElement method, of class IrStream.
-//     */
-//    @Test
-//    public void testToElement() throws Exception {
-//        System.out.println("toElement");
-//        Document document = null;
-//        IrStream instance = null;
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
     /**
      * Test of numberOfBareDurations method, of class IrStream.
      */

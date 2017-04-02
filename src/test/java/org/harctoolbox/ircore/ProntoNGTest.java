@@ -18,7 +18,7 @@ public class ProntoNGTest {
     private static IrSignal nec1;
     private static final int[] necIntArray = new int[]{9041, 4507, 573, 573, 573, 573, 573, 1694, 573, 1694, 573, 573, 573, 573, 573, 573, 573, 573, 573, 573, 573, 1694, 573, 573, 573, 573, 573, 573, 573, 1694, 573, 573, 573, 573, 573, 573, 573, 573, 573, 573, 573, 1694, 573, 1694, 573, 1694, 573, 573, 573, 573, 573, 1694, 573, 1694, 573, 1694, 573, 573, 573, 573, 573, 573, 573, 1694, 573, 1694, 573, 44293,
         +9041, 2267, 573, 96193};
-    private static final String nec1_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+    private static final String NEC1_D12_S34_F56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -128,7 +128,7 @@ public class ProntoNGTest {
     public void testParse_String() {
         System.out.println("parse");
         try {
-            IrSignal result = Pronto.parse(nec1_12_34_56);
+            IrSignal result = Pronto.parse(NEC1_D12_S34_F56);
             assertTrue(result.approximatelyEquals(nec1));
         } catch (Pronto.NonProntoFormatException | InvalidArgumentException ex) {
             Logger.getLogger(ProntoNGTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -184,6 +184,6 @@ public class ProntoNGTest {
     public void testToPrintString_IrSignal() {
         System.out.println("toPrintString");
         String result = Pronto.toPrintString(nec1);
-        assertEquals(result.substring(0, 358), nec1_12_34_56.substring(0, 358));
+        assertEquals(result.substring(0, 358), NEC1_D12_S34_F56.substring(0, 358));
     }
 }

@@ -107,7 +107,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
         NameEngine nameEngine = renderData.getNameEngine();
         long val = value.toNumber(nameEngine);
         try {
-            nameEngine.define(name, val);
+            nameEngine.define(name.toString(), val);
         } catch (InvalidNameException ex) {
             throw new ThisCannotHappenException(ex);
         }

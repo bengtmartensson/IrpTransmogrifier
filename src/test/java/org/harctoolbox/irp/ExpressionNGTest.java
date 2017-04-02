@@ -69,35 +69,6 @@ public class ExpressionNGTest {
         assertEquals(result, "(A+((2*B)*C))");
     }
 
-//    /**
-//     * Test of toStringTree method, of class Expression.
-//     */
-//    @Test
-//    public void testToStringTree_IrpParser() {
-//        System.out.println("toStringTree");
-//        IrpParser parser = null;
-//        Expression instance = null;
-//        String expResult = "";
-//        String result = instance.toStringTree(parser);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
-//    /**
-//     * Test of toStringTree method, of class Expression.
-//     */
-//    @Test
-//    public void testToStringTree_0args() {
-//        System.out.println("toStringTree");
-//        Expression instance = null;
-//        String expResult = "";
-//        String result = instance.toStringTree();
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
     /**
      * Test of toNumber method, of class Expression.
      */
@@ -126,35 +97,6 @@ public class ExpressionNGTest {
             fail();
         }
     }
-
-//    /**
-//     * Test of getParseTree method, of class Expression.
-//     */
-//    @Test
-//    public void testGetParseTree() {
-//        System.out.println("getParseTree");
-//        Expression instance = null;
-//        IrpParser.ExpressionContext expResult = null;
-//        IrpParser.ExpressionContext result = instance.getParseTree();
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
-//    /**
-//     * Test of toElement method, of class Expression.
-//     */
-//    @Test
-//    public void testToElement() {
-//        System.out.println("toElement");
-//        Document document = null;
-//        Expression instance = null;
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
 
     /**
      * Test of toIrpString method, of class Expression.

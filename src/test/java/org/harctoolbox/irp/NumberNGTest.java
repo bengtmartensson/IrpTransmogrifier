@@ -10,10 +10,13 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class NumberNGTest {
-    private final static long deadbeef = 0xdeadbeefL;
+
+    private final static long DEADBEEF = 0xdeadbeefL;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
+
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
@@ -71,7 +74,7 @@ public class NumberNGTest {
     public void testToString() {
         System.out.println("toString");
         String result = instance.toString();
-        assertEquals(result, Long.toString(deadbeef));
+        assertEquals(result, Long.toString(DEADBEEF));
     }
 
     /**

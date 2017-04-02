@@ -55,27 +55,27 @@ import org.xml.sax.SAXException;
 public final class IrpDatabase {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
 
-    public static final String irpProtocolNS = "http://www.harctoolbox.org/irp-protocols";
-    public static final String irpProtocolLocation = "file:///home/bengt/harctoolbox/IrpTransmogrifier/src/main/schemas/irp-protocols.xsd"; // FIXME
-    public static final String irpNamespacePrefix = "irp";
-    private static final int maxRecursionDepth = 5;
+    public static final String IRP_PROTOCOL_NS = "http://www.harctoolbox.org/irp-protocols";
+    public static final String IRP_PROTOCOL_SCHEMA_LOCATION = "http://www.harctoolbox.org/schemas/irp-protocols.xsd";
+    public static final String IRP_NAMESPACE_PREFIX = "irp";
+    private static final int MAX_RECURSION_DEPTH = 5;
     private static final int APRIORI_NUMBER_PROTOCOLS = 200;
     private static final String INI_CHARSET = "WINDOWS-1252"; // Don't ever consider making this configurable!!
 
-    public static final String unnamed = "unnamed_protocol";
-    public static final String protocolName = "protocol";
-    public static final String nameName = "name";
-    public static final String cNameName = "c-name";
-    public static final String irpName = "irp";
-    public static final String usableName = "usable";
-    public static final String documentationName = "documentation";
-    public static final String parameterName = "parameter";
-    public static final String decodableName = "decodable";
-    public static final String frequencyToleranceName = "frequency-tolerance";
-    public static final String relativeToleranceName = "relative-tolerance";
-    public static final String absoluteToleranceName = "absolute-tolerance";
-    public static final String minimumLeadoutName = "minimum-leadout";
-    public static final String preferOverName = "prefer-over";
+    public static final String UNNAMED = "unnamed_protocol";
+    public static final String PROTOCOL_NAME = "protocol";
+    public static final String NAME_NAME = "name";
+    public static final String CNAME_NAME = "c-name";
+    public static final String IRP_NAME = "irp";
+    public static final String USABLE_NAME = "usable";
+    public static final String DOCUMENTATION_NAME = "documentation";
+    public static final String PARAMETER_NAME = "parameter";
+    public static final String DECODABLE_NAME = "decodable";
+    public static final String FREQUENCY_TOLERANCE_NAME = "frequency-tolerance";
+    public static final String RELATIVE_TOLERANCE_NAME = "relative-tolerance";
+    public static final String ABSOLUTE_TOLERANCE_NAME = "absolute-tolerance";
+    public static final String MINIMUM_LEADOUT_NAME = "minimum-leadout";
+    public static final String PREFER_OVER_NAME = "prefer-over";
 
     public static boolean isKnown(String protocolsPath, String protocol) throws IOException, SAXException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
@@ -141,7 +141,7 @@ public final class IrpDatabase {
                 lineNo++;
             } else if (line.equals("[protocol]")) {
                 if (currentProtocol != null) {
-                    currentProtocol.put(documentationName, documentation.toString().trim());
+                    currentProtocol.put(DOCUMENTATION_NAME, documentation.toString().trim());
                     addProtocol(protocols, new UnparsedProtocol(currentProtocol));
                 }
                 currentProtocol = new HashMap<>(UnparsedProtocol.APRIORI_SIZE);
@@ -161,11 +161,11 @@ public final class IrpDatabase {
                     isDocumentation = true;
             } else if (keyword.equals("name")) {
                 if (currentProtocol != null)
-                    currentProtocol.put(nameName, payload);
+                    currentProtocol.put(NAME_NAME, payload);
             } else if (keyword.equals("irp")) {
                 if (currentProtocol != null)
-                    currentProtocol.put(irpName, payload);
-            } else if (keyword.equals(usableName)) {
+                    currentProtocol.put(IRP_NAME, payload);
+            } else if (keyword.equals(USABLE_NAME)) {
                 if (currentProtocol != null)
                     currentProtocol.put(keyword, payload);
             } else if (keyword.length() > 1) {
@@ -175,7 +175,7 @@ public final class IrpDatabase {
                 logger.log(Level.FINER, "Ignored line: {0}", line);
         }
         if (currentProtocol != null) {
-            currentProtocol.put(documentationName, documentation.toString().trim());
+            currentProtocol.put(DOCUMENTATION_NAME, documentation.toString().trim());
             addProtocol(protocols, new UnparsedProtocol(currentProtocol));
         }
         return new IrpDatabase(protocols, configFileVersion);
@@ -224,12 +224,10 @@ public final class IrpDatabase {
     public IrpDatabase(Document doc) {
         Element root = doc.getDocumentElement();
         configFileVersion = root.getAttribute("version");
-        NodeList nodes = root.getElementsByTagNameNS(irpProtocolNS, "protocol");
+        NodeList nodes = root.getElementsByTagNameNS(IRP_PROTOCOL_NS, "protocol");
         protocols = new LinkedHashMap<>(nodes.getLength()); // to preserve order
         for (int i = 0; i < nodes.getLength(); i++)
             addProtocol((Element)nodes.item(i));
-        // FIXME
-        //expand();
     }
 
     private IrpDatabase(Map<String, UnparsedProtocol> protocols, String version) {
@@ -242,12 +240,12 @@ public final class IrpDatabase {
         ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
                 "type=\"text/xsl\" href=\"IrpProtocols2html.xsl\"");
         doc.appendChild(pi);
-        Element root = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":protocols");
+        Element root = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":protocols");
         root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
         root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
         root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        root.setAttribute("xsi:schemaLocation", irpProtocolNS + " " + irpProtocolLocation);
+        root.setAttribute("xsi:schemaLocation", IRP_PROTOCOL_NS + " " + IRP_PROTOCOL_SCHEMA_LOCATION);
         root.setAttribute("version", configFileVersion);
         doc.appendChild(root);
         return doc;
@@ -413,9 +411,9 @@ public final class IrpDatabase {
                 String replacement = ancestor.getIrp().lastIndexOf('[') == -1 ? ancestor.getIrp()
                         : ancestor.getIrp().substring(0, ancestor.getIrp().lastIndexOf('['));
                 logger.log(Level.FINEST, "Protocol {0}: `{1}'' replaced by `{2}''.", new Object[]{name, p_name, replacement});
-                p.setUniqueProperty(irpName, p.getIrp().replaceAll(p_name, replacement));
+                p.setUniqueProperty(IRP_NAME, p.getIrp().replaceAll(p_name, replacement));
                 protocols.put(name, p);
-                if (depth < maxRecursionDepth)
+                if (depth < MAX_RECURSION_DEPTH)
                     expand(depth + 1, name);
                 else
                     logger.log(Level.SEVERE, "Recursion depth in expanding {0} exceeded.", name);
@@ -456,11 +454,11 @@ public final class IrpDatabase {
     }
 
     private void printAsIni(PrintStream out, String protocol) {
-        out.println("[" + protocolName + "]");
+        out.println("[" + PROTOCOL_NAME + "]");
         UnparsedProtocol prot = getUnparsedProtocol(protocol);
         prot.map.entrySet().forEach((kvp) -> { // assume that "name" comes first
             String key = kvp.getKey();
-            if (!key.equals(documentationName))
+            if (!key.equals(DOCUMENTATION_NAME))
                 kvp.getValue().forEach((value) -> {
                     out.println(key + "=" + value);
                 });
@@ -484,14 +482,14 @@ public final class IrpDatabase {
         }
 
         UnparsedProtocol(String irp) {
-            this(unnamed, irp, null);
+            this(UNNAMED, irp, null);
         }
 
         UnparsedProtocol(String name, String irp, String documentation) {
             this();
-            addProperty(nameName, name);
-            addProperty(irpName, irp);
-            addProperty(documentationName, documentation);
+            addProperty(NAME_NAME, name);
+            addProperty(IRP_NAME, irp);
+            addProperty(DOCUMENTATION_NAME, documentation);
         }
 
         UnparsedProtocol(Map<String, String> map) {
@@ -525,10 +523,10 @@ public final class IrpDatabase {
         }
 
         private void parseElement(Element element) {
-            addProperty(nameName, element.getAttribute(nameName));
-            String usable = element.getAttribute(usableName);
+            addProperty(NAME_NAME, element.getAttribute(NAME_NAME));
+            String usable = element.getAttribute(USABLE_NAME);
             if (!usable.isEmpty())
-                addProperty(usableName, usable);
+                addProperty(USABLE_NAME, usable);
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -536,13 +534,13 @@ public final class IrpDatabase {
                     continue;
                 Element e = (Element) node;
                 switch (e.getLocalName()) {
-                    case irpName:
-                        addProperty(irpName, e.getTextContent().replaceAll("\\s+", ""));
+                    case IRP_NAME:
+                        addProperty(IRP_NAME, e.getTextContent().replaceAll("\\s+", ""));
                         break;
-                    case documentationName:
-                        addProperty(documentationName, e.getTextContent().trim());
+                    case DOCUMENTATION_NAME:
+                        addProperty(DOCUMENTATION_NAME, e.getTextContent().trim());
                         break;
-                    case parameterName:
+                    case PARAMETER_NAME:
                         addProperty(e.getAttribute("name"), e.getTextContent());
                         break;
                     default:
@@ -556,26 +554,26 @@ public final class IrpDatabase {
         }
 
         String getName() {
-            return getFirstProperty(nameName);
+            return getFirstProperty(NAME_NAME);
         }
 
         String getIrp() {
-            return getFirstProperty(irpName);
+            return getFirstProperty(IRP_NAME);
         }
 
         String getDocumentation() {
-            return getFirstProperty(documentationName);
+            return getFirstProperty(DOCUMENTATION_NAME);
         }
 
         boolean isUsable() {
-            String str = getFirstProperty(usableName);
+            String str = getFirstProperty(USABLE_NAME);
             return str == null || Boolean.parseBoolean(str) || str.equalsIgnoreCase("yes");
         }
 
         NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
             return new NamedProtocol(getName(), getIrp(), getDocumentation(),
-                    getFirstProperty(frequencyToleranceName), getFirstProperty(absoluteToleranceName), getFirstProperty(relativeToleranceName),
-                    getFirstProperty(minimumLeadoutName), getFirstProperty(decodableName), getProperties(preferOverName));
+                    getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
+                    getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getProperties(PREFER_OVER_NAME));
         }
 
         @Override
@@ -584,23 +582,23 @@ public final class IrpDatabase {
         }
 
         Element toElement(Document doc) {
-            Element element = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":" + protocolName);
+            Element element = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PROTOCOL_NAME);
             for (Map.Entry<String, List<String>> kvp : map.entrySet()) {
                 switch (kvp.getKey()) {
-                    case nameName:
-                        element.setAttribute(nameName, kvp.getValue().get(0));
-                        element.setAttribute(cNameName, IrpUtils.toCName(kvp.getValue().get(0)));
+                    case NAME_NAME:
+                        element.setAttribute(NAME_NAME, kvp.getValue().get(0));
+                        element.setAttribute(CNAME_NAME, IrpUtils.toCName(kvp.getValue().get(0)));
                         break;
-                    case usableName:
-                        element.setAttribute(usableName, Boolean.toString(!kvp.getValue().get(0).equals("no")));
+                    case USABLE_NAME:
+                        element.setAttribute(USABLE_NAME, Boolean.toString(!kvp.getValue().get(0).equals("no")));
                         break;
-                    case irpName: {
-                        Element irp = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":" + irpName);
+                    case IRP_NAME: {
+                        Element irp = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + IRP_NAME);
                         irp.appendChild(doc.createCDATASection(kvp.getValue().get(0)));
                         element.appendChild(irp);
                     }
                     break;
-                    case documentationName:
+                    case DOCUMENTATION_NAME:
                         try {
                             String docXml = "<?xml version=\"1.0\"?><irp:documentation xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:irp=\"http://www.harctoolbox.org/irp-protocols\">" + kvp.getValue() + "</irp:documentation>";
                             Document miniDoc = XmlUtils.parseStringToXmlDocument(docXml, true, false);
@@ -612,8 +610,8 @@ public final class IrpDatabase {
                         break;
                     default: {
                         kvp.getValue().stream().map((s) -> {
-                            Element param = doc.createElementNS(irpProtocolNS, irpNamespacePrefix + ":" + parameterName);
-                            param.setAttribute(nameName, kvp.getKey());
+                            Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
+                            param.setAttribute(NAME_NAME, kvp.getKey());
                             param.setTextContent(s);
                         return param;
                     }).forEachOrdered((param) -> {

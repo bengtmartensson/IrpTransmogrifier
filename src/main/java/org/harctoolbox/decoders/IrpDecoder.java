@@ -419,8 +419,8 @@ public abstract class IrpDecoder {
 
     protected static class Pwm4DecodeSequence extends IrpDecoder.DecodeSequence {
 
-        public static final int bitSpecLength = 2;
-        public static final int chunkSize = 2;
+        public static final int BITSPEC_LENGTH = 2;
+        public static final int CHUNKSIZE = 2;
 
         private final double zeroGap;
         private final double zeroFlash;
@@ -436,7 +436,7 @@ public abstract class IrpDecoder {
 
         Pwm4DecodeSequence(IrSequence irSequence, boolean lsbFirst, double zeroFlash, double zeroGap, double oneFlash, double oneGap,
                 double twoFlash, double twoGap, double threeFlash, double threeGap) {
-            super(irSequence, lsbFirst, chunkSize);
+            super(irSequence, lsbFirst, CHUNKSIZE);
             this.zeroGap = zeroGap;
             this.zeroFlash = zeroFlash;
             this.oneGap = oneGap;
@@ -463,8 +463,8 @@ public abstract class IrpDecoder {
 
             while (width < (int) length) {
                 long chunk = parseChunk();
-                data = data << chunkSize | chunk;
-                width += chunkSize;
+                data = data << CHUNKSIZE | chunk;
+                width += CHUNKSIZE;
             }
             if (length != width) {
                 pendingData = IrCoreUtils.maskTo(data, width - length);
@@ -477,16 +477,16 @@ public abstract class IrpDecoder {
         @Override
         protected Integer parseChunk() throws DecodeException {
             if (duration(zeroFlash, 0) && duration(zeroGap, 1)) {
-                pull(bitSpecLength);
+                pull(BITSPEC_LENGTH);
                 return 0;
             } else if (duration(oneFlash,  0) && duration(oneGap,  1)) {
-                 pull(bitSpecLength);
+                 pull(BITSPEC_LENGTH);
                  return 1;
             } else if (duration(twoFlash,  0) && duration(twoGap,  1)) {
-                pull(bitSpecLength);
+                pull(BITSPEC_LENGTH);
                 return 2;
             } else if (duration(threeFlash,0) && duration(threeGap,1)) {
-                pull(bitSpecLength);
+                pull(BITSPEC_LENGTH);
                 return 3;
             } else
                 throw new DecodeException("parseChunk");
@@ -517,12 +517,12 @@ public abstract class IrpDecoder {
     }
 
     protected static class BiPhaseDecodeSequence extends IrpDecoder.NonInterlacedDecodeSequence {
-        public final static int chunkSize = 1;
+        public final static int CHUNKSIZE = 1;
         private final double halfPeriod;
         private final boolean inverted; // not inverted; gap, flash -> 0 (e.g. RC6)
 
         BiPhaseDecodeSequence(IrSequence irSequence, boolean lsbFirst, boolean inverted, double halfPeriod) {
-            super(irSequence, lsbFirst, chunkSize);
+            super(irSequence, lsbFirst, CHUNKSIZE);
             this.halfPeriod = halfPeriod;
             this.inverted = inverted;
         }

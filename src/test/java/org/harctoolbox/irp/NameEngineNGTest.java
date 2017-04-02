@@ -108,34 +108,6 @@ public class NameEngineNGTest {
         }
     }
 
-//    /**
-//     * Test of parseDefinitions method, of class NameEngine.
-//     */
-//    @Test
-//    public void testParseDefinitions_IrpParserDefinitionsContext() throws Exception {
-//        System.out.println("parseDefinitions");
-//        IrpParser.DefinitionsContext ctx = null;
-//        NameEngine instance = new NameEngine();
-//        instance.parseDefinitions(ctx);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of get method, of class NameEngine.
-//     */
-//    @Test
-//    public void testGet() throws Exception {
-//        System.out.println("get");
-//        String name = "";
-//        NameEngine instance = new NameEngine();
-//        Expression expResult = null;
-//        Expression result = instance.get(name);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
     /**
      * Test of toNumber method, of class NameEngine.
      */

@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 
 public final class NumberWithDecimals extends IrpObject implements Floatable {
     private static final int WEIGHT = 1;
-    private static final double equalityTolerance = 1E-6;
+    private static final double EQUALITY_TOLERANCE = 1E-6;
 
     public static double parse(String str) {
         NumberWithDecimals numberWithDecimals = new NumberWithDecimals(str);
@@ -101,7 +101,7 @@ public final class NumberWithDecimals extends IrpObject implements Floatable {
             return false;
 
         NumberWithDecimals other = (NumberWithDecimals) obj;
-        return IrCoreUtils.approximatelyEquals(data, other.data, equalityTolerance, 0);
+        return IrCoreUtils.approximatelyEquals(data, other.data, EQUALITY_TOLERANCE, 0);
     }
 
     @Override

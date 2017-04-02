@@ -79,7 +79,7 @@ public final class Analyzer extends Cleaner {
         super(IrSequence.toInts(irSequenceList), indices, signalMode, absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.DEFAULTABSOLUTETOLERANCE,
                 relativeTolerance != null ? relativeTolerance : IrCoreUtils.DEFAULTRELATIVETOLERANCE);
         if (frequency == null)
-            logger.log(Level.FINE, String.format(Locale.US, "No frequency given, using default frequency = %d Hz", (int) ModulatedIrSequence.defaultFrequency));
+            logger.log(Level.FINE, String.format(Locale.US, "No frequency given, using default frequency = %d Hz", (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
         this.frequency = frequency;
 //        indices = new int[irSequenceList.size()];
 //        for (int i = 0; i < irSequenceList.size(); i++)

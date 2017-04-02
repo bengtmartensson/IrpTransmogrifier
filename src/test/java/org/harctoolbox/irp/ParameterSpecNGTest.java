@@ -77,7 +77,6 @@ public class ParameterSpecNGTest {
         }
     }
 
-        // TODO: move stuff to test file
     //public static void main(String[] args) {
         /*        ParameterSpec dev = null;
         ParameterSpec toggle = null;
@@ -103,21 +102,6 @@ public class ParameterSpecNGTest {
         System.out.println(ex.getMessage());
         }*/
     //}
-
-    /**
-     * Test of isOk method, of class ParameterSpec.
-     */
-//    @Test
-//    public void testIsOk() {
-//        System.out.println("isOK");
-//        long x = 0L;
-//        ParameterSpec instance = null;
-//        boolean expResult = false;
-//        boolean result = instance.isOk(x);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
 
     /**
      * Test of domainAsString method, of class ParameterSpec.
@@ -186,5 +170,34 @@ public class ParameterSpecNGTest {
         instance = new ParameterSpec("T@:0..255=255-D");
         result = instance.hasMemory();
         assertTrue(result);
+    }
+
+    /**
+     * Test of random method, of class ParameterSpec.
+     */
+    @Test
+    public void testRandom() {
+        System.out.println("random");
+        ParameterSpec instance = new ParameterSpec("D:10..20");
+        long min = Long.MAX_VALUE;
+        long max = Long.MIN_VALUE;
+        for (int i = 0; i < 100; i++) {
+            long p = instance.random();
+            min = Math.min(min, p);
+            max = Math.max(max, p);
+        }
+        assertEquals(min, 10);
+        assertEquals(max, 20);
+
+        instance = new ParameterSpec("Z:10..0x4000000000000000");
+        min = Long.MAX_VALUE;
+        max = Long.MIN_VALUE;
+        for (int i = 0; i < 1000; i++) {
+            long p = instance.random();
+            min = Math.min(min, p);
+            max = Math.max(max, p);
+        }
+        assertTrue(min < 0x0100000000000000L);
+        assertTrue(max > 0x3F00000000000000L);
     }
 }

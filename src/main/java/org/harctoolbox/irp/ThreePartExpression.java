@@ -36,7 +36,7 @@ final class ThreePartExpression extends Expression {
 
     private ThreePartExpression(ParseTree first, ParseTree second, ParseTree third) {
         super(null);
-        operator = second.getText();  // FIXME
+        operator = second.getText();
         op1 = Expression.newExpression((IrpParser.ExpressionContext) first);
         op2 = Expression.newExpression((IrpParser.ExpressionContext) third);
     }

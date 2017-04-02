@@ -39,29 +39,29 @@ import org.antlr.v4.gui.TreeViewer;
  */
 public final class IrpUtils {
 
-    public final static String dumbCharsetName = "US-ASCII";
+    public final static String DUMB_CHARSET_NAME = "US-ASCII";
 
     public final static long INVALID= -1L;
     public final static long ALL = -2L;
     public final static long SOME = -3L;
 
     // Symbolic names for exit statii
-    public final static int exitSuccess             = 0;
-    public final static int exitUsageError          = 1;
-    public final static int exitSemanticUsageError  = 2;
-    public final static int exitFatalProgramFailure = 3;
-    public final static int exitInternalFailure     = 4;
-    public final static int exitConfigReadError     = 5;
-    public final static int exitConfigWriteError    = 6;
-    public final static int exitIoError             = 7;
-    public final static int exitXmlError            = 8;
-    public final static int exitDynamicLinkError    = 9;
-    public final static int exitThisCannotHappen    = 10;
-    public final static int exitRestart             = 99; // An invoking script is supposed to restart the program
+    public final static int EXIT_SUCCESS               = 0;
+    public final static int EXIT_USAGE_ERROR           = 1;
+    public final static int EXIT_SEMANTIC_USAGE_ERROR  = 2;
+    public final static int EXIT_FATAL_PROGRAM_FAILURE = 3;
+    public final static int EXIT_INTERNAL_FAILURE      = 4;
+    public final static int EXIT_CONFIG_READ_ERROR     = 5;
+    public final static int EXIT_CONFIG_WRITE_ERROR    = 6;
+    public final static int EXIT_IO_ERROR              = 7;
+    public final static int EXIT_XML_ERROR             = 8;
+    public final static int EXIT_DYNAMICLINK_ERROR     = 9;
+    public final static int EXIT_THISCANNOTHAPPEN      = 10;
+    public final static int EXIT_RESTART               = 99; // An invoking script is supposed to restart the program
 
-    public final static String jp1WikiUrl = "http://www.hifi-remote.com/wiki/index.php?title=Main_Page";
-    public final static String irpNotationUrl = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";
-    public final static String decodeIrUrl = "http://www.hifi-remote.com/wiki/index.php?title=DecodeIR";
+    public final static String JP1_WIKI_URL = "http://www.hifi-remote.com/wiki/index.php?title=Main_Page";
+    public final static String IRP_NOTATION_URL = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";
+    public final static String DECODEIR_URL = "http://www.hifi-remote.com/wiki/index.php?title=DecodeIR";
     public final static String C_IDENTIFIER_REGEXP = "[A-Za-z_][A-Za-z0-9_]*";
 
     private final static Level enteringExitingLevel = Level.FINER;
@@ -157,7 +157,7 @@ public final class IrpUtils {
         try {
             return filename.equals("-")
                     ? System.out
-                    : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, dumbCharsetName);
+                    : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, DUMB_CHARSET_NAME);
         } catch (UnsupportedEncodingException ex) {
             assert false;
             return null;

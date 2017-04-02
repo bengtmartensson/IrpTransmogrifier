@@ -28,19 +28,19 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
  * Extends org.harctoolbox.ircore with functions for handling short Pronto format for the protocols rc5, rc5x, rc6, and nec1.
  */
 public final class ShortPronto extends Pronto {
-    private final static int rc5Code = 0x5000;
-    private final static int rc5xCode = 0x5001;
-    private final static int rc6Code = 0x6000;
-    private final static int nec1Code = 0x900a;
-    private final static int rc5Frequency = 0x0073;
-    private final static int rc5xFrequency = 0x0073;
-    private final static int rc6Frequency = 0x0073;
-    private final static int nec1Frequency = 0x006C;
+    private final static int RC5_CODE = 0x5000;
+    private final static int RC5X_CODE = 0x5001;
+    private final static int RC6_CODE = 0x6000;
+    private final static int NEC1_CODE = 0x900a;
+    private final static int RC5_FREQUENCY = 0x0073;
+    private final static int RC5X_FREQUENCY = 0x0073;
+    private final static int RC6_FREQUENCY = 0x0073;
+    private final static int NEC1_FREQUENCY = 0x006C;
 
-    private final static String rc5Irp  = "{36k,msb,889}<1,-1|-1,1>((1:1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[T@:0..1=0,D:0..31,F:0..127]";
-    private final static String rc5xIrp = "{36k,msb,889}<1,-1|-1,1>((1:1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T) [D:0..31,S:0..127,F:0..63,T@:0..1=0]";
-    private final static String rc6Irp  = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]";
-    private final static String nec1Irp = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,-78,(16,-4,1,-173)*) [D:0..255,S:0..255=255-D,F:0..255]";
+    private final static String RC5_IRP  = "{36k,msb,889}<1,-1|-1,1>((1:1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[T@:0..1=0,D:0..31,F:0..127]";
+    private final static String RC5X_IRP = "{36k,msb,889}<1,-1|-1,1>((1:1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T) [D:0..31,S:0..127,F:0..63,T@:0..1=0]";
+    private final static String RC6_IRP  = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]";
+    private final static String NEC1_IRP = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,-78,(16,-4,1,-173)*) [D:0..255,S:0..255=255-D,F:0..255]";
 
     private static final Logger logger = Logger.getLogger(ShortPronto.class.getName());
 
@@ -79,35 +79,35 @@ public final class ShortPronto extends Pronto {
                 irSignal = Pronto.parse(ccf);
                 break;
 
-            case rc5Code: // 0x5000:
+            case RC5_CODE: // 0x5000:
                 if (repeatLength != 1)
                     throw new InvalidArgumentException("wrong repeat length");
-                irp = rc5Irp;
+                irp = RC5_IRP;
                 dev = ccf[index++];
                 cmd = ccf[index++];
                 break;
 
-            case rc5xCode: // 0x5001:
+            case RC5X_CODE: // 0x5001:
                 if (repeatLength != 2)
                     throw new InvalidArgumentException("wrong repeat length");
-                irp = rc5xIrp;
+                irp = RC5X_IRP;
                 dev = ccf[index++];
                 subdev = ccf[index++];
                 cmd = ccf[index++];
                 break;
 
-            case rc6Code: // 0x6000:
+            case RC6_CODE: // 0x6000:
                 if (repeatLength != 1)
                     throw new InvalidArgumentException("wrong repeat length");
-                irp = rc6Irp;
+                irp = RC6_IRP;
                 dev = ccf[index++];
                 cmd = ccf[index++];
                 break;
 
-            case nec1Code: // 0x900a:
+            case NEC1_CODE: // 0x900a:
                 if (repeatLength != 1)
                     throw new InvalidArgumentException("wrong repeat length");
-                irp = nec1Irp;
+                irp = NEC1_IRP;
 		dev = ccf[index] >> 8;
                 subdev = ccf[index++] & 0xff;
 		cmd = ccf[index] >> 8;
@@ -192,8 +192,8 @@ public final class ShortPronto extends Pronto {
                 throw new InvalidArgumentException("Invalid parameters");
 
             int[] result = new int[6];
-            result[index++] = rc5Code;
-            result[index++] = rc5Frequency;
+            result[index++] = RC5_CODE;
+            result[index++] = RC5_FREQUENCY;
             result[index++] = 0;
             result[index++] = 1;
             result[index++] = device;
@@ -205,8 +205,8 @@ public final class ShortPronto extends Pronto {
                 throw new InvalidArgumentException("Invalid parameters");
 
             int[] result = new int[8];
-            result[index++] = rc5xCode;
-            result[index++] = rc5xFrequency;
+            result[index++] = RC5X_CODE;
+            result[index++] = RC5X_FREQUENCY;
             result[index++] = 0;
             result[index++] = 2;
             result[index++] = device;
@@ -220,8 +220,8 @@ public final class ShortPronto extends Pronto {
                 throw new InvalidArgumentException("Invalid parameters");
 
             int[] result = new int[6];
-            result[index++] = rc6Code;
-            result[index++] = rc6Frequency;
+            result[index++] = RC6_CODE;
+            result[index++] = RC6_FREQUENCY;
             result[index++] = 0;
             result[index++] = 1;
             result[index++] = device;
@@ -233,8 +233,8 @@ public final class ShortPronto extends Pronto {
                 throw new InvalidArgumentException("Invalid parameters");
 
             int[] result = new int[6];
-            result[index++] = nec1Code;
-            result[index++] = nec1Frequency;
+            result[index++] = NEC1_CODE;
+            result[index++] = NEC1_FREQUENCY;
             result[index++] = 0;
             result[index++] = 1;
             result[index++] = (device << 8) + (subdevice != null ? subdevice : (0xff - device));

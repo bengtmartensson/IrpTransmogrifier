@@ -107,6 +107,7 @@ public final class Decoder {
                     if (namedProtocol.isDecodeable())
                         parsedProtocols.put(protocolName, namedProtocol);
                 } catch (NameUnassignedException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
+                    ex.printStackTrace();
                     throw new ThisCannotHappenException(ex);
                 }
             });

@@ -49,7 +49,7 @@ public final class Number extends PrimaryItem {
                 : str.equals("UINT16_MAX") ? 65535L
                 : str.equals("UINT24_MAX") ? 16777215L
                 : str.equals("UINT32_MAX") ? 4294967295L
-                : str.equals("UINT64_MAX") ? -1L // FIXME: 18446744073709551615
+                : str.equals("UINT64_MAX") ? -1L // 18446744073709551615
                 : str.length() >= 3 && str.substring(0, 2).equals("0x") ? Long.parseLong(str.substring(2), 16)
                 : str.length() >= 3 && str.substring(0, 2).equals("0b") ? Long.parseLong(str.substring(2), 2)
                 : str.length() >= 1 && str.substring(0, 1).equals("0")  ? Long.parseLong(str, 8)

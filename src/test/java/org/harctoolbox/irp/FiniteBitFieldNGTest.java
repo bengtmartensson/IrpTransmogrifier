@@ -137,21 +137,6 @@ public class FiniteBitFieldNGTest {
 //        assertEquals(result, expResult);
 //    }
 
-//    /**
-//     * Test of toElement method, of class FiniteBitField.
-//     */
-//    @Test
-//    public void testToElement() throws Exception {
-//        System.out.println("toElement");
-//        Document document = null;
-//        FiniteBitField instance = null;
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
     /**
      * Test of numberOfBits method, of class FiniteBitField.
      */

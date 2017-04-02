@@ -180,8 +180,8 @@ public abstract class IrpRenderer {
 
     protected abstract static class Pwm4IrList extends IrpRenderer.IrList {
 
-        public static final int bitSpecLength = 2;
-        public static final int chunkSize = 2;
+        public static final int BITSPEC_LENGTH = 2;
+        public static final int CHUNKSIZE = 2;
 
         private final double zeroGap;
         private final double zeroFlash;
@@ -226,7 +226,7 @@ public abstract class IrpRenderer {
                 pendingBits = (int) width;
                 width = 0L;
             }
-            for (int i = 0; i < (int) width; i += chunkSize) {
+            for (int i = 0; i < (int) width; i += CHUNKSIZE) {
                 switch (((int) data >> (width - i - 2)) & 3) {
                     case 0:
                         flash(zeroFlash);

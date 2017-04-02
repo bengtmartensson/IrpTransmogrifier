@@ -34,9 +34,9 @@ import org.w3c.dom.Element;
  */
 public final class GeneralSpec extends IrpObject implements AggregateLister {
     private final static int WEIGHT = 0;
-    public final static BitDirection defaultBitDirection = BitDirection.lsb;
-    public final static double defaultFrequency = ModulatedIrSequence.defaultFrequency;
-    public final static double defaultUnit = 1;
+    public final static BitDirection DEFAULT_BITDIRECTION = BitDirection.lsb;
+    public final static double DEFAULT_FREQUENCY = ModulatedIrSequence.DEFAULT_FREQUENCY;
+    public final static double DEFAULT_UNIT = 1d;
 
     /** Carrier frequency in Hz */
     private Double frequency = null;
@@ -45,10 +45,10 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
     private Double dutyCycle = null;
 
     /** BitDirection */
-    private BitDirection bitDirection = defaultBitDirection;
+    private BitDirection bitDirection = DEFAULT_BITDIRECTION;
 
     /** Timing unit in us */
-    private double unit = defaultUnit;
+    private double unit = DEFAULT_UNIT;
 
 
     /**
@@ -62,7 +62,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
     public GeneralSpec(BitDirection bitDirection, Double unit, Double frequency, Double dutyCycle) {
         super(null);
         this.bitDirection = bitDirection;
-        this.unit = unit != null ? unit : defaultUnit;
+        this.unit = unit != null ? unit : DEFAULT_UNIT;
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
     }
@@ -85,7 +85,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
 
     /** This constructor is intended for debugging and testing only */
     public GeneralSpec() {
-        this(defaultBitDirection, defaultUnit, null, null);
+        this(DEFAULT_BITDIRECTION, DEFAULT_UNIT, null, null);
     }
 
     public GeneralSpec(String str) throws IrpInvalidArgumentException {
@@ -130,7 +130,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
         if (unitInPeriods != null) {
             if (IrCoreUtils.approximatelyEquals(frequency, 0d))
                 throw new IrpInvalidArgumentException("Units in p and frequency == 0 do not go together.");
-            unit = IrCoreUtils.seconds2microseconds(unitInPeriods / (frequency != null ? frequency : defaultFrequency));
+            unit = IrCoreUtils.seconds2microseconds(unitInPeriods / (frequency != null ? frequency : DEFAULT_FREQUENCY));
         }
     }
 
@@ -165,7 +165,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
     }
 
     public double getFrequencyWitDefault() {
-        return frequency != null ? frequency : defaultFrequency;
+        return frequency != null ? frequency : DEFAULT_FREQUENCY;
     }
 
     public double getUnit() {

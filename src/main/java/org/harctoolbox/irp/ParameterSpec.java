@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.Objects;
 import java.util.Random;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -88,7 +89,7 @@ public final class ParameterSpec extends IrpObject {
                 return;
 
             if (deflt != null)
-                nameEngine.define(name, deflt);
+                nameEngine.define(name.toString(), deflt);
             else
                 throw new NameUnassignedException(name, true);
         }
@@ -146,11 +147,19 @@ public final class ParameterSpec extends IrpObject {
     }
 
     public long random() {
-        long bound = getMax() - getMin() + 1;
-        if (bound > Integer.MAX_VALUE) {
-            return random.nextInt(Integer.MAX_VALUE); // FIXME
-        } else
-            return random.nextInt((int) bound) + getMin();
+        long interval = getMax() - getMin() + 1;
+        return interval <= Integer.MAX_VALUE ? randomSimple() : randomHairy();
+    }
+
+    private long randomSimple() {
+        return random.nextInt((int) (getMax() - getMin() + 1)) + getMin();
+    }
+
+    private long randomHairy() {
+        long x = random.nextLong() & IrCoreUtils.ones((long) (Long.SIZE - 1)); // between 0 and Long.MAX_VALUE
+        double frac = ((double) x) / Long.MAX_VALUE; // between 0 and 1
+        long out = (long) ((getMax() - getMin()) * frac + getMin());
+        return out;
     }
 
     @Override

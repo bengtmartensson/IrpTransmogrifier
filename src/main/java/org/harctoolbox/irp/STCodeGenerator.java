@@ -32,7 +32,7 @@ public final class STCodeGenerator extends CodeGenerator {
 
     private static final Logger logger = Logger.getLogger(STCodeGenerator.class.getName());
 
-    private static final String sTGroupFileExtension = ".stg";
+    private static final String ST_GROUP_FILEEXTENSION = ".stg";
 
     private static String stDir = null;
 
@@ -45,7 +45,7 @@ public final class STCodeGenerator extends CodeGenerator {
     }
 
     public static List<String> listTargets() throws IOException {
-        File[] candidates = new File(stDir).listFiles((File dir, String name) -> name.toLowerCase().endsWith(sTGroupFileExtension));
+        File[] candidates = new File(stDir).listFiles((File dir, String name) -> name.toLowerCase().endsWith(ST_GROUP_FILEEXTENSION));
         ArrayList<String> result = new ArrayList<>(candidates.length);
         for (File file : candidates) {
             if (!new STCodeGenerator(file).isAbstract()) {
@@ -69,7 +69,7 @@ public final class STCodeGenerator extends CodeGenerator {
     private STGroup stGroup;
 
     public STCodeGenerator(String target) throws IOException {
-        this(new File(stDir, target + sTGroupFileExtension));
+        this(new File(stDir, target + ST_GROUP_FILEEXTENSION));
     }
 
     public STCodeGenerator(File file) throws IOException {

@@ -21,7 +21,7 @@ import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 public class ProtocolNGTest {
-    private static final String irpDatabasePath = "src/test/resources/IrpProtocols.xml";
+    private static final String IRPDATABASE_PATH = "src/test/resources/IrpProtocols.xml";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -34,7 +34,7 @@ public class ProtocolNGTest {
     private final IrpDatabase irpDatabase;
 
     public ProtocolNGTest() throws IOException, SAXException {
-        irpDatabase = new IrpDatabase(irpDatabasePath);
+        irpDatabase = new IrpDatabase(IRPDATABASE_PATH);
     }
 
     @BeforeMethod

@@ -197,7 +197,6 @@ public class Cleaner {
         return data;
     }
 
-    // FIXME
     protected String toTimingsString(int beg, int length) {
         StringJoiner str = new StringJoiner(" ");
         for (int i = 0; i < length; i += 2) {

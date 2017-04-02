@@ -79,40 +79,6 @@ public class InfiniteBitFieldNGTest {
     }
 
     /**
-     * Test of evaluate method, of class InfiniteBitField.
-     */
-//    @Test
-//    public void testEvaluate() throws Exception {
-//        System.out.println("evaluate");
-//        NameEngine nameEngine = null;
-//        GeneralSpec generalSpec = null;
-//        BitSpec bitSpec = null;
-//        IrSignal.Pass pass = null;
-//        double elapsed = 0.0;
-//        InfiniteBitField instance = null;
-//        EvaluatedIrStream expResult = null;
-//        EvaluatedIrStream result = instance.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
-//    /**
-//     * Test of toElement method, of class InfiniteBitField.
-//     */
-//    @Test
-//    public void testToElement() throws Exception {
-//        System.out.println("toElement");
-//        Document document = null;
-//        InfiniteBitField instance = null;
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
-    /**
      * Test of numberOfBits method, of class InfiniteBitField.
      */
     @Test
@@ -121,17 +87,4 @@ public class InfiniteBitFieldNGTest {
         Integer result = instance.numberOfBits();
         assertTrue(result == 0L);
     }
-
-//    /**
-//     * Test of numberOfBareDurations method, of class InfiniteBitField.
-//     */
-//    @Test
-//    public void testNumberOfBareDurations() {
-//        System.out.println("numberOfBareDurations");
-//        try {
-//            instance.numberOfBareDurations(true);
-//            fail();
-//        } catch (UnsupportedOperationException ex) {
-//        }
-//    }
 }

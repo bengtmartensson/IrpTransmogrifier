@@ -70,11 +70,10 @@ import org.xml.sax.SAXException;
  * member functions, defined elsewhere.
  */
 public final class IrpTransmogrifier {
-    // TODO: make these user settable, reading environment vars, etc.
-    private static final String defaultConfigFile = "/IrpProtocols.xml";
 
-    // No need to make these settable
-    private static final String charSet = "UTF-8"; // Just for runMain
+    // No need to make these settable, at least not presently
+    private static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml"; // in jar-file
+    private static final String DEFAULT_CHARSET = "UTF-8"; // Just for runMain
     private static final String SEPARATOR = "\t";
     private static final String PROGRAMNAME = Version.appName;
 
@@ -82,9 +81,9 @@ public final class IrpTransmogrifier {
     private static JCommander argumentParser;
 
     private static void die(int exitcode, String message) {
-        PrintStream stream = exitcode == IrpUtils.exitSuccess ? System.out : System.err;
+        PrintStream stream = exitcode == IrpUtils.EXIT_SUCCESS ? System.out : System.err;
         stream.println(message);
-        if (exitcode == IrpUtils.exitUsageError) {
+        if (exitcode == IrpUtils.EXIT_USAGE_ERROR) {
             stream.println();
             stream.println("Use \"" + PROGRAMNAME + " help\" or \"" + PROGRAMNAME + " help --short\"\nfor command syntax.");
         }
@@ -103,10 +102,10 @@ public final class IrpTransmogrifier {
     public static String runMain(String[] input) {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            PrintStream printStream = new PrintStream(byteArrayOutputStream, false, charSet);
+            PrintStream printStream = new PrintStream(byteArrayOutputStream, false, DEFAULT_CHARSET);
             main(input, printStream);
             printStream.flush();
-            return new String(byteArrayOutputStream.toByteArray(), charSet);
+            return new String(byteArrayOutputStream.toByteArray(), DEFAULT_CHARSET);
         } catch (UnsupportedEncodingException ex) {
             throw new ThisCannotHappenException();
         }
@@ -180,7 +179,7 @@ public final class IrpTransmogrifier {
         try {
             argumentParser.parse(args);
         } catch (ParameterException ex) {
-            die(IrpUtils.exitUsageError, ex.getLocalizedMessage());
+            die(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         }
 
         try {
@@ -234,7 +233,7 @@ public final class IrpTransmogrifier {
                     : argumentParser.getParsedCommand();
 
             if (command == null)
-                die(IrpUtils.exitUsageError, "No command given.");
+                die(IrpUtils.EXIT_USAGE_ERROR, "No command given.");
             else // For findbugs...
                 switch (command) {
                     case "analyze":
@@ -272,7 +271,7 @@ public final class IrpTransmogrifier {
                         break;
                     default:
                         System.err.println("Unknown command: " + command);
-                        System.exit(IrpUtils.exitSemanticUsageError);
+                        System.exit(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR);
                 }
         } catch (UsageException ex) {
             System.err.println(ex.getLocalizedMessage());
@@ -439,7 +438,7 @@ public final class IrpTransmogrifier {
     private void convertConfig(CommandConvertConfig commandConvertConfig, CommandLineArgs commandLineArgs) throws IOException, SAXException, UsageException {
         setupDatabase(false, commandLineArgs); // checks exactly one of -c, -i given
         if (commandLineArgs.iniFile != null)
-            XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.irpProtocolNS + "}irp");
+            XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.IRP_PROTOCOL_NS + "}irp");
         else
             irpDatabase.printAsIni(out);
 
@@ -789,7 +788,7 @@ public final class IrpTransmogrifier {
             irpDatabase = IrpDatabase.readIni(commandLineArgs.iniFile);
         } else {
             irpDatabase = commandLineArgs.configFile == null
-                    ? new IrpDatabase(getClass().getResourceAsStream(defaultConfigFile))
+                    ? new IrpDatabase(getClass().getResourceAsStream(DEFAULT_CONFIG_FILE))
                     : new IrpDatabase(commandLineArgs.configFile);
         }
         if (expand) {
@@ -1010,7 +1009,6 @@ public final class IrpTransmogrifier {
 
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode IR signal given as argument")
     private static class CommandDecode extends MyCommand {
-        // TODO: presently no sensible way to input raw sequences/signals, issue #14
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
         private boolean noPreferOver = false;
 

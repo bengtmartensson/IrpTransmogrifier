@@ -12,11 +12,11 @@ import org.testng.annotations.Test;
 
 public class BitSpecNGTest {
 
-    private static final String NEC1BitSpec = "<1,-1|1,-3>";
-    private static final String RC5BitSpec = "<1,-1|-1,1>";
-    private static final String RC6BitSpec = "<-1,1|1,-1>";
-    private static final String Nokia32BitSpec = "<164,-276|164,-445|164,-614|164,-783>";
-    private static final String NEC1GeneralSpec = "{38.4k,564}";
+    private static final String NEC1_BITSPEC = "<1,-1|1,-3>";
+    private static final String RC5_BITSPEC = "<1,-1|-1,1>";
+    private static final String RC6_BITSPEC = "<-1,1|1,-1>";
+    private static final String NOKIA32_BITSPEC = "<164,-276|164,-445|164,-614|164,-783>";
+    private static final String NEC1_GENERALSPEC = "{38.4k,564}";
 
 
     @BeforeClass
@@ -38,44 +38,14 @@ public class BitSpecNGTest {
     }
 
     /**
-     * Test of get method, of class BitSpec.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testGet() throws Exception {
-//        System.out.println("getBitIrsteam");
-//        int index = 0;
-//        BitSpec instance = new BitSpec();
-//        BareIrStream expResult = null;
-//        BareIrStream result = instance.get(index);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-
-    }
-
-    /**
-     * Test of toString method, of class BitSpec.
-     */
-    @Test
-    public void testToString() {
-//        try {
-//            System.out.println("toString");
-//            assertEquals(new BitSpec().toString(), "<null>");
-//            assertEquals(new BitSpec(NEC1BitSpec).toString(), NEC1BitSpec);
-//        } catch (IrpSyntaxException | InvalidRepeatException ex) {
-//            fail();
-//        }
-    }
-
-    /**
      * Test of getChunkSize method, of class BitSpec.
      */
     @Test
     public void testGetChunkSize() {
         System.out.println("getChunkSize");
-        BitSpec nec1 = new BitSpec(NEC1BitSpec);
-        BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
-        BitSpec rc5 = new BitSpec(RC5BitSpec);
+        BitSpec nec1 = new BitSpec(NEC1_BITSPEC);
+        BitSpec nokia32 = new BitSpec(NOKIA32_BITSPEC);
+        BitSpec rc5 = new BitSpec(RC5_BITSPEC);
         assertEquals(nec1.getChunkSize(), 1);
         assertEquals(rc5.getChunkSize(), 1);
         assertEquals(nokia32.getChunkSize(), 2);
@@ -88,7 +58,7 @@ public class BitSpecNGTest {
     public void testIsEmpty() {
         System.out.println("isEmpty");
         assertEquals(new BitSpec().isEmpty(), true);
-        assertEquals(new BitSpec(NEC1BitSpec).isEmpty(), false);
+        assertEquals(new BitSpec(NEC1_BITSPEC).isEmpty(), false);
     }
 
     /**
@@ -98,9 +68,9 @@ public class BitSpecNGTest {
     public void testIsStandardPWM() {
         System.out.println("isStandardPWM");
         GeneralSpec generalSpec = new GeneralSpec();
-        BitSpec nec1 = new BitSpec(NEC1BitSpec);
-        BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
-        BitSpec rc5 = new BitSpec(RC5BitSpec);
+        BitSpec nec1 = new BitSpec(NEC1_BITSPEC);
+        BitSpec nokia32 = new BitSpec(NOKIA32_BITSPEC);
+        BitSpec rc5 = new BitSpec(RC5_BITSPEC);
         //BitSpec empty = new BitSpec();
         assertTrue(nec1.isPWM(2, generalSpec, NameEngine.empty));
         assertFalse(nokia32.isPWM(2, generalSpec, NameEngine.empty));
@@ -117,11 +87,11 @@ public class BitSpecNGTest {
     public void testIsStandardBiPhase() {
         System.out.println("isStandardBiPhase");
         try {
-            GeneralSpec generalSpec = new GeneralSpec(NEC1GeneralSpec);
-            BitSpec nec1 = new BitSpec(NEC1BitSpec);
-            BitSpec nokia32 = new BitSpec(Nokia32BitSpec);
-            BitSpec rc5 = new BitSpec(RC5BitSpec);
-            BitSpec rc6 = new BitSpec(RC6BitSpec);
+            GeneralSpec generalSpec = new GeneralSpec(NEC1_GENERALSPEC);
+            BitSpec nec1 = new BitSpec(NEC1_BITSPEC);
+            BitSpec nokia32 = new BitSpec(NOKIA32_BITSPEC);
+            BitSpec rc5 = new BitSpec(RC5_BITSPEC);
+            BitSpec rc6 = new BitSpec(RC6_BITSPEC);
             //BitSpec empty = new BitSpec();
             assertFalse(nec1.isStandardBiPhase(generalSpec, NameEngine.empty));
             assertFalse(nokia32.isStandardBiPhase(generalSpec, NameEngine.empty));
@@ -133,27 +103,12 @@ public class BitSpecNGTest {
     }
 
     /**
-     * Test of toElement method, of class BitSpec.
-     */
-    @Test
-    public void testToElement() {
-        System.out.println("toElement");
-//        Document document = null;
-//        BitSpec instance = new BitSpec();
-//        Element expResult = null;
-//        Element result = instance.toElement(document);
-//        assertEquals(result, expResult);
-//        // TODO review the generated test code and remove the default call to fail.
-
-    }
-
-    /**
      * Test of numberOfInfiniteRepeats method, of class BitSpec.
      */
     @Test
     public void testNumberOfInfiniteRepeats() {
         System.out.println("numberOfInfiniteRepeats");
-        BitSpec instance = new BitSpec(Nokia32BitSpec);
+        BitSpec instance = new BitSpec(NOKIA32_BITSPEC);
         int expResult = 0;
         int result = instance.numberOfInfiniteRepeats();
         assertEquals(result, expResult);
@@ -165,7 +120,7 @@ public class BitSpecNGTest {
     @Test
     public void testToIrpString() {
         System.out.println("toIrpString");
-        BitSpec instance = new BitSpec(Nokia32BitSpec);
+        BitSpec instance = new BitSpec(NOKIA32_BITSPEC);
         String result = instance.toIrpString();
         assertEquals(result, "<164,-276|164,-445|164,-614|164,-783>");
     }
@@ -176,7 +131,7 @@ public class BitSpecNGTest {
     @Test
     public void testNumberOfBitspecDurations() {
         System.out.println("numberOfBitspecDurations");
-        int result = new BitSpec(Nokia32BitSpec).numberOfBitspecDurations();
+        int result = new BitSpec(NOKIA32_BITSPEC).numberOfBitspecDurations();
         assertEquals(result, 2);
     }
 }

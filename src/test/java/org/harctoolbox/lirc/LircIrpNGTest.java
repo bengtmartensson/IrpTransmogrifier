@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
  */
 public class LircIrpNGTest {
 
-    private final static String mode2String = "begin remote \n"
+    private final static String MODE2_STRING = "begin remote \n"
             + "\n"
             + "  name  yamaha-amp\n"
             + "  bits           16\n"
@@ -87,7 +87,7 @@ public class LircIrpNGTest {
             + "\n"
             + "end remote";
 
-    private static final String rawString = "#\n"
+    private static final String RAW_STRING = "#\n"
             + "# this config file was automatically generated\n"
             + "# using lirc-0.7.0(serial) on Thu Jul  7 21:36:22 2005\n"
             + "#\n"
@@ -366,7 +366,7 @@ public class LircIrpNGTest {
             + "\n"
             + "end remote";
 
-    private static final String lircModeString = "#\n"
+    private static final String LIRCMODE_STRING = "#\n"
             + "# this config file was automatically generated\n"
             + "# using lirc-0.7.0-CVS(atiusb) on Tue Apr 27 23:51:09 2004\n"
             + "#\n"
@@ -470,11 +470,11 @@ public class LircIrpNGTest {
     private final LircRemote lircModeRemote;
 
     public LircIrpNGTest() throws IOException {
-        StringReader reader = new StringReader(mode2String);
+        StringReader reader = new StringReader(MODE2_STRING);
         lircRemote = LircConfigFile.readRemotes(reader).get(0);
-        StringReader rawReader = new StringReader(rawString);
+        StringReader rawReader = new StringReader(RAW_STRING);
         rawRemote = LircConfigFile.readRemotes(rawReader).get(0);
-        StringReader lircModeReader = new StringReader(lircModeString);
+        StringReader lircModeReader = new StringReader(LIRCMODE_STRING);
         lircModeRemote = LircConfigFile.readRemotes(lircModeReader).get(0);
     }
 

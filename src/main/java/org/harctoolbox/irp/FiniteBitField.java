@@ -293,22 +293,16 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                     // perform assignment
 
                     Name name = (Name) expression;
-                    //Name name = data.toName();
-                    //if (name != null) {
                     logger.log(Level.FINE, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(10), payload, bitmask});
-                    //Long inverted = data.invert(payload);
-                    //if (inverted != null) {
                     if (data instanceof Name)
                         recognizeData.add(name.toString(), rhs, bitmask);
                     else
                         recognizeData.add(name.toString(), rhs);
-
-                    //}
                 } else if (expression instanceof Number) {
                     // check, barf if not OK
-                    long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine()); // FIXME
+                    long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine());
                     if (expected != rhs)
-                        throw new SignalRecognitionException("Constant FiniteBitField did not evaluated to expected value");//return false;
+                        throw new SignalRecognitionException("Constant FiniteBitField did not evaluated to expected value");
                 } else
                     throw new ThisCannotHappenException();
             } else {

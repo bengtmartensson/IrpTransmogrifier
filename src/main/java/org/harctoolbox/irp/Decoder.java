@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
@@ -34,58 +35,31 @@ import org.xml.sax.SAXException;
 
 public final class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
+    private static final String CONFIG_PATH = "src/main/resources/IrpProtocols.xml";
 
-    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
     public static void main(String[] args) {
-        ParameterSpec.initRandom(1);
-
         try {
-            if (args.length == 0)
-                decode("src/main/resources/IrpProtocols.xml");
-            else {
+            Decoder decoder = new Decoder(CONFIG_PATH);
+            if (args.length == 0) {
+                decoder.testDecode(123);
+            } else {
                 IrSignal irSignal = Pronto.parse(args);
-                IrpDatabase database = new IrpDatabase("src/main/config/IrpProtocols.xml");
-                Decoder decoder = new Decoder(database);
                 Map<String, Decode> decodes = decoder.decode(irSignal, true, true);
-                decodes.entrySet().forEach((kvp) -> {
+                decodes.values().forEach((kvp) -> {
                     System.out.println(kvp);
                 });
             }
-        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | IrpInvalidArgumentException | DomainViolationException | InvalidNameException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
-            Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | SAXException ex) {
+            logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
     }
 
-    public static boolean decode(String irpDatabasePath) throws IOException, SAXException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
-        IrpDatabase irp = new IrpDatabase(irpDatabasePath);
-        irp.expand();
-        Decoder decoder = new Decoder(irp);
-
-        for (String protocolName : irp.getNames()) {
-            NamedProtocol protocol = irp.getNamedProtocol(protocolName);
-            if (protocol.isDecodeable()) {
-                NameEngine nameEngine = new NameEngine(protocol.randomParameters());
-                IrSignal irSignal = protocol.toIrSignal(nameEngine);
-                Map<String, Decode> decodes = decoder.decode(irSignal, true, true);
-                boolean success = false;
-                for (Decode decode : decodes.values()) {
-                    System.out.println(decode);
-                    if (decode.same(protocolName, nameEngine)) {
-                        success = true;
-                        break;
-                    }
-                }
-                if (!success) {
-                    System.out.println(">>>>>>>>> " + protocol.getName() + "\t" + nameEngine.toString());
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     private final Map<String, NamedProtocol> parsedProtocols;
+
+    public Decoder(String irpDatabasePath) throws IOException, SAXException {
+        this(new IrpDatabase(irpDatabasePath), null);
+    }
 
     public Decoder(IrpDatabase irpDatabase) {
         this(irpDatabase, null);
@@ -97,24 +71,57 @@ public final class Decoder {
      * @param names If non-null and non-empty, include only the protocols with these names.
      */
     public Decoder(IrpDatabase irpDatabase, Collection<String> names) {
-//        try {
-            irpDatabase.expand();
-            parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
-            Collection<String> list = names != null ? names : irpDatabase.getNames();
-            list.parallelStream().forEach((protocolName) -> {
-                try {
-                    NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(protocolName);
-                    if (namedProtocol.isDecodeable())
-                        parsedProtocols.put(protocolName, namedProtocol);
-                } catch (NameUnassignedException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
-                    ex.printStackTrace();
-                    throw new ThisCannotHappenException(ex);
+        irpDatabase.expand();
+        parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
+        Collection<String> list = names != null ? names : irpDatabase.getNames();
+        list.forEach((protocolName) -> {
+            try {
+                NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(protocolName);
+                if (namedProtocol.isDecodeable())
+                    parsedProtocols.put(protocolName, namedProtocol);
+            } catch (NameUnassignedException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
+                //ex.printStackTrace();
+                throw new ThisCannotHappenException(ex);
+            }
+        });
+    }
+
+    public boolean testDecode() {
+        return testDecode(new Random());
+    }
+
+    public boolean testDecode(long seed) {
+        return testDecode(new Random(seed));
+    }
+
+    public boolean testDecode(Random random) {
+        try {
+            for (NamedProtocol protocol : parsedProtocols.values()) {
+                NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
+                IrSignal irSignal = protocol.toIrSignal(nameEngine);
+                Map<String, Decode> decodes = decode(irSignal, true, true);
+                boolean success = false;
+                for (Decode decode : decodes.values()) {
+                    System.out.println(decode);
+                    if (decode.same(protocol.getName(), nameEngine)) {
+                        success = true;
+                        break;
+                    }
                 }
-            });
-//        } catch (IrpSyntaxException ex) {
-//            // Only happens when there are errors in the Irp database
-//            throw new ThisCannotHappenException(ex);
-//        }
+                if (!success) {
+                    System.out.println(">>>>>>>>> " + protocol.getName() + "\t" + nameEngine.toString());
+                    decodes.values().forEach((decode) -> {
+                        System.out.println("----------------> " + decode.toString());
+                    });
+
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     /**
@@ -174,7 +181,6 @@ public final class Decoder {
     public Map<String, Decode> decode(IrSignal irSignal, boolean allDecodes, boolean keepDefaultedParameters) {
         return decode(irSignal, allDecodes, keepDefaultedParameters, null, null, null, null);
     }
-
 
     public static class Decode {
         private final NamedProtocol namedProtocol;

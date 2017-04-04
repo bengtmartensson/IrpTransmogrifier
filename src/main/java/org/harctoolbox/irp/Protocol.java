@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -463,6 +464,10 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public Map<String, Long> randomParameters() {
         return parameterSpecs.random();
+    }
+
+    public Map<String, Long> randomParameters(Random random) {
+        return parameterSpecs.random(random);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException {

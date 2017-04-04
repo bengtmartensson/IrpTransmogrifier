@@ -147,16 +147,20 @@ public final class ParameterSpec extends IrpObject {
     }
 
     public long random() {
+        return random(random);
+    }
+
+    public long random(Random rng) {
         long interval = getMax() - getMin() + 1;
-        return interval <= Integer.MAX_VALUE ? randomSimple() : randomHairy();
+        return interval <= Integer.MAX_VALUE ? randomSimple(rng) : randomHairy(rng);
     }
 
-    private long randomSimple() {
-        return random.nextInt((int) (getMax() - getMin() + 1)) + getMin();
+    private long randomSimple(Random rng) {
+        return rng.nextInt((int) (getMax() - getMin() + 1)) + getMin();
     }
 
-    private long randomHairy() {
-        long x = random.nextLong() & IrCoreUtils.ones((long) (Long.SIZE - 1)); // between 0 and Long.MAX_VALUE
+    private long randomHairy(Random rng) {
+        long x = rng.nextLong() & IrCoreUtils.ones((long) (Long.SIZE - 1)); // between 0 and Long.MAX_VALUE
         double frac = ((double) x) / Long.MAX_VALUE; // between 0 and 1
         long out = (long) ((getMax() - getMin()) * frac + getMin());
         return out;

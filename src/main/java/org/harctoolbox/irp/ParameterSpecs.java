@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
@@ -148,10 +149,28 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return nameEngine;
     }
 
+    public Map<String, Long> random(Random rng) {
+        Map<String, Long> nameEngine = new HashMap<>(map.size());
+        map.values().stream().forEach((parameter) -> {
+            nameEngine.put(parameter.getName(), parameter.random(rng));
+        });
+
+        return nameEngine;
+    }
+
     public Map<String, Long> randomUsingDefaults() {
         Map<String, Long> nameEngine = new HashMap<>(map.size());
         map.values().stream().filter((parameter) -> (parameter.getDefault() == null)).forEach((parameter) -> {
             nameEngine.put(parameter.getName(), parameter.random());
+        });
+
+        return nameEngine;
+    }
+
+    public Map<String, Long> randomUsingDefaults(Random rng) {
+        Map<String, Long> nameEngine = new HashMap<>(map.size());
+        map.values().stream().filter((parameter) -> (parameter.getDefault() == null)).forEach((parameter) -> {
+            nameEngine.put(parameter.getName(), parameter.random(rng));
         });
 
         return nameEngine;

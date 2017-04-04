@@ -2,6 +2,7 @@ package org.harctoolbox.irp;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
@@ -74,6 +75,21 @@ public class ProtocolNGTest {
         } catch (UnsupportedRepeatException ex) {
             // success!
         } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testRandomParametersNec1() {
+        try {
+            System.out.println("randomParametersNec1");
+            NameEngine nameEngine = new NameEngine("{D=186,S=13,F=174}");
+            NamedProtocol nec1 = irpDatabase.getNamedProtocol("nec1");
+            Random rng = new Random(42);
+            Map<String, Long> params = nec1.randomParameters(rng);
+            assertTrue(nameEngine.numericallyEquals(params));
+        } catch (InvalidNameException | UnknownProtocolException | UnsupportedRepeatException | IrpInvalidArgumentException | NameUnassignedException ex) {
+            Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }
     }

@@ -25,13 +25,15 @@ import org.harctoolbox.ircore.IrSignal;
 
 /**
  * This interface describes the things that make up an IRStream.
- *
- * This should rather be an interface.
  */
 public interface IrStreamItem extends XmlExport {
 
     public static IrStreamItem newIrStreamItem(String str) {
-        return newIrStreamItem((new ParserDriver(str)).getParser().irstream_item());
+        return newIrStreamItem(new ParserDriver(str));
+    }
+
+    public static IrStreamItem newIrStreamItem(ParserDriver parserDriver) {
+        return newIrStreamItem(parserDriver.getParser().irstream_item());
     }
 
     public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) {

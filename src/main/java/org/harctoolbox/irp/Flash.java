@@ -24,7 +24,11 @@ package org.harctoolbox.irp;
 public final class Flash extends Duration {
 
     public Flash(String str) {
-        this((new ParserDriver(str)).getParser().flash());
+        this(new ParserDriver(str));
+    }
+
+    public Flash(ParserDriver parserDriver) {
+        this(parserDriver.getParser().flash());
     }
 
     public Flash(IrpParser.FlashContext ctx) {

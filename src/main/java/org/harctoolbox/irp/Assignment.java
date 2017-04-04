@@ -42,7 +42,11 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     //private IrpParser.AssignmentContext parseTree = null;
 
     public Assignment(String str) {
-        this((new ParserDriver(str)).getParser().assignment());
+        this(new ParserDriver(str));
+    }
+
+    private Assignment(ParserDriver parserDriver) {
+        this(parserDriver.getParser().assignment());
     }
 
     public Assignment(IrpParser.AssignmentContext assignment) {

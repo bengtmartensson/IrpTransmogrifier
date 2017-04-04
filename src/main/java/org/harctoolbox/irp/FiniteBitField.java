@@ -49,7 +49,11 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     private boolean reverse;
 
     public FiniteBitField(String str) {
-        this((IrpParser.Finite_bitfieldContext) new ParserDriver(str).getParser().bitfield());
+        this(new ParserDriver(str));
+    }
+
+    private FiniteBitField(ParserDriver parserDriver) {
+        this((IrpParser.Finite_bitfieldContext) parserDriver.getParser().bitfield());
 //        this.parser = new ParserDriver(str).getParser();
 //        int last = parseTree.getStop().getStopIndex();
 //            if (last != str.length() - 1)

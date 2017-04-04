@@ -42,7 +42,11 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     //private final ParserRuleContext parseTree;
 
     public IrStream(String str) {
-        this(new ParserDriver(str).getParser().irstream());
+        this(new ParserDriver(str));
+    }
+
+    public IrStream(ParserDriver parserDriver) {
+        this(parserDriver.getParser().irstream());
     }
 
     public IrStream(IrpParser.IrstreamContext ctx) {
@@ -50,7 +54,6 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         bareIrStream = new BareIrStream(ctx.bare_irstream());
         IrpParser.Repeat_markerContext ctxRepeatMarker = ctx.repeat_marker();
         repeatMarker = ctxRepeatMarker != null ? new RepeatMarker(ctxRepeatMarker) : new RepeatMarker();
-        //parseTree = ctx;
     }
 
     public IrStream(List<IrStreamItem> irStreamItems, RepeatMarker repeatMarker) {
@@ -61,7 +64,6 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         super(null);
         this.bareIrStream = bareIrStream;
         this.repeatMarker = repeatMarker;
-        //parseTree = null;
     }
 
     public IrStream(BareIrStream bareIrStream) {

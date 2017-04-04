@@ -22,11 +22,11 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 
 abstract class OnePartExpression extends Expression {
 
-    static Expression newExpression(ParseTree ctx) {
-        if (ctx instanceof IrpParser.Primary_itemContext)
-            return PrimaryItemExpression.newExpression((IrpParser.Primary_itemContext) ctx);
-        else if (ctx instanceof IrpParser.BitfieldContext)
-            return BitFieldExpression.newExpression((IrpParser.BitfieldContext) ctx);
+    public static Expression newExpression(ParseTree ctx, ParseTree child) {
+        if (child instanceof IrpParser.Primary_itemContext)
+            return PrimaryItemExpression.newExpression((IrpParser.Primary_itemContext) child);
+        else if (child instanceof IrpParser.BitfieldContext)
+            return BitFieldExpression.newExpression((IrpParser.BitfieldContext) child);
         else
             throw new ThisCannotHappenException("Unknown OneOpExpression");
     }

@@ -25,11 +25,21 @@ import org.w3c.dom.Element;
  */
 public final class RepeatMarker extends IrpObject {
 
+    public static RepeatMarker newRepeatMarker(char ch) {
+        return ch == '*' ? new RepeatMarker(0, Integer.MAX_VALUE)
+                : ch == '+' ? new RepeatMarker(1, Integer.MAX_VALUE)
+                : new RepeatMarker(Character.toString(ch));
+    }
+
     private int min;
     private int max;
 
     public RepeatMarker(String str) {
-        this((new ParserDriver(str)).getParser().repeat_marker());
+        this(new ParserDriver(str));
+    }
+
+    private RepeatMarker(ParserDriver parserDriver) {
+        this(parserDriver.getParser().repeat_marker());
     }
 
     public RepeatMarker(IrpParser.Repeat_markerContext ctx) {
@@ -68,9 +78,6 @@ public final class RepeatMarker extends IrpObject {
         this(1, 1);
     }
 
-    public RepeatMarker(char ch) {
-        this(Character.toString(ch));
-    }
 
     @Override
     public boolean equals(Object obj) {

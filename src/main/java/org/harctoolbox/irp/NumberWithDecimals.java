@@ -30,14 +30,20 @@ public final class NumberWithDecimals extends IrpObject implements Floatable {
         NumberWithDecimals numberWithDecimals = new NumberWithDecimals(str);
         return numberWithDecimals.toFloat();
     }
+
     public static double parse(IrpParser.Number_with_decimalsContext ctx) {
         NumberWithDecimals numberWithDecimals = new NumberWithDecimals(ctx);
         return numberWithDecimals.toFloat();
     }
+
     private double data;
 
     public NumberWithDecimals(String str) {
-        this(new ParserDriver(str).getParser().number_with_decimals());
+        this(new ParserDriver(str));
+    }
+
+    public NumberWithDecimals(ParserDriver parserDriver) {
+        this(parserDriver.getParser().number_with_decimals());
     }
 
     public NumberWithDecimals(IrpParser.Number_with_decimalsContext ctx) {

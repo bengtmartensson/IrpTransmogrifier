@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.antlr.v4.gui.TreeViewer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -63,13 +64,11 @@ public class Protocol extends IrpObject implements AggregateLister {
     private ParameterSpecs parameterSpecs;
     private BitspecIrstream bitspecIrstream;
     private Variation normalFormVariation;
-    //private IrpParser.ProtocolContext parseTree;
-    private ParserDriver parseDriver;
     private NameEngine definitions;
     private NameEngine memoryVariables;
-    private IrpParser parser = null;
     private Boolean interleavingFlash = null;
     private Boolean interleavingGap = null;
+    private ParserDriver parserDriver = null;
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs) {
         this(generalSpec, bitspecIrstream, definitions, parameterSpecs, null);
@@ -106,24 +105,20 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws org.harctoolbox.irp.UnsupportedRepeatException
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      */
+    // TODO: should throw a "real" esxception if antlr parsing fails, now ParseCancellationException
     public Protocol(String irpString) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(new ParserDriver(irpString));
     }
 
-    public Protocol(ParserDriver parserDriver) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
+    private Protocol(ParserDriver parserDriver) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(parserDriver.getParser().protocol());
-        this.parser = parserDriver.getParser();
-        this.parseDriver = parserDriver;
+        this.parserDriver = parserDriver;
     }
 
     public Protocol(IrpParser.ProtocolContext parseTree) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(new GeneralSpec(parseTree), new BitspecIrstream(parseTree), new NameEngine(), new ParameterSpecs(parseTree), parseTree);
         parseTree.definitions().forEach((defs) -> {
-            try {
                 definitions.parseDefinitions(defs);
-            } catch (InvalidNameException ex) {
-                throw new ThisCannotHappenException(ex);
-            }
         });
 
         parameterSpecs = new ParameterSpecs(parseTree);
@@ -137,6 +132,14 @@ public class Protocol extends IrpObject implements AggregateLister {
         }
 
         checkSanity();
+    }
+
+    public String toStringTree() {
+        return toStringTree(parserDriver);
+    }
+
+    public TreeViewer toTreeViewer() {
+        return toTreeViewer(parserDriver);
     }
 
     private void computeNormalForm() {
@@ -203,7 +206,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     private Protocol mkProtocol(BareIrStream bareIrStream) {
-        IrStream irStream = new IrStream(bareIrStream);
+        IrStream irStream = new IrStream(bareIrStream, RepeatMarker.newRepeatMarker('*'));
         BitspecIrstream normalBitspecIrstream = new BitspecIrstream(bitspecIrstream.getBitSpec(), irStream);
         return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, null);
     }

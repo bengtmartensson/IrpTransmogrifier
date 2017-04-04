@@ -89,7 +89,11 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
     }
 
     public GeneralSpec(String str) throws IrpInvalidArgumentException {
-        this(new ParserDriver(str).getParser().generalspec());
+        this(new ParserDriver(str));
+    }
+
+    private GeneralSpec(ParserDriver parserDriver) throws IrpInvalidArgumentException {
+        this(parserDriver.getParser().generalspec());
     }
 
     public GeneralSpec(IrpParser.ProtocolContext ctx) throws IrpInvalidArgumentException {

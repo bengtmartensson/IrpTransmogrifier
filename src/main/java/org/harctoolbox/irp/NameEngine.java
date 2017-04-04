@@ -70,25 +70,34 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
 
     private Map<String, Expression> map;
 
+    public NameEngine() {
+        this(0);
+    }
+
     public NameEngine(int initialCapacity) {
-        super(null);
+        this(null, initialCapacity);
+    }
+
+    public NameEngine(IrpParser.DefinitionsContext ctx, int initialCapacity) {
+        super(ctx);
         map = new LinkedHashMap<>(initialCapacity);
     }
 
-    public NameEngine() {
-        this(4);
+    public NameEngine(IrpParser.DefinitionsContext ctx) {
+        this(ctx, 4);
+        parseDefinitions(ctx.definitions_list());
     }
 
     public NameEngine(String str) throws InvalidNameException {
-        this();
-        if (str != null && !str.isEmpty()) {
-            ParserDriver parserDriver = new ParserDriver(str);
-            parseDefinitions(parserDriver.getParser().definitions());
-        }
+        this(new ParserDriver(str));
+    }
+
+    public NameEngine(ParserDriver parserDriver) throws InvalidNameException {
+        this(parserDriver.getParser().definitions());
     }
 
     public NameEngine(Map<String, Long> numericalParameters) {
-        this(numericalParameters.size());
+        this(null, numericalParameters.size());
         numericalParameters.entrySet().stream().forEach((entry) -> {
             map.put(entry.getKey(), new NumberExpression(entry.getValue()));
         });
@@ -212,20 +221,32 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
      * Invoke the parser on the supplied argument, and stuff the result into the name engine.
      *
      * @param str String to be parsed, like "{C = F*4 + D + 3}".
-     * @throws org.harctoolbox.irp.InvalidNameException
      */
-    public void parseDefinitions(String str) throws InvalidNameException {
+    public void parseDefinitions(String str) {
         ParserDriver parserDriver = new ParserDriver(str);
         parseDefinitions(parserDriver.getParser().definitions());
     }
 
-    public void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) throws InvalidNameException {
-        for (IrpParser.DefinitionContext definition : ctx.definitions_list().definition())
-            parseDefinition(definition);
+    public void parseDefinitions(IrpParser.DefinitionsContext ctx /* DEFINITIONS */) {
+        parseDefinitions(ctx.definitions_list());
     }
 
-    private void parseDefinition(IrpParser.DefinitionContext ctx /* DEFINITION */) throws InvalidNameException {
-        define(ctx.name().getText(), ctx.expression());
+    private void parseDefinition(IrpParser.DefinitionContext ctx /* DEFINITION */) {
+        try {
+            define(ctx.name().getText(), ctx.expression());
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
+    }
+
+    private void parseDefinitions(IrpParser.Definitions_listContext definitions_list) {
+        parseDefinitions(definitions_list.definition());
+    }
+
+    private void parseDefinitions(List<IrpParser.DefinitionContext> list) {
+        list.forEach((def) -> {
+            parseDefinition(def);
+        });
     }
 
     /**

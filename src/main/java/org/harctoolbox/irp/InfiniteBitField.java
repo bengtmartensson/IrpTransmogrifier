@@ -24,7 +24,11 @@ import org.w3c.dom.Element;
 public final class InfiniteBitField extends BitField {
 
     public InfiniteBitField(String str) {
-        this((IrpParser.Infinite_bitfieldContext) (new ParserDriver(str)).getParser().bitfield());
+        this(new ParserDriver(str));
+    }
+
+    public InfiniteBitField(ParserDriver parserDriver) {
+        this((IrpParser.Infinite_bitfieldContext) parserDriver.getParser().bitfield());
     }
 
     public InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx) {

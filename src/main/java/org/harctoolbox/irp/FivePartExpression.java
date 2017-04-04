@@ -23,16 +23,20 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 final class FivePartExpression extends Expression {
 
-    static FivePartExpression newExpression(ParseTree cond, ParseTree question, ParseTree trueExpression, ParseTree colon, ParseTree falseExpression) {
-        return new FivePartExpression((IrpParser.ExpressionContext) cond, (IrpParser.ExpressionContext) trueExpression, (IrpParser.ExpressionContext) falseExpression);
+    public static FivePartExpression newExpression(IrpParser.ExpressionContext ctx) {
+        return newExpression(ctx, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
+    }
+
+    public static FivePartExpression newExpression(IrpParser.ExpressionContext ctx, ParseTree cond, ParseTree trueExpression, ParseTree falseExpression) {
+        return new FivePartExpression(ctx, (IrpParser.ExpressionContext) cond, (IrpParser.ExpressionContext) trueExpression, (IrpParser.ExpressionContext) falseExpression);
     }
 
     private final Expression conditional;
     private final Expression trueExp;
     private final Expression falseExp;
 
-    private FivePartExpression(IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
-        super(null);
+    private FivePartExpression(IrpParser.ExpressionContext ctx, IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
+        super(ctx);
         conditional = Expression.newExpression(cond);
         trueExp = Expression.newExpression(trueExpression);
         falseExp = Expression.newExpression(falseExpression);

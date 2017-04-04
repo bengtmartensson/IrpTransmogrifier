@@ -26,15 +26,19 @@ import org.w3c.dom.Element;
 
 final class TwoPartExpression extends Expression {
 
-    static Expression newExpression(ParseTree first, ParseTree second) {
-        return new TwoPartExpression(first, second);
+    public static Expression newExpression(IrpParser.ExpressionContext ctx) {
+        return newExpression(ctx, ctx.getChild(0), ctx.getChild(1));
+    }
+
+    public static Expression newExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second) {
+        return new TwoPartExpression(ctx, first, second);
     }
 
     private final char operator;
     private final Expression operand;
 
-    private TwoPartExpression(ParseTree first, ParseTree second) {
-        super(null);
+    private TwoPartExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second) {
+        super(ctx);
         operator = first.getText().charAt(0);
         operand = Expression.newExpression((IrpParser.ExpressionContext) second);
     }

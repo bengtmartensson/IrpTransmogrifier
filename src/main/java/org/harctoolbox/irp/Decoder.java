@@ -41,7 +41,7 @@ public final class Decoder {
 
         try {
             if (args.length == 0)
-                decode("src/main/config/IrpProtocols.xml");
+                decode("src/main/resources/IrpProtocols.xml");
             else {
                 IrSignal irSignal = Pronto.parse(args);
                 IrpDatabase database = new IrpDatabase("src/main/config/IrpProtocols.xml");

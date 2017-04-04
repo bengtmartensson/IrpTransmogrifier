@@ -29,7 +29,11 @@ public final class NameOrNumber extends IrpObject implements Floatable {
     private Floatable thing;
 
     public NameOrNumber(String str) {
-        this(new ParserDriver(str).getParser().name_or_number());
+        this(new ParserDriver(str));
+    }
+
+    private NameOrNumber(ParserDriver parserDriver) {
+        this(parserDriver.getParser().name_or_number());
     }
 
     public NameOrNumber(IrpParser.Name_or_numberContext ctx) {

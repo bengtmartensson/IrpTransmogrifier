@@ -33,7 +33,6 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     private BitSpec bitSpec;
     private IrStream irStream;
-    //private final IrpParser.Bitspec_irstreamContext parseTree;
 
     public BitspecIrstream(IrpParser.ProtocolContext ctx) {
         this(ctx.bitspec_irstream());
@@ -54,7 +53,11 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     public BitspecIrstream(String str) {
-        this((new ParserDriver(str)).getParser().bitspec_irstream());
+        this(new ParserDriver(str));
+    }
+
+    private BitspecIrstream(ParserDriver parserDriver) {
+        this(parserDriver.getParser().bitspec_irstream());
     }
 
     @Override

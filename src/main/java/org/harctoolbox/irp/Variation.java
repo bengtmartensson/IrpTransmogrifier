@@ -35,10 +35,13 @@ public final class Variation extends IrpObject implements IrStreamItem {
     private final BareIrStream intro;
     private final BareIrStream repeat;
     private final BareIrStream ending;
-    //private final IrpParser.VariationContext parseTree;
 
     public Variation(String str) {
-        this((new ParserDriver(str)).getParser().variation());
+        this(new ParserDriver(str));
+    }
+
+    public Variation(ParserDriver parserDriver) {
+        this(parserDriver.getParser().variation());
     }
 
     public Variation(IrpParser.VariationContext variation) {

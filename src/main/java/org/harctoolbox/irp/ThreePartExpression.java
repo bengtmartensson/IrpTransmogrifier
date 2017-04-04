@@ -26,16 +26,20 @@ import org.w3c.dom.Element;
 
 final class ThreePartExpression extends Expression {
 
-    static Expression newExpression(ParseTree first, ParseTree second, ParseTree third) {
-        return new ThreePartExpression(first, second, third);
+    public static Expression newExpression(IrpParser.ExpressionContext ctx) {
+        return new ThreePartExpression(ctx, ctx.getChild(0), ctx.getChild(1), ctx.getChild(2));
+    }
+
+    public static Expression newExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second, ParseTree third) {
+        return new ThreePartExpression(ctx, first, second, third);
     }
 
     private final String operator;
     private final Expression op1;
     private final Expression op2;
 
-    private ThreePartExpression(ParseTree first, ParseTree second, ParseTree third) {
-        super(null);
+    private ThreePartExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second, ParseTree third) {
+        super(ctx);
         operator = second.getText();
         op1 = Expression.newExpression((IrpParser.ExpressionContext) first);
         op2 = Expression.newExpression((IrpParser.ExpressionContext) third);

@@ -29,7 +29,11 @@ public final class Extent extends Duration {
     private static final Logger logger = Logger.getLogger(Extent.class.getName());
 
     public Extent(String str) {
-        this((new ParserDriver(str)).getParser().extent());
+        this(new ParserDriver(str));
+    }
+
+    public Extent(ParserDriver parserDriver) {
+        this(parserDriver.getParser().extent());
     }
 
     public Extent(IrpParser.ExtentContext ctx) {
@@ -41,7 +45,7 @@ public final class Extent extends Duration {
     }
 
     public Extent(double d) {
-        super(d);
+        this(d, null);
     }
 
     @Override

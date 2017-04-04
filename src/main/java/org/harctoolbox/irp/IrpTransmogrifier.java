@@ -72,69 +72,54 @@ import org.xml.sax.SAXException;
 public final class IrpTransmogrifier {
 
     // No need to make these settable, at least not presently
-    private static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml"; // in jar-file
-    private static final String DEFAULT_CHARSET = "UTF-8"; // Just for runMain
+    public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml"; // in jar-file
+    public static final String DEFAULT_CHARSET = "UTF-8"; // Just for runMain
     private static final String SEPARATOR = "\t";
     private static final String PROGRAMNAME = Version.appName;
 
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
     private static JCommander argumentParser;
 
-    private static void die(int exitcode, String message) {
-        PrintStream stream = exitcode == IrpUtils.EXIT_SUCCESS ? System.out : System.err;
-        stream.println(message);
-        if (exitcode == IrpUtils.EXIT_USAGE_ERROR) {
-            stream.println();
-            stream.println("Use \"" + PROGRAMNAME + " help\" or \"" + PROGRAMNAME + " help --short\"\nfor command syntax.");
-        }
-        doExit(exitcode);
+    static String transmogrify(String commandLine) {
+        return transmogrify(commandLine.split("\\s+"));
     }
 
-    private static void doExit(int exitCode) {
-        System.exit(exitCode);
-    }
-
-    /**
-     * Runs main on the input, and returns the result as a string. Intended for testing etc.
-     * @param input
-     * @return Result as String.
-     */
-    public static String runMain(String[] input) {
+    static String transmogrify(String[] args) {
         try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            PrintStream printStream = new PrintStream(byteArrayOutputStream, false, DEFAULT_CHARSET);
-            main(input, printStream);
-            printStream.flush();
-            return new String(byteArrayOutputStream.toByteArray(), DEFAULT_CHARSET);
-        } catch (UnsupportedEncodingException ex) {
-            throw new ThisCannotHappenException();
-        }
-    }
+            ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
+            try (PrintStream outStream = new PrintStream(outBytes, false, DEFAULT_CHARSET)) {
+                ProgramExitStatus status = main(args, outStream);
+                if (!status.isSuccess())
+                    return null;
 
-    /**
-     * Runs main on the split-ted argument, and returns the result as a string. Intended for testing etc.
-     * @param input
-     * @return Result as String.
-     */
-    public static String runMain(String input) {
-        return runMain(input.split("\\s+"));
+                outStream.flush();
+            }
+            return new String(outBytes.toByteArray(), DEFAULT_CHARSET).trim();
+        } catch (UnsupportedEncodingException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     /**
      *
-     * @param args program args
+     * @param args
      */
     public static void main(String[] args) {
-        main(args, null);
+        ProgramExitStatus status = main(args, System.out);
+        status.die();
+    }
+
+    static ProgramExitStatus main(String cmdLine, PrintStream printStream) {
+        return main(cmdLine.split("\\s+"), printStream);
     }
 
     /**
      *
      * @param args program args
-     * @param printStream overrides normal print output
+     * @param printStream
+     * @return
      */
-    @SuppressWarnings({"null"})
-    private static void main(String[] args, PrintStream printStream) {
+    static ProgramExitStatus main(String[] args, PrintStream printStream) {
         CommandLineArgs commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(PROGRAMNAME);
@@ -179,7 +164,7 @@ public final class IrpTransmogrifier {
         try {
             argumentParser.parse(args);
         } catch (ParameterException ex) {
-            die(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         }
 
         try {
@@ -233,7 +218,7 @@ public final class IrpTransmogrifier {
                     : argumentParser.getParsedCommand();
 
             if (command == null)
-                die(IrpUtils.EXIT_USAGE_ERROR, "No command given.");
+                return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "No command given.");
             else // For findbugs...
                 switch (command) {
                     case "analyze":
@@ -270,22 +255,28 @@ public final class IrpTransmogrifier {
                         instance.convertConfig(commandConvertConfig, commandLineArgs);
                         break;
                     default:
-                        System.err.println("Unknown command: " + command);
-                        System.exit(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR);
+                        return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Unknown command: " + command);
                 }
         } catch (UsageException ex) {
-            System.err.println(ex.getLocalizedMessage());
+            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (ParseCancellationException ex) {
             // When we get here,
             // Antlr has already written a somewhat sensible error message on
             // stderr; that is good enough for now.
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
+            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
-            logger.log(Level.SEVERE, ex.getMessage());
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
+            return new ProgramExitStatus(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());
+        } catch (IrpParseException ex) {
+            // TODO: Improve error message
+            if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
+                ex.printStackTrace();
+            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Parse error in \"" + ex.getText() + "\"");
         }
+        return new ProgramExitStatus();
     }
 
     private static Map<String, String> assembleParameterMap(List<String> paramStrings) throws UsageException {
@@ -541,7 +532,7 @@ public final class IrpTransmogrifier {
             out.println(irSignal.ccfString());
     }
 
-    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+    private void render(CommandRender commandRenderer, CommandLineArgs commandLineArgs) throws UsageException, IOException, SAXException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
         boolean finished = commandRenderer.process(this);
         if (finished)
             return;
@@ -549,14 +540,17 @@ public final class IrpTransmogrifier {
         if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
-        setupDatabase(commandLineArgs);
-
         if (commandRenderer.irp != null) {
             if (!commandRenderer.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
-            NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
-            render(protocol, commandRenderer);
+            try {
+                NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
+                render(protocol, commandRenderer);
+            } catch (ParseCancellationException ex) {
+                throw new IrpParseException(commandRenderer.irp, ex);
+            }
         } else {
+            setupDatabase(commandLineArgs);
             List<String> list = irpDatabase.evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
             for (String proto : list) {
                 //logger.info(proto);
@@ -743,8 +737,8 @@ public final class IrpTransmogrifier {
             XmlUtils.printDOM(IrpUtils.getPrintSteam(commandBitField.xml), bitfield.toDocument(), commandLineArgs.encoding, null);
             logger.log(Level.INFO, "Wrote {0}", commandBitField.xml);
         }
-        if (commandBitField.gui)
-            IrpUtils.showTreeViewer(bitfield.toTreeViewer(), text + "=" + result);
+//        if (commandBitField.gui)
+//            IrpUtils.showTreeViewer(bitfield.toTreeViewer(), text + "=" + result);
     }
 
     private void lirc(CommandLirc commandLirc, CommandLineArgs commandLineArgs) throws IOException {
@@ -855,23 +849,23 @@ public final class IrpTransmogrifier {
     // The reaining classes are ordered alphabetically
     private final static class CommandLineArgs {
 
-        @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds")
+        @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds, used when comparing durations.")
         private Double absoluteTolerance = null;
 
-        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default in jar file.")
+        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
         private String configFile = null;
 
-        @Parameter(names = { "-e", "--encoding" }, description = "Encoding used for generating output")
+        @Parameter(names = { "-e", "--encoding" }, description = "Encoding used in generated output.")
         private String encoding = "UTF-8";
 
         @Parameter(names = {"-f", "--frequencytolerance"}, converter = FrequencyParser.class,
-                description = "Frequency tolerance in Hz. Negative disables frequency check")
+                description = "Frequency tolerance in Hz. Negative disables frequency check.")
         private Double frequencyTolerance = null;
 
-        @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message (deprecated; use command help instead)")
+        @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message (deprecated; use the command \"help\" instead).")
         private boolean helpRequested = false;
 
-        @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format")
+        @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format.")
         private String iniFile = null;//"src/main/config/IrpProtocols.ini";
 
         @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels.")
@@ -887,29 +881,29 @@ public final class IrpTransmogrifier {
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
         private Level logLevel = Level.INFO;
 
-        @Parameter(names = { "--min-leadout"}, description = "Threshold for leadout when decoding")
+        @Parameter(names = { "--min-leadout"}, description = "Threshold for leadout when decoding.")
         private Double minLeadout = null;
 
-        @Parameter(names = { "-o", "--output" }, description = "Name of output file (default stdout)")
+        @Parameter(names = { "-o", "--output" }, description = "Name of output file (default: stdout).")
         private String output = null;
 
         @Parameter(names = {"-r", "--relativetolerance"}, validateWith = LessThanOne.class,
                 description = "Relative tolerance as a number < 1")
         private Double relativeTolerance = null;
 
-        @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions")
+        @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions.")
         private boolean regexp = false;
 
-        @Parameter(names = {"-s", "--sort"}, description = "Sort the protocols alphabetically")
+        @Parameter(names = {"-s", "--sort"}, description = "Sort the protocols alphabetically on output.")
         private boolean sort = false;
 
-        @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random)")
+        @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random).")
         private Long seed = null;
 
-        @Parameter(names = {"-u", "--url-decode"}, description = "URL-decode protocol names, (understanding %20 for example)")
+        @Parameter(names = {"-u", "--url-decode"}, description = "URL-decode protocol names, (understanding %20 for example).")
         private boolean urlDecode = false;
 
-        @Parameter(names = {"-v", "--version"}, description = "Report version (deprecated; use command version instead)")
+        @Parameter(names = {"-v", "--version"}, description = "Report version (deprecated; use command version instead).")
         private boolean versionRequested = false;
 
         @Parameter(names = {"-x", "--xmllog"}, description = "Log in XML format.")
@@ -919,72 +913,68 @@ public final class IrpTransmogrifier {
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters")
     private static class CommandAnalyze extends MyCommand {
 
-        @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument")
+        @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument.")
         private Integer chop = null;
 
-        @Parameter(names = { "-C", "--clean" }, description = "Output only the cleaned sequence(s)")
+        @Parameter(names = { "-C", "--clean" }, description = "Output only the cleaned sequence(s).")
         private boolean clean = false;
 
-        @Parameter(names = { "-e", "--extent" }, description = "Output last gap as extent")
+        @Parameter(names = { "-e", "--extent" }, description = "Output the last gap as an extent.")
         private boolean extent = false;
 
-        @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class,
-                description = "Modulation frequency of raw signal")
+        @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
         private Double frequency = null;
 
-        @Parameter(names = { "-i", "--invert"}, description = "Invert order in bitspec")
+        @Parameter(names = { "-i", "--invert"}, description = "Invert the order in bitspec.")
         private boolean invert = false;
 
-        @Parameter(names = { "--ire", "--intro-repeat-ending"}, description = "Consider the argument as begin, repeat, and ending sequence")
+        @Parameter(names = { "--ire", "--intro-repeat-ending"}, description = "Consider the argument as begin, repeat, and ending sequence.")
         private boolean introRepeatEnding = false;
 
-        @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the parameters")
+        @Parameter(names = { "-l", "--lsb" }, description = "Force lsb-first bitorder for the parameters.")
         private boolean lsb = false;
 
-        @Parameter(names = { "-m", "--maxunits" }, description = "Maximal multiplier of time unit in durations")
+        @Parameter(names = { "-m", "--maxunits" }, description = "Maximal multiplier of time unit in durations.")
         private double maxUnits = 30f;
 
-        @Parameter(names = { "-u", "--maxmicroseconds" }, description = "Maximal duration to be expressed as micro seconds")
+        @Parameter(names = { "-u", "--maxmicroseconds" }, description = "Maximal duration to be expressed as micro seconds.")
         private double maxMicroSeconds = 10000f;
 
-        @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit")
+        @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit.")
         private double maxRoundingError = 0.3;
 
         @Parameter(names = {      "--decoder" }, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")
         private String decoder = null;
 
-        @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths")
+        @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths.")
         private List<Integer> parameterWidths = new ArrayList<>(4);
 
-        @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder")
+        @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder.")
         private boolean repeatFinder = false;
 
-        @Parameter(names = {"--radix" }, description = "Radix of parameter output")
+        @Parameter(names = {"--radix" }, description = "Radix used for printing of output parameters.")
         private int radix = 10;
 
-        @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics")
+        @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics.")
         private boolean statistics = false;
 
-        @Parameter(names = {"-t", "--timebase"}, description = "Force time unit , in microseconds (no suffix), or in periods (with suffix \"p\")")
+        @Parameter(names = {"-t", "--timebase"}, description = "Force time unit , in microseconds (no suffix), or in periods (with suffix \"p\").")
         private String timeBase = null;
 
-        @Parameter(description = "durations in microseconds, or pronto hex", required = true)
+        @Parameter(description = "durations in microseconds, or pronto hex.", required = true)
         private List<String> args;
     }
 
-    @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield given as argument")
+    @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield given as argument.")
     private static class CommandBitField extends MyCommand {
 
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        @Parameter(names = { "-n", "--nameengine" }, description = "Define a name engine for resolving the bitfield.", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
 
-        @Parameter(names = { "-l", "--lsb" }, description = "Least significant bit first")
+        @Parameter(names = { "-l", "--lsb" }, description = "Output bitstream with least significant bit first.")
         private boolean lsb = false;
 
-        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
-        private boolean gui = false;
-
-        @Parameter(names = { "--xml"}, description = "Generate XML and write to file argument")
+        @Parameter(names = { "--xml"}, description = "Generate XML and write to file given as argument.")
         private String xml = null;
 
         @Parameter(description = "bitfield", required = true)
@@ -994,79 +984,86 @@ public final class IrpTransmogrifier {
     @Parameters(commandNames = {"code"}, commandDescription = "Generate code for the given target(s)")
     private static class CommandCode extends MyCommand {
 
-        @Parameter(names = { "-d", "--directory" }, description = "Directory to generate output files, if not using the --output option.")
+        @Parameter(names = { "-d", "--directory" }, description = "Directory in whicht the generate output files will be written, if not using the --output option.")
         private String directory = null;
 
         @Parameter(names = {       "--inspect" }, description = "Fire up stringtemplate inspector on generated code (if sensible)")
         private boolean inspect = false;
 
-        @Parameter(names = { "-p", "--parameter" }, description = "Specify target dependent parameters to the code generators")
+        @Parameter(names = { "-p", "--parameter" }, description = "Specify target dependent parameters to the code generators.")
         private List<String> parameters = new ArrayList<>(4);
 
-        @Parameter(names = { "-s", "--stdirectory" }, description = "Directory containing st (string template) files for code generation")
+        @Parameter(names = { "-s", "--stdirectory" }, description = "Directory containing st (string template) files for code generation.")
         private String stDir = System.getenv("STDIR") != null ? System.getenv("STDIR") : "st";
 
         @Parameter(names = { "-t", "--target" }, required = true, description = "Target(s) for code generation. Use ? for a list.")
         private List<String> target = new ArrayList<>(4);
 
-        @Parameter(description = "protocol")
+        @Parameter(description = "protocols")
         private List<String> protocols;
     }
 
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode IR signal given as argument")
     private static class CommandDecode extends MyCommand {
-        @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over")
+        @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over.")
         private boolean noPreferOver = false;
 
-        @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency")
+        @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Set modulation frequency.")
         private Double frequency = null;
 
-        @Parameter(names = { "-k", "--keep-defaulted"}, description = "Keep parameters equal to their defaults")
+        @Parameter(names = { "-k", "--keep-defaulted"}, description = "In output, do not remove parameters that are equal to their defaults.")
         private boolean keepDefaultedParameters = false;
 
-        @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all)")
+        @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all).")
         private String protocol = null;
 
-        @Parameter(description = "durations in micro seconds, or pronto hex", required = true)
+        @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = true)
         private List<String> args;
     }
 
-    @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression given as argument")
+    @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression given as argument.")
     private static class CommandExpression extends MyCommand {
 
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
+        @Parameter(names = { "-n", "--nameengine" }, description = "Define a name engine to use for evaluating.", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
 
-        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+        @Parameter(names = { "--stringtree" }, description = "Output stringtree.")
         private boolean stringTree = false;
 
-        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram.")
         private boolean gui = false;
 
-        @Parameter(names = { "--xml"}, description = "Generate XML and write to file argument")
+        @Parameter(names = { "--xml"}, description = "Generate XML and write to file argument.")
         private String xml = null;
 
         @Parameter(description = "expression", required = true)
         private List<String> expressions;
+
+        @Override
+        public String description() {
+            return "This command evaluates its argument as an expression. "
+                    + "Using the --nameengine argument, the expression may also contain names. "
+                    + "The --gui options presents a graphical representation of the parse tree.";
+        }
     }
 
-    @Parameters(commandNames = { "lirc" }, commandDescription = "Convert Lirc configuration files to IRP form")
+    @Parameters(commandNames = { "lirc" }, commandDescription = "Convert Lirc configuration files to IRP form.")
     private static class CommandLirc extends MyCommand {
 
-        @Parameter(names = { "-c", "--commands" }, description = "List the commands in the remotes")
+        @Parameter(names = { "-c", "--commands" }, description = "List the commands in the remotes.")
         private boolean commands = false;
 
-        @Parameter(names = { "-r", "--radix"}, description = "Radix for outputting result") // Too much...?
+        @Parameter(names = { "-r", "--radix"}, description = "Radix for outputting result, deefault 16.") // Too much...?
         private int radix = 16;
 
-        @Parameter(description = "Lirc config files/directories/URLs); empty for <stdin>", required = false)
+        @Parameter(description = "Lirc config files/directories/URLs); empty for <stdin>.", required = false)
         private List<String> files = new ArrayList<>(8);
     }
 
-    @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands")
+    @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
     private static class CommandHelp extends MyCommand {
 
-        @Parameter(names = { "-s", "--short" }, description = "Produce a short usage message")
+        @Parameter(names = { "-s", "--short" }, description = "Produce a short usage message.")
         private boolean shortForm = false;
 
         @Parameter(description = "commands")
@@ -1076,62 +1073,64 @@ public final class IrpTransmogrifier {
     @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")
     private static class CommandList extends MyCommand {
 
-        @Parameter(names = { "-c", "--classify"}, description = "Classify the protocols")
+        @Parameter(names = { "-c", "--classify"}, description = "Classify the protocols.")
         private boolean classify = false;
 
-        @Parameter(names = { "--cname"}, description = "List C name of the protocols")
+        @Parameter(names = { "--cname"}, description = "List C name of the protocols.")
         private boolean cName = false;
 
-        @Parameter(names = { "--documentation"}, description = "List documentation")
+        @Parameter(names = { "--documentation"}, description = "List documentation.")
         private boolean documentation = false;
 
-        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram")
+        @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram.")
         private boolean gui = false;
 
-        @Parameter(names = { "-i", "--irp"}, description = "List IRP")
+        @Parameter(names = { "-i", "--irp"}, description = "List IRP form.")
         private boolean irp = false;
 
-        @Parameter(names = { "--is"}, description = "test toIrpString")
+        // not really useful, therefore hidden
+        @Parameter(names = { "--istring"}, hidden = true, description = "test toIrpString.")
         private boolean is = false;
 
-        @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List normal form")
+        @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List normal form.")
         private boolean normalForm = false;
 
-        @Parameter(names = { "-r", "--radix" }, description = "Radix of parameter output")
+        // Only sensible together with --irpstring, consequentely hidded
+        @Parameter(names = { "-r", "--radix" }, description = "Radix of parameter output.")
         private int radix = 16;
 
-        @Parameter(names = { "--stringtree" }, description = "Produce stringtree")
+        @Parameter(names = { "--stringtree" }, description = "Produce stringtree.")
         private boolean stringTree = false;
 
-        @Parameter(names = { "-w", "--weight" }, description = "Compute weight")
+        @Parameter(names = { "-w", "--weight" }, description = "Compute weight of the protocols.")
         private boolean weight = false;
 
-        @Parameter(names = { "--warnings" }, description = "Issue warnings for some problematic IRP constructs")
+        @Parameter(names = { "--warnings" }, description = "Issue warnings for some problematic IRP constructs.")
         private boolean warnings = false;
 
         @Parameter(description = "List of protocols (default all)")
         private List<String> protocols = new ArrayList<>(8);
     }
 
-    @Parameters(commandNames = {"render"}, commandDescription = "Render signal")
+    @Parameters(commandNames = {"render"}, commandDescription = "Render signal from parameters")
     private static class CommandRender extends MyCommand {
 
-        @Parameter(names = { "-i", "--irp" }, description = "IRP string to use as protocol definition")
+        @Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
         private String irp = null;
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
 
-        @Parameter(names = { "-p", "--pronto" }, description = "Generate Pronto hex")
+        @Parameter(names = { "-p", "--pronto", "--ccf", "--hex" }, description = "Generate Pronto hex.")
         private boolean pronto = false;
 
-        @Parameter(names = { "-r", "--raw" }, description = "Generate raw form")
+        @Parameter(names = { "-r", "--raw" }, description = "Generate raw form.")
         private boolean raw = false;
 
-        @Parameter(names = { "-R", "--raw-without-signs" }, description = "Generate raw form without signs")
+        @Parameter(names = { "-R", "--raw-without-signs" }, description = "Generate raw form without signs.")
         private boolean rawWithoutSigns = false;
 
-        @Parameter(names = { "--random" }, description = "Generate random, but valid, parameters")
+        @Parameter(names = { "--random" }, description = "Generate random, valid, parameters")
         private boolean random = false;
 
         @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
@@ -1156,11 +1155,11 @@ public final class IrpTransmogrifier {
     }
 
     private static abstract class MyCommand {
-        @Parameter(names = { "-h", "-?", "--help" }, help = true, description = "Print help for this command")
+        @Parameter(names = { "-h", "-?", "--help" }, help = true, description = "Print help for this command.")
         @SuppressWarnings("FieldMayBeFinal")
         private boolean help = false;
 
-        @Parameter(names = { "--description" }, help = true, description = "Print a possibly longer documentation for the command")
+        @Parameter(names = { "--description" }, help = true, description = "Print a possibly longer documentation for the command.")
         @SuppressWarnings("FieldMayBeFinal")
         private boolean description = false;
 
@@ -1170,7 +1169,7 @@ public final class IrpTransmogrifier {
          */
         // Please override!
         public String description() {
-            return "Documentation for this command has not yet been written.\nUse --help for syntax of command.";
+            return "Documentation for this command has not yet been written.\nUse --help for the syntax of the command.";
         }
 
         public boolean process(IrpTransmogrifier instance) {
@@ -1190,6 +1189,58 @@ public final class IrpTransmogrifier {
 
         UsageException(String message) {
             super(message);
+        }
+    }
+
+    @SuppressWarnings("PackageVisibleInnerClass")
+    static class ProgramExitStatus {
+
+        private static void doExit(int exitCode) {
+            System.exit(exitCode);
+        }
+
+        static void die(int exitStatus, String message) {
+            new ProgramExitStatus(exitStatus, message).die();
+        }
+
+        private final int exitStatus;
+        private final String message;
+
+        ProgramExitStatus(int exitStatus, String message) {
+            this.exitStatus = exitStatus;
+            this.message = message;
+        }
+
+        ProgramExitStatus() {
+            this(IrpUtils.EXIT_SUCCESS, null);
+        }
+
+        /**
+         * @return the exitStatus
+         */
+        int getExitStatus() {
+            return exitStatus;
+        }
+
+        /**
+         * @return the message
+         */
+        String getMessage() {
+            return message;
+        }
+
+        boolean isSuccess() {
+            return exitStatus == IrpUtils.EXIT_SUCCESS;
+        }
+
+        void die() {
+            PrintStream stream = exitStatus == IrpUtils.EXIT_SUCCESS ? System.out : System.err;
+            stream.println(message);
+            if (exitStatus == IrpUtils.EXIT_USAGE_ERROR) {
+                stream.println();
+                stream.println("Use \"" + PROGRAMNAME + " help\" or \"" + PROGRAMNAME + " help --short\"\nfor command syntax.");
+            }
+            doExit(exitStatus);
         }
     }
 }

@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
@@ -48,45 +49,63 @@ public abstract class Expression extends PrimaryItem {
             long number = Long.parseLong(str);
             return new NumberExpression(number);
         } catch (NumberFormatException ex) {
-            ParserDriver parseDriver = new ParserDriver(str);
-            Expression exp = newExpression(parseDriver);
+            return newExpression(new ParserDriver(str));
+            //Expression exp = newExpression(parseDriver);
 //            int last = exp.parseTree.getStop().getStopIndex();
 //            if (last != str.length() - 1)
 //                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
-            return exp;
+            //return exp;
         }
     }
 
     public static Expression newExpression(ParserDriver parserDriver) {
-        return newExpression(parserDriver.getParser().expression());
+        Expression expression = newExpression(parserDriver.getParser().expression());
+        expression.parserDriver = parserDriver;
+        return expression;
     }
 
     static Expression newExpression(IrpParser.Para_expressionContext para_expressionContext) {
         return newExpression(para_expressionContext.expression());
     }
 
-    static Expression newExpression(IrpParser.ExpressionContext ctx) {
+    public static Expression newExpression(IrpParser.ExpressionContext ctx) {
         List<ParseTree> children = ctx.children;
         switch (children.size()) {
             case 1:
-                return OnePartExpression.newExpression(children.get(0));
+                return OnePartExpression.newExpression(ctx, ctx.getChild(0));
             case 2:
-                return TwoPartExpression.newExpression(children.get(0), children.get(1));
+                return TwoPartExpression.newExpression(ctx, ctx.getChild(0), ctx.getChild(1));
             case 3:
-                return ThreePartExpression.newExpression(children.get(0), children.get(1), children.get(2));
+                return ThreePartExpression.newExpression(ctx, ctx.getChild(0), ctx.getChild(1), ctx.getChild(2));
             case 5:
-                return FivePartExpression.newExpression(children.get(0), children.get(1), children.get(2), children.get(3), children.get(4));
+                return FivePartExpression.newExpression(ctx, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
             default:
                 throw new ThisCannotHappenException("Unknown expression type");
-        }
+    }
     }
 
     protected static long cBoolean(boolean x) {
         return x ? 1L : 0L;
     }
 
+    private ParserDriver parserDriver = null;
+
     protected Expression(ParseTree ctx) {
         super(ctx);
+    }
+
+    private Expression(ParseTree ctx, ParserDriver parserDriver, Expression old) {
+        super(ctx);
+        this.parserDriver = parserDriver;
+
+    }
+
+    public String toStringTree() {
+        return parserDriver != null ? toStringTree(parserDriver) : null;
+    }
+
+    public TreeViewer toTreeViewer() {
+        return toTreeViewer(parserDriver);
     }
 
     @Override

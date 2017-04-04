@@ -51,12 +51,12 @@ public abstract class IrpObject implements XmlExport {
         return toIrpString(10);
     }
 
-    public final String toStringTree() {
-        return null;
+    public final String toStringTree(IrpParser parser) {
+        return parseTree != null ? parseTree.toStringTree(parser) : null;
     }
 
-    public final String toStringTree(IrpParser parser) {
-        return parseTree.toStringTree(parser);
+    public final String toStringTree(ParserDriver parserDriver) {
+        return toStringTree(parserDriver.getParser());
     }
 
     @Override
@@ -69,16 +69,23 @@ public abstract class IrpObject implements XmlExport {
         return 0;
     }
 
+    public final TreeViewer toTreeViewer(ParserDriver parserDriver) {
+        return toTreeViewer(parserDriver.getParser());
+    }
+
     public final TreeViewer toTreeViewer(IrpParser parser) {
-        List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+        return toTreeViewer(Arrays.asList(parser.getRuleNames()));
+    }
+
+    public final TreeViewer toTreeViewer(List<String> ruleNames) {
         return new TreeViewer(ruleNames, parseTree);
     }
 
-    public final TreeViewer toTreeViewer() {
-        return null;
-        //List<String> ruleNames = Arrays.asList(parser.getRuleNames());
-        //return new TreeViewer(ruleNames, parseTree);
-    }
+//    public final TreeViewer toTreeViewer() {
+//        return null;
+//        //List<String> ruleNames = Arrays.asList(parser.getRuleNames());
+//        //return new TreeViewer(ruleNames, parseTree);
+//    }
 
     /**
      * Returns a (somewhat arbitrary) measure of the complexity of the object. Can be used

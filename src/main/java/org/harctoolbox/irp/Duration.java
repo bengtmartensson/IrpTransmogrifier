@@ -44,7 +44,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     private static final double DUMMYTIMEUNIT = 999;
 
     public static Duration newDuration(String str) {
-        IrpParser parser = new ParserDriver(str).getParser();
+        return newDuration(new ParserDriver(str));
+    }
+
+    public static Duration newDuration(ParserDriver parserDriver) {
+        IrpParser parser = parserDriver.getParser();
         try {
             return newDuration(parser.duration());
         } catch (ParseCancellationException ex) {

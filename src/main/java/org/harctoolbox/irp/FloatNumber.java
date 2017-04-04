@@ -28,6 +28,7 @@ public final class FloatNumber extends IrpObject implements Floatable {
         FloatNumber floatNumber = new FloatNumber(str);
         return floatNumber.toFloat();
     }
+    
     public static double parse(IrpParser.Float_numberContext ctx) {
         FloatNumber floatNumber = new FloatNumber(ctx);
         return floatNumber.toFloat();
@@ -46,7 +47,11 @@ public final class FloatNumber extends IrpObject implements Floatable {
     }
 
     public FloatNumber(String str) {
-        this(new ParserDriver((str)).getParser().float_number());
+        this(new ParserDriver(str));
+    }
+
+    public FloatNumber(ParserDriver parserDriver) {
+        this(parserDriver.getParser().float_number());
     }
 
     @Override

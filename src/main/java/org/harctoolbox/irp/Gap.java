@@ -23,7 +23,11 @@ package org.harctoolbox.irp;
 public final class Gap extends Duration {
 
     public Gap(String str) {
-        this((new ParserDriver(str)).getParser().gap());
+        this(new ParserDriver(str));
+    }
+
+    private Gap(ParserDriver parserDriver) {
+        this(parserDriver.getParser().gap());
     }
 
     Gap(IrpParser.GapContext ctx) {

@@ -38,17 +38,18 @@ public abstract class BitField extends IrpObject implements Numerical {
     private static final Logger logger = Logger.getLogger(BitField.class.getName());
 
     public static BitField newBitField(String str) {
-        ParserDriver parseDriver = new ParserDriver(str);
-        IrpParser parser = parseDriver.getParser();
-        BitField bitField = newBitField(parser);
+        return newBitField(new ParserDriver(str));
+    }
+
+    public static BitField newBitField(ParserDriver parserDriver) {
+        return newBitField(parserDriver.getParser().bitfield());
 //        int last = parser.bitfield().getStop().getStopIndex();
 //        if (last != str.length() - 1)
 //            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
-        return bitField;
-    }
-
-    private static BitField newBitField(IrpParser parser) {
-        return newBitField(parser.bitfield());
+//    }
+//
+//    private static BitField newBitField(IrpParser parser) {
+//        return newBitField(parser.bitfield());
     }
 
     public static BitField newBitField(IrpParser.BitfieldContext ctx) {
@@ -72,6 +73,7 @@ public abstract class BitField extends IrpObject implements Numerical {
     protected boolean complement;
     protected PrimaryItem data;
     protected PrimaryItem chop;
+
     protected BitField(ParseTree ctx) {
         super(ctx);
     }

@@ -78,17 +78,17 @@ public final class IrpTransmogrifier {
     private static final String PROGRAMNAME = Version.appName;
 
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
-    private static JCommander argumentParser;
 
-    static String transmogrify(String commandLine) {
-        return transmogrify(commandLine.split("\\s+"));
+    static String execute(String commandLine) {
+        return execute(commandLine.split("\\s+"));
     }
 
-    static String transmogrify(String[] args) {
+    static String execute(String[] args) {
         try {
             ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
             try (PrintStream outStream = new PrintStream(outBytes, false, DEFAULT_CHARSET)) {
-                ProgramExitStatus status = main(args, outStream);
+                IrpTransmogrifier instance = new IrpTransmogrifier(outStream);
+                ProgramExitStatus status = instance.run(args);
                 if (!status.isSuccess())
                     return null;
 
@@ -100,27 +100,62 @@ public final class IrpTransmogrifier {
         }
     }
 
+    // Allow for parallel execition of several instances -- main is static.
     /**
      *
      * @param args
+     * @param out
      */
-    public static void main(String[] args) {
-        ProgramExitStatus status = main(args, System.out);
+    public static void main(String[] args, PrintStream out) {
+        IrpTransmogrifier instance = new IrpTransmogrifier(out);
+        ProgramExitStatus status = instance.run(args);
         status.die();
     }
 
-    static ProgramExitStatus main(String cmdLine, PrintStream printStream) {
-        return main(cmdLine.split("\\s+"), printStream);
+    public static void main(String[] args) {
+        main(args, System.out);
+    }
+
+    public static void main(String cmdLine, PrintStream printStream) {
+        main(cmdLine.split("\\s+"), printStream);
+    }
+
+    private static Map<String, String> assembleParameterMap(List<String> paramStrings) throws UsageException {
+        HashMap<String, String> result = new HashMap<>(paramStrings.size());
+        for (String s : paramStrings) {
+            String[] kvp = s.split(":");
+            if (kvp.length != 2)
+                throw new UsageException("Wrong syntax for parameter:value");
+
+            result.put(kvp[0], kvp[1]);
+        }
+        return result;
+    }
+
+    private PrintStream out = null;
+    private IrpDatabase irpDatabase;
+    private CommandLineArgs commandLineArgs;
+    private JCommander argumentParser;
+
+    public IrpTransmogrifier() {
+        this(System.out);
+    }
+
+    public IrpTransmogrifier(PrintStream out) {
+        this.out = out;
+    }
+
+    public ProgramExitStatus run(String cmdLine) {
+        return run(cmdLine.split("\\s+"));
     }
 
     /**
      *
      * @param args program args
-     * @param printStream
      * @return
      */
-    static ProgramExitStatus main(String[] args, PrintStream printStream) {
-        CommandLineArgs commandLineArgs = new CommandLineArgs();
+    public ProgramExitStatus run(String[] args) {
+        commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(PROGRAMNAME);
         argumentParser.setAllowAbbreviatedOptions(true);
@@ -178,7 +213,7 @@ public final class IrpTransmogrifier {
 
             String[] logclasses = commandLineArgs.logclasses.split("\\|");
             @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-            List<Logger> loggers = new ArrayList<>(logclasses.length);
+                    List<Logger> loggers = new ArrayList<>(logclasses.length);
             for (String logclass : logclasses) {
                 String[] classLevel = logclass.trim().split(":");
                 if (classLevel.length < 2)
@@ -205,10 +240,9 @@ public final class IrpTransmogrifier {
             if (commandLineArgs.seed != null)
                 ParameterSpec.initRandom(commandLineArgs.seed);
 
-            PrintStream ps = printStream != null ? printStream
-                    : commandLineArgs.output == null ? System.out
-                    : IrpUtils.getPrintSteam(commandLineArgs.output);
-            IrpTransmogrifier instance = new IrpTransmogrifier(ps);
+            if (commandLineArgs.output != null)
+                out = IrpUtils.getPrintSteam(commandLineArgs.output);
+            //IrpTransmogrifier instance = new IrpTransmogrifier(ps);
 
             // Since we have help and version as subcommands, --help and --version
             // are a little off. Keep them for compatibility, and
@@ -222,37 +256,37 @@ public final class IrpTransmogrifier {
             else // For findbugs...
                 switch (command) {
                     case "analyze":
-                        instance.analyze(commandAnalyze, commandLineArgs);
+                        analyze(commandAnalyze, commandLineArgs);
                         break;
                     case "bitfield":
-                        instance.bitfield(commandBitField, commandLineArgs);
+                        bitfield(commandBitField, commandLineArgs);
                         break;
                     case "code":
-                        instance.code(commandCode, commandLineArgs);
+                        code(commandCode, commandLineArgs);
                         break;
                     case "decode":
-                        instance.decode(commandDecode, commandLineArgs);
+                        decode(commandDecode, commandLineArgs);
                         break;
                     case "expression":
-                        instance.expression(commandExpression, commandLineArgs);
+                        expression(commandExpression, commandLineArgs);
                         break;
                     case "help":
-                        instance.help(commandHelp);
+                        help(commandHelp);
                         break;
                     case "lirc":
-                        instance.lirc(commandLirc, commandLineArgs);
+                        lirc(commandLirc, commandLineArgs);
                         break;
                     case "list":
-                        instance.list(commandList, commandLineArgs);
+                        list(commandList, commandLineArgs);
                         break;
                     case "render":
-                        instance.render(commandRenderer, commandLineArgs);
+                        render(commandRenderer, commandLineArgs);
                         break;
                     case "version":
-                        instance.version(commandLineArgs, commandVersion);
+                        version(commandLineArgs, commandVersion);
                         break;
                     case "convertconfig":
-                        instance.convertConfig(commandConvertConfig, commandLineArgs);
+                        convertConfig(commandConvertConfig, commandLineArgs);
                         break;
                     default:
                         return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Unknown command: " + command);
@@ -277,26 +311,6 @@ public final class IrpTransmogrifier {
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Parse error in \"" + ex.getText() + "\"");
         }
         return new ProgramExitStatus();
-    }
-
-    private static Map<String, String> assembleParameterMap(List<String> paramStrings) throws UsageException {
-        HashMap<String, String> result = new HashMap<>(paramStrings.size());
-        for (String s : paramStrings) {
-            String[] kvp = s.split(":");
-            if (kvp.length != 2)
-                throw new UsageException("Wrong syntax for parameter:value");
-
-            result.put(kvp[0], kvp[1]);
-        }
-        return result;
-    }
-
-    private PrintStream out = null;
-    private IrpDatabase irpDatabase;
-    private String configFilename;
-
-    private IrpTransmogrifier(PrintStream out) {
-        this.out = out;
     }
 
     private String usageString(String command) {
@@ -1192,8 +1206,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    @SuppressWarnings("PackageVisibleInnerClass")
-    static class ProgramExitStatus {
+    public static class ProgramExitStatus {
 
         private static void doExit(int exitCode) {
             System.exit(exitCode);

@@ -1235,7 +1235,8 @@ public final class IrpTransmogrifier {
 
         void die() {
             PrintStream stream = exitStatus == IrpUtils.EXIT_SUCCESS ? System.out : System.err;
-            stream.println(message);
+            if (message != null && !message.isEmpty())
+                stream.println(message);
             if (exitStatus == IrpUtils.EXIT_USAGE_ERROR) {
                 stream.println();
                 stream.println("Use \"" + PROGRAMNAME + " help\" or \"" + PROGRAMNAME + " help --short\"\nfor command syntax.");

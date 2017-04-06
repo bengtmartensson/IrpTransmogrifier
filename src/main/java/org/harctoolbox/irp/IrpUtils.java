@@ -66,20 +66,6 @@ public final class IrpUtils {
 
     private final static Level enteringExitingLevel = Level.FINER;
 
-    public static String stringArray(int[] array) {
-        if (array == null)
-            return null;
-        if (array.length == 0)
-            return "[]";
-
-        StringBuilder result = new StringBuilder(array.length*6);
-        result.append("[").append(array[0]);
-        for (int i = 1; i < array.length; i++)
-            result.append(", ").append(array[i]);
-
-        return result.append("]").toString();
-    }
-
     public static double l1Norm(Double[] sequence) {
         double sum = 0;
         for (Double d : sequence)

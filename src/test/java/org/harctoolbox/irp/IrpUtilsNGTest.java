@@ -28,19 +28,7 @@ public class IrpUtilsNGTest {
     @AfterMethod
     public void tearDownMethod() throws Exception {
     }
-
-    /**
-     * Test of stringArray method, of class IrpUtils.
-     */
-    @Test
-    public void testStringArray() {
-        System.out.println("stringArray");
-        int[] array = new int[]{ 42, 73 };
-        String expResult = "[42, 73]";
-        String result = IrpUtils.stringArray(array);
-        assertEquals(result, expResult);
-    }
-
+    
     /**
      * Test of l1Norm method, of class IrpUtils.
      */

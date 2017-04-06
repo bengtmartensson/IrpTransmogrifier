@@ -74,4 +74,13 @@ public class IrpTransmogrifierNGTest {
         String expResult = "Parse error in \"silly\"";
         assertEquals(status.getMessage(), expResult);
     }
+
+    @Test
+    public void testExpression() {
+        System.out.println("Expression");
+        String result = IrpTransmogrifier.execute("expression -n \"a=1 b=11\" -- -1 ? a+ b : 9");
+        String expResult = "Parse error in \"silly\"";
+        assertEquals(result, "12");
+
+    }
 }

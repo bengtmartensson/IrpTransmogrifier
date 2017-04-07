@@ -649,7 +649,7 @@ public final class IrpTransmogrifier {
     }
 
     private void analyze(List<IrSequence> irSequences, CommandAnalyze commandAnalyze, CommandLineArgs commandLineArgs) {
-        Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfind, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, commandAnalyze, commandLineArgs);
     }
 
@@ -672,15 +672,22 @@ public final class IrpTransmogrifier {
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(i));
             }
-        } else {
-            List<Protocol> protocols = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
-            for (int i = 0; i < protocols.size(); i++) {
-                if (protocols.size() > 1)
+        }
+        if (commandAnalyze.dumpRepeatfind) {
+            for (int i = 0; i < analyzer.getNoSequences(); i++) {
+                if (analyzer.getNoSequences() > 1)
                     out.print("Seq. #" + i + ": ");
-                if (commandAnalyze.statistics)
-                    out.println(analyzer.toTimingsString(i));
-                printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
+                out.println(analyzer.repeatReducedIrSignal(i).toString(true));
             }
+        }
+
+        List<Protocol> protocols = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
+        for (int i = 0; i < protocols.size(); i++) {
+            if (protocols.size() > 1)
+                out.print("Seq. #" + i + ": ");
+            if (commandAnalyze.statistics)
+                out.println(analyzer.toTimingsString(i));
+            printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
         }
     }
 
@@ -931,7 +938,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument.")
         private Integer chop = null;
 
-        @Parameter(names = { "-C", "--clean" }, description = "Output only the cleaned sequence(s).")
+        @Parameter(names = { "-C", "--clean" }, description = "Output the cleaned sequence(s).")
         private boolean clean = false;
 
         @Parameter(names = { "-e", "--extent" }, description = "Output the last gap as an extent.")
@@ -958,7 +965,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit.")
         private double maxRoundingError = 0.3;
 
-        @Parameter(names = {      "--decoder" }, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")
+        // too complicated for most users...
+        @Parameter(names = {      "--decoder" }, hidden = true, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")
         private String decoder = null;
 
         @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths.")
@@ -967,8 +975,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder.")
         private boolean repeatFinder = false;
 
-        @Parameter(names = { "-R", "--just-repeatfinder" }, description = "Invoke the repeatfinder (and cleaner), then quit.")
-        private boolean justRepeatFinder = false;
+        @Parameter(names = { "-R", "--dump-repeatfind" }, description = "Print the result of the repeatfinder.")
+        private boolean dumpRepeatfind = false;
 
         @Parameter(names = {"--radix" }, description = "Radix used for printing of output parameters.")
         private int radix = 10;

@@ -111,6 +111,10 @@ public final class Analyzer extends Cleaner {
         this(new IrSequence(data), null, false, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
+    public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder) {
+        this(irSequence, frequency, invokeRepeatFinder, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+    }
+
     private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int number) {
         int beg = getSequenceBegin(number);
         int length = getSequenceLength(number);
@@ -124,6 +128,32 @@ public final class Analyzer extends Cleaner {
 
     RepeatFinder.RepeatFinderData getRepeatFinderData(int number) {
         return repeatFinderData[number];
+    }
+
+    public IrSignal repeatReducedIrSignal() {
+        return repeatReducedIrSignal(0);
+    }
+
+    public IrSignal repeatReducedIrSignal(int number) {
+        IrSequence intro;
+        IrSequence repeat;
+        IrSequence ending;
+        try {
+            if (isSignalMode()) {
+                intro = new IrSequence(toDurations(getSequenceBegin(0), getSequenceLength(0)));
+                repeat = new IrSequence(toDurations(getSequenceBegin(1), getSequenceLength(1)));
+                ending = new IrSequence(toDurations(getSequenceBegin(2), getSequenceLength(2)));
+            } else {
+                int begin = getSequenceBegin(number);
+                RepeatFinder.RepeatFinderData repeatfinderData = getRepeatFinderData(number);
+                intro = new IrSequence(toDurations(begin, repeatfinderData.getBeginLength()));
+                repeat = new IrSequence(toDurations(begin + repeatfinderData.getBeginLength(), repeatfinderData.getRepeatLength()));
+                ending = new IrSequence(toDurations(begin + repeatfinderData.getEndingStart(), repeatfinderData.getEndingLength()));
+            }
+            return new IrSignal(intro, repeat, ending, frequency);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     private void createNormedTimings() {

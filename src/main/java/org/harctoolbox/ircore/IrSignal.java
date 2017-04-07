@@ -347,7 +347,7 @@ public final class IrSignal implements Cloneable {
 
     @Override
     public String toString() {
-        return "Freq=" + Math.round(frequency) + "Hz " + introSequence + repeatSequence + endingSequence;
+        return toString(false);
     }
 
     /**
@@ -357,8 +357,12 @@ public final class IrSignal implements Cloneable {
      * @return nice string.
      */
     public String toString(boolean alternatingSigns) {
-        return "Freq=" + Math.round(frequency) + "Hz " + introSequence.toString(alternatingSigns)
+        return "Freq=" + getFrequencyAsString() + introSequence.toString(alternatingSigns)
                 + repeatSequence.toString(alternatingSigns) + endingSequence.toString(alternatingSigns);
+    }
+
+    public String getFrequencyAsString() {
+        return (frequency != null ? Long.toString(Math.round(frequency)) : "?") + "Hz";
     }
 
     /**

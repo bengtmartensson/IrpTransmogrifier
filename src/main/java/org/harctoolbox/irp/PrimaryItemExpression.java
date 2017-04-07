@@ -22,14 +22,14 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 
 abstract class PrimaryItemExpression extends OnePartExpression {
 
-    static Expression newExpression(IrpParser.Primary_itemContext ctx) {
+    static Expression newExpression(ParseTree original, IrpParser.Primary_itemContext ctx) {
         ParseTree child = ctx.getChild(0);
         if (child instanceof IrpParser.NameContext)
-            return NameExpression.newExpression((IrpParser.NameContext) child);
+            return NameExpression.newExpression(original, (IrpParser.NameContext) child);
         else if (child instanceof IrpParser.NumberContext)
-            return NumberExpression.newExpression((IrpParser.NumberContext) child);
+            return NumberExpression.newExpression(original, (IrpParser.NumberContext) child);
         else if (child instanceof IrpParser.Para_expressionContext)
-            return Expression.newExpression((IrpParser.Para_expressionContext) child);
+            return Expression.newExpression(original, (IrpParser.Para_expressionContext) child);
         else
             throw new ThisCannotHappenException("Unknown PrimaryItemExpression");
     }

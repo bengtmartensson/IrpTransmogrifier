@@ -42,7 +42,17 @@ public abstract class Expression extends PrimaryItem {
      * Construct an Expression by parsing the argument.
      * @param str
      * @return
+     * @throws org.harctoolbox.irp.IrpParseException
      */
+    public static Expression newExpressionEOF(String str) throws IrpParseException {
+        ParserDriver parserDriver = new ParserDriver(str);
+        Expression expression = newExpression(parserDriver);
+        String matched = expression.getParseTree().getText();
+        if (matched.length() < str.replaceAll("\\s+", "").length())
+            throw new IrpParseException(str, "Did not match all input, just \"" + matched + "\".");
+        return expression;
+    }
+
     public static Expression newExpression(String str) {
         try {
             // First try as number, for efficiency
@@ -68,20 +78,28 @@ public abstract class Expression extends PrimaryItem {
         return newExpression(para_expressionContext.expression());
     }
 
+    static Expression newExpression(ParseTree ctx, IrpParser.Para_expressionContext para_expressionContext) {
+        return newExpression(ctx, para_expressionContext.expression());
+    }
+
     public static Expression newExpression(IrpParser.ExpressionContext ctx) {
+        return newExpression(ctx, ctx);
+    }
+
+    public static Expression newExpression(ParseTree original, IrpParser.ExpressionContext ctx) {
         List<ParseTree> children = ctx.children;
         switch (children.size()) {
             case 1:
-                return OnePartExpression.newExpression(ctx, ctx.getChild(0));
+                return OnePartExpression.newExpression(original, ctx.getChild(0));
             case 2:
-                return TwoPartExpression.newExpression(ctx, ctx.getChild(0), ctx.getChild(1));
+                return TwoPartExpression.newExpression(original, ctx.getChild(0), ctx.getChild(1));
             case 3:
-                return ThreePartExpression.newExpression(ctx, ctx.getChild(0), ctx.getChild(1), ctx.getChild(2));
+                return ThreePartExpression.newExpression(original, ctx.getChild(0), ctx.getChild(1), ctx.getChild(2));
             case 5:
-                return FivePartExpression.newExpression(ctx, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
+                return FivePartExpression.newExpression(original, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
             default:
                 throw new ThisCannotHappenException("Unknown expression type");
-    }
+        }
     }
 
     protected static long cBoolean(boolean x) {

@@ -19,15 +19,16 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import java.util.Objects;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 final class NameExpression extends PrimaryItemExpression {
 
-    static Expression newExpression(IrpParser.NameContext nameContext) {
+    static Expression newExpression(ParseTree original, IrpParser.NameContext nameContext) {
         try {
-            return new NameExpression(nameContext.getText());
+            return new NameExpression(original, nameContext.getText());
         } catch (InvalidNameException ex) {
             throw new ThisCannotHappenException(ex);
         }
@@ -35,8 +36,8 @@ final class NameExpression extends PrimaryItemExpression {
 
     private final Name name;
 
-    private NameExpression(String text) throws InvalidNameException {
-        super(null);
+    private NameExpression(ParseTree original, String text) throws InvalidNameException {
+        super(original);
         name = new Name(text);
     }
 

@@ -24,11 +24,11 @@ abstract class OnePartExpression extends Expression {
 
     public static Expression newExpression(ParseTree ctx, ParseTree child) {
         if (child instanceof IrpParser.Primary_itemContext)
-            return PrimaryItemExpression.newExpression((IrpParser.Primary_itemContext) child);
+            return PrimaryItemExpression.newExpression(ctx, (IrpParser.Primary_itemContext) child);
         else if (child instanceof IrpParser.BitfieldContext)
-            return BitFieldExpression.newExpression((IrpParser.BitfieldContext) child);
+            return BitFieldExpression.newExpression(ctx, (IrpParser.BitfieldContext) child);
         else
-            throw new ThisCannotHappenException("Unknown OneOpExpression");
+            throw new ThisCannotHappenException("Unknown OneOpExpression" + child.getClass());
     }
 
     protected OnePartExpression(ParseTree ctx) {

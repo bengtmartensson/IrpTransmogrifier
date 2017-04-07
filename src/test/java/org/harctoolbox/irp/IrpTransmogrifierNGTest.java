@@ -78,9 +78,19 @@ public class IrpTransmogrifierNGTest {
     @Test
     public void testExpression() {
         System.out.println("Expression");
-        String result = IrpTransmogrifier.execute("expression -n \"a=1 b=11\" -- -1 ? a+ b : 9");
-        String expResult = "Parse error in \"silly\"";
+        String result = IrpTransmogrifier.execute("expression -n a=1,b=11 -- -1?a+b:9");
         assertEquals(result, "12");
 
+    }
+
+    @Test
+    public void testExpression1() {
+        System.out.println("Expression1");
+        String result = IrpTransmogrifier.execute("expression -n D=244  D   + 1 +");
+        assertEquals(result, null);
+        result = IrpTransmogrifier.execute("expression -n D=244  D:-6:2"); // invalid expression
+        assertEquals(result, null);
+        result = IrpTransmogrifier.execute("expression -n D=244  (D:-6:2)");
+        assertEquals(result, "47");
     }
 }

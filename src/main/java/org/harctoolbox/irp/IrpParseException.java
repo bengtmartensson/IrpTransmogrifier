@@ -28,6 +28,11 @@ public class IrpParseException extends Exception {
         this.text = text;
     }
 
+    public IrpParseException(String text, String message) {
+        super(message);
+        this.text = text;
+    }
+
     /**
      * @return the text
      */

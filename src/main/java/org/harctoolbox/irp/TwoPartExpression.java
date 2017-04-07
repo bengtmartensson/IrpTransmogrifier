@@ -30,14 +30,14 @@ final class TwoPartExpression extends Expression {
         return newExpression(ctx, ctx.getChild(0), ctx.getChild(1));
     }
 
-    public static Expression newExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second) {
+    public static Expression newExpression(ParseTree ctx, ParseTree first, ParseTree second) {
         return new TwoPartExpression(ctx, first, second);
     }
 
     private final char operator;
     private final Expression operand;
 
-    private TwoPartExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second) {
+    private TwoPartExpression(ParseTree ctx, ParseTree first, ParseTree second) {
         super(ctx);
         operator = first.getText().charAt(0);
         operand = Expression.newExpression((IrpParser.ExpressionContext) second);

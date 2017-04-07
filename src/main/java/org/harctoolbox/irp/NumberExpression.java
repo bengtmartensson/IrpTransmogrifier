@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import java.util.Objects;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -29,7 +30,11 @@ import org.w3c.dom.Element;
 final class NumberExpression extends PrimaryItemExpression {
 
     static NumberExpression newExpression(IrpParser.NumberContext numberContext) {
-        return new NumberExpression(numberContext);
+        return new NumberExpression(numberContext, numberContext);
+    }
+
+    static NumberExpression newExpression(ParseTree ctx, IrpParser.NumberContext numberContext) {
+        return new NumberExpression(ctx, numberContext);
     }
 
     private final Number number;
@@ -39,8 +44,8 @@ final class NumberExpression extends PrimaryItemExpression {
         number = new Number(value);
     }
 
-    private NumberExpression(IrpParser.NumberContext ctx) {
-        super(ctx);
+    private NumberExpression(ParseTree original, IrpParser.NumberContext ctx) {
+        super(original);
         number = new Number(ctx.getText());
     }
 

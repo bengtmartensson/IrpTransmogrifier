@@ -132,7 +132,7 @@ public final class IrpTransmogrifier {
         return result;
     }
 
-    private PrintStream out = null;
+    private PrintStream out;
     private IrpDatabase irpDatabase;
     private CommandLineArgs commandLineArgs;
     private JCommander argumentParser;
@@ -579,6 +579,7 @@ public final class IrpTransmogrifier {
         if (finished)
             return;
 
+        // FIXME: parallelization blocker
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
@@ -709,14 +710,14 @@ public final class IrpTransmogrifier {
             out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
     }
 
-    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws FileNotFoundException, NameUnassignedException {
+    private void expression(CommandExpression commandExpression, CommandLineArgs commandLineArgs) throws FileNotFoundException, NameUnassignedException, IrpParseException {
         boolean finished = commandExpression.process(this);
         if (finished)
             return;
 
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
-        Expression expression = Expression.newExpression(text);
+        Expression expression = Expression.newExpressionEOF(text);
         long result = expression.toNumber(nameEngine);
         out.println(result);
         if (commandExpression.stringTree)
@@ -965,6 +966,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder.")
         private boolean repeatFinder = false;
+
+        @Parameter(names = { "-R", "--just-repeatfinder" }, description = "Invoke the repeatfinder (and cleaner), then quit.")
+        private boolean justRepeatFinder = false;
 
         @Parameter(names = {"--radix" }, description = "Radix used for printing of output parameters.")
         private int radix = 10;

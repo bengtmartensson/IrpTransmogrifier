@@ -30,7 +30,7 @@ final class ThreePartExpression extends Expression {
         return new ThreePartExpression(ctx, ctx.getChild(0), ctx.getChild(1), ctx.getChild(2));
     }
 
-    public static Expression newExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second, ParseTree third) {
+    public static Expression newExpression(ParseTree ctx, ParseTree first, ParseTree second, ParseTree third) {
         return new ThreePartExpression(ctx, first, second, third);
     }
 
@@ -38,7 +38,7 @@ final class ThreePartExpression extends Expression {
     private final Expression op1;
     private final Expression op2;
 
-    private ThreePartExpression(IrpParser.ExpressionContext ctx, ParseTree first, ParseTree second, ParseTree third) {
+    private ThreePartExpression(ParseTree ctx, ParseTree first, ParseTree second, ParseTree third) {
         super(ctx);
         operator = second.getText();
         op1 = Expression.newExpression((IrpParser.ExpressionContext) first);

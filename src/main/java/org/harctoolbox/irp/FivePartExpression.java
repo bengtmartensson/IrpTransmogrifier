@@ -27,7 +27,7 @@ final class FivePartExpression extends Expression {
         return newExpression(ctx, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
     }
 
-    public static FivePartExpression newExpression(IrpParser.ExpressionContext ctx, ParseTree cond, ParseTree trueExpression, ParseTree falseExpression) {
+    public static FivePartExpression newExpression(ParseTree ctx, ParseTree cond, ParseTree trueExpression, ParseTree falseExpression) {
         return new FivePartExpression(ctx, (IrpParser.ExpressionContext) cond, (IrpParser.ExpressionContext) trueExpression, (IrpParser.ExpressionContext) falseExpression);
     }
 
@@ -35,7 +35,7 @@ final class FivePartExpression extends Expression {
     private final Expression trueExp;
     private final Expression falseExp;
 
-    private FivePartExpression(IrpParser.ExpressionContext ctx, IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
+    private FivePartExpression(ParseTree ctx, IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
         super(ctx);
         conditional = Expression.newExpression(cond);
         trueExp = Expression.newExpression(trueExpression);

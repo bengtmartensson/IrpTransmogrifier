@@ -19,19 +19,24 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import java.util.Objects;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 final class BitFieldExpression extends PrimaryItemExpression {
 
     static BitFieldExpression newExpression(IrpParser.BitfieldContext ctx) {
-        return new BitFieldExpression(ctx);
+        return new BitFieldExpression(ctx, ctx);
+    }
+
+    static BitFieldExpression newExpression(ParseTree original, IrpParser.BitfieldContext ctx) {
+        return new BitFieldExpression(original, ctx);
     }
 
     private final BitField bitField;
 
-    private BitFieldExpression(IrpParser.BitfieldContext ctx) {
-        super(ctx);
+    private BitFieldExpression(ParseTree original, IrpParser.BitfieldContext ctx) {
+        super(original);
         bitField = BitField.newBitField(ctx);
     }
 

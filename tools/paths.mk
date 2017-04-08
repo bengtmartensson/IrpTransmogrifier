@@ -2,7 +2,8 @@
 
 VERSION := 0.0.1dev
 INSTALLDIR := /usr/local/share/irptransmogrifier
-BINLINK := /usr/local/bin/irptransmogrifier	
+BINLINK := /usr/local/bin/irptransmogrifier
+BROWSELINK := /usr/local/bin/irpbrowse
 
 BROWSE := xdg-open	
 JAVA := java

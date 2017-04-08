@@ -66,6 +66,19 @@
                                 </fileMapper>
                             </fileMappers>
                         </transformationSet>
+                        <transformationSet>
+                            <dir>src/main/resources</dir>
+                            <outputDir>${project.build.directory}</outputDir>
+                            <includes>
+                                <include>IrpProtocols.xml</include>
+                            </includes>
+                            <stylesheet>src/main/resources/IrpProtocols2html.xsl</stylesheet>
+                            <fileMappers>
+                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.html</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet>
                     </transformationSets>
                     <catalogs>
                         <catalog>../harctoolboxbundle/schemas/catalog.xml</catalog>

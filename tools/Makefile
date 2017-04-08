@@ -25,6 +25,9 @@ default: $(IRP_TRANSMOGRIFIER_JAR)
 $(IRP_TRANSMOGRIFIER_JAR):
 	mvn install -Dmaven.test.skip=true
 
+$(IRP_TRANSMOGRIFIER_JAR)-test:
+	mvn install -Dmaven.test.skip=false
+
 apidoc:
 	mvn javadoc:javadoc
 	$(BROWSE) target/site/apidocs/index.html
@@ -79,9 +82,12 @@ uninstall:
 	rm -rf $(INSTALLDIR)
 	rm $(BINLINK)
 
+test: $(IRP_TRANSMOGRIFIER_JAR)-test javacodetest lirc.xml
+	diff lirc.xml lirc.xml.old
+
 clean:
 	mvn clean
 	rm -f all-protocols.xml lirc.xml
 	rm -rf $(JAVA_PROTOCOL_TEST)
 
-.PHONY: clean
+.PHONY: clean $(IRP_TRANSMOGRIFIER_JAR)-test

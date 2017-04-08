@@ -14,5 +14,5 @@ IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
 XSLT_DIR := $(IRPHOME)/xslt
 LIRC_TRANSFORM=$(XSLT_DIR)/lirc.xsl
 
-IRPTRANSMOGRIFIER = $(JAVA) -jar $(IRP_TRANSMOGRIFIER_JAR) -c $(IRPPROTOCOLS_XML) --loglevel warning --url-decode
+IRPTRANSMOGRIFIER = $(JAVA) -jar $(IRP_TRANSMOGRIFIER_JAR) --loglevel warning --url-decode
 SAXON := $(JAVA) -jar $(SAXON_JAR)

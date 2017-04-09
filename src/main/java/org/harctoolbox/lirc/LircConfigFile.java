@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -74,8 +75,7 @@ public final class LircConfigFile {
      * @param charsetName Name of the Charset used for reading.
      * @throws IOException Misc IO problem
      */
-    @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public static void readConfig(Map<String, LircRemote> dictionary, File filename, String charsetName) throws IOException {
+    static void readConfig(Map<String, LircRemote> dictionary, File filename, String charsetName) throws IOException {
         logger.log(Level.FINER, "Parsing {0}", filename.getCanonicalPath());
         if (filename.isFile()) {
             LircConfigFile config = new LircConfigFile(filename, filename.getCanonicalPath(), charsetName);
@@ -96,18 +96,23 @@ public final class LircConfigFile {
             throw new IOException(filename.getCanonicalPath());
     }
 
-    public static void readConfig(Map<String, LircRemote> dictionary, File filename) throws IOException {
+    static void readConfig(Map<String, LircRemote> dictionary, File filename) throws IOException {
         readConfig(dictionary, filename, DEFAULT_CHARSET_NAME);
     }
 
-    @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public static void readConfig(Map<String, LircRemote> dictionary, Reader reader, String source) throws IOException {
+    static void readConfig(Map<String, LircRemote> dictionary, Reader reader, String source) throws IOException {
         LircConfigFile config = new LircConfigFile(reader, source);
         accumulate(dictionary, config.remotes);
     }
 
-    public static void readConfig(Map<String, LircRemote> dictionary, Reader reader) throws IOException {
+    static void readConfig(Map<String, LircRemote> dictionary, Reader reader) throws IOException {
         readConfig(dictionary, reader, null);
+    }
+
+    public static List<LircRemote> readRemotesFileOrDirectory(File fileOrDirectory, String charSetName) throws IOException {
+        Map<String, LircRemote> map = new LinkedHashMap<>(4);
+        readConfig(map, fileOrDirectory, charSetName);
+        return new ArrayList<>(map.values());
     }
 
     public static List<LircRemote> readRemotes(Reader reader, String source) throws IOException {
@@ -123,7 +128,8 @@ public final class LircConfigFile {
         try {
             rems = readRemotesURL(urlOrFilename, charSetName);
         } catch (MalformedURLException ex) {
-            rems = new LircConfigFile(new File(urlOrFilename), urlOrFilename, charSetName).remotes;
+            rems = readRemotesFileOrDirectory(new File(urlOrFilename), charSetName);
+            //rems = new LircConfigFile(new File(urlOrFilename), urlOrFilename, charSetName).remotes;
         }
         return Collections.unmodifiableList(rems);
     }

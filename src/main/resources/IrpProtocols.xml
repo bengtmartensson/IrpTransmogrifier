@@ -873,9 +873,18 @@ Almost all examples we've seen start with "0E0F441A0" or "060F44120". But we've 
         <irp:documentation>Two-signal version of the <a href="#Pioneer">Pioneer</a> protocol;
         first sends the "normal" signal (parameters D0 and F0), then, as repeat, the one determined by D and F.</irp:documentation>
     </irp:protocol>
+    <irp:protocol c-name="Fujitsu_128" name="Fujitsu-128">
+        <irp:irp><![CDATA[{38.4k,413}<1,-1|1,-3>(8, -4, A0:8, A1:8, A2:8, A3:8, A4:8, A5:8, A6:8, A7:8, A8:8, A9:8, A10:8, A11:8, A12:8, A13:8, A14:8, A15:8, 1, -104.3m)*
+                    [A0:0..255, A1:0..255, A2:0..255,  A3:0..255,  A4:0..255,  A5:0..255,  A6:0..255,  A7:0..255,
+                     A8:0..255, A9:0..255, A10:0..255, A11:0..255, A12:0..255, A13:0..255, A14:0..255, A15:0..255]]]></irp:irp>
+    </irp:protocol>
     <irp:protocol c-name="Fujitsu_Aircon" name="Fujitsu_Aircon">
         <irp:parameter name="decodable">false</irp:parameter>
-        <irp:irp><![CDATA[{38.4k,413}<1,-1|1,-3>(8,-4,20:8,99:8,0:8,16:8,16:8,254:8,9:8,48:8,H:8,J:8, K:8, L:8, M:8,N:8,32:8,Z:8,1,-104.3m)*{H=16*A + wOn, J=16*C + B, K=16*E:4 + D:4, L=tOff:8, M=tOff:3:8+fOff*8+16*tOn:4, N=tOn:7:8+128*fOn,Z=256-(H+J+K+L+M+N+80)%256}[A:0..15,wOn:0..1,B:0..15, C:0..15,D:0..15,E:0..15,tOff:0..1024,tOn:0..1024,fOff:0..1,fOn:0..1]]]></irp:irp>
+        <irp:irp><![CDATA[Fujitsu-128
+                   {A0=20, A1=99, A2=0, A3=16, A4=16, A5=254, A6=9, A7=48,
+                    A8=16*A + wOn, A9=16*C + B, A10=16*E:4 + D:4, A11=tOff:8, A12=tOff:3:8+fOff*8+16*tOn:4,
+                    A13=tOn:7:8+128*fOn, A14=32, A15=256 -(A8+A9+A10+A11+A12+A13+80)%256}
+           [A:0..15, wOn:0..1, B:0..15, C:0..15, D:0..15, E:0..15, tOff:0..1024, tOn:0..1024, fOff:0..1, fOn:0..1]]]></irp:irp>
         <irp:documentation>Protocol for Fujitsu inverter air conditioning. <a href="http://www.remotecentral.com/cgi-bin/mboard/rc-discrete/thread.cgi?4894">Reference</a>.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="RokuOfficial" name="Roku-Official">

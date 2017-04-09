@@ -70,13 +70,15 @@ $(JAVA_RENDERER_CODEDIR) $(JAVA_RENDERER_TESTDIR) $(JAVA_DECODER_CODEDIR) $(JAVA
 # Only for Unix-like systems	
 install: $(IRP_TRANSMOGRIFIER_JAR)
 	-mkdir -p $(INSTALLDIR)
+	-rm -rf $(INSTALLDIR)
+	-mkdir $(INSTALLDIR)
 	cp target/IrpTransmogrifier-$(VERSION)-bin.zip $(INSTALLDIR)
-	( cd $(INSTALLDIR); unzip IrpTransmogrifier-$(VERSION)-bin.zip; rm IrpTransmogrifier-$(VERSION)-bin.zip )
+	( cd $(INSTALLDIR); jar xf IrpTransmogrifier-$(VERSION)-bin.zip; rm IrpTransmogrifier-$(VERSION)-bin.zip )
 	cp tools/Makefile tools/paths.mk $(INSTALLDIR)
 	ln -sf $(INSTALLDIR)/irptransmogrifier.sh $(BINLINK)
 	echo \#!/bin/sh > $(BROWSELINK)
 	echo $(BROWSE) $(INSTALLDIR)/IrpProtocols.html >> $(BROWSELINK)
-	chmod +x $(BROWSELINK)
+	chmod +x $(BROWSELINK) $(INSTALLDIR)/irptransmogrifier.sh
 
 uninstall:
 	rm -rf $(INSTALLDIR)

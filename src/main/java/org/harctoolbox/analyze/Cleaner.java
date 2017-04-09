@@ -59,7 +59,7 @@ public class Cleaner {
         return clean(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
-    public static IrSignal clean(IrSignal irSignal, double absoluteTolerance, double relativeTolerance) throws InvalidArgumentException {
+    public static IrSignal clean(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         ModulatedIrSequence irSequence = irSignal.toModulatedIrSequence(1);
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
         IrSequence cleansed = new IrSequence(cleaner.toDurations());
@@ -90,17 +90,19 @@ public class Cleaner {
         this(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
-    public Cleaner(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+    public Cleaner(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
         this(irSequence.toInts(), new int[]{ irSequence.getLength() }, false, absoluteTolerance, relativeTolerance);
     }
 
-    protected Cleaner(int[] data, int[] indices, boolean signalMode, double absoluteTolerance, double relativeTolerance) {
+    protected Cleaner(int[] data, int[] indices, boolean signalMode, Double absoluteTolerance, Double relativeTolerance) {
+        double relTol = IrCoreUtils.getRelativeTolerance(relativeTolerance);
+        double absTol = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         rawData = data;
         this.indices = indices;
         this.signalMode = signalMode;
         createRawHistogram();
-        createDumbTimingsTable(absoluteTolerance, relativeTolerance);
-        improveTimingsTable(absoluteTolerance, relativeTolerance);
+        createDumbTimingsTable(absTol, relTol);
+        improveTimingsTable(absTol, relTol);
         createCookedData();
         createCleanHistogram();
         createSortedGapsAndFlashes();

@@ -73,14 +73,14 @@ public final class RepeatFinder {
         defaultAbsoluteTolerance = aDefaultAbsoluteTolerance;
     }
 
-    public static IrSignal findRepeat(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+    public static IrSignal findRepeat(ModulatedIrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
         RepeatFinder repeatFinder = new RepeatFinder(irSequence, absoluteTolerance, relativeTolerance);
         return repeatFinder.toIrSignal(irSequence);
     }
     public static IrSignal findRepeat(ModulatedIrSequence irSequence) {
         return findRepeat(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
-    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
         RepeatFinder repeatFinder = new RepeatFinder(irSequence, absoluteTolerance, relativeTolerance);
         return repeatFinder.toIrSignalClean(irSequence);
     }
@@ -94,9 +94,9 @@ public final class RepeatFinder {
     private IrSequence irSequence;
     private RepeatFinderData repeatFinderData;
 
-    public RepeatFinder(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
-        this.absoluteTolerance = absoluteTolerance;
-        this.relativeTolerance = relativeTolerance;
+    public RepeatFinder(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+        this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
+        this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
         this.minRepeatLastGap = defaultMinRepeatLastGap;
         this.irSequence = irSequence;
         try {

@@ -59,6 +59,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testDecodeRepeatedNec1() {
+        System.out.println("decodeRepeatedNec1");
+        String args = "decode  -r  -- +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}");
+    }
+
+    @Test(enabled = true)
     public void testListIrp() {
         System.out.println("listIrp");
         String result = IrpTransmogrifier.execute("list --irp nec1");
@@ -92,5 +100,12 @@ public class IrpTransmogrifierNGTest {
         assertEquals(result, null);
         result = IrpTransmogrifier.execute("expression -n D=244  (D:-6:2)");
         assertEquals(result, "47");
+    }
+
+    @Test
+    public void testLirc() {
+        System.out.println("lirc");
+        String result = IrpTransmogrifier.execute("lirc src/test/resources/RX-V995.lircd.conf");
+        assertEquals(result, "yamaha-amp:	{38.0k,1,msb}<642u,-1600u|642u,-470u>(9067u,-4393u,pre_data:16,F:16,642u,-39597u,(9065u,-2139u,642u,-39597u)*){pre_data=0xa15e}[F:0x0..0xffff]");
     }
 }

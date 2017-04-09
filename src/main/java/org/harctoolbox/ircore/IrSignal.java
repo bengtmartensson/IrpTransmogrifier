@@ -60,13 +60,19 @@ public final class IrSignal implements Cloneable {
                 throw new InvalidArgumentException("Must not use explicit frequency with a Pronto type signal.");
             return irSignal;
         }
-        return parseRaw(args, frequency, fixOddSequences);
+        return parseRawWithDefaultFrequency(args, frequency, fixOddSequences);
+    }
+
+    public static IrSignal parseRawWithDefaultFrequency(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+        if (frequency == null)
+            logger.log(Level.WARNING, String.format(Locale.US, "Frequency missing, assuming default frequency = %d Hz",
+                    (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
+        return parseRaw(args, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, fixOddSequences);
     }
 
     public static IrSignal parseRaw(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
         if (frequency == null)
-            logger.log(Level.WARNING, String.format(Locale.US, "Unknown frequency, assuming default frequency = %d Hz",
-                    (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
+            throw new InvalidArgumentException("Frequency must not be null");
 
         String str = String.join(" ", args).trim();
 
@@ -429,6 +435,15 @@ public final class IrSignal implements Cloneable {
         repeatSequence = victim.repeatSequence;
         endingSequence = victim.endingSequence;
         map = victim.map;
+    }
+
+    /**
+     * Returns a ModulatedIrSequence consisting of one intro sequence,
+     * one repeat sequence, followed by one ending sequence.
+     * @return ModulatedIrSequence.
+     */
+    public ModulatedIrSequence toModulatedIrSequence() {
+        return toModulatedIrSequence(true, 1, true);
     }
 
     /**

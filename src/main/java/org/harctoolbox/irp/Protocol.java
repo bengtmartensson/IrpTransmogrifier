@@ -496,8 +496,9 @@ public class Protocol extends IrpObject implements AggregateLister {
         return result;
     }
 
-    private void checkFrequency(double frequency, double frequencyTolerance) throws SignalRecognitionException {
-        boolean success = frequencyTolerance < 0 || IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0);
+    private void checkFrequency(Double frequency, double frequencyTolerance) throws SignalRecognitionException {
+        boolean success = frequencyTolerance < 0
+                || (frequency != null && IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0));
         if (!success)
             throw new SignalRecognitionException("Frequency does not match");
     }

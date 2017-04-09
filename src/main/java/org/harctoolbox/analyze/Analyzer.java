@@ -49,14 +49,6 @@ public final class Analyzer extends Cleaner {
         return indices;
     }
 
-//    public static int[] mkIndices(IrSignal irSignal) {
-//        int[] indices = new int[3];
-//        indices[0] = irSignal.getIntroLength();
-//        indices[1] = indices[0] + irSignal.getRepeatLength();
-//        indices[2] = indices[1] + irSignal.getEndingLength();
-//        return indices;
-//    }
-
     private int timebase;
     private int[] normedTimings;
     private List<Burst> pairs;
@@ -76,14 +68,10 @@ public final class Analyzer extends Cleaner {
     }
 
     public Analyzer(List<IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
-        super(IrSequence.toInts(irSequenceList), indices, signalMode, absoluteTolerance != null ? absoluteTolerance : IrCoreUtils.DEFAULTABSOLUTETOLERANCE,
-                relativeTolerance != null ? relativeTolerance : IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        super(IrSequence.toInts(irSequenceList), indices, signalMode, absoluteTolerance, relativeTolerance);
         if (frequency == null)
-            logger.log(Level.FINE, String.format(Locale.US, "No frequency given, using default frequency = %d Hz", (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
+            logger.log(Level.FINE, String.format(Locale.US, "No frequency given, assuming default frequency = %d Hz", (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
         this.frequency = frequency;
-//        indices = new int[irSequenceList.size()];
-//        for (int i = 0; i < irSequenceList.size(); i++)
-//            indices[i] = irSequenceList.get(i).getLength() + (i > 0 ? indices[i - 1] : 0);
         repeatFinderData = new RepeatFinder.RepeatFinderData[irSequenceList.size()];
         for (int i = 0; i < irSequenceList.size(); i++)
             repeatFinderData[i] = getRepeatFinderData(invokeRepeatFinder, i);
@@ -104,15 +92,15 @@ public final class Analyzer extends Cleaner {
     }
 
     public Analyzer(IrSequence irSequence) {
-        this(irSequence, null, false, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        this(irSequence, null, false, null, null);
     }
 
     public Analyzer(int[] data) throws OddSequenceLengthException {
-        this(new IrSequence(data), null, false, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        this(new IrSequence(data), null, false, null, null);
     }
 
     public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder) {
-        this(irSequence, frequency, invokeRepeatFinder, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        this(irSequence, frequency, invokeRepeatFinder, null, null);
     }
 
     private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int number) {

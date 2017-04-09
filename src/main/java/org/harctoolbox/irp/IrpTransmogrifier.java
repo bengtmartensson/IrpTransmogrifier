@@ -49,6 +49,8 @@ import java.util.logging.XMLFormatter;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
+import org.harctoolbox.analyze.Cleaner;
+import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -577,6 +579,8 @@ public final class IrpTransmogrifier {
         } else {
             setupDatabase();
             List<String> list = irpDatabase.evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
+            if (list.isEmpty())
+                throw new UsageException("No protocol matched.");
             for (String proto : list) {
                 //logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
@@ -715,11 +719,20 @@ public final class IrpTransmogrifier {
 
         Decoder decoder = new Decoder(irpDatabase, protocolsNames);
         IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
+        if (commandDecode.repeatFinder) {
+            // ignoring commandDecode.cleaner
+            irSignal = RepeatFinder.findRepeatClean(irSignal.toModulatedIrSequence(), commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            logger.log(Level.INFO, "Repeat-reduced signal: {0}", irSignal.toString(true));
+        } else if (commandDecode.cleaner) {
+            irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
+        }
+
         Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver,
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
-        decodes.entrySet().forEach((kvp) -> {
-            out.println(kvp.getKey() + ": " + kvp.getValue().toString());
+        decodes.values().forEach((kvp) -> {
+            out.println(kvp.toString());
         });
     }
 
@@ -1045,6 +1058,9 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over.")
         private boolean noPreferOver = false;
 
+        @Parameter(names = { "-c", "--clean"}, description = "Invoke cleaner on signal") // ignored with --repeat-finder
+        private boolean cleaner = false;
+
         @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Set modulation frequency.")
         private Double frequency = null;
 
@@ -1053,6 +1069,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all).")
         private String protocol = null;
+
+        @Parameter(names = { "-r", "--repeat-finder"}, description = "Invoke repeat finder on input sequence")
+        private boolean repeatFinder = false;
 
         @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = true)
         private List<String> args;
@@ -1087,14 +1106,19 @@ public final class IrpTransmogrifier {
     @Parameters(commandNames = { "lirc" }, commandDescription = "Convert Lirc configuration files to IRP form.")
     private static class CommandLirc extends MyCommand {
 
-        @Parameter(names = { "-c", "--commands" }, description = "List the commands in the remotes.")
+        @Parameter(names = { "-c", "--commands" }, description = "Also list the commands if the remotes.")
         private boolean commands = false;
 
-        @Parameter(names = { "-r", "--radix"}, description = "Radix for outputting result, deefault 16.") // Too much...?
+        @Parameter(names = { "-r", "--radix"}, hidden = true, description = "Radix for outputting result, default 16.") // Too much...?
         private int radix = 16;
 
         @Parameter(description = "Lirc config files/directories/URLs); empty for <stdin>.", required = false)
         private List<String> files = new ArrayList<>(8);
+
+        @Override
+        public String description() {
+            return "This command reads a Lirc configuration and computes the IRP form thereof.";
+        }
     }
 
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
@@ -1105,18 +1129,23 @@ public final class IrpTransmogrifier {
 
         @Parameter(description = "commands")
         private List<String> commands = null;
+
+        @Override
+        public String description() {
+            return "This command list the syntax for the command(s) given as argument, default all.";
+        }
     }
 
     @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")
     private static class CommandList extends MyCommand {
 
-        @Parameter(names = { "-c", "--classify"}, description = "Classify the protocols.")
+        @Parameter(names = { "-c", "--classify"}, description = "Classify the protocol(s).")
         private boolean classify = false;
 
-        @Parameter(names = { "--cname"}, description = "List C name of the protocols.")
+        @Parameter(names = { "--cname"}, description = "List C name of the protocol(s).")
         private boolean cName = false;
 
-        @Parameter(names = { "--documentation"}, description = "List documentation.")
+        @Parameter(names = { "--documentation"}, description = "Print (possible longer) documentation.")
         private boolean documentation = false;
 
         @Parameter(names = { "--gui", "--display"}, description = "Display parse diagram.")
@@ -1129,7 +1158,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "--istring"}, hidden = true, description = "test toIrpString.")
         private boolean is = false;
 
-        @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List normal form.")
+        @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List the normal form.")
         private boolean normalForm = false;
 
         // Only sensible together with --irpstring, consequentely hidded
@@ -1147,6 +1176,11 @@ public final class IrpTransmogrifier {
 
         @Parameter(description = "List of protocols (default all)")
         private List<String> protocols = new ArrayList<>(8);
+
+        @Override
+        public String description() {
+            return "This command list miscellaneous properties of the protocol(s) given as arguments.";
+        }
     }
 
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal from parameters")
@@ -1175,15 +1209,25 @@ public final class IrpTransmogrifier {
 
         @Override
         public String description() {
-            return "This command is used to compute an IR signal from a parametric description (\"render\" it).";
+            return "This command is used to compute an IR signal from one or more protocols\n"
+                    + " (\"render\" it). The protocol can be given either by name(s)\n"
+                    + "(or regular expression if using the --regexp option), or, using the\n"
+                    + "--irp options, given explicitly as an IRP form.\n"
+                    + "The parameters can be either given directly with the -n option,"
+                    + "or the --random option can be used to generate random, but valid parameters";
         }
     }
 
     @Parameters(commandNames = {"version"}, commandDescription = "Report version")
-    private static class CommandVersion {
+    private static class CommandVersion extends MyCommand {
 
         @Parameter(names = { "-s", "--short" }, description = "Issue only the version number of the program proper")
         private boolean shortForm = false;
+
+        @Override
+        public String description() {
+            return "This command returns the version. and licensing information for the program.";
+        }
     }
 
     @Parameters(commandNames = {"convertconfig"}, commandDescription = "Convert an IrpProtocols.ini-file to an IrpProtocols.xml, or vice versa.")

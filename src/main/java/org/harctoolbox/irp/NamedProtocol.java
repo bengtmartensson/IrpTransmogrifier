@@ -140,7 +140,7 @@ public final class NamedProtocol extends Protocol {
      * @return the documentation
      */
     public String getDocumentation() {
-        return documentation;
+        return documentation != null ? documentation : "";
     }
 
     public String getIrp() {

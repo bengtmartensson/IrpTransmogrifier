@@ -111,6 +111,7 @@ public final class IrpTransmogrifier {
     public static void main(String[] args, PrintStream out) {
         IrpTransmogrifier instance = new IrpTransmogrifier(out);
         ProgramExitStatus status = instance.run(args);
+        out.close();
         status.die();
     }
 

@@ -138,12 +138,12 @@ public final class IrpTransmogrifier {
 
     private PrintStream out;
     private IrpDatabase irpDatabase;
-    private CommandLineArgs commandLineArgs;
     private JCommander argumentParser;
+    private CommandLineArgs commandLineArgs;
     private CommandHelp commandHelp;
     private CommandVersion commandVersion;
     private CommandList commandList;
-    private CommandRender commandRenderer;
+    private CommandRender commandRender;
     private CommandDecode commandDecode;
     private CommandAnalyze commandAnalyze;
     private CommandCode commandCode;
@@ -187,8 +187,8 @@ public final class IrpTransmogrifier {
         commandList = new CommandList();
         argumentParser.addCommand(commandList);
 
-        commandRenderer = new CommandRender();
-        argumentParser.addCommand(commandRenderer);
+        commandRender = new CommandRender();
+        argumentParser.addCommand(commandRender);
 
         commandDecode = new CommandDecode();
         argumentParser.addCommand(commandDecode);
@@ -544,64 +544,64 @@ public final class IrpTransmogrifier {
     }
 
     private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException {
-        NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
-                : commandRenderer.random ? new NameEngine(protocol.randomParameters())
+        NameEngine nameEngine = !commandRender.nameEngine.isEmpty() ? commandRender.nameEngine
+                : commandRender.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();
-        if (commandRenderer.random)
+        if (commandRender.random)
             logger.log(Level.INFO, nameEngine.toString());
 
-        if (!commandRenderer.pronto && !commandRenderer.raw && !commandRenderer.rawWithoutSigns)
+        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns)
             logger.warning("No output requested, use either --raw, --raw-without-signs, or --pronto go get output.");
         IrSignal irSignal = protocol.toIrSignal(nameEngine);
 
-        if (commandRenderer.count != null) {
-            if (commandRenderer.numberRepeats != null)
+        if (commandRender.count != null) {
+            if (commandRender.numberRepeats != null)
                 throw new UsageException("Can only specify one of --number-repeats and --count.");
-            renderPrint(irSignal.toModulatedIrSequence(commandRenderer.count));
-        } else if (commandRenderer.numberRepeats != null)
-            renderPrint(irSignal.toModulatedIrSequence(true, commandRenderer.numberRepeats, true));
+            renderPrint(irSignal.toModulatedIrSequence(commandRender.count));
+        } else if (commandRender.numberRepeats != null)
+            renderPrint(irSignal.toModulatedIrSequence(true, commandRender.numberRepeats, true));
         else
             renderPrint(irSignal);
     }
 
     private void renderPrint(IrSignal irSignal) {
-        if (commandRenderer.raw)
+        if (commandRender.raw)
             out.println(irSignal.toString(true));
-        if (commandRenderer.rawWithoutSigns)
+        if (commandRender.rawWithoutSigns)
             out.println(irSignal.toString(false));
-        if (commandRenderer.pronto)
+        if (commandRender.pronto)
             out.println(irSignal.ccfString());
     }
 
     private void renderPrint(ModulatedIrSequence irSequence) {
-        if (commandRenderer.raw)
+        if (commandRender.raw)
             out.println(irSequence.toString(true));
-        if (commandRenderer.rawWithoutSigns)
+        if (commandRender.rawWithoutSigns)
             out.println(irSequence.toString(false));
-        if (commandRenderer.pronto)
+        if (commandRender.pronto)
             out.println(new IrSignal(irSequence).ccfString());
     }
 
     private void render() throws UsageException, IOException, SAXException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
-        boolean finished = commandRenderer.process(this);
+        boolean finished = commandRender.process(this);
         if (finished)
             return;
 
-        if (commandRenderer.irp == null && (commandRenderer.random != commandRenderer.nameEngine.isEmpty()))
+        if (commandRender.irp == null && (commandRender.random != commandRender.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
-        if (commandRenderer.irp != null) {
-            if (!commandRenderer.protocols.isEmpty())
+        if (commandRender.irp != null) {
+            if (!commandRender.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
             try {
-                NamedProtocol protocol = new NamedProtocol("user-irp", commandRenderer.irp, "This IRP was entered at the command line of IrpTransmogrifier");
+                NamedProtocol protocol = new NamedProtocol("user-irp", commandRender.irp, "This IRP was entered at the command line of IrpTransmogrifier");
                 render(protocol);
             } catch (ParseCancellationException ex) {
-                throw new IrpParseException(commandRenderer.irp, ex);
+                throw new IrpParseException(commandRender.irp, ex);
             }
         } else {
             setupDatabase();
-            List<String> list = irpDatabase.evaluateProtocols(commandRenderer.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
+            List<String> list = irpDatabase.evaluateProtocols(commandRender.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
             if (list.isEmpty())
                 throw new UsageException("No protocol matched.");
             for (String proto : list) {

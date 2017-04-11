@@ -55,6 +55,7 @@ import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -542,7 +543,7 @@ public final class IrpTransmogrifier {
         XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
     }
 
-    private void render(NamedProtocol protocol, CommandRender commandRenderer) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException {
+    private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException {
         NameEngine nameEngine = !commandRenderer.nameEngine.isEmpty() ? commandRenderer.nameEngine
                 : commandRenderer.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();
@@ -550,14 +551,35 @@ public final class IrpTransmogrifier {
             logger.log(Level.INFO, nameEngine.toString());
 
         if (!commandRenderer.pronto && !commandRenderer.raw && !commandRenderer.rawWithoutSigns)
-            logger.warning("No output requested, use either --raw, --raw-without-signs or --pronto go get output.");
+            logger.warning("No output requested, use either --raw, --raw-without-signs, or --pronto go get output.");
         IrSignal irSignal = protocol.toIrSignal(nameEngine);
+
+        if (commandRenderer.count != null) {
+            if (commandRenderer.numberRepeats != null)
+                throw new UsageException("Can only specify one of --number-repeats and --count.");
+            renderPrint(irSignal.toModulatedIrSequence(commandRenderer.count));
+        } else if (commandRenderer.numberRepeats != null)
+            renderPrint(irSignal.toModulatedIrSequence(true, commandRenderer.numberRepeats, true));
+        else
+            renderPrint(irSignal);
+    }
+
+    private void renderPrint(IrSignal irSignal) {
         if (commandRenderer.raw)
             out.println(irSignal.toString(true));
         if (commandRenderer.rawWithoutSigns)
             out.println(irSignal.toString(false));
         if (commandRenderer.pronto)
             out.println(irSignal.ccfString());
+    }
+
+    private void renderPrint(ModulatedIrSequence irSequence) {
+        if (commandRenderer.raw)
+            out.println(irSequence.toString(true));
+        if (commandRenderer.rawWithoutSigns)
+            out.println(irSequence.toString(false));
+        if (commandRenderer.pronto)
+            out.println(new IrSignal(irSequence).ccfString());
     }
 
     private void render() throws UsageException, IOException, SAXException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
@@ -572,8 +594,8 @@ public final class IrpTransmogrifier {
             if (!commandRenderer.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
             try {
-                NamedProtocol protocol = new NamedProtocol("irp", commandRenderer.irp, "");
-                render(protocol, commandRenderer);
+                NamedProtocol protocol = new NamedProtocol("user-irp", commandRenderer.irp, "This IRP was entered at the command line of IrpTransmogrifier");
+                render(protocol);
             } catch (ParseCancellationException ex) {
                 throw new IrpParseException(commandRenderer.irp, ex);
             }
@@ -585,7 +607,7 @@ public final class IrpTransmogrifier {
             for (String proto : list) {
                 //logger.info(proto);
                 NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
-                render(protocol, commandRenderer);
+                render(protocol);
             }
         }
     }
@@ -1187,6 +1209,9 @@ public final class IrpTransmogrifier {
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal from parameters")
     private static class CommandRender extends MyCommand {
 
+        @Parameter(names = { "-#", "--count" }, description = "Generate am IR sequence with count number of transmissions")
+        private Integer count = null;
+
         @Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
         private String irp = null;
 
@@ -1205,6 +1230,9 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "--random" }, description = "Generate random, valid, parameters")
         private boolean random = false;
 
+        @Parameter(names = { "--number-repeats" }, description = "Generate an IR sequence containing the given number of repeats")
+        private Integer numberRepeats = null;
+
         @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
         private List<String> protocols = new ArrayList<>(0);
 
@@ -1214,8 +1242,10 @@ public final class IrpTransmogrifier {
                     + " (\"render\" it). The protocol can be given either by name(s)\n"
                     + "(or regular expression if using the --regexp option), or, using the\n"
                     + "--irp options, given explicitly as an IRP form.\n"
-                    + "The parameters can be either given directly with the -n option,"
-                    + "or the --random option can be used to generate random, but valid parameters";
+                    + "The parameters can be either given directly with the -n option,\n"
+                    + "or the --random option can be used to generate random, but valid parameters"
+                    + "With the --count or --number-repeats option, instead an IR sequence is computed,"
+                    + "containing the desired number of repeats.";
         }
     }
 

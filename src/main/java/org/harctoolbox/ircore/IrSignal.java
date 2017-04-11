@@ -148,6 +148,14 @@ public final class IrSignal implements Cloneable {
     }
 
     /**
+     * Convenience constructor for IrSignals having only an intro sequence.
+     * @param introSequence
+     */
+    public IrSignal(ModulatedIrSequence introSequence) {
+        this(introSequence, new IrSequence(), new IrSequence(), introSequence.getFrequency(), introSequence.getDutyCycle());
+    }
+
+    /**
      * Constructs an IrSignal from its arguments.
      *
      * @param durations

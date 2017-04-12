@@ -1026,7 +1026,7 @@ public final class IrpTransmogrifier {
         private boolean dumpRepeatfind = false;
 
         @Parameter(names = {"--radix" }, description = "Radix used for printing of output parameters.")
-        private int radix = 10;
+        private int radix = 16;
 
         @Parameter(names = {"-s", "--statistics" }, description = "Print some statistics.")
         private boolean statistics = false;

@@ -285,7 +285,6 @@ public final class Analyzer extends Cleaner {
         return mult != null ? "= " + mult.toString() + "*" + Long.toString(Math.round(tick)) + "  " : "\t";
     }
 
-
     public static class AnalyzerParams {
         private final Double frequency;
         private final Double timebase;
@@ -294,13 +293,22 @@ public final class Analyzer extends Cleaner {
         private final boolean useExtents;
         private final boolean invert;
         private final List<Integer> parameterWidths;
+        private final int maxParameterWidth;
 
         public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) {
+            this(frequency, timeBaseString, bitDirection, useExtents, parameterWidths, 32, invert);
+        }
+
+        public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents,
+                List<Integer> parameterWidths, int maxParameterWidth, boolean invert) {
             this.frequency = frequency;
             this.bitDirection = bitDirection;
             this.useExtents = useExtents;
             this.invert = invert;
             this.parameterWidths = parameterWidths == null ? new ArrayList<>(0) : parameterWidths;
+            if (maxParameterWidth >= Long.SIZE)
+                throw new IllegalArgumentException("maxParameterWidth must be < " + Long.SIZE);
+            this.maxParameterWidth = maxParameterWidth;
 
             if (timeBaseString == null) {
                 timebase = null;
@@ -316,7 +324,8 @@ public final class Analyzer extends Cleaner {
         }
 
         public int getNoBitsLimit(int noPayload) {
-            return (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
+            int tableLimit = (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
+            return Math.min(maxParameterWidth, tableLimit);
         }
 
         /**
@@ -339,6 +348,10 @@ public final class Analyzer extends Cleaner {
          */
         public Integer getParameterWidth(int i) {
             return parameterWidths.get(i);
+        }
+
+        public int getMaxParameterWidth() {
+            return maxParameterWidth;
         }
 
         /**

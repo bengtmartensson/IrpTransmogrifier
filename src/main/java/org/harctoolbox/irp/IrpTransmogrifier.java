@@ -695,7 +695,7 @@ public final class IrpTransmogrifier {
     private void analyze(Analyzer analyzer) {
         Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
-                commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.invert);
+                commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.maxParameterWidth, commandAnalyze.invert);
 
         if (commandAnalyze.statistics) {
             analyzer.printStatistics(out, params);
@@ -1012,11 +1012,14 @@ public final class IrpTransmogrifier {
         @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit.")
         private double maxRoundingError = 0.3;
 
+        @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width (must be < 64).")
+        private int maxParameterWidth = 16;
+
         // too complicated for most users...
         @Parameter(names = {      "--decoder" }, hidden = true, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")
         private String decoder = null;
 
-        @Parameter(names = { "-w", "--parameterwidths" }, variableArity = true, description = "Comma separated list of parameter widths.")
+        @Parameter(names = { "-w", "--parameterwidths" }, description = "Comma separated list of parameter widths.")
         private List<Integer> parameterWidths = new ArrayList<>(4);
 
         @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder.")

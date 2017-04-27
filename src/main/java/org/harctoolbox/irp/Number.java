@@ -27,9 +27,11 @@ public final class Number extends PrimaryItem {
 
     public final static int SIZE = Long.SIZE;
 
-//    static long parse(String str) {
-//        return parse(new ParserDriver(str).getParser().number());
-//    }
+    private static final long UINT8_MAX = 255L;
+    private static final long UINT16_MAX = 65535L;
+    private static final long UINT24_MAX = 16777215L;
+    private static final long UINT32_MAX = 4294967295L;
+    private static final long UINT64_MAX = -1L;// "18446744073709551615"
 
     static long parse(IrpParser.NumberContext ctx) {
         Number number = new Number(ctx);
@@ -45,11 +47,11 @@ public final class Number extends PrimaryItem {
     }
 
     public static long parse(String str) {
-        return str.equals("UINT8_MAX") ? 255L
-                : str.equals("UINT16_MAX") ? 65535L
-                : str.equals("UINT24_MAX") ? 16777215L
-                : str.equals("UINT32_MAX") ? 4294967295L
-                : str.equals("UINT64_MAX") ? -1L // 18446744073709551615
+        return str.equals("UINT8_MAX") ? UINT8_MAX
+                : str.equals("UINT16_MAX") ? UINT16_MAX
+                : str.equals("UINT24_MAX") ? UINT24_MAX
+                : str.equals("UINT32_MAX") ? UINT32_MAX
+                : str.equals("UINT64_MAX") ? UINT64_MAX
                 : str.length() >= 3 && str.substring(0, 2).equals("0x") ? Long.parseLong(str.substring(2), 16)
                 : str.length() >= 3 && str.substring(0, 2).equals("0b") ? Long.parseLong(str.substring(2), 2)
                 : str.length() >= 1 && str.substring(0, 1).equals("0")  ? Long.parseLong(str, 8)

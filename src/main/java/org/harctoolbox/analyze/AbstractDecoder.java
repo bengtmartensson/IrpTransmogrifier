@@ -81,6 +81,7 @@ public abstract class AbstractDecoder {
 
     Protocol parse(int number, boolean signalMode) throws DecodeException {
         assert (!(signalMode && number > 0));
+        noPayload = 0;
         nameEngine = new NameEngine();
         IrStream irStream;
         if (signalMode) {

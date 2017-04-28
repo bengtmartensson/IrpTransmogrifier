@@ -58,6 +58,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
+import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.lirc.LircCommand;
 import org.harctoolbox.lirc.LircConfigFile;
@@ -730,6 +731,9 @@ public final class IrpTransmogrifier {
     }
 
     private void decode() throws IrpInvalidArgumentException, IOException, SAXException, UsageException, InvalidArgumentException {
+        if (IrpUtils.numberTrue(commandDecode.input != null, commandDecode.namedInput != null, commandDecode.args != null) != 1)
+            throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
+
         boolean finished = commandDecode.process(this);
         if (finished)
             return;
@@ -741,7 +745,24 @@ public final class IrpTransmogrifier {
             throw new UsageException("No protocol given or matched.");
 
         Decoder decoder = new Decoder(irpDatabase, protocolsNames);
-        IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
+        if (commandDecode.input != null) {
+            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return new IrSignal(line); });
+            List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding);
+            for (IrSignal irSignal : signals)
+                decode(decoder, irSignal, null);
+        } else if (commandDecode.namedInput != null) {
+            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return new IrSignal(line); });
+            Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
+            for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
+                decode(decoder, kvp.getValue(), kvp.getKey());
+        } else {
+            IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
+            decode(decoder, irSignal, null);
+        }
+    }
+
+    @SuppressWarnings("AssignmentToMethodParameter")
+    private void decode(Decoder decoder, IrSignal irSignal, String name) throws InvalidArgumentException {
         if (commandDecode.repeatFinder) {
             // ignoring commandDecode.cleaner
             irSignal = RepeatFinder.findRepeatClean(irSignal.toModulatedIrSequence(), commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
@@ -754,9 +775,13 @@ public final class IrpTransmogrifier {
         Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver,
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
+        if (name != null)
+            out.println(name + ":");
         decodes.values().forEach((kvp) -> {
             out.println(kvp.toString());
         });
+        if (name != null)
+            out.println();
     }
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
@@ -1090,8 +1115,14 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Set modulation frequency.")
         private Double frequency = null;
 
+        @Parameter(names = { "-i", "--input"}, description = "File/URL from which to take inputs, one per line.")
+        private String input = null;
+
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "In output, do not remove parameters that are equal to their defaults.")
         private boolean keepDefaultedParameters = false;
+
+        @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
+        private String namedInput = null;
 
         @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all).")
         private String protocol = null;
@@ -1099,7 +1130,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-r", "--repeat-finder"}, description = "Invoke repeat finder on input sequence")
         private boolean repeatFinder = false;
 
-        @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = true)
+        @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = false)
         private List<String> args;
     }
 

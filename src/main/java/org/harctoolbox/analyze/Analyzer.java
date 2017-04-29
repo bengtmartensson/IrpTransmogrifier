@@ -22,6 +22,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -42,10 +43,13 @@ public final class Analyzer extends Cleaner {
 
     private static final Logger logger = Logger.getLogger(Analyzer.class.getName());
 
-    public static int[] mkIndices(List<IrSequence> irSequenceList) {
+    public static int[] mkIndices(Collection<IrSequence> irSequenceList) {
         int[] indices = new int[irSequenceList.size()];
-        for (int i = 0; i < irSequenceList.size(); i++)
-            indices[i] = irSequenceList.get(i).getLength() + (i > 0 ? indices[i - 1] : 0);
+        int i = 0;
+        for (IrSequence irSequence : irSequenceList) {
+            indices[i] = irSequence.getLength() + (i > 0 ? indices[i - 1] : 0);
+            i++;
+        }
         return indices;
     }
 
@@ -63,11 +67,11 @@ public final class Analyzer extends Cleaner {
         this(Arrays.asList(irSequence), frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(List<IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    public Analyzer(Collection<IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
         this(irSequenceList, mkIndices(irSequenceList), false, frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(List<IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    private Analyzer(Collection<IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
         super(IrSequence.toInts(irSequenceList), indices, signalMode, absoluteTolerance, relativeTolerance);
         if (frequency == null)
             logger.log(Level.FINE, String.format(Locale.US, "No frequency given, assuming default frequency = %d Hz", (int) ModulatedIrSequence.DEFAULT_FREQUENCY));

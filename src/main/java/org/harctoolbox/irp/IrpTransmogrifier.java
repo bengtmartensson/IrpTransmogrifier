@@ -613,23 +613,41 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException {
+    private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException, IOException {
         boolean finished = commandAnalyze.process(this);
         if (finished)
             return;
+
+        if (IrpUtils.numberTrue(commandAnalyze.input != null, commandAnalyze.namedInput != null, commandAnalyze.args != null) != 1)
+            throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         // FIXME: parallelization blocker
         Burst.setMaxUnits(commandAnalyze.maxUnits);
         Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
-        try {
-            analyzePronto();
-        } catch (Pronto.NonProntoFormatException ex) {
-            logger.log(Level.FINE, "Parsing as Pronto Hex failed, trying as raw.");
+
+        if (commandAnalyze.input != null) {
+            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSequence.parseProntoOrRaw(line); });
+            List<IrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding);
+            if (signals.isEmpty())
+                throw new UsageException("No parseable sequences found.");
+            analyze(signals);
+        } else if (commandAnalyze.namedInput != null) {
+            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSequence.parseProntoOrRaw(line); });
+            Map<String, IrSequence> signals = irSignalParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
+            if (signals.isEmpty())
+                throw new UsageException("No parseable sequences found.");
+            analyze(signals);
+        } else {
             try {
-                analyzeRaw();
-            } catch (NumberFormatException e) {
-                throw new UsageException("Invalid signal, neither valid as Pronto nor as raw.");
+                analyzePronto();
+            } catch (Pronto.NonProntoFormatException ex) {
+                logger.log(Level.FINE, "Parsing as Pronto Hex failed, trying as raw.");
+                try {
+                    analyzeRaw();
+                } catch (NumberFormatException e) {
+                    throw new UsageException("Invalid signal, neither valid as Pronto nor as raw.");
+                }
             }
         }
     }
@@ -684,16 +702,20 @@ public final class IrpTransmogrifier {
 
     private void analyze(IrSignal irSignal) {
         Analyzer analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-        analyze(analyzer);
+        analyze(analyzer, null);
+    }
+
+    private void analyze(Map<String, IrSequence> irSequences) {
+        Analyzer analyzer = new Analyzer(irSequences.values(), commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfind, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
     }
 
     private void analyze(List<IrSequence> irSequences) {
         Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfind, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-        analyze(analyzer);
+        analyze(analyzer, null);
     }
 
-
-    private void analyze(Analyzer analyzer) {
+    private void analyze(Analyzer analyzer, String[] names) {
         Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
                 commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.maxParameterWidth, commandAnalyze.invert);
@@ -706,7 +728,7 @@ public final class IrpTransmogrifier {
         if (commandAnalyze.clean) {
             for (int i = 0; i < analyzer.getNoSequences(); i++) {
                 if (analyzer.getNoSequences() > 1)
-                    out.print("Seq. #" + i + ": ");
+                    out.print("#" + i + ":\t");
                 out.println(analyzer.cleanedIrSequence(i).toString(true));
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(i));
@@ -715,7 +737,7 @@ public final class IrpTransmogrifier {
         if (commandAnalyze.dumpRepeatfind) {
             for (int i = 0; i < analyzer.getNoSequences(); i++) {
                 if (analyzer.getNoSequences() > 1)
-                    out.print("Seq. #" + i + ": ");
+                    out.print("#" + i + ":\t");
                 out.println(analyzer.repeatReducedIrSignal(i).toString(true));
             }
         }
@@ -723,7 +745,7 @@ public final class IrpTransmogrifier {
         List<Protocol> protocols = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
         for (int i = 0; i < protocols.size(); i++) {
             if (protocols.size() > 1)
-                out.print("Seq. #" + i + ": ");
+                out.print((names != null ? names[i] : "#" + i) + ":\t");
             if (commandAnalyze.statistics)
                 out.println(analyzer.toTimingsString(i));
             printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
@@ -731,12 +753,12 @@ public final class IrpTransmogrifier {
     }
 
     private void decode() throws IrpInvalidArgumentException, IOException, SAXException, UsageException, InvalidArgumentException {
-        if (IrpUtils.numberTrue(commandDecode.input != null, commandDecode.namedInput != null, commandDecode.args != null) != 1)
-            throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
-
         boolean finished = commandDecode.process(this);
         if (finished)
             return;
+
+        if (IrpUtils.numberTrue(commandDecode.input != null, commandDecode.namedInput != null, commandDecode.args != null) != 1)
+            throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         setupDatabase();
         List<String> protocolNamePatterns = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
@@ -746,12 +768,12 @@ public final class IrpTransmogrifier {
 
         Decoder decoder = new Decoder(irpDatabase, protocolsNames);
         if (commandDecode.input != null) {
-            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return new IrSignal(line); });
+            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSignal.parseRawWithDefaultFrequency(line, commandDecode.frequency, false); });
             List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding);
             for (IrSignal irSignal : signals)
                 decode(decoder, irSignal, null);
         } else if (commandDecode.namedInput != null) {
-            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return new IrSignal(line); });
+            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSignal.parseRawWithDefaultFrequency(line, commandDecode.frequency, false); });
             Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
             for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
                 decode(decoder, kvp.getValue(), kvp.getKey());
@@ -776,11 +798,11 @@ public final class IrpTransmogrifier {
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
         if (name != null)
-            out.println(name + ":");
+            out.print(name + ":\t");
         decodes.values().forEach((kvp) -> {
             out.println(kvp.toString());
         });
-        if (name != null)
+        if (decodes.isEmpty())
             out.println();
     }
 
@@ -1019,7 +1041,10 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
         private Double frequency = null;
 
-        @Parameter(names = { "-i", "--invert"}, description = "Invert the order in bitspec.")
+        @Parameter(names = { "-i", "--input"}, description = "File/URL from which to take inputs, one sequence per line.")
+        private String input = null;
+
+        @Parameter(names = { "-I", "--invert"}, description = "Invert the order in bitspec.")
         private boolean invert = false;
 
         @Parameter(names = { "--ire", "--intro-repeat-ending"}, description = "Consider the argument as begin, repeat, and ending sequence.")
@@ -1030,6 +1055,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-m", "--maxunits" }, description = "Maximal multiplier of time unit in durations.")
         private double maxUnits = 30f;
+
+        @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
+        private String namedInput = null;
 
         @Parameter(names = { "-u", "--maxmicroseconds" }, description = "Maximal duration to be expressed as micro seconds.")
         private double maxMicroSeconds = 10000f;
@@ -1062,8 +1090,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = {"-t", "--timebase"}, description = "Force time unit , in microseconds (no suffix), or in periods (with suffix \"p\").")
         private String timeBase = null;
 
-        @Parameter(description = "durations in microseconds, or pronto hex.", required = true)
-        private List<String> args;
+        @Parameter(description = "durations in microseconds, or pronto hex.", required = false)
+        private List<String> args = null;
     }
 
     @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield given as argument.")

@@ -40,7 +40,7 @@ public final class IrCoreUtils {
     /**
      * Default absolute tolerance for frequency comparison.
      */
-    public static final double DEFAULTFREQUENCYTOLERANCE = 500;
+    public static final double DEFAULTFREQUENCYTOLERANCE = 2000;
 
     /**
      * Default absolute tolerance for frequency comparison.

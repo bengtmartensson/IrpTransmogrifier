@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -70,11 +71,20 @@ public final class IrSignal implements Cloneable {
         return parseRaw(args, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, fixOddSequences);
     }
 
+    public static IrSignal parseRawWithDefaultFrequency(String string, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+        if (frequency == null)
+            logger.log(Level.WARNING, String.format(Locale.US, "Frequency missing, assuming default frequency = %d Hz",
+                    (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
+        return parseRaw(string, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, fixOddSequences);
+    }
+
     public static IrSignal parseRaw(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+        return parseRaw(String.join(" ", args).trim(), frequency, fixOddSequences);
+    }
+
+   public static IrSignal parseRaw(String str, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
         if (frequency == null)
             throw new InvalidArgumentException("Frequency must not be null");
-
-        String str = String.join(" ", args).trim();
 
         IrSequence intro;
         IrSequence repeat = null;

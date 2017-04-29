@@ -128,6 +128,15 @@ public class IrSequence implements Cloneable {
         return result;
     }
 
+    public static IrSequence parseProntoOrRaw(String line) {
+        try {
+            IrSignal irSignal = new IrSignal(line);
+            return irSignal.toModulatedIrSequence(1);
+        } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
+            return new IrSequence(line, DUMMYGAPDURATION);
+        }
+    }
+
     public static int[] toInts(Iterable<IrSequence> list) {
         int length = 0;
         for (IrSequence seq : list)
@@ -216,6 +225,18 @@ public class IrSequence implements Cloneable {
         }
     }
 
+    public IrSequence(double[] inData, double dummyGapDuration) {
+        int effectiveSize = inData.length % 2 == 0 ? inData.length : inData.length + 1;
+        this.data = new double[effectiveSize];
+        int i = 0;
+        for (double d : inData) {
+            data[i] = Math.abs(d);
+            i++;
+        }
+        if (effectiveSize > inData.length)
+            data[effectiveSize - 1] = dummyGapDuration;
+    }
+
     /**
      * Constructs an IrSequence from the parameter data.
      * @param inData
@@ -244,6 +265,10 @@ public class IrSequence implements Cloneable {
 
     public IrSequence(String string) throws OddSequenceLengthException {
         this(toDoubles(string));
+    }
+
+    public IrSequence(String string, double dummyGapDuration) {
+        this(toDoubles(string), dummyGapDuration);
     }
 
     /**

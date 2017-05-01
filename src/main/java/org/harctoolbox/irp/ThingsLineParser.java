@@ -142,9 +142,7 @@ public class ThingsLineParser<T> {
         list.add(line);
         while (true) {
             line = in.readLine();
-            if (line == null)
-                return null;
-            if (line.trim().isEmpty())
+            if (line == null || line.trim().isEmpty())
                 break;
             list.add(line);
         }

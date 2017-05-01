@@ -130,7 +130,7 @@ public class Cleaner {
         dumbTimingsTable = new ArrayList<>(rawData.length);
         sorted = rawData.clone();
         Arrays.sort(sorted);
-        int last = Integer.MIN_VALUE;
+        int last = -99999;
         for (int d : sorted) {
             if (!IrCoreUtils.approximatelyEquals(d, last, (int) absoluteTolerance, relativeTolerance)) {
                 dumbTimingsTable.add(d);

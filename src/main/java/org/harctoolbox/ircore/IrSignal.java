@@ -17,11 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -47,75 +44,18 @@ import java.util.logging.Logger;
 public final class IrSignal implements Cloneable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
 
-    public static IrSignal parse(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
-        IrSignal irSignal = null;
-        try {
-            irSignal = Pronto.parse(args);
-            // Do not catch InvalidArgumentException here, if that is thrown
-            // likely erroneous wanna-be Pronto
-        } catch (Pronto.NonProntoFormatException ex) {
-            // Signal does not look like Pronto, try it as raw
-        }
-        if (irSignal != null) {
-            if (frequency != null)
-                throw new InvalidArgumentException("Must not use explicit frequency with a Pronto type signal.");
-            return irSignal;
-        }
-        return parseRawWithDefaultFrequency(args, frequency, fixOddSequences);
-    }
-
-    public static IrSignal parseRawWithDefaultFrequency(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
-        if (frequency == null)
-            logger.log(Level.WARNING, String.format(Locale.US, "Frequency missing, assuming default frequency = %d Hz",
-                    (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
-        return parseRaw(args, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, fixOddSequences);
-    }
-
-    public static IrSignal parseRawWithDefaultFrequency(String string, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
-        if (frequency == null)
-            logger.log(Level.WARNING, String.format(Locale.US, "Frequency missing, assuming default frequency = %d Hz",
-                    (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
-        return parseRaw(string, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, fixOddSequences);
-    }
-
-    public static IrSignal parseRaw(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
-        return parseRaw(String.join(" ", args).trim(), frequency, fixOddSequences);
-    }
-
-   public static IrSignal parseRaw(String str, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
-        if (frequency == null)
-            throw new InvalidArgumentException("Frequency must not be null");
-
-        IrSequence intro;
-        IrSequence repeat = null;
-        IrSequence ending = null;
-
-        if (str.startsWith("[")) {
-            String[] parts = str.replace("[", "").split("\\]");
-            if (parts.length < 2) {
-                throw new InvalidArgumentException("Less than two parts");
-            }
-            intro = new IrSequence(parts[0]);
-            repeat = new IrSequence(parts[1]);
-            ending = (parts.length >= 3) ? new IrSequence(parts[2]) : null;
-        } else
-            intro = new IrSequence(str);
-
-        return new IrSignal(intro, repeat, ending, frequency);
-    }
-
     /** Intro sequence, always sent once. Can be empty, but not null. */
     private IrSequence introSequence;
 
     /** Repeat sequence, sent after the intro sequence if the signal is repeating. Can be empty, but  not null. */
     private IrSequence repeatSequence;
 
-    /** Ending sequence, sent at the end of transmission. Can be empty (but not null),
-     * actually, most often is. */
+    /** Ending sequence, sent at the end of transmission. Can be empty, but not null.
+     * Actually, most often is empty. */
     private IrSequence endingSequence;
 
     /** "Table" for mapping Pass to intro, repeat, or ending sequence. */
-    private EnumMap<Pass, IrSequence>map;
+    private EnumMap<Pass, IrSequence> map;
 
     /** Modulation frequency in Hz. Use 0 for not modulated, and null for defaulted. */
     private Double frequency;
@@ -268,6 +208,10 @@ public final class IrSignal implements Cloneable {
 
     public Double getFrequency() {
         return frequency;
+    }
+
+    public Double getFrequencyWithDefault() {
+        return frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY;
     }
 
     public Double getDutyCycle() {
@@ -485,7 +429,7 @@ public final class IrSignal implements Cloneable {
     public ModulatedIrSequence toModulatedIrSequence(boolean intro, int repetitions, boolean ending) {
         IrSequence seq1 = intro ? introSequence : new IrSequence();
         IrSequence seq2 = seq1.append(repeatSequence, repetitions);
-        IrSequence seq3 = seq2.append(endingSequence);
+        IrSequence seq3 = ending ? seq2.append(endingSequence) : seq2;
 
         return new ModulatedIrSequence(seq3, frequency, dutyCycle);
     }

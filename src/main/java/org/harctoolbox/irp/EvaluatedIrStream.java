@@ -33,6 +33,24 @@ final class EvaluatedIrStream {
 
     private final static Logger logger = Logger.getLogger(EvaluatedIrStream.class.getName());
 
+    /**
+     * Factory method that generates an IrSequence also for non-interleaved, signed data,
+     * possibly starting with gaps.
+     * @param durations
+     * @param fixOdd It true, appends {@link DUMMYGAPDURATION} to sequences ending with a flash.
+     * @return
+     * @throws OddSequenceLengthException
+     */
+    private static IrSequence mkIrSequence(List<Double> durations) {
+        List<Double> interleaved = IrSequence.toInterleavingList(durations);
+        try {
+            //checkFixOddLength(interleaved, fixOdd);
+            return new IrSequence(interleaved);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException();
+        }
+    }
+
     private final List<Evaluatable> elements;
     private final GeneralSpec generalSpec;
     private final IrSignal.Pass pass;
@@ -51,6 +69,7 @@ final class EvaluatedIrStream {
         this(evaluatedIrStream.nameEngine, evaluatedIrStream.generalSpec, evaluatedIrStream.pass);
         state = evaluatedIrStream.state;
     }
+
 
     IrSequence toIrSequence() throws NameUnassignedException, IrpInvalidArgumentException {
         IrpUtils.entering(logger, "toIrSequence", this);
@@ -71,12 +90,7 @@ final class EvaluatedIrStream {
                 elapsed += Math.abs(time);
             }
         }
-        IrSequence result;
-        try {
-            result = IrSequence.mkIrSequence(times, false);
-        } catch (OddSequenceLengthException ex) {
-            throw new ThisCannotHappenException(ex);
-        }
+        IrSequence result = mkIrSequence(times);
         IrpUtils.exiting(logger, "toIrSequence", result);
         return result;
     }

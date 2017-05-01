@@ -17,12 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * This class models an IR Sequence, which is a sequence of pulse pairs, sometimes called "bursts".
+ * This class models an IR Sequence, which is a sequence of pulse pairs.
  *
  * <p>It consists of a sequence of positive real numbers, each representing a gap
  * (for odd indices) or flash (for even indices).
@@ -38,8 +39,8 @@ import java.util.StringJoiner;
  *
  */
 public class IrSequence implements Cloneable {
-    private static final double EPSILON = 0.001;
 
+    private static final double EPSILON = 0.001;
     public static final double DUMMYGAPDURATION = 50000d; // should not translate to 0000 in Pronto
 
     /**
@@ -48,27 +49,50 @@ public class IrSequence implements Cloneable {
      * @return new IrSequence
      */
     public static IrSequence concatenate(Collection<IrSequence> sequences) {
-        IrSequence s = new IrSequence();
-        for (IrSequence seq : sequences)
-            s = s.append(seq);
+        int totalLength = 0;
+        totalLength = sequences.stream().map((seq) -> seq.data.length).reduce(totalLength, Integer::sum);
+        double[] data = new double[totalLength];
+        int pos = 0;
+        for (IrSequence seq : sequences) {
+            System.arraycopy(seq.data, 0, data, pos, seq.data.length);
+            pos += seq.data.length;
+        }
+        try {
+            return new IrSequence(data);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException();
+        }
+    }
 
-        return s;
+    public static IrSequence concatenate(IrSequence... sequences) {
+        return concatenate(Arrays.asList(sequences));
     }
 
     private static boolean isFlash(int i) {
         return i % 2 == 0;
     }
 
-    private static void checkFixOddLength(List<Double> list, boolean fixOddSequences) throws OddSequenceLengthException {
-        if (list.size() % 2 != 0) {
-            if (fixOddSequences)
-                list.add(DUMMYGAPDURATION);
-            else
-                throw new OddSequenceLengthException();
+    private static void checkOddLength(int length) throws OddSequenceLengthException {
+        if (length % 2 != 0)
+            throw new OddSequenceLengthException(length);
+    }
+
+    private static void checkOddLength(double[] data) throws OddSequenceLengthException {
+        checkOddLength(data.length);
+    }
+
+    private static double[] fixOddLength(double[] data, double dummyGapDuration) {
+        if (data.length % 2 != 0) {
+            double[] newData = new double[data.length + 1];
+            System.arraycopy(data, 0, newData, 0, data.length);
+            newData[data.length] = dummyGapDuration;
+            return newData;
+        } else {
+            return data;
         }
     }
 
-    private static List<Double> toInterleavingList(Collection<? extends Number> list) {
+    public static List<Double> toInterleavingList(Collection<? extends Number> list) {
         if (list == null || list.isEmpty())
             return new ArrayList<>(0);
 
@@ -91,50 +115,8 @@ public class IrSequence implements Cloneable {
         return result;
     }
 
-    /**
-     * Factory method that generates an IrSequence also for non-interleaved, signed data,
-     * possibly starting with gaps.
-     * @param durations
-     * @param fixOdd It true, appends {@link DUMMYGAPDURATION} to sequences ending with a flash.
-     * @return
-     * @throws OddSequenceLengthException
-     */
-    public static IrSequence mkIrSequence(Collection<? extends Number> durations, boolean fixOdd) throws OddSequenceLengthException {
-        List<Double> interleaved = toInterleavingList(durations);
-        checkFixOddLength(interleaved, fixOdd);
-        return new IrSequence(interleaved);
-
-    }
-
     private static boolean equalSign(Number x, Number y) {
-        return x.doubleValue() <= 0 == y.doubleValue() <= 0;
-    }
-
-    /**
-     *
-     * @param str
-     * @return
-     * @throws OddSequenceLengthException
-     */
-    public static List<IrSequence> parse(String str) throws OddSequenceLengthException {
-        String[] parts = str.trim().startsWith("[")
-                ? str.replace("[", "").split("\\]")
-                : new String[] { str };
-
-        ArrayList<IrSequence> result = new ArrayList<>(parts.length);
-        for (String s : parts)
-            result.add(new IrSequence(s));
-
-        return result;
-    }
-
-    public static IrSequence parseProntoOrRaw(String line) {
-        try {
-            IrSignal irSignal = new IrSignal(line);
-            return irSignal.toModulatedIrSequence(1);
-        } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
-            return new IrSequence(line, DUMMYGAPDURATION);
-        }
+        return x.doubleValue() < 0 == y.doubleValue() < 0;
     }
 
     public static int[] toInts(Iterable<IrSequence> list) {
@@ -213,28 +195,12 @@ public class IrSequence implements Cloneable {
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
     public IrSequence(double[] inData) throws OddSequenceLengthException {
-        int effectiveSize = inData.length;
-        if (effectiveSize % 2 != 0)
-            throw new OddSequenceLengthException(inData.length);
-
-        this.data = new double[effectiveSize];
-        int i = 0;
-        for (double d : inData) {
-            data[i] = Math.abs(d);
-            i++;
-        }
+        checkOddLength(inData);
+        setup(inData);
     }
 
     public IrSequence(double[] inData, double dummyGapDuration) {
-        int effectiveSize = inData.length % 2 == 0 ? inData.length : inData.length + 1;
-        this.data = new double[effectiveSize];
-        int i = 0;
-        for (double d : inData) {
-            data[i] = Math.abs(d);
-            i++;
-        }
-        if (effectiveSize > inData.length)
-            data[effectiveSize - 1] = dummyGapDuration;
+        setup(fixOddLength(inData, dummyGapDuration));
     }
 
     /**
@@ -243,18 +209,15 @@ public class IrSequence implements Cloneable {
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
     public IrSequence(int[] inData) throws OddSequenceLengthException {
-        int effectiveSize = inData.length;
-        if (effectiveSize % 2 != 0)
-                throw new OddSequenceLengthException(inData.length);
-
-        this.data = new double[effectiveSize];
-        int i = 0;
-        for (double d : inData) {
-            data[i] = Math.abs(d);
-            i++;
-        }
+        checkOddLength(inData.length);
+        setup(inData);
     }
 
+    /**
+     * Constructs an IrSequence from the parameter data.
+     * @param collection Collection of numbers representing durations.
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
     public IrSequence(Collection<? extends Number> collection) throws OddSequenceLengthException {
         this(toDoubles(collection));
     }
@@ -314,6 +277,24 @@ public class IrSequence implements Cloneable {
         System.arraycopy(src.data, start, data, 0, length);
     }
 
+    private void setup(double[] inData) {
+        this.data = new double[inData.length];
+        int i = 0;
+        for (double d : inData) {
+            data[i] = Math.abs(d);
+            i++;
+        }
+    }
+
+    private void setup(int[] inData) {
+        this.data = new double[inData.length];
+        int i = 0;
+        for (int d : inData) {
+            data[i] = Math.abs(d);
+            i++;
+        }
+    }
+
     /**
      * Returns the i'th value, a duration in micro seconds.
      * If i is even, it is a flash (light on), if i is odd, a gap (light off).
@@ -365,7 +346,7 @@ public class IrSequence implements Cloneable {
         }
     }
 
-     /**
+    /**
      * Returns an IrSequence consisting of this sequence, with one
      * copy of the argument appended.
      * @param tail IrSequence to be appended.

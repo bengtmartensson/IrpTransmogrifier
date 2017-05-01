@@ -483,7 +483,7 @@ public class Protocol extends IrpObject implements AggregateLister {
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
             throws SignalRecognitionException {
         //IrpUtils.entering(logger, Level.FINE, "recognize", this);
-        checkFrequency(irSignal.getFrequency(), frequencyTolerance);
+        checkFrequency(irSignal.getFrequencyWithDefault(), frequencyTolerance);
         ParameterCollector names = new ParameterCollector();
 
         decode(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);

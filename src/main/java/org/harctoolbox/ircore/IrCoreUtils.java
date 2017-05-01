@@ -202,9 +202,11 @@ public final class IrCoreUtils {
     public static boolean approximatelyEquals(int x, int y, int absoluteTolerance, double relativeTolerance) {
         int absDiff = Math.abs(x - y);
         boolean absoluteOk = absDiff <= absoluteTolerance;
+        if (absoluteOk)
+            return true;
         int max = Math.max(Math.abs(x), Math.abs(y));
         boolean relativeOk = max > 0 && absDiff / (double) max <= relativeTolerance;
-        return absoluteOk || relativeOk;
+        return relativeOk;
     }
 
     /**

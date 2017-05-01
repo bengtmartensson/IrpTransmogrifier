@@ -3,6 +3,7 @@ package org.harctoolbox.analyze;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
@@ -58,6 +59,59 @@ public class RepeatFinderNGTest {
             RepeatFinder repeatFinder = new RepeatFinder(modulatedIrSequence);
             assertEquals(repeatFinder.getRepeatFinderData().getNumberRepeats(), 3);
         } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
+            assert(false);
+        }
+    }
+
+    /**
+     * Test of findRepeat method, of class RepeatFinder.
+     */
+    @Test
+    public void testFindRepeat_ModulatedIrSequence2() {
+        System.out.println("findRepeat2");
+        IrSignal irSignal;
+        try {
+            int[] arr = new int[]{
+                2336, 646, 572, 621, 1168, 621,
+                572, 621, 1168, 621, 572, 621,
+                572, 621, 1168, 646, 572, 621,
+                1168, 621, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 572, 621,
+                572, 646, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 1168, 11604,
+                2336, 621, 572, 621, 1168, 621,
+                572, 621, 1168, 621, 572, 621,
+                572, 621, 1168, 646, 572, 621,
+                1168, 621, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 572, 621,
+                572, 646, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 1168, 11604,
+                2336, 646, 572, 621, 1168, 621,
+                572, 621, 1168, 621, 572, 621,
+                572, 621, 1168, 646, 572, 621,
+                1168, 621, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 572, 621,
+                572, 646, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 1168, 11604,
+                2336, 621, 572, 621, 1168, 621,
+                572, 621, 1168, 621, 572, 621,
+                572, 621, 1168, 646, 572, 621,
+                1168, 621, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 572, 621,
+                572, 646, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 1168, 11604,
+                2336, 621, 572, 621, 1168, 621,
+                572, 621, 1168, 621, 572, 621,
+                572, 621, 1168, 646, 572, 621,
+                1168, 621, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 572, 621,
+                572, 646, 572, 621, 1168, 621,
+                1168, 621, 1168, 621, 1168, 11604
+            };
+            ModulatedIrSequence modulatedIrSequence = new ModulatedIrSequence(arr, 38400d);
+            RepeatFinder repeatFinder = new RepeatFinder(modulatedIrSequence, 100d, 0.2d, 10000d);
+            assertEquals(5, repeatFinder.getRepeatFinderData().getNumberRepeats());
+        } catch (OddSequenceLengthException ex) {
             assert(false);
         }
     }

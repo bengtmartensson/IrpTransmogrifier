@@ -98,6 +98,10 @@ public final class Burst {
         maxUs = aMaxUs;
     }
 
+    public static int compare(Burst burst1, Burst burst2) {
+        return burst1.compare(burst2);
+    }
+
     private final int gapDuration;
     private final int flashDuration;
 
@@ -149,5 +153,11 @@ public final class Burst {
         hash = 67 * hash + this.gapDuration;
         hash = 67 * hash + this.flashDuration;
         return hash;
+    }
+
+    // Lexicographical order
+    public int compare(Burst burst) {
+        int flashcompare = flashDuration - burst.flashDuration;
+        return flashcompare != 0 ? flashcompare : gapDuration - burst.gapDuration;
     }
 }

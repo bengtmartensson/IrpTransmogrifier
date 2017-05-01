@@ -19,6 +19,14 @@ package org.harctoolbox.analyze;
 
 public final class Pwm2Decoder extends PwmDecoder {
 
+    private static Burst smallest(Burst burst0, Burst burst1) {
+        return burst0.compare(burst1) <= 0 ? burst0 : burst1;
+    }
+
+    private static Burst largest(Burst burst0, Burst burst1) {
+        return burst0.compare(burst1) <= 0 ? burst1 : burst0;
+    }
+
     public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
         super(analyzer, params, mkBursts(zero, one));
     }
@@ -32,8 +40,6 @@ public final class Pwm2Decoder extends PwmDecoder {
     }
 
     public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
-        this(analyzer, params,
-                analyzer.getFlashes().get(0), analyzer.getGaps().get(0),
-                analyzer.getFlashes().get(0), analyzer.getGaps().get(1));
+        this(analyzer, params, smallest(analyzer.getBurst(0), analyzer.getBurst(1)), largest(analyzer.getBurst(0), analyzer.getBurst(1)));
     }
 }

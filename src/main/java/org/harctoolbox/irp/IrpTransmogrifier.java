@@ -58,7 +58,6 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
-import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.lirc.LircCommand;
 import org.harctoolbox.lirc.LircConfigFile;
@@ -259,6 +258,8 @@ public final class IrpTransmogrifier {
             if (commandLineArgs.output != null)
                 out = IrpUtils.getPrintSteam(commandLineArgs.output);
             //IrpTransmogrifier instance = new IrpTransmogrifier(ps);
+
+            RepeatFinder.setDefaultMinRepeatLastGap(commandLineArgs.minRepeatGap); // Parallelization problem
 
             // Since we have help and version as subcommands, --help and --version
             // are a little off. Keep them for compatibility, and
@@ -618,6 +619,9 @@ public final class IrpTransmogrifier {
         if (finished)
             return;
 
+        if (commandAnalyze.allDecodes && commandAnalyze.decoder != null)
+            throw new UsageException("Cannot use both --alldecodes and --decode.");
+
         if (IrpUtils.numberTrue(commandAnalyze.input != null, commandAnalyze.namedInput != null, commandAnalyze.args != null) != 1)
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
@@ -627,13 +631,13 @@ public final class IrpTransmogrifier {
         Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
 
         if (commandAnalyze.input != null) {
-            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSequence.parseProntoOrRaw(line); });
+            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line); });
             List<IrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding);
             if (signals.isEmpty())
                 throw new UsageException("No parseable sequences found.");
             analyze(signals);
         } else if (commandAnalyze.namedInput != null) {
-            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSequence.parseProntoOrRaw(line); });
+            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line); });
             Map<String, IrSequence> signals = irSignalParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
             if (signals.isEmpty())
                 throw new UsageException("No parseable sequences found.");
@@ -671,7 +675,7 @@ public final class IrpTransmogrifier {
     private void analyzeIntroRepeatEnding() throws UsageException, OddSequenceLengthException, InvalidArgumentException {
         IrSignal irSignal;
         if (commandAnalyze.chop != null) {
-            List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args));
+            List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args));
             if (sequences.size() > 1)
                 throw new UsageException("Cannot use --chop together with several IR seqeunces");
             sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
@@ -686,12 +690,12 @@ public final class IrpTransmogrifier {
                     throw new UsageException("Wrong number of parts after chop = " + sequences.size());
             }
         } else
-            irSignal = IrSignal.parseRaw(commandAnalyze.args, commandAnalyze.frequency, false);
+            irSignal = IrSignalParsers.parseRaw(commandAnalyze.args, commandAnalyze.frequency, false);
         analyze(irSignal);
     }
 
     private void analyzeSequence() throws UsageException, OddSequenceLengthException {
-        List<IrSequence> sequences = IrSequence.parse(String.join(" ", commandAnalyze.args));
+        List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args));
         if (commandAnalyze.chop != null) {
             if (sequences.size() > 1)
                 throw new UsageException("Cannot use --chop together with several IR seqeunces");
@@ -701,7 +705,12 @@ public final class IrpTransmogrifier {
     }
 
     private void analyze(IrSignal irSignal) {
-        Analyzer analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer analyzer;
+        if (commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfind) {
+            IrSequence irSequence = irSignal.toModulatedIrSequence();
+            analyzer = new Analyzer(irSequence, commandAnalyze.frequency, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        } else
+            analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, null);
     }
 
@@ -742,13 +751,27 @@ public final class IrpTransmogrifier {
             }
         }
 
-        List<Protocol> protocols = analyzer.searchProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
-        for (int i = 0; i < protocols.size(); i++) {
-            if (protocols.size() > 1)
-                out.print((names != null ? names[i] : "#" + i) + ":\t");
-            if (commandAnalyze.statistics)
-                out.println(analyzer.toTimingsString(i));
-            printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
+        if (commandAnalyze.allDecodes) {
+            List<List<Protocol>> protocols = analyzer.searchAllProtocols(params, commandAnalyze.decoder, commandLineArgs.regexp);
+            int noSignal = 0;
+            for (List<Protocol> protocolList : protocols) {
+                if (protocols.size() > 1)
+                    out.print((names != null ? names[noSignal] : "#" + noSignal) + ":\t");
+                if (commandAnalyze.statistics)
+                    out.println(analyzer.toTimingsString(noSignal));
+                for (Protocol protocol : protocolList)
+                    printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
+                noSignal++;
+            }
+        } else {
+            List<Protocol> protocols = analyzer.searchBestProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
+            for (int i = 0; i < protocols.size(); i++) {
+                if (protocols.size() > 1)
+                    out.print((names != null ? names[i] : "#" + i) + ":\t");
+                if (commandAnalyze.statistics)
+                    out.println(analyzer.toTimingsString(i));
+                printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
+            }
         }
     }
 
@@ -768,17 +791,21 @@ public final class IrpTransmogrifier {
 
         Decoder decoder = new Decoder(irpDatabase, protocolsNames);
         if (commandDecode.input != null) {
-            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSignal.parseRawWithDefaultFrequency(line, commandDecode.frequency, false); });
+            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
+                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, false);
+            });
             List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding);
             for (IrSignal irSignal : signals)
                 decode(decoder, irSignal, null);
         } else if (commandDecode.namedInput != null) {
-            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((String line) -> { return IrSignal.parseRawWithDefaultFrequency(line, commandDecode.frequency, false); });
+            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
+                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, false);
+            });
             Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
             for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
                 decode(decoder, kvp.getValue(), kvp.getKey());
         } else {
-            IrSignal irSignal = IrSignal.parse(commandDecode.args, commandDecode.frequency, false);
+            IrSignal irSignal = IrSignalParsers.parseProntoOrRaw(commandDecode.args, commandDecode.frequency, false);
             decode(decoder, irSignal, null);
         }
     }
@@ -978,6 +1005,9 @@ public final class IrpTransmogrifier {
                 description = "Frequency tolerance in Hz. Negative disables frequency check.")
         private Double frequencyTolerance = null;
 
+        @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minumum gap at end of repetition")
+        private double minRepeatGap = RepeatFinder.DEFAULTMINREPEATLASTGAP;
+
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message (deprecated; use the command \"help\" instead).")
         private boolean helpRequested = false;
 
@@ -995,7 +1025,7 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
-        private Level logLevel = Level.INFO;
+        private Level logLevel = Level.WARNING;
 
         @Parameter(names = { "--min-leadout"}, description = "Threshold for leadout when decoding.")
         private Double minLeadout = null;
@@ -1028,6 +1058,9 @@ public final class IrpTransmogrifier {
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters")
     private static class CommandAnalyze extends MyCommand {
+
+        @Parameter(names = { "-a", "--all" }, description = "List all decoder outcomes, instead of only the one with lowest weight.")
+        private boolean allDecodes = false;
 
         @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument.")
         private Integer chop = null;

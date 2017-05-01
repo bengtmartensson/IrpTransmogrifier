@@ -107,6 +107,10 @@ public final class Analyzer extends Cleaner {
         this(irSequence, frequency, invokeRepeatFinder, null, null);
     }
 
+    public Burst getBurst(int i) {
+        return pairs.get(i);
+    }
+
     private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int number) {
         int beg = getSequenceBegin(number);
         int length = getSequenceLength(number);
@@ -235,30 +239,48 @@ public final class Analyzer extends Cleaner {
         return frequency;
     }
 
-    public ArrayList<Protocol> searchProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) {
+    public List<List<Protocol>> searchAllProtocols(AnalyzerParams params, String decoderPattern, boolean regexp) {
         List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern, regexp);
-        ArrayList<Protocol> result = new ArrayList<>(getNoSequences());
+        List<List<Protocol>> result = new ArrayList<>(getNoSequences());
         for (int i = 0; i < getNoSequences(); i++)
-            result.add(searchProtocol(decoders, i));
+            result.add(searchProtocols(decoders, i));
 
         return result;
     }
 
-    public Protocol searchProtocol(List<AbstractDecoder> decoders, int number) {
+    public List<Protocol> searchBestProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) {
+        List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern, regexp);
+        List<Protocol> result = new ArrayList<>(getNoSequences());
+        for (int i = 0; i < getNoSequences(); i++)
+            result.add(searchBestProtocol(decoders, i));
+
+        return result;
+    }
+
+    public List<Protocol> searchProtocols(List<AbstractDecoder> decoders, int number) {
+        List<Protocol> protocols = new ArrayList<>(decoders.size());
+        decoders.forEach((decoder) -> {
+            try {
+                Protocol protocol = decoder.parse(number, isSignalMode());
+                protocols.add(protocol);
+                logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(10), protocol.weight()});
+            } catch (DecodeException ex) {
+                logger.log(Level.FINE, "{0}: {1}", new Object[]{decoder.name(), ex.getMessage()});
+            }
+        });
+        return protocols;
+    }
+
+    public Protocol searchBestProtocol(List<AbstractDecoder> decoders, int number) {
+        List<Protocol> protocols = searchProtocols(decoders, number);
         Protocol bestSoFar = null;
         int weight = Integer.MAX_VALUE;
 
-        for (AbstractDecoder decoder : decoders) {
-            try {
-                Protocol protocol = decoder.parse(number, isSignalMode());
-                int protocolWeight = protocol.weight();
-                logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(10), protocolWeight});
-                if (protocolWeight < weight) {
-                    bestSoFar = protocol;
-                    weight = protocolWeight;
-                }
-            } catch (DecodeException ex) {
-                logger.log(Level.FINE, "{0}: {1}", new Object[]{decoder.name(), ex.getMessage()});
+        for (Protocol protocol : protocols) {
+            int protocolWeight = protocol.weight();
+            if (protocolWeight < weight) {
+                bestSoFar = protocol;
+                weight = protocolWeight;
             }
         }
         return bestSoFar;

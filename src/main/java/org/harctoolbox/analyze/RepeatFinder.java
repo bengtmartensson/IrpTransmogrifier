@@ -26,7 +26,7 @@ import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public final class RepeatFinder {
-    public static final double DEFAULTMINREPEATLASTGAP = 20000; // 20 milli seconds minimum for a repetition
+    public static final double DEFAULTMINREPEATLASTGAP = 15000d; // 10 milli seconds minimum for a repetition
     private static double defaultMinRepeatLastGap = DEFAULTMINREPEATLASTGAP;
     private static double defaultRelativeTolerance = IrCoreUtils.DEFAULTRELATIVETOLERANCE;
     private static double defaultAbsoluteTolerance = IrCoreUtils.DEFAULTABSOLUTETOLERANCE;
@@ -94,15 +94,19 @@ public final class RepeatFinder {
     private IrSequence irSequence;
     private RepeatFinderData repeatFinderData;
 
-    public RepeatFinder(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+    public RepeatFinder(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance, double minRepeatLastGap) {
         this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
-        this.minRepeatLastGap = defaultMinRepeatLastGap;
+        this.minRepeatLastGap = minRepeatLastGap;
         this.irSequence = irSequence;
         try {
             analyze();
         } catch (Exception ex) {
         }
+    }
+
+    public RepeatFinder(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+        this(irSequence, absoluteTolerance, relativeTolerance, defaultMinRepeatLastGap);
     }
 
     public RepeatFinder(IrSequence irSequence) {

@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
 
-package org.harctoolbox.ircore;
+package org.harctoolbox.irp;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.IrSequence;
 
 public class ThingsLineParser<T> {
 
@@ -99,14 +100,10 @@ public class ThingsLineParser<T> {
         BufferedReader in = new BufferedReader(reader);
         List<T> list = new ArrayList<>(4);
         while (true) {
-            String line = in.readLine();
-            if (line == null)
-                break;
-            line = line.trim();
-            if (line.isEmpty())
-                continue;
             try {
-                T thing = (T) parser.newThing(line);
+                T thing = parseThing(in);
+                if (thing == null)
+                    break;
                 list.add(thing);
             } catch (Exception ex) {
                 logger.log(Level.WARNING, "{0}", ex.getMessage());
@@ -126,9 +123,8 @@ public class ThingsLineParser<T> {
             if (line.isEmpty())
                 continue;
             String name = line;
-            line = in.readLine();
             try {
-                T thing = (T) parser.newThing(line);
+                T thing = parseThing(in);
                 map.put(name, thing);
             } catch (Exception ex) {
                 logger.log(Level.WARNING, "{0}", ex.getMessage());
@@ -137,7 +133,25 @@ public class ThingsLineParser<T> {
         return map;
     }
 
+    @SuppressWarnings("unchecked")
+    T parseThing(BufferedReader in) throws Exception {
+        ArrayList<String> list = new ArrayList<>(2);
+        String line = in.readLine();
+        if (line == null)
+            return null;
+        list.add(line);
+        while (true) {
+            line = in.readLine();
+            if (line == null)
+                return null;
+            if (line.trim().isEmpty())
+                break;
+            list.add(line);
+        }
+        return (T) parser.newThing(list);
+    }
+
     public interface ThingParser {
-        public Object newThing(String s) throws Exception;
+        public Object newThing(List<String> list) throws Exception;
     }
 }

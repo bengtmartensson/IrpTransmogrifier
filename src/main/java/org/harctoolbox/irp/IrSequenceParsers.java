@@ -57,7 +57,7 @@ public class IrSequenceParsers {
             return irSignal.toModulatedIrSequence(1);
         } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
             IrSequence intro = new IrSequence(line.get(0), IrSequence.DUMMYGAPDURATION);
-            IrSequence repeat = new IrSequence(line.get(1), IrSequence.DUMMYGAPDURATION);
+            IrSequence repeat = line.size() > 1 ? new IrSequence(line.get(1), IrSequence.DUMMYGAPDURATION) : new IrSequence();
             IrSequence ending = line.size() > 2 ? new IrSequence(line.get(2), IrSequence.DUMMYGAPDURATION) : new IrSequence();
             return IrSequence.concatenate(intro, repeat, ending);
         }

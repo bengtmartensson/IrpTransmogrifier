@@ -253,11 +253,11 @@ public abstract class Pronto {
      * @return Integer array of numbers if successful, null if unsuccessful (e.g. by NumberFormatException).
      * @throws org.harctoolbox.ircore.IrpInvalidArgumentException
      */
-    static int[] parseAsInts(String[] array, int begin) throws NonProntoFormatException {
+    public static int[] parseAsInts(String[] array, int begin) throws NonProntoFormatException {
         int[] ccf = new int[array.length];
 
         for (int i = begin; i < array.length; i++) {
-            if (array[i].length() != CHARS_IN_DIGIT)
+            if (array[i].charAt(0) == '-' || array[i].charAt(0) == '+' || array[i].length() != CHARS_IN_DIGIT)
                 throw new NonProntoFormatException(array[i]);
             try {
                 ccf[i] = Integer.parseInt(array[i], 16);

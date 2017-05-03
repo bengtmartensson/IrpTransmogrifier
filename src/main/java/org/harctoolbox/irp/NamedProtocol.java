@@ -79,14 +79,14 @@ public final class NamedProtocol extends Protocol {
         this(name, irp, documentation, null, null, null, null, null, null);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
+    public Map<String, Long> recognize(IrSignal irSignal, boolean acceptNullRepeats, boolean keepDefaulted,
             Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout) throws DomainViolationException, SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             //return null;
             throw new ProtocolNotDecodableException(name);
 
-        return super.recognize(irSignal, keepDefaulted,
+        return super.recognize(irSignal, acceptNullRepeats, keepDefaulted,
                 getFrequencyTolerance(userFrequencyTolerance), getAbsoluteTolerance(userAbsoluteTolerance),
                 getRelativeTolerance(userRelativeTolerance), getMinimumLeadout(userMinimumLeadout));
     }
@@ -174,8 +174,8 @@ public final class NamedProtocol extends Protocol {
     }
 
     @Override
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws SignalRecognitionException {
-        return recognize(irSignal, keepDefaulted, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
+    public Map<String, Long> recognize(IrSignal irSignal, boolean acceptNullRepeats, boolean keepDefaulted) throws SignalRecognitionException {
+        return recognize(irSignal, acceptNullRepeats, keepDefaulted, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
                 IrCoreUtils.getAbsoluteTolerance(absoluteTolerance), IrCoreUtils.getRelativeTolerance(relativeTolerance),
                 IrCoreUtils.getMinimumLeadout(minimumLeadout));
     }

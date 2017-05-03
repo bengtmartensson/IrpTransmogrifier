@@ -830,13 +830,13 @@ public final class IrpTransmogrifier {
             logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
         }
 
-        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.noPreferOver,
+        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, true, commandDecode.noPreferOver,
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
         if (name != null)
-            out.print(name + ":\t");
+            out.print(name + ":");
         decodes.values().forEach((kvp) -> {
-            out.println(kvp.toString());
+            out.println("\t" + kvp.toString());
         });
         if (decodes.isEmpty())
             out.println();

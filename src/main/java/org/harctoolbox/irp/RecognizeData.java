@@ -253,8 +253,19 @@ public final class RecognizeData extends Traverser implements Cloneable {
         danglingBitFieldData = new BitwiseParameter();
     }
 
+    public int remaining() {
+        return irSequence.getLength() - position;
+    }
+
     @Override
     public boolean isFinished() {
-        return position == irSequence.getLength();
+        return remaining() == 0;
+    }
+
+    void finish() {
+        if (hasConsumed > 0) {
+            position++;
+            hasConsumed = 0;
+        }
     }
 }

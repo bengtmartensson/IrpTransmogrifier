@@ -1,6 +1,12 @@
 package org.harctoolbox.irp;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -8,6 +14,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class IrpTransmogrifierNGTest {
+
+    private static final String IRPPROTOCOLS_XML="src/main/resources/IrpProtocols.xml";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -130,5 +138,36 @@ public class IrpTransmogrifierNGTest {
         System.out.println("lirc");
         String result = IrpTransmogrifier.execute("lirc src/test/resources/RX-V995.lircd.conf");
         assertEquals(result, "yamaha-amp:	{38.0k,1,msb}<642u,-1600u|642u,-470u>(9067u,-4393u,pre_data:16,F:16,642u,-39597u,(9065u,-2139u,642u,-39597u)*){pre_data=0xa15e}[F:0x0..0xffff]");
+    }
+
+    @Test
+    public void testDecodingFile() throws IOException {
+        System.out.println("testDecodingFiles");
+        File testDir = new File("src/test/decoderfiles");
+        File outputDir = new File("target/testdecodeoutput");
+        boolean status = outputDir.mkdirs();
+        if (!status)
+            throw new IOException("directory could not be created.");
+        File[] files = testDir.listFiles();
+        Arrays.sort(files);
+        for (File file : files) {
+            System.out.println(file.getCanonicalPath());
+            File out = new File(outputDir, file.getName() + ".out");
+            List<String> args = new ArrayList<>(8);
+            args.add("-c");
+            args.add(IRPPROTOCOLS_XML); // "The built-in" may not be reliable at this point
+            args.add("-f");
+            args.add("-1");
+            args.add("-o");
+            args.add(out.getCanonicalPath());
+            args.add("decode");
+            args.add("-r");
+            args.add("--namedinput");
+            args.add(file.getCanonicalPath());
+            //System.out.println(String.join(" ", args));
+            String result = IrpTransmogrifier.execute(args.toArray(new String[args.size()]));
+            assertTrue(result != null);
+            //System.out.println(result);
+        }
     }
 }

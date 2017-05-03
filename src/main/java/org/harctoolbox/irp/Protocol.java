@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -476,15 +477,15 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException {
-        return recognize(irSignal, true);
+        return recognize(irSignal, true, true);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted) throws SignalRecognitionException {
-        return recognize(irSignal, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE,
+    public Map<String, Long> recognize(IrSignal irSignal, boolean acceptNullRepeats, boolean keepDefaulted) throws SignalRecognitionException {
+        return recognize(irSignal, acceptNullRepeats, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE,
                 IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean keepDefaulted,
+    public Map<String, Long> recognize(IrSignal irSignal, boolean acceptNullRepeats, boolean keepDefaulted,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
             throws SignalRecognitionException {
         //IrpUtils.entering(logger, Level.FINE, "recognize", this);
@@ -494,15 +495,40 @@ public class Protocol extends IrpObject implements AggregateLister {
         IrSequence intro = irSignal.getIntroSequence();
         IrSequence repeat = irSignal.getRepeatSequence();
         IrSequence ending = irSignal.getEndingSequence();
-        if (this.isEmpty(Pass.intro) && ! intro.isEmpty() && repeat.isEmpty()) {
+        boolean justIntro = repeat.isEmpty() && ending.isEmpty();
+        if (this.isEmpty(Pass.intro) && justIntro) {
             repeat = intro;
             intro = new IrSequence();
         }
 
-        decode(names, intro, IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
-        decode(names, repeat, IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
-        decode(names, ending, IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
-
+        int rest = decode(names, intro, IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
+        if (rest != 0) {
+            if (repeat.isEmpty()) {
+                try {
+                    repeat = intro.subSequence(intro.getLength() - rest, rest);
+                } catch (InvalidArgumentException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
+            } else
+                throw new SignalRecognitionException("Intro sequence was not fully matched");
+        }
+        if (!(acceptNullRepeats && repeat.isEmpty() && ending.isEmpty() && rest == 0)) {
+            rest = decode(names, repeat, IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
+            if (rest > 0) {
+                if (justIntro) {
+                    try {
+                        ending = repeat.subSequence(repeat.getLength() - rest, rest);
+                    } catch (InvalidArgumentException ex) {
+                        throw new ThisCannotHappenException(ex);
+                    }
+                } else
+                    throw new SignalRecognitionException("Repeat sequence was not fully matched");
+            }
+            rest = decode(names, ending, IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
+            if (rest > 0) {
+                throw new SignalRecognitionException("Ending sequence was not fully matched");
+            }
+        }
         Map<String, Long> result = names.collectedNames();
         parameterSpecs.reduceNamesMap(result, keepDefaulted);
         //IrpUtils.exiting(logger, Level.FINE, "recognize", result);
@@ -516,7 +542,7 @@ public class Protocol extends IrpObject implements AggregateLister {
             throw new SignalRecognitionException("Frequency does not match");
     }
 
-    private void decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
+    private int decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
             throws SignalRecognitionException {
         RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, interleavingOk(), names,
                 absoluteTolerance, relativeTolerance, minimumLeadout);
@@ -529,12 +555,14 @@ public class Protocol extends IrpObject implements AggregateLister {
         } catch (DomainViolationException | NameUnassignedException ex) {
             throw new SignalRecognitionException(ex);
         }
+        return recognizeData.remaining();
     }
 
     public void decode(RecognizeData recognizeData) throws SignalRecognitionException {
         bitspecIrstream.decode(recognizeData, new ArrayList<>(0));
-        if (!recognizeData.isFinished())
-            throw new SignalRecognitionException("IrSequence not fully matched");
+        recognizeData.finish();
+//        if (!recognizeData.isFinished())
+//            throw new SignalRecognitionException("IrSequence not fully matched");
     }
 
     @Override

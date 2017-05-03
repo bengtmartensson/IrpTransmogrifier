@@ -251,16 +251,19 @@ public abstract class Pronto {
      * @param array Input strings, to be parsed/tested.
      * @param begin Starting index
      * @return Integer array of numbers if successful, null if unsuccessful (e.g. by NumberFormatException).
-     * @throws org.harctoolbox.ircore.IrpInvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
     public static int[] parseAsInts(String[] array, int begin) throws NonProntoFormatException {
         int[] ccf = new int[array.length];
 
         for (int i = begin; i < array.length; i++) {
-            if (array[i].charAt(0) == '-' || array[i].charAt(0) == '+' || array[i].length() != CHARS_IN_DIGIT)
-                throw new NonProntoFormatException(array[i]);
+            String string = array[i];
+            if (string == null || string.isEmpty())
+                throw new NonProntoFormatException("Empty or null string");
+            if (string.charAt(0) == '-' || string.charAt(0) == '+' || string.length() != CHARS_IN_DIGIT)
+                throw new NonProntoFormatException(string);
             try {
-                ccf[i] = Integer.parseInt(array[i], 16);
+                ccf[i] = Integer.parseInt(string, 16);
             } catch (NumberFormatException ex) {
                 throw new NonProntoFormatException(ex);
             }

@@ -706,7 +706,7 @@ public final class IrpTransmogrifier {
 
     private void analyze(IrSignal irSignal) {
         Analyzer analyzer;
-        if (commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfind) {
+        if (commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder) {
             IrSequence irSequence = irSignal.toModulatedIrSequence();
             analyzer = new Analyzer(irSequence, commandAnalyze.frequency, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         } else
@@ -715,12 +715,12 @@ public final class IrpTransmogrifier {
     }
 
     private void analyze(Map<String, IrSequence> irSequences) {
-        Analyzer analyzer = new Analyzer(irSequences.values(), commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfind, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer analyzer = new Analyzer(irSequences.values(), commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
     }
 
     private void analyze(List<IrSequence> irSequences) {
-        Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfind, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, null);
     }
 
@@ -743,11 +743,13 @@ public final class IrpTransmogrifier {
                     out.println(analyzer.toTimingsString(i));
             }
         }
-        if (commandAnalyze.dumpRepeatfind) {
+        if (commandAnalyze.dumpRepeatfinder) {
             for (int i = 0; i < analyzer.getNoSequences(); i++) {
                 if (analyzer.getNoSequences() > 1)
                     out.print("#" + i + ":\t");
                 out.println(analyzer.repeatReducedIrSignal(i).toString(true));
+                out.println("RepeatFinderData: " + analyzer.repeatFinderData(i).toString());
+
             }
         }
 
@@ -812,10 +814,17 @@ public final class IrpTransmogrifier {
 
     @SuppressWarnings("AssignmentToMethodParameter")
     private void decode(Decoder decoder, IrSignal irSignal, String name) throws InvalidArgumentException {
-        if (commandDecode.repeatFinder) {
+        if (commandDecode.repeatFinder || commandDecode.dumpRepeatfinder) {
             // ignoring commandDecode.cleaner
-            irSignal = RepeatFinder.findRepeatClean(irSignal.toModulatedIrSequence(), commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            logger.log(Level.INFO, "Repeat-reduced signal: {0}", irSignal.toString(true));
+            ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
+            RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+
+            irSignal = repeatFinder.toIrSignalClean(sequence);
+            // logger.log(Level.INFO, "Repeat-reduced signal: {0}", irSignal.toString(true));
+            if (commandDecode.dumpRepeatfinder) {
+                out.println("RepeatReduced: " + irSignal);
+                out.println("RepeatData: " + repeatFinder.getRepeatFinderData());
+            }
         } else if (commandDecode.cleaner) {
             irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
@@ -1111,8 +1120,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-r", "--repeatfinder" }, description = "Invoke the repeatfinder.")
         private boolean repeatFinder = false;
 
-        @Parameter(names = { "-R", "--dump-repeatfind" }, description = "Print the result of the repeatfinder.")
-        private boolean dumpRepeatfind = false;
+        @Parameter(names = { "-R", "--dump-repeatfinder" }, description = "Print the result of the repeatfinder.")
+        private boolean dumpRepeatfinder = false;
 
         @Parameter(names = {"--radix" }, description = "Radix used for printing of output parameters.")
         private int radix = 16;
@@ -1190,6 +1199,10 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-r", "--repeat-finder"}, description = "Invoke repeat finder on input sequence")
         private boolean repeatFinder = false;
+
+        @Parameter(names = { "-R", "--dump-repeatfinder" }, description = "Print the result of the repeatfinder.")
+        private boolean dumpRepeatfinder = false;
+
 
         @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = false)
         private List<String> args;

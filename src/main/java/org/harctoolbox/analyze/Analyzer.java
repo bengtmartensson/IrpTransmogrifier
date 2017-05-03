@@ -311,6 +311,10 @@ public final class Analyzer extends Cleaner {
         return mult != null ? "= " + mult.toString() + "*" + Long.toString(Math.round(tick)) + "  " : "\t";
     }
 
+    public RepeatFinder.RepeatFinderData repeatFinderData(int i) {
+        return repeatFinderData[i];
+    }
+
     public static class AnalyzerParams {
         private final Double frequency;
         private final Double timebase;

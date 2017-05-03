@@ -202,8 +202,13 @@ public class Protocol extends IrpObject implements AggregateLister {
     public Protocol normalForm(IrSignal.Pass pass) {
         return mkProtocol(normalFormVariation.select(pass));
     }
+
     public BareIrStream normalBareIrStream(IrSignal.Pass pass) {
         return normalFormVariation.select(pass);
+    }
+
+    private boolean isEmpty(IrSignal.Pass pass) {
+        return normalFormVariation.select(pass).isEmpty();
     }
 
     private Protocol mkProtocol(BareIrStream bareIrStream) {
@@ -486,9 +491,17 @@ public class Protocol extends IrpObject implements AggregateLister {
         checkFrequency(irSignal.getFrequencyWithDefault(), frequencyTolerance);
         ParameterCollector names = new ParameterCollector();
 
-        decode(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
-        decode(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
-        decode(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
+        IrSequence intro = irSignal.getIntroSequence();
+        IrSequence repeat = irSignal.getRepeatSequence();
+        IrSequence ending = irSignal.getEndingSequence();
+        if (this.isEmpty(Pass.intro) && ! intro.isEmpty() && repeat.isEmpty()) {
+            repeat = intro;
+            intro = new IrSequence();
+        }
+
+        decode(names, intro, IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
+        decode(names, repeat, IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
+        decode(names, ending, IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
 
         Map<String, Long> result = names.collectedNames();
         parameterSpecs.reduceNamesMap(result, keepDefaulted);

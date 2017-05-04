@@ -55,16 +55,18 @@ public class CleanerNGTest {
     @Test
     public void testClean_IrSequence() {
         System.out.println("clean");
-        IrSequence verynoisy = irSequence.addNoise(60);
-        IrSequence cleaned = Cleaner.clean(verynoisy);
+        final double absolute = 60.0;
+        final double relative = 0.1;
+        IrSequence verynoisy = irSequence.addNoise(absolute);
+        IrSequence cleaned = Cleaner.clean(verynoisy, absolute, relative);
         //Assert.assertFalse(irSequence.approximatelyEquals(verynoisy, IrCoreUtils.defaultAbsoluteTolerance, 0.1));
-        Assert.assertTrue(irSequence.approximatelyEquals(cleaned, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, 0.1));
+        Assert.assertTrue(irSequence.approximatelyEquals(cleaned, absolute, relative));
 
         IrSequence reallynoisy = irSequence.addNoise(200);
-        cleaned = Cleaner.clean(reallynoisy);
-        Assert.assertFalse(irSequence.approximatelyEquals(reallynoisy, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, 0.1));
-        Assert.assertFalse(irSequence.approximatelyEquals(cleaned, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, 0.1));
-        Assert.assertFalse(irSequence.approximatelyEquals(cleaned));
+        cleaned = Cleaner.clean(reallynoisy, absolute, relative);
+        Assert.assertFalse(irSequence.approximatelyEquals(reallynoisy, absolute, relative));
+        Assert.assertFalse(irSequence.approximatelyEquals(cleaned, absolute, relative));
+        //Assert.assertFalse(irSequence.approximatelyEquals(cleaned));
     }
 
     /**

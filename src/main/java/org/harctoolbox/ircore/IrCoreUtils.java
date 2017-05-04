@@ -30,7 +30,7 @@ public final class IrCoreUtils {
     /**
      * Default absolute tolerance in micro seconds.
      */
-    public static final double DEFAULTABSOLUTETOLERANCE = 60;
+    public static final double DEFAULTABSOLUTETOLERANCE = 100;
 
     /**
      * Default relative tolerance as a number between 0 and 1.

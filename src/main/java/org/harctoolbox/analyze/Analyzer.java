@@ -58,6 +58,7 @@ public final class Analyzer extends Cleaner {
     private List<Burst> pairs;
     private final RepeatFinder.RepeatFinderData[] repeatFinderData;
     private Double frequency;
+    private List<Burst> sortedBursts;
 
     public Analyzer(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) {
         this(irSignal.toIrSequences(), mkIndices(irSignal.toIrSequences()), true, irSignal.getFrequency(), false, absoluteTolerance, relativeTolerance);
@@ -107,8 +108,22 @@ public final class Analyzer extends Cleaner {
         this(irSequence, frequency, invokeRepeatFinder, null, null);
     }
 
+    /**
+     * Return bursts order after their frequency.
+     * @param i
+     * @return
+     */
     public Burst getBurst(int i) {
         return pairs.get(i);
+    }
+
+    /**
+     * Return bursts ordered lexicographically.
+     * @param i
+     * @return
+     */
+    public Burst getSortedBurst(int i) {
+        return sortedBursts.get(i);
     }
 
     private RepeatFinder.RepeatFinderData getRepeatFinderData(boolean invokeRepeatFinder, int number) {
@@ -169,6 +184,8 @@ public final class Analyzer extends Cleaner {
             });
         });
         Collections.sort(pairs, (a, b) -> getNumberPairs(b) - getNumberPairs(a));
+        sortedBursts = new ArrayList<>(pairs);
+        sortedBursts.sort((a, b) -> Burst.compare(a, b));
     }
 
 

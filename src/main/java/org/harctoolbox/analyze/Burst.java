@@ -155,9 +155,12 @@ public final class Burst {
         return hash;
     }
 
-    // Lexicographical order
+    private int sum() {
+        return flashDuration + gapDuration;
+    }
+
     public int compare(Burst burst) {
-        int flashcompare = flashDuration - burst.flashDuration;
-        return flashcompare != 0 ? flashcompare : gapDuration - burst.gapDuration;
+        int sumCompare = sum() - burst.sum();
+        return sumCompare != 0 ? sumCompare : flashDuration - burst.flashDuration;
     }
 }

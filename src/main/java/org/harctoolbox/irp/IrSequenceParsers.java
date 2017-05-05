@@ -54,7 +54,7 @@ public class IrSequenceParsers {
     public static IrSequence parseProntoOrRaw(List<String> line) {
         try {
             IrSignal irSignal = new IrSignal(line.get(0));
-            return irSignal.toModulatedIrSequence(1);
+            return irSignal.toModulatedIrSequence();
         } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
             IrSequence intro = new IrSequence(line.get(0), IrSequence.DUMMYGAPDURATION);
             IrSequence repeat = line.size() > 1 ? new IrSequence(line.get(1), IrSequence.DUMMYGAPDURATION) : new IrSequence();

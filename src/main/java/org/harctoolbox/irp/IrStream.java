@@ -281,8 +281,12 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
 //    }
 
     @Override
-    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
+        if (repeatMarker.isInfinite() || repeatMarker.getMax() != repeatMarker.getMin())
+            throw new UnsupportedOperationException();
+
+        for (int i = 0; i < repeatMarker.getMin(); i++)
+            bareIrStream.evaluate(renderData, bitSpecStack);
     }
 
     @Override

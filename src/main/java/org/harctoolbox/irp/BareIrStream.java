@@ -248,8 +248,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
 
     @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
-        for (IrStreamItem irStreamItem : irStreamItems)
-            irStreamItem.evaluate(renderData, bitSpecStack);
+        render(renderData, bitSpecStack);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.harctoolbox.analyze;
 
 import org.harctoolbox.ircore.InvalidArgumentException;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;

@@ -70,5 +70,10 @@ public final class Gap extends Duration {
         int hash = 7;
         return hash + 31*super.hashCode();
     }
+
+    @Override
+    protected Gap evaluatedDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
+        return new Gap(evaluate(generalSpec, nameEngine));
+    }
 }
 

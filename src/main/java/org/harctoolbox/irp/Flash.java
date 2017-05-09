@@ -66,4 +66,9 @@ public final class Flash extends Duration {
         int hash = 5;
         return hash + 31*super.hashCode();
     }
+
+    @Override
+    protected Flash evaluatedDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
+        return new Flash(evaluate(generalSpec, nameEngine));
+    }
 }

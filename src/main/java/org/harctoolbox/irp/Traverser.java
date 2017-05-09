@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 public abstract class Traverser {
 
     private final GeneralSpec generalSpec;
-    private final NameEngine nameEngine;
+    protected NameEngine nameEngine;
 
     protected Traverser(GeneralSpec generalSpec, NameEngine nameEngine) {
         this.nameEngine = nameEngine;

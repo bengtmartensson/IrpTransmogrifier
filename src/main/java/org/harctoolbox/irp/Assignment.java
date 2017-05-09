@@ -118,7 +118,8 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
-    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
+        render(renderData, bitSpecStack);
     }
 
     @Override
@@ -147,8 +148,14 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
         try {
-            recognizeData.getParameterCollector().setExpected(name.toString(), value.toNumber(recognizeData.toNameEngine()));
-        } catch (NameUnassignedException ex) {
+            NameEngine nameEngine = recognizeData.getNameEngine();
+            String nameString = name.toString();
+            long val = value.toNumber(recognizeData.toNameEngine());
+            if (nameEngine.containsKey(nameString))
+                nameEngine.define(nameString, val);
+            else
+                recognizeData.getParameterCollector().setExpected(nameString, val);
+        } catch (NameUnassignedException | InvalidNameException ex) {
             throw new SignalRecognitionException(ex);
         }
     }

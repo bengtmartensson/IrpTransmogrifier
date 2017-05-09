@@ -66,6 +66,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private ParameterSpecs parameterSpecs;
     private BitspecIrstream bitspecIrstream;
     private Variation normalFormVariation;
+    private NameEngine initialDefinitions;
     private NameEngine definitions;
     private NameEngine memoryVariables;
     private Boolean interleavingFlash = null;
@@ -81,7 +82,8 @@ public class Protocol extends IrpObject implements AggregateLister {
         super(parseTree);
         this.generalSpec = generalSpec;
         this.bitspecIrstream = bitspecIrstream;
-        this.definitions = definitions;
+        this.initialDefinitions = definitions;
+        initializeDefinitions();
         this.parameterSpecs = parameterSpecs != null ? parameterSpecs : new ParameterSpecs();
         computeNormalForm();
     }
@@ -120,8 +122,9 @@ public class Protocol extends IrpObject implements AggregateLister {
     public Protocol(IrpParser.ProtocolContext parseTree) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(new GeneralSpec(parseTree), new BitspecIrstream(parseTree), new NameEngine(), new ParameterSpecs(parseTree), parseTree);
         parseTree.definitions().forEach((defs) -> {
-                definitions.parseDefinitions(defs);
+            initialDefinitions.parseDefinitions(defs);
         });
+        initializeDefinitions();
 
         parameterSpecs = new ParameterSpecs(parseTree);
         memoryVariables = new NameEngine();
@@ -134,6 +137,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         }
 
         checkSanity();
+    }
+
+    private void initializeDefinitions() {
+        definitions = initialDefinitions != null ? initialDefinitions.clone() : null;
     }
 
     public String toStringTree() {
@@ -163,7 +170,7 @@ public class Protocol extends IrpObject implements AggregateLister {
                 generalSpec.equals(other.generalSpec)
                 && bitspecIrstream.equals(other.bitspecIrstream)
                 && parameterSpecs.equals(other.parameterSpecs)
-                && definitions.equals(other.definitions);
+                && initialDefinitions.equals(other.initialDefinitions);
     }
 
     @Override
@@ -172,7 +179,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         hash = 31 * hash + Objects.hashCode(this.generalSpec);
         hash = 31 * hash + Objects.hashCode(this.parameterSpecs);
         hash = 31 * hash + Objects.hashCode(this.bitspecIrstream);
-        hash = 31 * hash + Objects.hashCode(this.definitions);
+        hash = 31 * hash + Objects.hashCode(this.initialDefinitions);
         return hash;
     }
 
@@ -234,6 +241,7 @@ public class Protocol extends IrpObject implements AggregateLister {
      */
     public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException {
         IrpUtils.entering(logger, "toIrSignal");
+        initializeDefinitions();
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
         nameEngine.add(definitions);
@@ -337,23 +345,23 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public boolean isPWM2() {
-        return bitspecIrstream.isPWM2(generalSpec, definitions);
+        return bitspecIrstream.isPWM2(generalSpec, initialDefinitions);
     }
 
     public boolean isPWM4() {
-        return bitspecIrstream.isPWM4(generalSpec, definitions);
+        return bitspecIrstream.isPWM4(generalSpec, initialDefinitions);
     }
 
     boolean isPWM16() {
-        return bitspecIrstream.isPWM16(generalSpec, definitions);
+        return bitspecIrstream.isPWM16(generalSpec, initialDefinitions);
     }
 
     public boolean isBiphase() {
-        return bitspecIrstream.isBiphase(generalSpec, definitions);
+        return bitspecIrstream.isBiphase(generalSpec, initialDefinitions);
     }
 
     public boolean isTrivial(boolean inverted) {
-        return bitspecIrstream.isTrivial(generalSpec, definitions, inverted);
+        return bitspecIrstream.isTrivial(generalSpec, initialDefinitions, inverted);
     }
 
     public boolean interleavingOk() {
@@ -362,13 +370,13 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public boolean interleavingFlashOk() {
         if (interleavingFlash == null)
-            interleavingFlash = bitspecIrstream.interleavingOk(DurationType.flash, generalSpec, definitions);
+            interleavingFlash = bitspecIrstream.interleavingOk(DurationType.flash, generalSpec, initialDefinitions.clone());
         return interleavingFlash;
     }
 
     public boolean interleavingGapOk() {
         if (interleavingGap == null)
-            interleavingGap = bitspecIrstream.interleavingOk(DurationType.gap, generalSpec, definitions);
+            interleavingGap = bitspecIrstream.interleavingOk(DurationType.gap, generalSpec, initialDefinitions.clone());
         return interleavingGap;
     }
 
@@ -377,7 +385,7 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @return
      */
     public boolean isSonyType() {
-        return bitspecIrstream.isSonyType(generalSpec, definitions);
+        return bitspecIrstream.isSonyType(generalSpec, initialDefinitions.clone());
     }
 
     public boolean isRPlus() {
@@ -490,6 +498,7 @@ public class Protocol extends IrpObject implements AggregateLister {
             throws SignalRecognitionException {
         //IrpUtils.entering(logger, Level.FINE, "recognize", this);
         checkFrequency(irSignal.getFrequencyWithDefault(), frequencyTolerance);
+        initializeDefinitions();
         ParameterCollector names = new ParameterCollector();
 
         IrSequence intro = irSignal.getIntroSequence();
@@ -558,7 +567,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return recognizeData.remaining();
     }
 
-    public void decode(RecognizeData recognizeData) throws SignalRecognitionException {
+    private void decode(RecognizeData recognizeData) throws SignalRecognitionException {
         bitspecIrstream.decode(recognizeData, new ArrayList<>(0));
         recognizeData.finish();
 //        if (!recognizeData.isFinished())
@@ -568,7 +577,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     @Override
     public int weight() {
         return generalSpec.weight() + bitspecIrstream.weight()
-                + definitions.weight() + parameterSpecs.weight();
+                + initialDefinitions.weight() + parameterSpecs.weight();
     }
 
     public GeneralSpec getGeneralSpec() {

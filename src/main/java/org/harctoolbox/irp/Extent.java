@@ -102,4 +102,9 @@ public final class Extent extends Duration {
     public boolean hasExtent() {
         return true;
     }
+
+    @Override
+    protected Extent evaluatedDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
+        return new Extent(evaluate(generalSpec, nameEngine), "u");
+    }
 }

@@ -263,6 +263,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                 recognizeData.setPosition(inData.getPosition());
                 recognizeData.setHasConsumed(inData.getHasConsumed());
                 payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
+                recognizeData.getNameEngine().add(inData.getNameEngine());
             }
 
             if (rest != 0) {

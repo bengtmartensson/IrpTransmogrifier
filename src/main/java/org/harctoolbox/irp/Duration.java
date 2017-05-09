@@ -176,6 +176,8 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return evaluate(generalSpec, nameEngine, 0);
     }
 
+    protected abstract Duration evaluatedDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException;
+
     @Override
     public final boolean isEmpty(NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
         return evaluate(null, nameEngine, 0f) == 0;
@@ -187,8 +189,12 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public void render(RenderData renderData, List<BitSpec> bitSpecs) {
-        renderData.add(this);
+    public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException {
+        try {
+            renderData.add(evaluatedDuration(renderData.getGeneralSpec(), renderData.getNameEngine()));
+        } catch (IrpInvalidArgumentException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     @Override
@@ -208,8 +214,8 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
-        renderData.add(this);
+    public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
+        render(renderData, bitSpecStack);
     }
 
     @Override

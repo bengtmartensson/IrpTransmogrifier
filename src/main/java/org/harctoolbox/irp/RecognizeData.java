@@ -69,6 +69,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
             throw new InternalError(ex);
         }
         result.setParameterCollector(getParameterCollector().clone());
+        result.nameEngine = this.nameEngine.clone();
         return result;
     }
 

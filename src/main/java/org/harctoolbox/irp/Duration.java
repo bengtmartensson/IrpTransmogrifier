@@ -176,6 +176,14 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return evaluate(generalSpec, nameEngine, 0);
     }
 
+    /**
+     * Deliver an "evaluated" Duration (variables resolved) of the same subclass.
+     * @param generalSpec
+     * @param nameEngine
+     * @return
+     * @throws NameUnassignedException
+     * @throws IrpInvalidArgumentException
+     */
     protected abstract Duration evaluatedDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException;
 
     @Override

@@ -150,7 +150,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
         try {
             NameEngine nameEngine = recognizeData.getNameEngine();
             String nameString = name.toString();
-            long val = value.toNumber(recognizeData.toNameEngine());
+            long val = value.toNumber(nameEngine);
             if (nameEngine.containsKey(nameString))
                 nameEngine.define(nameString, val);
             else

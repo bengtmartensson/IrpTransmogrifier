@@ -830,7 +830,7 @@ public final class IrpTransmogrifier {
             logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
         }
 
-        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, true, commandDecode.noPreferOver,
+        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.strict, commandDecode.loose, commandDecode.noPreferOver,
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
         if (name != null)
@@ -1191,6 +1191,9 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "In output, do not remove parameters that are equal to their defaults.")
         private boolean keepDefaultedParameters = false;
 
+        @Parameter(names = { "-l", "--loose"}, description = "Accept some looseness in decodeing, like ending junk.")
+        private boolean loose = false;
+
         @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
         private String namedInput = null;
 
@@ -1203,6 +1206,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-R", "--dump-repeatfinder" }, description = "Print the result of the repeatfinder.")
         private boolean dumpRepeatfinder = false;
 
+        @Parameter(names = { "-s", "--strict"}, description = "Require intro- and repeat sequences to match exactly.")
+        private boolean strict = false;
 
         @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = false)
         private List<String> args;

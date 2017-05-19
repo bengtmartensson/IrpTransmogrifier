@@ -43,7 +43,7 @@ public final class Decoder {
                 decoder.testDecode(123);
             } else {
                 IrSignal irSignal = Pronto.parse(args);
-                Map<String, Decode> decodes = decoder.decode(irSignal, true, true, true);
+                Map<String, Decode> decodes = decoder.decode(irSignal, true, false, true, true);
                 decodes.values().forEach((kvp) -> {
                     System.out.println(kvp);
                 });
@@ -98,7 +98,7 @@ public final class Decoder {
             for (NamedProtocol protocol : parsedProtocols.values()) {
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);
-                Map<String, Decode> decodes = decode(irSignal, true, true, true);
+                Map<String, Decode> decodes = decode(irSignal, true, false, true, true);
                 boolean success = false;
                 for (Decode decode : decodes.values()) {
                     System.out.println(decode);
@@ -126,7 +126,8 @@ public final class Decoder {
     /**
      * Deliver a Map of Decodes
      * @param irSignal IrSignal to be decoded.
-     * @param acceptNullRepeats
+     * @param strict
+     * @param loose
      * @param allDecodes If true, output all possible decodes. Otherwise, remove decodes according to prefer-over.
      * @param keepDefaultedParameters If false, remove parameters with value equals to their default.
      * @param frequencyTolerance
@@ -135,7 +136,7 @@ public final class Decoder {
      * @param minimumLeadout
      * @return Map of decodes with protocol name as key.
      */
-    public Map<String, Decode> decode(IrSignal irSignal, boolean acceptNullRepeats, boolean allDecodes, boolean keepDefaultedParameters,
+    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean loose, boolean allDecodes, boolean keepDefaultedParameters,
             Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
         Map<String, Decode> output = new LinkedHashMap<>(8);
         parsedProtocols.values().forEach((namedProtocol) -> {
@@ -143,7 +144,7 @@ public final class Decoder {
             try {
                 //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
 
-                parameters = namedProtocol.recognize(irSignal, acceptNullRepeats, keepDefaultedParameters,
+                parameters = namedProtocol.recognize(irSignal, strict, loose, keepDefaultedParameters,
                         frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
                 if (parameters == null)
                     throw new ThisCannotHappenException(namedProtocol.getName());
@@ -175,11 +176,11 @@ public final class Decoder {
     }
 
     public Map<String, Decode> decode(IrSignal irSignal) {
-        return decode(irSignal, true, false, false, null, null, null, null);
+        return decode(irSignal, true, false, false, false, null, null, null, null);
     }
 
-    public Map<String, Decode> decode(IrSignal irSignal, boolean acceptNullRepeats, boolean allDecodes, boolean keepDefaultedParameters) {
-        return decode(irSignal, acceptNullRepeats, allDecodes, keepDefaultedParameters, null, null, null, null);
+    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean loose, boolean allDecodes, boolean keepDefaultedParameters) {
+        return decode(irSignal, strict, loose, allDecodes, keepDefaultedParameters, null, null, null, null);
     }
 
     public static class Decode {

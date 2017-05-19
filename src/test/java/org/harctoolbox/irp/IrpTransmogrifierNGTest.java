@@ -140,14 +140,16 @@ public class IrpTransmogrifierNGTest {
         assertEquals(result, "yamaha-amp:	{38.0k,1,msb}<642u,-1600u|642u,-470u>(9067u,-4393u,pre_data:16,F:16,642u,-39597u,(9065u,-2139u,642u,-39597u)*){pre_data=0xa15e}[F:0x0..0xffff]");
     }
 
-    @Test
+    @Test(enabled = true)
     public void testDecodingFile() throws IOException {
         System.out.println("testDecodingFiles");
         File testDir = new File("src/test/decoderfiles");
         File outputDir = new File("target/testdecodeoutput");
-        boolean status = outputDir.mkdirs();
-        if (!status)
-            throw new IOException("directory could not be created.");
+        if (!outputDir.isDirectory()) {
+            boolean status = outputDir.mkdirs();
+            if (!status)
+                throw new IOException("directory could not be created.");
+        }
         File[] files = testDir.listFiles();
         Arrays.sort(files);
         for (File file : files) {

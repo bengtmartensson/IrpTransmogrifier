@@ -485,15 +485,15 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException {
-        return recognize(irSignal, true, true);
+        return recognize(irSignal, true, false, true);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean acceptNullRepeats, boolean keepDefaulted) throws SignalRecognitionException {
-        return recognize(irSignal, acceptNullRepeats, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE,
+    public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted) throws SignalRecognitionException {
+        return recognize(irSignal, strict, loose, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE,
                 IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean acceptNullRepeats, boolean keepDefaulted,
+    public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
             throws SignalRecognitionException {
         //IrpUtils.entering(logger, Level.FINE, "recognize", this);
@@ -505,37 +505,38 @@ public class Protocol extends IrpObject implements AggregateLister {
         IrSequence repeat = irSignal.getRepeatSequence();
         IrSequence ending = irSignal.getEndingSequence();
         boolean justIntro = repeat.isEmpty() && ending.isEmpty();
-        if (this.isEmpty(Pass.intro) && justIntro) {
+        if (!strict && this.isEmpty(Pass.intro) && justIntro) {
             repeat = intro;
             intro = new IrSequence();
         }
 
         int rest = decode(names, intro, IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
         if (rest != 0) {
-            if (repeat.isEmpty()) {
+            if (!strict && repeat.isEmpty()) {
                 try {
                     repeat = intro.subSequence(intro.getLength() - rest, rest);
                 } catch (InvalidArgumentException ex) {
                     throw new ThisCannotHappenException(ex);
                 }
             } else
-                throw new SignalRecognitionException("Intro sequence was not fully matched");
+                throw new SignalRecognitionException("Intro sequence was not fully matched"); // FIXME
         }
-        if (!(acceptNullRepeats && repeat.isEmpty() && ending.isEmpty() && rest == 0)) {
+
+        if (strict || ! repeat.isEmpty() || ! ending.isEmpty() || rest != 0) {
             rest = decode(names, repeat, IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
             if (rest > 0) {
-                if (justIntro) {
-                    try {
-                        ending = repeat.subSequence(repeat.getLength() - rest, rest);
-                    } catch (InvalidArgumentException ex) {
-                        throw new ThisCannotHappenException(ex);
-                    }
-                } else
-                    throw new SignalRecognitionException("Repeat sequence was not fully matched");
+                if (strict || !justIntro)
+                    throw new SignalRecognitionException("Repeat sequence was not fully matched"); // FIXME
+
+                try {
+                    ending = repeat.subSequence(repeat.getLength() - rest, rest);
+                } catch (InvalidArgumentException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
             }
             rest = decode(names, ending, IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
             if (rest > 0) {
-                throw new SignalRecognitionException("Ending sequence was not fully matched");
+                throw new SignalRecognitionException("Ending sequence was not fully matched");// FIXME
             }
         }
         Map<String, Long> result = names.collectedNames();

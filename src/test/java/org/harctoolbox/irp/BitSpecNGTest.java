@@ -67,17 +67,12 @@ public class BitSpecNGTest {
     @Test
     public void testIsStandardPWM() {
         System.out.println("isStandardPWM");
-        GeneralSpec generalSpec = new GeneralSpec();
         BitSpec nec1 = new BitSpec(NEC1_BITSPEC);
         BitSpec nokia32 = new BitSpec(NOKIA32_BITSPEC);
         BitSpec rc5 = new BitSpec(RC5_BITSPEC);
-        //BitSpec empty = new BitSpec();
-        assertTrue(nec1.isPWM(2, generalSpec, NameEngine.empty));
-        assertFalse(nokia32.isPWM(2, generalSpec, NameEngine.empty));
-        assertFalse(rc5.isPWM(generalSpec, NameEngine.empty));
-        //assertEquals(result, expResult);
-
-
+        assertTrue(nec1.isPWM(2));
+        assertFalse(nokia32.isPWM(2));
+        assertFalse(rc5.isPWM());
     }
 
     /**

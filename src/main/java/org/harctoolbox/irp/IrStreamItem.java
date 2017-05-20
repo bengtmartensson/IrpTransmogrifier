@@ -52,15 +52,13 @@ public interface IrStreamItem extends XmlExport {
 
     /**
      *
-     * @param nameEngine nameengine, or null
-     * @param generalSpec generalspec, or null
      * @param last
      * @param gapFlashBitSpecs
      * @return
      */
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs);
 
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType toCheck, DurationType last, boolean gapFlashBitSpecs);
 
     public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs);
 

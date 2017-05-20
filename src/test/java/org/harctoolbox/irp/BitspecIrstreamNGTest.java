@@ -57,7 +57,7 @@ public class BitspecIrstreamNGTest {
     @Test
     public void testInterleavingOk() {
         System.out.println("interleavingOk");
-        boolean result = instance.interleavingOk(new GeneralSpec(), null);
+        boolean result = instance.interleavingOk();
         assertTrue(result);
     }
 

@@ -44,12 +44,12 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return bareIrStream == null ? DurationType.none : bareIrStream.startingDuratingType(last, gapFlashBitSpecs);
     }
 
-    static boolean interleavingOk(BareIrStream bareIrStream, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitspecs) {
-        return bareIrStream == null || bareIrStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitspecs);
+    static boolean interleavingOk(BareIrStream bareIrStream, DurationType last, boolean gapFlashBitspecs) {
+        return bareIrStream == null || bareIrStream.interleavingOk(last, gapFlashBitspecs);
     }
 
-    static boolean interleavingOk(DurationType toCheck, BareIrStream bareIrStream, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitspecs) {
-        return bareIrStream == null || bareIrStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitspecs);
+    static boolean interleavingOk(DurationType toCheck, BareIrStream bareIrStream, DurationType last, boolean gapFlashBitspecs) {
+        return bareIrStream == null || bareIrStream.interleavingOk(last, gapFlashBitspecs);
     }
 
     private static List<IrStreamItem> parse(List<IrpParser.Irstream_itemContext> list) {
@@ -303,6 +303,15 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return sum;
     }
 
+    public List<Duration> getDurations() {
+        List<Duration> result = new ArrayList<>(irStreamItems.size());
+        irStreamItems.stream().filter((irStreamItem) -> (irStreamItem instanceof Duration)).forEachOrdered((irStreamItem) -> {
+            result.add((Duration) irStreamItem);
+        });
+
+        return result;
+    }
+
     /**
      * Fallback version of numberOfDurations().
      * @param bitspecLength
@@ -333,10 +342,10 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems) {
-            if (!item.interleavingOk(generalSpec, nameEngine, current, gapFlashBitSpecs))
+            if (!item.interleavingOk(current, gapFlashBitSpecs))
                 return false;
             current = item.endingDurationType(last, gapFlashBitSpecs);
         }
@@ -344,10 +353,10 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType toCheck, DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = last;
         for (IrStreamItem item : irStreamItems) {
-            if (!item.interleavingOk(toCheck, generalSpec, nameEngine, current, gapFlashBitSpecs))
+            if (!item.interleavingOk(toCheck, current, gapFlashBitSpecs))
                 return false;
             current = item.endingDurationType(last, gapFlashBitSpecs);
         }

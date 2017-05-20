@@ -125,15 +125,13 @@ public final class Name extends PrimaryItem implements Floatable {
 
     @Override
     public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-//        if (nameEngine == null)
-//            throw new UnassignedException(name);
         Expression expression = nameEngine.get(getName());
         return expression.toNumber(nameEngine);
     }
 
     @Override
     public long toNumber() throws NameUnassignedException {
-        return toNumber(NameEngine.empty);
+        throw new NameUnassignedException(name);
     }
 
     @Override

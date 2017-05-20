@@ -51,7 +51,7 @@ public class FlashNGTest {
     public void testInterleavingOk() {
         System.out.println("interleavingOk");
         Flash instance = new Flash("Z");
-        boolean result = instance.interleavingOk(null, null, DurationType.gap, false);
+        boolean result = instance.interleavingOk(DurationType.gap, false);
         Assert.assertTrue(result);
     }
 

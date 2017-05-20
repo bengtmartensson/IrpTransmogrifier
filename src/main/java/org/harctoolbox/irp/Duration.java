@@ -275,12 +275,12 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     protected abstract boolean isOn();
 
     @Override
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs) {
         return last == DurationType.none || last == DurationType.newDurationType(!isOn());
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType toCheck, DurationType last, boolean gapFlashBitSpecs) {
         DurationType current = DurationType.newDurationType(isOn());
         return !(current == toCheck && last == current);
     }

@@ -345,15 +345,15 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public boolean isPWM2() {
-        return bitspecIrstream.isPWM2(generalSpec, initialDefinitions);
+        return bitspecIrstream.isPWM2();
     }
 
     public boolean isPWM4() {
-        return bitspecIrstream.isPWM4(generalSpec, initialDefinitions);
+        return bitspecIrstream.isPWM4();
     }
 
     boolean isPWM16() {
-        return bitspecIrstream.isPWM16(generalSpec, initialDefinitions);
+        return bitspecIrstream.isPWM16();
     }
 
     public boolean isBiphase() {
@@ -370,13 +370,13 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public boolean interleavingFlashOk() {
         if (interleavingFlash == null)
-            interleavingFlash = bitspecIrstream.interleavingOk(DurationType.flash, generalSpec, initialDefinitions.clone());
+            interleavingFlash = bitspecIrstream.interleavingFlashOk();
         return interleavingFlash;
     }
 
     public boolean interleavingGapOk() {
         if (interleavingGap == null)
-            interleavingGap = bitspecIrstream.interleavingOk(DurationType.gap, generalSpec, initialDefinitions.clone());
+            interleavingGap = bitspecIrstream.interleavingGapOk();
         return interleavingGap;
     }
 

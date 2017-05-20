@@ -51,9 +51,9 @@ public class GapNGTest {
     public void testInterleavingOk() {
         System.out.println("interleavingOk");
         Gap instance = new Gap("-Z");
-        boolean result = instance.interleavingOk(null, null, DurationType.flash, false);
+        boolean result = instance.interleavingOk(DurationType.flash, false);
         Assert.assertTrue(result);
-        result = instance.interleavingOk(null, null, DurationType.gap, false);
+        result = instance.interleavingOk(DurationType.gap, false);
         Assert.assertFalse(result);
     }
 }

@@ -174,40 +174,25 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         return numberDurations;
     }
 
-   /**
-     * @param nameEngine
-     * @param generalSpec
-     * @return
-     */
-    public boolean isPWM(GeneralSpec generalSpec, NameEngine nameEngine) {
-        return isPWM(2, generalSpec, nameEngine);
+    public boolean isPWM() {
+        return isPWM(2);
     }
 
-    /**
-     * @param length
-     * @param nameEngine
-     * @param generalSpec
-     * @return
-     */
-    public boolean isPWM(int length, GeneralSpec generalSpec, NameEngine nameEngine) {
-        return bitCodes.size() == length && isTwoLengthFlashGap(generalSpec, nameEngine);
+    public boolean isPWM(int length) {
+        return bitCodes.size() == length && isTwoLengthFlashGap();
     }
 
-    private boolean isTwoLengthFlashGap(GeneralSpec generalSpec, NameEngine nameEngine) {
-        for (BareIrStream bitCode : bitCodes) {
-            try {
-                EvaluatedIrStream irSequence = bitCode.evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
-                if (!(irSequence.getLength() == 2 && irSequence.isFlash(0) && irSequence.isGap(1)))
-                    return false;
-            } catch (NameUnassignedException | ArithmeticException ex) {
-                return false;
-            }
-        }
-        return true;
+    private boolean isTwoLengthFlashGap() {
+        return bitCodes.stream().allMatch((bitCode) -> isTwoLengthFlashGap(bitCode));
+    }
+
+    private boolean isTwoLengthFlashGap(BareIrStream bitCode) {
+        List<Duration> durations = bitCode.getDurations();
+        return durations.size() == 2 && (durations.get(0) instanceof Flash) && (durations.get(1) instanceof Gap);
     }
 
     boolean isSonyType(GeneralSpec generalSpec, NameEngine nameEngine) {
-        return isPWM(generalSpec, nameEngine)
+        return isPWM()
                 && ! IrCoreUtils.approximatelyEquals(bitCodes.get(0).getIrStreamItems().get(0).microSeconds(generalSpec, nameEngine),
                         bitCodes.get(1).getIrStreamItems().get(0).microSeconds(generalSpec, nameEngine));
     }
@@ -269,7 +254,7 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunkSize", Integer.toString(chunkSize));
         element.setAttribute("bitMask", Integer.toString(IrCoreUtils.ones(chunkSize)));
-        element.setAttribute("pwm2", Boolean.toString(isPWM(2, new GeneralSpec(), new NameEngine())));
+        element.setAttribute("pwm2", Boolean.toString(isPWM(2)));
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new GeneralSpec(), new NameEngine())));
         Integer nod = numberOfDurations();
         if (nod != null)
@@ -280,12 +265,11 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         return element;
     }
 
-    boolean interleaveOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-        if (!gapFlashBitSpecs && (isPWM(2, generalSpec, nameEngine)
-                || isPWM(4, generalSpec, nameEngine)))
+    boolean interleaveOk(DurationType last, boolean gapFlashBitSpecs) {
+        if (!gapFlashBitSpecs && (isPWM(2) || isPWM(4)))
             return true;
 
-        return bitCodes.stream().noneMatch((bareIrStream) -> (bareIrStream.getIrStreamItems().size() < 2 || !bareIrStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitSpecs)));
+        return bitCodes.stream().noneMatch((bareIrStream) -> (bareIrStream.getIrStreamItems().size() < 2 || !bareIrStream.interleavingOk(last, gapFlashBitSpecs)));
     }
 
     @Override
@@ -324,7 +308,7 @@ public final class BitSpec extends IrpObject implements AggregateLister {
             map.put("chunkSize", chunkSize);
         map.put("bitMask", IrCoreUtils.ones(chunkSize));
         map.put("size", bitCodes.size());
-        if (isPWM(2, new GeneralSpec(), new NameEngine())) {
+        if (isPWM(2)) {
             map.put("pwm2", true);
             map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(generalSpec, nameEngine));
             map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(generalSpec, nameEngine));
@@ -334,7 +318,7 @@ public final class BitSpec extends IrpObject implements AggregateLister {
                     bitCodes.get(0).getIrStreamItems().get(0).microSeconds(generalSpec, nameEngine),
                     bitCodes.get(0).getIrStreamItems().get(0).microSeconds(generalSpec, nameEngine)));
         }
-        if (isPWM(4, new GeneralSpec(), new NameEngine())) {
+        if (isPWM(4)) {
             map.put("pwm4", true);
             map.put("zeroGap",   bitCodes.get(0).getIrStreamItems().get(1).microSeconds(generalSpec, nameEngine));
             map.put("zeroFlash", bitCodes.get(0).getIrStreamItems().get(0).microSeconds(generalSpec, nameEngine));

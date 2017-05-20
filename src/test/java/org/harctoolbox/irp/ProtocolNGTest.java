@@ -12,7 +12,6 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
@@ -488,7 +487,7 @@ public class ProtocolNGTest {
                 fail();
             }
             try {
-                recognizeData = rc5.recognize(irSignal, true, false, false);
+                rc5.recognize(irSignal, true, false, false);
                 fail();
             } catch (SignalRecognitionException ex) {
             }

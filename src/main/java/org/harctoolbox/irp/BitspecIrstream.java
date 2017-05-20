@@ -172,45 +172,53 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecsUnused) {
-        boolean flashGapBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.gap, true);
-        boolean gapFlashBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.flash, false);
+    public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecsUnused) {
+        boolean flashGapBitspecs = bitSpec.interleaveOk(DurationType.gap, true);
+        boolean gapFlashBitspecs = bitSpec.interleaveOk(DurationType.flash, false);
 
         return (flashGapBitspecs || gapFlashBitspecs)
-                && irStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitspecs);
+                && irStream.interleavingOk(last, gapFlashBitspecs);
     }
 
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last) {
-        boolean flashGapBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.gap, false);
-        boolean gapFlashBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.flash, true);
+    public boolean interleavingOk(DurationType last) {
+        boolean flashGapBitspecs = bitSpec.interleaveOk(DurationType.gap, false);
+        boolean gapFlashBitspecs = bitSpec.interleaveOk(DurationType.flash, true);
 
         return (flashGapBitspecs || gapFlashBitspecs)
-                && irStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitspecs);
+                && irStream.interleavingOk(last, gapFlashBitspecs);
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-        boolean flashGapBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.gap, false);
-        boolean gapFlashBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.flash, true);
+    public boolean interleavingOk(DurationType toCheck, DurationType last, boolean gapFlashBitSpecs) {
+        boolean flashGapBitspecs = bitSpec.interleaveOk(DurationType.gap, false);
+        boolean gapFlashBitspecs = bitSpec.interleaveOk(DurationType.flash, true);
 
         return (flashGapBitspecs || gapFlashBitspecs)
-                && irStream.interleavingOk(toCheck, generalSpec, nameEngine, last, gapFlashBitspecs);
+                && irStream.interleavingOk(toCheck, last, gapFlashBitspecs);
     }
 
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last) {
-        boolean flashGapBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.gap, false);
-        boolean gapFlashBitspecs = bitSpec.interleaveOk(generalSpec, nameEngine, DurationType.flash, true);
+    public boolean interleavingOk(DurationType toCheck, DurationType last) {
+        boolean flashGapBitspecs = bitSpec.interleaveOk(DurationType.gap, false);
+        boolean gapFlashBitspecs = bitSpec.interleaveOk(DurationType.flash, true);
 
         return (flashGapBitspecs || gapFlashBitspecs)
-                && irStream.interleavingOk(toCheck, generalSpec, nameEngine, last, gapFlashBitspecs);
+                && irStream.interleavingOk(toCheck, last, gapFlashBitspecs);
     }
 
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine) {
-        return interleavingOk(generalSpec, nameEngine, DurationType.gap);
+    public boolean interleavingOk() {
+        return interleavingOk(DurationType.gap);
     }
 
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine) {
-        return interleavingOk(toCheck, generalSpec, nameEngine, DurationType.gap);
+//    public boolean interleavingOk(DurationType toCheck) {
+//        return interleavingOk(toCheck, DurationType.gap);
+//    }
+
+    public boolean interleavingFlashOk() {
+        return interleavingOk(DurationType.flash, DurationType.gap);
+    }
+
+    public boolean interleavingGapOk() {
+        return interleavingOk(DurationType.gap, DurationType.gap);
     }
 
     @Override
@@ -223,16 +231,16 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         return irStream.startingDuratingType(last, gapFlashBitSpecs);
     }
 
-    boolean isPWM2(GeneralSpec generalSpec, NameEngine nameEngine) {
-        return bitSpec.isPWM(2, generalSpec, nameEngine);
+    boolean isPWM2() {
+        return bitSpec.isPWM(2);
     }
 
-    boolean isPWM4(GeneralSpec generalSpec, NameEngine nameEngine) {
-        return bitSpec.isPWM(4, generalSpec, nameEngine);
+    boolean isPWM4() {
+        return bitSpec.isPWM(4);
     }
 
-    boolean isPWM16(GeneralSpec generalSpec, NameEngine nameEngine) {
-        return bitSpec.isPWM(16, generalSpec, nameEngine);
+    boolean isPWM16() {
+        return bitSpec.isPWM(16);
     }
 
     boolean isBiphase(GeneralSpec generalSpec, NameEngine nameEngine) {
@@ -248,8 +256,7 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     boolean isSonyType(GeneralSpec generalSpec, NameEngine nameEngine) {
-        return interleavingOk(DurationType.flash, generalSpec, nameEngine)
-                && bitSpec.isSonyType(generalSpec, nameEngine);
+        return interleavingFlashOk() && bitSpec.isSonyType(generalSpec, nameEngine);
     }
 
     public DurationType startingDurationType(boolean gapFlashBitSpecs) {

@@ -161,12 +161,12 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs) {
         return true;
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
+    public boolean interleavingOk(DurationType toCheck, DurationType last, boolean gapFlashBitSpecs) {
         return true;
     }
 

@@ -256,13 +256,13 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     @Override
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-        return bareIrStream.interleavingOk(generalSpec, nameEngine, last, gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.interleavingOk(last, gapFlashBitSpecs);
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-        return bareIrStream.interleavingOk(toCheck, generalSpec, nameEngine, last, gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType toCheck, DurationType last, boolean gapFlashBitSpecs) {
+        return bareIrStream.interleavingOk(toCheck, last, gapFlashBitSpecs);
     }
 
     @Override

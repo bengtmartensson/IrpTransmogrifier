@@ -143,17 +143,17 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-        return BareIrStream.interleavingOk(intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(intro, generalSpec, nameEngine, last, gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs) {
+        return BareIrStream.interleavingOk(intro, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(intro, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(intro, last, gapFlashBitSpecs);
     }
 
     @Override
-    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-         return BareIrStream.interleavingOk(toCheck, intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(toCheck, intro, generalSpec, nameEngine, last, gapFlashBitSpecs)
-                && BareIrStream.interleavingOk(toCheck, intro, generalSpec, nameEngine, last, gapFlashBitSpecs);
+    public boolean interleavingOk(DurationType toCheck, DurationType last, boolean gapFlashBitSpecs) {
+         return BareIrStream.interleavingOk(toCheck, intro, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(toCheck, intro, last, gapFlashBitSpecs)
+                && BareIrStream.interleavingOk(toCheck, intro, last, gapFlashBitSpecs);
     }
 
     @Override

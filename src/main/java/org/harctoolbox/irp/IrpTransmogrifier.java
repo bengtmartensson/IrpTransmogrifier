@@ -836,7 +836,7 @@ public final class IrpTransmogrifier {
         if (name != null)
             out.print(name + ":");
         decodes.values().forEach((kvp) -> {
-            out.println("\t" + kvp.toString());
+            out.println("\t" + kvp.toString(commandDecode.radix));
         });
         if (decodes.isEmpty())
             out.println();
@@ -1205,6 +1205,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-R", "--dump-repeatfinder" }, description = "Print the result of the repeatfinder.")
         private boolean dumpRepeatfinder = false;
+
+        @Parameter(names = {"--radix" }, description = "Radix used for printing of output parameters.")
+        private int radix = 10;
 
         @Parameter(names = { "-s", "--strict"}, description = "Require intro- and repeat sequences to match exactly.")
         private boolean strict = false;

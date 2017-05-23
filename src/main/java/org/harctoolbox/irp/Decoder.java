@@ -209,7 +209,11 @@ public final class Decoder {
 
         @Override
         public String toString() {
-            return namedProtocol.getName() + ": " + nameEngine.toString()
+            return toString(10);
+        }
+
+        public String toString(int radix) {
+            return namedProtocol.getName() + ": " + nameEngine.toIrpString(radix)
                     + (notes.isEmpty() ? "" : " (" + notes + ")");
         }
 

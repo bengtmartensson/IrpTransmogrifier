@@ -22,7 +22,7 @@ IsAbstract() ::= "false"
 FileSuffix() ::= "Renderer.java"
 
 FilePreamble() ::= <<
-package org.harctoolbox.render;
+package org.harctoolbox.renderers;
 
 import java.util.Map;
 import org.harctoolbox.ircore.IrSignal;

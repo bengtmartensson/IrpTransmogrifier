@@ -21,13 +21,19 @@
     <irp:protocol c-name="Aiwa" name="Aiwa">
         <irp:parameter name="uei-executor">005E</irp:parameter>
         <irp:parameter name="uei-executor">009E</irp:parameter>
-        <irp:irp><![CDATA[{38k,550}<1,-1|1,-3>(16,-8,D:8,S:5,~D:8,~S:5,F:8,~F:8,1,-42,(16,-8,1,-165)*) [D:0..255,S:0..31,F:0..255]]]></irp:irp>
+        <irp:irp><![CDATA[{38.123k,550}<1,-1|1,-3>(16,-8,D:8,S:5,~D:8,~S:5,F:8,~F:8,1,-42,(16,-8,1,-165)*)[D:0..255,S:0..31,F:0..255]]]></irp:irp>
         <!--irp:documentation/--> <!-- Leave it out, to get this case tested -->
     </irp:protocol>
     <irp:protocol c-name="Akai" name="Akai">
         <irp:parameter name="uei-executor">000D</irp:parameter>
         <irp:irp><![CDATA[{38k,289}<1,-2.6|1,-6.3>(D:3,F:7,1,^25.3m)*[D:0..7,F:0..127]]]></irp:irp>
         <irp:documentation/>
+    </irp:protocol>
+    <irp:protocol c-name="Aiwa2" name="Aiwa2">
+        <irp:irp><![CDATA[
+{38k,550}<1,-1|1,-3>(16,-8,D:8,S:5,~D:8,~S:5,F:8,~F:8,1,-42)* [D:0..255,S:0..31,F:0..255]
+]]></irp:irp>
+        <irp:documentation>From 3FG's teaser.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Amino56" name="Amino-56">
         <irp:parameter name="uei-executor">000D</irp:parameter>
@@ -41,12 +47,21 @@
     </irp:protocol>
     <irp:protocol c-name="Anthem" name="Anthem">
         <irp:parameter name="uei-executor">0123</irp:parameter>
+        <irp:parameter name="prefer-over">Anthem_relaxed</irp:parameter>
         <irp:irp><![CDATA[{38.0k,605}<1,-1|1,-3>((8000u,-4000u,D:8,S:8,F:8,C:8,1,-25m)2, 8000u,-4000u,D:8,S:8,F:8,C:8,1,-100)* { C=~(D+S+F+255):8} [D:0..255,S:0..255,F:0..255]]]></irp:irp>
         <irp:documentation>Anthem framing is very similar to <a href="#NEC1">NEC</a>, and also uses 32 bits of data. However, the leadout is much shorter. The signal is sent at least 3 times. Anthem usually splits F into a 2 bit unit number, and a 6 bit function number.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="Anthem_relaxed" name="Anthem_relaxed">
+        <irp:parameter name="uei-executor">0123</irp:parameter>
+        <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:irp><![CDATA[{38.0k,605}<1,-1|1,-3>(8000u,-4000u,D:8,S:8,F:8,C:8,1,-25m)* { C=~(D+S+F+255):8} [D:0..255,S:0..255,F:0..255]]]></irp:irp>
+        <irp:documentation>Relaxed version of the Anthem protocol.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Apple" name="Apple">
         <irp:parameter name="uei-executor">01E0</irp:parameter>
         <irp:parameter name="prefer-over">NEC1-f16</irp:parameter>
+        <irp:parameter name="prefer-over">NEC1</irp:parameter>
+        <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,C:1,F:7,PairID:8,1,^108m,(16,-4,1,^108m)*){C=1-(#F+#PairID)%2,S=135}[D:0..255=238,F:0..127,PairID:0..255]]]></irp:irp>
         <irp:documentation>C=1 if the number of 1 bits in the fields F and I is even.  I is the remote ID. Apple uses the same framing as <a href="#NEC1">NEC1</a>, with D=238 in normal use, 224 while pairing.  S=135</irp:documentation>
     </irp:protocol>
@@ -59,7 +74,28 @@
         <irp:irp><![CDATA[{40k,500}<1,-1|1,-3>(16,-8,D:8,1,-8,F:8,1,-40)*[D:0..255,F:0..255]]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>
+    <irp:protocol name="B&amp;O" c-name="BO">
+        <irp:irp><![CDATA[
+{455k,3125,msb}<200u,-zeroGap,zeroGap=2,oneGap=3 | 200u,-oneGap,zeroGap=1,oneGap=2>
+(200u,-1,200u,-1,200u,-5,D:9,F:8,200u,-4,200u,-100m)
+{zeroGap=1, oneGap=3}
+[D:0..511,F:0..255]
+]]></irp:irp>
+        <irp:documentation>
+            <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=12486">Forum thread.</a>
+        </irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="B&amp;O repeat" c-name="BO">
+        <irp:irp><![CDATA[
+{455k,3125,msb}<200u,-zeroGap,zeroGap=2,oneGap=3 | 200u,-oneGap,zeroGap=1,oneGap=2>
+(200u,-1,200u,-1,200u,-5,D:9,F:8,200u,-4)
+{zeroGap=1, oneGap=3}
+[D:0..511,F:0..255]
+]]></irp:irp>
+    <irp:documentation>From 3FG's teaser.</irp:documentation>
+    </irp:protocol>
     <irp:protocol c-name="Barco" name="Barco">
+        <irp:parameter name="absolute-tolerance">60</irp:parameter>
         <irp:parameter name="uei-executor">002A</irp:parameter>
         <irp:irp><![CDATA[{0k,10}<1,-5|1,-15>(1,-25, D:5,F:6, 1,-25,1,-120m)*[D:0..31,F:0..63]]]></irp:irp>
         <irp:documentation>This protocol uses no modulation of the signal.
@@ -67,7 +103,17 @@
 This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Blaupunkt" name="Blaupunkt">
-        <irp:irp><![CDATA[{30.3k,528}<-1,1|1,-1>(1,-5,1023:10,-39,1,-5,1:1,F:6,D:3,-230)[F:0..63,D:0..7]]]></irp:irp>
+        <irp:parameter name="uei-executor">00A5</irp:parameter>
+        <irp:irp><![CDATA[
+{30.3k,512}<-1,1|1,-1>(1,-5,1023:10, -44, (1,-5,1:1,F:6,D:3,-236)+ ,1,-5,1023:10,-44)[F:0..63,D:0..7]
+]]></irp:irp>
+        <irp:documentation/>
+    </irp:protocol>
+    <irp:protocol name="Blaupunkt_relaxed">
+        <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:irp><![CDATA[
+{30.3k,512}<-1,1|1,-1>(1,-5,1023:10, -44, (1,-5,1:1,F:6,D:3,-236)* ,1,-5,1023:10,-44)[F:0..63,D:0..7]
+]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>
     <irp:protocol c-name="Bose" name="Bose">
@@ -89,9 +135,20 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:documentation>The official name for CanalSatLD is "ruwido r-step"</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Denon" name="Denon">
-        <irp:parameter name="alt_name">Denon{2}</irp:parameter>
+        <irp:parameter name="prefer-over">Denon{1}</irp:parameter>
+        <irp:parameter name="prefer-over">Denon{2}</irp:parameter>
         <irp:parameter name="uei-executor">001C</irp:parameter>
         <irp:irp><![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,0:2,1,-165,D:5,~F:8,3:2,1,-165)* [D:0..31,F:0..255]]]></irp:irp>
+        <irp:documentation>A Denon signal has two halves, either one of which is enough to fully decode the information. A significant fraction of Denon learned signals contain just one half or have the halves separated so that DecodeIr can't process them together. When one half is seen separate from the other, DecodeIr will name the protocol Denon{1} or Denon{2} depending on which half is decoded. Denon, Denon{1} and Denon{2} all represent the same protocol when they are correct. But only Denon is robust. A Denon{1} or Denon{2} decode might be <A href="#spurious">spurious</A>.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="Denon_1_" name="Denon{1}">
+    <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:irp><![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,0:2,1,-165)* [D:0..31,F:0..255]]]></irp:irp>
+        <irp:documentation>A Denon signal has two halves, either one of which is enough to fully decode the information. A significant fraction of Denon learned signals contain just one half or have the halves separated so that DecodeIr can't process them together. When one half is seen separate from the other, DecodeIr will name the protocol Denon{1} or Denon{2} depending on which half is decoded. Denon, Denon{1} and Denon{2} all represent the same protocol when they are correct. But only Denon is robust. A Denon{1} or Denon{2} decode might be <A href="#spurious">spurious</A>.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="Denon_2_" name="Denon{2}">
+        <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:irp><![CDATA[{38k,264}<1,-3|1,-7>(D:5,~F:8,3:2,1,-165)* [D:0..31,F:0..255]]]></irp:irp>
         <irp:documentation>A Denon signal has two halves, either one of which is enough to fully decode the information. A significant fraction of Denon learned signals contain just one half or have the halves separated so that DecodeIr can't process them together. When one half is seen separate from the other, DecodeIr will name the protocol Denon{1} or Denon{2} depending on which half is decoded. Denon, Denon{1} and Denon{2} all represent the same protocol when they are correct. But only Denon is robust. A Denon{1} or Denon{2} decode might be <A href="#spurious">spurious</A>.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="DenonK" name="Denon-K" usable="true">
@@ -108,10 +165,34 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     </irp:protocol>
     <irp:protocol c-name="DirecTV" name="DirecTV">
         <irp:irp><![CDATA[{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]></irp:irp>
+        <irp:documentation>There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
+            The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
+            The various Parm values correspond to three different frequencies (the 38k in the above) and two different lead-out times (the -50 in the above).
+            The corresponding values are:
+
+            <ul>
+                <li>Parm=0 : 40k, -15</li>
+                <li>Parm=1 : 40k, -50</li>
+                <li>Parm=2 : 38k, -15</li>
+                <li>Parm=3 : 38k, -50</li>
+                <li>Parm=4 : 57k, -15</li>
+                <li>Parm=5 : 57k, -50</li>
+            </ul>
+        </irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="DirecTV_3FG" name="DirecTV_3_FG">
+        <irp:irp><![CDATA[{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>(10,-2,(D:4,F:8,C:4,1,-30m,5,-2)*){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]></irp:irp>
         <irp:documentation>There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.  The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.  The various Parm values correspond to three different frequencies (the 38k in the above) and two different lead-out times (the -50 in the above).  The corresponding values are:
 
 <ul> <li>Parm=0 : 40k, -15</li> <li>Parm=1 : 40k, -50</li> <li>Parm=2 : 38k, -15</li> <li>Parm=3 : 38k, -50</li> <li>Parm=4 : 57k, -15</li> <li>Parm=5 : 57k, -50</li> </ul>
         </irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Digivision">
+        <irp:irp><![CDATA[
+{38.0k,182}<3,-3|3,-6>(20,-10,D:8,Dev2:8,Dev3:8,20,-10,F:8,~F:8,3,^108m,(20,-20,3,^108m)*)
+[D:0..255,Dev2:0..255,Dev3:0..255,F:0..255]
+            ]]></irp:irp>
+            <irp:documentation>See <a href="#GuangZhou">GuangZhou</a>, which has identical framing but with different bit definitions.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Dishplayer" name="Dishplayer">
         <irp:parameter name="uei-executor">010F</irp:parameter>
@@ -125,6 +206,12 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         See <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=13923">this thread</a> for a discussion.
         </irp:documentation>
     </irp:protocol>
+    <irp:protocol name="Dysan">
+        <irp:irp><![CDATA[
+    {780,38k}<1,-1|1,-2>(3,-1,D:7,F:8,1,-104m)*
+            [D:0..127,F:0..255]
+            ]]></irp:irp>
+    </irp:protocol>
     <irp:protocol c-name="Elan" name="Elan">
         <!--irp:parameter name="uei-executor">Unknown</irp:parameter-->
         <irp:irp><![CDATA[{40.2k,398,msb}<1,-1|1,-2>(3,-2,D:8,~D:8,2,-2,F:8,~F:8,1,^50m)* [D:0..255,F:0..255]]]></irp:irp>
@@ -132,8 +219,19 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     </irp:protocol>
     <irp:protocol c-name="Emerson" name="Emerson">
         <irp:parameter name="uei-executor">0065</irp:parameter>
+        <irp:parameter name="prefer-over">Sampo</irp:parameter>
+        <irp:parameter name="prefer-over">ScAtl-6</irp:parameter>
         <irp:irp><![CDATA[{36.7k,872}<1,-1|1,-3>(4,-4,D:6,F:6,~D:6,~F:6,1,-39)* [D:0..63,F:0..63]]]></irp:irp>
         <irp:documentation/>
+    </irp:protocol>
+    <irp:protocol name="Epson">
+        <irp:irp><![CDATA[
+            {38.4k,577}<2,-1|1,-2|1,-1|2,-2>((4,-1,D:8,T1:2,OBC:6,T2:2,S:8,1,-75m)*,(4,-1,D:8,~F1:2,OBC:6,~F2:2,S:8,1,-250m))
+               [D:0..255,S:0..255,OBC:0..63,T1:0..3,T2:0..3,F1:0..3,F2:0..3]
+            ]]></irp:irp>
+        <irp:documentation>
+            <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=17051">Forum thread</a>
+        </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="F12" name="F12">
         <irp:parameter name="uei-executor">001A</irp:parameter>
@@ -182,6 +280,15 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:documentation>These are two variants of the same protocol, differing only in frequency.  The IRP notation is corrected from previous versions of this document, to bring it into line with what DecodeIR actually does.
 
 Note (BM): These two entries was one in the original document; I split it into two separate.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="GuangZhou">
+        <irp:irp><![CDATA[
+ {38.0k,182}<3,-3|3,-6>(20,-10,T:2,D:6,F:8,S:8,20,-10,~T:2,D:6,~F:8,3,^108m,(20,-20,3,^108m)*){T=3}
+            [D:0..63,F:0..255,S:0..255]
+            ]]></irp:irp>
+            <irp:documentation>
+                <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=14600">Forum thread.</a>
+            </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="GXB" name="GXB">
         <irp:irp><![CDATA[{38.3k,520,msb}<1,-3|3,-1>(1,-1,D:4,F:8,P:1,1,^100m)*{P=1-#F%2}[D:0..15,F:0..255]]]></irp:irp>
@@ -283,22 +390,35 @@ Note (BM): These two entries was one in the original document; I split it into t
     </irp:protocol>
     <irp:protocol c-name="NEC1" name="NEC1">
         <irp:parameter name="prefer-over">NEC1-f16</irp:parameter>
+
+        <irp:parameter name="prefer-over">Pioneer</irp:parameter>
         <!--irp:parameter name="frequencyTolerance">100</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
         <irp:parameter name="absolute-tolerance">20</irp:parameter-->
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
         <irp:documentation>A few devices use NEC1 protocol at 40Khz, rather than the typical frequency.  When getting a decode of NEC1, if you notice that the frequency is closer to 40Khz than to 38Khz, examine multiple learns from the same device to estimate whether the 40Khz frequency is a learning error or a true characteristic of the device. If the 40Khz is correct, there are methods in JP1, or MakeHex (whichever you are using) to reproduce NEC1 at 40Khz rather than the usual frequency.</irp:documentation>
     </irp:protocol>
+    <irp:protocol c-name="NEC" name="NEC">
+        <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
+        <irp:parameter name="prefer-over">NEC1</irp:parameter>
+        <irp:parameter name="prefer-over">NEC2</irp:parameter>
+        <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m) [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
+        <irp:documentation>Analogous to DecodeIR, we call a NEC signal without repeat "NEC".</irp:documentation>
+    </irp:protocol>
     <irp:protocol c-name="NEC1rnc" name="NEC1-rnc">
         <irp:parameter name="prefer-over">NEC1-f16</irp:parameter>
+        <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:4:4,~F:4,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>
     <irp:protocol c-name="NEC1f16" name="NEC1-f16">
+        <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:16,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..65535]]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>
     <irp:protocol c-name="NEC2" name="NEC2">
+        <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
         <irp:documentation>
             <a href="#Pioneer">Pioneer</a> is distinguished from NEC2 only by frequency.  So if your learning system does not learn frequency accurately, it won't accurately distinguish Pioneer from NEC2.  All Pioneer signals should have a device number in the range 160 to 175 and no subdevice.  No NEC2 signal should fit those rules.  So you usually can determine whether the decision (by frequency) was wrong by checking the device numbers.</irp:documentation>
@@ -324,6 +444,15 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
         <irp:irp><![CDATA[{36k,1p,msb}<6,-10|6,-16|6,-22|6,-28>((15,-10,D:8,S:8,T:1,X:7,F:8,6,^100m)*,T=1-T) [D:0..255,S:0..255,F:0..255,T@:0..1=0,X:0..127]]]></irp:irp>
         <irp:documentation>The Nokia32 protocol is one variation of the RCMM 1.5 protocol developed by Philips.  RCMM refers to X as "System" and to D:2,S:4:4 as "Customer". The parameters have been taken from <a href="http://www.sbprojects.com/knowledge/ir/rcmm.php">here</a>.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Nova Pace" c-name="NovaPace">
+        <irp:irp><![CDATA[
+    {38k, 300, msb}<-1,1|1,-1>((1,-1,D:10, S:8, F:8, T:1, -1, 1,-82m)*,T=1-T)
+            [D:0..1023,S:0..255,F:0..255,T@:0..1=0]
+            ]]></irp:irp>
+            <irp:documentation>
+                <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=16645">Forum thread.</a>
+            </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="NRC16" name="NRC16">
         <irp:parameter name="uei-executor">00B0</irp:parameter>
@@ -355,11 +484,13 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:parameter name="uei-executor">001F</irp:parameter>
         <irp:parameter name="uei-executor">00C9</irp:parameter>
         <irp:parameter name="uei-executor">00CD</irp:parameter>
+        <irp:parameter name="prefer-over">Kaseikyo</irp:parameter>
         <irp:irp><![CDATA[{37k,432}<1,-1|1,-3>(8,-4,2:8,32:8,D:8,S:8,F:8,(D^S^F):8,1,-173)* [D:0..255,S:0..255,F:0..255]]]></irp:irp>
         <irp:documentation>Panasonic protocol is the most commonly seen member of the <a href="#Kaseikyo">Kaseikyo</a> family.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Panasonic2" name="Panasonic2">
         <irp:parameter name="uei-executor">0109</irp:parameter>
+        <irp:parameter name="prefer-over">Kaseikyo56</irp:parameter>
         <irp:irp><![CDATA[{37k,432}<1,-1|1,-3>(8,-4,2:8,32:8,D:8,S:8,X:8,F:8,(D^S^X^F):8,1,-173)* [D:0..255,S:0..255,F:0..255,X:0..255]]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>
@@ -434,8 +565,13 @@ Many Pioneer commands are sent as combinations of two different Pioneer signals.
     </irp:protocol>
     <irp:protocol c-name="RC6" name="RC6">
         <irp:parameter name="uei-executor">0058</irp:parameter>
+        <irp:parameter name="prefer-over">RC6-M-16</irp:parameter>
         <irp:irp><![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,0:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,T@:0..1=0]]]></irp:irp>
         <irp:documentation>RC6 is the name used for the first member of the RC6 family of protocols.  Technically this is RC6-0-16, but DecodeIr will always display that as simply "RC6"</irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="RC6M16" name="RC6-M-16">
+        <irp:irp><![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,M:3,<-2,2|2,-2>(T:1),D:8,F:8,^107m)*,T=1-T) [D:0..255,F:0..255,M:0..7,T@:0..1=0]]]></irp:irp>
+        <irp:documentation></irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="RC6620" name="RC6-6-20">
         <irp:parameter name="uei-executor">0020</irp:parameter>
@@ -502,6 +638,7 @@ Note (BM): One entry split into two.</irp:documentation>
         <irp:documentation/>
     </irp:protocol>
     <irp:protocol c-name="Replay" name="Replay">
+        <irp:parameter name="alt_name">RC6-6-24</irp:parameter>
         <irp:parameter name="uei-executor">0092</irp:parameter>
         <irp:irp><![CDATA[{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,6:3,<-2,2|2,-2>(T:1),D:8,S:8,F:8,-100m/*???*/)*[D:0..255,S:0..255,F:0..255,T@:0..1=0]]]></irp:irp>
         <irp:documentation>Replay is a member of the RC6 family.  Technically it is RC6-6-24, but DecodeIr will always display the name as "Replay".  ProntoEdit calls this protocol "RC6 mode 6A" and KM has it under the alternate name "RC-6a" as well as its primary name "Replay".  RM has it under the alternate name "RC6-M-24n" as well as its primary name "Replay".
@@ -548,6 +685,7 @@ In ProntoEdit, DecodeIr's "Device" is called "Customer Code"; DecodeIr's "Subdev
     </irp:protocol>
     <irp:protocol c-name="SharpDVD" name="SharpDVD">
         <irp:parameter name="uei-executor">00F8</irp:parameter>
+        <irp:parameter name="prefer-over">Kaseikyo</irp:parameter>
         <irp:irp><![CDATA[{38k,400}<1,-1|1,-3>(8,-4,170:8,90:8,15:4,D:4,S:8,F:8,E:4,C:4,1,-48)*{C = D ^ S:4:0 ^ S:4:4 ^ F:4:0 ^ F:4:4 ^ E:4}[D:0..15,S:0..255,F:0..255,E:0..15=1]]]></irp:irp>
         <irp:documentation>SharpDVD is the member of the <a href="#Kaseikyo">Kaseikyo</a> family with OEM_code1=170 and OEM_code2=90. E=1 in all instances seen so far.</irp:documentation>
     </irp:protocol>
@@ -649,6 +787,15 @@ DecodeIR2.42 deprecates Thompson (5 bits of device, and 6 bits of function) and 
         <irp:parameter name="uei-executor">0021</irp:parameter>
         <irp:irp><![CDATA[{50.5k,337}<1,-8|1,-5>(~F:5,1,-17)*[F:0..31]]]></irp:irp>
         <irp:documentation>This is not a robust protocol, so <A href="#spurious">spurious decodes</A> are likely.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Whynter">
+        <irp:irp><![CDATA[
+         {750,msb}<1,-1|1,-3>(0:1,4,-4,F:32,1,-50m)[F:0..0xFFFFFFFF]
+  ]]>
+        </irp:irp>
+        <irp:documentation>From <a href="https://github.com/z3t0/Arduino-IRremote">IRremote</a>, see also
+        <a href="https://github.com/z3t0/Arduino-IRremote/pull/105">this issue</a>.
+        "Tested with Whynter ARC-110WD."</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="X10" name="X10">
         <irp:parameter name="uei-executor">01DF</irp:parameter>

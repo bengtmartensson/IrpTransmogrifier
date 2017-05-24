@@ -790,7 +790,7 @@ DecodeIR2.42 deprecates Thompson (5 bits of device, and 6 bits of function) and 
     </irp:protocol>
     <irp:protocol name="Whynter">
         <irp:irp><![CDATA[
-         {750,msb}<1,-1|1,-3>(0:1,4,-4,F:32,1,-50m)[F:0..0xFFFFFFFF]
+         {38k,750,msb}<1,-1|1,-3>(0:1,4,-4,F:32,1,-50m)[F:0..0xFFFFFFFF]
   ]]>
         </irp:irp>
         <irp:documentation>From <a href="https://github.com/z3t0/Arduino-IRremote">IRremote</a>, see also

@@ -201,7 +201,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
     @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
-        element.setAttribute("frequency", Long.toString(Math.round(getFrequency())));
+        element.setAttribute("frequency", Long.toString(Math.round(getFrequencyWitDefault())));
         element.setAttribute("bitDirection", getBitDirection().toString());
         element.setAttribute("unit", Long.toString(Math.round(getUnit())));
         if (getDutyCycle() != null)

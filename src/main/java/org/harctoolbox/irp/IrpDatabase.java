@@ -538,7 +538,7 @@ public final class IrpDatabase {
                         addProperty(IRP_NAME, e.getTextContent().replaceAll("\\s+", ""));
                         break;
                     case DOCUMENTATION_NAME:
-                        addProperty(DOCUMENTATION_NAME, e.getTextContent().trim());
+                        addProperty(DOCUMENTATION_NAME, e.getTextContent().trim().replaceAll("\\s+", " "));
                         break;
                     case PARAMETER_NAME:
                         addProperty(e.getAttribute("name"), e.getTextContent());

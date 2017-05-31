@@ -365,7 +365,24 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:irp><![CDATA[{38.4k,416,msb}<1,-6|1,-12>(D:4,C:1,F:7,1,-26)* {C = (#F+1)&1} [D:0..15,F:0..127]]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>
-    <irp:protocol c-name="Matsui" name="Matsui">
+    <irp:protocol name="Lutron">
+        <irp:irp><![CDATA[
+            {40k,2300,msb}<-1|1>(255:8,X:24,0:4)*[X:0..0xFFFFFF]
+    ]]></irp:irp>
+        <irp:documentation>
+            This is an unusual protocol in that an 8-bit device code and 8-bit OBC are encoded
+            in a 24-bit error-correcting code as the X of the IRP notation.
+            This is constructed as follows.
+            First two parity bits are appended to the 16 data bits to give even parity for the two sets
+            of 9 bits taken alternately.
+            The resulting 18-bit sequence is then treated as 6 octal digits (0-7) expressed in 3-bit binary code.
+            These are then re-coded in the 3-bit Gray code
+            (also called, more descriptively, the reflected-binary code) with a parity bit to give odd parity,
+            so giving 6 4-bit groups treated as a single 24-bit sequence.
+            The whole thing allows any single-bit error in transmission to be identified and corrected.
+        </irp:documentation>
+    </irp:protocol>
+        <irp:protocol c-name="Matsui" name="Matsui">
         <irp:irp><![CDATA[{38k,525}<1,-1|1,-3>(D:3,F:7,1,^30.5m)* [D:0..7,F:0..127]]]></irp:irp>
         <irp:documentation>This is not a robust protocol, so <A href="#spurious">spurious decodes</A> are likely.</irp:documentation>
     </irp:protocol>

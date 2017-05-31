@@ -77,7 +77,7 @@ public final class IrpTransmogrifier {
     // No need to make these settable, at least not presently
     public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml"; // in jar-file
     public static final String DEFAULT_CHARSET = "UTF-8"; // Just for runMain
-    private static final String SEPARATOR = "\t";
+    public static final String SEPARATOR = "\n";//"\t";
     private static final String PROGRAMNAME = Version.appName;
 
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());

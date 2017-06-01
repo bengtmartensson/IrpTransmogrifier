@@ -464,7 +464,14 @@ public final class IrpTransmogrifier {
     }
 
     private void convertConfig() throws IOException, SAXException, UsageException {
+        boolean finished = commandConvertConfig.process(this);
+        if (finished)
+            return;
+
         setupDatabase(false); // checks exactly one of -c, -i given
+        if (commandConvertConfig.checkSorted)
+            irpDatabase.checkSorted();
+
         if (commandLineArgs.iniFile != null)
             XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.IRP_PROTOCOL_NS + "}irp");
         else
@@ -1379,7 +1386,15 @@ public final class IrpTransmogrifier {
 
     @Parameters(commandNames = {"convertconfig"}, commandDescription = "Convert an IrpProtocols.ini-file to an IrpProtocols.xml, or vice versa.")
     @SuppressWarnings("ClassMayBeInterface")
-    private static class CommandConvertConfig {
+    private static class CommandConvertConfig extends MyCommand {
+
+        @Parameter(names = { "-c", "--check" }, description = "Check that the protocols in the input file are alphabetically ordered.")
+        private boolean checkSorted = false;
+
+        @Override
+        public String description() {
+            return "This command converts between the xml form and the ini form on IrpProtocols.";
+        }
     }
 
     private static abstract class MyCommand {

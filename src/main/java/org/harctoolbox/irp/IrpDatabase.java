@@ -472,6 +472,19 @@ public final class IrpDatabase {
         out.println();
     }
 
+    public boolean checkSorted() {
+        boolean result = true;
+        String last = " ";
+        for (String protocol : protocols.keySet()) {
+            if (protocol.compareTo(last) < 0) {
+                result = false;
+                logger.log(Level.WARNING, "Protocol {0} violates ordering", protocols.get(protocol).getName());
+            }
+            last = protocol;
+        }
+        return result;
+    }
+
     private static class UnparsedProtocol {
         public static final int APRIORI_SIZE = 4;
 

@@ -141,7 +141,7 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
-    public void testDecodingFile() throws IOException {
+    public void testDecodingFiles() throws IOException {
         System.out.println("testDecodingFiles");
         File testDir = new File("src/test/decoderfiles");
         File outputDir = new File("target/testdecodeoutput");

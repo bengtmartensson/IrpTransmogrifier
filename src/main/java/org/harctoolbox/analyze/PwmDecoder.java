@@ -40,12 +40,29 @@ public abstract class PwmDecoder extends AbstractDecoder {
 
     private final Burst[] bursts;
     private final int chunksize;
+    private final boolean distinctFlashesInBursts;
 
     public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst[] bursts) {
         super(analyzer, params);
         this.bursts = bursts.clone();
+        distinctFlashesInBursts = setupDistinctFlashesInBursts();
         chunksize = (int) IrpUtils.log2(bursts.length);
         bitSpec = mkBitSpec(bursts, timebase);
+    }
+
+    public boolean hasDistinctFlashesInBursts() {
+        return distinctFlashesInBursts;
+    }
+
+    private boolean setupDistinctFlashesInBursts() {
+        ArrayList<Integer> flashes = new ArrayList<>(bursts.length);
+        for (Burst burst : bursts) {
+            int flash = burst.getFlashDuration();
+            if (flashes.contains(flash))
+                return false;
+            flashes.add(flash);
+        }
+        return true;
     }
 
     @Override
@@ -67,15 +84,34 @@ public abstract class PwmDecoder extends AbstractDecoder {
                 }
                 n++;
             }
+            int overhang = 0;
             if (!hit) {
+                if (hasDistinctFlashesInBursts() && !data.isEmpty()) {
+                    n = 0;
+                    while (!hit && n < bursts.length) {
+                        if (burst.equalsWithLongGap(bursts[n])) {
+                            data.update(n);
+                            hit = true;
+                            overhang = burst.overhang(bursts[n]);
+                        }
+                        n++;
+                    }
+                }
                 while (!data.isEmpty())
                     dumpParameters(data, items, noBitsLimit);
 
-                items.add(newFlash(flash));
-                if (i == beg + length - 2 && params.isUseExtents())
-                    items.add(newExtent(analyzer.getTotalDuration(beg, length)));
-                else
-                    items.add(newGap(gap));
+                if (overhang == 0) {
+                    items.add(newFlash(flash));
+                    if (i == beg + length - 2 && params.isUseExtents())
+                        items.add(newExtent(analyzer.getTotalDuration(beg, length)));
+                    else
+                        items.add(newGap(gap));
+                } else {
+                    if (i == beg + length - 2 && params.isUseExtents())
+                        items.add(newExtent(analyzer.getTotalDuration(beg, length) - gap));
+                    else
+                        items.add(newGap(overhang));
+                }
             }
 
             while (data.getNoBits() >= noBitsLimit)

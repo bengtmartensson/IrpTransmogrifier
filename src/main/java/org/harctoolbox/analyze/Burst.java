@@ -147,6 +147,10 @@ public final class Burst {
                 && gapDuration == ((Burst) obj).gapDuration;
     }
 
+    public boolean equalsWithLongGap(Burst burst) {
+        return flashDuration == burst.flashDuration && gapDuration > burst.gapDuration;
+    }
+
     @Override
     public int hashCode() {
         int hash = 5;
@@ -162,5 +166,9 @@ public final class Burst {
     public int compare(Burst burst) {
         int sumCompare = sum() - burst.sum();
         return sumCompare != 0 ? sumCompare : flashDuration - burst.flashDuration;
+    }
+
+    public int overhang(Burst burst) {
+         return gapDuration - burst.gapDuration;
     }
 }

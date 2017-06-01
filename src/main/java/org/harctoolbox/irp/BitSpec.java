@@ -276,8 +276,7 @@ public final class BitSpec extends IrpObject implements AggregateLister {
     public int weight() {
         int weight = 0;
         weight = bitCodes.stream().map((bitCode) -> bitCode.weight()).reduce(weight, Integer::sum);
-        // if weight is 2, then it is something like <a|-b> (serial) very nasty, penalize that nasty bitspec!
-        return weight != 2 ? weight : 100;
+        return weight;
     }
 
     public boolean hasExtent() {

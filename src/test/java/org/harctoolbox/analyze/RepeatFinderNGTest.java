@@ -115,4 +115,31 @@ public class RepeatFinderNGTest {
             assert(false);
         }
     }
+
+    @Test
+    public void testFindRepeat_ModulatedIrSequence3() {
+        System.out.println("findRepeat3");
+        IrSignal irSignal;
+        try {
+            int[] arr = new int[]{
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,
+                334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 500000
+            };
+            ModulatedIrSequence modulatedIrSequence = new ModulatedIrSequence(arr, 38400d);
+            RepeatFinder repeatFinder = new RepeatFinder(modulatedIrSequence, 100d, 0.2d, 5000d);
+            assertEquals(12, repeatFinder.getRepeatFinderData().getNumberRepeats());
+        } catch (OddSequenceLengthException ex) {
+            assert(false);
+        }
+    }
 }

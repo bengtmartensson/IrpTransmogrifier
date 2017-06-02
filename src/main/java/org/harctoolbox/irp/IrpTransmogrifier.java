@@ -1022,7 +1022,7 @@ public final class IrpTransmogrifier {
         private Double frequencyTolerance = null;
 
         @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minumum gap at end of repetition")
-        private double minRepeatGap = RepeatFinder.DEFAULTMINREPEATLASTGAP;
+        private double minRepeatGap = IrCoreUtils.DEFAULTMINREPEATLASTGAP;
 
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message (deprecated; use the command \"help\" instead).")
         private boolean helpRequested = false;

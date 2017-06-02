@@ -52,6 +52,11 @@ public final class IrCoreUtils {
      */
     public static final double DEFAULT_MINIMUM_LEADOUT = 20000;
 
+    /**
+     * Default value for least value in a repeat.
+     */
+    public static final double DEFAULTMINREPEATLASTGAP = 5000d;
+
     private static double getDoubleWithSubstitute(Double userValue, double fallback) {
         return userValue != null ? userValue : fallback;
     }

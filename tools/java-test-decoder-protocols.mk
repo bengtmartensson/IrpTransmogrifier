@@ -78,7 +78,7 @@ recs80-0045 \
 recs80-0068 \
 recs80-0090 \
 revox \
-roku-official \
+roku \
 sampo \
 samsung20 \
 samsung36 \

@@ -41,6 +41,7 @@ import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrStream;
 import org.harctoolbox.irp.IrStreamItem;
 import org.harctoolbox.irp.NameEngine;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 import org.harctoolbox.irp.ParameterSpec;
 import org.harctoolbox.irp.ParameterSpecs;
 import org.harctoolbox.irp.Protocol;
@@ -79,12 +80,12 @@ public final class LircIrp {
                 });
                 System.out.println();
             }
-        } catch (IOException | RawRemoteException | LircCodeRemoteException ex) {
+        } catch (IOException | RawRemoteException | LircCodeRemoteException | NonUniqueBitCodeException ex) {
             Logger.getLogger(LircIrp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static Protocol toProtocol(LircRemote lircRemote) throws RawRemoteException, LircCodeRemoteException {
+    public static Protocol toProtocol(LircRemote lircRemote) throws RawRemoteException, LircCodeRemoteException, NonUniqueBitCodeException {
         return new LircIrp(lircRemote).protocol;
     }
 
@@ -95,7 +96,7 @@ public final class LircIrp {
     private BitSpec bitSpec;
     private IrStream body;
 
-    private LircIrp(LircRemote remote) throws RawRemoteException, LircCodeRemoteException {
+    private LircIrp(LircRemote remote) throws RawRemoteException, LircCodeRemoteException, NonUniqueBitCodeException {
         this.remote = remote;
         if (remote.isRaw())
             throw new RawRemoteException(remote.getName());
@@ -150,7 +151,7 @@ public final class LircIrp {
         return lengthXBareIrStream(value);
     }
 
-    private void setupBitSpec() {
+    private void setupBitSpec() throws NonUniqueBitCodeException {
         ArrayList<BareIrStream> list = new ArrayList<>(remote.hasFlag("RCMM") ? 4 : 2);
         BareIrStream zero = new BareIrStream(lengthTwoBareIrStream("zero"));
         list.add(zero);

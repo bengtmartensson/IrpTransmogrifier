@@ -923,6 +923,8 @@ public final class IrpTransmogrifier {
                 out.println("raw remote");
             } catch (LircIrp.LircCodeRemoteException ex) {
                 out.println("lirc code remote");
+            } catch (NonUniqueBitCodeException ex) {
+                out.println("Non-unique bitcodes");
             }
             if (commandLirc.commands) {
                 for (LircCommand cmd : rem.getCommands()) {

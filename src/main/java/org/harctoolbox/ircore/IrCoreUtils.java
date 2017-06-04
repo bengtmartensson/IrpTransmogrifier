@@ -251,6 +251,16 @@ public final class IrCoreUtils {
         return s.replaceAll("\n\r?", " ").replaceAll("\\s\\s+", " ").replace("\"", "\\\"");
     }
 
+    public static boolean hasDuplicatedElements(List<?> list) {
+        for (int i = 0; i < list.size(); i++) {
+            Object obj = list.get(i);
+            for (int j = i + 1; j < list.size(); j++)
+                if (obj.equals(list.get(j)))
+                    return true;
+        }
+        return false;
+    }
+
     private IrCoreUtils() {
     }
 }

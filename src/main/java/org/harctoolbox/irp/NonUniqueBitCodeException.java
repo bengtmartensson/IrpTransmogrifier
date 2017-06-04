@@ -13,19 +13,16 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
+ */
 
-package org.harctoolbox.analyze;
+package org.harctoolbox.irp;
 
-import org.harctoolbox.irp.NonUniqueBitCodeException;
+/**
+ *
+ */
+public final class NonUniqueBitCodeException extends IrpException {
 
-public final class Pwm4AltDecoder extends PwmDecoder {
-
-    private static Burst[] mkBursts(Analyzer analyzer) throws DecodeException {
-        return new Burst[] { analyzer.getSortedBurst(0), analyzer.getSortedBurst(1), analyzer.getSortedBurst(2), analyzer.getSortedBurst(3) };
-    }
-
-    public Pwm4AltDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) throws DecodeException, NonUniqueBitCodeException {
-        super(analyzer, params, mkBursts(analyzer));
+    public NonUniqueBitCodeException() {
+        super();
     }
 }

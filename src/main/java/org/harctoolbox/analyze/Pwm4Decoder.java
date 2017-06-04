@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.analyze;
 
 import java.util.List;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 
 public final class Pwm4Decoder extends PwmDecoder {
 
@@ -36,15 +37,15 @@ public final class Pwm4Decoder extends PwmDecoder {
         return mkBursts(flash, gaps.get(0), gaps.get(1), gaps.get(2), gaps.get(3));
     }
 
-    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one, Burst two, Burst three) {
+    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one, Burst two, Burst three) throws NonUniqueBitCodeException {
         super(analyzer, params, mkBursts(zero, one, two, three));
     }
 
-    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int flash, int zeroGap, int oneGap, int twoGap, int threeGap) {
+    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int flash, int zeroGap, int oneGap, int twoGap, int threeGap) throws NonUniqueBitCodeException {
         this(analyzer, params, new Burst(flash, zeroGap), new Burst(flash, oneGap), new Burst(flash, twoGap), new Burst(flash, threeGap));
     }
 
-    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) throws DecodeException {
+    public Pwm4Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) throws DecodeException, NonUniqueBitCodeException {
         super(analyzer, params, mkBursts(analyzer));//, new Burst(flash, zeroGap), new Burst(flash, oneGap), new Burst(flash, twoGap), new Burst(flash, threeGap));
     }
 }

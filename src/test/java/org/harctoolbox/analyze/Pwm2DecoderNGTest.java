@@ -6,6 +6,7 @@ import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
 import org.harctoolbox.irp.NameUnassignedException;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 import org.harctoolbox.irp.Protocol;
 import org.harctoolbox.irp.UnsupportedRepeatException;
 import static org.testng.Assert.*;
@@ -43,7 +44,7 @@ public class Pwm2DecoderNGTest {
             Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400d, null, BitDirection.msb, true, null, false);
             analyzer = new Analyzer(irSequence);
             pwm = new Pwm2Decoder(analyzer, analyzerParams);
-        } catch (OddSequenceLengthException ex) {
+        } catch (OddSequenceLengthException | NonUniqueBitCodeException ex) {
             fail();
         }
     }

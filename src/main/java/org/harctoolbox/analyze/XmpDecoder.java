@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.analyze;
 
 import java.util.List;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 
 public final class XmpDecoder extends PwmDecoder {
 
@@ -45,11 +46,11 @@ public final class XmpDecoder extends PwmDecoder {
         return mkBursts(flash, gapsBase, delta);
     }
 
-    public XmpDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int flash, int gapsBase, int delta) {
+    public XmpDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int flash, int gapsBase, int delta) throws NonUniqueBitCodeException {
         super(analyzer, params, mkBursts(flash, gapsBase, delta));
     }
 
-    public XmpDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+    public XmpDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) throws NonUniqueBitCodeException {
         super(analyzer, params, mkBursts(analyzer));
     }
 }

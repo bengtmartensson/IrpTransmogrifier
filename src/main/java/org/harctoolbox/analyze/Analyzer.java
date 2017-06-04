@@ -224,7 +224,7 @@ public final class Analyzer extends Cleaner {
                 throw new ThisCannotHappenException(ex);
             } catch (InvocationTargetException ex) {
                 // Likely not a fatal problem, the decoder just did not accept the data.
-                logger.log(Level.FINE, String.format("Decoder %1$s failed: %2$s", decoderClass.getSimpleName(), ex.getTargetException().getMessage()));
+                logger.log(Level.FINE, String.format("Decoder %1$s failed: %2$s(%3$s)", decoderClass.getSimpleName(), ex.getTargetException().getClass().getSimpleName(), ex.getTargetException().getMessage()));
             }
         });
         return decoders;

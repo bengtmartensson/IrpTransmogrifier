@@ -7,6 +7,7 @@ import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
 import org.harctoolbox.irp.NameUnassignedException;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 import org.harctoolbox.irp.Protocol;
 import org.harctoolbox.irp.UnsupportedRepeatException;
 import static org.testng.Assert.*;
@@ -65,7 +66,7 @@ public class SerialDecoderNGTest {
             System.out.println("Expect warnings on missing ParameterSpec");
             Protocol expResult = new Protocol("{38.4k,832,lsb}<-1|1>(A:2,B:8,C:1,D:8,E:8,F:2,-100m){A=3,B=0,C=1,D=12,E=34,F=3}");
             assertEquals(result, expResult);
-        } catch (DecodeException | InvalidNameException | NameUnassignedException | UnsupportedRepeatException ex) {
+        } catch (DecodeException | InvalidNameException | NameUnassignedException | UnsupportedRepeatException | NonUniqueBitCodeException ex) {
             fail();
         }
     }

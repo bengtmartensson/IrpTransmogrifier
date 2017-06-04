@@ -27,10 +27,11 @@ import org.harctoolbox.irp.Duration;
 import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 
 public final class SerialDecoder extends AbstractDecoder {
 
-    private static BitSpec mkBitSpec(boolean invert) {
+    private static BitSpec mkBitSpec(boolean invert) throws NonUniqueBitCodeException {
         Flash on = new Flash(1f, null);
         Gap off = new Gap(1f, null);
         List<IrStreamItem> listOn = new ArrayList<>(1);
@@ -49,7 +50,7 @@ public final class SerialDecoder extends AbstractDecoder {
         return new BitSpec(list);
     }
 
-    public SerialDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+    public SerialDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) throws NonUniqueBitCodeException {
         super(analyzer, params);
         bitSpec = mkBitSpec(params.isInvert());
     }

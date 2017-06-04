@@ -25,6 +25,7 @@ import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.Flash;
 import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 
 public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
 
@@ -47,7 +48,11 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
             list.add(new BareIrStream(listOffOn));
             list.add(new BareIrStream(listOnOff));
         }
-        return new BitSpec(list);
+        try {
+            return new BitSpec(list);
+        } catch (NonUniqueBitCodeException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     private final int half;

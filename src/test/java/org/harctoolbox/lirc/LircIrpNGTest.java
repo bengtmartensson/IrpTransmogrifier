@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.irp.NonUniqueBitCodeException;
 import org.harctoolbox.irp.Protocol;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
@@ -496,7 +497,7 @@ public class LircIrpNGTest {
         try {
             result = LircIrp.toProtocol(lircRemote);
             assertEquals(result.toIrpString(), "{38.0k,1,msb}<642u,-1600u|642u,-470u>(9067u,-4393u,pre_data:16,F:16,642u,-39597u,(9065u,-2139u,642u,-39597u)*){pre_data=41310}[F:0..65535]");
-        } catch (LircIrp.RawRemoteException | LircIrp.LircCodeRemoteException ex) {
+        } catch (LircIrp.RawRemoteException | LircIrp.LircCodeRemoteException | NonUniqueBitCodeException ex) {
             Logger.getLogger(LircIrpNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -504,15 +505,14 @@ public class LircIrpNGTest {
             LircIrp.toProtocol(rawRemote);
             fail();
         } catch (LircIrp.RawRemoteException ex) {
-
-        } catch (LircIrp.LircCodeRemoteException ex) {
+        } catch (LircIrp.LircCodeRemoteException | NonUniqueBitCodeException ex) {
             fail();
         }
 
         try {
             LircIrp.toProtocol(lircModeRemote);
             fail();
-        } catch (LircIrp.RawRemoteException ex) {
+        } catch (LircIrp.RawRemoteException | NonUniqueBitCodeException ex) {
             fail();
         } catch (LircIrp.LircCodeRemoteException ex) {
         }

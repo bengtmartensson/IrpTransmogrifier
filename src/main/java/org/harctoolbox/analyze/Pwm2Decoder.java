@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
+import org.harctoolbox.irp.NonUniqueBitCodeException;
+
 public final class Pwm2Decoder extends PwmDecoder {
 
     private static Burst smallest(Burst burst0, Burst burst1) {
@@ -27,19 +29,19 @@ public final class Pwm2Decoder extends PwmDecoder {
         return burst0.compare(burst1) <= 0 ? burst1 : burst0;
     }
 
-    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst zero, Burst one) throws NonUniqueBitCodeException {
         super(analyzer, params, mkBursts(zero, one));
     }
 
-    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int zeroFlash, int zeroGap, int oneFlash, int oneGap) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int zeroFlash, int zeroGap, int oneFlash, int oneGap) throws NonUniqueBitCodeException {
         this(analyzer, params, new Burst(zeroFlash, zeroGap), new Burst(oneFlash, oneGap));
     }
 
-    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int a, int b) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int a, int b) throws NonUniqueBitCodeException {
         this(analyzer, params, a, a, a, b);
     }
 
-    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+    public Pwm2Decoder(Analyzer analyzer, Analyzer.AnalyzerParams params) throws NonUniqueBitCodeException {
         this(analyzer, params, smallest(analyzer.getBurst(0), analyzer.getBurst(1)), largest(analyzer.getBurst(0), analyzer.getBurst(1)));
     }
 }

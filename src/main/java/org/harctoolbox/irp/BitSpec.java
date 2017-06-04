@@ -73,14 +73,18 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         chunkSize = computeNoBits(bitCodes.size());
     }
 
-    public BitSpec(List<BareIrStream> list) {
-        super(null);
+    public BitSpec(List<BareIrStream> list) throws NonUniqueBitCodeException {
+        this();
+        if (IrCoreUtils.hasDuplicatedElements(list))
+            throw new NonUniqueBitCodeException();
         chunkSize = computeNoBits(list.size());
         bitCodes = list;
     }
 
     public BitSpec() {
-        this(new ArrayList<BareIrStream>(2));
+        super(null);
+        chunkSize = 0;
+        bitCodes = new ArrayList<>(0);
     }
 
     public Integer numberOfDurations() {

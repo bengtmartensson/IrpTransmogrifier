@@ -123,7 +123,7 @@ rs200 \
 gwts \
 pioneer-mix \
 fujitsu_aircon \
-roku-official \
+roku \
 nec-shirriff-32 \
 nokia32 \
 grundig16 \

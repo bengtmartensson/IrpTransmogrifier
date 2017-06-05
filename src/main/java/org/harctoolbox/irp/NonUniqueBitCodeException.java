@@ -18,7 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 /**
- *
+ * Thrown if the BitCodes in a BitSpec are not unique.
  */
 public final class NonUniqueBitCodeException extends IrpException {
 

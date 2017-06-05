@@ -228,7 +228,7 @@ public final class IrpTransmogrifier {
 
             String[] logclasses = commandLineArgs.logclasses.split("\\|");
             @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-                    List<Logger> loggers = new ArrayList<>(logclasses.length);
+            List<Logger> loggers = new ArrayList<>(logclasses.length);
             for (String logclass : logclasses) {
                 String[] classLevel = logclass.trim().split(":");
                 if (classLevel.length < 2)
@@ -1200,7 +1200,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "In output, do not remove parameters that are equal to their defaults.")
         private boolean keepDefaultedParameters = false;
 
-        @Parameter(names = { "-l", "--loose"}, description = "Accept some looseness in decodeing, like ending junk.")
+        @Parameter(names = { "-l", "--loose"}, description = "Accept certain looseness in decoding, like ending junk.")
         private boolean loose = false;
 
         @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")

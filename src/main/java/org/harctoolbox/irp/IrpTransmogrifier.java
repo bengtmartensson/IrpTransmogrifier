@@ -1346,7 +1346,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-p", "--pronto", "--ccf", "--hex" }, description = "Generate Pronto hex.")
         private boolean pronto = false;
 
-        @Parameter(names = { "-r", "--raw" }, description = "Generate raw form.")
+        @Parameter(names = { "-r", "--signed-raw" }, description = "Generate raw form.")
         private boolean raw = false;
 
         @Parameter(names = { "-R", "--raw-without-signs" }, description = "Generate raw form without signs.")

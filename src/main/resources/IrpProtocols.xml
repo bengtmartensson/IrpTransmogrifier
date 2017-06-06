@@ -1007,6 +1007,12 @@ RemoteMaster has a single protocol, named X10 with PID 003F, that sends X10.<i>n
 
 RemoteMaster has a single protocol, named X10 with PID 003F, that sends X10.<i>n</i> signals.  This is the same as the UEI protocol with that PID.  There is no control over the value of <i>n</i>, this is handled automatically by the remote.  The newer UEI protocol, with PID 01DF, sends X10 signals.</irp:documentation>
     </irp:protocol>
+    <irp:protocol c-name="X10_18" name="X10_18">
+        <irp:irp><![CDATA[{40.8k,565}<2,-12|7,-7>(7,-7,F:9,~F:9,21,-7)*[F:0..511]]]></irp:irp>
+    </irp:protocol>
+    <irp:protocol c-name="X10_8" name="X10_8">
+        <irp:irp><![CDATA[{40.8k,565}<2,-12|7,-7>(7,-7,F:4,~F:4,21,-7)*[F:0..15]]]></irp:irp>
+    </irp:protocol>
     <irp:protocol name="Xiaomi">
         <irp:irp><![CDATA[
        {36k,290,msb}<2,-2|2,-3|2,-4|2,-5>(1000u,-2,D:8,F:8,C:4,2,^30m)* {C=(D:4:4^D:4^F:4:4^F:4)} [D:0..255,F:0..255]
@@ -1106,5 +1112,21 @@ Almost all examples we've seen start with "0E0F441A0" or "060F44120". But we've 
         <irp:parameter name="decodable">false</irp:parameter>
         <irp:irp><![CDATA[{40k,520,msb}<1,-10|1,-1,1,-8>(S:1,<1:2|2:2>(F:D),-90m)*[S:0..1,F:0..255,D:5..8]]]></irp:irp>
         <irp:documentation>An unusual protocol, in that the number of bits in the function code is variable.  It is represented in DecodeIR as the device code.  There are also two lead-in styles, decoded as subdevice values 0 and 1. Style 1 aka "double-start" is usually used in TV's, other appliances use 0 aka "single start".  If the device code is &gt;8 then the bytes given in the Misc field as E = ... follow the OBC in the function code value.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Zenith5">
+        <irp:irp><![CDATA[Zenith{D=5}[S:0..1,F:0..255]]]></irp:irp>
+        <irp:documentation>Special case of the Zenith protocol, with D = 5.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Zenith6">
+        <irp:irp><![CDATA[Zenith{D=6}[S:0..1,F:0..255]]]></irp:irp>
+        <irp:documentation>Special case of the Zenith protocol, with D = 6.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Zenith7">
+        <irp:irp><![CDATA[Zenith{D=7}[S:0..1,F:0..255]]]></irp:irp>
+        <irp:documentation>Special case of the Zenith protocol, with D = 7.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Zenith8">
+        <irp:irp><![CDATA[Zenith{D=8}[S:0..1,F:0..255]]]></irp:irp>
+        <irp:documentation>Special case of the Zenith protocol, with D = 8.</irp:documentation>
     </irp:protocol>
 </irp:protocols>

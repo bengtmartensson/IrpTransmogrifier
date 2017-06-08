@@ -17,7 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 /**
@@ -30,7 +30,7 @@ public final class ParserDriver {
     private final IrpParser parser;
 
     public ParserDriver(String irpString) {
-        lexer = new IrpLexer(new ANTLRInputStream(irpString));
+        lexer = new IrpLexer(CharStreams.fromString(irpString));
         tokens = new CommonTokenStream(lexer);
         parser = new IrpParser(tokens);
         parser.setErrorHandler(new ErrorStrategy());

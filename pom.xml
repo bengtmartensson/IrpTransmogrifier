@@ -99,7 +99,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.5.3</version>
+                <version>4.7</version>
                 <executions>
                     <execution>
                         <id>antlr</id>
@@ -285,35 +285,10 @@
     </profiles>
 
     <dependencies>
-        <!--
-        Note to maintainer 2017-02-20. Tried version 4.6, per
-
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.6</version>
-            <type>jar</type>
-        </dependency>
-
-        but the generated code says
-
-        // Generated from org/harctoolbox/irp/Irp.g4 by ANTLR 4.5.3
-
-        and the test target subsequently says
-
-        ANTLR Tool version 4.5.3 used for code generation does not match the current runtime version 4.6
-        -->
-
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>4.5.3</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-tool-testsuite</artifactId>
-            <version>4.5.3</version>
+            <version>4.7</version>
             <type>jar</type>
         </dependency>
         <dependency>

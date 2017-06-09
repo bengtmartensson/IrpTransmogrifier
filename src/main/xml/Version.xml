@@ -30,8 +30,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see http://www.gnu.org/licenses/.</licenseString>
 
     <!-- Verbal description of licenses of third-party components. -->
-    <thirdPartyString>TODO...
-DecodeIR was originally written by John S. Fine, with later contributions from others.
-It is public domain software.
+    <thirdPartyString>
+Antlr was written by Terence Parr and is licensed under the BSD license.
+JCommander was written by Cedric Beust and is licensed under the Apache 2.0 license.
 </thirdPartyString>
 </version>

@@ -29,9 +29,9 @@ import org.harctoolbox.irp.NonUniqueBitCodeException;
 
 public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
 
-    private static BitSpec mkBitSpec(double timebase, boolean invert) {
-        Flash on = Burst.newFlash(timebase, timebase);
-        Gap off = Burst.newGap(timebase, timebase);
+    protected static BitSpec mkBitSpec(double duration, double timebase, boolean invert) {
+        Flash on = Burst.newFlash(duration, timebase);
+        Gap off = Burst.newGap(duration, timebase);
         List<IrStreamItem> listOffOn = new ArrayList<>(2);
         listOffOn.add(off);
         listOffOn.add(on);
@@ -55,13 +55,13 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
         }
     }
 
-    private final int half;
-    private final int full;
-    private ParameterData data;
+    protected final int half;
+    protected final int full;
+    protected ParameterData data;
 
     public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full)  {
         super(analyzer, params);
-        bitSpec = mkBitSpec(timebase, params.isInvert());
+        bitSpec = mkBitSpec(timebase, timebase, params.isInvert());
         this.half = half;
         this.full = full;
     }

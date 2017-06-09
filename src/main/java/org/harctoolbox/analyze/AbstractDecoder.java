@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -49,6 +50,7 @@ public abstract class AbstractDecoder {
         XmpDecoder.class,
         BiphaseDecoder.class,
         BiphaseWithStartbitDecoder.class,
+        BiphaseWithDoubleToggleDecoder.class,
         SerialDecoder.class,
     };
 
@@ -143,7 +145,11 @@ public abstract class AbstractDecoder {
     }
 
     protected void saveParameter(ParameterData parameterData, List<IrStreamItem> items, BitDirection bitDirection, boolean complement) {
-        if (parameterData.isEmpty())
+        saveParameter(null, parameterData, items, bitDirection, complement);
+    }
+
+    protected void saveParameter(BitSpec bitSpec, ParameterData parameterData, List<IrStreamItem> items, BitDirection bitDirection, boolean complement) {
+       if (parameterData.isEmpty())
             return;
 
         parameterData.fixBitDirection(bitDirection);
@@ -153,7 +159,16 @@ public abstract class AbstractDecoder {
         noPayload++;
         try {
             nameEngine.define(name, parameterData.getData());
-            items.add(new FiniteBitField(name, parameterData.getNoBits()));
+            FiniteBitField bitField = new FiniteBitField(name, parameterData.getNoBits());
+            if (bitSpec == null) {
+                items.add(bitField);
+            } else {
+                List<IrStreamItem> list = new ArrayList<>(1);
+                list.add(bitField);
+                IrStream irStream = new IrStream(list);
+                BitspecIrstream bitspecIrstream = new BitspecIrstream(bitSpec, irStream);
+                items.add(bitspecIrstream);
+            }
         } catch (InvalidNameException ex) {
             throw new ThisCannotHappenException();
         }

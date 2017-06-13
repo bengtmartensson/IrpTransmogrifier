@@ -519,14 +519,14 @@ public class Protocol extends IrpObject implements AggregateLister {
                     throw new ThisCannotHappenException(ex);
                 }
             } else
-                throw new SignalRecognitionException("Intro sequence was not fully matched"); // FIXME
+                throw new SignalRecognitionException("Intro sequence was not fully matched");
         }
 
         if (strict || ! repeat.isEmpty() || ! ending.isEmpty() || rest != 0) {
             rest = decode(names, repeat, IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
             if (rest > 0) {
                 if (strict || !justIntro)
-                    throw new SignalRecognitionException("Repeat sequence was not fully matched"); // FIXME
+                    throw new SignalRecognitionException("Repeat sequence was not fully matched");
 
                 try {
                     ending = repeat.subSequence(repeat.getLength() - rest, rest);
@@ -536,7 +536,7 @@ public class Protocol extends IrpObject implements AggregateLister {
             }
             rest = decode(names, ending, IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
             if (rest > 0) {
-                throw new SignalRecognitionException("Ending sequence was not fully matched");// FIXME
+                throw new SignalRecognitionException("Ending sequence was not fully matched");
             }
         }
         Map<String, Long> result = names.collectedNames();

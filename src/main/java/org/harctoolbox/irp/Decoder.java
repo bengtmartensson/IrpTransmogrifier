@@ -126,8 +126,8 @@ public final class Decoder {
     /**
      * Deliver a Map of Decodes
      * @param irSignal IrSignal to be decoded.
-     * @param strict
-     * @param loose
+     * @param strict If true, intro-, repeat-, and ending sequences are required to match exactly.
+     * @param loose Accept certain looseness, like trailing "junk" durations. Not yet implemented.
      * @param allDecodes If true, output all possible decodes. Otherwise, remove decodes according to prefer-over.
      * @param keepDefaultedParameters If false, remove parameters with value equals to their default.
      * @param frequencyTolerance

@@ -1200,7 +1200,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "In output, do not remove parameters that are equal to their defaults.")
         private boolean keepDefaultedParameters = false;
 
-        @Parameter(names = { "-l", "--loose"}, description = "Accept certain looseness in decoding, like ending junk.")
+        // Not implemented yet, therefore hidden
+        @Parameter(names = { "-l", "--loose", "--guess"}, hidden = true, description = "Accept certain looseness in decoding, like ending junk.")
         private boolean loose = false;
 
         @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
@@ -1286,6 +1287,10 @@ public final class IrpTransmogrifier {
 
     @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")
     private static class CommandList extends MyCommand {
+
+        // not yet implemented
+        @Parameter(names = { "-b", "--browse" }, hidden = true, description = "Open the protoocol data base file in the browser")
+        private boolean browse = false;
 
         @Parameter(names = { "-c", "--classify"}, description = "Classify the protocol(s).")
         private boolean classify = false;
@@ -1404,7 +1409,7 @@ public final class IrpTransmogrifier {
         @SuppressWarnings("FieldMayBeFinal")
         private boolean help = false;
 
-        @Parameter(names = { "--description" }, help = true, description = "Print a possibly longer documentation for the command.")
+        @Parameter(names = { "--description" }, help = true, description = "Print a possibly longer documentation for the present command.")
         @SuppressWarnings("FieldMayBeFinal")
         private boolean description = false;
 

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Ad hoc wrapper, for development
+JAVA=java
+
+VERSION=0.0.1dev
+IRPHOME="$(dirname -- "$(readlink -f -- "${0}")" )"
+JAR=${IRPHOME}/../target/IrpTransmogrifier-${VERSION}-jar-with-dependencies.jar
+CONFIG=${IRPHOME}/../src/main/config/IrpProtocols.xml
+STDIR=${IRPHOME}/../src/main/st
+export STDIR
+
+exec "${JAVA}" -jar "${JAR}" -c "${CONFIG}" "$@"

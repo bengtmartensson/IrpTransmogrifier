@@ -153,6 +153,8 @@ public class IrpTransmogrifierNGTest {
     public void testDecodingFiles() throws IOException {
         System.out.println("testDecodingFiles");
         File testDir = new File("src/test/decoderfiles");
+        if (!testDir.isDirectory())
+            return;
         File outputDir = new File("target/testdecodeoutput");
         if (!outputDir.isDirectory()) {
             boolean status = outputDir.mkdirs();

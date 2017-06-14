@@ -46,7 +46,7 @@ public abstract class Expression extends PrimaryItem {
      */
     public static Expression newExpressionEOF(String str) throws IrpParseException {
         ParserDriver parserDriver = new ParserDriver(str);
-        Expression expression = newExpression(parserDriver);
+        Expression expression = newExpressionEOF(parserDriver);
         String matched = expression.getParseTree().getText();
         if (matched.length() < str.replaceAll("\\s+", "").length())
             throw new IrpParseException(str, "Did not match all input, just \"" + matched + "\".");
@@ -70,6 +70,12 @@ public abstract class Expression extends PrimaryItem {
 
     public static Expression newExpression(ParserDriver parserDriver) {
         Expression expression = newExpression(parserDriver.getParser().expression());
+        expression.parserDriver = parserDriver;
+        return expression;
+    }
+
+    public static Expression newExpressionEOF(ParserDriver parserDriver) {
+        Expression expression = newExpression(parserDriver.getParser().expressionEOF().expression());
         expression.parserDriver = parserDriver;
         return expression;
     }

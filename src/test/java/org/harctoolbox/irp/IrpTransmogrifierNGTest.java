@@ -64,7 +64,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze2() {
         System.out.println("analyze2");
-        String args = "analyze --radix 16 --chop 30000 --ire --maxparameterwidth 32 -- +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
+        String args = "analyze --radix 16 --chop 30000 --ire --maxparameterwidth 32 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{573,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m,(16,-4,1,-96m)*){A=0x30441ce3}" + IrpTransmogrifier.SEPARATOR + "weight = 16");
     }
@@ -136,8 +136,8 @@ public class IrpTransmogrifierNGTest {
         System.out.println("Expression1");
         String result = IrpTransmogrifier.execute("expression -n D=244  D   + 1 +");
         assertEquals(result, null);
-        result = IrpTransmogrifier.execute("expression -n D=244  D:-6:2"); // invalid expression
-        assertEquals(result, null);
+        result = IrpTransmogrifier.execute("expression -n D=244  D:-6:2");
+        assertEquals(result, "47");
         result = IrpTransmogrifier.execute("expression -n D=244  (D:-6:2)");
         assertEquals(result, "47");
     }

@@ -189,6 +189,10 @@ expression:
     | <assoc=right> expression '?'                  expression ':' expression
 ;
 
+expressionEOF:
+    expression EOF
+;
+
 // 10.2
 // (class NameEngine)
 definitions:

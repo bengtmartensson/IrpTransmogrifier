@@ -676,7 +676,7 @@ public final class IrpTransmogrifier {
         if (commandAnalyze.introRepeatEnding)
             analyzeIntroRepeatEnding();
         else
-            analyzeSequence();
+            analyzeSequences();
     }
 
     private void analyzeIntroRepeatEnding() throws UsageException, OddSequenceLengthException, InvalidArgumentException {
@@ -701,7 +701,7 @@ public final class IrpTransmogrifier {
         analyze(irSignal);
     }
 
-    private void analyzeSequence() throws UsageException, OddSequenceLengthException {
+    private void analyzeSequences() throws UsageException, OddSequenceLengthException {
         List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args));
         if (commandAnalyze.chop != null) {
             if (sequences.size() > 1)
@@ -1143,6 +1143,36 @@ public final class IrpTransmogrifier {
 
         @Parameter(description = "durations in microseconds, or pronto hex.", required = false)
         private List<String> args = null;
+
+        @Override
+        public String description() {
+            return "The \"analyze\" command takes as input one or several sequences or signals, and computes an IRP form that corresponds to the given input "
+                    + "(within the specified tolerances). "
+                    + "The input can be given either as Pronto Hex or in raw form, optionally with signs (ignored). "
+                    //+ "(In the latter case, it may be necessary to use \"--\" to denote the end of the options.) "
+                    + "Several raw format input sequences can be given by enclosing the individual sequences in brackets (\"[]\"). "
+                    + "However, if using the --intro-repeat-ending option, the sequences are instead interpreted as intro-, repeat-, "
+                    + "and (optionally) ending sequences of an IR signal. "
+                    + "\n\n"
+                    + "For raw sequences, an explicit modulation frequency can be given with the --frequency option. "
+                    + "Otherwise the default frequency, " + (int) ModulatedIrSequence.DEFAULT_FREQUENCY + "Hz, will be assumed. "
+                    + "\n\n"
+                    + "Using the option --input, instead the content of a file can be taken as input, containing sequences to be analyzed, "
+                    + "one per line, blank lines ignored. "
+                    + "Using the option --namedinput, the sequences may have names, immediately preceeding the signal. "
+                    + "\n\n"
+                    + "Input sequences can be pre-processed using the options --chop, --clean, and --repeatfinder. "
+                    + "\n\n"
+                    + "The input sequence(s) are matched using different \"decoders\". "
+                    + "Normally the \"best\" decoder match is output. "
+                    + "With the --all option, all decoder matches are output. "
+                    + "\n\n"
+                    + "The options --statistics and --dump-repeatfinder (the latter forces the repeatfinder to be on) can be used to print extra information. "
+                    + "The common options --absolutetolerance, --relativetolerance, --minrepeatgap determine how the repeat finder breaks the input data. "
+                    + "The options --extent, --invert, --lsb, --maxmicroseconds, --maxparameterwidth, --maxroundingerror, --maxunits, --parameterwidths, "
+                    + "--radix, and --timebase determine how the computed IRP is displayed."
+                    ;
+        }
     }
 
     @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield given as argument.")
@@ -1159,6 +1189,16 @@ public final class IrpTransmogrifier {
 
         @Parameter(description = "bitfield", required = true)
         private List<String> bitField;
+
+        @Override
+        public String description() {
+            return
+                    "The \"bitfield\" command computes the value and the binary form corresponding to the bitfield given as input. "
+                    + "Using the --nameengine argument, the bitfield can also refer to names. "
+                    + "\n\n"
+                    + "As an alternatively, the \"expression\" command may be used."
+                    ;
+        }
     }
 
     @Parameters(commandNames = {"code"}, commandDescription = "Generate code for the given target(s)")
@@ -1224,6 +1264,27 @@ public final class IrpTransmogrifier {
 
         @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = false)
         private List<String> args;
+
+        @Override
+        public String description() {
+            return "The \"decode\" command takes as input one or several sequences or signals, "
+                    + "and output one or many protocol/parameter combinations that corresponds to the given input "
+                    + "(within the specified tolerances). "
+                    + "The input can be given either as Pronto Hex or in raw form, optionally with signs (ignored). "
+                    + "Several raw format input sequences can be given by enclosing the individual sequences in brackets (\"[]\"). "
+                    + "\n\n"
+                    + "For raw sequences, an explicit modulation frequency can be given with the --frequency option. "
+                    + "Otherwise the default frequency, " + (int) ModulatedIrSequence.DEFAULT_FREQUENCY + "Hz, will be assumed. "
+                    + "\n\n"
+                    + "Using the option --input, instead the content of a file can be taken as input, containing sequences to be analyzed, "
+                    + "one per line, blank lines ignored. "
+                    + "Using the option --namedinput, the sequences may have names, immediately preceeding the signal. "
+                    + "\n\n"
+                    + "Input sequences can be pre-processed using the options --clean, and --repeatfinder. "
+                    + "\n\n"
+                    + "The common options --absolutetolerance --relativetolerance, --minrepeatgap determine how the repeat finder breaks the input data. "
+                    ;
+        }
     }
 
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression given as argument.")
@@ -1252,6 +1313,23 @@ public final class IrpTransmogrifier {
         }
     }
 
+    @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
+    private static class CommandHelp extends MyCommand {
+
+        @Parameter(names = { "-s", "--short" }, description = "Produce a short usage message.")
+        private boolean shortForm = false;
+
+        @Parameter(description = "commands")
+        private List<String> commands = null;
+
+        @Override
+        public String description() {
+            return "This command list the syntax for the command(s) given as argument, default all. "
+                    + "Also see the option \"--describe\"."
+                    ;
+        }
+    }
+
     @Parameters(commandNames = { "lirc" }, commandDescription = "Convert Lirc configuration files to IRP form.")
     private static class CommandLirc extends MyCommand {
 
@@ -1266,22 +1344,7 @@ public final class IrpTransmogrifier {
 
         @Override
         public String description() {
-            return "This command reads a Lirc configuration and computes the IRP form thereof.";
-        }
-    }
-
-    @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
-    private static class CommandHelp extends MyCommand {
-
-        @Parameter(names = { "-s", "--short" }, description = "Produce a short usage message.")
-        private boolean shortForm = false;
-
-        @Parameter(description = "commands")
-        private List<String> commands = null;
-
-        @Override
-        public String description() {
-            return "This command list the syntax for the command(s) given as argument, default all.";
+            return "This command reads a Lirc configuration, from a file, directory, or an URL, and computes a correponding IRP form.";
         }
     }
 
@@ -1289,8 +1352,8 @@ public final class IrpTransmogrifier {
     private static class CommandList extends MyCommand {
 
         // not yet implemented
-        @Parameter(names = { "-b", "--browse" }, hidden = true, description = "Open the protoocol data base file in the browser")
-        private boolean browse = false;
+        //@Parameter(names = { "-b", "--browse" }, description = "Open the protoocol data base file in the browser")
+        //private boolean browse = false;
 
         @Parameter(names = { "-c", "--classify"}, description = "Classify the protocol(s).")
         private boolean classify = false;
@@ -1368,11 +1431,11 @@ public final class IrpTransmogrifier {
 
         @Override
         public String description() {
-            return "This command is used to compute an IR signal from one or more protocols\n"
-                    + " (\"render\" it). The protocol can be given either by name(s)\n"
-                    + "(or regular expression if using the --regexp option), or, using the\n"
-                    + "--irp options, given explicitly as an IRP form.\n"
-                    + "The parameters can be either given directly with the -n option,\n"
+            return "This command is used to compute an IR signal from one or more protocols "
+                    + "(\"render\" it). The protocol can be given either by name(s) "
+                    + "(or regular expression if using the --regexp option), or, using the "
+                    + "--irp options, given explicitly as an IRP form. "
+                    + "The parameters can be either given directly with the -n option,"
                     + "or the --random option can be used to generate random, but valid parameters"
                     + "With the --count or --number-repeats option, instead an IR sequence is computed,"
                     + "containing the desired number of repeats.";
@@ -1409,7 +1472,7 @@ public final class IrpTransmogrifier {
         @SuppressWarnings("FieldMayBeFinal")
         private boolean help = false;
 
-        @Parameter(names = { "--description" }, help = true, description = "Print a possibly longer documentation for the present command.")
+        @Parameter(names = { "--describe" }, help = true, description = "Print a possibly longer documentation for the present command.")
         @SuppressWarnings("FieldMayBeFinal")
         private boolean description = false;
 
@@ -1428,7 +1491,7 @@ public final class IrpTransmogrifier {
                 return true;
             }
             if (description) {
-                instance.out.println(description());
+                IrpUtils.trivialFormatter(instance.out, description(), 65);
                 return true;
             }
             return false;

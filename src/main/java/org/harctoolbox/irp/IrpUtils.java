@@ -162,6 +162,30 @@ public final class IrpUtils {
     }
 
     /**
+     * Prints the String in the second argument nicely on the PrintStream in the first argument,
+     * nicely chopping after lineLength positions. Respects linefeeds, tabs, etc.
+     * @param out PrintStream to print on.
+     * @param string String to print
+     * @param lineLength Break after this position.
+     */
+    public static void trivialFormatter(PrintStream out, String string, int lineLength) {
+        int pos = 0;
+        String[] data = string.split("((?<=\\s)|(?=\\s))"); // splits on whitspace, while keeping it
+        for (String str : data) {
+            if (pos <= 0 && str.matches(" ")) {
+            } else
+                out.print(str);
+            pos = str.matches("\\v") ? 0 : pos + str.length();
+            if (pos > lineLength) {
+                out.println();
+                pos = 0;
+            }
+        }
+        if (pos > 0)
+            out.println();
+    }
+
+    /**
      * The power function for long arguments.
      *
      * @param x long

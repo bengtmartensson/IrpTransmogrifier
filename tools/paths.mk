@@ -1,6 +1,6 @@
 # External programs
 
-VERSION := 0.0.1dev
+VERSION := 0.2.0
 INSTALLDIR := /usr/local/share/irptransmogrifier
 BINLINK := /usr/local/bin/irptransmogrifier
 BROWSELINK := /usr/local/bin/irpbrowse

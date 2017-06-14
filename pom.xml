@@ -7,7 +7,7 @@
     <groupId>org.harctoolbox</groupId>
     <artifactId>IrpTransmogrifier</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.1dev</version>
+    <version>0.2.0</version>
     <name>IrpTransmogrifier</name>
     <licenses>
         <license>

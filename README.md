@@ -56,6 +56,11 @@ To be recognizable, the IRP protocol should preferably adhere to some additional
 Presently all but two protocols (`zenith`, `nec1-shirrif`, (bitfield width as parameter), `fujitsu_aircon` (would require non-trivial equation solving))
 are recognizable.  It is not guaranteed that new protocols automatically will be recognizable.
 
+#### Loose matches, Guessing
+Many captured signals are not quite correct according to their protocol. However, the firmware in a receiving device is often "forgiving",
+and accepts slightly flawed signals. It is thus desirable for a program of this type to find a near match, "guess", when an real match fails.
+The program currently does not implement this, however, it is [planned](https://github.com/bengtmartensson/IrpTransmogrifier/issues/42).
+
 ### Code generation for rendering and/or decoding
 For a particular protocol, generate target code (C, C++, Java, Python,...) that can render or decode signals
 with the selected protocol. As opposed to the previous use cases, efficency (memory, execution time) (for the generated code) is potentially

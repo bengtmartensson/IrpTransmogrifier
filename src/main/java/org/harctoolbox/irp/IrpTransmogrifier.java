@@ -1374,7 +1374,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "--istring"}, hidden = true, description = "test toIrpString.")
         private boolean is = false;
 
-        @Parameter(names = { "-n", "--normal", "--normalform"}, description = "List the normal form.")
+        @Parameter(names = { "-n", "--normalform"}, description = "List the normal form.")
         private boolean normalForm = false;
 
         // Only sensible together with --irpstring, consequentely hidded

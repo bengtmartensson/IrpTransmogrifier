@@ -1344,7 +1344,10 @@ public final class IrpTransmogrifier {
 
         @Override
         public String description() {
-            return "This command reads a Lirc configuration, from a file, directory, or an URL, and computes a correponding IRP form.";
+            return "This command reads a Lirc configuration, from a file, directory, or an URL, "
+                    + "and computes a correponding IRP form. "
+                    + "No attempt is made to clean up, for example by rounding times or "
+                    + "finding a largest common divider.";
         }
     }
 

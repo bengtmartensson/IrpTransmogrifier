@@ -121,20 +121,29 @@ public final class LircIrp {
     }
 
     private List<IrStreamItem> lengthTwoBareIrStream(String key) {
-        return lengthTwoBareIrStream(remote.getBinaryParameters(key));
+        return lengthTwoBareIrStream(false, key);
+    }
+
+    private List<IrStreamItem> lengthTwoBareIrStream(boolean invert, String key) {
+        return lengthTwoBareIrStream(invert, remote.getBinaryParameters(key));
     }
 
     private List<IrStreamItem> lengthTwoBareIrStream(LircRemote.Pair pair) {
-        if (pair == null)
-            return new ArrayList<>(0);
-
-        return lengthXBareIrStream(pair.getFirst(), pair.getSecond());
+        return lengthTwoBareIrStream(false, pair);
     }
 
-    private List<IrStreamItem> lengthXBareIrStream(Long... vars) {
+    private List<IrStreamItem> lengthTwoBareIrStream(boolean invert, LircRemote.Pair pair) {
+        if (pair == null || pair.isTrivial())
+            return new ArrayList<>(0);
+
+        return lengthXBareIrStream(invert, pair.getFirst(), pair.getSecond());
+    }
+
+    private List<IrStreamItem> lengthXBareIrStream(boolean invert, Long... vars) {
         List<IrStreamItem> list = new ArrayList<>(vars.length);
         for (int i = 0; i < vars.length; i++) {
-            Duration duration = i % 2 == 0 ? new Flash(vars[i]) : new Gap(vars[i]);
+            boolean odd = i % 2 != 0;
+            Duration duration = odd == invert ? new Flash(vars[i]) : new Gap(vars[i]);
             list.add(duration);
         }
         return list;
@@ -145,22 +154,24 @@ public final class LircIrp {
     }
 
     private List<IrStreamItem> lengthOneBareIrStream(Long value) {
-        if (value == null)
+        if (value == null || value == 0L)
             return new ArrayList<>(0);
 
-        return lengthXBareIrStream(value);
+        return lengthXBareIrStream(false, value);
     }
 
     private void setupBitSpec() throws NonUniqueBitCodeException {
         ArrayList<BareIrStream> list = new ArrayList<>(remote.hasFlag("RCMM") ? 4 : 2);
-        BareIrStream zero = new BareIrStream(lengthTwoBareIrStream("zero"));
+        boolean biphaseNonInvert = remote.hasFlag("RC6");
+        boolean biphaseInvert = remote.hasFlag("RC5") || remote.hasFlag("SHIFT_ENC");
+        BareIrStream zero = new BareIrStream(lengthTwoBareIrStream(biphaseNonInvert, "zero"));
         list.add(zero);
-        BareIrStream one  = new BareIrStream(lengthTwoBareIrStream("one"));
+        BareIrStream one  = new BareIrStream(lengthTwoBareIrStream(biphaseInvert, "one"));
         list.add(one);
         if (remote.hasFlag("RCMM")) {
-            BareIrStream two = new BareIrStream(lengthTwoBareIrStream("two"));
+            BareIrStream two = new BareIrStream(lengthTwoBareIrStream(false, "two"));
             list.add(two);
-            BareIrStream three  = new BareIrStream(lengthTwoBareIrStream("three"));
+            BareIrStream three  = new BareIrStream(lengthTwoBareIrStream(false, "three"));
             list.add(three);
         }
         bitSpec = new BitSpec(list);
@@ -169,8 +180,9 @@ public final class LircIrp {
     private List<IrStreamItem> mkBitField(String name, String lengthName) throws InvalidNameException {
         List<IrStreamItem> result = new ArrayList<>(1);
         Long value = remote.getUnaryParameters(name);
-        if (value != null)
-            result.add(new FiniteBitField(name, remote.getUnaryParameters(lengthName)));
+        Long length = remote.getUnaryParameters(lengthName);
+        if (value != null && length > 0)
+            result.add(new FiniteBitField(name, length));
         return result;
     }
 
@@ -184,7 +196,7 @@ public final class LircIrp {
 
     private void setupBody() {
         try {
-            List<IrStreamItem> list = new ArrayList<>(4);
+            List<IrStreamItem> list = new ArrayList<>(8);
             list.addAll(lengthTwoBareIrStream("header"));
             list.addAll(bareIrStreamFlash("plead"));
             list.addAll(mkBitField("pre_data", "pre_data_bits"));
@@ -200,7 +212,7 @@ public final class LircIrp {
             Long repeatMin = remote.getUnaryParameters("min_repeat");
             LircRemote.Pair repeatPair = remote.getBinaryParameters("repeat");
             RepeatMarker repeatMarker;
-            if (repeatPair != null || remote.hasFlag("NO_HEAD_REP") || remote.hasFlag("NO_FOOT_REP")) {
+            if ((repeatPair != null && !repeatPair.isTrivial()) || remote.hasFlag("NO_HEAD_REP") || remote.hasFlag("NO_FOOT_REP")) {
                 outerRepeatMax = repeatMin != null ? repeatMin.intValue() : 1;
                 List<IrStreamItem> repeatList = new ArrayList<>(4);
                 if (remote.hasFlag("REPEAT_HEADER"))

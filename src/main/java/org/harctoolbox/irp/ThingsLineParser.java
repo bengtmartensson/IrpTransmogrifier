@@ -45,13 +45,21 @@ public class ThingsLineParser<T> {
         this.parser = thingParser;
     }
 
-    public List<T> readThings(String urlOrFilename, String charSetName) throws IOException {
+    /**
+     * Reads Ts from the file/url in the first argument.
+     * @param urlOrFilename
+     * @param charSetName name of character set.
+     * @param multiLines if true, successive lines are considered to belong to the same object, unless separated by empty lines.
+     * @return List of Ts read from the first argument.
+     * @throws IOException
+     */
+    public List<T> readThings(String urlOrFilename, String charSetName, boolean multiLines) throws IOException {
         if (urlOrFilename.equals("-"))
-            return readThings(new InputStreamReader(System.in, charSetName));
+            return readThings(new InputStreamReader(System.in, charSetName), multiLines);
         try {
-            return readThingsURL(urlOrFilename, charSetName);
+            return readThingsURL(urlOrFilename, charSetName, multiLines);
         } catch (MalformedURLException ex) {
-            return readThingsFile(new File(urlOrFilename), charSetName);
+            return readThingsFile(new File(urlOrFilename), charSetName, multiLines);
         }
     }
 
@@ -65,12 +73,12 @@ public class ThingsLineParser<T> {
         }
     }
 
-    private List<T> readThingsURL(String urlOrFilename, String charsetName) throws MalformedURLException, IOException {
+    private List<T> readThingsURL(String urlOrFilename, String charsetName, boolean multiLines) throws MalformedURLException, IOException {
         URL url = new URL(urlOrFilename);
         URLConnection urlConnection = url.openConnection();
         try (InputStream inputStream = urlConnection.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charsetName);
-            return readThings(inputStreamReader);
+            return readThings(inputStreamReader, multiLines);
         }
     }
 
@@ -83,9 +91,9 @@ public class ThingsLineParser<T> {
         }
     }
 
-    private List<T> readThingsFile(File file, String charSetName) throws FileNotFoundException, IOException {
+    private List<T> readThingsFile(File file, String charSetName, boolean multiLines) throws FileNotFoundException, IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
-            return readThings(new InputStreamReader(new FileInputStream(file), charSetName));
+            return readThings(new InputStreamReader(new FileInputStream(file), charSetName), multiLines);
         }
     }
 
@@ -96,12 +104,12 @@ public class ThingsLineParser<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<T> readThings(Reader reader) throws IOException {
+    public List<T> readThings(Reader reader, boolean multiLines) throws IOException {
         BufferedReader in = new BufferedReader(reader);
         List<T> list = new ArrayList<>(4);
         while (true) {
             try {
-                T thing = parseThing(in);
+                T thing = parseThing(in, multiLines);
                 if (thing == null)
                     break;
                 list.add(thing);
@@ -124,7 +132,7 @@ public class ThingsLineParser<T> {
                 continue;
             String name = line;
             try {
-                T thing = parseThing(in);
+                T thing = parseThing(in, true);
                 map.put(name, thing);
             } catch (Exception ex) {
                 logger.log(Level.WARNING, "{0}", ex.getMessage());
@@ -134,13 +142,16 @@ public class ThingsLineParser<T> {
     }
 
     @SuppressWarnings("unchecked")
-    T parseThing(BufferedReader in) throws Exception {
-        ArrayList<String> list = new ArrayList<>(2);
-        String line = in.readLine();
-        if (line == null)
-            return null;
+    T parseThing(BufferedReader in, boolean multiLines) throws Exception {
+        ArrayList<String> list = new ArrayList<>(multiLines ? 4 : 1);
+        String line;
+        do {
+            line = in.readLine();
+            if (line == null)
+                return null;
+        } while (line.trim().isEmpty());
         list.add(line);
-        while (true) {
+        while (multiLines) {
             line = in.readLine();
             if (line == null || line.trim().isEmpty())
                 break;

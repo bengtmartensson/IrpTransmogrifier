@@ -639,7 +639,7 @@ public final class IrpTransmogrifier {
 
         if (commandAnalyze.input != null) {
             ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line); });
-            List<IrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding);
+            List<IrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
             if (signals.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             analyze(signals);
@@ -803,7 +803,7 @@ public final class IrpTransmogrifier {
             ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                 return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, false);
             });
-            List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding);
+            List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding, false);
             for (IrSignal irSignal : signals)
                 decode(decoder, irSignal, null);
         } else if (commandDecode.namedInput != null) {

@@ -160,7 +160,7 @@ public final class ParameterSpec extends IrpObject {
     }
 
     private long randomHairy(Random rng) {
-        long x = rng.nextLong() & IrCoreUtils.ones((long) (Long.SIZE - 1)); // between 0 and Long.MAX_VALUE
+        long x = rng.nextLong() & IrCoreUtils.ones(Long.SIZE - 1); // between 0 and Long.MAX_VALUE
         double frac = ((double) x) / Long.MAX_VALUE; // between 0 and 1
         long out = (long) ((getMax() - getMin()) * frac + getMin());
         return out;

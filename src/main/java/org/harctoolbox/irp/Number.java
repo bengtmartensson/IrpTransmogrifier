@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -114,7 +115,7 @@ public final class Number extends PrimaryItem {
 
     @Override
     public String toIrpString(int radix) {
-        return IrpUtils.radixPrefix(radix) + Long.toString(data, radix);
+        return IrCoreUtils.radixPrefix(radix) + Long.toString(data, radix);
     }
 
     @Override

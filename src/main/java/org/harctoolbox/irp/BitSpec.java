@@ -257,7 +257,7 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         Element element = super.toElement(document);
         element.setAttribute("size", Integer.toString(bitCodes.size()));
         element.setAttribute("chunkSize", Integer.toString(chunkSize));
-        element.setAttribute("bitMask", Integer.toString(IrCoreUtils.ones(chunkSize)));
+        element.setAttribute("bitMask", Long.toString(IrCoreUtils.ones(chunkSize)));
         element.setAttribute("pwm2", Boolean.toString(isPWM(2)));
         element.setAttribute("standardBiPhase", Boolean.toString(isStandardBiPhase(new GeneralSpec(), new NameEngine())));
         Integer nod = numberOfDurations();

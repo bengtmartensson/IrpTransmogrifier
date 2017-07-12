@@ -110,7 +110,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
             x = ~x;
         x &= ((1L << width.toNumber(nameEngine)) - 1L);
         if (reverse)
-            x = IrpUtils.reverse(x, (int) width.toNumber(nameEngine));
+            x = IrCoreUtils.reverse(x, (int) width.toNumber(nameEngine));
 
         return x;
     }
@@ -269,7 +269,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
             if (rest != 0) {
                 // this has been tested only with bitorder = msb.
                 int bitsToStore = chunkSize - rest;
-                int bitmask = IrCoreUtils.ones(bitsToStore);
+                long bitmask = IrCoreUtils.ones(bitsToStore);
                 recognizeData.setDanglingBitFieldData(payload, bitmask);
                 payload >>= bitsToStore;
             }
@@ -278,7 +278,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
             if (this.complement)
                 payload = ~payload;
             payload <<= (int) chop.toNumber(recognizeData.toNameEngine());
-            long bitmask = IrCoreUtils.ones(width.toNumber(recognizeData.toNameEngine())) << chop.toNumber(recognizeData.toNameEngine());
+            long bitmask = IrCoreUtils.ones((int) width.toNumber(recognizeData.toNameEngine())) << chop.toNumber(recognizeData.toNameEngine());
             payload &= bitmask;
 
             // We now have the "equation" data == payload, we are turning that into an assignment

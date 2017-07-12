@@ -73,7 +73,7 @@ public final class SerialDecoder extends AbstractDecoder {
                 } catch (Exception ex) {
                     throw new ThisCannotHappenException(ex);
                 }
-                int amount = isFlash ? IrCoreUtils.ones(noBits) : 0;
+                int amount = isFlash ? (int) IrCoreUtils.ones(noBits) : 0;
                 data.update(amount, noBits);
             } else {
                 while (!data.isEmpty())

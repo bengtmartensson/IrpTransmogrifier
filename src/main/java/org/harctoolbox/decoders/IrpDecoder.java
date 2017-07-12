@@ -33,7 +33,7 @@ public abstract class IrpDecoder {
     // functions evaluating BitFields in expressions
     protected static final long finiteBitField(long data, long width, long chop, boolean complement, boolean reverse) {
         long realdata = preprocessFiniteBitField(data, width, chop, complement, reverse);
-        return IrCoreUtils.maskTo(realdata, width);
+        return IrCoreUtils.maskTo(realdata, (int) width);
     }
 
     private static long preprocessFiniteBitField(long data, long width, long chop, boolean complement, boolean reverse) {
@@ -467,7 +467,7 @@ public abstract class IrpDecoder {
                 width += CHUNKSIZE;
             }
             if (length != width) {
-                pendingData = IrCoreUtils.maskTo(data, width - length);
+                pendingData = IrCoreUtils.maskTo(data, (int) (width - length));
                 pendingBits = width - (int) length;
                 data >>= width - (int) length;
             }

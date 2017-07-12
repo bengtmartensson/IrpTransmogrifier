@@ -256,7 +256,7 @@ public final class IrpTransmogrifier {
                 ParameterSpec.initRandom(commandLineArgs.seed);
 
             if (commandLineArgs.output != null)
-                out = IrpUtils.getPrintSteam(commandLineArgs.output);
+                out = IrCoreUtils.getPrintSteam(commandLineArgs.output);
             //IrpTransmogrifier instance = new IrpTransmogrifier(ps);
 
             RepeatFinder.setDefaultMinRepeatLastGap(commandLineArgs.minRepeatGap); // Parallelization problem
@@ -629,7 +629,7 @@ public final class IrpTransmogrifier {
         if (commandAnalyze.allDecodes && commandAnalyze.decoder != null)
             throw new UsageException("Cannot use both --alldecodes and --decode.");
 
-        if (IrpUtils.numberTrue(commandAnalyze.input != null, commandAnalyze.namedInput != null, commandAnalyze.args != null) != 1)
+        if (IrCoreUtils.numberTrue(commandAnalyze.input != null, commandAnalyze.namedInput != null, commandAnalyze.args != null) != 1)
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         // FIXME: parallelization blocker
@@ -789,7 +789,7 @@ public final class IrpTransmogrifier {
         if (finished)
             return;
 
-        if (IrpUtils.numberTrue(commandDecode.input != null, commandDecode.namedInput != null, commandDecode.args != null) != 1)
+        if (IrCoreUtils.numberTrue(commandDecode.input != null, commandDecode.namedInput != null, commandDecode.args != null) != 1)
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         setupDatabase();
@@ -893,7 +893,7 @@ public final class IrpTransmogrifier {
         out.println();
 
         if (commandBitField.xml != null) {
-            XmlUtils.printDOM(IrpUtils.getPrintSteam(commandBitField.xml), bitfield.toDocument(), commandLineArgs.encoding, null);
+            XmlUtils.printDOM(IrCoreUtils.getPrintSteam(commandBitField.xml), bitfield.toDocument(), commandLineArgs.encoding, null);
             logger.log(Level.INFO, "Wrote {0}", commandBitField.xml);
         }
 //        if (commandBitField.gui)
@@ -1494,7 +1494,7 @@ public final class IrpTransmogrifier {
                 return true;
             }
             if (description) {
-                IrpUtils.trivialFormatter(instance.out, description(), 65);
+                IrCoreUtils.trivialFormatter(instance.out, description(), 65);
                 return true;
             }
             return false;

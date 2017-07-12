@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.math.BigInteger;
 import java.util.Objects;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
@@ -46,7 +47,7 @@ final class BitStream extends IrpObject implements Evaluatable {
 
         data = BigInteger.valueOf((generalSpec != null && generalSpec.getBitDirection() == BitDirection.msb)
                     ? bitField.toNumber(nameEngine)
-                    : IrpUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine)));
+                    : IrCoreUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine)));
         length = bitField.getWidth(nameEngine);
 
     }

@@ -17,6 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,6 +31,10 @@ import java.util.Locale;
  * Some useful static functions and constants.
  */
 public final class IrCoreUtils {
+
+    public final static long INVALID= -1L;
+    public final static long ALL = -2L;
+    public final static long SOME = -3L;
 
     public static final String LINESEPARATOR = System.getProperty("line.separator");
 
@@ -41,11 +52,6 @@ public final class IrCoreUtils {
      * Default absolute tolerance for frequency comparison.
      */
     public static final double DEFAULTFREQUENCYTOLERANCE = 2000;
-
-    /**
-     * Default absolute tolerance for frequency comparison.
-     */
-    public static final double INVALID = -1f;
 
     /**
      * Default threshold value for lead-out in microseconds.
@@ -151,6 +157,187 @@ public final class IrCoreUtils {
         return sum;
     }
 
+    public static int l1Norm(int[] sequence, int beg, int length) {
+        int sum = 0;
+        for (int i = beg; i < beg + length; i++)
+            sum += Math.abs(sequence[i]);
+        return sum;
+    }
+
+    public static int l1Norm(int[] sequence) {
+        return l1Norm(sequence, 0, sequence.length);
+    }
+
+    public static String spaces(int length) {
+        byte[] buf = new byte[length];
+        for (int i = 0; i < length; i++)
+            buf[i] = 0x20;
+        return new String(buf, Charset.forName("US-ASCII"));
+    }
+
+    public static long ones(int n) {
+        if (n < 0 || n > Long.SIZE)
+            throw new IllegalArgumentException("Argument must be non-negative and <= " + Long.SIZE);
+        long result = 0L;
+        for (int i = 0; i < n; i++)
+            result = (result << 1) | 1L;
+        return result;
+    }
+
+    public static String toCName(String name) {
+        String newName = name.replaceAll("[^0-9A-Za-z_]", "");
+        return newName.matches("\\d.*") ? ("X" + newName) : newName;
+    }
+
+    public static int numberTrue(Boolean... args) {
+        int result = 0;
+        for (boolean b : args) {
+            if (b)
+                result++;
+        }
+        return result;
+    }
+
+    /**
+     * Either opens a file (optionally for appending (if beginning with +)) or returns stdout.
+     *
+     * @param filename Either - for stdout, or a file name, or null. If starting with +, the file is opened in append mode, after removing the +-character.
+     * @return Open PrintStream
+     * @throws FileNotFoundException if FileOutputStream does
+     */
+    public static PrintStream getPrintSteam(String filename) throws FileNotFoundException {
+        if (filename == null)
+            return null;
+
+        String realFilename = filename.startsWith("+") ? filename.substring(1) : filename;
+        try {
+            return filename.equals("-")
+                    ? System.out
+                    : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, "US-ASCII");
+        } catch (UnsupportedEncodingException ex) {
+            throw new ThisCannotHappenException();
+        }
+    }
+
+    /**
+     * Either opens an input file or returns stdin.
+     *
+     * @param filename
+     * @return Open InputStream
+     * @throws FileNotFoundException
+     */
+    public static InputStream getInputSteam(String filename) throws FileNotFoundException {
+        return filename.equals("-") ? System.in : new FileInputStream(filename);
+    }
+
+    /**
+     * Prints the String in the second argument nicely on the PrintStream in the first argument,
+     * nicely chopping after lineLength positions. Respects linefeeds, tabs, etc.
+     * @param out PrintStream to print on.
+     * @param string String to print
+     * @param lineLength Break after this position.
+     */
+    public static void trivialFormatter(PrintStream out, String string, int lineLength) {
+        int pos = 0;
+        String[] data = string.split("((?<=\\s)|(?=\\s))"); // splits on whitspace, while keeping it
+        for (String str : data) {
+            if (pos <= 0 && str.matches(" ")) {
+            } else
+                out.print(str);
+            pos = str.matches("\\v") ? 0 : pos + str.length();
+            if (pos > lineLength) {
+                out.println();
+                pos = 0;
+            }
+        }
+        if (pos > 0)
+            out.println();
+    }
+
+    /**
+     * The power function for long arguments.
+     *
+     * @param x long
+     * @param y long, non-negative
+     * @return x raised to the y'th power
+     *
+     * @throws ArithmeticException
+     */
+    public static long power(long x, long y) {
+        if (y < 0)
+            throw new ArithmeticException("power to a negative integer is not sensible here.");
+        long r = 1;
+        for (long i = 0; i < y; i++)
+            r *= x;
+        return r;
+    }
+
+    /**
+     * Computes ceil(log2(x))
+     * @param x
+     * @return
+     */
+    public static long log2(long x) {
+        if (x <= 0)
+            throw new IllegalArgumentException("argument must be positive");
+        long pow = 1;
+        for (long n = 0; ; n++) {
+            if (pow >= x)
+                return n;
+            pow *= 2;
+        }
+    }
+
+    public static String radixPrefix(int radix) {
+        return radix == 2 ? "0b"
+                : radix == 8 ? "0"
+                : radix == 16 ? "0x"
+                : "";
+    }
+
+    /**
+     * Parses integers of base 2 (prefix "0b"  or "%", 8 (leading 0), 10, or 16 (prefix "0x).
+     * If argument special is true, allows intervals 123..456 or 123:456 by ignoring upper part.
+     * and translates `*' to the constant "all" = (-2) and `#' to "some" (= -3).
+     *
+     * @param str String to be parsed
+     * @param special If the special stuff should be interpreted ('*', '+', intervals).
+     * @return long integer.
+     */
+    public static long parseLong(String str, boolean special) /*throws NumberFormatException*/ {
+        if (special && (str.startsWith("#") || str.contains(",")))
+            return SOME;
+
+        String s = special ? str.replaceAll("[:.\\+<#].*$", "").trim() : str;
+        if (special && (s.equals("*") || s.equals("'*'")))
+            return ALL; // Just to help Windows' victims, who cannot otherwise pass a *.
+        //s.equals("#") ? some :
+        return s.startsWith("0x") ? Long.parseLong(s.substring(2), 16) :
+               s.startsWith("0b") ? Long.parseLong(s.substring(2), 2) :
+               s.startsWith("%") ? Long.parseLong(s.substring(1), 2) :
+               s.equals("0") ? 0L :
+               s.startsWith("0") ? Long.parseLong(s.substring(1), 8) :
+               Long.parseLong(s);
+    }
+
+    /**
+     * Parses integers of base 2 (prefix "0b"  or "%", 8 (leading 0), 10, or 16 (prefix "0x).
+     *
+     * @param str String to be parsed
+     * @return long integer.
+     */
+    public static long parseLong(String str) {
+        return parseLong(str,false);
+    }
+
+    public static long parseUpper(String str) {
+        String[] s = str.split("\\.\\.");
+        if (s.length == 1)
+            s = str.split(":");
+
+        return (s.length == 2) ? parseLong(s[1], false) : INVALID;
+    }
+
     /**
      * Reverses the bits, living in a width-bit wide world.
      *
@@ -217,29 +404,7 @@ public final class IrCoreUtils {
         return relativeOk;
     }
 
-    /**
-     * Return a number consisting of width number of 1, probably for using as bit mask.
-     * @param width &gt; 0
-     * @return
-     */
-    public static long ones(long width) {
-        return (1L << width) - 1L;
-    }
-
-    /**
-     * Return a number consisting of width number of 1, probably for using as bit mask.
-     * @param width &gt; 0
-     * @return
-     */
-    public static int ones(int width) {
-        return (1 << width) - 1;
-    }
-
-    public static long maskTo(long data, long width) {
-        return data & ones(width);
-    }
-
-    public static long maskTo(int data, int width) {
+    public static long maskTo(long data, int width) {
         return data & ones(width);
     }
 

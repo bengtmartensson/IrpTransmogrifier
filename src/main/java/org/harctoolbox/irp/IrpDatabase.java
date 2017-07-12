@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.xml.validation.Schema;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -99,7 +100,7 @@ public final class IrpDatabase {
     }
 
     public static IrpDatabase readIni(String datafile) throws IOException {
-        try (InputStreamReader is = new InputStreamReader(IrpUtils.getInputSteam(datafile), INI_CHARSET)) {
+        try (InputStreamReader is = new InputStreamReader(IrCoreUtils.getInputSteam(datafile), INI_CHARSET)) {
             return readIni(is);
         }
     }
@@ -214,7 +215,7 @@ public final class IrpDatabase {
     }
 
     public IrpDatabase(String file) throws IOException, SAXException {
-        this(IrpUtils.getInputSteam(file));
+        this(IrCoreUtils.getInputSteam(file));
     }
 
     /**
@@ -300,11 +301,11 @@ public final class IrpDatabase {
     }
 
     public void dump(String filename) throws FileNotFoundException {
-        dump(IrpUtils.getPrintSteam(filename));
+        dump(IrCoreUtils.getPrintSteam(filename));
     }
 
     public void dump(String filename, String name) throws FileNotFoundException {
-        dump(IrpUtils.getPrintSteam(filename), name);
+        dump(IrCoreUtils.getPrintSteam(filename), name);
     }
 
     public boolean isKnown(String protocol) {
@@ -600,7 +601,7 @@ public final class IrpDatabase {
                 switch (kvp.getKey()) {
                     case NAME_NAME:
                         element.setAttribute(NAME_NAME, kvp.getValue().get(0));
-                        element.setAttribute(CNAME_NAME, IrpUtils.toCName(kvp.getValue().get(0)));
+                        element.setAttribute(CNAME_NAME, IrCoreUtils.toCName(kvp.getValue().get(0)));
                         break;
                     case USABLE_NAME:
                         element.setAttribute(USABLE_NAME, Boolean.toString(!kvp.getValue().get(0).equals("no")));

@@ -19,10 +19,10 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.irp.BareIrStream;
 import org.harctoolbox.irp.BitSpec;
 import org.harctoolbox.irp.IrStreamItem;
-import org.harctoolbox.irp.IrpUtils;
 import org.harctoolbox.irp.NonUniqueBitCodeException;
 
 public abstract class PwmDecoder extends AbstractDecoder {
@@ -47,7 +47,7 @@ public abstract class PwmDecoder extends AbstractDecoder {
         super(analyzer, params);
         this.bursts = bursts.clone();
         distinctFlashesInBursts = setupDistinctFlashesInBursts();
-        chunksize = (int) IrpUtils.log2(bursts.length);
+        chunksize = (int) IrCoreUtils.log2(bursts.length);
         bitSpec = mkBitSpec(bursts, timebase);
     }
 

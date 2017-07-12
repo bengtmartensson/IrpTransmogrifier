@@ -39,6 +39,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -186,7 +187,7 @@ public final class XmlUtils {
     }
 
     public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException {
-        PrintStream xmlStream = IrpUtils.getPrintSteam(xmlFileName);
+        PrintStream xmlStream = IrCoreUtils.getPrintSteam(xmlFileName);
         printDOM(xmlStream, doc, encoding, cdataElements);
     }
 

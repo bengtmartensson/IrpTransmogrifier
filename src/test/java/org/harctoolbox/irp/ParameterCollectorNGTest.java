@@ -1,5 +1,6 @@
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
@@ -27,7 +28,7 @@ public class ParameterCollectorNGTest {
             //NameEngine nameEngine = new NameEngine("{X=Y+Z}");
             parameterCollector = new ParameterCollector();
             parameterCollector.add("answer", 42);
-            parameterCollector.add("F", 5, IrpUtils.ones(5));
+            parameterCollector.add("F", 5, IrCoreUtils.ones(5));
         } catch (ParameterInconsistencyException ex) {
             fail();
         }

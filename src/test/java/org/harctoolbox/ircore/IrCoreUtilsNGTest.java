@@ -2,6 +2,7 @@ package org.harctoolbox.ircore;
 
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -161,6 +162,8 @@ public class IrCoreUtilsNGTest {
         long expResult = 146L;
         long result = IrCoreUtils.reverse(x, width);
         assertEquals(result, expResult);
+        assertEquals(IrCoreUtils.reverse(123, 8), 222);
+        assertEquals(IrCoreUtils.reverse(1, 5), 16);
     }
 
     /**
@@ -169,7 +172,7 @@ public class IrCoreUtilsNGTest {
     @Test
     public void testOnes_long() {
         System.out.println("ones");
-        long width = 7L;
+        int width = 7;
         long expResult = 127L;
         long result = IrCoreUtils.ones(width);
         assertEquals(result, expResult);
@@ -183,7 +186,7 @@ public class IrCoreUtilsNGTest {
         System.out.println("ones");
         int width = 9;
         int expResult = 511;
-        int result = IrCoreUtils.ones(width);
+        long result = IrCoreUtils.ones(width);
         assertEquals(result, expResult);
     }
 
@@ -194,7 +197,7 @@ public class IrCoreUtilsNGTest {
     public void testMaskTo_long_long() {
         System.out.println("maskTo");
         long data = 73L;
-        long width = 4L;
+        int width = 4;
         long expResult = 9L;
         long result = IrCoreUtils.maskTo(data, width);
         assertEquals(result, expResult);
@@ -248,5 +251,105 @@ public class IrCoreUtilsNGTest {
         double expResult = 42;
         double result = IrCoreUtils.us2Periods(us, frequency);
         assertEquals(result, expResult, 0.0001);
+    }
+
+    /**
+     * Test of l1Norm method, of class IrCoreUtils.
+     */
+    @Test
+    public void testL1Norm_DoubleArr() {
+        System.out.println("l1Norm");
+        Double[] sequence = new Double[] { Double.valueOf(42f), Double.valueOf(73f) };
+        double expResult = 115f;
+        double result = IrCoreUtils.l1Norm(sequence);
+        assertEquals(result, expResult, 0.0);
+    }
+
+    /**
+     * Test of l1Norm method, of class IrCoreUtils.
+     */
+    @Test
+    public void testL1Norm_doubleArr() {
+        System.out.println("l1Norm");
+        double[] sequence = new double[] { 42f, 73f};
+        double expResult = 115f;
+        double result = IrCoreUtils.l1Norm(sequence);
+        assertEquals(result, expResult, 0.0);
+    }
+
+    /**
+     * Test of spaces method, of class IrCoreUtils.
+     */
+    @Test
+    public void testSpaces() {
+        System.out.println("spaces");
+        int length = 5;
+        String expResult = "     ";
+        String result = IrCoreUtils.spaces(length);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of ones method, of class IrCoreUtils.
+     */
+    @Test
+    public void testOnes() {
+        System.out.println("ones");
+        int n = 5;
+        long expResult = 0x1FL;
+        long result = IrCoreUtils.ones(n);
+        assertEquals(result, expResult);
+        assertEquals(IrCoreUtils.ones(0), 0L);
+        assertEquals(IrCoreUtils.ones(64), -1L);
+        try {
+            IrCoreUtils.ones(-1);
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
+        try {
+            IrCoreUtils.ones(65);
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    /**
+     * Test of power method, of class IrCoreUtils.
+     */
+    @Test
+    public void testPower() {
+        System.out.println("power");
+        assertEquals(IrCoreUtils.power(2L, 0L), 1L);
+        assertEquals(IrCoreUtils.power(2L, 16L), 65536L);
+    }
+
+    /**
+     * Test of parseLong method, of class IrCoreUtils.
+     */
+    @Test
+    public void testParseLong_String() {
+        System.out.println("parseLong");
+        assertEquals(IrCoreUtils.parseLong("0x12345"), 0x12345);
+        assertEquals(IrCoreUtils.parseLong("12345"), 12345);
+        assertEquals(IrCoreUtils.parseLong("0b100100"), 0b100100);
+        assertEquals(IrCoreUtils.parseLong("%100100"), 0b100100);
+        assertEquals(IrCoreUtils.parseLong("012345"), 012345);
+        assertEquals(IrCoreUtils.parseLong("0"), 0);
+    }
+
+    /**
+     * Test of log2 method, of class IrCoreUtils.
+     */
+    @Test
+    public void testLog2() {
+        System.out.println("log2");
+        assertEquals(IrCoreUtils.log2(15), 4);
+        assertEquals(IrCoreUtils.log2(16), 4);
+        assertEquals(IrCoreUtils.log2(17), 5);
+        try {
+            assertEquals(IrCoreUtils.log2(0), 5);
+            fail();
+        } catch (IllegalArgumentException ex) {
+        }
     }
 }

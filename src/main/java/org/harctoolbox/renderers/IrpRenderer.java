@@ -31,7 +31,7 @@ public abstract class IrpRenderer {
     // functions evaluating BitFields in expressions
     protected static long finiteBitField(long data, long width, long chop, boolean complement, boolean reverse) {
         long realdata = preprocessFiniteBitField(data, width, chop, complement, reverse);
-        return IrCoreUtils.maskTo(realdata, width);
+        return IrCoreUtils.maskTo(realdata, (int) width);
     }
 
     private static long preprocessFiniteBitField(long data, long width, long chop, boolean complement, boolean reverse) {

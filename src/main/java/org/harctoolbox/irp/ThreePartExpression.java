@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -120,7 +121,7 @@ final class ThreePartExpression extends Expression {
         switch (operator) {
 
             case "**":
-                return IrpUtils.power(left, right);
+                return IrCoreUtils.power(left, right);
             case "*":
                 return left * right;
             case "/":

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.IrCoreUtils;
 
 public abstract class CodeGenerator {
 
@@ -70,7 +71,7 @@ public abstract class CodeGenerator {
             NamedProtocol protocol;
             protocol = irpDatabase.getNamedProtocol(protocolName);
             String filename = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + fileSuffix()).getCanonicalPath();
-            try (PrintStream out = IrpUtils.getPrintSteam(filename)) {
+            try (PrintStream out = IrCoreUtils.getPrintSteam(filename)) {
                 generate(protocol, out, true, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);
                 logger.log(Level.INFO, "Wrote {0}", filename);
             }

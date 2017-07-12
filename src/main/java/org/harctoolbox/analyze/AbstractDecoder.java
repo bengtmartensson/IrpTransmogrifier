@@ -33,7 +33,6 @@ import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrStream;
 import org.harctoolbox.irp.IrStreamItem;
-import org.harctoolbox.irp.IrpUtils;
 import org.harctoolbox.irp.NameEngine;
 import org.harctoolbox.irp.Protocol;
 import org.harctoolbox.irp.RepeatMarker;
@@ -237,7 +236,7 @@ public abstract class AbstractDecoder {
             } else {
                 pd = new ParameterData(data >> (noBits - maxBits), maxBits, chunkSize);
                 noBits -= maxBits;
-                data &= IrpUtils.ones(noBits);
+                data &= IrCoreUtils.ones(noBits);
             }
             return pd;
         }
@@ -248,7 +247,7 @@ public abstract class AbstractDecoder {
 
         private void fixBitDirection(BitDirection bitDirection) {
             if (bitDirection == BitDirection.lsb)
-                data = IrpUtils.reverse(getData(), getNoBits());
+                data = IrCoreUtils.reverse(getData(), getNoBits());
         }
 
         /**

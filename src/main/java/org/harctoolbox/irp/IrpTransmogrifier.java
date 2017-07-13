@@ -1114,7 +1114,7 @@ public final class IrpTransmogrifier {
         private double maxRoundingError = Burst.Preferences.DEFAULTMAXROUNDINGERROR;
 
         @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width (must be < 64).")
-        private int maxParameterWidth = 16;
+        private int maxParameterWidth = 32;
 
         // too complicated for most users...
         @Parameter(names = {      "--decoder" }, hidden = true, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")

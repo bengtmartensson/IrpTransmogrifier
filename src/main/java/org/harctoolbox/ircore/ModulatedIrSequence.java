@@ -33,6 +33,10 @@ public final class ModulatedIrSequence extends IrSequence {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
     }
 
+    public static double getFrequencyWithDefault(Double frequency) {
+        return frequency != null ? frequency : DEFAULT_FREQUENCY;
+    }
+
     /**
      * Modulation frequency in Hz. Use 0 for no modulation. Use
      * null for no information.
@@ -127,7 +131,7 @@ public final class ModulatedIrSequence extends IrSequence {
     }
 
     public double getFrequencyWithDefault() {
-        return frequency != null ? frequency : DEFAULT_FREQUENCY;
+        return getFrequencyWithDefault(frequency);
     }
 
     /**

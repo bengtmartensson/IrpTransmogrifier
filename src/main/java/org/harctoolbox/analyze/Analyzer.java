@@ -358,11 +358,15 @@ public final class Analyzer extends Cleaner {
                 preferPeriods = false;
             } else {
                 preferPeriods = timeBaseString.endsWith("p");
+                if (preferPeriods && frequency == null)
+                    logger.warning("Period based timing selected, but no explicit frequency given.");
                 String str = (timeBaseString.endsWith("p") || timeBaseString.endsWith("u"))
                         ? timeBaseString.substring(0, timeBaseString.length() - 1)
                         : timeBaseString;
                 double timeBaseNumber = Double.parseDouble(str);
-                timebase = preferPeriods ? IrCoreUtils.seconds2microseconds(timeBaseNumber / frequency) : timeBaseNumber;
+                timebase = preferPeriods
+                        ? IrCoreUtils.seconds2microseconds(timeBaseNumber / ModulatedIrSequence.getFrequencyWithDefault(frequency))
+                        : timeBaseNumber;
             }
         }
 

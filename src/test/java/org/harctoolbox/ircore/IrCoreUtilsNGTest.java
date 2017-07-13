@@ -1,7 +1,11 @@
 package org.harctoolbox.ircore;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -351,5 +355,185 @@ public class IrCoreUtilsNGTest {
             fail();
         } catch (IllegalArgumentException ex) {
         }
+    }
+
+    /**
+     * Test of microseconds2seconds method, of class IrCoreUtils.
+     */
+    @Test
+    public void testMicroseconds2seconds() {
+        System.out.println("microseconds2seconds");
+        double us = 12345000;
+        double expResult = 12.345;
+        double result = IrCoreUtils.microseconds2seconds(us);
+        assertEquals(result, expResult, 0.0000001);
+    }
+
+    /**
+     * Test of l1Norm method, of class IrCoreUtils.
+     */
+    @Test
+    public void testL1Norm_Iterable() {
+        System.out.println("l1Norm");
+        List<Double> sequence = new ArrayList<>(3);
+        sequence.add(12.34);
+        sequence.add(42.0);
+        sequence.add(-1.0);
+        double expResult = 55.34;
+        double result = IrCoreUtils.l1Norm(sequence);
+        assertEquals(result, expResult, 0.0000001);
+    }
+
+    /**
+     * Test of l1Norm method, of class IrCoreUtils.
+     */
+    @Test
+    public void testL1Norm_3args_1() {
+        System.out.println("l1Norm");
+        double[] sequence = new double[] {12.34, 42.0, -1.0};
+        double expResult = 42.0;
+        int beg = 1;
+        int length = 1;
+        double result = IrCoreUtils.l1Norm(sequence, beg, length);
+        assertEquals(result, expResult, 0.0);
+    }
+
+    /**
+     * Test of l1Norm method, of class IrCoreUtils.
+     */
+    @Test
+    public void testL1Norm_List_int() {
+        System.out.println("l1Norm");
+        List<Double> list = new ArrayList<>(10);
+        list.add(12.34);
+        list.add(42.0);
+        int beg = 1;
+        double expResult = 42.0;
+        double result = IrCoreUtils.l1Norm(list, beg);
+        assertEquals(result, expResult, 0.0);
+    }
+
+    /**
+     * Test of l1Norm method, of class IrCoreUtils.
+     */
+    @Test
+    public void testL1Norm_3args_2() {
+        System.out.println("l1Norm");
+        int[] sequence = new int[] { 1, 2, 3};
+        int beg = 1;
+        int length = 1;
+        int expResult = 2;
+        int result = IrCoreUtils.l1Norm(sequence, beg, length);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of l1Norm method, of class IrCoreUtils.
+     */
+    @Test
+    public void testL1Norm_intArr() {
+        System.out.println("l1Norm");
+        int[] sequence = new int[] { 1, 2, 3};
+        int expResult = 6;
+        int result = IrCoreUtils.l1Norm(sequence);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of toCName method, of class IrCoreUtils.
+     */
+    @Test
+    public void testToCName() {
+        System.out.println("toCName");
+        String name = "Donald J. Trump";
+        String expResult = "DonaldJTrump";
+        String result = IrCoreUtils.toCName(name);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of numberTrue method, of class IrCoreUtils.
+     */
+    @Test
+    public void testNumberTrue() {
+        System.out.println("numberTrue");
+        Boolean[] args = new Boolean[] { true, false, true};
+        int expResult = 2;
+        int result = IrCoreUtils.numberTrue(args);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of radixPrefix method, of class IrCoreUtils.
+     */
+    @Test
+    public void testRadixPrefix() {
+        System.out.println("radixPrefix");
+        assertEquals(IrCoreUtils.radixPrefix(2), "0b");
+        assertEquals(IrCoreUtils.radixPrefix(8), "0");
+        assertEquals(IrCoreUtils.radixPrefix(10), "");
+        assertEquals(IrCoreUtils.radixPrefix(16), "0x");
+    }
+
+    /**
+     * Test of approximatelyEquals method, of class IrCoreUtils.
+     */
+    @Test
+    public void testApproximatelyEquals_Double_Double() {
+        System.out.println("approximatelyEquals");
+        assertFalse(IrCoreUtils.approximatelyEquals(12.34, 112.35));
+        assertTrue(IrCoreUtils.approximatelyEquals(12.34, 12.3400005));
+    }
+
+    /**
+     * Test of maskTo method, of class IrCoreUtils.
+     */
+    @Test
+    public void testMaskTo() {
+        System.out.println("maskTo");
+        long data = -1L;
+        int width = 3;
+        long expResult = 7L;
+        long result = IrCoreUtils.maskTo(data, width);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of capitalize method, of class IrCoreUtils.
+     */
+    @Test
+    public void testCapitalize() {
+        System.out.println("capitalize");
+        String s = "capitalize";
+        String expResult = "Capitalize";
+        String result = IrCoreUtils.capitalize(s);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of javaifyString method, of class IrCoreUtils.
+     */
+    @Test
+    public void testJavaifyString() {
+        System.out.println("javaifyString");
+        String s = "";
+        String expResult = "";
+        String result = IrCoreUtils.javaifyString(s);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of hasDuplicatedElements method, of class IrCoreUtils.
+     */
+    @Test
+    public void testHasDuplicatedElements() {
+        System.out.println("hasDuplicatedElements");
+        List<String> list = new ArrayList<>(10);
+        list.add("xyz");
+        list.add("78");
+        boolean expResult = false;
+        assertFalse(IrCoreUtils.hasDuplicatedElements(list));
+        list.add("xyz");
+        assertTrue(IrCoreUtils.hasDuplicatedElements(list));
     }
 }

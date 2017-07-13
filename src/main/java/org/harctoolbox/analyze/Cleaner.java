@@ -36,6 +36,7 @@ public class Cleaner {
 
     private final static int NUMBEROFINITIALTIMINGSCAPACITY = 20;
     private static final int NO_LETTERS = 26;
+    private static final int MAXSPAN = 5;
 
     public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
@@ -338,6 +339,18 @@ public class Cleaner {
 
     public int getNoSequences() {
         return signalMode ? 1 : indices.length;
+    }
+
+    protected int getTimeBaseFromData(double relativeTolerance) {
+        Integer min = timings.get(0);
+        List<Integer> list = new ArrayList<>(timings.size());
+        timings.forEach((time) -> {
+            int numberOccurances = cleanedHistogram.get(time).total();
+            int span = time/min;
+            if (numberOccurances > 1 && span <= MAXSPAN)
+                list.add(time);
+        });
+        return IrCoreUtils.approximateGreatestCommonDivider(list, relativeTolerance);
     }
 
     private static class HistoPair {

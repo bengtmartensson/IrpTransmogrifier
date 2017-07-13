@@ -171,6 +171,14 @@ public final class Burst {
             this.maxMicroSeconds = DEFAULTMAXMICROSECONDS;
         }
 
+        @Override
+        public String toString() {
+            return "{"
+                    + Double.toString(maxRoundingError) + ", "
+                    + Double.toString(maxUnits) + ", "
+                    + Double.toString(maxMicroSeconds) + "}";
+        }
+
         /**
          * @return the maxRoundingError
          */

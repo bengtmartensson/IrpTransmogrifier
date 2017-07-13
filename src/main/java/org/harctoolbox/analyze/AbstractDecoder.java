@@ -66,7 +66,7 @@ public abstract class AbstractDecoder {
         this.nameEngine = null;
         this.analyzer = analyzer;
         this.params = params;
-        this.timebase = params.getTimebase() != null ? params.getTimebase() : analyzer.getTiming(0);
+        this.timebase = analyzer.getTimeBaseFromData(params);
         this.bitSpec = new BitSpec();
     }
 

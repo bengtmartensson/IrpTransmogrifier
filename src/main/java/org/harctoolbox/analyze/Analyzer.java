@@ -53,8 +53,6 @@ public final class Analyzer extends Cleaner {
         return indices;
     }
 
-    private int timebase;
-    private int[] normedTimings;
     private List<Burst> pairs;
     private final RepeatFinder.RepeatFinderData[] repeatFinderData;
     private Double frequency;
@@ -80,7 +78,6 @@ public final class Analyzer extends Cleaner {
         repeatFinderData = new RepeatFinder.RepeatFinderData[irSequenceList.size()];
         for (int i = 0; i < irSequenceList.size(); i++)
             repeatFinderData[i] = getRepeatFinderData(invokeRepeatFinder, i);
-        createNormedTimings();
         createPairs();
     }
 
@@ -167,15 +164,6 @@ public final class Analyzer extends Cleaner {
         }
     }
 
-    private void createNormedTimings() {
-        //List<Integer> timings = cleaner.getTimings();
-        timebase = getTiming(0);
-        normedTimings = new int[timings.size()];
-        for (int i = 0; i < timings.size(); i++) {
-            normedTimings[i] = Math.round(timings.get(i) / (float) getTimebase());
-        }
-    }
-
     private void createPairs() {
         pairs = new ArrayList<>(16);
         getFlashes().stream().forEach((flash) -> {
@@ -230,12 +218,12 @@ public final class Analyzer extends Cleaner {
         return decoders;
     }
 
-    /**
-     * @return the timebase
-     */
-    public int getTimebase() {
-        return timebase;
-    }
+//    /**
+//     * @return the timebase
+//     */
+//    public int getTimebase() {
+//        return timebase;
+//    }
 
     /**
      * @return the pairs
@@ -323,13 +311,19 @@ public final class Analyzer extends Cleaner {
     }
 
     private String multiplierString(int us, Double timebase, Burst.Preferences burstPrefs) {
-        double tick = timebase != null ? timebase : timings.get(0);
+        double tick = timebase != null ? timebase : getTimeBaseFromData(burstPrefs.getMaxRoundingError());
         Integer mult = Burst.multiplier(us, tick, burstPrefs);
         return mult != null ? "= " + mult.toString() + "*" + Long.toString(Math.round(tick)) + "  " : "\t";
     }
 
     public RepeatFinder.RepeatFinderData repeatFinderData(int i) {
         return repeatFinderData[i];
+    }
+
+    double getTimeBaseFromData(AnalyzerParams params) {
+        return params.getTimebase() != null
+                ? params.getTimebase()
+                : getTimeBaseFromData(params.getBurstPrefs().getMaxRoundingError());
     }
 
     public static class AnalyzerParams {

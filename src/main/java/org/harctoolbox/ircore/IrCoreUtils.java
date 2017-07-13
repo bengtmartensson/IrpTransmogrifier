@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -424,6 +425,33 @@ public final class IrCoreUtils {
                     return true;
         }
         return false;
+    }
+
+    public static int approximateGreatestCommonDivider(List<Integer> args, double relTolerance) {
+        if (args.isEmpty())
+            throw new IllegalArgumentException();
+
+        return approximateGreatestCommonDivider(null, args, relTolerance);
+    }
+
+    private static int approximateGreatestCommonDivider(Integer num, List<Integer> args, double relTolerance) {
+        if (args.isEmpty())
+            return num;
+        int newNum = num == null ? args.get(0) : approximateGreatestCommonDivider(num, args.get(0), relTolerance);
+        ArrayList<Integer> list = new ArrayList<>(args);
+        list.remove(0);
+        return approximateGreatestCommonDivider(newNum, list, relTolerance);
+    }
+
+    public static int approximateGreatestCommonDivider(int first, int second, double relTolerance) {
+        return first > second ? approximateGCD(first, second, relTolerance)
+                : approximateGCD(second, first, relTolerance);
+    }
+
+    private static int approximateGCD(int first, int second, double relTolerance) {
+        int quot = (first + second/2)/second;
+        int rest = Math.abs(first - quot * second);
+        return rest/((double) second) <= relTolerance ? second : approximateGCD(second, rest, relTolerance);
     }
 
     private IrCoreUtils() {

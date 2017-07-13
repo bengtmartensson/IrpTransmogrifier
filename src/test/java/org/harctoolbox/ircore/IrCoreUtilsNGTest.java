@@ -536,4 +536,30 @@ public class IrCoreUtilsNGTest {
         list.add("xyz");
         assertTrue(IrCoreUtils.hasDuplicatedElements(list));
     }
+
+    /**
+     * Test of approximateGreatestCommonDivider method, of class IrCoreUtils.
+     */
+    @Test
+    public void testApproximateGreatestCommonDivider() {
+        System.out.println("approximateGreatestCommonDivider");
+        assertEquals(IrCoreUtils.approximateGreatestCommonDivider(100, 128, 0.01), 4);
+        assertEquals(IrCoreUtils.approximateGreatestCommonDivider(997, 57, 0.01), 1);
+    }
+
+    /**
+     * Test of approximateGreatestCommonDivider method, of class IrCoreUtils.
+     */
+    @Test
+    public void testApproximateGreatestCommonDividerList() {
+        System.out.println("approximateGreatestCommonDividerList");
+        List<Integer> list = new ArrayList<>(10);
+        list.add(100);
+        list.add(128);
+        assertEquals(IrCoreUtils.approximateGreatestCommonDivider(list, 0.01), 4);
+        list.add(2*997);
+        assertEquals(IrCoreUtils.approximateGreatestCommonDivider(list, 0.01), 2);
+        list.add(3);
+        assertEquals(IrCoreUtils.approximateGreatestCommonDivider(list, 0.01), 1);
+    }
 }

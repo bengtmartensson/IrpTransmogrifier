@@ -27,10 +27,10 @@ import org.harctoolbox.irp.NonUniqueBitCodeException;
 
 public abstract class PwmDecoder extends AbstractDecoder {
 
-    private static BitSpec mkBitSpec(Burst[] bursts, double timebase) throws NonUniqueBitCodeException {
+    private static BitSpec mkBitSpec(Burst[] bursts, double timebase, Burst.Preferences burstPrefs) throws NonUniqueBitCodeException {
         List<BareIrStream> list = new ArrayList<>(bursts.length);
         for (Burst burst : bursts)
-            list.add(burst.toBareIrStream(timebase));
+            list.add(burst.toBareIrStream(timebase, burstPrefs));
 
         return new BitSpec(list);
     }
@@ -48,7 +48,7 @@ public abstract class PwmDecoder extends AbstractDecoder {
         this.bursts = bursts.clone();
         distinctFlashesInBursts = setupDistinctFlashesInBursts();
         chunksize = (int) IrCoreUtils.log2(bursts.length);
-        bitSpec = mkBitSpec(bursts, timebase);
+        bitSpec = mkBitSpec(bursts, timebase, params.getBurstPrefs());
     }
 
     public boolean hasDistinctFlashesInBursts() {

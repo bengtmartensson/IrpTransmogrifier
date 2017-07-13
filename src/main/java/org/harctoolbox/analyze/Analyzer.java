@@ -306,13 +306,13 @@ public final class Analyzer extends Cleaner {
     public void printStatistics(PrintStream out, AnalyzerParams params) {
         out.println("Gaps:");
         this.getGaps().stream().forEach((d) -> {
-            out.println(this.getName(d) + ":\t" + d + "\t" + multiplierString(d, params.getTimebase()) + "\t" + this.getNumberGaps(d));
+            out.println(this.getName(d) + ":\t" + d + "\t" + multiplierString(d, params.getTimebase(), params.burstPrefs) + "\t" + this.getNumberGaps(d));
         });
         out.println();
 
         out.println("Flashes:");
         this.getFlashes().stream().forEach((d) -> {
-            out.println(this.getName(d) + ":\t" + d + "\t" + multiplierString(d, params.getTimebase()) + "\t" + this.getNumberFlashes(d));
+            out.println(this.getName(d) + ":\t" + d + "\t" + multiplierString(d, params.getTimebase(), params.burstPrefs) + "\t" + this.getNumberFlashes(d));
         });
         out.println();
 
@@ -322,9 +322,9 @@ public final class Analyzer extends Cleaner {
         });
     }
 
-    private String multiplierString(int us, Double timebase) {
+    private String multiplierString(int us, Double timebase, Burst.Preferences burstPrefs) {
         double tick = timebase != null ? timebase : timings.get(0);
-        Integer mult = Burst.multiplier(us, tick);
+        Integer mult = Burst.multiplier(us, tick, burstPrefs);
         return mult != null ? "= " + mult.toString() + "*" + Long.toString(Math.round(tick)) + "  " : "\t";
     }
 
@@ -341,17 +341,19 @@ public final class Analyzer extends Cleaner {
         private final boolean invert;
         private final List<Integer> parameterWidths;
         private final int maxParameterWidth;
+        private final Burst.Preferences burstPrefs;
 
         public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) {
-            this(frequency, timeBaseString, bitDirection, useExtents, parameterWidths, 32, invert);
+            this(frequency, timeBaseString, bitDirection, useExtents, parameterWidths, 32, invert, new Burst.Preferences());
         }
 
         public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents,
-                List<Integer> parameterWidths, int maxParameterWidth, boolean invert) {
+                List<Integer> parameterWidths, int maxParameterWidth, boolean invert, Burst.Preferences burstPrefs) {
             this.frequency = frequency;
             this.bitDirection = bitDirection;
             this.useExtents = useExtents;
             this.invert = invert;
+            this.burstPrefs = burstPrefs;
             this.parameterWidths = parameterWidths == null ? new ArrayList<>(0) : parameterWidths;
             if (maxParameterWidth >= Long.SIZE)
                 throw new IllegalArgumentException("maxParameterWidth must be < " + Long.SIZE);
@@ -368,6 +370,10 @@ public final class Analyzer extends Cleaner {
                 double timeBaseNumber = Double.parseDouble(str);
                 timebase = preferPeriods ? IrCoreUtils.seconds2microseconds(timeBaseNumber / frequency) : timeBaseNumber;
             }
+        }
+
+        Burst.Preferences getBurstPrefs() {
+            return burstPrefs;
         }
 
         public int getNoBitsLimit(int noPayload) {

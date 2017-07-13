@@ -632,11 +632,6 @@ public final class IrpTransmogrifier {
         if (IrCoreUtils.numberTrue(commandAnalyze.input != null, commandAnalyze.namedInput != null, commandAnalyze.args != null) != 1)
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
-        // FIXME: parallelization blocker
-        Burst.setMaxUnits(commandAnalyze.maxUnits);
-        Burst.setMaxUs(commandAnalyze.maxMicroSeconds);
-        Burst.setMaxRoundingError(commandAnalyze.maxRoundingError);
-
         if (commandAnalyze.input != null) {
             ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line); });
             List<IrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
@@ -732,9 +727,11 @@ public final class IrpTransmogrifier {
     }
 
     private void analyze(Analyzer analyzer, String[] names) {
+        Burst.Preferences burstPrefs = new Burst.Preferences(commandAnalyze.maxRoundingError, commandAnalyze.maxUnits, commandAnalyze.maxMicroSeconds);
         Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
-                commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.maxParameterWidth, commandAnalyze.invert);
+                commandAnalyze.extent, commandAnalyze.parameterWidths, commandAnalyze.maxParameterWidth, commandAnalyze.invert,
+                burstPrefs);
 
         if (commandAnalyze.statistics) {
             analyzer.printStatistics(out, params);
@@ -1105,16 +1102,16 @@ public final class IrpTransmogrifier {
         private boolean lsb = false;
 
         @Parameter(names = { "-m", "--maxunits" }, description = "Maximal multiplier of time unit in durations.")
-        private double maxUnits = 30f;
+        private double maxUnits = Burst.Preferences.DEFAULTMAXUNITS;
 
         @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
         private String namedInput = null;
 
         @Parameter(names = { "-u", "--maxmicroseconds" }, description = "Maximal duration to be expressed as micro seconds.")
-        private double maxMicroSeconds = 10000f;
+        private double maxMicroSeconds = Burst.Preferences.DEFAULTMAXMICROSECONDS;
 
         @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit.")
-        private double maxRoundingError = 0.3;
+        private double maxRoundingError = Burst.Preferences.DEFAULTMAXROUNDINGERROR;
 
         @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width (must be < 64).")
         private int maxParameterWidth = 16;

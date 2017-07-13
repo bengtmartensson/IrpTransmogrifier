@@ -28,74 +28,48 @@ import org.harctoolbox.irp.Gap;
 import org.harctoolbox.irp.IrStreamItem;
 
 public final class Burst {
-    public static final double DEFAULTMAXROUNDINGERROR = 0.3f;
-    public static final double DEFAULTMAXUNITS = 30f;
-    public static final double DEFAULTMAXUS = 10000f;
 
-    private static double maxRoundingError = DEFAULTMAXROUNDINGERROR;
-    private static double maxUnits = DEFAULTMAXUNITS;
-    private static double maxUs = DEFAULTMAXUS;
-
-    static Integer multiplier(double us, Double timebase) {
+    static Integer multiplier(double us, Double timebase, Preferences prefs) {
         if (timebase == null)
             return null;
 
         double units = us/timebase;
         int rounded = (int) Math.round(units);
         double roundingError = Math.round(units) - units;
-        boolean ok = units < maxUnits && Math.abs(roundingError) < maxRoundingError;
+        boolean ok = units < prefs.getMaxUnits() && Math.abs(roundingError) < prefs.getMaxRoundingError();
         return ok ? rounded : null;
     }
 
-    private static Duration newFlashOrGap(boolean isFlash, double us, Double timebase) {
-        Integer mult = multiplier(us, timebase);
-        String unit = mult != null ? ""
-                : us < maxUs ? "u"
+    private static String unitString(Integer mult, double us, Preferences prefs) {
+        return mult != null ? ""
+                : us < prefs.getMaxMicroSeconds() ? "u"
                 : "m";
+    }
+
+    private static Duration newFlashOrGap(boolean isFlash, double us, Double timebase, Preferences prefs) {
+        Integer mult = multiplier(us, timebase, prefs);
+        String unit = unitString(mult, us, prefs);
         double duration = mult != null ? mult.doubleValue()
                 : unit.equals("m") ? IrCoreUtils.microseconds2milliseconds(us)
                 : us;
         return isFlash ? new Flash(duration, unit) : new Gap(duration, unit);
     }
 
-    public static Extent newExtent(int us, Double timebase) {
-        Integer mult = multiplier(us, timebase);
-        String unit = mult != null ? ""
-                : us < maxUs ? "u"
-                : "m";
+    public static Extent newExtent(int us, Double timebase, Preferences prefs) {
+        Integer mult = multiplier(us, timebase, prefs);
+        String unit = unitString(mult, us, prefs);
         double duration = unit.isEmpty() && mult != null ? mult.doubleValue()
                 : unit.equals("m") ? Math.round(IrCoreUtils.microseconds2milliseconds(us))
                 : us;
         return new Extent(duration, unit);
     }
 
-    public static Flash newFlash(double duration, Double timebase) {
-        return (Flash) newFlashOrGap(true, duration, timebase);
+    public static Flash newFlash(double duration, Double timebase, Preferences prefs) {
+        return (Flash) newFlashOrGap(true, duration, timebase, prefs);
     }
 
-    public static Gap newGap(double duration, Double timebase) {
-        return (Gap) newFlashOrGap(false, duration, timebase);
-    }
-
-    /**
-     * @param aMaxRoundingError the maxRoundingError to set
-     */
-    public static void setMaxRoundingError(double aMaxRoundingError) {
-        maxRoundingError = aMaxRoundingError;
-    }
-
-    /**
-     * @param aMaxUnits the maxUnits to set
-     */
-    public static void setMaxUnits(double aMaxUnits) {
-        maxUnits = aMaxUnits;
-    }
-
-    /**
-     * @param aMaxUs the maxUs to set
-     */
-    public static void setMaxUs(double aMaxUs) {
-        maxUs = aMaxUs;
+    public static Gap newGap(double duration, Double timebase, Preferences prefs) {
+        return (Gap) newFlashOrGap(false, duration, timebase, prefs);
     }
 
     public static int compare(Burst burst1, Burst burst2) {
@@ -124,18 +98,22 @@ public final class Burst {
         return flashDuration;
     }
 
-    public BareIrStream toBareIrStream(double timebase) {
+    public BareIrStream toBareIrStream(double timebase, Preferences prefs) {
         List<IrStreamItem> items = new ArrayList<>(2);
-        Flash flash = newFlash(flashDuration, timebase);
+        Flash flash = newFlash(flashDuration, timebase, prefs);
         items.add(flash);
-        Gap gap = newGap(gapDuration, timebase);
+        Gap gap = newGap(gapDuration, timebase, prefs);
         items.add(gap);
         return new BareIrStream(items);
     }
 
     @Override
     public String toString() {
-        return toBareIrStream(0).toIrpString(10);
+        return toBareIrStream(0, new Preferences()).toIrpString(10);
+    }
+
+    public String toString(Preferences prefs) {
+        return toBareIrStream(0, prefs).toIrpString(10);
     }
 
     @Override
@@ -170,5 +148,48 @@ public final class Burst {
 
     public int overhang(Burst burst) {
          return gapDuration - burst.gapDuration;
+    }
+
+    public final static class Preferences {
+        public static final double DEFAULTMAXROUNDINGERROR = 0.3;
+        public static final double DEFAULTMAXUNITS = 30.0;
+        public static final double DEFAULTMAXMICROSECONDS = 10000.0;
+
+        private double maxRoundingError = DEFAULTMAXROUNDINGERROR;
+        private double maxUnits = DEFAULTMAXUNITS;
+        private double maxMicroSeconds = DEFAULTMAXMICROSECONDS;
+
+        public Preferences(double maxRoundingError, double maxUnits, double maxMicroSeconds) {
+            this.maxRoundingError = maxRoundingError;
+            this.maxUnits = maxUnits;
+            this.maxMicroSeconds = maxMicroSeconds;
+        }
+
+        public Preferences() {
+            this.maxRoundingError = DEFAULTMAXROUNDINGERROR;
+            this.maxUnits = DEFAULTMAXUNITS;
+            this.maxMicroSeconds = DEFAULTMAXMICROSECONDS;
+        }
+
+        /**
+         * @return the maxRoundingError
+         */
+        public double getMaxRoundingError() {
+            return maxRoundingError;
+        }
+
+        /**
+         * @return the maxUnits
+         */
+        public double getMaxUnits() {
+            return maxUnits;
+        }
+
+        /**
+         * @return the maxMicroSeconds
+         */
+        public double getMaxMicroSeconds() {
+            return maxMicroSeconds;
+        }
     }
 }

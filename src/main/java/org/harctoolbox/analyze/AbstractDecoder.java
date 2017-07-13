@@ -124,15 +124,15 @@ public abstract class AbstractDecoder {
     }
 
     protected Flash newFlash(int flash) {
-        return Burst.newFlash(flash, timebase);
+        return Burst.newFlash(flash, timebase, params.getBurstPrefs());
     }
 
     protected Extent newExtent(int total) {
-        return Burst.newExtent(total, timebase);
+        return Burst.newExtent(total, timebase, params.getBurstPrefs());
     }
 
     protected Gap newGap(int gap) {
-        return Burst.newGap(gap, timebase);
+        return Burst.newGap(gap, timebase, params.getBurstPrefs());
     }
 
     protected Duration newFlashOrGap(boolean isFlash, int time) {

@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -34,9 +36,11 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class Cleaner {
 
+    private final static Logger logger = Logger.getLogger(Cleaner.class.getName());
+
     private final static int NUMBEROFINITIALTIMINGSCAPACITY = 20;
     private static final int NO_LETTERS = 26;
-    private static final int MAXSPAN = 5;
+    private static final int MAXSPAN = 4;
 
     public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
@@ -344,13 +348,18 @@ public class Cleaner {
     protected int getTimeBaseFromData(double relativeTolerance) {
         Integer min = timings.get(0);
         List<Integer> list = new ArrayList<>(timings.size());
+        StringBuilder str = new StringBuilder(5*timings.size());
         timings.forEach((time) -> {
             int numberOccurances = cleanedHistogram.get(time).total();
             int span = time/min;
-            if (numberOccurances > 1 && span <= MAXSPAN)
+            if (numberOccurances > 1 && span <= MAXSPAN) {
                 list.add(time);
+                str.append(" ").append(time);
+            }
         });
-        return IrCoreUtils.approximateGreatestCommonDivider(list, relativeTolerance);
+        int gcd = IrCoreUtils.approximateGreatestCommonDivider(list, relativeTolerance);
+        logger.log(Level.INFO, "Computing GCD of {0} to {1}", new Object[]{str.toString(), gcd});
+        return gcd;
     }
 
     private static class HistoPair {

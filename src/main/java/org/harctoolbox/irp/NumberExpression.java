@@ -39,7 +39,7 @@ final class NumberExpression extends PrimaryItemExpression {
 
     private final Number number;
 
-    NumberExpression(long value) {
+    NumberExpression(java.lang.Number value) {
         super(null);
         number = new Number(value);
     }

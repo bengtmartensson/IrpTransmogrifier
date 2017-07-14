@@ -213,7 +213,7 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         map.put(name, expression);
     }
 
-    public void define(String name, long value) throws InvalidNameException {
+    public void define(String name, java.lang.Number value) throws InvalidNameException {
         define(name, new NumberExpression(value));
     }
 

@@ -17,7 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.math.BigInteger;
 import java.util.Map;
+import java.util.Objects;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.w3c.dom.Document;
@@ -34,34 +36,55 @@ public final class Number extends PrimaryItem {
     private static final long UINT32_MAX = 4294967295L;
     private static final long UINT64_MAX = -1L;// "18446744073709551615"
 
-    static long parse(IrpParser.NumberContext ctx) {
-        Number number = new Number(ctx);
-        return number.toNumber();
+    static NumberExpression newExpression(IrpParser.NumberContext child) {
+        return newExpression(child.getText());
     }
 
-    static Expression newExpression(IrpParser.NumberContext child) {
-        String str = child.getText();
-        long num = child.HEXINT() != null ? Long.parseLong(str.substring(2), 16)
-                : child.BININT() != null ? Long.parseLong(str.substring(2), 2)
-                : Long.parseLong(str);
+    static NumberExpression newExpression(String str) {
+        java.lang.Number num = parse(str);
         return new NumberExpression(num);
     }
 
-    public static long parse(String str) {
-        return str.equals("UINT8_MAX") ? UINT8_MAX
-                : str.equals("UINT16_MAX") ? UINT16_MAX
-                : str.equals("UINT24_MAX") ? UINT24_MAX
-                : str.equals("UINT32_MAX") ? UINT32_MAX
-                : str.equals("UINT64_MAX") ? UINT64_MAX
-                : str.length() >= 3 && str.substring(0, 2).equals("0x") ? Long.parseLong(str.substring(2), 16)
-                : str.length() >= 3 && str.substring(0, 2).equals("0b") ? Long.parseLong(str.substring(2), 2)
-                : str.length() >= 1 && str.substring(0, 1).equals("0")  ? Long.parseLong(str, 8)
-                : Long.parseLong(str);
+    static java.lang.Number parse(IrpParser.NumberContext ctx) {
+        return parse(ctx.getText());
     }
 
-    private long data;
+    public static java.lang.Number parse(String str) {
+        int radix;
+        String s;
+        if (str.length() >= 3 && str.substring(0, 2).equals("0x")) {
+            radix = 16;
+            s = str.substring(2);
+        } else if (str.length() >= 3 && str.substring(0, 2).equals("0b")) {
+            radix = 2;
+            s = str.substring(2);
+        } else if (str.length() >= 2 && str.substring(0, 1).equals("0")) {
+            radix = 8;
+            s = str.substring(1);
+        } else {
+            radix = 10;
+            s = str;
+        }
 
-    public Number(long n) {
+        return parse(s, radix);
+    }
+
+    public static java.lang.Number parse(String str, int radix) {
+        try {
+            return Long.parseLong(str, radix);
+        } catch (NumberFormatException ex) {
+            return str.equals("UINT8_MAX") ? UINT8_MAX
+                    : str.equals("UINT16_MAX") ? UINT16_MAX
+                    : str.equals("UINT24_MAX") ? UINT24_MAX
+                    : str.equals("UINT32_MAX") ? UINT32_MAX
+                    : str.equals("UINT64_MAX") ? UINT64_MAX
+                    : new BigInteger(str, radix);
+        }
+    }
+
+    private java.lang.Number data;
+
+    public Number(java.lang.Number n) {
         super(null);
         data = n;
     }
@@ -78,44 +101,55 @@ public final class Number extends PrimaryItem {
         this(parse(str));
     }
 
+    public long longValueExact() throws ArithmeticException {
+        return data instanceof BigInteger
+                ? ((BigInteger) data).longValueExact()
+                : data.longValue();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Number))
             return false;
 
-        return this.data == ((Number) obj).data;
+        Number other = (Number) obj;
+
+        if (data.equals(other.data))
+            return true;
+
+        try {
+            return longValueExact() == other.longValueExact();
+        } catch (ArithmeticException ex) {
+            return false;
+        }
     }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 79 * hash + (int) (this.data ^ (this.data >>> 32));
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.data);
         return hash;
     }
 
-    @Override
-    public long toNumber(NameEngine nameEngine) {
-        return data;
+    public String toString(int radix) {
+        return IrCoreUtils.radixPrefix(radix) + (data instanceof Long
+                ? Long.toString((Long)data, radix)
+                : ((BigInteger) data).toString(radix));
     }
 
     @Override
-    public long toNumber() {
-        return data;
+    public long toNumber(NameEngine nameEngine) throws ArithmeticException {
+        return longValueExact();
     }
 
-//    @Override
-//    public String toString() {
-//        return Long.toString(data);
-//    }
-
-//    @Override
-//    public String toIrpString() {
-//        return Long.toString(data);
-//    }
+    @Override
+    public long toNumber() throws ArithmeticException {
+        return longValueExact();
+    }
 
     @Override
     public String toIrpString(int radix) {
-        return IrCoreUtils.radixPrefix(radix) + Long.toString(data, radix);
+        return toString(radix);
     }
 
     @Override
@@ -125,25 +159,10 @@ public final class Number extends PrimaryItem {
         return element;
     }
 
-//    @Override
-//    public Name toName() {
-//        return null;
-//    }
-
     @Override
     public int weight() {
         return WEIGHT;
     }
-
-//    @Override
-//    public Long invert(long rhs) {
-//        return rhs;
-//    }
-
-//    @Override
-//    public boolean isUnary() {
-//        return true;
-//    }
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
@@ -151,11 +170,6 @@ public final class Number extends PrimaryItem {
         map.put("value", toString());
         return map;
     }
-
-//    @Override
-//    public int numberOfNames() {
-//        return 0;
-//    }
 
     @Override
     public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
@@ -166,9 +180,4 @@ public final class Number extends PrimaryItem {
     public PrimaryItem leftHandSide() {
         return this;
     }
-
-//    @Override
-//    public boolean isName() {
-//        return false;
-//    }
 }

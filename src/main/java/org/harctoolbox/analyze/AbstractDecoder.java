@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -190,11 +191,15 @@ public abstract class AbstractDecoder {
 
     protected static class ParameterData {
 
-        private long data;
+        private BigInteger data;
         private int noBits;
         private final int chunkSize;
 
         private ParameterData(long data, int noBits, int chunkSize) {
+            this(BigInteger.valueOf(data), noBits, chunkSize);
+        }
+
+        private ParameterData(BigInteger data, int noBits, int chunkSize) {
             this.data = data;
             this.noBits = noBits;
             this.chunkSize = chunkSize;
@@ -208,9 +213,13 @@ public abstract class AbstractDecoder {
             this(1);
         }
 
+        public String toString(int radix) {
+            return IrCoreUtils.radixPrefix(radix)  + getData().toString(radix) + ":" + Integer.toString(getNoBits());
+        }
+
         @Override
         public String toString() {
-            return Long.toString(getData()) + ":" + Integer.toString(getNoBits());
+            return toString(10);
         }
 
         public void update(int amount) {
@@ -218,8 +227,12 @@ public abstract class AbstractDecoder {
         }
 
         public void update(int amount, int bits) {
-            data <<= bits;
-            data += amount;
+            update(BigInteger.valueOf(amount), bits);
+        }
+
+        public void update(BigInteger amount, int bits) {
+            data = data.shiftLeft(bits);
+            data = data.or(amount);
             noBits += bits;
         }
 
@@ -231,18 +244,19 @@ public abstract class AbstractDecoder {
             ParameterData pd;
             if (noBits <= maxBits) {
                 pd = new ParameterData(data, noBits, chunkSize);
-                data = 0L;
+                data = BigInteger.ZERO;
                 noBits = 0;
             } else {
-                pd = new ParameterData(data >> (noBits - maxBits), maxBits, chunkSize);
+                pd = new ParameterData(data.shiftRight(noBits - maxBits), maxBits, chunkSize);
                 noBits -= maxBits;
-                data &= IrCoreUtils.ones(noBits);
+                data = data.and(BigInteger.valueOf(IrCoreUtils.ones(noBits)));
             }
             return pd;
         }
 
         private void invertData() {
-            data = IrCoreUtils.maskTo(~data, noBits);
+            BigInteger mask = BigInteger.valueOf(IrCoreUtils.ones(noBits));
+            data = data.xor(mask);
         }
 
         private void fixBitDirection(BitDirection bitDirection) {
@@ -253,7 +267,7 @@ public abstract class AbstractDecoder {
         /**
          * @return the data
          */
-        public long getData() {
+        public BigInteger getData() {
             return data;
         }
 

@@ -48,9 +48,9 @@ public class NumberNGTest {
             assertEquals(Number.parse("UINT24_MAX"), 16777215L);
             assertEquals(Number.parse("UINT32_MAX"), 4294967295L);
             assertEquals(Number.parse("UINT64_MAX"), -1L);
-            assertEquals(Number.parse("073"), 59);
+            assertEquals(Number.parse("073"), 59L);
             assertEquals(Number.parse("0"), 0L);
-            assertEquals(Number.parse("123456789"), 123456789);
+            assertEquals(Number.parse("123456789"), 123456789L);
             assertEquals(Number.parse("0xdeadbeef"), 0xdeadbeefL);
             assertEquals(Number.parse("0xdeadBeef"), 0xdeadbeefL);
         } catch (ParseCancellationException ex) {

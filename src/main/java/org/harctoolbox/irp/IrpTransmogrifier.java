@@ -1113,7 +1113,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit.")
         private double maxRoundingError = Burst.Preferences.DEFAULTMAXROUNDINGERROR;
 
-        @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width (must be < 64).")
+        @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width.")
         private int maxParameterWidth = 32;
 
         // too complicated for most users...

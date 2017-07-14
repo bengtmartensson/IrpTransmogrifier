@@ -349,8 +349,6 @@ public final class Analyzer extends Cleaner {
             this.invert = invert;
             this.burstPrefs = burstPrefs;
             this.parameterWidths = parameterWidths == null ? new ArrayList<>(0) : parameterWidths;
-            if (maxParameterWidth >= Long.SIZE)
-                throw new IllegalArgumentException("maxParameterWidth must be < " + Long.SIZE);
             this.maxParameterWidth = maxParameterWidth;
 
             if (timeBaseString == null) {

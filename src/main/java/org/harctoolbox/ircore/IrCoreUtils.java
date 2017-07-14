@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -352,6 +353,10 @@ public final class IrCoreUtils {
         if (width > 0)
             y >>>= Long.SIZE - width;
         return y;
+    }
+
+    public static BigInteger reverse(BigInteger x, int width) throws ArithmeticException {
+        return BigInteger.valueOf(reverse(x.longValueExact(), width));
     }
 
     /**

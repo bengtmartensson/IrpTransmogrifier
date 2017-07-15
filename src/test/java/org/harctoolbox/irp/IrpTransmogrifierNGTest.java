@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 public class IrpTransmogrifierNGTest {
 
     private static final String IRPPROTOCOLS_XML="src/main/resources/IrpProtocols.xml";
+    private static final String ACDATA = "3120, 1588, 548, 1068, 524, 1064, 548, 300, 528, 292, 544, 300, 524, 1064, 548, 300, 528, 320, 528, 1060, 520, 1092, 528, 292, 524, 1092, 520, 300, 528, 320, 524, 1064, 520, 1096, 524, 296, 540, 1076, 528, 1056, 552, 296, 520, 300, 548, 1068, 524, 320, 528, 292, 524, 1092, 528, 292, 524, 324, 524, 296, 520, 328, 520, 300, 544, 300, 528, 320, 528, 292, 524, 324, 524, 296, 520, 328, 516, 304, 524, 320, 528, 292, 576, 272, 524, 296, 552, 296, 528, 320, 528, 292, 524, 320, 528, 1060, 528, 320, 528, 292, 576, 1040, 520, 1068, 544, 300, 524, 296, 552, 296, 520, 300, 548, 300, 528, 320, 524, 1060, 524, 324, 520, 1068, 524, 1092, 520, 300, 524, 320, 528, 292, 576, 272, 524, 296, 552, 1064, 524, 320, 528, 292, 524, 328, 520, 296, 520, 328, 520, 300, 524, 320, 528, 292, 576, 272, 524, 296, 572, 276, 520, 324, 520, 300, 528, 320, 528, 292, 524, 320, 528, 292, 524, 324, 520, 300, 580, 268, 528, 292, 576, 272, 520, 324, 524, 296, 520, 328, 520, 300, 528, 316, 528, 292, 524, 324, 524, 296, 572, 276, 520, 300, 576, 272, 524, 320, 548, 272, 556, 292, 556, 264, 548, 1064, 528, 1060, 520, 1068, 556, 1060, 520, 324, 552, 272, 576, 268, 560, 1028, 572, 1044, 524, 10000";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -97,6 +98,17 @@ public class IrpTransmogrifierNGTest {
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "");
     }
+
+    @Test(enabled = true)
+    public void testAnalyze6() {
+        System.out.println("analyze6");
+        String args = "analyze " + ACDATA;
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:32,B:32,C:32,D:16,4,-10m){A=0xc4d36480,B=0x4c0b0,C=0x40000000,D=0x1e3}" + IrpTransmogrifier.SEPARATOR + "weight = 20");
+        args = "analyze --maxparameterwidth 1024 --decoder pwm2 " + ACDATA;
+        result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:112,4,-10m){A=0xc4d364800004c0b04000000001e3}" + IrpTransmogrifier.SEPARATOR + "weight = 11");
+   }
 
     @Test(enabled = true)
     public void testDecodeRepeatedNec1() {

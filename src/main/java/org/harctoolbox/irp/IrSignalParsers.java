@@ -83,37 +83,37 @@ public class IrSignalParsers {
 //        return parseRaw(args, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, fixOddSequences);
 //    }
 
-    public static IrSignal parseRaw(String string, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+    public static IrSignal parseRaw(String string, Double frequency, Double dummyGap) throws InvalidArgumentException {
         if (frequency == null)
             logger.log(Level.WARNING, String.format(Locale.US, "Frequency missing, assuming default frequency = %d Hz",
                     (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
-        return parseRaw(string, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, fixOddSequences);
+        return parseRaw(string, frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY, dummyGap);
     }
 
-    public static IrSignal parseRaw(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
-        return parseRaw(String.join(" ", args).trim(), frequency, fixOddSequences);
+    public static IrSignal parseRaw(List<String> args, Double frequency, Double dummyGap) throws InvalidArgumentException {
+        return parseRaw(String.join(" ", args).trim(), frequency, dummyGap);
     }
 
-    public static IrSignal parseRaw(String str, double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+    public static IrSignal parseRaw(String str, double frequency, Double dummyGap) throws InvalidArgumentException {
         IrSequence intro;
         IrSequence repeat = null;
         IrSequence ending = null;
 
         if (str.startsWith("[")) {
             String[] parts = str.replace("[", "").split("\\]");
-            if (parts.length < 2) {
+            if (parts.length < 2)
                 throw new InvalidArgumentException("Less than two parts");
-            }
-            intro = new IrSequence(parts[0]);
-            repeat = new IrSequence(parts[1]);
-            ending = (parts.length >= 3) ? new IrSequence(parts[2]) : null;
+
+            intro = IrSequenceParsers.parseRaw(parts[0], dummyGap);
+            repeat = IrSequenceParsers.parseRaw(parts[1], dummyGap);
+            ending = (parts.length >= 3) ? IrSequenceParsers.parseRaw(parts[2], dummyGap) : null;
         } else
-            intro = new IrSequence(str);
+            intro = IrSequenceParsers.parseRaw(str, dummyGap);
 
         return new IrSignal(intro, repeat, ending, frequency);
     }
 
-    public static IrSignal parseProntoOrRaw(List<String> args, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+    public static IrSignal parseProntoOrRaw(List<String> args, Double frequency, Double dummyGap) throws InvalidArgumentException {
         try {
             IrSignal irSignal = Pronto.parse(args);
             if (frequency != null)
@@ -123,11 +123,11 @@ public class IrSignalParsers {
             // likely erroneous wanna-be Pronto
         } catch (Pronto.NonProntoFormatException ex) {
             // Signal does not look like Pronto, try it as raw
-            return parseRaw(args, frequency, fixOddSequences);
+            return parseRaw(args, frequency, dummyGap);
         }
     }
 
-    static IrSignal parseProntoOrRawFromLines(List<String> line, Double frequency, boolean fixOddSequences) throws InvalidArgumentException {
+    static IrSignal parseProntoOrRawFromLines(List<String> line, Double frequency, Double dummyGap) throws InvalidArgumentException {
         try {
             IrSignal irSignal = Pronto.parse(line.get(0));
             if (frequency != null)
@@ -137,14 +137,14 @@ public class IrSignalParsers {
             // likely erroneous wanna-be Pronto
         } catch (Pronto.NonProntoFormatException ex) {
             // Signal does not look like Pronto, try it as raw
-            return parseRawFromLines(line, frequency, fixOddSequences);
+            return parseRawFromLines(line, frequency, dummyGap);
         }
     }
 
-    private static IrSignal parseRawFromLines(List<String> line, Double frequency, boolean fixOddSequences) throws OddSequenceLengthException {
-        IrSequence intro = IrSequenceParsers.parseRaw(line.get(0), fixOddSequences);
-        IrSequence repeat = line.size() > 1 ? IrSequenceParsers.parseRaw(line.get(1), fixOddSequences) : null;
-        IrSequence ending = line.size() > 2 ? IrSequenceParsers.parseRaw(line.get(2), fixOddSequences) : null;
+    private static IrSignal parseRawFromLines(List<String> line, Double frequency, Double dummyGap) throws OddSequenceLengthException {
+        IrSequence intro = IrSequenceParsers.parseRaw(line.get(0), dummyGap);
+        IrSequence repeat = line.size() > 1 ? IrSequenceParsers.parseRaw(line.get(1), dummyGap) : null;
+        IrSequence ending = line.size() > 2 ? IrSequenceParsers.parseRaw(line.get(2), dummyGap) : null;
         IrSignal irSignal = new IrSignal(intro, repeat, ending, frequency);
         return irSignal;
     }

@@ -310,6 +310,9 @@ public final class IrpTransmogrifier {
                 }
         } catch (UsageException ex) {
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+        } catch (OddSequenceLengthException ex) {
+            return new ProgramExitStatus(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR,
+                    ex.getLocalizedMessage() + ". Consider using --trailinggap.");
         } catch (ParseCancellationException ex) {
             // When we get here,
             // Antlr has already written a somewhat sensible error message on
@@ -633,13 +636,17 @@ public final class IrpTransmogrifier {
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         if (commandAnalyze.input != null) {
-            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line); });
+            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>(
+                    (List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line, commandAnalyze.trailingGap); }
+            );
             List<IrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
             if (signals.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             analyze(signals);
         } else if (commandAnalyze.namedInput != null) {
-            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>((List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line); });
+            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>(
+                    (List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line, commandAnalyze.trailingGap); }
+            );
             Map<String, IrSequence> signals = irSignalParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
             if (signals.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
@@ -677,7 +684,7 @@ public final class IrpTransmogrifier {
     private void analyzeIntroRepeatEnding() throws UsageException, OddSequenceLengthException, InvalidArgumentException {
         IrSignal irSignal;
         if (commandAnalyze.chop != null) {
-            List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args));
+            List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args), commandAnalyze.trailingGap);
             if (sequences.size() > 1)
                 throw new UsageException("Cannot use --chop together with several IR seqeunces");
             sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
@@ -692,12 +699,12 @@ public final class IrpTransmogrifier {
                     throw new UsageException("Wrong number of parts after chop = " + sequences.size());
             }
         } else
-            irSignal = IrSignalParsers.parseRaw(commandAnalyze.args, commandAnalyze.frequency, false);
+            irSignal = IrSignalParsers.parseRaw(commandAnalyze.args, commandAnalyze.frequency, commandAnalyze.trailingGap);
         analyze(irSignal);
     }
 
     private void analyzeSequences() throws UsageException, OddSequenceLengthException {
-        List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args));
+        List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args), commandAnalyze.trailingGap);
         if (commandAnalyze.chop != null) {
             if (sequences.size() > 1)
                 throw new UsageException("Cannot use --chop together with several IR seqeunces");
@@ -798,20 +805,20 @@ public final class IrpTransmogrifier {
         Decoder decoder = new Decoder(irpDatabase, protocolsNames);
         if (commandDecode.input != null) {
             ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, false);
+                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, commandDecode.trailingGap);
             });
             List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding, false);
             for (IrSignal irSignal : signals)
                 decode(decoder, irSignal, null);
         } else if (commandDecode.namedInput != null) {
             ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, false);
+                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, commandDecode.trailingGap);
             });
             Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
             for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
                 decode(decoder, kvp.getValue(), kvp.getKey());
         } else {
-            IrSignal irSignal = IrSignalParsers.parseProntoOrRaw(commandDecode.args, commandDecode.frequency, false);
+            IrSignal irSignal = IrSignalParsers.parseProntoOrRaw(commandDecode.args, commandDecode.frequency, commandDecode.trailingGap);
             decode(decoder, irSignal, null);
         }
     }
@@ -1138,6 +1145,9 @@ public final class IrpTransmogrifier {
         @Parameter(names = {"-t", "--timebase"}, description = "Force time unit , in microseconds (no suffix), or in periods (with suffix \"p\").")
         private String timeBase = null;
 
+        @Parameter(names = {"-T", "--trailinggap"}, description = "Trailing gap (in micro seconds) added to sequences of odd length.")
+        private Double trailingGap = null;
+
         @Parameter(description = "durations in microseconds, or pronto hex.", required = false)
         private List<String> args = null;
 
@@ -1258,6 +1268,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-s", "--strict"}, description = "Require intro- and repeat sequences to match exactly.")
         private boolean strict = false;
+
+        @Parameter(names = {"-T", "--trailinggap"}, description = "Trailing gap (in micro seconds) added to sequences of odd length.")
+        private Double trailingGap = null;
 
         @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = false)
         private List<String> args;

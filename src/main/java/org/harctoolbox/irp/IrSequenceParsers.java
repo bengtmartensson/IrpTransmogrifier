@@ -29,42 +29,42 @@ public class IrSequenceParsers {
 
     private final static Logger logger = Logger.getLogger(IrSequence.class.getName());
 
-//    public static IrSequence mkIrSequence(String str, boolean fixOddSequences) throws OddSequenceLengthException {
-//        return fixOddSequences ? new IrSequence(str, IrSequence.DUMMYGAPDURATION) : new IrSequence(str);
-//    }
-
     /**
      *
      * @param str
+     * @param dummyGap
      * @return
      * @throws OddSequenceLengthException
      */
-    public static List<IrSequence> parseIntoSeveral(String str) throws OddSequenceLengthException {
-        String[] parts = str.trim().startsWith("[")
-                ? str.replace("[", "").split("\\]")
-                : new String[]{str};
-
+    public static List<IrSequence> parseIntoSeveral(String str, Double dummyGap) throws OddSequenceLengthException {
+        String[] parts = chop(str);
         ArrayList<IrSequence> result = new ArrayList<>(parts.length);
         for (String s : parts)
-            result.add(new IrSequence(s));
+            result.add(parseRaw(s, dummyGap));
 
         return result;
     }
 
-    public static IrSequence parseProntoOrRaw(List<String> line) {
+    private static String[] chop(String str) {
+        return str.trim().startsWith("[")
+                ? str.replace("[", "").split("\\]")
+                : new String[]{str};
+    }
+
+    public static IrSequence parseProntoOrRaw(List<String> line, Double dummyGap) throws OddSequenceLengthException {
         try {
-            IrSignal irSignal = new IrSignal(line.get(0));
+            IrSignal irSignal = new IrSignal(line.get(0)); // pronto
             return irSignal.toModulatedIrSequence();
         } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
-            IrSequence intro = new IrSequence(line.get(0), IrSequence.DUMMYGAPDURATION);
-            IrSequence repeat = line.size() > 1 ? new IrSequence(line.get(1), IrSequence.DUMMYGAPDURATION) : new IrSequence();
-            IrSequence ending = line.size() > 2 ? new IrSequence(line.get(2), IrSequence.DUMMYGAPDURATION) : new IrSequence();
+            IrSequence intro = parseRaw(line.get(0), dummyGap);
+            IrSequence repeat = line.size() > 1 ? parseRaw(line.get(1), dummyGap) : new IrSequence();
+            IrSequence ending = line.size() > 2 ? parseRaw(line.get(2), dummyGap) : new IrSequence();
             return IrSequence.concatenate(intro, repeat, ending);
         }
     }
 
-    public static IrSequence parseRaw(String line, boolean fixOddSequences) throws OddSequenceLengthException {
-        return fixOddSequences ? new IrSequence(line, IrSequence.DUMMYGAPDURATION) : new IrSequence(line);
+    public static IrSequence parseRaw(String line, Double dummyGap) throws OddSequenceLengthException {
+        return dummyGap != null ? new IrSequence(line, dummyGap) : new IrSequence(line);
     }
 
     private IrSequenceParsers() {

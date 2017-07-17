@@ -59,13 +59,14 @@ public final class LircIrp {
      */
     public static void main(String[] args) {
         int radix = 16;
+        Double relTolerance = 0.3;
         try {
             Map<String, LircRemote> remotes = new LinkedHashMap<>(args.length);
             for (String file : args)
                 LircConfigFile.readConfig(remotes, new File(file));
 
             for (LircRemote remote : remotes.values()) {
-                LircIrp irp = new LircIrp(remote);
+                LircIrp irp = new LircIrp(remote, relTolerance);
                 System.out.println(irp.protocol.toIrpString(radix, false));
                 remote.getCommands().stream().map((command) -> {
                     System.out.print(command.getName() + "\t");
@@ -86,7 +87,11 @@ public final class LircIrp {
     }
 
     public static Protocol toProtocol(LircRemote lircRemote) throws RawRemoteException, LircCodeRemoteException, NonUniqueBitCodeException {
-        return new LircIrp(lircRemote).protocol;
+        return toProtocol(lircRemote, null);
+    }
+
+    public static Protocol toProtocol(LircRemote lircRemote, Double relativeTolerance) throws RawRemoteException, LircCodeRemoteException, NonUniqueBitCodeException {
+        return new LircIrp(lircRemote, relativeTolerance).protocol;
     }
 
     private final LircRemote remote;
@@ -95,15 +100,17 @@ public final class LircIrp {
     private GeneralSpec generalSpec;
     private BitSpec bitSpec;
     private IrStream body;
+    private double timebase;
+    private int timeBase;
 
-    private LircIrp(LircRemote remote) throws RawRemoteException, LircCodeRemoteException, NonUniqueBitCodeException {
+    private LircIrp(LircRemote remote, Double relativeTolerance) throws RawRemoteException, LircCodeRemoteException, NonUniqueBitCodeException {
         this.remote = remote;
         if (remote.isRaw())
             throw new RawRemoteException(remote.getName());
         if (!remote.isMode2())
             throw new LircCodeRemoteException(remote.getName());
 
-        setupBitSpec();
+        setupBitSpec(relativeTolerance);
         setupBody();
         BitspecIrstream bitspecIrstream = new BitspecIrstream(bitSpec, body);
         setupGeneralSpec();
@@ -160,21 +167,42 @@ public final class LircIrp {
         return lengthXBareIrStream(false, value);
     }
 
-    private void setupBitSpec() throws NonUniqueBitCodeException {
-        ArrayList<BareIrStream> list = new ArrayList<>(remote.hasFlag("RCMM") ? 4 : 2);
+    private void setupBitSpec(Double relativeTolerance) throws NonUniqueBitCodeException {
+        int noBitSpecs = remote.hasFlag("RCMM") ? 4 : 2;
+        ArrayList<BareIrStream> list = new ArrayList<>(noBitSpecs);
+        ArrayList<Integer> times = new ArrayList<>(2 * noBitSpecs);
         boolean biphaseNonInvert = remote.hasFlag("RC6");
         boolean biphaseInvert = remote.hasFlag("RC5") || remote.hasFlag("SHIFT_ENC");
         BareIrStream zero = new BareIrStream(lengthTwoBareIrStream(biphaseNonInvert, "zero"));
         list.add(zero);
+        addTime(times, zero);
         BareIrStream one  = new BareIrStream(lengthTwoBareIrStream(biphaseInvert, "one"));
         list.add(one);
+        addTime(times, one);
         if (remote.hasFlag("RCMM")) {
             BareIrStream two = new BareIrStream(lengthTwoBareIrStream(false, "two"));
             list.add(two);
+            addTime(times, two);
             BareIrStream three  = new BareIrStream(lengthTwoBareIrStream(false, "three"));
             list.add(three);
+            addTime(times, three);
         }
+        if (relativeTolerance != null) {
+            timebase = IrCoreUtils.approximateGreatestCommonDivider(times, relativeTolerance);
+        } else
+            timeBase = 1;
         bitSpec = new BitSpec(list);
+    }
+
+    private void addTime(List<Integer> times, BareIrStream bareIrStream) {
+        for (Duration duration : bareIrStream.getDurations())
+            addTime(times, duration);
+    }
+
+    private void addTime(List<Integer> times, Duration duration) {
+        Integer time = (int) Math.round(duration.getTimeInUnits());
+        if (! times.contains(time))
+            times.add(time);
     }
 
     private List<IrStreamItem> mkBitField(String name, String lengthName) throws InvalidNameException {

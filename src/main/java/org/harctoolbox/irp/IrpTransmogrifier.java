@@ -922,7 +922,7 @@ public final class IrpTransmogrifier {
         for (LircRemote rem : list) {
             out.print(rem.getName() + ":\t");
             try {
-                out.println(LircIrp.toProtocol(rem).toIrpString(commandLirc.radix, false));
+                out.println(LircIrp.toProtocol(rem, commandLirc.gcdRelativeTolerance).toIrpString(commandLirc.radix, false));
             } catch (LircIrp.RawRemoteException ex) {
                 out.println("raw remote");
             } catch (LircIrp.LircCodeRemoteException ex) {
@@ -1345,6 +1345,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-c", "--commands" }, description = "Also list the commands if the remotes.")
         private boolean commands = false;
+
+        @Parameter(names = { "-g", "--gcd" }, description = "Find an approximate greatest common divisor for the timings")
+        private Double gcdRelativeTolerance = null;
 
         @Parameter(names = { "-r", "--radix"}, hidden = true, description = "Radix for outputting result, default 16.") // Too much...?
         private int radix = 16;

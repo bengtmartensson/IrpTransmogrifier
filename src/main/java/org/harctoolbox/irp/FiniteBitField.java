@@ -340,7 +340,13 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public int weight() {
-        return super.weight() + width.weight();
+        try {
+            return super.weight() + (int) width.toNumber()/8;
+        } catch (NameUnassignedException ex) {
+            // Something weird has happened
+            logger.log(Level.WARNING, "Cannot compute weight of {0}", toString());
+            return 1000;
+        }
     }
 
     @Override

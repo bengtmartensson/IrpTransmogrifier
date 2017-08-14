@@ -25,6 +25,7 @@
                 <include>*jar-with-dependencies.jar</include>
                 <include>*.xml</include>
                 <include>*.html</include>
+                <include>*.md</include>
                 <include>*.xsl</include>
                 <include>*.bat</include>
             </includes>

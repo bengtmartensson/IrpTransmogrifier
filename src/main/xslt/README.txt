@@ -9,4 +9,3 @@ Note that they may require an XSLT2 processor, unfortunately ruling out all the
 standard ones (Xalan, xsltproc, msxml,...). There is presently only one such
 freely available, Saxon home edition:
 http://www.saxonica.com/download/opensource.xml.
- 

@@ -79,7 +79,9 @@ this program. If not, see http://www.gnu.org/licenses/.
                             href="http://www.hifi-remote.com/forums/dload.php?action=file&amp;file_id=13104">Binaries for Windows, Linux, and Mac</a>,
                         <a
                             href="https://sourceforge.net/p/controlremote/code/HEAD/tree/trunk/decodeir/">source
-                            code at SourceForge</a>.</dd>
+                            code</a>.
+                            <a href="https://github.com/bengtmartensson/Arduino-DecodeIR">Arduino port</a>.
+                    </dd>
                 </dl>
 
                 <dt id="Executor">Executor</dt>

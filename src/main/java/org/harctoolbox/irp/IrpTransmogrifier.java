@@ -773,7 +773,7 @@ public final class IrpTransmogrifier {
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(noSignal));
                 for (Protocol protocol : protocolList)
-                    printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods());
+                    printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods(), true);
                 noSignal++;
             }
         } else {
@@ -783,7 +783,7 @@ public final class IrpTransmogrifier {
                     out.print((names != null ? names[i] : "#" + i) + ":\t");
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(i));
-                printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods());
+                printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods(), commandAnalyze.statistics);
             }
         }
     }
@@ -853,9 +853,12 @@ public final class IrpTransmogrifier {
             out.println();
     }
 
-    private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods) {
-        if (protocol != null)
-            out.println(protocol.toIrpString(radix, usePeriods) + SEPARATOR + "weight = " + protocol.weight());
+    private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight) {
+        if (protocol != null) {
+            out.println(protocol.toIrpString(radix, usePeriods));
+            if (printWeight)
+                out.println("weight = " + protocol.weight());
+        }
     }
 
     private void expression() throws FileNotFoundException, NameUnassignedException, IrpParseException {

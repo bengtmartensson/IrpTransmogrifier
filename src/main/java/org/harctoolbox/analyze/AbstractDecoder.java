@@ -56,6 +56,13 @@ public abstract class AbstractDecoder {
 
     static final int NUMBERDECODERS = decoders.length;
 
+    public static List<String> decoderNames() {
+        List<String> result = new ArrayList<>(NUMBERDECODERS);
+        for (Class<?> decoder : decoders)
+            result.add(decoder.getSimpleName());
+        return result;
+    }
+
     protected NameEngine nameEngine;
     protected int noPayload;
     protected final double timebase;

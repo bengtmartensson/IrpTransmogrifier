@@ -47,9 +47,11 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.harctoolbox.analyze.AbstractDecoder;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.analyze.Cleaner;
+import org.harctoolbox.analyze.NoDecoderMatchException;
 import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -329,6 +331,10 @@ public final class IrpTransmogrifier {
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Parse error in \"" + ex.getText() + "\"");
+        } catch (NoDecoderMatchException ex) {
+            return new ProgramExitStatus(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR,
+                    "No decoder matched \"" + commandAnalyze.decoder +
+                    "\". Use \"--decoder list\" to list the available decoders.");
         }
         return new ProgramExitStatus();
     }
@@ -624,7 +630,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException, IOException {
+    private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException, IOException, NoDecoderMatchException {
         boolean finished = commandAnalyze.process(this);
         if (finished)
             return;
@@ -665,7 +671,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void analyzePronto() throws InvalidArgumentException, InvalidArgumentException, Pronto.NonProntoFormatException {
+    private void analyzePronto() throws InvalidArgumentException, InvalidArgumentException, Pronto.NonProntoFormatException, NoDecoderMatchException {
         IrSignal irSignal = Pronto.parse(commandAnalyze.args);
         if (commandAnalyze.introRepeatEnding)
             logger.warning("--intro.repeat-ending ignored when using a Pronto Hex signal.");
@@ -674,14 +680,14 @@ public final class IrpTransmogrifier {
         analyze(irSignal);
     }
 
-    private void analyzeRaw() throws IrpInvalidArgumentException, UsageException, OddSequenceLengthException, InvalidArgumentException {
+    private void analyzeRaw() throws IrpInvalidArgumentException, UsageException, OddSequenceLengthException, InvalidArgumentException, NoDecoderMatchException {
         if (commandAnalyze.introRepeatEnding)
             analyzeIntroRepeatEnding();
         else
             analyzeSequences();
     }
 
-    private void analyzeIntroRepeatEnding() throws UsageException, OddSequenceLengthException, InvalidArgumentException {
+    private void analyzeIntroRepeatEnding() throws UsageException, OddSequenceLengthException, InvalidArgumentException, NoDecoderMatchException {
         IrSignal irSignal;
         if (commandAnalyze.chop != null) {
             List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args), commandAnalyze.trailingGap);
@@ -703,7 +709,7 @@ public final class IrpTransmogrifier {
         analyze(irSignal);
     }
 
-    private void analyzeSequences() throws UsageException, OddSequenceLengthException {
+    private void analyzeSequences() throws UsageException, OddSequenceLengthException, NoDecoderMatchException {
         List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args), commandAnalyze.trailingGap);
         if (commandAnalyze.chop != null) {
             if (sequences.size() > 1)
@@ -713,7 +719,7 @@ public final class IrpTransmogrifier {
         analyze(sequences);
     }
 
-    private void analyze(IrSignal irSignal) {
+    private void analyze(IrSignal irSignal) throws NoDecoderMatchException {
         Analyzer analyzer;
         if (commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder) {
             IrSequence irSequence = irSignal.toModulatedIrSequence();
@@ -723,17 +729,17 @@ public final class IrpTransmogrifier {
         analyze(analyzer, null);
     }
 
-    private void analyze(Map<String, IrSequence> irSequences) {
+    private void analyze(Map<String, IrSequence> irSequences) throws NoDecoderMatchException {
         Analyzer analyzer = new Analyzer(irSequences.values(), commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
     }
 
-    private void analyze(List<IrSequence> irSequences) {
+    private void analyze(List<IrSequence> irSequences) throws NoDecoderMatchException {
         Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, null);
     }
 
-    private void analyze(Analyzer analyzer, String[] names) {
+    private void analyze(Analyzer analyzer, String[] names) throws NoDecoderMatchException {
         Burst.Preferences burstPrefs = new Burst.Preferences(commandAnalyze.maxRoundingError, commandAnalyze.maxUnits, commandAnalyze.maxMicroSeconds);
         Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), commandAnalyze.timeBase,
                 commandAnalyze.lsb ? BitDirection.lsb : BitDirection.msb,
@@ -1093,6 +1099,10 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-C", "--clean" }, description = "Output the cleaned sequence(s).")
         private boolean clean = false;
 
+        @Parameter(names = { "-d", "--decoder" }, description = "Use only the decoders matching argument (regular expression, or prefix). "
+                + "Use the argument \"list\" to list the available decoders.")
+        private String decoder = null;
+
         @Parameter(names = { "-e", "--extent" }, description = "Output the last gap as an extent.")
         private boolean extent = false;
 
@@ -1125,10 +1135,6 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width.")
         private int maxParameterWidth = 32;
-
-        // too complicated for most users...
-        @Parameter(names = {      "--decoder" }, hidden = true, description = "Use only the decoders matching argument (regular expression). Mainly for debugging.")
-        private String decoder = null;
 
         @Parameter(names = { "-w", "--parameterwidths" }, description = "Comma separated list of parameter widths.")
         private List<Integer> parameterWidths = new ArrayList<>(4);
@@ -1176,12 +1182,29 @@ public final class IrpTransmogrifier {
                     + "The input sequence(s) are matched using different \"decoders\". "
                     + "Normally the \"best\" decoder match is output. "
                     + "With the --all option, all decoder matches are output. "
-                    + "\n\n"
+                    + "Using the --decode option, the used decoders can be further limited. "
+                    + "The presently available decoders are: "
+                    + String.join(", ", AbstractDecoder.decoderNames())
+                    + ".\n\n"
                     + "The options --statistics and --dump-repeatfinder (the latter forces the repeatfinder to be on) can be used to print extra information. "
                     + "The common options --absolutetolerance, --relativetolerance, --minrepeatgap determine how the repeat finder breaks the input data. "
                     + "The options --extent, --invert, --lsb, --maxmicroseconds, --maxparameterwidth, --maxroundingerror, --maxunits, --parameterwidths, "
                     + "--radix, and --timebase determine how the computed IRP is displayed."
                     ;
+        }
+
+        @Override
+        public boolean process(IrpTransmogrifier instance) {
+            boolean result = super.process(instance);
+            if (result)
+                return true;
+
+            if (decoder != null && (decoder.equals("list") || decoder.equals("help") || decoder.equals("?"))) {
+                IrCoreUtils.trivialFormatter(instance.out,
+                        "Available decoders: " + String.join(", ", AbstractDecoder.decoderNames()), 65);
+                return true;
+            }
+            return false;
         }
     }
 

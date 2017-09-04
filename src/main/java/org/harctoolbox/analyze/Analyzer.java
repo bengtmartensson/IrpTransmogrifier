@@ -177,8 +177,11 @@ public final class Analyzer extends Cleaner {
     }
 
 
-    private List<Class<?>> selectDecoderClasses(String decoderPattern, boolean regexp) {
-        return regexp ? selectDecoderClassesRegexp(decoderPattern) : selectDecoderClassesSubstring(decoderPattern);
+    private List<Class<?>> selectDecoderClasses(String decoderPattern, boolean regexp) throws NoDecoderMatchException {
+        List<Class<?>> decoders = regexp ? selectDecoderClassesRegexp(decoderPattern) : selectDecoderClassesSubstring(decoderPattern);
+        if (decoders.isEmpty())
+            throw new NoDecoderMatchException();
+        return decoders;
     }
 
     private List<Class<?>> selectDecoderClassesRegexp(String decoderPattern) {
@@ -199,7 +202,7 @@ public final class Analyzer extends Cleaner {
         return decoders;
     }
 
-    private List<AbstractDecoder> setupDecoders(Analyzer.AnalyzerParams params, String decoderPattern, boolean regexp) {
+    private List<AbstractDecoder> setupDecoders(Analyzer.AnalyzerParams params, String decoderPattern, boolean regexp) throws NoDecoderMatchException {
         List<Class<?>> decoderClasses = selectDecoderClasses(decoderPattern, regexp);
         List<AbstractDecoder> decoders = new ArrayList<>(AbstractDecoder.NUMBERDECODERS);
         decoderClasses.forEach((decoderClass) -> {
@@ -244,7 +247,7 @@ public final class Analyzer extends Cleaner {
         return frequency;
     }
 
-    public List<List<Protocol>> searchAllProtocols(AnalyzerParams params, String decoderPattern, boolean regexp) {
+    public List<List<Protocol>> searchAllProtocols(AnalyzerParams params, String decoderPattern, boolean regexp) throws NoDecoderMatchException {
         List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern, regexp);
         List<List<Protocol>> result = new ArrayList<>(getNoSequences());
         for (int i = 0; i < getNoSequences(); i++)
@@ -253,7 +256,7 @@ public final class Analyzer extends Cleaner {
         return result;
     }
 
-    public List<Protocol> searchBestProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) {
+    public List<Protocol> searchBestProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) throws NoDecoderMatchException {
         List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern, regexp);
         List<Protocol> result = new ArrayList<>(getNoSequences());
         for (int i = 0; i < getNoSequences(); i++)

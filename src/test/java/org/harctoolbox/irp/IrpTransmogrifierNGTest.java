@@ -131,10 +131,18 @@ public class IrpTransmogrifierNGTest {
 
     @Test(enabled = true)
     public void testAnalyze7() {
-        System.out.println("analyze6");
+        System.out.println("analyze7");
         String args = "--absol 200 analyze -M 332 --trailinggap 10000 " + ACDATA1;
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{539,msb}<1,-1|1,-3>(8,-8,A:88,1,-10m){A=0xf20d05fa01700000210252}");
+   }
+
+    @Test(enabled = true)
+    public void testAnalyze8() {
+        System.out.println("analyze8");
+        String args = "--absol 200 analyze --decode covfefe -M 332 --trailinggap 10000 " + ACDATA1;
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, null);
    }
 
     @Test(enabled = true)
@@ -202,6 +210,15 @@ public class IrpTransmogrifierNGTest {
         System.out.println("lirc");
         String result = IrpTransmogrifier.execute("lirc src/test/resources/RX-V995.lircd.conf");
         assertEquals(result, "yamaha-amp:	{38.0k,1,msb}<642u,-1600u|642u,-470u>(9067u,-4393u,pre_data:16,F:16,642u,-39597u,(9065u,-2139u,642u,-39597u)*){pre_data=0xa15e}[F:0x0..0xffff]");
+    }
+
+    @Test
+    public void testListDecoders() {
+        System.out.println("listDecoders");
+        String result = IrpTransmogrifier.execute("analyze --decoder list");
+        assertEquals(result, "Available decoders: TrivialDecoder, Pwm2Decoder, Pwm4Decoder, Pwm4AltDecoder,\n"
+                + "XmpDecoder, BiphaseDecoder, BiphaseWithStartbitDecoder, BiphaseWithDoubleToggleDecoder,\n"
+                + "SerialDecoder");
     }
 
     @Test(enabled = true)

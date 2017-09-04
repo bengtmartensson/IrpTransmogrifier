@@ -241,15 +241,19 @@ public final class IrCoreUtils {
      */
     public static void trivialFormatter(PrintStream out, String string, int lineLength) {
         int pos = 0;
+        boolean justBrokeLine = false;
         String[] data = string.split("((?<=\\s)|(?=\\s))"); // splits on whitspace, while keeping it
         for (String str : data) {
             if (pos <= 0 && str.matches(" ")) {
+            } else if (pos == 0 && str.matches("\\v") && justBrokeLine) {
             } else
                 out.print(str);
+            justBrokeLine = false;
             pos = str.matches("\\v") ? 0 : pos + str.length();
             if (pos > lineLength) {
                 out.println();
                 pos = 0;
+                justBrokeLine = true;
             }
         }
         if (pos > 0)

@@ -637,6 +637,8 @@ public final class IrpTransmogrifier {
 
         if (commandAnalyze.allDecodes && commandAnalyze.decoder != null)
             throw new UsageException("Cannot use both --alldecodes and --decode.");
+        if (commandAnalyze.allDecodes && commandAnalyze.bitUsage)
+                throw new UsageException("Bit usage report not possible together with --all.");
 
         if (IrCoreUtils.numberTrue(commandAnalyze.input != null, commandAnalyze.namedInput != null, commandAnalyze.args != null) != 1)
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
@@ -784,12 +786,48 @@ public final class IrpTransmogrifier {
             }
         } else {
             List<Protocol> protocols = analyzer.searchBestProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
+            int maxNameLength = IrCoreUtils.maxLength(names);
             for (int i = 0; i < protocols.size(); i++) {
                 if (protocols.size() > 1)
-                    out.print((names != null ? names[i] : "#" + i) + ":\t");
+                    out.print(names != null
+                            ? (names[i] + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names[i].length() + 1)))
+                            : ("#" + i + "\t"));
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(i));
                 printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods(), commandAnalyze.statistics);
+            }
+
+            if (commandAnalyze.bitUsage) {
+                try {
+                    out.println();
+                    out.println("Bit usage analysis:");
+                    Map<String, BitCounter> bitStatistics = BitCounter.scrutinizeProtocols(protocols);
+                    bitStatistics.entrySet().forEach((kvp) -> {
+                        out.println(kvp.getKey() + "\t" + kvp.getValue().toString());
+                    });
+                } catch (NameUnassignedException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
+            }
+
+            if (commandAnalyze.parameterTable) {
+                out.println();
+                out.println("Parameter table:");
+                for (int i = 0; i < protocols.size(); i++) {
+                    if (protocols.size() > 1)
+                        out.print(names != null
+                                ? (names[i] + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names[i].length() + 1)))
+                                :  ("#" + i + "\t"));
+                    NameEngine definitions = protocols.get(i).getDefinitions();
+                    for (Map.Entry<String, Expression> definition : definitions) {
+                        try {
+                            out.print("\t" + Long.toString(definition.getValue().toNumber(), commandAnalyze.radix));
+                        } catch (NameUnassignedException ex) {
+                            throw new ThisCannotHappenException(ex);
+                        }
+                    }
+                    out.println();
+                }
             }
         }
     }
@@ -861,7 +899,7 @@ public final class IrpTransmogrifier {
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight) {
         if (protocol != null) {
-            out.println(protocol.toIrpString(radix, usePeriods));
+            out.println(protocol.toIrpString(radix, usePeriods, commandLineArgs.tsvOptimize));
             if (printWeight)
                 out.println("weight = " + protocol.weight());
         }
@@ -1077,6 +1115,9 @@ public final class IrpTransmogrifier {
         @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random).")
         private Long seed = null;
 
+        @Parameter(names = {"-t", "--tsv", "--csv"}, description = "Use tabs in output to optimize for the import in spreadsheet programs as cvs.")
+        private boolean tsvOptimize = false;
+
         @Parameter(names = {"-u", "--url-decode"}, description = "URL-decode protocol names, (understanding %20 for example).")
         private boolean urlDecode = false;
 
@@ -1092,6 +1133,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-a", "--all" }, description = "List all decoder outcomes, instead of only the one with lowest weight.")
         private boolean allDecodes = false;
+
+        @Parameter(names = { "-b", "--bit-usage" }, description = "Create bit usage report. (Not with --all)")
+        private boolean bitUsage = false;
 
         @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument.")
         private Integer chop = null;
@@ -1126,6 +1170,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
         private String namedInput = null;
+
+        @Parameter(names = { "-p", "--parametertable" }, description = "Create parameter table.")
+        private boolean parameterTable = false;
 
         @Parameter(names = { "-u", "--maxmicroseconds" }, description = "Maximal duration to be expressed as micro seconds.")
         private double maxMicroSeconds = Burst.Preferences.DEFAULTMAXMICROSECONDS;

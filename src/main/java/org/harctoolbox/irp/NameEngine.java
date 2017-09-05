@@ -278,12 +278,17 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
 
     @Override
     public String toIrpString(int radix) {
-        StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
+        return toIrpString(radix, "");
+    }
+
+    String toIrpString(int radix, String separator) {
+        StringJoiner stringJoiner = new StringJoiner("," + separator, "{", "}");
         map.entrySet().stream().forEach((kvp) -> {
             stringJoiner.add(kvp.getKey() + "=" + kvp.getValue().toIrpString(radix));
         });
         return stringJoiner.toString();
     }
+
 
     @Override
     public Element toElement(Document document) {

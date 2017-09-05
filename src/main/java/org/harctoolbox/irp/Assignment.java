@@ -214,4 +214,9 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     public boolean nonConstantBitFieldLength() {
         return false;
     }
+
+    @Override
+    public Integer guessParameterLength(String name) {
+        return null;
+    }
 }

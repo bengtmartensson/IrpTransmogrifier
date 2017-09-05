@@ -80,13 +80,12 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     @Override
     public String toIrpString(int radix) {
-        return bitSpec.toIrpString(radix) + irStream.toIrpString(radix);
+        return toIrpString(radix, "");
     }
 
-//    @Override
-//    public String toString() {
-//        return toIrpString();
-//    }
+    public String toIrpString(int radix, String separator) {
+        return bitSpec.toIrpString(radix) + separator + irStream.toIrpString(radix, separator);
+    }
 
     @Override
     public Element toElement(Document document) {
@@ -324,5 +323,10 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     @Override
     public boolean nonConstantBitFieldLength() {
         return irStream.nonConstantBitFieldLength();
+    }
+
+    @Override
+    public Integer guessParameterLength(String name) {
+        return irStream.guessParameterLength(name);
     }
 }

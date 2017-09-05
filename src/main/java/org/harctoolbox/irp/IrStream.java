@@ -115,14 +115,13 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         return isInfiniteRepeat() ? IrSignal.Pass.ending : null;
     }
 
-//    @Override
-//    public String toString() {
-//        return toIrpString();
-//    }
-
     @Override
     public String toIrpString(int radix) {
-        return "(" + bareIrStream.toIrpString(radix) + ")" + repeatMarker.toIrpString(radix);
+        return toIrpString(radix, "");
+    }
+
+    public String toIrpString(int radix, String separator) {
+        return "(" + bareIrStream.toIrpString(radix) + ")" + separator + repeatMarker.toIrpString(radix);
     }
 
     public boolean isRepeatSequence() {
@@ -315,5 +314,10 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     @Override
     public boolean nonConstantBitFieldLength() {
         return bareIrStream.nonConstantBitFieldLength();
+    }
+
+    @Override
+    public Integer guessParameterLength(String name) {
+        return bareIrStream.guessParameterLength(name);
     }
 }

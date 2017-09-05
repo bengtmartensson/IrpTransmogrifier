@@ -113,4 +113,11 @@ public interface IrStreamItem extends XmlExport {
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException;
 
     public boolean nonConstantBitFieldLength();
+
+    /**
+     * Tries to infer the bit-length of the parameter with name as the argument.
+     * @param name Name of parameter sought.
+     * @return length if success, null if failure.
+     */
+    public Integer guessParameterLength(String name);
 }

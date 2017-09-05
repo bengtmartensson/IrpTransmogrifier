@@ -104,15 +104,19 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
 
     @Override
     public String toIrpString(int radix) {
+        return toIrpString(radix, "");
+    }
+
+    public String toIrpString(int radix, String separator) {
         if (isEmpty())
-            return "";
+            return separator;
         StringBuilder str = new StringBuilder("[");
         map.values().stream().forEach((ps) -> {
-            str.append(ps.toIrpString(radix)).append(",");
+            str.append(ps.toIrpString(radix)).append(",").append(separator);
         });
 
         if (str.length() > 0)
-            str.deleteCharAt(str.length()-1);
+            str.delete(str.length() - 1 - separator.length(), str.length());
         str.append("]");
         return str.toString();
     }

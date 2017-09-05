@@ -464,11 +464,19 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public String toIrpString(int radix, boolean usePeriods) {
+        return toIrpString(radix, usePeriods, "");
+    }
+
+    public String toIrpString(int radix, boolean usePeriods, String separator) {
         return
-                generalSpec.toIrpString(usePeriods)
-                + bitspecIrstream.toIrpString(radix)
-                + definitions.toIrpString(radix)
-                + parameterSpecs.toIrpString(radix);
+                generalSpec.toIrpString(usePeriods) + separator
+                + bitspecIrstream.toIrpString(radix, separator) + separator
+                + definitions.toIrpString(radix, separator) + separator
+                + parameterSpecs.toIrpString(radix, separator);
+    }
+
+    public String toIrpString(int radix, boolean usePeriods, boolean tsvOptimized) {
+        return toIrpString(radix, usePeriods, tsvOptimized ? "\t" : "");
     }
 
 //    @Override
@@ -711,6 +719,10 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public boolean nonConstantBitFieldLength() {
         return bitspecIrstream.nonConstantBitFieldLength();
+    }
+
+    public Integer guessParameterLength(String name) {
+        return bitspecIrstream.guessParameterLength(name);
     }
 
     public static class ProtocolNotDecodableException extends IrpException {

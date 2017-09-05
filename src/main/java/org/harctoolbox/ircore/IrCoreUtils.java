@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -170,11 +171,29 @@ public final class IrCoreUtils {
         return l1Norm(sequence, 0, sequence.length);
     }
 
-    public static String spaces(int length) {
+    private static String chars(int length, byte value) {
         byte[] buf = new byte[length];
         for (int i = 0; i < length; i++)
-            buf[i] = 0x20;
+            buf[i] = value;
         return new String(buf, Charset.forName("US-ASCII"));
+    }
+
+    /**
+     * Returns a string consisting of length spaces.
+     * @param length
+     * @return
+     */
+    public static String spaces(int length) {
+        return chars(length, (byte) 0x20);
+    }
+
+    /**
+     * Returns a string consisting of length number of tabs.
+     * @param length
+     * @return
+     */
+    public static String tabs(int length) {
+        return chars(length, (byte) 0x09);
     }
 
     public static long ones(int n) {
@@ -461,6 +480,20 @@ public final class IrCoreUtils {
         int quot = (first + second/2)/second;
         int rest = Math.abs(first - quot * second);
         return rest/((double) second) <= relTolerance ? second : approximateGCD(second, rest, relTolerance);
+    }
+
+    public static int maxLength(Iterable<String> strings) {
+        int max = 0;
+        for (String s : strings) {
+            int len = s.length();
+            if (len > max)
+                max = len;
+        }
+        return max;
+    }
+
+    public static int maxLength(String[] strings) {
+        return strings != null ? maxLength(Arrays.asList(strings)) : 0;
     }
 
     public static void main(String[] args) {

@@ -346,4 +346,9 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     public boolean nonConstantBitFieldLength() {
         return false;
     }
+
+    @Override
+    public Integer guessParameterLength(String name) {
+        return null;
+    }
 }

@@ -429,4 +429,14 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
         return null;
     }
+
+    @Override
+    public Integer guessParameterLength(String name) {
+        for (IrStreamItem item : irStreamItems) {
+            Integer result = item.guessParameterLength(name);
+            if (result != null)
+                return result;
+        }
+        return null;
+    }
 }

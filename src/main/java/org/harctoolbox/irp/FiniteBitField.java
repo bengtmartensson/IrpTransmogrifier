@@ -388,4 +388,13 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         }
         return false;
     }
+
+    @Override
+    public Integer guessParameterLength(String name) {
+        try {
+            return data.toString().equals(name) ? (int) width.toNumber() : null;
+        } catch (NameUnassignedException ex) {
+            return null;
+        }
+    }
 }

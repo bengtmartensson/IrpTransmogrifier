@@ -245,4 +245,15 @@ public final class Variation extends IrpObject implements IrStreamItem {
     public boolean nonConstantBitFieldLength() {
         return intro.nonConstantBitFieldLength() || repeat.nonConstantBitFieldLength() || ending.nonConstantBitFieldLength();
     }
+
+    @Override
+    public Integer guessParameterLength(String name) {
+        Integer result = this.intro.guessParameterLength(name);
+        if (result != null)
+            return result;
+        result = repeat.guessParameterLength(name);
+        if (result != null)
+            return result;
+        return ending.guessParameterLength(name);
+    }
 }

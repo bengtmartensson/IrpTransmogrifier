@@ -1134,7 +1134,7 @@ public final class IrpTransmogrifier {
         private double maxRoundingError = Burst.Preferences.DEFAULTMAXROUNDINGERROR;
 
         @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width.")
-        private int maxParameterWidth = 32;
+        private int maxParameterWidth = 63;
 
         @Parameter(names = { "-w", "--parameterwidths" }, description = "Comma separated list of parameter widths.")
         private List<Integer> parameterWidths = new ArrayList<>(4);

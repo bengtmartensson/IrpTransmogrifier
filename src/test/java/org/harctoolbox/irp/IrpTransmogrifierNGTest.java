@@ -121,7 +121,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze6() {
         System.out.println("analyze6");
-        String args = "analyze " + ACDATA;
+        String args = "analyze --maxparameterwidth 32 " + ACDATA;
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:32,B:32,C:32,D:16,4,-10m){A=0xc4d36480,B=0x4c0b0,C=0x40000000,D=0x1e3}");
         args = "analyze --maxparameterwidth 1024 --decoder pwm2 " + ACDATA;

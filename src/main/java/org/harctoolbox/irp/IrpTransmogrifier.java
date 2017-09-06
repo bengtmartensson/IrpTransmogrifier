@@ -30,11 +30,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -652,13 +654,21 @@ public final class IrpTransmogrifier {
                 throw new InvalidArgumentException("No parseable sequences found.");
             analyze(signals);
         } else if (commandAnalyze.namedInput != null) {
-            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>(
-                    (List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line, commandAnalyze.trailingGap); }
-            );
-            Map<String, IrSequence> signals = irSignalParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
-            if (signals.isEmpty())
-                throw new InvalidArgumentException("No parseable sequences found.");
-            analyze(signals);
+            try {
+                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandAnalyze.namedInput);
+                if (modSequences.isEmpty())
+                    throw new InvalidArgumentException("No parseable sequences found.");
+                analyze(modSequences);
+            } catch (ParseException ex) {
+                logger.log(Level.INFO, "Parsing of {0} as ict failed", commandAnalyze.namedInput);
+                ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>(
+                        (List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line, commandAnalyze.trailingGap); }
+                );
+                Map<String, IrSequence> signals = irSignalParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
+                if (signals.isEmpty())
+                    throw new InvalidArgumentException("No parseable sequences found.");
+                analyze(signals, commandAnalyze.frequency);
+            }
         } else {
             try {
                 analyzePronto();
@@ -731,8 +741,19 @@ public final class IrpTransmogrifier {
         analyze(analyzer, null);
     }
 
-    private void analyze(Map<String, IrSequence> irSequences) throws NoDecoderMatchException {
-        Analyzer analyzer = new Analyzer(irSequences.values(), commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+    private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws NoDecoderMatchException {
+        Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
+        irSequences.putAll(modulatedIrSequences);
+        double sum = 0.0;
+        for (ModulatedIrSequence mis : modulatedIrSequences.values())
+            sum += mis.getFrequency();
+
+        double frequency = sum / modulatedIrSequences.keySet().size();
+        analyze(irSequences, frequency);
+    }
+
+    private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws NoDecoderMatchException {
+        Analyzer analyzer = new Analyzer(irSequences.values(), frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
     }
 
@@ -855,12 +876,20 @@ public final class IrpTransmogrifier {
             for (IrSignal irSignal : signals)
                 decode(decoder, irSignal, null);
         } else if (commandDecode.namedInput != null) {
-            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, commandDecode.trailingGap);
-            });
-            Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
+            try {
+                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandDecode.namedInput);
+                for (Map.Entry<String, ModulatedIrSequence> kvp : modSequences.entrySet()) {
+                    IrSignal signal = new IrSignal(kvp.getValue());
+                    decode(decoder, signal, kvp.getKey());
+                }
+            } catch (ParseException ex) {
+                ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
+                    return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, commandDecode.trailingGap);
+                });
+                Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
             for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
-                decode(decoder, kvp.getValue(), kvp.getKey());
+                    decode(decoder, kvp.getValue(), kvp.getKey());
+            }
         } else {
             IrSignal irSignal = IrSignalParsers.parseProntoOrRaw(commandDecode.args, commandDecode.frequency, commandDecode.trailingGap);
             decode(decoder, irSignal, null);

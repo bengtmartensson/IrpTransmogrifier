@@ -106,7 +106,8 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                         }
                     } else {
                         items.add(newFlashOrGap(isFlash, time));
-                        foundStartBits++;
+                        if (params.isInvert() == isFlash)
+                            foundStartBits++;
                         if (foundStartBits == startBits())
                             state = BiphaseState.zero;
                     }

@@ -58,7 +58,7 @@ public class IctImporter {
      * Reads an ICT file from URL or file, produces a map of ModulatedIrSequence-s.
      * @param urlOrFilename URL or Filename
      * @param charSetName Character set for the file/URL.
-     * @return Map name -> ModulatedIrSequence
+     * @return Map name -&gt; ModulatedIrSequence
      * @throws IOException
      * @throws UnsupportedEncodingException
      * @throws ParseException
@@ -73,7 +73,7 @@ public class IctImporter {
     /**
      * Equivalent to parse(urlOrFilename, "US-ASCII").
      * @param urlOrFilename URL or Filename
-     * @return Map name -> ModulatedIrSequence
+     * @return Map name -&gt; ModulatedIrSequence
      * @throws IOException
      * @throws ParseException
      */

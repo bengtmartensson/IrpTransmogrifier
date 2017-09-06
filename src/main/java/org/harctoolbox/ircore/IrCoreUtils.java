@@ -181,7 +181,7 @@ public final class IrCoreUtils {
     /**
      * Returns a string consisting of length spaces.
      * @param length
-     * @return
+     * @return String of the requested length.
      */
     public static String spaces(int length) {
         return chars(length, (byte) 0x20);

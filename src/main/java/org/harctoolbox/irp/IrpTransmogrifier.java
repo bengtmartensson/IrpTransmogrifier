@@ -901,7 +901,7 @@ public final class IrpTransmogrifier {
         if (protocol != null) {
             out.println(protocol.toIrpString(radix, usePeriods, commandLineArgs.tsvOptimize));
             if (printWeight)
-                out.println("weight = " + protocol.weight());
+                out.println("weight = " + protocol.weight() + "\t" + protocol.getDecoderName());
         }
     }
 

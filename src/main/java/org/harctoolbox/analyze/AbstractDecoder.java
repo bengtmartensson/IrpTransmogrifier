@@ -127,7 +127,7 @@ public abstract class AbstractDecoder {
             }
         }
         BitspecIrstream bitspecIrstream = new BitspecIrstream(bitSpec, irStream);
-        Protocol protocol = new Protocol(params.getGeneralSpec(timebase), bitspecIrstream, nameEngine, null, null);
+        Protocol protocol = new Protocol(params.getGeneralSpec(timebase), bitspecIrstream, nameEngine, null, null, getClass());
         return protocol;
     }
 

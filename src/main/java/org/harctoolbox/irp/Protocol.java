@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
+import org.harctoolbox.analyze.AbstractDecoder;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -72,6 +73,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private Boolean interleavingFlash = null;
     private Boolean interleavingGap = null;
     private ParserDriver parserDriver = null;
+    private Class<? extends AbstractDecoder> decoderClass;
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs) {
         this(generalSpec, bitspecIrstream, definitions, parameterSpecs, null);
@@ -79,10 +81,16 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree) {
+        this(generalSpec, bitspecIrstream, definitions, parameterSpecs, parseTree, null);
+    }
+
+    public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
+            IrpParser.ProtocolContext parseTree, Class<? extends AbstractDecoder> decoderClass) {
         super(parseTree);
         this.generalSpec = generalSpec;
         this.bitspecIrstream = bitspecIrstream;
         this.initialDefinitions = definitions;
+        this.decoderClass = decoderClass;
         initializeDefinitions();
         this.parameterSpecs = parameterSpecs != null ? parameterSpecs : new ParameterSpecs();
         computeNormalForm();
@@ -137,6 +145,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         }
 
         checkSanity();
+    }
+
+    public String getDecoderName() {
+        return decoderClass != null ? decoderClass.getSimpleName() : "";
     }
 
     private void initializeDefinitions() {

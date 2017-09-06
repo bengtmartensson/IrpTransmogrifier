@@ -48,6 +48,8 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
+    private final static int SILLYNESSPENALTY = 3;
+
     private final static double LOWER_COMMON_FREQUENCY1 = 36000d;
     private final static double UPPER_COMMON_FREQUENCY1 = 40000d;
     private final static double LOWER_COMMON_FREQUENCY2 = 56000d;
@@ -376,6 +378,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         return bitspecIrstream.isTrivial(generalSpec, initialDefinitions, inverted);
     }
 
+    public boolean isTrivial() {
+        return isTrivial(true) || isTrivial(false);
+    }
+
     public boolean interleavingOk() {
        return interleavingFlashOk() && interleavingGapOk();
     }
@@ -595,10 +601,13 @@ public class Protocol extends IrpObject implements AggregateLister {
 //            throw new SignalRecognitionException("IrSequence not fully matched");
     }
 
+    // Penalize silly protocols
     @Override
     public int weight() {
-        return generalSpec.weight() + bitspecIrstream.weight()
+        int w = generalSpec.weight() + bitspecIrstream.weight()
                 + initialDefinitions.weight() + parameterSpecs.weight();
+        int penalty = isTrivial() ? SILLYNESSPENALTY : 1;
+        return penalty * w;
     }
 
     public GeneralSpec getGeneralSpec() {
@@ -664,7 +673,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public String warningTrivialBitspec() {
-        return (isTrivial(false) || isTrivial(true)) ? warn("Protocol uses trivial bitspec") : "";
+        return isTrivial() ? warn("Protocol uses trivial bitspec") : "";
     }
 
     public String warningRepeatPlus() {

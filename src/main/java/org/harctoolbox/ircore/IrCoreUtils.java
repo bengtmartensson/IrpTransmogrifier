@@ -279,6 +279,37 @@ public final class IrCoreUtils {
             out.println();
     }
 
+    public static String formatIntegerWithLeadingZeros(long x, int radix, int length) {
+        return radix == 2 ? formatIntegerBase2WithLeadingZeros(x, length)
+                : radix == 8 ? formatIntegerBase8WithLeadingZeros(x, length)
+                : radix == 16 ? formatIntegerBase16WithLeadingZeros(x, length)
+                : formatIntegerBaseSomeWithLeadingZeros(x, radix, length);
+    }
+
+    private static String formatIntegerBase2WithLeadingZeros(long x, int length) {
+        return pad(Long.toBinaryString(x), length, 1);
+    }
+
+    private static String formatIntegerBase8WithLeadingZeros(long x, int length) {
+        return pad(Long.toOctalString(x), length, 3);
+    }
+
+    private static String formatIntegerBase16WithLeadingZeros(long x, int length) {
+        return pad(Long.toHexString(x), length, 4);
+    }
+
+    private static String formatIntegerBaseSomeWithLeadingZeros(long x, int radix, int length) {
+        return pad(Long.toString(x, radix), length, Math.log(radix)/Math.log(2.0));
+    }
+
+    private static String pad(String rawString, int length, double noBits) {
+        StringBuilder str = new StringBuilder(rawString);
+        int effectiveLength = (int) Math.ceil(length/noBits);
+        while (str.length() < effectiveLength)
+            str.insert(0, '0');
+        return str.toString();
+    }
+
     /**
      * The power function for long arguments.
      *

@@ -839,10 +839,14 @@ public final class IrpTransmogrifier {
                         out.print(names != null
                                 ? (names[i] + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names[i].length() + 1)))
                                 :  ("#" + i + "\t"));
-                    NameEngine definitions = protocols.get(i).getDefinitions();
+                    Protocol protocol = protocols.get(i);
+                    NameEngine definitions = protocol.getDefinitions();
                     for (Map.Entry<String, Expression> definition : definitions) {
                         try {
-                            out.print("\t" + Long.toString(definition.getValue().toNumber(), commandAnalyze.radix));
+                            String name = definition.getKey();
+                            int length = protocol.guessParameterLength(name);
+                            long num = definition.getValue().toNumber();
+                            out.print("\t" + IrCoreUtils.formatIntegerWithLeadingZeros(num, commandAnalyze.radix, length));
                         } catch (NameUnassignedException ex) {
                             throw new ThisCannotHappenException(ex);
                         }

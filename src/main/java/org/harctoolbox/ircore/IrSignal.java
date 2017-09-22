@@ -81,9 +81,19 @@ public final class IrSignal implements Cloneable {
 
         map = new EnumMap<>(Pass.class);
 
-        map.put(Pass.intro, introSequence);
-        map.put(Pass.repeat, repeatSequence);
-        map.put(Pass.ending, endingSequence);
+        map.put(Pass.intro, this.introSequence);
+        map.put(Pass.repeat, this.repeatSequence);
+        map.put(Pass.ending, this.endingSequence);
+    }
+
+    /**
+     *  Constructs an IrSignal from its arguments. The single sequence is made intro sequence.
+     * @param introSequence
+     * @param frequency
+     * @param dutyCycle
+     */
+    public IrSignal(IrSequence introSequence, Double frequency, Double dutyCycle) {
+        this(introSequence, null, null, frequency, dutyCycle);
     }
 
     /**

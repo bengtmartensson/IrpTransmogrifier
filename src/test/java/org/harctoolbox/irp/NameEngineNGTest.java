@@ -22,7 +22,9 @@ public class NameEngineNGTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
+
     private final NameEngine instance;
+
     public NameEngineNGTest() throws InvalidNameException {
         instance = new NameEngine("{A=11,B=22,C=33,D=A-B,E=A-#(C-D),F=UINT8_MAX}");
     }
@@ -171,9 +173,9 @@ public class NameEngineNGTest {
             assertEquals(result.toString(), expResult.toString());
 
             result = NameEngine.parseLoose("");
-            assertEquals(result.toString(), "{}");
+            assertEquals(result.toString(), "");
             result = NameEngine.parseLoose(null);
-            assertEquals(result.toString(), "{}");
+            assertEquals(result.toString(), "");
         } catch (InvalidNameException ex) {
             Logger.getLogger(NameEngineNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }

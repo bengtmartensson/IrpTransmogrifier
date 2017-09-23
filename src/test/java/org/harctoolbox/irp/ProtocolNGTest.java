@@ -221,7 +221,7 @@ public class ProtocolNGTest {
         mce = irpDatabase.getNamedProtocol("MCE");
         Protocol result = mce.substituteConstantVariables();
         //assertEquals(result.toIrpString(), "{36.0k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=(1-T)){OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
-        assertEquals(result.toIrpString(), "{36.0k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,128:8,S:8,T:1,D:7,F:8,^107m)*,T=(1-T)){}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
+        assertEquals(result.toIrpString(), "{36.0k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,128:8,S:8,T:1,D:7,F:8,^107m)*,T=(1-T))[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
     }
 
     @Test
@@ -376,7 +376,7 @@ public class ProtocolNGTest {
             System.out.println("toIrpString");
             NamedProtocol rc5 = irpDatabase.getNamedProtocol("rc5");
             String result = rc5.toIrpString();
-            assertEquals(result, "{36.0k,889,msb}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=(1-T)){}[D:0..31,F:0..127,T@:0..1=0]");
+            assertEquals(result, "{36.0k,889,msb}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=(1-T))[D:0..31,F:0..127,T@:0..1=0]");
         } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException  ex) {
             fail();
         }

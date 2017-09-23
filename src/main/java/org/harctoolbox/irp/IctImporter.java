@@ -94,11 +94,6 @@ public class IctImporter {
         sequences = new LinkedHashMap<>(4);
     }
 
-
-    private void load(String urlOrFilename) throws IOException, ParseException {
-        load(urlOrFilename, "US-ASCII");
-    }
-
     private void load(String urlOrFilename, String charSetName) throws UnsupportedEncodingException, IOException, ParseException {
         if (urlOrFilename.equals("-"))
             load(new InputStreamReader(System.in, charSetName));

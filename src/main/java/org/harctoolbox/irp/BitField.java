@@ -150,4 +150,6 @@ public abstract class BitField extends IrpObject implements Numerical {
     public Integer numberOfBareDurations(boolean recursive) {
         return 0;
     }
+
+    public abstract BitField substituteConstantVariables(Map<String, Long> constantVariables);
 }

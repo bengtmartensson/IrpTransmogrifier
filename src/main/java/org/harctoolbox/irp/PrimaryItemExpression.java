@@ -34,6 +34,17 @@ abstract class PrimaryItemExpression extends OnePartExpression {
             throw new ThisCannotHappenException("Unknown PrimaryItemExpression");
     }
 
+    static Expression newExpression(PrimaryItem primaryItem) {
+        if (primaryItem instanceof Name)
+            return NameExpression.newExpression((Name) primaryItem);
+        else if (primaryItem instanceof Number)
+            return NumberExpression.newExpression(primaryItem);
+        else if (primaryItem instanceof Expression)
+            return (Expression) primaryItem;
+        else
+            throw new ThisCannotHappenException("Unknown PrimaryItem");
+    }
+
     protected PrimaryItemExpression(ParseTree ctx) {
         super(ctx);
     }

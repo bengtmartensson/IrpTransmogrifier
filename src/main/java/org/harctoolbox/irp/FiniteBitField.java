@@ -65,12 +65,16 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     public FiniteBitField(String name, long width, boolean complement) throws InvalidNameException {
+        this(new Name(name), new Number(width), new Number(0), complement, false);
+    }
+
+    private FiniteBitField(PrimaryItem data, PrimaryItem width, PrimaryItem chop, boolean complement, boolean reverse) throws InvalidNameException {
         super(null);
+        this.data = data;
+        this.width = width;
+        this.chop = chop;
         this.complement = complement;
-        data = new Name(name);
-        this.width = new Number(width);
-        this.chop = new Number(0);
-        this.reverse = false;
+        this.reverse = reverse;
     }
 
     public FiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
@@ -84,6 +88,17 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         width = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
         chop = ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0);
         reverse = ! (ctx.getChild(index+2) instanceof IrpParser.Primary_itemContext);
+    }
+
+    @Override
+    public FiniteBitField substituteConstantVariables(Map<String, Long> constantVariables) {
+        try {
+            return new FiniteBitField(data.substituteConstantVariables(constantVariables),
+                    width.substituteConstantVariables(constantVariables),
+                    chop.substituteConstantVariables(constantVariables), complement, reverse);
+        } catch (InvalidNameException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     @Override

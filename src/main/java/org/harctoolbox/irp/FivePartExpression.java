@@ -35,11 +35,27 @@ final class FivePartExpression extends Expression {
     private final Expression trueExp;
     private final Expression falseExp;
 
-    private FivePartExpression(ParseTree ctx, IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
+    private FivePartExpression(ParseTree ctx, Expression cond, Expression trueExpression, Expression falseExpression) {
         super(ctx);
-        conditional = Expression.newExpression(cond);
-        trueExp = Expression.newExpression(trueExpression);
-        falseExp = Expression.newExpression(falseExpression);
+        this.conditional = cond;
+        this.trueExp = trueExpression;
+        this.falseExp = falseExpression;
+    }
+
+    private FivePartExpression(ParseTree ctx, IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
+        this(ctx, Expression.newExpression(cond), Expression.newExpression(trueExpression), Expression.newExpression(falseExpression));
+    }
+
+    private FivePartExpression(ParseTree parseTree, PrimaryItem cond, PrimaryItem trueExpression, PrimaryItem falseExpression) {
+        this(parseTree, PrimaryItemExpression.newExpression(cond),
+                PrimaryItemExpression.newExpression(trueExpression),
+                PrimaryItemExpression.newExpression(falseExpression));
+    }
+
+    @Override
+    public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new FivePartExpression(getParseTree(), conditional.substituteConstantVariables(constantVariables),
+                trueExp.substituteConstantVariables(constantVariables), falseExp.substituteConstantVariables(constantVariables));
     }
 
     @Override

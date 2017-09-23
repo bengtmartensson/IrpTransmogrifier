@@ -34,11 +34,19 @@ final class NameExpression extends PrimaryItemExpression {
         }
     }
 
+    static Expression newExpression(Name name) {
+        return new NameExpression(null, name);
+    }
+
     private final Name name;
 
     private NameExpression(ParseTree original, String text) throws InvalidNameException {
+        this(original, new Name(text));
+    }
+
+    private NameExpression(ParseTree original, Name name) {
         super(original);
-        name = new Name(text);
+        this.name = name;
     }
 
     @Override
@@ -92,5 +100,10 @@ final class NameExpression extends PrimaryItemExpression {
     @Override
     public PrimaryItem leftHandSide() {
         return name;
+    }
+
+    @Override
+    public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return name.substituteConstantVariables(constantVariables);
     }
 }

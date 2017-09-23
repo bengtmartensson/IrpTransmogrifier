@@ -197,6 +197,21 @@ public class Protocol extends IrpObject implements AggregateLister {
         return hash;
     }
 
+    /**
+     * Returns a Protocol with all of the variables which are constant
+     * literals in the Definitions replaced by their values.
+     * Does not change the containing object, but the returned protocol
+     * may share some objects with the original protocol.
+     * @return Protocol.
+     */
+    public Protocol substituteConstantVariables() {
+        Map<String, Long> constantVariables = definitions.getNumericLiterals();
+        NameEngine newDefs = definitions.remove(constantVariables.keySet());
+        BitspecIrstream newBitspecIrstream = bitspecIrstream.substituteConstantVariables(constantVariables);
+        Protocol newProtocol = new Protocol(this.generalSpec, newBitspecIrstream, newDefs, parameterSpecs);
+        return newProtocol;
+    }
+
     private void checkSanity() throws UnsupportedRepeatException {
         if (numberOfInfiniteRepeats() > 1)
             throw new UnsupportedRepeatException();

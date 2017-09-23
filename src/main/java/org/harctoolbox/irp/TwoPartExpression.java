@@ -38,9 +38,22 @@ final class TwoPartExpression extends Expression {
     private final Expression operand;
 
     private TwoPartExpression(ParseTree ctx, ParseTree first, ParseTree second) {
+        this(ctx, first.getText().charAt(0), Expression.newExpression((IrpParser.ExpressionContext) second));
+    }
+
+    private TwoPartExpression(ParseTree ctx, char operator, Expression operand) {
         super(ctx);
-        operator = first.getText().charAt(0);
-        operand = Expression.newExpression((IrpParser.ExpressionContext) second);
+        this.operator = operator;
+        this.operand = operand;
+    }
+
+    private TwoPartExpression(char operator, PrimaryItem primaryItem) {
+        this(null, operator, PrimaryItemExpression.newExpression(primaryItem));
+    }
+
+    @Override
+    public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new TwoPartExpression(operator, operand.substituteConstantVariables(constantVariables));
     }
 
     @Override

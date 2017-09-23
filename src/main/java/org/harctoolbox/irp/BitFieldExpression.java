@@ -36,8 +36,17 @@ final class BitFieldExpression extends PrimaryItemExpression {
     private final BitField bitField;
 
     private BitFieldExpression(ParseTree original, IrpParser.BitfieldContext ctx) {
+        this(original, BitField.newBitField(ctx));
+    }
+
+    private BitFieldExpression(ParseTree original, BitField bitField) {
         super(original);
-        bitField = BitField.newBitField(ctx);
+        this.bitField = bitField;
+    }
+
+    @Override
+    public BitFieldExpression substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new BitFieldExpression(null, bitField.substituteConstantVariables(constantVariables));
     }
 
     @Override

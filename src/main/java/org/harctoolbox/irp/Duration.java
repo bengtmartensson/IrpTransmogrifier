@@ -98,6 +98,12 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         this.unit = unit != null ? unit : "";
     }
 
+    protected Duration(NameOrNumber nameOrNumber, String unit) {
+        super(null);
+        this.nameOrNumber = nameOrNumber;
+        this.unit = unit;
+    }
+
     @Override
     public int hashCode() {
         int hash = 5;

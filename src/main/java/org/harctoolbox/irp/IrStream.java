@@ -75,6 +75,11 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     @Override
+    public IrStream substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new IrStream(bareIrStream.substituteConstantVariables(constantVariables), this.repeatMarker);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof IrStream))
             return false;

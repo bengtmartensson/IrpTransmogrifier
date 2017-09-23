@@ -146,4 +146,8 @@ public abstract class Expression extends PrimaryItem {
     public Element toElement(Document document) {
         return document.createElement("Expression");
     }
+
+    public boolean isNumericLiteral() {
+        return false;
+    }
 }

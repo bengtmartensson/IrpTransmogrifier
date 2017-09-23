@@ -355,4 +355,25 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         });
         return result;
     }
+
+    Map<String, Long> getNumericLiterals() {
+        HashMap<String, Long> result = new HashMap<>(this.size());
+        map.entrySet().forEach((kvp) -> {
+            String name = kvp.getKey();
+            Expression exp = kvp.getValue();
+            long val;
+            try {
+                val = exp.toNumber();
+                result.put(name, val);
+            } catch (NameUnassignedException ex) {
+            }
+        });
+        return result;
+    }
+
+    NameEngine remove(Iterable<String> names) {
+        NameEngine result = this.clone();
+        names.forEach((key) -> result.map.remove(key));
+        return result;
+    }
 }

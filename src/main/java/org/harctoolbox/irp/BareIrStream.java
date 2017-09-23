@@ -439,4 +439,13 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         }
         return null;
     }
+
+    @Override
+    public BareIrStream substituteConstantVariables(Map<String, Long> constantVariables) {
+        List<IrStreamItem> newList = new ArrayList<>(irStreamItems.size());
+        irStreamItems.forEach((item) -> {
+            newList.add(item.substituteConstantVariables(constantVariables));
+        });
+        return new BareIrStream(newList);
+    }
 }

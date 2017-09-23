@@ -66,6 +66,11 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
+    public Assignment substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new Assignment(name, PrimaryItemExpression.newExpression(value.substituteConstantVariables(constantVariables)));
+    }
+
+    @Override
     public int hashCode() {
         int hash = 7;
         hash = 43 * hash + Objects.hashCode(this.name);

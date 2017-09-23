@@ -932,7 +932,8 @@ public final class IrpTransmogrifier {
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight) {
         if (protocol != null) {
-            out.println(protocol.toIrpString(radix, usePeriods, commandLineArgs.tsvOptimize));
+            Protocol actualProtocol = commandAnalyze.eliminateVars ? protocol.substituteConstantVariables() : protocol;
+            out.println(actualProtocol.toIrpString(radix, usePeriods, commandLineArgs.tsvOptimize));
             if (printWeight)
                 out.println("weight = " + protocol.weight() + "\t" + protocol.getDecoderName());
         }
@@ -1182,6 +1183,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-e", "--extent" }, description = "Output the last gap as an extent.")
         private boolean extent = false;
+
+        @Parameter(names = {       "--eliminate-vars" }, description = "Eliminate variables in output form")
+        private boolean eliminateVars = false;
 
         @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
         private Double frequency = null;

@@ -59,6 +59,11 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public IrStreamItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new Variation(intro.substituteConstantVariables(constantVariables), repeat.substituteConstantVariables(constantVariables), ending.substituteConstantVariables(constantVariables));
+    }
+
+    @Override
     public boolean isEmpty(NameEngine nameEngine) {
         return intro.isEmpty(nameEngine) && repeat.isEmpty(nameEngine) && (ending == null || ending.isEmpty(nameEngine));
     }

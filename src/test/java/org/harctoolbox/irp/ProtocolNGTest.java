@@ -215,6 +215,24 @@ public class ProtocolNGTest {
     }
 
     @Test
+    public void testSubstituteConstantVariablesMCE() throws UnknownProtocolException, UnsupportedRepeatException, InvalidNameException, IrpInvalidArgumentException, NameUnassignedException {
+        System.out.println("substituteConstantVariablesMCE");
+        NamedProtocol mce;
+        mce = irpDatabase.getNamedProtocol("MCE");
+        Protocol result = mce.substituteConstantVariables();
+        //assertEquals(result.toIrpString(), "{36.0k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=(1-T)){OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
+        assertEquals(result.toIrpString(), "{36.0k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,128:8,S:8,T:1,D:7,F:8,^107m)*,T=(1-T)){}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
+    }
+
+    @Test
+    public void testSubstituteConstantVariablesLumagen() throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+        System.out.println("substituteConstantVariablesMCE");
+        NamedProtocol lumagen = irpDatabase.getNamedProtocol("Lumagen");
+        Protocol result = lumagen.substituteConstantVariables();
+        assertEquals(result.toIrpString(), lumagen.toIrpString());
+    }
+
+    @Test
     public void testRecognizeAmino() {
         System.out.println("recognizeAmino");
         try {

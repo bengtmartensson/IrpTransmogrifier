@@ -329,4 +329,9 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     public Integer guessParameterLength(String name) {
         return irStream.guessParameterLength(name);
     }
+
+    @Override
+    public BitspecIrstream substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new BitspecIrstream(bitSpec.substituteConstantVariables(constantVariables), irStream.substituteConstantVariables(constantVariables));
+    }
 }

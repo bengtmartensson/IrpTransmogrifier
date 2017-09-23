@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -46,6 +47,15 @@ public final class Extent extends Duration {
 
     public Extent(double d) {
         this(d, null);
+    }
+
+    public Extent(NameOrNumber non, String unit) {
+        super(non, unit);
+    }
+
+    @Override
+    public IrStreamItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new Extent(nameOrNumber.substituteConstantVariables(constantVariables), unit);
     }
 
     @Override

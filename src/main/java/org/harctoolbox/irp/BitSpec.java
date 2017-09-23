@@ -87,6 +87,18 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         bitCodes = new ArrayList<>(0);
     }
 
+    BitSpec substituteConstantVariables(Map<String, Long> constantVariables) {
+        try {
+            List<BareIrStream> list = new ArrayList<>(bitCodes.size());
+            bitCodes.forEach((bitCode) -> {
+                list.add(bitCode.substituteConstantVariables(constantVariables));
+            });
+            return new BitSpec(list);
+        } catch (NonUniqueBitCodeException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
+    }
+
     public Integer numberOfDurations() {
         int result = 0;
         for (BareIrStream bitCode : bitCodes) {

@@ -39,11 +39,27 @@ final class ThreePartExpression extends Expression {
     private final Expression op1;
     private final Expression op2;
 
-    private ThreePartExpression(ParseTree ctx, ParseTree first, ParseTree second, ParseTree third) {
+    private ThreePartExpression(ParseTree ctx, Expression first, String second, Expression third) {
         super(ctx);
-        operator = second.getText();
-        op1 = Expression.newExpression((IrpParser.ExpressionContext) first);
-        op2 = Expression.newExpression((IrpParser.ExpressionContext) third);
+        op1 = first;
+        operator = second;
+        op2 = third;
+    }
+
+    private ThreePartExpression(ParseTree ctx, ParseTree first, ParseTree second, ParseTree third) {
+        this(ctx, Expression.newExpression((IrpParser.ExpressionContext) first),
+                second.getText(), Expression.newExpression((IrpParser.ExpressionContext) third));
+    }
+
+    private ThreePartExpression(PrimaryItem pi1, String operator, PrimaryItem pi2) {
+        this(null, PrimaryItemExpression.newExpression(pi1),
+                operator, PrimaryItemExpression.newExpression(pi2));
+    }
+
+    @Override
+    public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new ThreePartExpression(op1.substituteConstantVariables(constantVariables),
+                operator, op2.substituteConstantVariables(constantVariables));
     }
 
     @Override

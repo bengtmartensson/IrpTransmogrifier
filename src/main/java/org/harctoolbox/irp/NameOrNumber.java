@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -46,8 +47,18 @@ public final class NameOrNumber extends IrpObject implements Floatable {
     }
 
     public NameOrNumber(double x) {
+        this(new NumberWithDecimals(x));
+    }
+
+    public NameOrNumber(Floatable floatable) {
         super(null);
-        thing = new NumberWithDecimals(x);
+        thing = floatable;
+    }
+
+    public NameOrNumber substituteConstantVariables(Map<String, Long> constantVariables) {
+        return (thing instanceof Name)
+                ? new NameOrNumber((Floatable) ((PrimaryItem)thing).substituteConstantVariables(constantVariables))
+                : this;
     }
 
     @Override

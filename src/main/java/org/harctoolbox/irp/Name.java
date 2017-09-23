@@ -102,6 +102,10 @@ public final class Name extends PrimaryItem implements Floatable {
         this.name = name;
     }
 
+    @Override
+    public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return constantVariables.containsKey(name) ? new Number(constantVariables.get(name)) : this;
+    }
 
     @Override
     public boolean equals(Object obj) {

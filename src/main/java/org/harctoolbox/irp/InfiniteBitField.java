@@ -33,10 +33,22 @@ public final class InfiniteBitField extends BitField {
 
     public InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx) {
         super(ctx);
-        if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext))
-            complement = true;
+        complement = ! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext);
         data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
         chop = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
+    }
+
+    private InfiniteBitField(PrimaryItem data, PrimaryItem chop, boolean complement) {
+        super(null);
+        this.data = data;
+        this.chop = chop;
+        this.complement = complement;
+    }
+
+    @Override
+    public InfiniteBitField substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new InfiniteBitField(data.substituteConstantVariables(constantVariables),
+                chop.substituteConstantVariables(constantVariables), complement);
     }
 
     @Override

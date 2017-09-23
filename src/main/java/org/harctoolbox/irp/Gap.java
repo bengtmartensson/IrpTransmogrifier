@@ -16,6 +16,8 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.irp;
 
+import java.util.Map;
+
 /**
  * This class implements Gap as per Chapter 3.
  *
@@ -40,6 +42,15 @@ public final class Gap extends Duration {
 
     public Gap(double d, String unit) {
         super(d, unit);
+    }
+
+    public Gap(NameOrNumber non, String unit) {
+        super(non, unit);
+    }
+
+    @Override
+    public IrStreamItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new Gap(nameOrNumber.substituteConstantVariables(constantVariables), unit);
     }
 
     @Override

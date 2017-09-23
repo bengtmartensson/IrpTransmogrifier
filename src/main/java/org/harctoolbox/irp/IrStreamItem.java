@@ -120,4 +120,14 @@ public interface IrStreamItem extends XmlExport {
      * @return length if success, null if failure.
      */
     public Integer guessParameterLength(String name);
+
+    /**
+     * Returns an IrStreamItem of the same type with all occurrences of the
+     * variables in the dictionary replaced by their values in the dictionary.
+     * Does not change the containing object. May return the object itself,
+     * or share sub-objects with it.
+     * @param constantVariables Map<String, Long> of variables to replace.
+     * @return IrStreamItem of the same type.
+     */
+    public IrStreamItem substituteConstantVariables(Map<String, Long> constantVariables);
 }

@@ -106,4 +106,14 @@ final class NumberExpression extends PrimaryItemExpression {
     public PrimaryItem leftHandSide() {
         return null;
     }
+
+    @Override
+    public boolean isNumericLiteral() {
+        return true;
+    }
+
+    @Override
+    public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return this;
+    }
 }

@@ -180,4 +180,9 @@ public final class Number extends PrimaryItem {
     public PrimaryItem leftHandSide() {
         return this;
     }
+
+    @Override
+    public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return this;
+    }
 }

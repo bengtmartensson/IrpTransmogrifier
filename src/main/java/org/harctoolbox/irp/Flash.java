@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Map;
+
 /**
  * This class implements Flash as per Chapter 3.
  *
@@ -41,6 +43,15 @@ public final class Flash extends Duration {
 
     public Flash(double d) {
         super(d);
+    }
+
+    public Flash(NameOrNumber non, String unit) {
+        super(non, unit);
+    }
+
+    @Override
+    public IrStreamItem substituteConstantVariables(Map<String, Long> constantVariables) {
+        return new Flash(nameOrNumber.substituteConstantVariables(constantVariables), unit);
     }
 
     @Override

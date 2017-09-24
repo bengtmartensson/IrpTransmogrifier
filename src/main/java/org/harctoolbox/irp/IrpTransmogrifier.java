@@ -878,30 +878,32 @@ public final class IrpTransmogrifier {
             });
             List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding, false);
             for (IrSignal irSignal : signals)
-                decode(decoder, irSignal, null);
+                decode(decoder, irSignal, null, 0);
         } else if (commandDecode.namedInput != null) {
             try {
                 Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandDecode.namedInput);
+                int maxNameLength = IrCoreUtils.maxLength(modSequences.keySet());
                 for (Map.Entry<String, ModulatedIrSequence> kvp : modSequences.entrySet()) {
                     IrSignal signal = new IrSignal(kvp.getValue());
-                    decode(decoder, signal, kvp.getKey());
+                    decode(decoder, signal, kvp.getKey(), maxNameLength);
                 }
             } catch (ParseException ex) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, commandDecode.trailingGap);
                 });
                 Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
-            for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
-                    decode(decoder, kvp.getValue(), kvp.getKey());
+                int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
+                for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
+                    decode(decoder, kvp.getValue(), kvp.getKey(), maxNameLength);
             }
         } else {
             IrSignal irSignal = IrSignalParsers.parseProntoOrRaw(commandDecode.args, commandDecode.frequency, commandDecode.trailingGap);
-            decode(decoder, irSignal, null);
+            decode(decoder, irSignal, null, 0);
         }
     }
 
     @SuppressWarnings("AssignmentToMethodParameter")
-    private void decode(Decoder decoder, IrSignal irSignal, String name) throws InvalidArgumentException {
+    private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws InvalidArgumentException {
         if (commandDecode.repeatFinder || commandDecode.dumpRepeatfinder) {
             // ignoring commandDecode.cleaner
             ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
@@ -922,7 +924,8 @@ public final class IrpTransmogrifier {
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
         if (name != null)
-            out.print(name + ":");
+            out.print(name + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
+
         decodes.values().forEach((kvp) -> {
             out.println("\t" + kvp.toString(commandDecode.radix));
         });

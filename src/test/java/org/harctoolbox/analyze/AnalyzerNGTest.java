@@ -46,7 +46,7 @@ public class AnalyzerNGTest {
             IrSequence irSequence = new IrSequence(ALLDATA);
             Analyzer instance = new Analyzer(irSequence, 38400d, true);
             IrSignal expResult = new IrSignal(new IrSequence(INTRODATA), new IrSequence(REPEATDATA), new IrSequence(), 38400d);
-            IrSignal result = instance.repeatReducedIrSignal();
+            IrSignal result = instance.repeatReducedIrSignal(0);
             assertTrue(result.approximatelyEquals(expResult));
         } catch (OddSequenceLengthException ex) {
             throw new ThisCannotHappenException(ex);

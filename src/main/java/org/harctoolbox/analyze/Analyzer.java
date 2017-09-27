@@ -138,10 +138,6 @@ public final class Analyzer extends Cleaner {
         return repeatFinderData[number];
     }
 
-    public IrSignal repeatReducedIrSignal() {
-        return repeatReducedIrSignal(0);
-    }
-
     public IrSignal repeatReducedIrSignal(int number) {
         IrSequence intro;
         IrSequence repeat;

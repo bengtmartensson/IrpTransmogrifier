@@ -350,7 +350,7 @@ public final class Analyzer extends Cleaner {
             this.parameterWidths = parameterWidths == null ? new ArrayList<>(0) : parameterWidths;
             this.maxParameterWidth = maxParameterWidth;
 
-            if (timeBaseString == null) {
+            if (timeBaseString == null || timeBaseString.isEmpty()) {
                 timebase = null;
                 preferPeriods = false;
             } else {

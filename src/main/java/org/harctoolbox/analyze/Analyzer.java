@@ -291,6 +291,9 @@ public final class Analyzer extends Cleaner {
     }
 
     public void printStatistics(PrintStream out, AnalyzerParams params) {
+        out.println("Timebase: " + getRealTimebase(params.getTimebase(), params.burstPrefs.getMaxRoundingError()));
+        out.println();
+
         out.println("Gaps:");
         this.getGaps().stream().forEach((d) -> {
             out.println(this.getName(d) + ":\t" + d + "\t" + multiplierString(d, params.getTimebase(), params.burstPrefs) + "\t" + this.getNumberGaps(d));
@@ -309,8 +312,12 @@ public final class Analyzer extends Cleaner {
         });
     }
 
+    private double getRealTimebase(Double timebase, double relativeTolerance) {
+        return timebase != null ? timebase : getTimeBaseFromData(relativeTolerance);
+    }
+
     private String multiplierString(int us, Double timebase, Burst.Preferences burstPrefs) {
-        double tick = timebase != null ? timebase : getTimeBaseFromData(burstPrefs.getMaxRoundingError());
+        double tick = getRealTimebase(timebase, burstPrefs.getMaxRoundingError());
         Integer mult = Burst.multiplier(us, tick, burstPrefs);
         return mult != null ? "= " + mult.toString() + "*" + Long.toString(Math.round(tick)) + "  " : "\t";
     }

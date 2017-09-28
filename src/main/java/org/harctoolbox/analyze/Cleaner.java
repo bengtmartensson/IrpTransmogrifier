@@ -358,7 +358,7 @@ public class Cleaner {
             }
         });
         int gcd = IrCoreUtils.approximateGreatestCommonDivider(list, relativeTolerance);
-        logger.log(Level.INFO, "Computing GCD of {0} to {1}", new Object[]{str.toString(), gcd});
+        logger.log(Level.FINER, "Computing GCD of {0} to {1}", new Object[]{str.toString(), gcd});
         return gcd;
     }
 

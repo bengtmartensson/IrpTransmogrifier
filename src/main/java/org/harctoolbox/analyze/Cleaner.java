@@ -357,6 +357,10 @@ public class Cleaner {
                 str.append(" ").append(time);
             }
         });
+        if (list.isEmpty()) {
+            logger.log(Level.FINE, "Cannot find a sensible time base");
+            return 1;
+        }
         int gcd = IrCoreUtils.approximateGreatestCommonDivider(list, relativeTolerance);
         logger.log(Level.FINER, "Computing GCD of {0} to {1}", new Object[]{str.toString(), gcd});
         return gcd;

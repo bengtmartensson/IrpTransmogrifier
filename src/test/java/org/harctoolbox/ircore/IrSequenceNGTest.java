@@ -1,5 +1,7 @@
 package org.harctoolbox.ircore;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.testng.Assert.*;
@@ -26,7 +28,6 @@ public class IrSequenceNGTest {
     private final String raw = " +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +1266 -7096 +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270  +422 -1270 +1266 -7096   ";
 
     //private final IrSignal nec1_123456;
-
     public IrSequenceNGTest() throws InvalidArgumentException {
         //nec1_123456 = new IrSignal("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C");
     }
@@ -61,7 +62,7 @@ public class IrSequenceNGTest {
 //        } catch (OddSequenceLenghtException e) {
 //            fail();
 //        }
-        }
+    }
 
     /**
      * Test of get method, of class IrSequence.
@@ -88,7 +89,6 @@ public class IrSequenceNGTest {
 //        int result = instance.iget(i);
 //        assertEquals(result, expResult);
 //    }
-
     /**
      * Test of approximatelyEquals method, of class IrSequence.
      */
@@ -238,5 +238,32 @@ public class IrSequenceNGTest {
         } catch (OddSequenceLengthException ex) {
             Logger.getLogger(IrSequenceNGTest.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * Test of stripDecoratedString method, of class IrSequence.
+     */
+    @Test
+    public void testStripDecoratedString() {
+        System.out.println("stripDecoratedString");
+        String in = "+8900, -4450 + 600, -1600 + 600, - 600 + 600, - 600\n"
+                + "+ 600, - 600 + 600, - 550 + 650, - 600 + 600, -1550";
+        String expResult = "8900 4450 600 1600 600 600 600 600 600 600 600 550 650 600 600 1550";
+        String result = IrSequence.stripDecoratedString(in);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of normalize method, of class IrSequence.
+     */
+    @Test
+    public void testNormalize() {
+        System.out.println("normalize");
+        String in = "+8900, -4450 + 600, -1600 + 600, - 600 + 600, - 600\n"
+                + "+ 600, - 600 + 600, - 550 + 650, - 600 + 600";
+        String result = IrSequence.normalize(in, 1234.0, true, " ");
+        assertEquals(result, "+8900 -4450 +600 -1600 +600 -600 +600 -600 +600 -600 +600 -550 +650 -600 +600 -1234");
+        result = IrSequence.normalize(in, 1234.0, false, ", ");
+        assertEquals(result, "8900, 4450, 600, 1600, 600, 600, 600, 600, 600, 600, 600, 550, 650, 600, 600, 1234");
     }
 }

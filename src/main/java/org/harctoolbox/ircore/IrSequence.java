@@ -81,8 +81,8 @@ public class IrSequence implements Cloneable {
         checkOddLength(data.length);
     }
 
-    private static double[] fixOddLength(double[] data, double dummyGapDuration) {
-        if (data.length % 2 != 0) {
+    private static double[] fixOddLength(double[] data, Double dummyGapDuration) {
+        if (data.length % 2 != 0 && dummyGapDuration != null) {
             double[] newData = new double[data.length + 1];
             System.arraycopy(data, 0, newData, 0, data.length);
             newData[data.length] = dummyGapDuration;
@@ -154,14 +154,7 @@ public class IrSequence implements Cloneable {
         return result;
     }
 
-    /**
-     * Constructs an IrSequence from the parameter data.
-     * This version does not require flashes and gaps to be interleaved (signs alternating).
-     * @param str String of durations, possibly using signed numbers.
-     * @param fixOddSequences it true, odd sequences (ending with gap) are silently fixed by adding a dummy gap.
-     * @throws OddSequenceLengthException If last duration is not a gap, and fixOddSequences false.
-     */
-    private static double[] toDoubles(String str) {
+    public static double[] toDoublesPreservingSigns(String str) {
         if (str == null || str.trim().isEmpty())
             return new double[0];
 
@@ -170,6 +163,30 @@ public class IrSequence implements Cloneable {
             // Instead, try to break at "+" and "-" chars, preserving these
             strings = str.trim().split("(?=\\+)|(?=-)");
         return stringsToDoubles(strings);
+    }
+
+    private static double[] toDoubles(String string) {
+        if (string == null || string.trim().isEmpty())
+            return new double[0];
+        String str = stripDecoratedString(string);
+        String[] strings = str.trim().split("\\s+");
+        return stringsToDoubles(strings);
+    }
+
+    /**
+     * Removes all "decorations" like signs, commas and semicolons.
+     * In particular, it is assumed that the numbers really are interleaving
+     * flash and gaps.
+     * @param in
+     * @return
+     */
+    public static String stripDecoratedString(String in) {
+        return in.replaceAll("[+\\-,;\\s]+", " ").trim();
+    }
+
+    public static String normalize(String in, Double dummyGap, boolean useSigns, String separator) {
+        IrSequence irSequence = new IrSequence(in, dummyGap);
+        return irSequence.toString(useSigns, separator, "", "");
     }
 
     /**
@@ -199,7 +216,7 @@ public class IrSequence implements Cloneable {
         setup(inData);
     }
 
-    public IrSequence(double[] inData, double dummyGapDuration) {
+    public IrSequence(double[] inData, Double dummyGapDuration) {
         setup(fixOddLength(inData, dummyGapDuration));
     }
 
@@ -230,7 +247,16 @@ public class IrSequence implements Cloneable {
         this(toDoubles(string));
     }
 
-    public IrSequence(String string, double dummyGapDuration) {
+    /**
+     * Constructs an IrSequence from the parameter data. It is assumed that
+     * flashes and gaps are interleaved. Signs, commas, and semicolons are
+     * ignored.
+     *
+     * @param string String of durations, possibly "decorated".
+     * @param dummyGapDuration if the string consists of an odd number of
+     * numbers, a gap of this length is silently adding to the sequence.
+     */
+    public IrSequence(String string, Double dummyGapDuration) {
         this(toDoubles(string), dummyGapDuration);
     }
 

@@ -541,8 +541,14 @@ Note (BM): These two entries was one in the original document; I split it into t
     </irp:protocol>
     <irp:protocol name="MCIR-2-kbd" c-name="MCIR2kbd">
         <irp:irp><![CDATA[
- {300,msb}<-1,1|1,-1>(9,32:8,C:5,0:8,F:8,M:4,WinKey:1,Alt:1,Shift:1,Ctrl:1,-74m)*
-[C:0..31,F:0..255,M:0..16,WinKey:0..1,Alt:0..1,Shift:0..1,Ctrl:0..1]
+ {300,msb}<-1,1|1,-1>(9,32:8,C:5,0:8,F:8,M:8,-74m)*
+{c1 =  #(F & 0b11111000) % 2,
+ c2 = (#(F & 0b00000111) + #(M & 0b00110000)) % 2,
+ c3 = (#(F & 0b11000111) + #(M & 0b10001110)) % 2,
+ c4 = (#(F & 0b00110110) + #(M & 0b10101101)) % 2,
+ c5 = (#(F & 0b10101101) + #(M & 0b10011011)) % 2,
+ C = (c1 << 4) | (c2 << 3) | (c3 << 2) | (c4 << 1) | c5 }
+[F:0..255,M:0..255]
             ]]></irp:irp>
         <irp:documentation>A RC6-ish keyboard IR protocol used by the Microsoft Remote Keyboard
             for Windows Media Center Edition, referred to by Microsoft's Windows Media Center

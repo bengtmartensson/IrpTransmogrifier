@@ -1,7 +1,5 @@
 package org.harctoolbox.ircore;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.testng.Assert.*;
@@ -40,30 +38,6 @@ public class IrSequenceNGTest {
     public void tearDownMethod() throws Exception {
     }
 
-    @Test(enabled = false)
-    public void xxxx(String[] args) {
-//        try {
-//             IrSequence irSequence = nec1_123456.toModulatedIrSequence(3);
-//             .addNoise(10);
-//            IrSequence[] seqs = irSequence.chop(25000);
-//            for (IrSequence irs : seqs)
-//                System.out.println(irs);
-//        } catch (IncompatibleArgumentException ex) {
-//            fail();
-//        }
-//        double[] d = {1, 2, 3, -4};
-//        String raw = " +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +1266 -7096 +1266 -426 +1266 -426 +422 -1270 +1266 -426 +1266 -426 +422 -1270 +422 -1270 +422 -1270 +422 -1270 +422 -1270  +422 -1270 +1266 -7096   ";
-//        try {
-//            IrSequence irs = new IrSequence(d);
-//            System.out.println(irs);
-//            irs = new IrSequence(raw);
-//            System.out.println(irs);
-//            System.out.println(new IrSequence());
-//        } catch (OddSequenceLenghtException e) {
-//            fail();
-//        }
-    }
-
     /**
      * Test of get method, of class IrSequence.
      */
@@ -77,18 +51,6 @@ public class IrSequenceNGTest {
         assertEquals(result, expResult, 0.0);
     }
 
-//    /**
-//     * Test of iget method, of class IrSequence.
-//     */
-//    @Test(enabled = false)
-//    public void testIget() {
-//        System.out.println("iget");
-//        int i = 0;
-//        IrSequence instance = new IrSequence();
-//        int expResult = 0;
-//        int result = instance.iget(i);
-//        assertEquals(result, expResult);
-//    }
     /**
      * Test of approximatelyEquals method, of class IrSequence.
      */

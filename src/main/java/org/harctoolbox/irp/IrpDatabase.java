@@ -291,7 +291,7 @@ public final class IrpDatabase {
     }
 
     private void dump(PrintStream ps, String name) {
-        ps.println(protocols.get(name));
+        ps.println(protocols.get(name.toLowerCase(Locale.US)));
     }
 
     private void dump(PrintStream ps) {
@@ -366,7 +366,7 @@ public final class IrpDatabase {
     }
 
     public String getDocumentation(String name) {
-        UnparsedProtocol prot = protocols.get(name);
+        UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
         return prot == null ? null : prot.getDocumentation();
     }
 
@@ -401,7 +401,7 @@ public final class IrpDatabase {
     }
 
     private void expand(int depth, String name) {
-        UnparsedProtocol p = protocols.get(name);
+        UnparsedProtocol p = protocols.get(name.toLowerCase(Locale.US));
         if (!p.getIrp().contains("{"))
             throw new ThisCannotHappenException("IRP `" + p.getIrp() + "' does not contain `{'.");
 

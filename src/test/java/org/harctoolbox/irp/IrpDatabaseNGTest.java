@@ -1,6 +1,8 @@
 package org.harctoolbox.irp;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -25,7 +27,10 @@ public class IrpDatabaseNGTest {
     public static void tearDownClass() throws Exception {
     }
 
-    public IrpDatabaseNGTest() {
+    private final IrpDatabase instance;
+
+    public IrpDatabaseNGTest() throws IOException, SAXException {
+        instance = new IrpDatabase(CONFIGFILE);
     }
 
     @BeforeMethod
@@ -42,14 +47,138 @@ public class IrpDatabaseNGTest {
      */
     @Test
     public void testCheckSorted() {
+        System.out.println("checkSorted");
+        boolean expResult = false;
+        boolean result = instance.checkSorted();
+        assertTrue(result);
+    }
+
+    /**
+     * Test of isKnown method, of class IrpDatabase.
+     * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
+     */
+    @Test
+    public void testIsKnown_String_String() throws IOException, SAXException {
+        System.out.println("isKnown");
+        String protocolsPath = CONFIGFILE;
+        assertFalse(IrpDatabase.isKnown(protocolsPath, "covfefe"));
+        assertTrue(IrpDatabase.isKnown(protocolsPath, "NEC1"));
+        assertFalse(IrpDatabase.isKnown(protocolsPath, "RC6-6-32")); // FIXME
+    }
+
+    /**
+     * Test of getConfigFileVersion method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetConfigFileVersion() {
+        System.out.println("getConfigFileVersion");
+        String expResult = "2017-06-14";
+        String result = instance.getConfigFileVersion();
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of isKnown method, of class IrpDatabase.
+     */
+    @Test
+    public void testIsKnown_String() {
+        System.out.println("isKnown");
+        assertFalse(instance.isKnown("covfefe"));
+        assertTrue(instance.isKnown("NEC1"));
+        assertFalse(instance.isKnown("RC6-6-32")); // FIXME
+    }
+
+    /**
+     * Test of getIrp method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetIrp_String() {
+        System.out.println("getIrp");
+        String name = "NEC1";
+        String expResult = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255]";
+        String result = instance.getIrp(name);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of getNames method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetNames() {
+        System.out.println("getNames");
+        Set result = instance.getNames();
+        assertTrue(result.size() > 100);// FIXME
+    }
+
+    /**
+     * Test of getName method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetName() {
+        System.out.println("getName");
+        String name = "nec1";
+        String expResult = "NEC1";
+        String result = instance.getName(name);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of getMatchingNamesRegexp method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetMatchingNamesRegexp() {
+        System.out.println("getMatchingNamesRegexp");
+        String regexp = "NEC.*";
+        List result = instance.getMatchingNamesRegexp(regexp);
+        assertEquals(result.size(), 9);
+    }
+
+    /**
+     * Test of getDocumentation method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetDocumentation() {
+        System.out.println("getDocumentation");
+        String name = "Anthem_relaxed";
+        String expResult = "Relaxed version of the Anthem protocol.";
+        String result = instance.getDocumentation(name);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of getProtocol method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetProtocol() {
+        System.out.println("getProtocol");
+        Protocol result;
         try {
-            System.out.println("checkSorted");
-            IrpDatabase instance = new IrpDatabase(CONFIGFILE);
-            boolean expResult = false;
-            boolean result = instance.checkSorted();
-            assertTrue(result);
-        } catch (IOException | SAXException ex) {
+            instance.getProtocol("covfefe");
+            fail();
+        } catch (UnknownProtocolException ex) {
+        } catch (UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
             fail();
         }
+        try {
+            instance.getProtocol("nec1");
+        } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            fail();
+        }
+        // FIXME
+    }
+
+    /**
+     * Test of getNormalFormIrp method, of class IrpDatabase.
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testGetNormalFormIrp() throws Exception {
+        System.out.println("getNormalFormIrp");
+        String protocolName = "CanalSat";
+        int radix = 10;
+        String expResult = "{55.5k,250,msb}<-1,1|1,-1>([T=0,1,-1,D:7,S:6,T:1,0:1,F:7,-89m,T=1][1,-1,D:7,S:6,T:1,0:1,F:7,-89m,T=1])*[D:0..127,S:0..63,F:0..127]";
+        String result = instance.getNormalFormIrp(protocolName, radix);
+        assertEquals(result, expResult);
     }
 }

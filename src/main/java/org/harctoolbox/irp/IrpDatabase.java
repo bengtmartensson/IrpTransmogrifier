@@ -77,6 +77,7 @@ public final class IrpDatabase {
     public static final String ABSOLUTE_TOLERANCE_NAME = "absolute-tolerance";
     public static final String MINIMUM_LEADOUT_NAME = "minimum-leadout";
     public static final String PREFER_OVER_NAME = "prefer-over";
+    public static final String ALT_NAME_NAME = "alt_name";
 
     public static boolean isKnown(String protocolsPath, String protocol) throws IOException, SAXException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
@@ -107,6 +108,7 @@ public final class IrpDatabase {
 
     public static IrpDatabase readIni(Reader reader) throws IOException {
         Map<String, UnparsedProtocol> protocols = new LinkedHashMap<>(APRIORI_NUMBER_PROTOCOLS);
+        Map<String, String> aliases = new LinkedHashMap<>(16);
         BufferedReader in = new BufferedReader(reader);
         Map<String, String> currentProtocol = null;
         String configFileVersion = null;
@@ -143,7 +145,7 @@ public final class IrpDatabase {
             } else if (line.equals("[protocol]")) {
                 if (currentProtocol != null) {
                     currentProtocol.put(DOCUMENTATION_NAME, documentation.toString().trim());
-                    addProtocol(protocols, new UnparsedProtocol(currentProtocol));
+                    addProtocol(protocols, aliases, new UnparsedProtocol(currentProtocol));
                 }
                 currentProtocol = new HashMap<>(UnparsedProtocol.APRIORI_SIZE);
                 documentation = new StringBuilder(1000);
@@ -177,12 +179,12 @@ public final class IrpDatabase {
         }
         if (currentProtocol != null) {
             currentProtocol.put(DOCUMENTATION_NAME, documentation.toString().trim());
-            addProtocol(protocols, new UnparsedProtocol(currentProtocol));
+            addProtocol(protocols, aliases, new UnparsedProtocol(currentProtocol));
         }
-        return new IrpDatabase(protocols, configFileVersion);
+        return new IrpDatabase(protocols, aliases, configFileVersion);
     }
 
-    private static void addProtocol(Map<String, UnparsedProtocol> protocols, UnparsedProtocol proto) {
+    private static void addProtocol(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, UnparsedProtocol proto) {
         if (!proto.isUsable() || proto.getName() == null || proto.getIrp() == null)
             return;
 
@@ -190,6 +192,17 @@ public final class IrpDatabase {
         if (protocols.containsKey(nameLower))
             logger.log(Level.WARNING, "Multiple definitions of protocol `{0}''. Keeping the last.", nameLower);
         protocols.put(nameLower, proto);
+        List<String> altNameList = proto.getProperties(ALT_NAME_NAME);
+        if (altNameList != null) {
+            altNameList.stream().map((name) -> {
+                String n = name.toLowerCase(Locale.US);
+                if (aliases.containsKey(n))
+                    logger.log(Level.WARNING, "alt_name \"{0}\" defined more than once.", name);
+                return n;
+            }).forEachOrdered((n) -> {
+                aliases.put(n, proto.getName());
+            });
+        }
     }
 
     private String configFileVersion;
@@ -197,9 +210,12 @@ public final class IrpDatabase {
     // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
     private Map<String, UnparsedProtocol> protocols;
 
+    private Map<String, String> aliases;
+
     private IrpDatabase() {
         this.configFileVersion = "";
         protocols = new LinkedHashMap<>(APRIORI_NUMBER_PROTOCOLS);
+        aliases = new LinkedHashMap<>(16);
     }
 
     public IrpDatabase(Reader reader) throws IOException, SAXException {
@@ -227,13 +243,19 @@ public final class IrpDatabase {
         configFileVersion = root.getAttribute("version");
         NodeList nodes = root.getElementsByTagNameNS(IRP_PROTOCOL_NS, "protocol");
         protocols = new LinkedHashMap<>(nodes.getLength()); // to preserve order
+        aliases = new LinkedHashMap<>(16);
         for (int i = 0; i < nodes.getLength(); i++)
             addProtocol((Element)nodes.item(i));
     }
 
-    private IrpDatabase(Map<String, UnparsedProtocol> protocols, String version) {
+    private IrpDatabase(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, String version) {
         this.configFileVersion = version;
         this.protocols = protocols;
+        this.aliases = aliases;
+    }
+
+    private void addProtocol(UnparsedProtocol proto) {
+        addProtocol(protocols, aliases, proto);
     }
 
     private Document emptyDocument() {
@@ -291,7 +313,7 @@ public final class IrpDatabase {
     }
 
     private void dump(PrintStream ps, String name) {
-        ps.println(protocols.get(name.toLowerCase(Locale.US)));
+        ps.println(getUnparsedProtocol(name));
     }
 
     private void dump(PrintStream ps) {
@@ -308,8 +330,16 @@ public final class IrpDatabase {
         dump(IrCoreUtils.getPrintSteam(filename), name);
     }
 
+    public boolean isAlias(String protocol) {
+        return aliases.containsKey(protocol.toLowerCase(Locale.US));
+    }
+
+    public String expandAlias(String protocol) {
+        return isAlias(protocol) ? aliases.get(protocol.toLowerCase(Locale.US)) : protocol;
+    }
+
     public boolean isKnown(String protocol) {
-        return protocols.containsKey(protocol.toLowerCase(Locale.US));
+        return protocols.containsKey(expandAlias(protocol).toLowerCase(Locale.US));
     }
 
     public String getIrp(String name) {
@@ -318,11 +348,15 @@ public final class IrpDatabase {
     }
 
     private UnparsedProtocol getUnparsedProtocol(String name) {
-        return protocols.get(name.toLowerCase(Locale.US));
+        return protocols.get(expandAlias(name).toLowerCase(Locale.US));
     }
 
     public Set<String> getNames() {
         return protocols.keySet();
+    }
+
+    public Set<String> getAliases() {
+        return aliases.keySet();
     }
 
     public String getName(String name) {
@@ -340,12 +374,18 @@ public final class IrpDatabase {
         protocols.keySet().stream().filter((candidate) -> (pattern.matcher(candidate).matches())).forEach((candidate) -> {
             result.add(candidate);
         });
+        aliases.keySet().stream().filter((candidate) -> (pattern.matcher(candidate).matches())).forEach((candidate) -> {
+            result.add(candidate);
+        });
         return result;
     }
 
     public List<String> getMatchingNamesExact(String string) {
         List<String> result = new ArrayList<>(10);
         protocols.keySet().stream().filter((candidate) -> (candidate.equalsIgnoreCase(string))).forEachOrdered((candidate) -> {
+            result.add(candidate);
+        });
+        aliases.keySet().stream().filter((candidate) -> (candidate.equalsIgnoreCase(string))).forEachOrdered((candidate) -> {
             result.add(candidate);
         });
         return result;
@@ -366,7 +406,7 @@ public final class IrpDatabase {
     }
 
     public String getDocumentation(String name) {
-        UnparsedProtocol prot = protocols.get(name.toLowerCase(Locale.US));
+        UnparsedProtocol prot = getUnparsedProtocol(name);
         return prot == null ? null : prot.getDocumentation();
     }
 
@@ -401,7 +441,7 @@ public final class IrpDatabase {
     }
 
     private void expand(int depth, String name) {
-        UnparsedProtocol p = protocols.get(name.toLowerCase(Locale.US));
+        UnparsedProtocol p = getUnparsedProtocol(name);
         if (!p.getIrp().contains("{"))
             throw new ThisCannotHappenException("IRP `" + p.getIrp() + "' does not contain `{'.");
 
@@ -423,7 +463,7 @@ public final class IrpDatabase {
     }
 
     private void addProtocol(Element current) {
-        addProtocol(protocols, new UnparsedProtocol(current));
+        addProtocol(new UnparsedProtocol(current));
     }
 
     public List<String> evaluateProtocols(List<String> protocols, boolean sort, boolean regexp, boolean urlDecode) {
@@ -479,7 +519,7 @@ public final class IrpDatabase {
         for (String protocol : protocols.keySet()) {
             if (protocol.compareTo(last) < 0) {
                 result = false;
-                logger.log(Level.WARNING, "Protocol {0} violates ordering", protocols.get(protocol).getName());
+                logger.log(Level.WARNING, "Protocol {0} violates ordering", protocol);
             }
             last = protocol;
         }

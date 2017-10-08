@@ -401,6 +401,9 @@ public final class IrpTransmogrifier {
             return;
 
         setupDatabase();
+        commandList.protocols.stream().filter((protocol) -> (irpDatabase.isAlias(protocol))).forEachOrdered((protocol) -> {
+            out.println(protocol + " -> " + irpDatabase.expandAlias(protocol));
+        });
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
 
         for (String protocolName : list) {

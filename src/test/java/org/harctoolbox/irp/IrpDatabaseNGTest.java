@@ -58,13 +58,13 @@ public class IrpDatabaseNGTest {
      * @throws java.io.IOException
      * @throws org.xml.sax.SAXException
      */
-    @Test
+    @Test(enabled = false)
     public void testIsKnown_String_String() throws IOException, SAXException {
         System.out.println("isKnown");
         String protocolsPath = CONFIGFILE;
         assertFalse(IrpDatabase.isKnown(protocolsPath, "covfefe"));
         assertTrue(IrpDatabase.isKnown(protocolsPath, "NEC1"));
-        assertFalse(IrpDatabase.isKnown(protocolsPath, "RC6-6-32")); // FIXME
+        assertTrue(IrpDatabase.isKnown(protocolsPath, "RC6-6-32"));
     }
 
     /**
@@ -86,7 +86,7 @@ public class IrpDatabaseNGTest {
         System.out.println("isKnown");
         assertFalse(instance.isKnown("covfefe"));
         assertTrue(instance.isKnown("NEC1"));
-        assertFalse(instance.isKnown("RC6-6-32")); // FIXME
+        assertTrue(instance.isKnown("RC6-6-32"));
     }
 
     /**
@@ -99,6 +99,10 @@ public class IrpDatabaseNGTest {
         String expResult = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255]";
         String result = instance.getIrp(name);
         assertEquals(result, expResult);
+        name = "RC6-6-32";
+        expResult = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T){OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]";
+        result = instance.getIrp(name);
+        assertEquals(result, expResult);
     }
 
     /**
@@ -108,7 +112,7 @@ public class IrpDatabaseNGTest {
     public void testGetNames() {
         System.out.println("getNames");
         Set result = instance.getNames();
-        assertTrue(result.size() > 100);// FIXME
+        assertTrue(result.size() > 100);
     }
 
     /**
@@ -121,6 +125,7 @@ public class IrpDatabaseNGTest {
         String expResult = "NEC1";
         String result = instance.getName(name);
         assertEquals(result, expResult);
+        assertEquals(instance.getName("rc6-6-32"), "MCE");
     }
 
     /**
@@ -132,6 +137,8 @@ public class IrpDatabaseNGTest {
         String regexp = "NEC.*";
         List result = instance.getMatchingNamesRegexp(regexp);
         assertEquals(result.size(), 9);
+        result = instance.getMatchingNamesRegexp("RC6.*");
+        assertTrue(result.contains("rc6-6-32"));
     }
 
     /**
@@ -144,6 +151,7 @@ public class IrpDatabaseNGTest {
         String expResult = "Relaxed version of the Anthem protocol.";
         String result = instance.getDocumentation(name);
         assertEquals(result, expResult);
+        assertEquals(instance.getDocumentation("GI Cable"), "This protocol signals repeats by the use of dittos.");
     }
 
     /**
@@ -162,10 +170,10 @@ public class IrpDatabaseNGTest {
         }
         try {
             instance.getProtocol("nec1");
+            instance.getProtocol("rc6-6-32");
         } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
             fail();
         }
-        // FIXME
     }
 
     /**

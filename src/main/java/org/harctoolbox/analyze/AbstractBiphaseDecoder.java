@@ -117,18 +117,16 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                     if (!isFlash)
                         throw new ThisCannotHappenException();
 
+                    data.update(params.isInvert());
                     if (isShort) {
-                        data.update(params.isInvert());
                         state = BiphaseState.zero;
                     } else if (isLong) {
-                        data.update(params.isInvert());
                         state = BiphaseState.pendingFlash;
                     } else {
-                        data.update(params.isInvert());
                         saveParameter(data, items, params.getBitDirection());
                         data = new ParameterData();
                         //items.add(newGap(half));
-                        items.add(newFlash(time-half));
+                        items.add(newFlash(time - half));
                         state = BiphaseState.zero;
                     }
                     break;
@@ -137,18 +135,16 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                     if (isFlash)
                         throw new ThisCannotHappenException();
 
+                    data.update(!params.isInvert());
                     if (isShort) {
-                        data.update(!params.isInvert());
                         state = BiphaseState.zero;
                     } else if (isLong) {
-                        data.update(!params.isInvert());
                         state = BiphaseState.pendingGap;
                     } else {
-                        data.update(!params.isInvert());
                         saveParameter(data, items, params.getBitDirection());
                         data = new ParameterData();
                         //items.add(newGap(half));
-                        items.add(useExtent ? newExtent(analyzer.getTotalDuration(beg, length-1) + time-half) : newGap(time-half));
+                        items.add(useExtent ? newExtent(analyzer.getTotalDuration(beg, length - 1) + time - half) : newGap(time - half));
                         state = BiphaseState.zero;
                     }
                     break;

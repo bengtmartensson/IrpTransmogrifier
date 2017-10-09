@@ -54,7 +54,8 @@ public abstract class AbstractDecoder {
         SerialDecoder.class,
     };
 
-    static final int NUMBERDECODERS = decoders.length;
+    protected static final int NUMBERDECODERS = decoders.length;
+    protected static final int CANNOT_MATCH = Integer.MIN_VALUE;
 
     public static List<String> decoderNames() {
         List<String> result = new ArrayList<>(NUMBERDECODERS);

@@ -95,7 +95,7 @@ public abstract class CodeGenerator {
             try {
                 generate(protocolName, irpDatabase, out, false, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);
             } catch (NameUnassignedException | UnknownProtocolException | ArithmeticException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
-                logger.log(Level.WARNING, "{0}, ignoring this protol", ex);
+                logger.log(Level.WARNING, "{0}, ignoring this protol", ex.getMessage());
             }
         });
         out.print(render("FileEnd")); // not println

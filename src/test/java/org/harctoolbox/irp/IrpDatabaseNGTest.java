@@ -86,7 +86,9 @@ public class IrpDatabaseNGTest {
         System.out.println("isKnown");
         assertFalse(instance.isKnown("covfefe"));
         assertTrue(instance.isKnown("NEC1"));
-        assertTrue(instance.isKnown("RC6-6-32"));
+        assertTrue(instance.isKnownExpandAlias("NEC1"));
+        assertFalse(instance.isKnown("RC6-6-32"));
+        assertTrue(instance.isKnownExpandAlias("RC6-6-32"));
     }
 
     /**
@@ -101,8 +103,8 @@ public class IrpDatabaseNGTest {
         assertEquals(result, expResult);
         name = "RC6-6-32";
         expResult = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T){OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]";
-        result = instance.getIrp(name);
-        assertEquals(result, expResult);
+        assertEquals(instance.getIrp(name), null);
+        assertEquals(instance.getIrpExpandAlias(name), expResult);
     }
 
     /**
@@ -125,7 +127,8 @@ public class IrpDatabaseNGTest {
         String expResult = "NEC1";
         String result = instance.getName(name);
         assertEquals(result, expResult);
-        assertEquals(instance.getName("rc6-6-32"), "MCE");
+        assertEquals(instance.getName("rc6-6-32"), null);
+        assertEquals(instance.getNameExpandAlias("rc6-6-32"), "MCE");
     }
 
     /**
@@ -151,7 +154,8 @@ public class IrpDatabaseNGTest {
         String expResult = "Relaxed version of the Anthem protocol.";
         String result = instance.getDocumentation(name);
         assertEquals(result, expResult);
-        assertEquals(instance.getDocumentation("GI Cable"), "This protocol signals repeats by the use of dittos.");
+        assertEquals(instance.getDocumentation("GI Cable"), null);
+        assertEquals(instance.getDocumentationExpandAlias("GI Cable"), "This protocol signals repeats by the use of dittos.");
     }
 
     /**
@@ -170,9 +174,16 @@ public class IrpDatabaseNGTest {
         }
         try {
             instance.getProtocol("nec1");
-            instance.getProtocol("rc6-6-32");
+            instance.getProtocolExpandAlias("rc6-6-32");
         } catch (UnknownProtocolException | UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
             fail();
+        }
+        try {
+            instance.getProtocol("rc6-6-32");
+            fail();
+        } catch (UnsupportedRepeatException | NameUnassignedException | InvalidNameException | IrpInvalidArgumentException ex) {
+            fail();
+        } catch (UnknownProtocolException ex) {
         }
     }
 

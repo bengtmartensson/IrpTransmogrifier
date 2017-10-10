@@ -339,7 +339,11 @@ public final class IrpDatabase {
     }
 
     public boolean isKnown(String protocol) {
-        return protocols.containsKey(expandAlias(protocol).toLowerCase(Locale.US));
+        return protocols.containsKey(protocol.toLowerCase(Locale.US));
+    }
+
+    public boolean isKnownExpandAlias(String protocol) {
+        return isKnown(expandAlias(protocol));
     }
 
     public String getIrp(String name) {
@@ -347,8 +351,12 @@ public final class IrpDatabase {
         return prot == null ? null : prot.getIrp();
     }
 
+    public String getIrpExpandAlias(String name) {
+        return getIrp(expandAlias(name));
+    }
+
     private UnparsedProtocol getUnparsedProtocol(String name) {
-        return protocols.get(expandAlias(name).toLowerCase(Locale.US));
+        return protocols.get(name.toLowerCase(Locale.US));
     }
 
     public Set<String> getNames() {
@@ -362,6 +370,10 @@ public final class IrpDatabase {
     public String getName(String name) {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         return prot == null ? null : prot.getName();
+    }
+
+    public String getNameExpandAlias(String name) {
+        return getName(expandAlias(name));
     }
 
     public int size() {
@@ -410,6 +422,10 @@ public final class IrpDatabase {
         return prot == null ? null : prot.getDocumentation();
     }
 
+    public String getDocumentationExpandAlias(String name) {
+        return getDocumentation(expandAlias(name));
+    }
+
     public String getFirstProperty(String name, String key) {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         return prot == null ? null : prot.getFirstProperty(key);
@@ -420,6 +436,10 @@ public final class IrpDatabase {
         if (prot == null)
             throw new UnknownProtocolException(name);
         return prot.toNamedProtocol();
+    }
+
+    public NamedProtocol getNamedProtocolExpandAlias(String name) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+        return getNamedProtocol(expandAlias(name));
     }
 
     public List<NamedProtocol> getNamedProtocol(Collection<String> protocolNames) {
@@ -478,6 +498,10 @@ public final class IrpDatabase {
         if (!isKnown(protocolName))
             throw new UnknownProtocolException(protocolName);
         return new Protocol(getIrp(protocolName));
+    }
+
+    public Protocol getProtocolExpandAlias(String protocolName) throws UnknownProtocolException, UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
+        return getProtocol(expandAlias(protocolName));
     }
 
     public String getNormalFormIrp(String protocolName, int radix) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {

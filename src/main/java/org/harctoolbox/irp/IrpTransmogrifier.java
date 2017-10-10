@@ -406,7 +406,8 @@ public final class IrpTransmogrifier {
         });
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
 
-        for (String protocolName : list) {
+        for (String name : list) {
+            String protocolName = irpDatabase.expandAlias(name);
             NamedProtocol protocol;
             try {
                 protocol = irpDatabase.getNamedProtocol(protocolName);
@@ -629,7 +630,7 @@ public final class IrpTransmogrifier {
                 throw new UsageException("No protocol matched.");
             for (String proto : list) {
                 //logger.info(proto);
-                NamedProtocol protocol = irpDatabase.getNamedProtocol(proto);
+                NamedProtocol protocol = irpDatabase.getNamedProtocolExpandAlias(proto);
                 render(protocol);
             }
         }

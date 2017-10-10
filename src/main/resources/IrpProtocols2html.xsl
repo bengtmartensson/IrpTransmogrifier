@@ -15,12 +15,12 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 -->
-    <xsl:stylesheet version="1.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
-                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
+<xsl:stylesheet version="1.0"
+                    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                    xmlns="http://www.w3.org/1999/xhtml"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
+                    xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
     <xsl:output method="html"/>
 
@@ -41,11 +41,19 @@ this program. If not, see http://www.gnu.org/licenses/.
                     <xsl:attribute name="type">text/css</xsl:attribute>
                     div.documentation { }
                     div.irp { font-family:'Lucida Console', monospace;
-                              background: LightGray;
-                            }
+                    background: LightGray;
+                    }
+                    div.protocol {
+                    padding-top: 1ex;
+                    }
+                    div.protocol-title {
+                    font-size: 150%;
+                    font-weight: bold;
+
+                    }
                     span.parametername { font-family:'Lucida Console', monospace;
-                                         font-weight: bold;
-                                       }
+                    font-weight: bold;
+                    }
                 </style>
             </head>
             <body>
@@ -80,7 +88,7 @@ this program. If not, see http://www.gnu.org/licenses/.
                         <a
                             href="https://sourceforge.net/p/controlremote/code/HEAD/tree/trunk/decodeir/">source
                             code</a>.
-                            <a href="https://github.com/bengtmartensson/Arduino-DecodeIR">Arduino port</a>.
+                        <a href="https://github.com/bengtmartensson/Arduino-DecodeIR">Arduino port</a>.
                     </dd>
                 </dl>
 
@@ -128,8 +136,8 @@ this program. If not, see http://www.gnu.org/licenses/.
     </xsl:template>
 
     <xsl:template match="irp:protocols">
-         <h2>Protocols</h2>
-         <xsl:apply-templates select="irp:protocol"/>
+        <h2>Protocols</h2>
+        <xsl:apply-templates select="irp:protocol"/>
     </xsl:template>
 
     <xsl:template match="irp:protocol" mode="toc">
@@ -145,16 +153,20 @@ this program. If not, see http://www.gnu.org/licenses/.
     </xsl:template>
 
     <xsl:template match="irp:protocol">
-        <h2>
+        <div>
+            <xsl:attribute name="class">protocol</xsl:attribute>
             <xsl:attribute name="id">
                 <xsl:value-of select="@name"/>
             </xsl:attribute>
-            <xsl:value-of select="@name"/>
-            <xsl:apply-templates select="@c-name"/>
-        </h2>
-        <xsl:apply-templates select="irp:irp"/>
-        <xsl:apply-templates select="irp:parameter"/>
-        <xsl:apply-templates select="irp:documentation"/>
+            <div>
+                <xsl:attribute name="class">protocol-title</xsl:attribute>
+                <xsl:value-of select="@name"/>
+                <xsl:apply-templates select="@c-name"/>
+            </div>
+            <xsl:apply-templates select="irp:irp"/>
+            <xsl:apply-templates select="irp:parameter" mode="protocol"/>
+            <xsl:apply-templates select="irp:documentation"/>
+        </div>
     </xsl:template>
 
     <xsl:template match="@c-name">
@@ -180,7 +192,7 @@ this program. If not, see http://www.gnu.org/licenses/.
         </div>
     </xsl:template>
 
-    <xsl:template match="irp:parameter">
+    <xsl:template match="irp:parameter" mode="protocol">
         <div>
             <xsl:attribute name="class">parameter</xsl:attribute>
             <span>

@@ -46,11 +46,27 @@ ProtocolNameComment(protocolName) ::= <<
 <beginLineComment>ProtocolName: <protocolName><endLineComment()>
 >>
 
+// Per default, Irp() just lists the IRP as a multiline comment
+Irp() ::= <<
+<beginComment()>
+IRP:
+<metaData.irp>
+<endComment()>
+>>
+
+// Per default, Documentation() just lists the documentation as a multiline comment
+Documentation() ::= <<
+<beginComment()>
+Protocol documentation:
+<metaData.documentation>
+<endComment()>
+>>
+
 TopFunctions() ::= <<
 <TopFunction("Intro", protocol.intro)>
-    
+
 <TopFunction("Repeat", protocol.repeat)>
-    
+
 <TopFunction("Ending", protocol.ending)>
 >>
 

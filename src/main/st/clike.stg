@@ -19,10 +19,10 @@ import "infix.stg"
 
 // NOTE: C versions not having // as comment are not supported.
 
-beginComment()                ::= "/* "
-endComment()                  ::= " */"
+beginComment()                ::= "/*"
+endComment()                  ::= "*/"
 
-beginLineComment()            ::= "// "
+beginLineComment()            ::= "//"
 endLineComment()              ::= ""
 
 Case(number,codeList) ::= <<

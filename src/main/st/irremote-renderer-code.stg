@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 */
 
-import "infrared4arduino.stg"
+import "irremote.stg"
 
 IsAbstract() ::= "false"
 
@@ -24,10 +24,6 @@ FileSuffix() ::= "Renderer.cpp"
 FilePreamble() ::= ""
 
 ClassName() ::= "<metaData.cProtocolName>Renderer"
-
-FileStart() ::= <<
-#include "<HeaderFileName()>"
->>
 
 NamedProtocol(metaData, protocol) ::= <<
 <FileStart()>
@@ -39,25 +35,27 @@ ClassBody() ::= <<
 
 <Documentation()>
 
-<DeclareStatic()>
+<!DeclareStatic()!>
 
-<DeclareParameters()>
+<!DeclareParameters()!>
 
-<DeclareAssignmentVariables()>
+<!DeclareAssignmentVariables()!>
 
-<DeclareParameterlessConstructor()>
+<!DeclareParameterlessConstructor()!>
 
-<DeclareFrequency()>
+<!DeclareFrequency()!>
 
-<DeclareDutyCycle()>
+<!DeclareDutyCycle()!>
 
-<DeclareCompute()>
+<!DeclareCompute()!>
 
-<DefineNames()>
+<DeclareSend()>
 
-<TopFunctions()>
+<!DefineNames()!>
 
-<DefineClassList()>
+<!TopFunctions()!>
+
+<!DefineClassList()!>
 >>
 
 DeclareCompute() ::= <<

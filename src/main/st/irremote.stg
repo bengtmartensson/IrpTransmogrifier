@@ -21,11 +21,11 @@ implementationTypes ::= [
 "booleanType":              "bool",
 "dutyCycleType":            "double",
 "dutyCycleTypeSuffix":      "",
-"frequencyType":            "frequency_t",
+"frequencyType":            "unsigned int",
 "frequencyTypeSuffix":      "U",
 "intType":                  "unsigned int",
 "intTypeSuffix":            "U",
-"microsecondsType":         "microseconds_t",
+"microsecondsType":         "unsigned int", // For now...
 "microsecondsTypeSuffix":   "",
 "parameterType":            "unsigned int",
 "parameterTypeClass":       "xxxx",
@@ -39,8 +39,10 @@ ImplementationType(type) ::= <<
 
 CodeFileExtension() ::= ".cpp"
 
-// Note: usable both for renderer and decoder
-HeaderFileName() ::= "<ClassName()>.h"
+FileStart() ::= <<
+#include "IRremote.h"
+#include "IRremoteInt.h"
+>>
 
 ProtocolNameComment() ::= <<
 <beginComment()>ProtocolName: <metaData.protocolName> <endComment()>
@@ -96,5 +98,4 @@ bitCount(<(e.arg.kind)(e.arg)>)
 >>
 
 Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"
-
 Exponentiate(arg1,arg2) ::= "TODO.power(arg1,arg2)"

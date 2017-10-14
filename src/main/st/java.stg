@@ -46,10 +46,6 @@ Documentation() ::= <<
 public final static String documentation = "<metaData.documentation>";
 >>
 
-ProtocolNameComment() ::= <<
-<beginComment()>ProtocolName: <metaData.protocolName> <endComment()>
->>
-
 DeclareParameterlessConstructor() ::= <<
 public <ClassName()>() {
 }

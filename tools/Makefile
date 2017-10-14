@@ -41,17 +41,17 @@ lirc.xml: all-protocols.xml ${LIRC_TRANSFORM}
 javacodetest: javarendertest javadecodertest $(JAVA_PROTOCOL_TEST)/pom.xml $(IRPPROTOCOLS_XML)
 	(cd $(JAVA_PROTOCOL_TEST); mvn test)
 
-javarendertest:  javarendercodefiles  javarendertestfiles 
+javarendertest:  javarendercodefiles  javarendertestfiles
 javadecodertest: javadecodercodefiles javadecodertestfiles
 
 javarendercodefiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_RENDERER_CODEDIR)
-	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_RENDERER_CODEDIR) --stdir $(IRPHOME)/st --target java-renderer $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS),"$(proto)")
+	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_RENDERER_CODEDIR) --stdir $(IRPHOME)/st --target java-renderer-code $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS),"$(proto)")
 
 javarendertestfiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_RENDERER_TESTDIR)
 	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_RENDERER_TESTDIR) --stdir $(IRPHOME)/st --target java-renderer-test $(foreach proto,$(JAVA_TEST_RENDERER_PROTOCOLS), "$(proto)")
 
 javadecodercodefiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_DECODER_CODEDIR)
-	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_DECODER_CODEDIR)  --stdir $(IRPHOME)/st --target java-decoder $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), "$(proto)")
+	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_DECODER_CODEDIR)  --stdir $(IRPHOME)/st --target java-decoder-code $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), "$(proto)")
 
 javadecodertestfiles: $(IRP_TRANSMOGRIFIER_JAR) | $(JAVA_DECODER_TESTDIR)
 	$(IRPTRANSMOGRIFIER) code --directory $(JAVA_DECODER_TESTDIR)  --stdir $(IRPHOME)/st --target java-decoder-test $(foreach proto,$(JAVA_TEST_DECODER_PROTOCOLS), "$(proto)")
@@ -67,7 +67,7 @@ $(JAVA_PROTOCOL_TEST)/src/main/resources \
 $(JAVA_RENDERER_CODEDIR) $(JAVA_RENDERER_TESTDIR) $(JAVA_DECODER_CODEDIR) $(JAVA_DECODER_TESTDIR):
 	mkdir -p $@
 
-# Only for Unix-like systems	
+# Only for Unix-like systems
 install: $(IRP_TRANSMOGRIFIER_JAR)
 	-mkdir -p $(INSTALLDIR)
 	-rm -rf $(INSTALLDIR)

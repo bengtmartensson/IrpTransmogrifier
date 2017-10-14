@@ -17,13 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 import "infix.stg"
 
-// NOTE: C versions not having // as comment are not supported.
+// NOTE: C versions not allowing // as comment are not supported.
 
-beginComment()                ::= "/*"
-endComment()                  ::= "*/"
+BeginComment()                ::= "/*"
+EndComment()                  ::= "*/"
 
-beginLineComment()            ::= "//"
-endLineComment()              ::= ""
+BeginLineComment()            ::= "//"
+EndLineComment()              ::= ""
 
 Case(number,codeList) ::= <<
 case <number>: {

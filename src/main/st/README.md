@@ -37,11 +37,11 @@ filetype: (empty), header, code, test,...
 
 Current inheritences (all non-leaves are abstract "classes"):
 
-     generic -+--infix -+- clike -+- java ------+- java-*-*
+     generic -+--infix -+- clike -+- java ---+- java-*-*
               |                   |
-              +- dump             +- cplusplus -+- infrared4arduino-*-*-*
-                                                |
-                                                +- irremote-*-*
+              +- dumb             +- c ------+- cplusplus -+- infrared4arduino-*-*-*
+                                                           |
+                                                           +- irremote -+- irremote-*-*
 
 
 ## Implementing new code generation targets

@@ -38,6 +38,8 @@ public abstract class ItemCodeGenerator {
 
     public abstract void inspect();
 
+    public abstract void inspectAndWait();
+
     public void setAttribute(Map<String, Object> map) {
         map.entrySet().stream().forEach((kvp) -> {
             setAttribute(kvp.getKey(), kvp.getValue());

@@ -20,7 +20,9 @@ package org.harctoolbox.irp;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.gui.STViz;
 import org.stringtemplate.v4.misc.Aggregate;
 
 public final class STItemCodeGenerator extends ItemCodeGenerator {
@@ -50,6 +52,16 @@ public final class STItemCodeGenerator extends ItemCodeGenerator {
     @Override
     public void inspect() {
         st.inspect();
+    }
+
+    @Override
+    public void inspectAndWait() {
+        STViz inspector = st.inspect();
+        try {
+            inspector.waitForClose();
+        } catch (InterruptedException ex) {
+            throw new ThisCannotHappenException();
+        }
     }
 
     @Override

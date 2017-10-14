@@ -117,4 +117,9 @@ public final class DumpItemCodeGenerator extends ItemCodeGenerator {
     public String render() {
         return render(name, aggregates, 0) + IrCoreUtils.LINESEPARATOR;
     }
+
+    @Override
+    public void inspectAndWait() {
+        throw new UnsupportedOperationException("inspect not supported.");
+    }
 }

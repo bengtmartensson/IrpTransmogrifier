@@ -130,7 +130,7 @@ public abstract class CodeGenerator {
         if (printPostAndPre)
             generateFileEnd(out);
         if (inspect)
-            code.inspect();
+            code.inspectAndWait();
     }
 
     public abstract void setInspect(boolean inspect);

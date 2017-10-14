@@ -98,7 +98,7 @@ public abstract class CodeGenerator {
                 logger.log(Level.WARNING, "{0}, ignoring this protol", ex.getMessage());
             }
         });
-        out.print(render("FileEnd")); // not println
+        generateFileEnd(out);
     }
 
     private void generateFileBegin(PrintStream out) {
@@ -108,6 +108,11 @@ public abstract class CodeGenerator {
         map.put("userName", System.getProperty("user.name"));
         itemCodeGenerator.addAggregateList("GenerateData", map);
         out.println(itemCodeGenerator.render());
+    }
+
+    private void generateFileEnd(PrintStream out) {
+        ItemCodeGenerator itemCodeGenerator = newItemCodeGenerator("FileEnd");
+        out.print(itemCodeGenerator.render());
     }
 
     private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
@@ -123,7 +128,7 @@ public abstract class CodeGenerator {
         ItemCodeGenerator code = protocol.code(this, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);// contains a trailing newline
         out.println(code.render());
         if (printPostAndPre)
-            out.println(render("FileEnd"));
+            generateFileEnd(out);
         if (inspect)
             code.inspect();
     }

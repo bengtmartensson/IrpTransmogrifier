@@ -37,14 +37,14 @@ ImplementationType(type) ::= <<
 <implementationTypes.(type)>
 >>
 
-CodeFileExtension() ::= ".cpp"
+//CodeFileExtension() ::= ".cpp"
 
 // Note: usable both for renderer and decoder
 HeaderFileName() ::= "<ClassName()>.h"
 
-ProtocolNameComment() ::= <<
-<beginComment()>ProtocolName: <metaData.protocolName> <endComment()>
->>
+//ProtocolNameComment() ::= <<
+//<BeginComment()>ProtocolName: <metaData.protocolName> <EndComment()>
+//>>
 
 DeclareParameterlessConstructor() ::= <<
 <ClassName()>();

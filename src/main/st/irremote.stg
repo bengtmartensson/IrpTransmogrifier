@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 */
 
-import "clike.stg"
+import "cplusplus.stg"
 
 implementationTypes ::= [
 "booleanType":              "bool",
@@ -25,6 +25,8 @@ implementationTypes ::= [
 "frequencyTypeSuffix":      "U",
 "intType":                  "unsigned int",
 "intTypeSuffix":            "U",
+"longType":                 "unsigned long",
+"longTypeSuffix":            "UL",
 "microsecondsType":         "unsigned int", // For now...
 "microsecondsTypeSuffix":   "",
 "parameterType":            "unsigned int",
@@ -37,65 +39,93 @@ ImplementationType(type) ::= <<
 <implementationTypes.(type)>
 >>
 
-CodeFileExtension() ::= ".cpp"
+ManyProtocolsInOneFile() ::= "true"
 
-FileStart() ::= <<
-#include "IRremote.h"
-#include "IRremoteInt.h"
+CProtocolName() ::= "<metaData.cProtocolName>"
+
+NamedProtocol(metaData, protocol) ::= <<
+<FileStart()>
+<Body()>
 >>
 
-ProtocolNameComment() ::= <<
-<beginComment()>ProtocolName: <metaData.protocolName> <endComment()>
->>
+DurationCounterName() ::= "durationCounter"
 
-DeclareParameterlessConstructor() ::= <<
-<ClassName()>();
->>
+//ProtocolNameComment() ::= <<
+//<BeginComment()>ProtocolName: <metaData.protocolName> <EndComment()>
+//>>
 
-DefineNames() ::= <<
-// Local functions; corresponds to Definitions in the IRP.
-<protocol.definitions.list:{p|<NameDefinition(p)>}; separator="\n\n">
->>
+//DeclareParameterlessConstructor() ::= <<
+//<ClassName()>();
+//>>
 
-NameDefinition(def) ::= <<
-private <ImplementationType("parameterType")> <def.name>() {
-    return <(def.expression.kind)(def.expression)>;
-}
->>
+//DefineNames() ::= <<
+//// Local functions; corresponds to Definitions in the IRP.
+//<protocol.definitions.list:{p|<NameDefinition(p)>}; separator="\n\n">
+//>>
 
-DeclareParameters() ::= <<
+//NameDefinition(def) ::= <<
+//private <ImplementationType("parameterType")> <def.name>() {
+//    return <(def.expression.kind)(def.expression)>;
+//}
+//>>
+
+//DeclareParameters() ::= <<
 // Parameters as declared in ParameterSpec
-<protocol.parameterSpecs.list:{par | <DeclareParameter(par)>;}; separator="\n">
->>
+//<protocol.parameterSpecs.list:{par | <DeclareParameter(par)>;}; separator="\n">
+//>>
 
 DeclareParameter(parameter) ::= <<
 private <if(parameter.memory)>static <endif><ImplementationType("parameterType")> <parameter.name><if(parameter.memory)> = <parameter.default><endif>
 >>
 
-DeclareSimpleParameter(parameterName) ::= <<
-private <ImplementationType("parameterType")> <parameterName>;
->>
+//DeclareSimpleParameter(parameterName) ::= <<
+//private <ImplementationType("parameterType")> <parameterName>;
+//>>
 
 DeclareFormalParameter(parameter) ::= <<
 <ImplementationType("parameterType")> <parameter.name>
 >>
 
-DeclareAssignmentVariables() ::= <<
+//DeclareAssignmentVariables() ::= <<
 // Internal variables, not declared in ParameterSpec
-<protocol.assignmentVariables:DeclareSimpleParameter()>
->>
+//<protocol.assignmentVariables:DeclareSimpleParameter()>
+//>>
 
-LocalAssignment(par) ::= <<
-this.<par.name> = <par.name>;
->>
+//LocalAssignment(par) ::= <<
+//this.<par.name> = <par.name>;
+//>>
 
-MapLocalAssignment(par) ::= <<
-<par.name> = map.get("<par.name>")
+//MapLocalAssignment(par) ::= <<
+//<par.name> = map.get("<par.name>")
+//>>
+
+DeclareDurationCounter() ::= <<
+static <ImplementationType("longType")> <DurationCounterName()> = 0<ImplementationType("longTypeSuffix")>;
 >>
 
 BitCount(e)           ::= <<
 bitCount(<(e.arg.kind)(e.arg)>)
 >>
 
-Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"
-Exponentiate(arg1,arg2) ::= "TODO.power(arg1,arg2)"
+//Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"
+//Exponentiate(arg1,arg2) ::= "TODO.power(arg1,arg2)"
+
+
+ResetDurationCounter() ::= <<
+<DurationCounterName()> = 0<ImplementationType("longTypeSuffix")>;
+>>
+
+SendFunctionSignature(prefix) ::= <<
+void <prefix>send<CProtocolName()>(<protocol.parameterSpecs.list:DeclareFormalParameter(); separator=", ">)
+>>
+
+DocumentPars(list) ::= <<
+/**
+ * Funktion  for sending one signal from the protcol <CProtocolName()>.
+ <list:{par | <DocumentFormalParameter(par)>}; separator="\n">
+ */
+>>
+
+DocumentFormalParameter(par) ::= <<
+* @param <par.name> Protocol parameter in the interval [<par.min> .. <par.max>].
+>>

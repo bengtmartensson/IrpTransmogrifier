@@ -20,9 +20,12 @@ package org.harctoolbox.irp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 
 public final class DumpItemCodeGenerator extends ItemCodeGenerator {
+
+    private static final Logger logger = Logger.getLogger(Duration.class.getName());
 
     private static String mkPrefix(int level) {
         StringBuilder s = new StringBuilder(level);
@@ -110,16 +113,16 @@ public final class DumpItemCodeGenerator extends ItemCodeGenerator {
 
     @Override
     public void inspect() {
-        throw new UnsupportedOperationException("inspect not supported.");
+        logger.warning("Inspect not supported, request ignored.");
+    }
+
+    @Override
+    public void inspectAndWait() {
+        inspect();
     }
 
     @Override
     public String render() {
         return render(name, aggregates, 0) + IrCoreUtils.LINESEPARATOR;
-    }
-
-    @Override
-    public void inspectAndWait() {
-        throw new UnsupportedOperationException("inspect not supported.");
     }
 }

@@ -155,6 +155,7 @@ public final class IrpTransmogrifier {
     private CommandExpression commandExpression;
     private CommandLirc commandLirc;
     private CommandConvertConfig commandConvertConfig;
+    private String[] originalArguments;
 
     public IrpTransmogrifier() {
         this(System.out);
@@ -174,6 +175,7 @@ public final class IrpTransmogrifier {
      * @return
      */
     public ProgramExitStatus run(String[] args) {
+        this.originalArguments = args.clone();
         commandLineArgs = new CommandLineArgs();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(PROGRAMNAME);
@@ -543,10 +545,12 @@ public final class IrpTransmogrifier {
         Map<String, String> parameters = assembleParameterMap(commandCode.parameters);
         if (commandCode.directory != null)
             codeGenerator.generate(protocolNames, irpDatabase, new File(commandCode.directory), commandCode.inspect, parameters,
-                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance,
+                    getClass().getSimpleName(), Version.version, String.join(" ", originalArguments));
         else
             codeGenerator.generate(protocolNames, irpDatabase, out, commandCode.inspect, parameters,
-                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance);
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance,
+                    getClass().getSimpleName(), Version.version, String.join(" ", this.originalArguments));
 
     }
 

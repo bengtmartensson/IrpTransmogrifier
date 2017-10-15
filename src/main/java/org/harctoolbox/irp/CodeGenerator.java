@@ -59,7 +59,7 @@ public abstract class CodeGenerator {
     }
 
     public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, File directory, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, String tool, String toolVersion, String commandLine) throws IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         if (isAbstract())
             throw new IrpInvalidArgumentException("This target cannot generete code since it is declared abstract.");
         if (directory == null || !directory.isDirectory() || !directory.canWrite())
@@ -72,14 +72,14 @@ public abstract class CodeGenerator {
             protocol = irpDatabase.getNamedProtocol(protocolName);
             String filename = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + fileSuffix()).getCanonicalPath();
             try (PrintStream out = IrCoreUtils.getPrintSteam(filename)) {
-                generate(protocol, out, true, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);
+                generate(protocol, out, true, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance, tool, toolVersion, commandLine);
                 logger.log(Level.INFO, "Wrote {0}", filename);
             }
         }
     }
 
     public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws IrpInvalidArgumentException {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, String tool, String toolVersion, String commandLine) throws IrpInvalidArgumentException {
         if (protocolNames == null || protocolNames.isEmpty())
             throw new IrpInvalidArgumentException("protocolNames cannot be null or empty");
         if (isAbstract())
@@ -89,11 +89,11 @@ public abstract class CodeGenerator {
 
         setInspect(inspect);
 
-        generateFileBegin(out);
+        generateFileBegin(out, tool, toolVersion, commandLine);
 
         protocolNames.forEach((protocolName) -> {
             try {
-                generate(protocolName, irpDatabase, out, false, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);
+                generate(protocolName, irpDatabase, out, false, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance, tool, toolVersion, commandLine);
             } catch (NameUnassignedException | UnknownProtocolException | ArithmeticException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}, ignoring this protol", ex.getMessage());
             }
@@ -101,11 +101,14 @@ public abstract class CodeGenerator {
         generateFileEnd(out);
     }
 
-    private void generateFileBegin(PrintStream out) {
+    private void generateFileBegin(PrintStream out, String tool, String toolVersion, String commandLine) {
         ItemCodeGenerator itemCodeGenerator = newItemCodeGenerator("FileBegin");
-        Map<String, Object> map = new HashMap<>(2);
+        Map<String, Object> map = new HashMap<>(5);
         map.put("date", new Date().toString());
         map.put("userName", System.getProperty("user.name"));
+        map.put("tool", tool);
+        map.put("toolVersion", toolVersion);
+        map.put("commandLineArguments", commandLine);
         itemCodeGenerator.addAggregateList("GenerateData", map);
         out.println(itemCodeGenerator.render());
     }
@@ -116,15 +119,15 @@ public abstract class CodeGenerator {
     }
 
     private void generate(String protocolName, IrpDatabase irpDatabase, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, String tool, String toolVersion, String commandLine) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         NamedProtocol protocol = irpDatabase.getNamedProtocol(protocolName);
-        generate(protocol, out, printPostAndPre, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);
+        generate(protocol, out, printPostAndPre, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance, tool, toolVersion, commandLine);
     }
 
     private void generate(NamedProtocol protocol, PrintStream out, boolean printPostAndPre, boolean inspect, Map<String, String> parameters,
-            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
+            Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, String tool, String toolVersion, String commandLine) {
         if (printPostAndPre)
-            generateFileBegin(out);
+            generateFileBegin(out, tool, toolVersion, commandLine);
         ItemCodeGenerator code = protocol.code(this, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance);// contains a trailing newline
         out.println(code.render());
         if (printPostAndPre)

@@ -73,7 +73,7 @@ public class IrpDatabaseNGTest {
     @Test
     public void testGetConfigFileVersion() {
         System.out.println("getConfigFileVersion");
-        String expResult = "2017-06-14";
+        String expResult = "2017-10-15";
         String result = instance.getConfigFileVersion();
         assertEquals(result, expResult);
     }

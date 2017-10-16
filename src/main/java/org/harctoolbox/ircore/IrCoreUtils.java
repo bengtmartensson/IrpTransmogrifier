@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Some useful static functions and constants.
@@ -536,6 +538,14 @@ public final class IrCoreUtils {
 
         int gcd = approximateGreatestCommonDivider(data, relTolerance);
         System.out.println(gcd);
+    }
+
+    public static File[] filesInDirMatchingRegExp(File dir, String regexp) {
+        Pattern pattern = Pattern.compile(regexp);
+        File[] selected = dir.listFiles((File dir1, String name) -> {
+            return pattern.matcher(name).matches();
+        });
+        return selected;
     }
 
     private IrCoreUtils() {

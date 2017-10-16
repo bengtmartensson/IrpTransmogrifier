@@ -505,43 +505,47 @@ public final class IrpTransmogrifier {
 
         if (commandCode.directory != null && commandLineArgs.output != null)
             throw new UsageException("The --output and the --directory options are mutually exclusive.");
-//        if (commandCode.protocols == null)
-//            throw new UsageException("At least one protocol needs to be given.");
 
         setupDatabase();
         List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (protocolNames.isEmpty())
             throw new UsageException("No protocols matched (forgot --regexp?)");
 
-        //String[] targets = commandCode.target.split(MULTIPLEARGSSEPARATOR);
-        for (String target : commandCode.target)
-            // Hardcoded selection of technologies for different targets
-            if (target.equalsIgnoreCase("xml"))
-                createXmlProtocols(protocolNames, commandLineArgs.encoding);
-            else
-                code(protocolNames, target);
-    }
-
-    private void code(Collection<String> protocolNames, String target) throws IOException, UsageException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
-        if (!new File(commandCode.stDir).isDirectory())
-            throw new IOException("Cannot find stdir = " + new File(commandCode.stDir).getCanonicalPath());
+        if (protocolNames.size() > 1 && commandCode.directory == null)
+            logger.warning("Several protocol will be concatenated in one file. Consider using --directory.");
 
         STCodeGenerator.setStDir(commandCode.stDir);
-        if (target.equals("?")) {
-            listTargets(out);
-            return;
-        }
+        for (String target : commandCode.target)
+            // Hardcoded selection of technologies for different targets
+            if (target.equals("?"))
+                listTargets(out);
+            else if (target.equalsIgnoreCase("xml"))
+                createXmlProtocols(protocolNames, commandLineArgs.encoding);
+            else if (target.equalsIgnoreCase("dump"))
+                code(protocolNames, new DumpCodeGenerator());
+            else {
+                if (!new File(commandCode.stDir).isDirectory())
+                    throw new IOException("Cannot find stdir = " + new File(commandCode.stDir).getCanonicalPath());
+                code(protocolNames, target);
+            }
+    }
 
-        CodeGenerator codeGenerator;
-        if (target.equals("dump"))
-            codeGenerator = new DumpCodeGenerator();
-        else {
+    private void code(Collection<String> protocolNames, String pattern) throws UsageException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
+        File[] targets = IrCoreUtils.filesInDirMatchingRegExp(new File(commandCode.stDir), pattern + STCodeGenerator.ST_GROUP_FILEEXTENSION);
+        if (targets.length > 1 && commandCode.directory == null)
+            logger.warning("Several targets will be concatenated in one file. Consider using --directory.");
+       for (File target : targets) {
+            CodeGenerator codeGenerator;
             try {
                 codeGenerator = new STCodeGenerator(target);
             } catch (FileNotFoundException ex) {
-                 throw new UsageException("Target " + target + " not available.  Available targets: " + String.join(" ", listTargets()));
+                throw new UsageException("Target " + target.getName() + " not available.  Available targets: " + String.join(" ", listTargets()));
             }
+            code(protocolNames, codeGenerator);
         }
+    }
+
+    private void code(Collection<String> protocolNames, CodeGenerator codeGenerator) throws UsageException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         Map<String, String> parameters = assembleParameterMap(commandCode.parameters);
         if (commandCode.directory != null)
             codeGenerator.generate(protocolNames, irpDatabase, new File(commandCode.directory), commandCode.inspect, parameters,

@@ -33,7 +33,7 @@ public final class STCodeGenerator extends CodeGenerator {
 
     private static final Logger logger = Logger.getLogger(STCodeGenerator.class.getName());
 
-    private static final String ST_GROUP_FILEEXTENSION = ".stg";
+    public static final String ST_GROUP_FILEEXTENSION = ".stg";
 
     private static String stDir = null;
 

@@ -94,7 +94,7 @@ FileStart() ::= <<
 <LineComment(" Beginning of file")>
 >>
 
-// Silly default, must be overridden
+// Silly defaults, must be overridden
 implementationTypes ::= [
 "booleanType":              "undefined",
 "dutyCycleType":            "undefined",

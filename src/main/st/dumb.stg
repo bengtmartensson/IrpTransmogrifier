@@ -22,7 +22,9 @@ import "generic.stg"
 
 IsAbstract() ::= "false"
 
-FileSuffix() ::= "Dumb.txt"
+FileName(protocolName) ::= <<
+<protocolName>.txt
+>>
 
 NamedProtocol(metaData, protocol) ::= <<
 metaData = <metaData>

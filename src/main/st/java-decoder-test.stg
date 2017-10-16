@@ -19,7 +19,9 @@ import "java.stg"
 
 IsAbstract() ::= "false"
 
-FileSuffix() ::= "DecoderNGTest.java"
+FileName(protocolName) ::= <<
+<protocolName; format="cap">DecoderNGTest<CodeFileExtension()>
+>>
 
 FilePreamble() ::= <<
 package org.harctoolbox.decoders;
@@ -46,9 +48,9 @@ public class <ClassName()> {
 
 ClassBody() ::= <<
 <DeclareStatic()>
-    
+
 <DeclareParameterlessConstructor()>
-    
+
 <DeclareCompute()>
 >>
 

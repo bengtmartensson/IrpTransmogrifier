@@ -42,13 +42,7 @@ public abstract class CodeGenerator {
         return newItemCodeGenerator(name).render();
     }
 
-    public String fileExtension() {
-        return render("CodeFileExtension");
-    }
-
-    public String fileSuffix() {
-        return render("FileSuffix");
-    }
+    public abstract String fileName(String protocolName);
 
     public boolean isAbstract() {
         return Boolean.parseBoolean(render("IsAbstract"));
@@ -70,13 +64,14 @@ public abstract class CodeGenerator {
         for (String protocolName : protocolNames) {
             NamedProtocol protocol;
             protocol = irpDatabase.getNamedProtocol(protocolName);
-            String filename = new File(directory, IrpUtils.toCIdentifier(protocol.getName()) + fileSuffix()).getCanonicalPath();
+            String filename = new File(directory + "/" + fileName(protocol.getCName())).getCanonicalPath();
             try (PrintStream out = IrCoreUtils.getPrintSteam(filename)) {
                 generate(protocol, out, true, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance, tool, toolVersion, commandLine);
                 logger.log(Level.INFO, "Wrote {0}", filename);
             }
         }
     }
+
 
     public void generate(Collection<String> protocolNames, IrpDatabase irpDatabase, PrintStream out, boolean inspect, Map<String, String> parameters,
             Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, String tool, String toolVersion, String commandLine) throws IrpInvalidArgumentException {

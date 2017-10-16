@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -83,13 +84,25 @@ public final class STCodeGenerator extends CodeGenerator {
     @Override
     public ItemCodeGenerator newItemCodeGenerator(String name) {
         ST st = stGroup.getInstanceOf(name);
-        if (st == null)
+        if (st == null) {
             logger.log(Level.WARNING, "Template {0} was not found", name);
+            return null;
+        }
         return new STItemCodeGenerator(st);
     }
 
     @Override
     public void setInspect(boolean inspect) {
          STCodeGenerator.trackCreationEvents(inspect);
+    }
+
+    @Override
+    public String fileName(String protocolName) {
+        ItemCodeGenerator itemCodeGenerator = newItemCodeGenerator("FileName");
+        if (itemCodeGenerator == null)
+            throw new ThisCannotHappenException("Template \"FileName\" not found."); // FIXME
+        itemCodeGenerator.setAttribute("protocolName", protocolName);
+        String fileName = itemCodeGenerator.render();
+        return fileName;
     }
 }

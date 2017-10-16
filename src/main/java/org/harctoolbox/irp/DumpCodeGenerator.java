@@ -28,11 +28,6 @@ public final class DumpCodeGenerator extends CodeGenerator {
 //    }
 
     @Override
-    public String fileSuffix() {
-        return "Dump.txt";
-    }
-
-    @Override
     public boolean isAbstract() {
         return false;
     }
@@ -50,5 +45,10 @@ public final class DumpCodeGenerator extends CodeGenerator {
     @Override
     public void setInspect(boolean debug) {
         // nothing (yet?)
+    }
+
+    @Override
+    public String fileName(String protocolName) {
+      return protocolName + ".txt";
     }
 }

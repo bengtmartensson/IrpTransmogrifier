@@ -19,7 +19,9 @@ import "java.stg"
 
 IsAbstract() ::= "false"
 
-FileSuffix() ::= "Decoder.java"
+FileName(protocolName) ::= <<
+<protocolName; format="cap">Decoder<CodeFileExtension()>
+>>
 
 FilePreamble() ::= <<
 package org.harctoolbox.decoders;
@@ -43,27 +45,27 @@ public final class <ClassName()> extends IrpDecoder {
 ClassBody() ::= <<
 <Irp()>
 <Documentation()>
-    
+
 <DeclareStatic()>
-    
+
 <DeclareParameters()>
-    
+
 <DeclareAssignmentVariables()>
-    
+
 <DeclareParameterlessConstructor()>
 
 <DeclareOneParameterConstructor()>
-    
+
 <DeclareFrequency()>
-    
+
 <DeclareDutyCycle()>
-    
+
 <DeclareCompute()>
-    
+
 <DefineNames()>
 
 <TopFunctions()>
-    
+
 <DefineClassList()>
 >>
 
@@ -172,7 +174,7 @@ private static class <metaData.cProtocolName>DecodeSequence extends IrpDecoder.<
     }
 <endif>
 <if(metaData.frequencyTolerance)>
- 
+
     @Override
     protected double getFrequencyTolerance() {
         return <metaData.frequencyTolerance>d;

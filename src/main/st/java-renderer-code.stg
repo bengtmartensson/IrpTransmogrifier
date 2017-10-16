@@ -19,7 +19,9 @@ import "java.stg"
 
 IsAbstract() ::= "false"
 
-FileSuffix() ::= "Renderer.java"
+FileName(protocolName) ::= <<
+<protocolName; format="cap">Renderer<CodeFileExtension()>
+>>
 
 FilePreamble() ::= <<
 package org.harctoolbox.renderers;
@@ -40,25 +42,25 @@ public final class <ClassName()> extends IrpRenderer {
 ClassBody() ::= <<
 <Irp()>
 <Documentation()>
-    
+
 <DeclareStatic()>
-    
+
 <DeclareParameters()>
-    
+
 <DeclareAssignmentVariables()>
-    
+
 <DeclareParameterlessConstructor()>
-    
+
 <DeclareFrequency()>
-    
+
 <DeclareDutyCycle()>
-    
+
 <DeclareCompute()>
-    
+
 <DefineNames()>
 
 <TopFunctions()>
-    
+
 <DefineClassList()>
 >>
 

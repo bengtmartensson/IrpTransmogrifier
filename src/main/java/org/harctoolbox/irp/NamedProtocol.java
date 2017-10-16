@@ -51,6 +51,7 @@ public final class NamedProtocol extends Protocol {
 
     private final String irp; // original one on input, not canonicalized
     private final String name;
+    private final String cName;
     private final String documentation;
     private final Double absoluteTolerance;
     private final Double relativeTolerance;
@@ -59,13 +60,14 @@ public final class NamedProtocol extends Protocol {
     private final boolean decodable;
     private final List<String> preferOver;
 
-    public NamedProtocol(String name, String irp, String documentation, String frequencyTolerance,
+    public NamedProtocol(String name, String cName, String irp, String documentation, String frequencyTolerance,
             String absoluteTolerance, String relativeTolerance, String minimumLeadout, String decodable,
             List<String> preferOver)
             throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         super(irp);
         this.irp = irp;
         this.name = name;
+        this.cName = cName;
         this.documentation = documentation;
         this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : null;
         this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : null;
@@ -76,7 +78,7 @@ public final class NamedProtocol extends Protocol {
     }
 
     public NamedProtocol(String name, String irp, String documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
-        this(name, irp, documentation, null, null, null, null, null, null);
+        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted,
@@ -134,6 +136,10 @@ public final class NamedProtocol extends Protocol {
      */
     public String getName() {
         return name;
+    }
+
+    public String getCName() {
+        return cName;
     }
 
     /**
@@ -218,7 +224,7 @@ public final class NamedProtocol extends Protocol {
     private Map<String, Object> metaDataPropertiesMap(Map<String, String> parameters, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userFrequencyTolerance) {
         Map<String, Object> map = IrpUtils.propertiesMap(parameters.size() + 11, this);
         map.put("protocolName", getName());
-        map.put("cProtocolName", IrpUtils.toCIdentifier(getName()));
+        map.put("cProtocolName", getCName());
         map.put("irp", getIrp());
         map.put("documentation", IrCoreUtils.javaifyString(getDocumentation()));
         putParameter(map, "relativeTolerance", userRelativeTolerance, relativeTolerance);

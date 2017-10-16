@@ -635,6 +635,11 @@ public final class IrpDatabase {
             return getFirstProperty(NAME_NAME);
         }
 
+        String getCName() {
+            String prop = getFirstProperty(CNAME_NAME);
+            return prop != null ? prop : IrpUtils.toCIdentifier(getName());
+        }
+
         String getIrp() {
             return getFirstProperty(IRP_NAME);
         }
@@ -649,7 +654,7 @@ public final class IrpDatabase {
         }
 
         NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
-            return new NamedProtocol(getName(), getIrp(), getDocumentation(),
+            return new NamedProtocol(getName(), getCName(), getIrp(), getDocumentation(),
                     getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
                     getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getProperties(PREFER_OVER_NAME));
         }

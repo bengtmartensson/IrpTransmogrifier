@@ -28,6 +28,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
+import org.stringtemplate.v4.StringRenderer;
 
 public final class STCodeGenerator extends CodeGenerator {
 
@@ -64,7 +65,9 @@ public final class STCodeGenerator extends CodeGenerator {
     private static STGroupFile newSTGroupFile(File file) throws IOException {
         if (!file.canRead())
             throw new FileNotFoundException("ST Group file " + file.getCanonicalPath() + " cannot be read.");
-        return new STGroupFile(file.getCanonicalPath());
+        STGroupFile group = new STGroupFile(file.getCanonicalPath());
+        group.registerRenderer(String.class, new StringRenderer());
+        return group;
     }
 
     private STGroup stGroup;

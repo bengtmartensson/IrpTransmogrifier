@@ -132,6 +132,31 @@ public class IrpDatabaseNGTest {
     }
 
     /**
+     * Test of getCName method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetCName() {
+        System.out.println("getCName");
+        String name = "48-nec1";
+        String expResult = "X48NEC1";
+        String result = instance.getCName(name);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of getCName method, of class IrpDatabase.
+     */
+    @Test
+    public void testGetCName1() {
+        System.out.println("getCName1");
+        String name = "Blaupunkt_relaxed";
+        String expResult = "Blaupunkt_relaxed";
+        String result = instance.getCName(name);
+        assertEquals(result, expResult);
+    }
+
+
+    /**
      * Test of getMatchingNamesRegexp method, of class IrpDatabase.
      */
     @Test

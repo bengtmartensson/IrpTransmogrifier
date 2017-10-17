@@ -372,6 +372,11 @@ public final class IrpDatabase {
         return prot == null ? null : prot.getName();
     }
 
+    public String getCName(String name) {
+        UnparsedProtocol prot = getUnparsedProtocol(name);
+        return prot == null ? null : prot.getCName();
+    }
+
     public String getNameExpandAlias(String name) {
         return getName(expandAlias(name));
     }
@@ -601,10 +606,13 @@ public final class IrpDatabase {
         }
 
         private void parseElement(Element element) {
-            addProperty(NAME_NAME, element.getAttribute(NAME_NAME));
             String usable = element.getAttribute(USABLE_NAME);
             if (!usable.isEmpty())
                 addProperty(USABLE_NAME, usable);
+            String name = element.getAttribute(NAME_NAME);
+            addProperty(NAME_NAME, name);
+            String cName = element.getAttribute(CNAME_NAME);
+            addProperty(CNAME_NAME, cName.isEmpty() ? IrpUtils.toCIdentifier(name) : cName);
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -636,8 +644,7 @@ public final class IrpDatabase {
         }
 
         String getCName() {
-            String prop = getFirstProperty(CNAME_NAME);
-            return prop != null ? prop : IrpUtils.toCIdentifier(getName());
+            return getFirstProperty(CNAME_NAME);
         }
 
         String getIrp() {

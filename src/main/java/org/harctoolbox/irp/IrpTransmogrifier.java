@@ -428,7 +428,7 @@ public final class IrpTransmogrifier {
                 listProperty("name", irpDatabase.getName(protocolName));
 
             if (commandList.cName)
-                listProperty("cname", IrpUtils.toCIdentifier(irpDatabase.getName(protocolName)));
+                listProperty("cName", irpDatabase.getCName(protocolName));
 
             if (commandList.irp)
                 listProperty("irp", irpDatabase.getIrp(protocolName));

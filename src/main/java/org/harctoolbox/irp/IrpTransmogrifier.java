@@ -81,7 +81,6 @@ public final class IrpTransmogrifier {
     // No need to make these settable, at least not presently
     public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml"; // in jar-file
     public static final String DEFAULT_CHARSET = "UTF-8"; // Just for runMain
-    public static final String SEPARATOR = "\n";//"\t";
     private static final String PROGRAMNAME = Version.appName;
 
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
@@ -403,9 +402,11 @@ public final class IrpTransmogrifier {
             return;
 
         setupDatabase();
-        commandList.protocols.stream().filter((protocol) -> (irpDatabase.isAlias(protocol))).forEachOrdered((protocol) -> {
-            out.println(protocol + " -> " + irpDatabase.expandAlias(protocol));
-        });
+        if (!commandLineArgs.quiet) {
+            commandList.protocols.stream().filter((protocol) -> (irpDatabase.isAlias(protocol))).forEachOrdered((protocol) -> {
+                out.println(protocol + " -> " + irpDatabase.expandAlias(protocol));
+            });
+        }
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
 
         for (String name : list) {
@@ -422,52 +423,64 @@ public final class IrpTransmogrifier {
                 continue;
             }
 
-            // Use one line for the first, relatively short items
-            out.print(irpDatabase.getName(protocolName));
+            if (!commandLineArgs.quiet)
+                // Use one line for the first, relatively short items
+                listProperty("name", irpDatabase.getName(protocolName));
 
             if (commandList.cName)
-                out.print(SEPARATOR + IrpUtils.toCIdentifier(irpDatabase.getName(protocolName)));
+                listProperty("cname", IrpUtils.toCIdentifier(irpDatabase.getName(protocolName)));
 
             if (commandList.irp)
-                out.print(SEPARATOR + irpDatabase.getIrp(protocolName));
+                listProperty("irp", irpDatabase.getIrp(protocolName));
 
             if (commandList.normalForm)
                 try {
                     // already checked it once...
-                    out.print(SEPARATOR + irpDatabase.getNormalFormIrp(protocolName, commandList.radix));
+                    listProperty("normal form", irpDatabase.getNormalFormIrp(protocolName, commandList.radix));
                 } catch (NameUnassignedException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
                     throw new ThisCannotHappenException(ex);
                 }
 
             if (commandList.documentation)
-                out.print(SEPARATOR + irpDatabase.getDocumentation(protocolName));
+                listProperty("documentation", irpDatabase.getDocumentation(protocolName));
 
             if (commandList.stringTree)
-                out.print(SEPARATOR + protocol.toStringTree());
+                listProperty("stringTree", protocol.toStringTree());
 
             if (commandList.is)
-                out.print(SEPARATOR + protocol.toIrpString(commandList.radix));
+                listProperty("irpString", protocol.toIrpString(commandList.radix));
 
             if (commandList.gui)
                 IrpUtils.showTreeViewer(protocol.toTreeViewer(), "Parse tree for " + protocolName);
 
             if (commandList.weight)
-                out.print(SEPARATOR + "Weight: " + protocol.weight());
+                listProperty("Weight", protocol.weight());
 
-            out.println();
-
-            // From here on, use full lines
             if (commandList.classify) {
-                out.println(protocol.classificationString());
+                listProperty("classification", protocol.classificationString());
             }
 
             if (commandList.warnings)
-                out.println(protocol.warningsString()); // already ends with LINESEPARATOR
+                listProperty("warnings", protocol.warningsString());
         }
     }
 
+    private void listProperty(String propertyName, String propertyValue) {
+        if (!commandLineArgs.quiet && propertyName != null)
+            out.print(propertyName + "=");
+        out.println(propertyValue);
+    }
+
+    private void listProperty(String propertyName, int value) {
+        listProperty(propertyName, Integer.toString(value));
+    }
+
+    private void listProperty(String propertyName, long value) {
+        listProperty(propertyName, Long.toString(value));
+    }
+
     private void version() throws UsageException, IOException, SAXException {
-        if (commandVersion.shortForm)
+        if (commandVersion.shortForm || commandLineArgs.quiet)
             out.println(Version.version);
         else {
             out.println(Version.versionString);
@@ -985,12 +998,11 @@ public final class IrpTransmogrifier {
         String text = String.join("", commandBitField.bitField).trim();
         BitField bitfield = BitField.newBitField(text);
         long result = bitfield.toNumber(nameEngine);
-        out.print(result);
+        listProperty("integer value", result);
         if (bitfield instanceof FiniteBitField) {
             FiniteBitField fbf = (FiniteBitField) bitfield;
-            out.print(SEPARATOR + fbf.toBinaryString(nameEngine, commandBitField.lsb));
+            listProperty("bitfield", fbf.toBinaryString(nameEngine, commandBitField.lsb));
         }
-        out.println();
 
         if (commandBitField.xml != null) {
             XmlUtils.printDOM(IrCoreUtils.getPrintSteam(commandBitField.xml), bitfield.toDocument(), commandLineArgs.encoding, null);
@@ -1150,6 +1162,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-o", "--output" }, description = "Name of output file (default: stdout).")
         private String output = null;
+
+        @Parameter(names = { "-q", "--quiet" }, description = "Quitest possible operation, typically to be used from scripts.")
+        private boolean quiet = false;
 
         @Parameter(names = {"-r", "--relativetolerance"}, validateWith = LessThanOne.class,
                 description = "Relative tolerance as a number < 1")

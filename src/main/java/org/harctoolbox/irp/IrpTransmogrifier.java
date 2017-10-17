@@ -223,13 +223,13 @@ public final class IrpTransmogrifier {
         }
 
         try {
+            if (commandLineArgs.logformat != null)
+                System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", commandLineArgs.logformat);
             Logger topLevelLogger = Logger.getLogger("");
             Formatter formatter = commandLineArgs.xmlLog ? new XMLFormatter() : new SimpleFormatter();
             Handler[] handlers = topLevelLogger.getHandlers();
             for (Handler handler : handlers)
                 topLevelLogger.removeHandler(handler);
-
-            System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", commandLineArgs.logformat);
 
             String[] logclasses = commandLineArgs.logclasses.split("\\|");
             @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -1151,7 +1151,7 @@ public final class IrpTransmogrifier {
         private String logfile = null;
 
         @Parameter(names = {"-F", "--logformat"}, description = "Log format, as in class java.util.logging.SimpleFormatter.")
-        private String logformat = "%4$s(%2$s): %5$s%n";
+        private String logformat = "[%2$s] %4$s: %5$s%n";
 
         @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")

@@ -423,7 +423,7 @@ public final class IrpTransmogrifier {
                 continue;
             }
 
-            if (!commandLineArgs.quiet)
+            if (!commandLineArgs.quiet || commandList.name)
                 // Use one line for the first, relatively short items
                 listProperty("name", irpDatabase.getName(protocolName));
 
@@ -1530,7 +1530,9 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-n", "--normalform"}, description = "List the normal form.")
         private boolean normalForm = false;
 
-        // Only sensible together with --irpstring, consequentely hidded
+        @Parameter(names = { "--name"}, description = "List protocol name, also if --quiet is given.")
+        private boolean name = false;
+
         @Parameter(names = { "-r", "--radix" }, description = "Radix of parameter output.")
         private int radix = 16;
 

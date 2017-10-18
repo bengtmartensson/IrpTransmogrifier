@@ -71,6 +71,18 @@ ProtocolNameComment(protocolName) ::= <<
 <LineComment(["ProtocolName: ", protocolName])>
 >>
 
+UpperCase(str) ::= <<
+<str; format="upper">
+>>
+
+CProtocolName() ::= <<
+<metaData.cProtocolName>
+>>
+
+CProtocolNameUpperCase() ::= <<
+<metaData.cProtocolName; format="upper">
+>>
+
 // Per default, Irp() just lists the IRP as a multiline comment
 Irp() ::= <<
 <Comment([NewLine(), "IRP: ", NewLine(), metaData.irp, NewLine()])>

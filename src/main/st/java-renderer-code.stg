@@ -20,7 +20,7 @@ import "java.stg"
 IsAbstract() ::= "false"
 
 FileName(protocolName) ::= <<
-<protocolName; format="cap">Renderer<CodeFileExtension()>
+<protocolName>Renderer<CodeFileExtension()>
 >>
 
 FilePreamble() ::= <<

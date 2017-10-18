@@ -20,7 +20,7 @@ import "java.stg"
 IsAbstract() ::= "false"
 
 FileName(protocolName) ::= <<
-<protocolName; format="cap">DecoderNGTest<CodeFileExtension()>
+<protocolName>DecoderNGTest<CodeFileExtension()>
 >>
 
 FilePreamble() ::= <<

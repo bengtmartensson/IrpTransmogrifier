@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 import "clike.stg"
 
+Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"
+
 CppIf(symbol) ::= <<
 #if <symbol>
 >>

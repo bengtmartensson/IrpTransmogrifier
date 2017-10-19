@@ -19,8 +19,8 @@ import "generic.stg"
 
 UnaryMinus(e)   ::= "-(<(e.arg.kind)(e.arg)>)"
 
-Add(e)          ::= "(<(e.arg1.kind)(e.arg1)>)+(<(e.arg2.kind)(e.arg2)>)"
-Subtract(e)     ::= "(<(e.arg1.kind)(e.arg1)>)-(<(e.arg2.kind)(e.arg2)>)"
-Multiply(e)     ::= "(<(e.arg1.kind)(e.arg1)>)*(<(e.arg2.kind)(e.arg2)>)"
-Divide(e)       ::= "(<(e.arg1.kind)(e.arg1)>)/(<(e.arg2.kind)(e.arg2)>)"
+Add(e)          ::= "(<(e.arg1.kind)(e.arg1)>) + (<(e.arg2.kind)(e.arg2)>)"
+Subtract(e)     ::= "(<(e.arg1.kind)(e.arg1)>) - (<(e.arg2.kind)(e.arg2)>)"
+Multiply(e)     ::= "(<(e.arg1.kind)(e.arg1)>) * (<(e.arg2.kind)(e.arg2)>)"
+Divide(e)       ::= "(<(e.arg1.kind)(e.arg1)>) / (<(e.arg2.kind)(e.arg2)>)"
 

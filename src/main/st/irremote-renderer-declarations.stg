@@ -19,13 +19,13 @@ import "irremote.stg"
 
 IsAbstract() ::= "false"
 
-FileSuffix() ::= "extra-protocol-symbols.inc"
+FileName(protocolName) ::= "ir_<protocolName>.decl"
 
 FilePreamble() ::= ""
 
 FileStart() ::= ""
 
-CppSymbol() ::= "SEND_<CProtocolName()>"
+CppSymbol() ::= "SEND_<CProtocolNameUpperCase()>"
 
 Body() ::= <<
 <CppIfSymbol()>

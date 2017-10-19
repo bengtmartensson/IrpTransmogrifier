@@ -18,5 +18,3 @@ this program. If not, see http://www.gnu.org/licenses/.
 import "c.stg"
 
 CodeFileExtension() ::= ".cpp"
-
-Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"

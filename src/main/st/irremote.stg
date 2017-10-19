@@ -31,7 +31,7 @@ implementationTypes ::= [
 "microsecondsTypeSuffix":   "",
 "parameterType":            "unsigned int",
 "parameterTypeClass":       "xxxx",
-"parameterTypeSuffix":      "L",
+"parameterTypeSuffix":      "U",
 "staticConst":              "static const"
 ]
 
@@ -40,8 +40,6 @@ ImplementationType(type) ::= <<
 >>
 
 ManyProtocolsInOneFile() ::= "true"
-
-CProtocolName() ::= "<metaData.cProtocolName>"
 
 NamedProtocol(metaData, protocol) ::= <<
 <FileStart()>
@@ -57,6 +55,59 @@ DurationCounterName() ::= "durationCounter"
 //DeclareParameterlessConstructor() ::= <<
 //<ClassName()>();
 //>>
+
+DefineNames() ::= <<
+<if(protocol.definitions.list)>
+// Local functions; corresponds to Definitions in the IRP.
+<protocol.definitions.list:{p|<NameDefinition(p)>}; separator="\n\n">
+<endif>
+>>
+
+NameDefinition(def) ::= <<
+static inline <ImplementationType("parameterType")> <def.name>(<FormalParameterList()>) {
+    return <(def.expression.kind)(def.expression)>;
+}
+>>
+
+FormalParameterList() ::= <<
+<ProtocolParametersParameterList()><if(protocol.assignmentVariables)>,<NewLine()>        <AssignmentVariablesParameterList()><endif>
+>>
+
+ActualParameterList()::= <<
+<ProtocolParametersActualList()><if(protocol.assignmentVariables)>, <AssignmentVariablesActualList()><endif>
+>>
+
+ProtocolParametersParameterList() ::= <<
+<DeclareAsFormalParameters(protocol.parameterSpecs.list)>
+>>
+
+ProtocolParametersActualList() ::= <<
+<ActualParameters(protocol.parameterSpecs.list)>
+>>
+
+AssignmentVariablesParameterList() ::= <<
+<protocol.assignmentVariables:{var | <DeclareFormalParameterByName(var)>}>
+>>
+
+AssignmentVariablesActualList() ::= <<
+<protocol.assignmentVariables:{var | <ActualParametersByName(var)>}>
+>>
+
+DefinitionsParameterList() ::= <<
+<DeclareAsFormalParameters(protocol.definitions.list)>
+>>
+
+DeclareAsFormalParameters(list) ::= <<
+<list:{p | <DeclareFormalParameter(p)>}; separator=",\n        ">
+>>
+
+ActualParameters(list) ::= <<
+<list:{p | <p.name>}; separator=", ">
+>>
+
+ActualParametersByName(list) ::= <<
+<list:{name | <name>}; separator=",\n        ">
+>>
 
 //DefineNames() ::= <<
 //// Local functions; corresponds to Definitions in the IRP.
@@ -82,8 +133,23 @@ private <if(parameter.memory)>static <endif><ImplementationType("parameterType")
 //private <ImplementationType("parameterType")> <parameterName>;
 //>>
 
+DefineSimpleParameter(parameterName) ::= <<
+<DeclareFormalParameterByName(parameterName)>;
+>>
+
 DeclareFormalParameter(parameter) ::= <<
-<ImplementationType("parameterType")> <parameter.name>
+<DeclareFormalParameterByName(parameter.name)>
+>>
+
+DeclareFormalParameterByName(parameterName) ::= <<
+<ImplementationType("parameterType")> <parameterName><AttributeUnused()>
+>>
+
+//AttributeUnused() ::= " __attribute__((unused))"
+AttributeUnused() ::= ""
+
+DefineStaticVariable(name, initValue) ::= <<
+static <ImplementationType("intType")> <name> = <initValue>;
 >>
 
 //DeclareAssignmentVariables() ::= <<
@@ -107,7 +173,9 @@ BitCount(e)           ::= <<
 bitCount(<(e.arg.kind)(e.arg)>)
 >>
 
-//Name(arg)           ::= "<arg.name><if(arg.isDefinition)>()<endif>"
+//Number(arg)         ::= "<arg.value><ImplementationType(\"parameterTypeSuffix\")>"
+
+Name(arg)           ::= "<arg.name><if(arg.isDefinition)>(<ActualParameterList()>)<endif>"
 //Exponentiate(arg1,arg2) ::= "TODO.power(arg1,arg2)"
 
 
@@ -116,12 +184,12 @@ ResetDurationCounter() ::= <<
 >>
 
 SendFunctionSignature(prefix) ::= <<
-void <prefix>send<CProtocolName()>(<protocol.parameterSpecs.list:DeclareFormalParameter(); separator=", ">)
+void <prefix>send<CProtocolName()>(<ProtocolParametersParameterList()>)
 >>
 
 DocumentPars(list) ::= <<
 /**
- * Funktion  for sending one signal from the protcol <CProtocolName()>.
+ * Function for sending one signal from the protcol <CProtocolName()>.
  <list:{par | <DocumentFormalParameter(par)>}; separator="\n">
  */
 >>

@@ -325,7 +325,7 @@ public final class IrpTransmogrifier {
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
+        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());

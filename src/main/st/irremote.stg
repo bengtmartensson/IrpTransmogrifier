@@ -19,18 +19,18 @@ import "cplusplus.stg"
 
 implementationTypes ::= [
 "booleanType":              "bool",
-"dutyCycleType":            "double",
-"dutyCycleTypeSuffix":      "",
+"dutyCycleType":            "**UNDEFINED**",
+"dutyCycleTypeSuffix":      "**UNDEFINED**",
 "frequencyType":            "unsigned int",
 "frequencyTypeSuffix":      "U",
 "intType":                  "unsigned int",
 "intTypeSuffix":            "U",
 "longType":                 "unsigned long",
-"longTypeSuffix":            "UL",
+"longTypeSuffix":           "UL",
 "microsecondsType":         "unsigned int", // For now...
 "microsecondsTypeSuffix":   "",
 "parameterType":            "unsigned int",
-"parameterTypeClass":       "xxxx",
+"parameterTypeClass":       "**UNDEFINED**",
 "parameterTypeSuffix":      "U",
 "staticConst":              "static const"
 ]
@@ -39,7 +39,8 @@ ImplementationType(type) ::= <<
 <implementationTypes.(type)>
 >>
 
-ManyProtocolsInOneFile() ::= "true"
+// Not tried, should possibly be supported
+ManyProtocolsInOneFile() ::= "false"
 
 NamedProtocol(metaData, protocol) ::= <<
 <FileStart()>
@@ -47,14 +48,6 @@ NamedProtocol(metaData, protocol) ::= <<
 >>
 
 DurationCounterName() ::= "durationCounter"
-
-//ProtocolNameComment() ::= <<
-//<BeginComment()>ProtocolName: <metaData.protocolName> <EndComment()>
-//>>
-
-//DeclareParameterlessConstructor() ::= <<
-//<ClassName()>();
-//>>
 
 DefineNames() ::= <<
 <if(protocol.definitions.list)>
@@ -109,29 +102,9 @@ ActualParametersByName(list) ::= <<
 <list:{name | <name>}; separator=",\n        ">
 >>
 
-//DefineNames() ::= <<
-//// Local functions; corresponds to Definitions in the IRP.
-//<protocol.definitions.list:{p|<NameDefinition(p)>}; separator="\n\n">
-//>>
-
-//NameDefinition(def) ::= <<
-//private <ImplementationType("parameterType")> <def.name>() {
-//    return <(def.expression.kind)(def.expression)>;
-//}
-//>>
-
-//DeclareParameters() ::= <<
-// Parameters as declared in ParameterSpec
-//<protocol.parameterSpecs.list:{par | <DeclareParameter(par)>;}; separator="\n">
-//>>
-
 DeclareParameter(parameter) ::= <<
 private <if(parameter.memory)>static <endif><ImplementationType("parameterType")> <parameter.name><if(parameter.memory)> = <parameter.default><endif>
 >>
-
-//DeclareSimpleParameter(parameterName) ::= <<
-//private <ImplementationType("parameterType")> <parameterName>;
-//>>
 
 DefineSimpleParameter(parameterName) ::= <<
 <DeclareFormalParameterByName(parameterName)>;
@@ -145,25 +118,13 @@ DeclareFormalParameterByName(parameterName) ::= <<
 <ImplementationType("parameterType")> <parameterName><AttributeUnused()>
 >>
 
+// Bad for readability
 //AttributeUnused() ::= " __attribute__((unused))"
 AttributeUnused() ::= ""
 
 DefineStaticVariable(name, initValue) ::= <<
 static <ImplementationType("intType")> <name> = <initValue>;
 >>
-
-//DeclareAssignmentVariables() ::= <<
-// Internal variables, not declared in ParameterSpec
-//<protocol.assignmentVariables:DeclareSimpleParameter()>
-//>>
-
-//LocalAssignment(par) ::= <<
-//this.<par.name> = <par.name>;
-//>>
-
-//MapLocalAssignment(par) ::= <<
-//<par.name> = map.get("<par.name>")
-//>>
 
 DeclareDurationCounter() ::= <<
 static <ImplementationType("longType")> <DurationCounterName()> = 0<ImplementationType("longTypeSuffix")>;
@@ -173,11 +134,7 @@ BitCount(e)           ::= <<
 bitCount(<(e.arg.kind)(e.arg)>)
 >>
 
-//Number(arg)         ::= "<arg.value><ImplementationType(\"parameterTypeSuffix\")>"
-
 Name(arg)           ::= "<arg.name><if(arg.isDefinition)>(<ActualParameterList()>)<endif>"
-//Exponentiate(arg1,arg2) ::= "TODO.power(arg1,arg2)"
-
 
 ResetDurationCounter() ::= <<
 <DurationCounterName()> = 0<ImplementationType("longTypeSuffix")>;

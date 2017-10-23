@@ -38,17 +38,10 @@ Body() ::= <<
 
 <Documentation()>
 
-<!DeclareStatic()!>
-<!DeclareParameters()!>
-<!DeclareParameterlessConstructor()!>
-<!DeclareFrequency()!>
-<!DeclareDutyCycle()!>
-<!DeclareCompute()!>
 <CppIfSymbol()>
 
 <ExternalDeclarations()>
 
-<!DefineCppConstants()!>
 <IfHasReset(DeclareDurationCounter())>
 
 <DefineFlashGapExtent()>
@@ -57,9 +50,6 @@ Body() ::= <<
 <DefineNames()>
 <DefineSend()>
 
-<!DefineNames()!>
-<!TopFunctions()!>
-<!DefineClassList()!>
 <CppEndifSymbol()>
 >>
 
@@ -132,77 +122,6 @@ DefineAssignmentVariables() ::= <<
 <protocol.assignmentVariables:{v | <DefineSimpleParameter(v)>}>
 >>
 
-//ShutdownIR() ::= <<
-//space(0);<SpacedLineComment("Always end with the LED off")>
-//>>
-
-//DeclareCompute() ::= <<
-//public IrSignal compute(<protocol.parameterSpecs.list:DeclareFormalParameter(); separator=", ">) {
-//    <protocol.parameterSpecs.list:LocalAssignment(); separator="\n">
-//    setup();
-//    return getIrSignal();
-//}
-
-//public IrSignal compute(Map\<String, <ImplementationType("parameterTypeClass")>\> map) {
-//    <protocol.parameterSpecs.list:{p | <MapLocalAssignment(p)>;}; separator="\n">
-//    setup();
-//    return getIrSignal();
-//}
-//>>
-
-//DeclareStatic() ::= <<
-// Static convenience functions
-//public static IrSignal newIrSignal(<protocol.parameterSpecs.list:{p | <ImplementationType("parameterType")> <p.name>}; separator=", ">) {
-//    <ClassName()> instance = new <ClassName()>();
-//    return instance.compute(<protocol.parameterSpecs.list:{p | <p.name>}; separator=", ">);
-//}
-
-//public static IrSignal newIrSignal(Map\<String, <ImplementationType("parameterTypeClass")>\> map) {
-//    <ClassName()> instance = new <ClassName()>();
-//    return instance.compute(map);
-//}
-//>>
-
-//DeclareFrequency() ::= <<
-//@Override
-//public <ImplementationType("frequencyType")> getFrequency() {
-//    return <protocol.generalSpec.frequency><ImplementationType("frequencyTypeSuffix")>;
-//}
-//>>
-
-//DeclareDutyCycle() ::= <<
-//@Override
-//public <ImplementationType("dutyCycleType")> getDutyCycle() {
-//    return <protocol.generalSpec.dutyCycle><ImplementationType("dutyCycleTypeSuffix")>; // FIXME
-//}
-//>>
-
-// DefineClassList() ::= <<
-// private static class <metaData.cProtocolName>IrList extends IrpRenderer.<if(protocol.bitSpec.pwm2)>Pwm2<elseif(protocol.bitSpec.pwm4)>Pwm4<elseif(protocol.bitSpec.standardBiPhase)>BiPhase<endif>IrList {
-
-// <if(protocol.bitSpec.pwm2)>
-//     <metaData.cProtocolName>IrList() {
-//         super(<protocol.bitSpec.lsbFirst>, <protocol.bitSpec.zeroFlash>d, <protocol.bitSpec.zeroGap>d, <protocol.bitSpec.oneFlash>d, <protocol.bitSpec.oneGap>d);
-//     }
-// <elseif(protocol.bitSpec.pwm4)>
-//     <metaData.cProtocolName>IrList() {
-//         super(<protocol.bitSpec.lsbFirst>, <protocol.bitSpec.zeroFlash>d, <protocol.bitSpec.zeroGap>d, <protocol.bitSpec.oneFlash>d, <protocol.bitSpec.oneGap>d,
-//               <protocol.bitSpec.twoFlash>d, <protocol.bitSpec.twoGap>d, <protocol.bitSpec.threeFlash>d, <protocol.bitSpec.threeGap>d);
-//     }
-// <elseif(protocol.bitSpec.standardBiPhase)>
-//     <metaData.cProtocolName>IrList() {
-//         super(<protocol.bitSpec.lsbFirst>, <protocol.bitSpec.biPhaseInverted>, <protocol.bitSpec.biPhaseHalfPeriod>d);
-//     }
-// <else>
-// <if(protocol.bitSpec.chunkSize)>
-//     private <ImplementationType("parameterType")> pendingData = 0<ImplementationType("parameterTypeSuffix")>;
-//     private <ImplementationType("parameterType")> pendingBits = 0<ImplementationType("parameterTypeSuffix")>;
-// <endif>
-
-//     <metaData.cProtocolName>IrList() {
-//         super(<protocol.bitSpec.lsbFirst>);
-//     }
-
 DefineBitfieldFunctions() ::= <<
 static void bitField(IRsend* instance, <ImplementationType("parameterType")> data, <ImplementationType("parameterType")> width) {
 <if(protocol.bitSpec.chunkSize)>
@@ -229,15 +148,6 @@ static void bitField(IRsend* instance, <ImplementationType("parameterType")> dat
 }
 >>
 
-// TopFunction(passName, functionBody) ::= <<
-// @Override
-// protected <metaData.cProtocolName>IrList setup<passName>() {
-//     <metaData.cProtocolName>IrList list = new <metaData.cProtocolName>IrList();
-//     <TopFunctionBody(functionBody)>
-//     return list;
-// }
-// >>
-
 FiniteBitField(fbf) ::= <<
 bitField(instance, <if(fbf.complement)>~<endif><if(fbf.reverse)>bitReverse(<endif><(fbf.data.kind)(fbf.data)><if(fbf.reverse)>, (<ImplementationType("parameterType")>)<(fbf.width.kind)(fbf.width)>)<endif><Chop(fbf.chop)>, <(fbf.width.kind)(fbf.width)>)
 >>
@@ -249,9 +159,3 @@ InfiniteBitFieldExpression(arg) ::= <<
 FiniteBitFieldExpression(arg) ::= <<
 finiteBitField(<(arg.data.kind)(arg.data)>, <(arg.width.kind)(arg.width)>, <if(arg.chop)><(arg.chop.kind)(arg.chop)><else>0<endif>, <arg.complement>, <arg.reverse>)
 >>
-
-// Flash(arg)          ::= "list.flash(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
-// Gap(arg)            ::= "list.gap(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
-// Extent(arg)         ::= "list.extent(<arg.microseconds><ImplementationType(\"microsecondsTypeSuffix\")>)"
-
-// NameAsDefinition(name, eval)    ::= "<name>()"

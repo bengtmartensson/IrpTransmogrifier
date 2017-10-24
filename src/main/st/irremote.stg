@@ -146,7 +146,7 @@ void <prefix>send<CProtocolName()>(<ProtocolParametersParameterList()>)
 
 DocumentPars(list) ::= <<
 /**
- * Function for sending one signal from the protcol <CProtocolName()>.
+ * Function for sending one signal from the protocol <CProtocolName()>.
  <list:{par | <DocumentFormalParameter(par)>}; separator="\n">
  */
 >>

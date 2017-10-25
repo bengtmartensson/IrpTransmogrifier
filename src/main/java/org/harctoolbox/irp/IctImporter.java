@@ -88,7 +88,7 @@ public class IctImporter {
     private int noSamples;
     private boolean hasComplainedAboutMissingFrequency;
 
-    private Map<String, ModulatedIrSequence> sequences;
+    private final Map<String, ModulatedIrSequence> sequences;
 
     private IctImporter() {
         sequences = new LinkedHashMap<>(4);

@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
@@ -116,5 +117,10 @@ public final class Extent extends Duration {
     @Override
     protected Extent evaluatedDuration(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException, IrpInvalidArgumentException {
         return new Extent(evaluate(generalSpec, nameEngine), "u");
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        return new TreeSet<>();
     }
 }

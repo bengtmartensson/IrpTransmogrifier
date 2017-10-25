@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
 import org.w3c.dom.Document;
@@ -447,5 +448,14 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
             newList.add(item.substituteConstantVariables(constantVariables));
         });
         return new BareIrStream(newList);
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        TreeSet<Double> result = new TreeSet<>();
+        irStreamItems.forEach((item) -> {
+            result.addAll(item.allDurationsInMicros(generalSpec, nameEngine));
+        });
+        return result;
     }
 }

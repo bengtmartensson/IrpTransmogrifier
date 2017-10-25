@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
@@ -546,6 +547,18 @@ public final class IrCoreUtils {
             return pattern.matcher(name).matches();
         });
         return selected;
+    }
+
+    public static double minDiff(TreeSet<Double> numbers) {
+        double lowestYet = Double.MAX_VALUE;
+        double last = -Double.MAX_VALUE;
+        for (Double d : numbers) {
+            double diff = d - last;
+            if (diff < lowestYet)
+                lowestYet = diff;
+            last = d;
+        }
+        return lowestYet;
     }
 
     private IrCoreUtils() {

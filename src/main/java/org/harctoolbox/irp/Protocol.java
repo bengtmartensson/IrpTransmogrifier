@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
@@ -460,6 +461,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         XmlUtils.addBooleanAttributeIfTrue(renderer, "startsWithFlash", startsWithFlash());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "hasVariation", hasVariation());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "rplus", isRPlus());
+        XmlUtils.addDoubleAttributeAsInteger(renderer, "minDiff", minDurationDiff());
         Element generalSpecElement = generalSpec.toElement(document);
         renderer.appendChild(generalSpecElement);
         Element bitspecIrstreamElement = bitspecIrstream.toElement(document);
@@ -642,7 +644,8 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public String classificationString() {
         StringBuilder str = new StringBuilder(128);
-        str.append((int) (getFrequency() != null ? getFrequency() : GeneralSpec.DEFAULT_FREQUENCY));
+        str.append((int) minDurationDiff());
+        str.append("\t").append((int) (getFrequency() != null ? getFrequency() : GeneralSpec.DEFAULT_FREQUENCY));
         str.append("\t").append(hasMemoryVariable("T") ? "toggle\t" : "\t");
         str.append(isPWM2() ? "PWM2" : "");
         str.append(isPWM4() ? "PWM4" : "");
@@ -735,6 +738,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         map.put("interleavingOk", interleavingOk());
         map.put("interleavingFlashOk", interleavingFlashOk());
         map.put("interleavingGapOk", interleavingGapOk());
+        map.put("minDiff", minDurationDiff());
 
         addSequence(map, IrSignal.Pass.intro);
         addSequence(map, IrSignal.Pass.repeat);
@@ -759,6 +763,14 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public Integer guessParameterLength(String name) {
         return bitspecIrstream.guessParameterLength(name);
+    }
+
+    public TreeSet<Double> allDurationsInMicros() {
+        return bitspecIrstream.allDurationsInMicros(generalSpec, definitions);
+    }
+
+    public double minDurationDiff() {
+        return IrCoreUtils.minDiff(allDurationsInMicros());
     }
 
     public static class ProtocolNotDecodableException extends IrpException {

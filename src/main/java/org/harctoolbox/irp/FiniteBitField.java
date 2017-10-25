@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -411,5 +412,10 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         } catch (NameUnassignedException ex) {
             return null;
         }
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        return new TreeSet<>();
     }
 }

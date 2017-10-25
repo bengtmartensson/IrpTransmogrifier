@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -356,5 +357,12 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     @Override
     public Integer guessParameterLength(String name) {
         return null;
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        TreeSet<Double> result = new TreeSet<>();
+        result.add(microSeconds(generalSpec, nameEngine));
+        return result;
     }
 }

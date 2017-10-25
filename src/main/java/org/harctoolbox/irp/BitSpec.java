@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -241,15 +242,15 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         return true;
     }
 
-    /**
+   /**
      * Checks if the BitSpec is of type &lt;a|-a&gt; (a != 0)
      * @param nameEngine
      * @param generalSpec
-     * @param inverted
+     * @param inverted If true then a > 0, i.e., starts with a flash.
      * @return
      */
     public boolean isTrivial(GeneralSpec generalSpec, NameEngine nameEngine, boolean inverted) {
-        if (bitCodes.size() != 2)
+       if (bitCodes.size() != 2)
             return false;
         try {
             EvaluatedIrStream off = bitCodes.get(0).evaluate(IrSignal.Pass.intro, IrSignal.Pass.intro, generalSpec, nameEngine);
@@ -262,6 +263,16 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
             return false;
         }
+    }
+
+    /**
+     * Checks if the BitSpec is of type &lt;a|-a&gt; (a != 0)
+     * @param nameEngine
+     * @param generalSpec
+     * @return
+     */
+    public boolean isTrivial(GeneralSpec generalSpec, NameEngine nameEngine) {
+        return isTrivial(generalSpec, nameEngine, true) || isTrivial(generalSpec, nameEngine, false);
     }
 
     @Override
@@ -363,5 +374,20 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         double sum = 0;
         sum = bitCodes.stream().map((bitCode) -> bitCode.averageDuration(generalSpec, nameEngine)).reduce(sum, (accumulator, _item) -> accumulator + _item);
         return sum / bitCodes.size();
+    }
+
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        TreeSet<Double> result = new TreeSet<>();
+        bitCodes.forEach((BareIrStream bitCode) -> {
+            result.addAll(bitCode.allDurationsInMicros(generalSpec, nameEngine));
+        });
+        if (result.size() == 1) {
+            if (isStandardBiPhase(generalSpec, nameEngine))
+                result.add(2*result.first());
+            else if (isTrivial(generalSpec, nameEngine))
+                result.add(0d);
+        }
+
+        return result;
     }
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -260,5 +261,17 @@ public final class Variation extends IrpObject implements IrStreamItem {
         if (result != null)
             return result;
         return ending.guessParameterLength(name);
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        TreeSet<Double> result = new TreeSet<>();
+        for (Pass pass : IrSignal.Pass.values()) {
+            if (pass == Pass.finish)
+                continue;
+            TreeSet<Double> durations = select(pass).allDurationsInMicros(generalSpec, nameEngine);
+            result.addAll(durations);
+        }
+        return result;
     }
 }

@@ -228,6 +228,10 @@ public final class XmlUtils {
             element.setAttribute(attName, "true");
     }
 
+    public static void addDoubleAttributeAsInteger(Element element, String attName, double value) {
+        element.setAttribute(attName, Long.toString(Math.round(value)));
+    }
+
     public static void main(String[] args) {
         try {
             Schema schema = args.length > 1 ? readSchemaFromFile(new File(args[1])) : null;

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
@@ -333,5 +334,15 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     @Override
     public BitspecIrstream substituteConstantVariables(Map<String, Long> constantVariables) {
         return new BitspecIrstream(bitSpec.substituteConstantVariables(constantVariables), irStream.substituteConstantVariables(constantVariables));
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        TreeSet<Double> result = new TreeSet<>();
+        Set<Double> bitSpecDurations = bitSpec.allDurationsInMicros(generalSpec, nameEngine);
+        result.addAll(bitSpecDurations);
+        Set<Double> irStreamDurations = irStream.allDurationsInMicros(generalSpec, nameEngine);
+        result.addAll(irStreamDurations);
+        return result;
     }
 }

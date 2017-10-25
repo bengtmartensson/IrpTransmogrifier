@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrSignal;
 
@@ -81,6 +82,17 @@ public interface IrStreamItem extends XmlExport {
     public Integer numberOfDurations();
 
     public Integer numberOfBitSpecs();
+
+    /**
+     * Delivers a set of all the contained durations in microseconds.
+     * Dumb, in that it does not consider consecutive flashes or consecutive gaps.
+     * Also, durations that cannot be statically computed may be omitted,
+     * as well as duration arising from extents.
+     * @param generalSpec
+     * @param nameEngine
+     * @return
+     */
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine);
 
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass);
 

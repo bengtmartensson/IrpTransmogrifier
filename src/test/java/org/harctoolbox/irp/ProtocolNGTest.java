@@ -3,6 +3,7 @@ package org.harctoolbox.irp;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
@@ -945,5 +946,23 @@ public class ProtocolNGTest {
             Logger.getLogger(ProtocolNGTest.class.getName()).log(Level.SEVERE, null, ex);
             fail();
         }
+    }
+
+    @Test
+    public void testAllDurationsInMicros() throws Exception {
+        System.out.println("allDurationsInMicros");
+        TreeSet<Double> durations = irpDatabase.getProtocol("NEC1").allDurationsInMicros();
+        assertEquals(durations.size(), 5);
+        durations = irpDatabase.getProtocol("B&O").allDurationsInMicros();
+        assertEquals(durations.size(), 6);
+    }
+
+    @Test
+    public void testMinDurationDiff() throws Exception {
+        System.out.println("minDurationsDiff");
+        Protocol prot = irpDatabase.getProtocol("NEC1");
+        TreeSet<Double> durations = prot.allDurationsInMicros();
+        double min = prot.minDurationDiff();
+        assertEquals(min, 564.0, 0.00001);
     }
 }

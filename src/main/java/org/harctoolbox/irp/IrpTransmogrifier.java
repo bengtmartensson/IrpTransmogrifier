@@ -326,8 +326,9 @@ public final class IrpTransmogrifier {
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
-            if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
-                ex.printStackTrace();
+            //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
+            // Likely a programming error or fatal error in the data base. Barf.
+            ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());
         } catch (IrpParseException ex) {
             // TODO: Improve error message
@@ -456,9 +457,11 @@ public final class IrpTransmogrifier {
             if (commandList.weight)
                 listProperty("Weight", protocol.weight());
 
-            if (commandList.classify) {
+            if (commandList.minDiff)
+                listProperty("minDiff", protocol.minDurationDiff());
+
+            if (commandList.classify)
                 listProperty("classification", protocol.classificationString());
-            }
 
             if (commandList.warnings)
                 listProperty("warnings", protocol.warningsString());
@@ -469,6 +472,10 @@ public final class IrpTransmogrifier {
         if (!commandLineArgs.quiet && propertyName != null)
             out.print(propertyName + "=");
         out.println(propertyValue);
+    }
+
+    private void listProperty(String propertyName, double value) {
+        listProperty(propertyName, Math.round(value));
     }
 
     private void listProperty(String propertyName, int value) {
@@ -1526,6 +1533,9 @@ public final class IrpTransmogrifier {
         // not really useful, therefore hidden
         @Parameter(names = { "--istring"}, hidden = true, description = "test toIrpString.")
         private boolean is = false;
+
+        @Parameter(names = { "-m", "--mindiff"}, description = "Display minimal difference between contained durations.")
+        private boolean minDiff = false;
 
         @Parameter(names = { "-n", "--normalform"}, description = "List the normal form.")
         private boolean normalForm = false;

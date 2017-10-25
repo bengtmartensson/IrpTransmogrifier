@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
@@ -223,5 +224,10 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     @Override
     public Integer guessParameterLength(String name) {
         return null;
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        return new TreeSet<>();
     }
 }

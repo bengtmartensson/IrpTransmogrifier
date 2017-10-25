@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
@@ -324,5 +325,10 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     @Override
     public Integer guessParameterLength(String name) {
         return bareIrStream.guessParameterLength(name);
+    }
+
+    @Override
+    public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
+        return bareIrStream.allDurationsInMicros(generalSpec, nameEngine);
     }
 }

@@ -13,7 +13,7 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
+ */
 
 package org.harctoolbox.analyze;
 
@@ -138,8 +138,9 @@ public class Cleaner {
         int last = -99999;
         for (int d : sorted) {
             if (!IrCoreUtils.approximatelyEquals(d, last, (int) absoluteTolerance, relativeTolerance)) {
-                dumbTimingsTable.add(d);
-                last = d;
+                int representative = d + (int) absoluteTolerance;
+                dumbTimingsTable.add(representative);
+                last = representative;
             }
         }
     }

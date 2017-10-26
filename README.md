@@ -168,6 +168,13 @@ to the end of each IR sequence lacking a final gap.
 Input sequences can be pre-processed using the options `--chop`, `--clean`,
 and `--repeatfinder`.
 
+The cleaner works according to this idea: The collected durations found in the sequence(s)
+are bundled into "bins" (disjoint intervals), according to `absolutetolerance` and `relativetolerance`.
+Every duration belonging to a bin is "close" (determined by those parameters) to the bin
+middle. All the durations within the bin are then replaced by the average of its
+members. It is thus not guaranteed that the distance between a duration and its relacement
+will be consistent with `absolutetolerance` and `relativetolerance`.
+
 The input sequence(s) are matched using different "decoders". Normally
 the "best" decoder match is output. With the `--all` option, all decoder
 matches are output.

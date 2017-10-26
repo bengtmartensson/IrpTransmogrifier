@@ -15,6 +15,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class CleanerNGTest {
+
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -23,22 +24,17 @@ public class CleanerNGTest {
     public static void tearDownClass() throws Exception {
     }
 
-    private String nec_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
-    private ModulatedIrSequence irSequence = null;
-    private ModulatedIrSequence noisy = null;
-    //ModulatedIrSequence cleaned = null;
-    private IrSignal irSignal = null;
+    private final String nec_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+    private final ModulatedIrSequence irSequence;
+    private final ModulatedIrSequence noisy;
+    private final IrSignal irSignal;
 
-    public CleanerNGTest() {
-        try {
-            irSignal = Pronto.parse(nec_12_34_56);
-            irSequence = irSignal.toModulatedIrSequence(5);
-            noisy = irSequence.addNoise(60.0);
-        } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
-            fail();
-        }
+    public CleanerNGTest() throws Pronto.NonProntoFormatException, InvalidArgumentException {
+        IrSequence.initRandom(997);
+        irSignal = Pronto.parse(nec_12_34_56);
+        irSequence = irSignal.toModulatedIrSequence(5);
+        noisy = irSequence.addNoise(60.0);
     }
-
 
     @BeforeMethod
     public void setUpMethod() throws Exception {
@@ -79,7 +75,6 @@ public class CleanerNGTest {
 //        int[] result = instance.getIndexData();
 //        assertEquals(result, expResult);
 //    }
-
     /**
      * Test of toTimingsString method, of class Cleaner.
      */
@@ -99,9 +94,13 @@ public class CleanerNGTest {
     public void testClean_3args_1() {
         System.out.println("clean");
         int absoluteTolerance = 60;
-        double relativeTolerance = 0.2;
-        IrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
-        Assert.assertTrue(result.approximatelyEquals(irSequence));
+        double relativeTolerance = 0.1;
+        try {
+            IrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
+            Assert.assertTrue(result.approximatelyEquals(irSequence, 3.0, 0.01));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -110,9 +109,8 @@ public class CleanerNGTest {
     @Test
     public void testClean_3args_2() {
         System.out.println("clean");
-        int absoluteTolerance = 60;
-        double relativeTolerance = 0.2;
-        ModulatedIrSequence expResult = null;
+        int absoluteTolerance = 280;
+        double relativeTolerance = 0.1;
         ModulatedIrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
         Assert.assertTrue(result.approximatelyEquals(irSequence));
     }
@@ -139,6 +137,6 @@ public class CleanerNGTest {
         assertEquals(Cleaner.mkName(27), "BB");
         assertEquals(Cleaner.mkName(1000), "BMM");
         assertEquals(Cleaner.mkName(10000), "OUQ");
-        assertEquals(Cleaner.mkName(26*26*26*26), "BAAAA");
+        assertEquals(Cleaner.mkName(26 * 26 * 26 * 26), "BAAAA");
     }
 }

@@ -79,7 +79,6 @@ public class Cleaner {
     }
 
     private int rawData[];
-    private List<Integer> dumbTimingsTable;
     protected List<Integer> timings;
     private HashMap<Integer, HistoPair> rawHistogram;
     private HashMap<Integer, HistoPair> cleanedHistogram;
@@ -100,14 +99,14 @@ public class Cleaner {
     }
 
     protected Cleaner(int[] data, int[] indices, boolean signalMode, Double absoluteTolerance, Double relativeTolerance) {
-        double relTol = IrCoreUtils.getRelativeTolerance(relativeTolerance);
-        double absTol = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         rawData = data;
         this.indices = indices;
         this.signalMode = signalMode;
         createRawHistogram();
-        createDumbTimingsTable(absTol, relTol);
-        improveTimingsTable(absTol, relTol);
+        double relTol = IrCoreUtils.getRelativeTolerance(relativeTolerance);
+        double absTol = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
+        List<Integer> dumbTimings = createDumbTimings(absTol, relTol);
+        improveTimingsTable(dumbTimings, absTol, relTol);
         createCookedData();
         createCleanHistogram();
         createSortedGapsAndFlashes();
@@ -131,26 +130,27 @@ public class Cleaner {
         }
     }
 
-    private void createDumbTimingsTable(double absoluteTolerance, double relativeTolerance) {
-        dumbTimingsTable = new ArrayList<>(rawData.length);
+    private ArrayList<Integer> createDumbTimings(double absoluteTolerance, double relativeTolerance) {
+        ArrayList<Integer> dumbTimings = new ArrayList<>(rawData.length);
         sorted = rawData.clone();
         Arrays.sort(sorted);
         int last = -99999;
         for (int d : sorted) {
             if (!IrCoreUtils.approximatelyEquals(d, last, (int) absoluteTolerance, relativeTolerance)) {
                 int representative = d + (int) absoluteTolerance;
-                dumbTimingsTable.add(representative);
+                dumbTimings.add(representative);
                 last = representative;
             }
         }
+        return dumbTimings;
     }
 
-    private void improveTimingsTable(double absoluteTolerance, double relativeTolerance) {
+    private void improveTimingsTable(List<Integer> dumbTimings, double absoluteTolerance, double relativeTolerance) {
         lookDownTable = new HashMap<>(NUMBEROFINITIALTIMINGSCAPACITY);
         timings = new ArrayList<>(NUMBEROFINITIALTIMINGSCAPACITY);
         int indexInSortedTimings = 0;
-        for (int timingsIndex = 0; timingsIndex < dumbTimingsTable.size(); timingsIndex++) {
-            int dumbTiming = dumbTimingsTable.get(timingsIndex);
+        for (int timingsIndex = 0; timingsIndex < dumbTimings.size(); timingsIndex++) {
+            int dumbTiming = dumbTimings.get(timingsIndex);
             int sum = 0;
             int terms = 0;
             int lastDuration = -1;

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.StringJoiner;
 
 /**
@@ -42,6 +43,25 @@ public class IrSequence implements Cloneable {
 
     private static final double EPSILON = 0.001;
     public static final double DUMMYGAPDURATION = 50000d; // should not translate to 0000 in Pronto
+    private static Random random = null;
+
+    /**
+     * Initialize the random number generator of the class (used for addNoise(...)
+     * in a predictable way, using the seed provided.
+     * @param seed
+     */
+    public static void initRandom(long seed) {
+        initRandom();
+        random.setSeed(seed);
+    }
+
+    /**
+     * Initialize the random number generator of the class (used for addNoise(...)
+     * in a non-predictable way.
+     */
+    public static void initRandom() {
+        random = new Random();
+    }
 
     /**
      * Concatenates the elements in the argument.
@@ -507,6 +527,7 @@ public class IrSequence implements Cloneable {
     /**
      * Adds a random number in the interval [-max, max) to each flash, and
      * subtract it from the next gap. For generating test data for decoders etc.
+     * NOTE: initRandom must have been called before this call.
      *
      * @param max max amount to add/subtract, in microseconds.
      * @return new instance
@@ -515,7 +536,7 @@ public class IrSequence implements Cloneable {
         IrSequence clone = clone();
 
         for (int i = 0; i < data.length; i += 2) {
-            double t = max * (2 * Math.random() - 1);
+            double t = max * (2 * random.nextDouble() - 1);
             clone.data[i] += t;
             clone.data[i + 1] -= t;
         }
@@ -528,7 +549,7 @@ public class IrSequence implements Cloneable {
      * @return equality
      */
     public boolean approximatelyEquals(IrSequence irSequence) {
-        return IrSequence.this.approximatelyEquals(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        return approximatelyEquals(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
     }
 
     /**

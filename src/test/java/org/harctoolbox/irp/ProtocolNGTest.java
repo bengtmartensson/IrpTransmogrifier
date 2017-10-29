@@ -961,7 +961,7 @@ public class ProtocolNGTest {
     public void testMinDurationDiff() throws Exception {
         System.out.println("minDurationsDiff");
         Protocol prot = irpDatabase.getProtocol("NEC1");
-        TreeSet<Double> durations = prot.allDurationsInMicros();
+        //TreeSet<Double> durations = prot.allDurationsInMicros();
         double min = prot.minDurationDiff();
         assertEquals(min, 564.0, 0.00001);
     }

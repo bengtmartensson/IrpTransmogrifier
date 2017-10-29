@@ -833,8 +833,9 @@ public final class IrpTransmogrifier {
                     out.print((names != null ? names[noSignal] : "#" + noSignal) + ":\t");
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(noSignal));
-                for (Protocol protocol : protocolList)
+                protocolList.forEach((protocol) -> {
                     printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods(), true);
+                });
                 noSignal++;
             }
         } else {

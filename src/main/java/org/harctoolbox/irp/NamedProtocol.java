@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,10 +61,11 @@ public final class NamedProtocol extends Protocol {
     private final Double minimumLeadout;
     private final boolean decodable;
     private final List<String> preferOver;
+    private final Map<String, List<String>> auxParameters;
 
     public NamedProtocol(String name, String cName, String irp, String documentation, String frequencyTolerance,
             String absoluteTolerance, String relativeTolerance, String minimumLeadout, String decodable,
-            List<String> preferOver)
+            List<String> preferOver, Map<String, List<String>> map)
             throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         super(irp);
         this.irp = irp;
@@ -75,10 +78,14 @@ public final class NamedProtocol extends Protocol {
         this.minimumLeadout = minimumLeadout != null ? Double.parseDouble(minimumLeadout) : null;
         this.decodable = decodable == null || Boolean.parseBoolean(decodable);
         this.preferOver = preferOver;
+        this.auxParameters = new HashMap<>(map.size());
+        map.entrySet().stream().filter((kvp) -> (!IrpDatabase.isKnownKeyword(kvp.getKey()))).forEach((kvp) -> {
+            this.auxParameters.put(kvp.getKey(), kvp.getValue());
+        });
     }
 
     public NamedProtocol(String name, String irp, String documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
-        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null);
+        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, new HashMap<>(0));
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted,
@@ -106,9 +113,15 @@ public final class NamedProtocol extends Protocol {
         int hash = 3;
         hash = 41 * hash + Objects.hashCode(this.irp);
         hash = 41 * hash + Objects.hashCode(this.name);
+        hash = 41 * hash + Objects.hashCode(this.cName);
         hash = 41 * hash + Objects.hashCode(this.documentation);
         hash = 41 * hash + Objects.hashCode(this.absoluteTolerance);
         hash = 41 * hash + Objects.hashCode(this.relativeTolerance);
+        hash = 41 * hash + Objects.hashCode(this.frequencyTolerance);
+        hash = 41 * hash + Objects.hashCode(this.minimumLeadout);
+        hash = 41 * hash + Objects.hashCode(this.decodable);
+        hash = 41 * hash + Objects.hashCode(this.preferOver);
+        hash = 41 * hash + Objects.hashCode(this.auxParameters);
         return hash;
     }
 
@@ -121,9 +134,15 @@ public final class NamedProtocol extends Protocol {
         return super.equals(obj)
                 && irp.equals(other.irp)
                 && name.equals(other.name)
+                && cName.equals(other.cName)
                 && documentation.equals(other.documentation)
                 && Double.compare(absoluteTolerance, other.absoluteTolerance) == 0
-                && Double.compare(relativeTolerance, other.relativeTolerance) == 0;
+                && Double.compare(relativeTolerance, other.relativeTolerance) == 0
+                && Double.compare(frequencyTolerance, other.frequencyTolerance) == 0
+                && Double.compare(minimumLeadout, other.minimumLeadout) == 0
+                && decodable == other.decodable
+                && preferOver.equals(other.preferOver)
+                && auxParameters.equals(other.auxParameters);
     }
 
     @Override
@@ -186,9 +205,8 @@ public final class NamedProtocol extends Protocol {
                 IrCoreUtils.getMinimumLeadout(minimumLeadout));
     }
 
-    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     List<String> getPreferOver() {
-        return preferOver;
+        return Collections.unmodifiableList(preferOver);
     }
 
     @Override
@@ -211,6 +229,21 @@ public final class NamedProtocol extends Protocol {
         irpElement.appendChild(document.createTextNode(getIrp()));
         root.appendChild(irpElement);
 
+        Element parameters = document.createElement("Parameters");
+        root.appendChild(parameters);
+        for (Map.Entry<String, List<String>> param : auxParameters.entrySet()) {
+            Element parameter = document.createElement("Parameter");
+            parameters.appendChild(parameter);
+            parameter.setAttribute("name", param.getKey());
+            param.getValue().stream().map((val) -> {
+                Element value = document.createElement("Value");
+                value.setTextContent(val);
+                return value;
+            }).forEachOrdered((value) -> {
+                parameter.appendChild(value);
+            });
+        }
+
         return root;
     }
 
@@ -223,6 +256,9 @@ public final class NamedProtocol extends Protocol {
 
     private Map<String, Object> metaDataPropertiesMap(Map<String, String> parameters, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userFrequencyTolerance) {
         Map<String, Object> map = IrpUtils.propertiesMap(parameters.size() + 11, this);
+        auxParameters.entrySet().forEach((kvp) -> {
+            map.put(kvp.getKey(), kvp.getValue());
+        });
         map.put("protocolName", getName());
         map.put("cProtocolName", getCName());
         map.put("irp", getIrp());

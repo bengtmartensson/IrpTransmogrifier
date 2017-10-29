@@ -79,6 +79,23 @@ public final class IrpDatabase {
     public static final String PREFER_OVER_NAME = "prefer-over";
     public static final String ALT_NAME_NAME = "alt_name";
 
+    static boolean isKnownKeyword(String key) {
+        return key.equals(PROTOCOL_NAME)
+                || key.equals(NAME_NAME)
+                || key.equals(CNAME_NAME)
+                || key.equals(IRP_NAME)
+                || key.equals(USABLE_NAME)
+                || key.equals(DOCUMENTATION_NAME)
+                || key.equals(PARAMETER_NAME)
+                || key.equals(DECODABLE_NAME)
+                || key.equals(FREQUENCY_TOLERANCE_NAME)
+                || key.equals(RELATIVE_TOLERANCE_NAME)
+                || key.equals(ABSOLUTE_TOLERANCE_NAME)
+                || key.equals(MINIMUM_LEADOUT_NAME)
+                || key.equals(PREFER_OVER_NAME)
+                || key.equals(ALT_NAME_NAME);
+    }
+
     public static boolean isKnown(String protocolsPath, String protocol) throws IOException, SAXException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
@@ -663,7 +680,7 @@ public final class IrpDatabase {
         NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
             return new NamedProtocol(getName(), getCName(), getIrp(), getDocumentation(),
                     getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
-                    getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getProperties(PREFER_OVER_NAME));
+                    getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getProperties(PREFER_OVER_NAME), map);
         }
 
         @Override

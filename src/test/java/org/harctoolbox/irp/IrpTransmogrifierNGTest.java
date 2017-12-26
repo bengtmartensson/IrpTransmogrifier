@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
@@ -78,7 +79,8 @@ public class IrpTransmogrifierNGTest {
                 "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
                 + "[+9024 -4512 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -39756]";
         String result = IrpTransmogrifier.execute(args);
-        assertEquals(result, "#0\t{569,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m){A=0x30441ce3}\n"
+        assertEquals(result, "#0\t{569,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m){A=0x30441ce3}"
+                + IrCoreUtils.LINESEPARATOR
                 + "#1\t{569,msb}<1,-1|1,-3>(16,-8,A:32,1,-39.756m){A=0xff00ff}");
     }
 
@@ -89,7 +91,8 @@ public class IrpTransmogrifierNGTest {
                 "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
                 + "[+9024 -4512 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -39756]";
         String result = IrpTransmogrifier.execute(args);
-        assertEquals(result, "#0\t{569,msb}<1,-1|1,-3>(16,-8,0x30441ce3:32,1,-44m)\n"
+        assertEquals(result, "#0\t{569,msb}<1,-1|1,-3>(16,-8,0x30441ce3:32,1,-44m)"
+                + IrCoreUtils.LINESEPARATOR
                 + "#1\t{569,msb}<1,-1|1,-3>(16,-8,0xff00ff:32,1,-39.756m)");
     }
 
@@ -184,7 +187,9 @@ public class IrpTransmogrifierNGTest {
     public void testListIrp() {
         System.out.println("listIrp");
         String result = IrpTransmogrifier.execute("list --irp nec1");
-        String expResult = "name=NEC1\nirp={38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255]";
+        String expResult = "name=NEC1"
+                + IrCoreUtils.LINESEPARATOR
+                + "irp={38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255]";
         assertEquals(result, expResult);
     }
 
@@ -235,8 +240,10 @@ public class IrpTransmogrifierNGTest {
     public void testListDecoders() {
         System.out.println("listDecoders");
         String result = IrpTransmogrifier.execute("analyze --decoder list");
-        assertEquals(result, "Available decoders: TrivialDecoder, Pwm2Decoder, Pwm4Decoder, Pwm4AltDecoder,\n"
-                + "XmpDecoder, BiphaseDecoder, BiphaseWithStartbitDecoder, BiphaseWithDoubleToggleDecoder,\n"
+        assertEquals(result, "Available decoders: TrivialDecoder, Pwm2Decoder, Pwm4Decoder, Pwm4AltDecoder,"
+                + IrCoreUtils.LINESEPARATOR
+                + "XmpDecoder, BiphaseDecoder, BiphaseWithStartbitDecoder, BiphaseWithDoubleToggleDecoder,"
+                + IrCoreUtils.LINESEPARATOR
                 + "SerialDecoder");
     }
 

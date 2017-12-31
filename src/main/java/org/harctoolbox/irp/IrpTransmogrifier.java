@@ -1497,7 +1497,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-r", "--radix"}, hidden = true, description = "Radix for outputting result, default 16.") // Too much...?
         private int radix = 16;
 
-        @Parameter(description = "Lirc config files/directories/URLs); empty for <stdin>.", required = false)
+        @Parameter(description = "Lirc config files/directories/URLs; empty for <stdin>.", required = false)
         private List<String> files = new ArrayList<>(8);
 
         @Override

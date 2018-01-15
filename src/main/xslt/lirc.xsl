@@ -281,7 +281,7 @@ end remote
             <xsl:text xml:space="preserve">&#10;</xsl:text>
             <xsl:apply-templates select="BitspecIrstream" mode="warnIntroAndRepeat"/>
             <xsl:apply-templates select="BitspecIrstream" mode="warnEnding"/>
-            <axsl:text xml:space="preserve">begin remote&#10;&#9;# Protocol name: <xsl:value-of select="../@name"/>&#10;&#9;name&#9;&#9;</axsl:text>
+            <axsl:text xml:space="preserve">begin remote&#10;# Protocol name: <xsl:value-of select="../@name"/>&#10;&#9;name&#9;&#9;</axsl:text>
             <axsl:value-of select="translate(../@name, ' ', '_')"/>
 <axsl:text>
 <xsl:apply-templates select="BitspecIrstream" mode="numberOfBits"/>

@@ -602,8 +602,11 @@ public final class IrpTransmogrifier {
         if (commandRender.random)
             logger.log(Level.INFO, nameEngine.toString());
 
-        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns)
-            logger.warning("No output requested, use either --raw, --raw-without-signs, or --pronto go get output.");
+        if (commandRender.printParameters)
+            out.println(nameEngine.toString());
+
+        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns && !commandRender.printParameters)
+            logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, or --printparameters to get output.");
         IrSignal irSignal = protocol.toIrSignal(nameEngine);
 
         if (commandRender.count != null) {
@@ -1579,6 +1582,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-p", "--pronto", "--ccf", "--hex" }, description = "Generate Pronto hex.")
         private boolean pronto = false;
+
+        @Parameter(names = { "-P", "--printparameters", "--parameters" }, description = "Print used parameters values")
+        private boolean printParameters = false;
 
         @Parameter(names = { "-r", "--signed-raw" }, description = "Generate raw form.")
         private boolean raw = false;

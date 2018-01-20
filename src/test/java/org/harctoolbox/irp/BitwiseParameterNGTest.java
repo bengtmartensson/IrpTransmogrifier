@@ -59,6 +59,22 @@ public class BitwiseParameterNGTest {
     }
 
     /**
+     * Test of append method, of class BitwiseParameter.
+     */
+    @Test
+    public void testAppend() {
+        System.out.println("append");
+        BitwiseParameter parameter = new BitwiseParameter(0x1200, 0xFF00);
+        BitwiseParameter instance = new BitwiseParameter(0x34,0xFF, 0x34L);
+        instance.append(parameter);
+        assertEquals(instance.getValue(), 0x341200L);
+        assertEquals(instance.getBitmask(), 0xFFFF00L);
+        instance.append(new BitwiseParameter(0x11200, 0xFFF0F));
+        assertEquals(instance.getValue(), 0x34120011200L);
+        assertEquals(instance.getBitmask(), 0xFFFF00FFF0FL);
+    }
+
+    /**
      * Test of equals method, of class BitwiseParameter.
      */
     @Test
@@ -132,5 +148,19 @@ public class BitwiseParameterNGTest {
         instance.setExpected(0L);
         assertFalse(instance.isConsistent(1023));
         assertTrue(instance.isConsistent(1024));
+    }
+
+    /**
+     * Test of length method, of class BitwiseParameter.
+     */
+    @Test
+    public void testLength() {
+        System.out.println("length");
+        BitwiseParameter instance = new BitwiseParameter();
+        int expResult = 0;
+        int result = instance.length();
+        assertEquals(result, expResult);
+        instance = new BitwiseParameter(0x12,0xFF);
+        assertEquals(instance.length(), 8);
     }
 }

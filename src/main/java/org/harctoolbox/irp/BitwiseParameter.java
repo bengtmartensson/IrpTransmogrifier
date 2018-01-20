@@ -79,6 +79,16 @@ public final class BitwiseParameter implements Cloneable {
         return bitmask == NOBITS;
     }
 
+    public int length() {
+        int result = 0;
+        long bm = bitmask;
+        while (bm != 0) {
+            bm >>= 1;
+            result++;
+        }
+        return result;
+    }
+
     private void canonicalize() {
         value &= bitmask;
     }
@@ -106,6 +116,17 @@ public final class BitwiseParameter implements Cloneable {
         bitmask |= parameter.bitmask;
         canonicalize();
         expected = null;
+    }
+
+    public void append(BitwiseParameter other) {
+        if (!other.isEmpty()) {
+            long size = other.length();
+            value = (value << size) | other.value;
+            bitmask = (bitmask << size) | other.bitmask;
+            expected = (expected != null && other.expected != null)
+                    ? (expected << size) | other.expected
+                    : null;
+        }
     }
 
     @Override

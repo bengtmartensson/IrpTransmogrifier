@@ -199,7 +199,8 @@ public final class IrCoreUtils {
         return chars(length, (byte) 0x09);
     }
 
-    public static long ones(int n) {
+    public static long ones(Number numOnes) {
+        long n = numOnes.longValue();
         if (n < 0 || n > Long.SIZE)
             throw new IllegalArgumentException("Argument must be non-negative and <= " + Long.SIZE);
         long result = 0L;

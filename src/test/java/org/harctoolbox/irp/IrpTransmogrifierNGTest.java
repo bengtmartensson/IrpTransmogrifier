@@ -230,6 +230,13 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test
+    public void testPrintParameters() {
+        System.out.println("PrintParameters");
+        String result = IrpTransmogrifier.execute("--seed 1 render --random --printparameters nec1");
+        assertEquals(result, "{D=187,F=104,S=25}");
+    }
+
+    @Test
     public void testLirc() {
         System.out.println("lirc");
         String result = IrpTransmogrifier.execute("lirc src/test/resources/RX-V995.lircd.conf");

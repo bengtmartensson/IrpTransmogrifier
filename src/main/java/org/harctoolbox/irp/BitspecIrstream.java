@@ -159,6 +159,13 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> inheritedBitSpecs) throws NameUnassignedException {
+        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
+        stack.add(bitSpec);
+        return irStream.renderAsOneParameter(nameEngine, bitDirection, stack);
+    }
+
+    @Override
     public List<IrStreamItem> extractPass(Pass pass, Pass state) {
         List<IrStreamItem> extractList = irStream.extractPass(pass, state);
         IrStream reducedIrStream = new IrStream(extractList);

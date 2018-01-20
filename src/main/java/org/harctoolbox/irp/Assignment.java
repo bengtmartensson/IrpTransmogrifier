@@ -114,13 +114,22 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
 
     @Override
     public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException {
-        NameEngine nameEngine = renderData.getNameEngine();
+        renderDoWork(renderData.getNameEngine(), bitSpecs);
+    }
+
+    private void renderDoWork(NameEngine nameEngine, List<BitSpec> bitSpecs) throws NameUnassignedException {
         long val = value.toNumber(nameEngine);
         try {
             nameEngine.define(name.toString(), val);
         } catch (InvalidNameException ex) {
             throw new ThisCannotHappenException(ex);
         }
+    }
+
+    @Override
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> bitSpecs) throws NameUnassignedException {
+        renderDoWork(nameEngine, bitSpecs);
+        return new BitwiseParameter();
     }
 
     @Override

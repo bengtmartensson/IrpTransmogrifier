@@ -239,6 +239,11 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> bitSpecs) {
+        throw new ThisCannotHappenException();
+    }
+
+    @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) {
         throw new ThisCannotHappenException();
     }

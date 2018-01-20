@@ -237,6 +237,15 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test
+    public void testOneParameter() {
+        System.out.println("OneParameter");
+        String result = IrpTransmogrifier.execute("render -n D=12,F=34,T=1 --one rc5");
+        assertEquals(result, "0x1b22");
+        result = IrpTransmogrifier.execute("render -n D=12,S=34,F=56 --one nec1");
+        assertEquals(result, "0x30441ce3");
+    }
+
+    @Test
     public void testLirc() {
         System.out.println("lirc");
         String result = IrpTransmogrifier.execute("lirc src/test/resources/RX-V995.lircd.conf");

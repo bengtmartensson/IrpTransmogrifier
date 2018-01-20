@@ -203,6 +203,12 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> bitSpecs) throws NameUnassignedException {
+        BitStream bitStream = new BitStream(this, bitDirection, nameEngine);
+        return bitStream.toBitwiseParameter();
+    }
+
+    @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
         BitStream bitStream = new BitStream(this, renderData.getGeneralSpec(), renderData.getNameEngine());
         renderData.add(bitStream);

@@ -284,6 +284,32 @@ public class Protocol extends IrpObject implements AggregateLister {
         return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
     }
 
+    /**
+     * Renders the NameEngine as one parameter in the spirit of IRremote.
+     * @param nameEngine
+     * @return long
+     * @throws DomainViolationException
+     * @throws NameUnassignedException
+     */
+    public long renderAsOneParameter(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException {
+        initializeDefinitions();
+        parameterSpecs.check(nameEngine);
+        fetchMemoryVariables(nameEngine);
+        nameEngine.add(definitions);
+
+        BitwiseParameter bitwiseParameter = renderAsOneParameter(nameEngine, Pass.intro);
+        bitwiseParameter.append(renderAsOneParameter(nameEngine, Pass.repeat));
+        bitwiseParameter.append(renderAsOneParameter(nameEngine, Pass.ending));
+        //saveMemoryVariables(nameEngine);
+        return bitwiseParameter.getValue();
+    }
+
+    private BitwiseParameter renderAsOneParameter(NameEngine nameEngine, Pass pass) throws NameUnassignedException {
+        Protocol reducedProtocol = normalForm(pass);
+        return reducedProtocol.bitspecIrstream.renderAsOneParameter(nameEngine, getBitDirection(), new ArrayList<>(0));
+    }
+
+
     private void fetchMemoryVariables(NameEngine nameEngine) {
         for (Map.Entry<String, Expression> kvp : memoryVariables) {
             String name = kvp.getKey();

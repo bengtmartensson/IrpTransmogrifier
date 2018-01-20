@@ -259,6 +259,16 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> bitSpecs) throws NameUnassignedException {
+        BitwiseParameter result = new BitwiseParameter();
+        for (IrStreamItem irStreamItem : irStreamItems) {
+            BitwiseParameter bits = irStreamItem.renderAsOneParameter(nameEngine, bitDirection, bitSpecs);
+            result.append(bits);
+        }
+        return result;
+    }
+
+    @Override
     @SuppressWarnings("AssignmentToMethodParameter")
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
         List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());

@@ -213,6 +213,11 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     @Override
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> bitSpecs) throws NameUnassignedException {
+        return bareIrStream.renderAsOneParameter(nameEngine, bitDirection, bitSpecs);
+    }
+
+    @Override
     public Integer numberOfDurations() {
         return bareIrStream.numberOfDurations() != null
                 ? getMinRepeats() * bareIrStream.numberOfDurations()

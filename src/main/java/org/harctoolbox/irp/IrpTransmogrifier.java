@@ -325,10 +325,13 @@ public final class IrpTransmogrifier {
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
-            //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
-            // Likely a programming error or fatal error in the data base. Barf.
-            ex.printStackTrace();
+        } catch (DomainViolationException | InvalidNameException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
+            // These are user errors
+            return new ProgramExitStatus(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());
+        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | IrpInvalidArgumentException | SAXException ex) {
+            if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
+                // Likely a programming error or fatal error in the data base. Barf.
+                ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());
         } catch (IrpParseException ex) {
             // TODO: Improve error message
@@ -598,15 +601,21 @@ public final class IrpTransmogrifier {
     private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException {
         NameEngine nameEngine = !commandRender.nameEngine.isEmpty() ? commandRender.nameEngine
                 : commandRender.random ? new NameEngine(protocol.randomParameters())
-                        : new NameEngine();
+                : new NameEngine();
         if (commandRender.random)
             logger.log(Level.INFO, nameEngine.toString());
 
         if (commandRender.printParameters)
             out.println(nameEngine.toString());
 
-        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns && !commandRender.printParameters)
-            logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, or --printparameters to get output.");
+        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns && !commandRender.printParameters && !commandRender.oneParameter)
+            logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, --printparameters, or --oneparameter to get output.");
+
+        if (commandRender.oneParameter) {
+            long oneParameter = protocol.renderAsOneParameter(nameEngine);
+            out.println("0x" + Long.toHexString(oneParameter));
+        }
+
         IrSignal irSignal = protocol.toIrSignal(nameEngine);
 
         if (commandRender.count != null) {
@@ -1576,6 +1585,10 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
         private String irp = null;
+
+        @Parameter(names = { "--irremote", "--oneparameter" },
+                description = "All parameters lumped into one hexadecimal integer")
+        private boolean oneParameter = false;
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();

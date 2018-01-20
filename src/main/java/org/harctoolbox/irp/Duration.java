@@ -213,6 +213,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> bitSpecs) {
+        return new BitwiseParameter();
+    }
+
+    @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
         if (!recognizeData.check(isOn())) {
             IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");

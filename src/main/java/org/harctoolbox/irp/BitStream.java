@@ -41,16 +41,24 @@ final class BitStream extends IrpObject implements Evaluatable {
     }
 
     BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
+        this(bitField, generalSpec != null ? generalSpec.getBitDirection() : BitDirection.lsb, nameEngine);
+    }
+
+    BitStream(BitField bitField, BitDirection bitDirection, NameEngine nameEngine) throws NameUnassignedException {
         super(null);
         if (bitField instanceof InfiniteBitField)
             throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
 
-        data = BigInteger.valueOf((generalSpec != null && generalSpec.getBitDirection() == BitDirection.msb)
+        data = BigInteger.valueOf(bitDirection == BitDirection.msb
                     ? bitField.toNumber(nameEngine)
                     : IrCoreUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine)));
         length = bitField.getWidth(nameEngine);
-
     }
+
+    BitwiseParameter toBitwiseParameter() {
+        return new BitwiseParameter(data.longValueExact(), IrCoreUtils.ones(length));
+    }
+
     @Override
     public String toIrpString(int radix) {
         //return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";

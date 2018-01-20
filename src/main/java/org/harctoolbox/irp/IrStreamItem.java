@@ -102,6 +102,8 @@ public interface IrStreamItem extends XmlExport {
 
     public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException;
 
+    public BitwiseParameter renderAsOneParameter(NameEngine nameEngine, BitDirection bitDirection, List<BitSpec> bitSpecs) throws NameUnassignedException;
+
     public boolean hasExtent();
 
     public Set<String> assignmentVariables();

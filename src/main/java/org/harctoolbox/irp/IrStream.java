@@ -191,8 +191,12 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws SignalRecognitionException {
-        Pass pass = null;
         bareIrStream.decode(recognizeData, bitSpecs);
+    }
+
+    @Override
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> bitSpecs) {
+        bareIrStream.decode(recognizeOneParameterData, bitSpecs);
     }
 
     @Override

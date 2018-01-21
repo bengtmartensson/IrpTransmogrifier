@@ -149,6 +149,14 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> inheritedBitSpecs) {
+        List<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
+        stack.add(bitSpec);
+        //IrSignal.Pass pass = null;
+        irStream.decode(recognizeOneParameterData, stack);
+    }
+
+    @Override
     public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws NameUnassignedException {
         ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);

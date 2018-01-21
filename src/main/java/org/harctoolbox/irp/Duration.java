@@ -234,6 +234,10 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> bitSpecStack) {
+    }
+
+    @Override
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException {
         render(renderData, bitSpecStack);
     }

@@ -183,6 +183,23 @@ public final class Decoder {
         return decode(irSignal, strict, loose, allDecodes, keepDefaultedParameters, null, null, null, null);
     }
 
+    public Map<String, Decode> decode(long oneParameter) {
+        Map<String, Decode> output = new LinkedHashMap<>(1);
+        parsedProtocols.values().forEach((namedProtocol) -> {
+            Map<String, Long> parameters;
+            try {
+                parameters = namedProtocol.recognize(oneParameter);
+                if (parameters == null)
+                    throw new ThisCannotHappenException(namedProtocol.getName());
+                output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
+            } catch (SignalRecognitionException ex) {
+                logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
+            }
+        });
+
+        return output;
+    }
+
     public static class Decode {
         private final NamedProtocol namedProtocol;
         private final NameEngine nameEngine;

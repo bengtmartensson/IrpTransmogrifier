@@ -341,6 +341,11 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> bitSpecStack) {
+        
+    }
+
+    @Override
     public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs) {
         return true; // ????
     }

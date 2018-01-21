@@ -176,6 +176,21 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> bitSpecStack) {
+/*        try {
+            NameEngine nameEngine = recognizeData.getNameEngine();
+            String nameString = name.toString();
+            long val = value.toNumber(recognizeData.toNameEngine());
+            if (nameEngine.containsKey(nameString))
+                nameEngine.define(nameString, val);
+            else
+                recognizeData.getParameterCollector().setExpected(nameString, val);
+        } catch (NameUnassignedException | InvalidNameException ex) {
+            throw new SignalRecognitionException(ex);
+        }*/
+    }
+
+    @Override
     public boolean interleavingOk(DurationType last, boolean gapFlashBitSpecs) {
         return true;
     }

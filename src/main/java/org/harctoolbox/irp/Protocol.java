@@ -614,6 +614,33 @@ public class Protocol extends IrpObject implements AggregateLister {
         return result;
     }
 
+    public Map<String, Long> recognize(long oneParameter) throws SignalRecognitionException {
+        //IrpUtils.entering(logger, Level.FINE, "recognize", this);
+        //checkFrequency(irSignal.getFrequencyWithDefault(), frequencyTolerance);
+        initializeDefinitions();
+        RecognizeOneParameterData recognizeOneParameterData = new RecognizeOneParameterData(generalSpec, definitions, oneParameter, numberOfBits(), interleavingOk());
+
+//        IrSequence intro = irSignal.getIntroSequence();
+//        IrSequence repeat = irSignal.getRepeatSequence();
+//        IrSequence ending = irSignal.getEndingSequence();
+//        boolean justIntro = repeat.isEmpty() && ending.isEmpty();
+//        if (!strict && this.isEmpty(Pass.intro) && justIntro) {
+//            repeat = intro;
+//            intro = new IrSequence();
+//        }
+        //Integer pos = this.numberOfBits();
+        decode(recognizeOneParameterData, IrSignal.Pass.intro);
+        decode(recognizeOneParameterData, IrSignal.Pass.repeat);
+        decode(recognizeOneParameterData, IrSignal.Pass.ending);
+
+//        if (pos != 0)
+//            throw new SignalRecognitionException("Wrong number of bits");
+
+        Map<String, Long> result = recognizeOneParameterData.getParameterCollector().collectedNames();
+        parameterSpecs.reduceNamesMap(result, true /*keepDefaulted*/);
+        return result;
+    }
+
     private void checkFrequency(Double frequency, double frequencyTolerance) throws SignalRecognitionException {
         boolean success = frequencyTolerance < 0
                 || (frequency != null && IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0));
@@ -642,6 +669,24 @@ public class Protocol extends IrpObject implements AggregateLister {
         recognizeData.finish();
 //        if (!recognizeData.isFinished())
 //            throw new SignalRecognitionException("IrSequence not fully matched");
+    }
+
+    private void decode(RecognizeOneParameterData recognizeParameterData, Pass pass) throws SignalRecognitionException {
+        Protocol reducedProtocol = normalForm(pass);
+        //traverse(recognizeData, pass);
+        reducedProtocol.decode(recognizeParameterData);
+        try {
+            //recognizeData.checkConsistency();
+            checkDomain(recognizeParameterData.getParameterCollector());
+        } catch (DomainViolationException ex) {
+            throw new SignalRecognitionException(ex);
+        }
+        //return recognizeData.remaining();
+    }
+
+    private void decode(RecognizeOneParameterData recognizeOneParameterData) {
+        bitspecIrstream.decode(recognizeOneParameterData, new ArrayList<>(0));
+        //recognizeOneParameterData.finish();
     }
 
     // Penalize silly protocols

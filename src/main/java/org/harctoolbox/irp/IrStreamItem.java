@@ -126,6 +126,8 @@ public interface IrStreamItem extends XmlExport {
 
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException;
 
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> bitSpecStack);
+
     public boolean nonConstantBitFieldLength();
 
     /**

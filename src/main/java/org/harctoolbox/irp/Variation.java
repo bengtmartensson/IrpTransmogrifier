@@ -144,6 +144,11 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> bitSpecStack) {
+        throw new ThisCannotHappenException("decode cannot be called on a protocol with variation.");
+    }
+
+    @Override
     public List<IrStreamItem> extractPass(Pass pass, Pass state) {
         return select(pass).extractPass(pass, state);
     }

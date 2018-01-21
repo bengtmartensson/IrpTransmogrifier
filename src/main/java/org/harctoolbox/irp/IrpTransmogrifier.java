@@ -941,10 +941,20 @@ public final class IrpTransmogrifier {
                 for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
                     decode(decoder, kvp.getValue(), kvp.getKey(), maxNameLength);
             }
+        } else if (commandDecode.args.size() == 1) {
+            //if (commandDecode.protocol == )
+            String str = commandDecode.args.get(0).replaceFirst("0x", "");
+            long oneParameter = Long.parseUnsignedLong(str, 16);
+            decode(decoder, oneParameter);
         } else {
             IrSignal irSignal = IrSignalParsers.parseProntoOrRaw(commandDecode.args, commandDecode.frequency, commandDecode.trailingGap);
             decode(decoder, irSignal, null, 0);
         }
+    }
+
+    private void decode(Decoder decoder, long oneParameter) throws InvalidArgumentException {
+        Map<String, Decoder.Decode> decodes = decoder.decode(oneParameter);
+        printDecodes(decodes, null, 0);
     }
 
     @SuppressWarnings("AssignmentToMethodParameter")
@@ -968,7 +978,11 @@ public final class IrpTransmogrifier {
         Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.strict, commandDecode.loose, commandDecode.noPreferOver,
                 commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
-        if (name != null)
+        printDecodes(decodes, name, maxNameLength);
+    }
+
+     private void printDecodes(Map<String, Decoder.Decode> decodes, String name, int maxNameLength) throws InvalidArgumentException {
+         if (name != null)
             out.print(name + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
 
         decodes.values().forEach((kvp) -> {

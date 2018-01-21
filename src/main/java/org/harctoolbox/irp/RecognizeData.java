@@ -20,18 +20,18 @@ package org.harctoolbox.irp;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
-public final class RecognizeData extends Traverser implements Cloneable {
+public final class RecognizeData extends AbstractRecognizeData implements Cloneable {
 
     private int position;
     private double hasConsumed;
-    private ParameterCollector parameterCollector;
+    //private ParameterCollector parameterCollector;
     private final IrSequence irSequence;
     private int extentStart;
-    private boolean interleaving;
-    private ParameterCollector needsChecking;
+    //private boolean interleaving;
+    //private ParameterCollector needsChecking;
     private final double absoluteTolerance;
     private final double relativeTolerance;
-    private BitwiseParameter danglingBitFieldData;
+    //private BitwiseParameter danglingBitFieldData;
     private final double minimumLeadout;
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
@@ -41,15 +41,15 @@ public final class RecognizeData extends Traverser implements Cloneable {
 
     private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/,
             ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance, double minimumLeadout) {
-        super(generalSpec, definitions);
-        danglingBitFieldData = new BitwiseParameter();
+        super(generalSpec, definitions, parameterCollector, interleaving);
+        //danglingBitFieldData = new BitwiseParameter();
         this.position = position;
         this.hasConsumed = 0.0;
         this.irSequence = irSequence;
-        this.parameterCollector = parameterCollector;
+        //this.parameterCollector = parameterCollector;
         this.extentStart = 0;
-        this.interleaving = interleaving;
-        this.needsChecking = new ParameterCollector();
+        //this.interleaving = interleaving;
+        //this.needsChecking = new ParameterCollector();
         this.absoluteTolerance = absoluteTolerance;
         this.relativeTolerance = relativeTolerance;
         this.minimumLeadout = minimumLeadout;
@@ -63,11 +63,11 @@ public final class RecognizeData extends Traverser implements Cloneable {
     @SuppressWarnings("CloneDeclaresCloneNotSupported")
     public RecognizeData clone() {
         RecognizeData result;
-        try {
+        //try {
             result = (RecognizeData) super.clone();
-        } catch (CloneNotSupportedException ex) {
-            throw new InternalError(ex);
-        }
+        //} catch (CloneNotSupportedException ex) {
+        //    throw new InternalError(ex);
+        //}
         result.setParameterCollector(getParameterCollector().clone());
         result.nameEngine = this.nameEngine.clone();
         return result;
@@ -94,19 +94,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.position = position;
     }
 
-    /**
-     * @return the parameterCollector
-     */
-    public ParameterCollector getParameterCollector() {
-        return parameterCollector;
-    }
 
-    /**
-     * @param parameterCollector the parameterCollector to set
-     */
-    public void setParameterCollector(ParameterCollector parameterCollector) {
-        this.parameterCollector = parameterCollector;
-    }
 
     void add(String name, BitwiseParameter parameter) throws ParameterInconsistencyException {
         if (getNameEngine().containsKey(name)) {
@@ -170,12 +158,12 @@ public final class RecognizeData extends Traverser implements Cloneable {
         extentStart = position + 1;
     }
 
-    /**
-     * @return the interleaving
-     */
-    public boolean isInterleaving() {
-        return interleaving;
-    }
+//    /**
+//     * @return the interleaving
+//     */
+//    public boolean isInterleaving() {
+//        return interleaving;
+//    }
 
     /**
      * @return the hasConsumed
@@ -235,24 +223,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         return nameEngine;
     }
 
-    /**
-     * @return the danglingBitFieldData
-     */
-    BitwiseParameter getDanglingBitFieldData() {
-        return danglingBitFieldData;
-    }
 
-    /**
-     * @param data
-     * @param bitmask
-     */
-    void setDanglingBitFieldData(long data, long bitmask) {
-        danglingBitFieldData = new BitwiseParameter(data, bitmask);
-    }
-
-    void setDanglingBitFieldData() {
-        danglingBitFieldData = new BitwiseParameter();
-    }
 
     public int remaining() {
         return irSequence.getLength() - position;

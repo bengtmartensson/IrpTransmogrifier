@@ -242,9 +242,14 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
-        IrSignal.Pass pass = null;
         for (IrStreamItem irStreamItem : irStreamItems)
             irStreamItem.decode(recognizeData, bitSpecStack);
+    }
+
+    @Override
+    public void decode(RecognizeOneParameterData recognizeOneParameterData, List<BitSpec> bitSpecStack) {
+        for (IrStreamItem irStreamItem : irStreamItems)
+            irStreamItem.decode(recognizeOneParameterData, bitSpecStack);
     }
 
     @Override

@@ -349,7 +349,7 @@ public final class IrpTransmogrifier {
             argumentParser.usage(stringBuilder);
         else
             argumentParser.usage(command, stringBuilder);
-        return stringBuilder.toString();
+        return stringBuilder.toString().trim();
     }
 
     private void help() {
@@ -361,6 +361,12 @@ public final class IrpTransmogrifier {
             shortUsage();
             return;
         }
+
+        if (commandHelp.commonOptions) {
+            commonOptions();
+            return;
+        }
+
         String cmd = argumentParser.getParsedCommand();
         if (commandHelp.commands != null)
             commandHelp.commands.forEach((command) -> {
@@ -376,6 +382,20 @@ public final class IrpTransmogrifier {
             out.println(usageString(cmd));
     }
 
+    /**
+     * Print just the common options.
+     * JCommander does not support this case,
+     * so this implementation is pretty gross.
+     */
+    private void commonOptions() {
+        CommandLineArgs cla = new CommandLineArgs();
+        JCommander parser = new JCommander(cla);
+        StringBuilder str = new StringBuilder(2500);
+        parser.usage(str);
+        str.replace(0, 41, "Common options:\n"); // barf!
+        out.println(str.toString().trim()); // str ends with line feed.
+    }
+
     private void shortUsage() {
         out.println("Usage: " + PROGRAMNAME + " [options] [command] [command_options]");
         out.println("Commands:");
@@ -387,7 +407,10 @@ public final class IrpTransmogrifier {
         });
 
         out.println();
-        out.println("Use \"" + PROGRAMNAME + " help [command]\" for the full syntax.");
+        out.println("Use");
+        out.println("    \"" + PROGRAMNAME + " help\" for the full syntax,");
+        out.println("    \"" + PROGRAMNAME + " help <command>\" for a particular command.");
+        out.println("    \"" + PROGRAMNAME + " help --common\" for the common options.");
     }
 
     private String padString(String name) {
@@ -1482,6 +1505,9 @@ public final class IrpTransmogrifier {
 
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
     private static class CommandHelp extends MyCommand {
+
+        @Parameter(names = { "-c", "--common", "--options"}, description = "Describe the common options only.")
+        private boolean commonOptions = false;
 
         @Parameter(names = { "-s", "--short" }, description = "Produce a short usage message.")
         private boolean shortForm = false;

@@ -318,14 +318,14 @@ public final class IrpTransmogrifier {
         } catch (OddSequenceLengthException ex) {
             return new ProgramExitStatus(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR,
                     ex.getLocalizedMessage() + ". Consider using --trailinggap.");
-        } catch (ParseCancellationException ex) {
+        } catch (ParseCancellationException | InvalidArgumentException ex) {
             // When we get here,
             // Antlr has already written a somewhat sensible error message on
             // stderr; that is good enough for now.
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidArgumentException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
+        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
             //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
             // Likely a programming error or fatal error in the data base. Barf.
             ex.printStackTrace();

@@ -99,16 +99,20 @@ public class IrSignalParsers {
         IrSequence repeat = null;
         IrSequence ending = null;
 
-        if (str.startsWith("[")) {
-            String[] parts = str.replace("[", "").split("\\]");
-            if (parts.length < 2)
-                throw new InvalidArgumentException("Less than two parts");
+        try {
+            if (str.startsWith("[")) {
+                String[] parts = str.replace("[", "").split("\\]");
+                if (parts.length < 2)
+                    throw new InvalidArgumentException("Less than two parts");
 
-            intro = IrSequenceParsers.parseRaw(parts[0], dummyGap);
-            repeat = IrSequenceParsers.parseRaw(parts[1], dummyGap);
-            ending = (parts.length >= 3) ? IrSequenceParsers.parseRaw(parts[2], dummyGap) : null;
-        } else
-            intro = IrSequenceParsers.parseRaw(str, dummyGap);
+                intro = IrSequenceParsers.parseRaw(parts[0], dummyGap);
+                repeat = IrSequenceParsers.parseRaw(parts[1], dummyGap);
+                ending = (parts.length >= 3) ? IrSequenceParsers.parseRaw(parts[2], dummyGap) : null;
+            } else
+                intro = IrSequenceParsers.parseRaw(str, dummyGap);
+        } catch (NumberFormatException ex) {
+            throw new InvalidArgumentException("Could not parse \"" + str + "\" as IrSignal.");
+        }
 
         return new IrSignal(intro, repeat, ending, frequency);
     }

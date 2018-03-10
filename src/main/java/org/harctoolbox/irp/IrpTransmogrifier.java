@@ -1133,7 +1133,9 @@ public final class IrpTransmogrifier {
     // The reaining classes are ordered alphabetically
     private final static class CommandLineArgs {
 
-        @Parameter(names = {"-a", "--absolutetolerance"}, description = "Absolute tolerance in microseconds, used when comparing durations.")
+        // JCommander does not know about our defaults being null, so handle this explicitly-
+        @Parameter(names = {"-a", "--absolutetolerance"},
+                description = "Absolute tolerance in microseconds, used when comparing durations. Default: " + IrCoreUtils.DEFAULTABSOLUTETOLERANCE + ".")
         private Double absoluteTolerance = null;
 
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
@@ -1143,16 +1145,18 @@ public final class IrpTransmogrifier {
         private String encoding = "UTF-8";
 
         @Parameter(names = {"-f", "--frequencytolerance"}, converter = FrequencyParser.class,
-                description = "Frequency tolerance in Hz. Negative disables frequency check.")
+                description = "Frequency tolerance in Hz. Negative disables frequency check. Default: " + IrCoreUtils.DEFAULTFREQUENCYTOLERANCE + ".")
         private Double frequencyTolerance = null;
 
         @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minumum gap at end of repetition")
         private double minRepeatGap = IrCoreUtils.DEFAULTMINREPEATLASTGAP;
 
-        @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message (deprecated; use the command \"help\" instead).")
+        @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message. Deprecated; use the command \"help\" instead.")
         private boolean helpRequested = false;
 
-        @Parameter(names = {"-i", "--ini", "--inifile"}, description = "Pathname of IRP database file in ini format.")
+        @Parameter(names = {"-i", "--ini", "--inifile"},
+                description = "Pathname of IRP database file in ini format. "
+                + "If not specified, an XML config file (using --configfile) will be used instead.")
         private String iniFile = null;//"src/main/config/IrpProtocols.ini";
 
         @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels.")
@@ -1168,17 +1172,18 @@ public final class IrpTransmogrifier {
                 description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
         private Level logLevel = Level.WARNING;
 
-        @Parameter(names = { "--min-leadout"}, description = "Threshold for leadout when decoding.")
+        @Parameter(names = { "--min-leadout"},
+                description = "Threshold for leadout when decoding. Default: " + IrCoreUtils.DEFAULT_MINIMUM_LEADOUT + ".")
         private Double minLeadout = null;
 
-        @Parameter(names = { "-o", "--output" }, description = "Name of output file (default: stdout).")
+        @Parameter(names = { "-o", "--output" }, description = "Name of output file. Default: stdout.")
         private String output = null;
 
         @Parameter(names = { "-q", "--quiet" }, description = "Quitest possible operation, typically to be used from scripts.")
         private boolean quiet = false;
 
         @Parameter(names = {"-r", "--relativetolerance"}, validateWith = LessThanOne.class,
-                description = "Relative tolerance as a number < 1")
+                description = "Relative tolerance as a number < 1. Default: " + IrCoreUtils.DEFAULTRELATIVETOLERANCE + ".")
         private Double relativeTolerance = null;
 
         @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions.")
@@ -1187,7 +1192,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = {"-s", "--sort"}, description = "Sort the protocols alphabetically on output.")
         private boolean sort = false;
 
-        @Parameter(names = {"--seed"}, description = "Set seed for pseudo random number generation (default: random).")
+        @Parameter(names = {"--seed"},
+                description = "Set seed for the pseudo random number generation. If not specified, will be random, different between program invocations.")
         private Long seed = null;
 
         @Parameter(names = {"-t", "--tsv", "--csv"}, description = "Use tabs in output to optimize for the import in spreadsheet programs as cvs.")
@@ -1196,10 +1202,10 @@ public final class IrpTransmogrifier {
         @Parameter(names = {"-u", "--url-decode"}, description = "URL-decode protocol names, (understanding %20 for example).")
         private boolean urlDecode = false;
 
-        @Parameter(names = {"-v", "--version"}, description = "Report version (deprecated; use command version instead).")
+        @Parameter(names = {"-v", "--version"}, description = "Report version. Deprecated; use the command \"version\" instead.")
         private boolean versionRequested = false;
 
-        @Parameter(names = {"-x", "--xmllog"}, description = "Log in XML format.")
+        @Parameter(names = {"-x", "--xmllog"}, description = "Write the log in XML format.")
         private boolean xmlLog = false;
     }
 

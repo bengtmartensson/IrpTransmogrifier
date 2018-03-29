@@ -68,7 +68,6 @@ import org.harctoolbox.lirc.LircConfigFile;
 import org.harctoolbox.lirc.LircIrp;
 import org.harctoolbox.lirc.LircRemote;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * This class contains a command line main routine, allowing command line access to most things in the package.
@@ -325,7 +324,7 @@ public final class IrpTransmogrifier {
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException | SAXException ex) {
+        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnknownProtocolException | UnsupportedRepeatException ex) {
             //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
             // Likely a programming error or fatal error in the data base. Barf.
             ex.printStackTrace();
@@ -420,7 +419,7 @@ public final class IrpTransmogrifier {
         return stringBuilder.toString();
     }
 
-    private void list() throws IOException, SAXException, UsageException {
+    private void list() throws IOException, UsageException {
         boolean finished = commandList.process(this);
         if (finished)
             return;
@@ -509,7 +508,7 @@ public final class IrpTransmogrifier {
         listProperty(propertyName, Long.toString(value));
     }
 
-    private void version() throws UsageException, IOException, SAXException {
+    private void version() throws UsageException, IOException {
         if (commandVersion.shortForm || commandLineArgs.quiet)
             out.println(Version.version);
         else {
@@ -523,7 +522,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void convertConfig() throws IOException, SAXException, UsageException {
+    private void convertConfig() throws IOException, UsageException {
         boolean finished = commandConvertConfig.process(this);
         if (finished)
             return;
@@ -541,7 +540,7 @@ public final class IrpTransmogrifier {
             logger.log(Level.INFO, "Wrote {0}", commandLineArgs.output);
     }
 
-    private void code() throws UsageException, IOException, SAXException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+    private void code() throws UsageException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         boolean finished = commandCode.process(this);
         if (finished)
             return;
@@ -660,7 +659,7 @@ public final class IrpTransmogrifier {
             out.println(new IrSignal(irSequence).ccfString());
     }
 
-    private void render() throws UsageException, IOException, SAXException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
+    private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
         boolean finished = commandRender.process(this);
         if (finished)
             return;
@@ -916,7 +915,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void decode() throws IrpInvalidArgumentException, IOException, SAXException, UsageException, InvalidArgumentException {
+    private void decode() throws IrpInvalidArgumentException, IOException, UsageException, InvalidArgumentException {
         boolean finished = commandDecode.process(this);
         if (finished)
             return;
@@ -1084,11 +1083,11 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void setupDatabase() throws IOException, SAXException, UsageException {
+    private void setupDatabase() throws IOException, UsageException {
         setupDatabase(true);
     }
 
-    private void setupDatabase(boolean expand) throws IOException, SAXException, UsageException {
+    private void setupDatabase(boolean expand) throws IOException, UsageException {
         if (commandLineArgs.iniFile != null) {
             if (commandLineArgs.configFile != null)
                 throw new UsageException("configfile and inifile cannot both be specified");

@@ -30,7 +30,6 @@ import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
-import org.xml.sax.SAXException;
 
 public final class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
@@ -48,7 +47,7 @@ public final class Decoder {
                     System.out.println(kvp);
                 });
             }
-        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | SAXException ex) {
+        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
@@ -56,7 +55,7 @@ public final class Decoder {
 
     private final Map<String, NamedProtocol> parsedProtocols;
 
-    public Decoder(String irpDatabasePath) throws IOException, SAXException {
+    public Decoder(String irpDatabasePath) throws IOException {
         this(new IrpDatabase(irpDatabasePath), null);
     }
 

@@ -9,7 +9,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -29,7 +28,7 @@ public class IrpDatabaseNGTest {
 
     private final IrpDatabase instance;
 
-    public IrpDatabaseNGTest() throws IOException, SAXException {
+    public IrpDatabaseNGTest() throws IOException {
         instance = new IrpDatabase(CONFIGFILE);
     }
 
@@ -59,7 +58,7 @@ public class IrpDatabaseNGTest {
      * @throws org.xml.sax.SAXException
      */
     @Test(enabled = false)
-    public void testIsKnown_String_String() throws IOException, SAXException {
+    public void testIsKnown_String_String() throws IOException {
         System.out.println("isKnown");
         String protocolsPath = CONFIGFILE;
         assertFalse(IrpDatabase.isKnown(protocolsPath, "covfefe"));

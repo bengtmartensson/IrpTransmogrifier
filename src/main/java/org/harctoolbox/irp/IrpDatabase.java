@@ -96,7 +96,7 @@ public final class IrpDatabase {
                 || key.equals(ALT_NAME_NAME);
     }
 
-    public static boolean isKnown(String protocolsPath, String protocol) throws IOException, SAXException {
+    public static boolean isKnown(String protocolsPath, String protocol) throws IOException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
 
@@ -111,7 +111,7 @@ public final class IrpDatabase {
         try {
             IrpDatabase irpMaster = new IrpDatabase(configFilename);
             return irpMaster.getIrp(protocolName);
-        } catch (SAXException | IOException ex) {
+        } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
             return null;
         }
@@ -221,6 +221,29 @@ public final class IrpDatabase {
             });
         }
     }
+    private static Document openXmlStream(InputStream inputStream) throws IOException {
+        try {
+            return XmlUtils.openXmlStream(inputStream, null, true, true);
+        } catch (SAXException ex) {
+            throw new IOException(ex);
+        }
+    }
+
+    private static Document openXmlReader(Reader reader) throws IOException {
+        try {
+            return XmlUtils.openXmlReader(reader, null, true, true);
+        } catch (SAXException ex) {
+            throw new IOException(ex);
+        }
+    }
+
+    private static Document openXmlFile(File file) throws IOException {
+        try {
+            return XmlUtils.openXmlFile(file, (Schema) null, true, true);
+        } catch (SAXException ex) {
+            throw new IOException(ex);
+        }
+    }
 
     private String configFileVersion;
 
@@ -235,19 +258,19 @@ public final class IrpDatabase {
         aliases = new LinkedHashMap<>(16);
     }
 
-    public IrpDatabase(Reader reader) throws IOException, SAXException {
-        this(XmlUtils.openXmlReader(reader, (Schema) null, true, true));
+    public IrpDatabase(Reader reader) throws IOException {
+        this(openXmlReader(reader));
     }
 
-    public IrpDatabase(InputStream inputStream) throws IOException, SAXException {
-        this(XmlUtils.openXmlStream(inputStream, null, true, true));
+    public IrpDatabase(InputStream inputStream) throws IOException {
+        this(openXmlStream(inputStream));
     }
 
-    public IrpDatabase(File file) throws IOException, SAXException {
-        this(XmlUtils.openXmlFile(file, (Schema) null, true, true));
+    public IrpDatabase(File file) throws IOException {
+        this(openXmlFile(file));
     }
 
-    public IrpDatabase(String file) throws IOException, SAXException {
+    public IrpDatabase(String file) throws IOException {
         this(IrCoreUtils.getInputSteam(file));
     }
 

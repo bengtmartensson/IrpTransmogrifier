@@ -347,7 +347,7 @@ public abstract class Pronto {
     protected Pronto() {
     }
 
-    public static class NonProntoFormatException extends Exception {
+    public static class NonProntoFormatException extends IrCoreException {
 
         public NonProntoFormatException(String string) {
             super("\"" + string + "\" is not a four digit hexadecimal string");

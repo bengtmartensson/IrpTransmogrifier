@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,19 +18,19 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 /**
- * Fatally incompatible arguments discovered.
+ * Abstract superclass of all the exceptions in IrCore.
  */
-public class InvalidArgumentException extends IrCoreException {
+public abstract class IrCoreException extends Exception {
 
-    public InvalidArgumentException(String string) {
+    public IrCoreException(String string) {
         super(string);
     }
 
-    public InvalidArgumentException(Throwable ex) {
+    public IrCoreException(Throwable ex) {
         super(ex);
     }
 
-    public InvalidArgumentException() {
+    public IrCoreException() {
         super();
     }
 }

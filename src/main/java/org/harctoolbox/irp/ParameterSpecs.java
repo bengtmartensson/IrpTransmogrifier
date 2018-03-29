@@ -261,4 +261,23 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         });
         return result;
     }
+
+    public boolean hasParameter(String name) {
+        return map.containsKey(name);
+    }
+
+    public boolean hasParameterMemory(String parameterName) {
+        ParameterSpec parameterSpec = getParameterSpec(parameterName);
+        return parameterSpec != null && parameterSpec.hasMemory();
+    }
+
+    public long getParameterMax(String parameterName) throws NullPointerException {
+        ParameterSpec parameterSpec = getParameterSpec(parameterName);
+        return parameterSpec.getMax();
+    }
+
+    public long getParameterMin(String parameterName) throws NullPointerException {
+        ParameterSpec parameterSpec = getParameterSpec(parameterName);
+        return parameterSpec.getMin();
+    }
 }

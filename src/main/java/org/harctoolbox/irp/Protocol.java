@@ -284,6 +284,11 @@ public class Protocol extends IrpObject implements AggregateLister {
         return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
     }
 
+    public IrSignal toIrSignal(Map<String, Long> params) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException {
+        NameEngine nameEngine = new NameEngine(params);
+        return toIrSignal(nameEngine);
+    }
+
     private void fetchMemoryVariables(NameEngine nameEngine) {
         for (Map.Entry<String, Expression> kvp : memoryVariables) {
             String name = kvp.getKey();
@@ -771,6 +776,22 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public double minDurationDiff() {
         return IrCoreUtils.minDiff(allDurationsInMicros());
+    }
+
+    public boolean hasParameter(String name) {
+        return parameterSpecs.hasParameter(name);
+    }
+
+    public boolean hasParameterMemory(String parameterName) {
+        return parameterSpecs.hasParameterMemory(parameterName);
+    }
+
+    public long getParameterMax(String parameterName) {
+        return parameterSpecs.getParameterMax(parameterName);
+    }
+
+    public long getParameterMin(String parameterName) {
+        return parameterSpecs.getParameterMin(parameterName);
     }
 
     public static class ProtocolNotDecodableException extends IrpException {

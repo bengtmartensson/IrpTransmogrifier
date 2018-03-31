@@ -53,6 +53,16 @@ import org.xml.sax.SAXParseException;
  */
 public final class XmlUtils {
 
+    public static final String DEFAULT_CHARSETNAME                  = "UTF-8";
+    public static final String W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME  = "xmlns:xsi";
+    public static final String W3C_SCHEMA_NAMESPACE                 = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String NAMESPACE_ATTRIBUTE_NAME             = "xmlns";
+    public static final String HTML_NAMESPACE_ATTRIBUTE_NAME        = "xmlns:html";
+    public static final String HTML_NAMESPACE                       = "http://www.w3.org/1999/xhtml";
+    public static final String SCHEMA_LOCATION_ATTRIBUTE_NAME       = "xsi:schemaLocation";
+    public static final String XML_LANG_ATTRIBUTE_NAME              = "xml:lang";
+    public static final String ENGLISH                              = "en";
+
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 
     public static Document parseStringToXmlDocument(String string, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {

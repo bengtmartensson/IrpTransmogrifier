@@ -165,31 +165,6 @@ public final class ModulatedIrSequence extends IrSequence {
     }
 
     /**
-     * Makes the current sequence into an IrSignal by considering the sequence as an intro sequence.
-     * @return IrSignal
-     */
-    public IrSignal toIrSignal() {
-        return new IrSignal(this, new IrSequence(), new IrSequence(), frequency, dutyCycle);
-    }
-
-    /**
-     * Constructs an IrSignal.
-     * @param beginningLength Length of the intro sequence
-     * @param repeatLength Length of the repeat sequence
-     * @param noRepeats Number of occurrences of the repeat sequence
-     * @return IrSignal
-     * @throws InvalidArgumentException
-     */
-    public IrSignal toIrSignal(int beginningLength, int repeatLength, int noRepeats) throws InvalidArgumentException {
-        IrSequence intro = truncate(beginningLength);
-        IrSequence repeat = subSequence(beginningLength, repeatLength);
-        int startEnding = beginningLength + noRepeats * repeatLength;
-        int lengthEnding = getLength() - startEnding;
-        IrSequence ending = subSequence(startEnding, lengthEnding);
-        return new IrSignal(intro, repeat, ending, frequency, dutyCycle);
-    }
-
-    /**
      * Compares two ModulatedIrSequences for (approximate) equality.
      *
      * @param irSequence to be compared against this.

@@ -72,18 +72,7 @@ public final class IrSignal implements Cloneable {
      * @param endingSequence
      */
     public IrSignal(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, Double frequency, Double dutyCycle) {
-        this.frequency = frequency;
-        this.dutyCycle = dutyCycle;
-        // If the given intro sequence is identical to the repeat sequence, reject it.
-        this.introSequence = ((introSequence != null) && !introSequence.approximatelyEquals(repeatSequence)) ? introSequence : new IrSequence();
-        this.repeatSequence = repeatSequence != null ? repeatSequence : new IrSequence();
-        this.endingSequence = ((endingSequence != null) && !endingSequence.approximatelyEquals(repeatSequence)) ? endingSequence : new IrSequence();
-
-        map = new EnumMap<>(Pass.class);
-
-        map.put(Pass.intro, this.introSequence);
-        map.put(Pass.repeat, this.repeatSequence);
-        map.put(Pass.ending, this.endingSequence);
+        setup(introSequence, repeatSequence, endingSequence, frequency, dutyCycle);
     }
 
     /**
@@ -113,6 +102,23 @@ public final class IrSignal implements Cloneable {
      */
     public IrSignal(ModulatedIrSequence introSequence) {
         this(introSequence, new IrSequence(), new IrSequence(), introSequence.getFrequency(), introSequence.getDutyCycle());
+    }
+
+    /**
+     * Constructs an IrSignal.
+     * @param sequence
+     * @param beginningLength Length of the intro sequence
+     * @param repeatLength Length of the repeat sequence
+     * @param noRepeats Number of occurrences of the repeat sequence
+     * @throws InvalidArgumentException
+     */
+    public IrSignal(ModulatedIrSequence sequence, int beginningLength, int repeatLength, int noRepeats) throws InvalidArgumentException {
+        IrSequence intro = sequence.truncate(beginningLength);
+        IrSequence repeat = sequence.subSequence(beginningLength, repeatLength);
+        int startEnding = beginningLength + noRepeats * repeatLength;
+        int lengthEnding = sequence.getLength() - startEnding;
+        IrSequence ending = sequence.subSequence(startEnding, lengthEnding);
+        setup(intro, repeat, ending, sequence.getFrequency(), sequence.getDutyCycle());
     }
 
     /**
@@ -177,6 +183,21 @@ public final class IrSignal implements Cloneable {
      */
     public IrSignal() throws InvalidArgumentException {
         this(new int[0], 0, 0, ModulatedIrSequence.DEFAULT_FREQUENCY, null);
+    }
+
+    private void setup(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, Double frequency, Double dutyCycle) {
+        this.frequency = frequency;
+        this.dutyCycle = dutyCycle;
+        // If the given intro sequence is identical to the repeat sequence, reject it.
+        this.introSequence = ((introSequence != null) && !introSequence.approximatelyEquals(repeatSequence)) ? introSequence : new IrSequence();
+        this.repeatSequence = repeatSequence != null ? repeatSequence : new IrSequence();
+        this.endingSequence = ((endingSequence != null) && !endingSequence.approximatelyEquals(repeatSequence)) ? endingSequence : new IrSequence();
+
+        map = new EnumMap<>(Pass.class);
+
+        map.put(Pass.intro, this.introSequence);
+        map.put(Pass.repeat, this.repeatSequence);
+        map.put(Pass.ending, this.endingSequence);
     }
 
     public Double getFrequency() {

@@ -260,9 +260,9 @@ public final class RepeatFinder {
         public IrSignal chopIrSequence(ModulatedIrSequence irSequence) {
             try {
                 return numberRepeats > 1
-                        ? irSequence.toIrSignal(beginLength, repeatLength, numberRepeats)
+                        ? new IrSignal(irSequence, beginLength, repeatLength, numberRepeats)
                         : // no repeat found, just do the trival
-                        irSequence.toIrSignal();
+                        new IrSignal(irSequence);
             } catch (InvalidArgumentException ex) {
                 assert(false); // cannot happen: repeatStart repeatLength have been checked to be even.
                 return null;

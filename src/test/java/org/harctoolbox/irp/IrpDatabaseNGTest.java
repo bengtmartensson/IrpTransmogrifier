@@ -55,7 +55,6 @@ public class IrpDatabaseNGTest {
     /**
      * Test of isKnown method, of class IrpDatabase.
      * @throws java.io.IOException
-     * @throws org.xml.sax.SAXException
      */
     @Test(enabled = false)
     public void testIsKnown_String_String() throws IOException {

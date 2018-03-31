@@ -307,7 +307,9 @@ public abstract class Pronto {
     }
 
     /**
-     * Computes the ("long", raw) CCF string
+     * Computes the ("long", raw) CCF string, if possible.
+     * Since a CCF does not have an ending sequence,
+     * a nonempty ending sequence will be ignored.
      * @param irSignal
      * @return CCF string
      */

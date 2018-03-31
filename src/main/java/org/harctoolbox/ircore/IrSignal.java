@@ -179,43 +179,6 @@ public final class IrSignal implements Cloneable {
         this(new int[0], 0, 0, ModulatedIrSequence.DEFAULT_FREQUENCY, null);
     }
 
-    /**
-     * Creates an IrSignal from a CCF string. Also some "short formats" of CCF are recognized.
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
-     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
-     * @see Pronto
-     *
-     * @param ccf String supposed to represent a valid CCF signal.
-     */
-    public IrSignal(String ccf) throws InvalidArgumentException, Pronto.NonProntoFormatException {
-        copyFrom(Pronto.parse(ccf));
-    }
-
-    /**
-     * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
-     * @throws org.harctoolbox.ircore.OddSequenceLengthException
-     * @see Pronto
-     *
-     * @param ccf Integer array supposed to represent a valid CCF signal.
-     */
-    public IrSignal(int[] ccf) throws InvalidArgumentException, OddSequenceLengthException {
-        copyFrom(Pronto.parse(ccf));
-    }
-
-    /**
-     * Creates an IrSignal from a CCF array. Also some "short formats" of CCF are recognized.
-     * @param begin starting index
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
-     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
-     * @see Pronto
-     *
-     * @param ccf String array supposed to represent a valid CCF signal.
-     */
-    public IrSignal(String[] ccf, int begin) throws InvalidArgumentException, Pronto.NonProntoFormatException {
-        copyFrom(Pronto.parse(ccf, begin));
-    }
-
     public Double getFrequency() {
         return frequency;
     }
@@ -398,17 +361,6 @@ public final class IrSignal implements Cloneable {
         return Math.max(introSequence.getLastGap(), repeatSequence.getLastGap());
     }
 
-
-    // Plunders the victim. Therefore private, othewise would violate immutability.
-    private void copyFrom(IrSignal victim) {
-        dutyCycle = victim.dutyCycle;
-        frequency = victim.frequency;
-        introSequence = victim.introSequence;
-        repeatSequence = victim.repeatSequence;
-        endingSequence = victim.endingSequence;
-        map = victim.map;
-    }
-
     /**
      * Returns a ModulatedIrSequence consisting of one intro sequence,
      * one repeat sequence, followed by one ending sequence.
@@ -511,16 +463,6 @@ public final class IrSignal implements Cloneable {
      */
     public ModulatedIrSequence getEndingSequence() {
         return new ModulatedIrSequence(endingSequence, frequency, dutyCycle);
-    }
-
-    /**
-     * Computes the CCF form, if possible. Since a CCF does not have an ending sequence,
-     * a nonempty ending sequence will be ignored.
-     * @see Pronto
-     * @return CCF as string.
-     */
-    public String ccfString() {
-        return Pronto.toPrintString(this);
     }
 
     public enum Pass {

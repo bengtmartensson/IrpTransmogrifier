@@ -647,7 +647,7 @@ public final class IrpTransmogrifier {
         if (commandRender.rawWithoutSigns)
             out.println(irSignal.toString(false));
         if (commandRender.pronto)
-            out.println(irSignal.ccfString());
+            out.println(Pronto.toPrintString(irSignal));
     }
 
     private void renderPrint(ModulatedIrSequence irSequence) {
@@ -656,7 +656,7 @@ public final class IrpTransmogrifier {
         if (commandRender.rawWithoutSigns)
             out.println(irSequence.toString(false));
         if (commandRender.pronto)
-            out.println(new IrSignal(irSequence).ccfString());
+            out.println(Pronto.toPrintString(new IrSignal(irSequence)));
     }
 
     private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {

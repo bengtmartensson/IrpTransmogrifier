@@ -53,7 +53,7 @@ public class IrSequenceParsers {
 
     public static IrSequence parseProntoOrRaw(List<String> line, Double dummyGap) throws OddSequenceLengthException {
         try {
-            IrSignal irSignal = new IrSignal(line.get(0)); // pronto
+            IrSignal irSignal = Pronto.parse(line.get(0));
             return irSignal.toModulatedIrSequence();
         } catch (InvalidArgumentException | Pronto.NonProntoFormatException ex) {
             IrSequence intro = parseRaw(line.get(0), dummyGap);

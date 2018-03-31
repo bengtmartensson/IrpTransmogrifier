@@ -617,7 +617,7 @@ public final class IrpTransmogrifier {
         XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
     }
 
-    private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException {
+    private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException {
         NameEngine nameEngine = !commandRender.nameEngine.isEmpty() ? commandRender.nameEngine
                 : commandRender.random ? new NameEngine(protocol.randomParameters())
                         : new NameEngine();

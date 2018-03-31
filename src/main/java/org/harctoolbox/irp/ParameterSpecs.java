@@ -135,13 +135,9 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return el;
     }
 
-    void check(NameEngine nameEngine) throws DomainViolationException {
+    void check(NameEngine nameEngine) throws DomainViolationException, InvalidNameException, NameUnassignedException {
         for (ParameterSpec parameter : map.values())
-            try {
-                parameter.check(nameEngine);
-            } catch (NameUnassignedException | InvalidNameException ex) {
-                throw new ThisCannotHappenException(ex);
-            }
+            parameter.check(nameEngine);
     }
 
     public Map<String, Long> random() {

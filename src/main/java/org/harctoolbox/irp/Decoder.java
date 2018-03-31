@@ -117,7 +117,7 @@ public final class Decoder {
             }
 
             return true;
-        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException ex) {
+        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException ex) {
             throw new ThisCannotHappenException(ex);
         }
     }

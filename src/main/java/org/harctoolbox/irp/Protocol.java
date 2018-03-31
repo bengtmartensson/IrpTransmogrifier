@@ -267,9 +267,10 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws ArithmeticException
      * @throws org.harctoolbox.irp.NameUnassignedException
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
+     * @throws org.harctoolbox.irp.InvalidNameException
      * @throws DomainViolationException
      */
-    public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException {
+    public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException {
         IrpUtils.entering(logger, "toIrSignal");
         initializeDefinitions();
         parameterSpecs.check(nameEngine);
@@ -284,7 +285,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
     }
 
-    public IrSignal toIrSignal(Map<String, Long> params) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException {
+    public IrSignal toIrSignal(Map<String, Long> params) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException {
         NameEngine nameEngine = new NameEngine(params);
         return toIrSignal(nameEngine);
     }

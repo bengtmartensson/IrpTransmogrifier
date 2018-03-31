@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.xml.validation.Schema;
 import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -593,6 +594,11 @@ public final class IrpDatabase {
             last = protocol;
         }
         return result;
+    }
+
+    public IrSignal render(String protocolName, Map<String, Long> params) throws IrpException {
+        Protocol protocol = getProtocolExpandAlias(protocolName);
+        return protocol.toIrSignal(params);
     }
 
     private static class UnparsedProtocol {

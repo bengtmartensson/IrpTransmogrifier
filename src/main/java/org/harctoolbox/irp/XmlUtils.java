@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.XMLConstants;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static javax.xml.XMLConstants.XML_NS_PREFIX;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,13 +56,12 @@ import org.xml.sax.SAXParseException;
 public final class XmlUtils {
 
     public static final String DEFAULT_CHARSETNAME                  = "UTF-8";
-    public static final String W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME  = "xmlns:xsi";
-    public static final String W3C_SCHEMA_NAMESPACE                 = "http://www.w3.org/2001/XMLSchema-instance";
-    public static final String NAMESPACE_ATTRIBUTE_NAME             = "xmlns";
-    public static final String HTML_NAMESPACE_ATTRIBUTE_NAME        = "xmlns:html";
+    public static final String W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME  = XMLNS_ATTRIBUTE + ":xsi";
+    public static final String HTML_NAMESPACE_ATTRIBUTE_NAME        = XMLNS_ATTRIBUTE + ":html";
     public static final String HTML_NAMESPACE                       = "http://www.w3.org/1999/xhtml";
+    public static final String XSLT_NAMESPACE_URI                   = "http://www.w3.org/1999/XSL/Transform";
     public static final String SCHEMA_LOCATION_ATTRIBUTE_NAME       = "xsi:schemaLocation";
-    public static final String XML_LANG_ATTRIBUTE_NAME              = "xml:lang";
+    public static final String XML_LANG_ATTRIBUTE_NAME              = XML_NS_PREFIX + ":lang";
     public static final String ENGLISH                              = "en";
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());

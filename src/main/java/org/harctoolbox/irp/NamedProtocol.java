@@ -206,7 +206,7 @@ public final class NamedProtocol extends Protocol {
     }
 
     List<String> getPreferOver() {
-        return Collections.unmodifiableList(preferOver);
+        return preferOver == null ? null : Collections.unmodifiableList(preferOver);
     }
 
     @Override

@@ -38,6 +38,15 @@ public final class ModulatedIrSequence extends IrSequence {
     }
 
     /**
+     * Checks the argument for null or validity of duty cycle (0, 1).
+     * @param dutyCycle number to be checked. null is allowed.
+     * @return
+     */
+    public static boolean isValidDutyCycle(Double dutyCycle) {
+        return dutyCycle == null || (dutyCycle > 0 && dutyCycle < 1);
+    }
+
+    /**
      * Modulation frequency in Hz. Use 0 for no modulation. Use
      * null for no information.
      */

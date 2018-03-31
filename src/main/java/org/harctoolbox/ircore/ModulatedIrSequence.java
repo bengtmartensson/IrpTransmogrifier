@@ -57,7 +57,8 @@ public final class ModulatedIrSequence extends IrSequence {
      */
     private Double dutyCycle;
 
-    private ModulatedIrSequence() {
+    public ModulatedIrSequence() {
+        super();
         frequency = null;
         dutyCycle = null;
     }
@@ -179,7 +180,7 @@ public final class ModulatedIrSequence extends IrSequence {
                 && super.approximatelyEquals(irSequence, absoluteTolerance, relativeTolerance);
     }
 
-    boolean approximatelyEquals(ModulatedIrSequence instance) {
+    public boolean approximatelyEquals(ModulatedIrSequence instance) {
         return approximatelyEquals(instance, IrCoreUtils.DEFAULTABSOLUTETOLERANCE,
                 IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
     }

@@ -75,6 +75,19 @@ public final class IrSignal implements Cloneable {
         setup(introSequence, repeatSequence, endingSequence, frequency, dutyCycle);
     }
 
+   /**
+     * Constructs an IrSignal from its arguments.
+     * @param frequency
+     * @param dutyCycle
+     * @param introSequence
+     * @param repeatSequence
+     * @param endingSequence
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
+    public IrSignal(String introSequence, String repeatSequence, String endingSequence, Double frequency, Double dutyCycle) throws OddSequenceLengthException {
+        setup(new IrSequence(introSequence), new IrSequence(repeatSequence), new IrSequence(endingSequence), frequency, dutyCycle);
+    }
+
     /**
      *  Constructs an IrSignal from its arguments. The single sequence is made intro sequence.
      * @param introSequence

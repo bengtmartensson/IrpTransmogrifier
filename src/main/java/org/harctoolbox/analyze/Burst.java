@@ -151,13 +151,13 @@ public final class Burst {
     }
 
     public final static class Preferences {
-        public static final double DEFAULTMAXROUNDINGERROR = 0.3;
-        public static final double DEFAULTMAXUNITS = 30.0;
-        public static final double DEFAULTMAXMICROSECONDS = 10000.0;
+        public static final double DEFAULT_MAX_ROUNDING_ERROR = 0.3;
+        public static final double DEFAULT_MAX_UNITS = 30.0;
+        public static final double DEFAULT_MAX_MICROSECONDS = 10000.0;
 
-        private double maxRoundingError = DEFAULTMAXROUNDINGERROR;
-        private double maxUnits = DEFAULTMAXUNITS;
-        private double maxMicroSeconds = DEFAULTMAXMICROSECONDS;
+        private double maxRoundingError = DEFAULT_MAX_ROUNDING_ERROR;
+        private double maxUnits = DEFAULT_MAX_UNITS;
+        private double maxMicroSeconds = DEFAULT_MAX_MICROSECONDS;
 
         public Preferences(double maxRoundingError, double maxUnits, double maxMicroSeconds) {
             this.maxRoundingError = maxRoundingError;
@@ -166,9 +166,9 @@ public final class Burst {
         }
 
         public Preferences() {
-            this.maxRoundingError = DEFAULTMAXROUNDINGERROR;
-            this.maxUnits = DEFAULTMAXUNITS;
-            this.maxMicroSeconds = DEFAULTMAXMICROSECONDS;
+            this.maxRoundingError = DEFAULT_MAX_ROUNDING_ERROR;
+            this.maxUnits = DEFAULT_MAX_UNITS;
+            this.maxMicroSeconds = DEFAULT_MAX_MICROSECONDS;
         }
 
         @Override

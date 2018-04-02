@@ -1272,7 +1272,7 @@ public final class IrpTransmogrifier {
         private boolean lsb = false;
 
         @Parameter(names = { "-m", "--maxunits" }, description = "Maximal multiplier of time unit in durations.")
-        private double maxUnits = Burst.Preferences.DEFAULTMAXUNITS;
+        private double maxUnits = Burst.Preferences.DEFAULT_MAX_UNITS;
 
         @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
         private String namedInput = null;
@@ -1281,10 +1281,10 @@ public final class IrpTransmogrifier {
         private boolean parameterTable = false;
 
         @Parameter(names = { "-u", "--maxmicroseconds" }, description = "Maximal duration to be expressed as micro seconds.")
-        private double maxMicroSeconds = Burst.Preferences.DEFAULTMAXMICROSECONDS;
+        private double maxMicroSeconds = Burst.Preferences.DEFAULT_MAX_MICROSECONDS;
 
         @Parameter(names = {      "--maxroundingerror" }, description = "Maximal rounding errors for expressing as multiple of time unit.")
-        private double maxRoundingError = Burst.Preferences.DEFAULTMAXROUNDINGERROR;
+        private double maxRoundingError = Burst.Preferences.DEFAULT_MAX_ROUNDING_ERROR;
 
         @Parameter(names = { "-M", "--maxparameterwidth" }, description = "Maximal parameter width.")
         private int maxParameterWidth = 63;

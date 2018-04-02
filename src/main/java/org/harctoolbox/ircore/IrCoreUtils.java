@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,22 +42,22 @@ public final class IrCoreUtils {
     public final static long ALL = -2L;
     public final static long SOME = -3L;
 
-    public static final String LINESEPARATOR = System.getProperty("line.separator");
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
      * Default absolute tolerance in micro seconds.
      */
-    public static final double DEFAULTABSOLUTETOLERANCE = 100;
+    public static final double DEFAULT_ABSOLUTE_TOLERANCE = 100;
 
     /**
      * Default relative tolerance as a number between 0 and 1.
      */
-    public static final double DEFAULTRELATIVETOLERANCE = 0.1;
+    public static final double DEFAULT_RELATIVE_TOLERANCE = 0.1;
 
     /**
      * Default absolute tolerance for frequency comparison.
      */
-    public static final double DEFAULTFREQUENCYTOLERANCE = 2000;
+    public static final double DEFAULT_FREQUENCY_TOLERANCE = 2000;
 
     /**
      * Default threshold value for lead-out in microseconds.
@@ -67,22 +67,32 @@ public final class IrCoreUtils {
     /**
      * Default value for least value in a repeat.
      */
-    public static final double DEFAULTMINREPEATLASTGAP = 5000d;
+    public static final double DEFAULT_MIN_REPEAT_LAST_GAP = 5000d;
+
+    /**
+     * "Dumb" Charset name
+     */
+    public static final String DEFAULT_CHARSET_NAME = "US-ASCII";
+
+    /**
+     * "Dumb" Charset
+     */
+    public static final Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_NAME);
 
     private static double getDoubleWithSubstitute(Double userValue, double fallback) {
         return userValue != null ? userValue : fallback;
     }
 
     public static double getRelativeTolerance(Double userValue) {
-        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     public static double getAbsoluteTolerance(Double userValue) {
-        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULTABSOLUTETOLERANCE);
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE);
     }
 
     public static double getFrequencyTolerance(Double userValue) {
-        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE);
     }
 
     public static double getMinimumLeadout(Double userValue) {
@@ -178,7 +188,7 @@ public final class IrCoreUtils {
         byte[] buf = new byte[length];
         for (int i = 0; i < length; i++)
             buf[i] = value;
-        return new String(buf, Charset.forName("US-ASCII"));
+        return new String(buf, DEFAULT_CHARSET);
     }
 
     /**
@@ -238,7 +248,7 @@ public final class IrCoreUtils {
         try {
             return filename.equals("-")
                     ? System.out
-                    : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, "US-ASCII");
+                    : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, DEFAULT_CHARSET_NAME);
         } catch (UnsupportedEncodingException ex) {
             throw new ThisCannotHappenException();
         }
@@ -446,7 +456,7 @@ public final class IrCoreUtils {
     }
 
     public static boolean approximatelyEquals(Double x, Double y) {
-        return approximatelyEquals(x, y, DEFAULTABSOLUTETOLERANCE, DEFAULTRELATIVETOLERANCE);
+        return approximatelyEquals(x, y, DEFAULT_ABSOLUTE_TOLERANCE, DEFAULT_RELATIVE_TOLERANCE);
     }
 
     /**

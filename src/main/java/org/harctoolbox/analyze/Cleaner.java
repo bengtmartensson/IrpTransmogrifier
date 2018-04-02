@@ -52,7 +52,7 @@ public class Cleaner {
     }
 
     public static IrSequence clean(IrSequence irSequence) {
-        return clean(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        return clean(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
@@ -61,7 +61,7 @@ public class Cleaner {
     }
 
     public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
-        return clean(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        return clean(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     public static IrSignal clean(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
@@ -91,7 +91,7 @@ public class Cleaner {
     private boolean signalMode;
 
     public Cleaner(IrSequence irSequence) {
-        this(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        this(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     public Cleaner(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {

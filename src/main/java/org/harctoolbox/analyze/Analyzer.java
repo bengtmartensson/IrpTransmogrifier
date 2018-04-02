@@ -86,7 +86,7 @@ public final class Analyzer extends Cleaner {
     }
 
     public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) {
-        this(irSequence, null, invokeRepeatFinder, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        this(irSequence, null, invokeRepeatFinder, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     public Analyzer(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {

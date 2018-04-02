@@ -104,7 +104,7 @@ public final class NamedProtocol extends Protocol {
     public String warningsString() {
         String str = super.warningsString();
         if (!name.matches(IrpUtils.C_IDENTIFIER_REGEXP))
-            str = str + "WARNING: The name \"" + name + "\" is not a valid C name." + IrCoreUtils.LINESEPARATOR;
+            str = str + "WARNING: The name \"" + name + "\" is not a valid C name." + IrCoreUtils.LINE_SEPARATOR;
         return str;
     }
 
@@ -183,15 +183,15 @@ public final class NamedProtocol extends Protocol {
     }
 
     public double getRelativeTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     public double getAbsoluteTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.DEFAULTABSOLUTETOLERANCE);
+        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE);
     }
 
     public double getFrequencyTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
+        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE);
     }
 
     public double getMinimumLeadout(Double userValue) throws NumberFormatException {

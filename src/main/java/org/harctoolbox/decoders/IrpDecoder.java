@@ -72,7 +72,7 @@ public abstract class IrpDecoder {
     }
 
     protected double getFrequencyTolerance() {
-        return IrCoreUtils.DEFAULTFREQUENCYTOLERANCE;
+        return IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE;
     }
 
     public final boolean isValid() {
@@ -143,11 +143,11 @@ public abstract class IrpDecoder {
         }
 
         protected double getAbsoluteTolerance() {
-            return IrCoreUtils.DEFAULTABSOLUTETOLERANCE;
+            return IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE;
         }
 
         protected double getRelativeTolerance() {
-            return IrCoreUtils.DEFAULTRELATIVETOLERANCE;
+            return IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE;
         }
 
         private boolean acceptablyClose(double x, double y) {

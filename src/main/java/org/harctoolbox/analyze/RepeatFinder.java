@@ -26,9 +26,9 @@ import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public final class RepeatFinder {
-    private static double defaultMinRepeatLastGap  = IrCoreUtils.DEFAULTMINREPEATLASTGAP;
-    private static double defaultRelativeTolerance = IrCoreUtils.DEFAULTRELATIVETOLERANCE;
-    private static double defaultAbsoluteTolerance = IrCoreUtils.DEFAULTABSOLUTETOLERANCE;
+    private static double defaultMinRepeatLastGap  = IrCoreUtils.DEFAULT_MIN_REPEAT_LAST_GAP;
+    private static double defaultRelativeTolerance = IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE;
+    private static double defaultAbsoluteTolerance = IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE;
 
     /**
      * @return the defaultMinRepeatLastGap

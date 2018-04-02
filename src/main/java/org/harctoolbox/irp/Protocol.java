@@ -57,7 +57,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private final static double UPPER_COMMON_FREQUENCY2 = 58000d;
 
     private static String warn(String message) {
-        return "Warning: " + message + "." + IrCoreUtils.LINESEPARATOR;
+        return "Warning: " + message + "." + IrCoreUtils.LINE_SEPARATOR;
     }
 
     private static boolean commonFrequency(double f) {
@@ -538,8 +538,8 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted) throws SignalRecognitionException {
-        return recognize(irSignal, strict, loose, keepDefaulted, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE,
-                IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
+        return recognize(irSignal, strict, loose, keepDefaulted, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE,
+                IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted,

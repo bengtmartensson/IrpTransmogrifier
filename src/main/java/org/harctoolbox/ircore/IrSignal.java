@@ -459,7 +459,7 @@ public final class IrSignal implements Cloneable {
      * @return equality within tolerance.
      */
     public boolean approximatelyEquals(IrSignal irSignal) {
-        return approximatelyEquals(irSignal, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
+        return approximatelyEquals(irSignal, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE);
     }
 
     /**
@@ -484,6 +484,11 @@ public final class IrSignal implements Cloneable {
      */
     public ModulatedIrSequence getEndingSequence() {
         return new ModulatedIrSequence(endingSequence, frequency, dutyCycle);
+    }
+
+    public int[] toIntArray(int i) {
+        ModulatedIrSequence seq = toModulatedIrSequence(i);
+        return seq.toInts();
     }
 
     public enum Pass {

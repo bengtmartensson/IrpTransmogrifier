@@ -549,7 +549,7 @@ public class IrSequence implements Cloneable {
      * @return equality
      */
     public boolean approximatelyEquals(IrSequence irSequence) {
-        return approximatelyEquals(irSequence, IrCoreUtils.DEFAULTABSOLUTETOLERANCE, IrCoreUtils.DEFAULTRELATIVETOLERANCE);
+        return approximatelyEquals(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     /**

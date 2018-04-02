@@ -176,13 +176,13 @@ public final class ModulatedIrSequence extends IrSequence {
      */
     public boolean approximatelyEquals(ModulatedIrSequence irSequence, double absoluteTolerance,
             double relativeTolerance, double frequencyTolerance) {
-        return IrCoreUtils.approximatelyEquals(this.getFrequency(), irSequence.getFrequency(), IrCoreUtils.DEFAULTFREQUENCYTOLERANCE, 0d)
+        return IrCoreUtils.approximatelyEquals(this.getFrequency(), irSequence.getFrequency(), IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE, 0d)
                 && super.approximatelyEquals(irSequence, absoluteTolerance, relativeTolerance);
     }
 
     public boolean approximatelyEquals(ModulatedIrSequence instance) {
-        return approximatelyEquals(instance, IrCoreUtils.DEFAULTABSOLUTETOLERANCE,
-                IrCoreUtils.DEFAULTRELATIVETOLERANCE, IrCoreUtils.DEFAULTFREQUENCYTOLERANCE);
+        return approximatelyEquals(instance, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE,
+                IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE);
     }
 
     /**

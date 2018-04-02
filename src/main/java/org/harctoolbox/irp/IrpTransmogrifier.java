@@ -1157,7 +1157,7 @@ public final class IrpTransmogrifier {
 
         // JCommander does not know about our defaults being null, so handle this explicitly-
         @Parameter(names = {"-a", "--absolutetolerance"},
-                description = "Absolute tolerance in microseconds, used when comparing durations. Default: " + IrCoreUtils.DEFAULTABSOLUTETOLERANCE + ".")
+                description = "Absolute tolerance in microseconds, used when comparing durations. Default: " + IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE + ".")
         private Double absoluteTolerance = null;
 
         @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
@@ -1167,11 +1167,11 @@ public final class IrpTransmogrifier {
         private String encoding = "UTF-8";
 
         @Parameter(names = {"-f", "--frequencytolerance"}, converter = FrequencyParser.class,
-                description = "Frequency tolerance in Hz. Negative disables frequency check. Default: " + IrCoreUtils.DEFAULTFREQUENCYTOLERANCE + ".")
+                description = "Frequency tolerance in Hz. Negative disables frequency check. Default: " + IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE + ".")
         private Double frequencyTolerance = null;
 
         @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minumum gap at end of repetition")
-        private double minRepeatGap = IrCoreUtils.DEFAULTMINREPEATLASTGAP;
+        private double minRepeatGap = IrCoreUtils.DEFAULT_MIN_REPEAT_LAST_GAP;
 
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message. Deprecated; use the command \"help\" instead.")
         private boolean helpRequested = false;
@@ -1205,7 +1205,7 @@ public final class IrpTransmogrifier {
         private boolean quiet = false;
 
         @Parameter(names = {"-r", "--relativetolerance"}, validateWith = LessThanOne.class,
-                description = "Relative tolerance as a number < 1. Default: " + IrCoreUtils.DEFAULTRELATIVETOLERANCE + ".")
+                description = "Relative tolerance as a number < 1. Default: " + IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE + ".")
         private Double relativeTolerance = null;
 
         @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions.")

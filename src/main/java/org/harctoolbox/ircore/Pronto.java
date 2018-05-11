@@ -42,7 +42,7 @@ public abstract class Pronto {
      * For non-modulated IR signals, use this as the second argument of the CCF
      * form.
      */
-    private final static int FREQUENCY_ZERO_FALLBACK_FREQUNCY_CODE = 1;
+    private final static int FREQUENCY_ZERO_FALLBACK_FREQUNCY_CODE = 10;
 
     /**
      * Format code used to format integers in the Pronto Hex.
@@ -107,6 +107,7 @@ public abstract class Pronto {
 
     /**
      * Computes number of cycles of the carrier the first argument will require.
+     * For frequency == 0, use 414514 as substitute.
      *
      * @param time duration in seconds
      * @param frequency
@@ -114,9 +115,10 @@ public abstract class Pronto {
      * @throws org.harctoolbox.ircore.InvalidArgumentException if frequency &lt;= 0.
      */
     public static int pulses(double time, double frequency) throws InvalidArgumentException {
-        if (frequency <= 0)
-            throw new InvalidArgumentException("Frequency must be > 0");
-        return Math.min((int)Math.round(time * frequency), 0xFFFF);
+        if (frequency < 0)
+            throw new InvalidArgumentException("Frequency must be >= 0");
+        double actualFrequency = frequency > 0 ? frequency : frequency(FREQUENCY_ZERO_FALLBACK_FREQUNCY_CODE);
+        return Math.min((int)Math.round(time * actualFrequency), 0xFFFF);
     }
 
     /**

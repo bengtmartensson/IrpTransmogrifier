@@ -122,6 +122,24 @@ public class ProntoNGTest {
     }
 
     /**
+     * Test of pulses method, of class Pronto.
+     */
+    @Test
+    public void testPulses0() {
+        try {
+            System.out.println("pulses, frequency = 0");
+            double time = 1000e-6;
+            double frequency = 0;
+            int expResult = 415;
+            int result = Pronto.pulses(time, frequency);
+            assertEquals(result, expResult, 0.1);
+        } catch (InvalidArgumentException ex) {
+            Logger.getLogger(ProntoNGTest.class.getName()).log(Level.SEVERE, null, ex);
+            fail();
+        }
+    }
+
+    /**
      * Test of parse method, of class Pronto.
      */
     @Test

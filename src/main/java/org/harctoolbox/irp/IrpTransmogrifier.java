@@ -312,7 +312,7 @@ public final class IrpTransmogrifier {
                     default:
                         return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Unknown command: " + command);
                 }
-        } catch (UsageException ex) {
+        } catch (UsageException | FileNotFoundException ex) {
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (OddSequenceLengthException ex) {
             return new ProgramExitStatus(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR,

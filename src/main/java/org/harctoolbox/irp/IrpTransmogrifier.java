@@ -859,7 +859,7 @@ public final class IrpTransmogrifier {
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(noSignal));
                 protocolList.forEach((protocol) -> {
-                    printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods(), true);
+                    printAnalyzedProtocol(protocol, commandAnalyze.radix, params.isPreferPeriods(), true, true);
                 });
                 noSignal++;
             }
@@ -873,7 +873,7 @@ public final class IrpTransmogrifier {
                             : ("#" + i + "\t"));
                 if (commandAnalyze.statistics)
                     out.println(analyzer.toTimingsString(i));
-                printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods(), commandAnalyze.statistics);
+                printAnalyzedProtocol(protocols.get(i), commandAnalyze.radix, params.isPreferPeriods(), commandAnalyze.statistics, commandAnalyze.timings);
             }
 
             if (commandAnalyze.bitUsage) {
@@ -991,12 +991,23 @@ public final class IrpTransmogrifier {
             out.println();
     }
 
-    private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight) {
+    private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight, boolean printTimings) {
         if (protocol != null) {
             Protocol actualProtocol = commandAnalyze.eliminateVars ? protocol.substituteConstantVariables() : protocol;
             out.println(actualProtocol.toIrpString(radix, usePeriods, commandLineArgs.tsvOptimize));
             if (printWeight)
                 out.println("weight = " + protocol.weight() + "\t" + protocol.getDecoderName());
+            if (printTimings) {
+                try {
+                    IrSignal irSignal = protocol.toIrSignal(new NameEngine());
+                    int introDuration = (int) irSignal.getIntroSequence().getTotalDuration();
+                    int repeatDuration = (int) irSignal.getRepeatSequence().getTotalDuration();
+                    int endingDuration = (int) irSignal.getEndingSequence().getTotalDuration();
+                    out.println("timings = (" + introDuration + ", " + repeatDuration + ", " + endingDuration + ").");
+                } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
+            }
         }
     }
 
@@ -1306,6 +1317,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = {"-t", "--timebase"}, description = "Force time unit , in microseconds (no suffix), or in periods (with suffix \"p\").")
         private String timeBase = null;
+
+        @Parameter(names = {      "--timings"}, description = "Print the total timings of the compute IRP form.")
+        private boolean timings = false;
 
         @Parameter(names = {"-T", "--trailinggap"}, description = "Trailing gap (in micro seconds) added to sequences of odd length.")
         private Double trailingGap = null;

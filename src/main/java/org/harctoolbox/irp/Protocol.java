@@ -66,17 +66,17 @@ public class Protocol extends IrpObject implements AggregateLister {
                 || (f >= LOWER_COMMON_FREQUENCY2) && (f <= UPPER_COMMON_FREQUENCY2);
     }
 
-    private GeneralSpec generalSpec;
-    private ParameterSpecs parameterSpecs;
-    private BitspecIrstream bitspecIrstream;
+    private final GeneralSpec generalSpec;
+    private final ParameterSpecs parameterSpecs;
+    private final BitspecIrstream bitspecIrstream;
     private Variation normalFormVariation;
-    private NameEngine initialDefinitions;
+    private final NameEngine initialDefinitions;
     private NameEngine definitions;
-    private NameEngine memoryVariables;
+    private final NameEngine memoryVariables;
     private Boolean interleavingFlash = null;
     private Boolean interleavingGap = null;
     private ParserDriver parserDriver = null;
-    private Class<? extends AbstractDecoder> decoderClass;
+    private final Class<? extends AbstractDecoder> decoderClass;
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs) {
         this(generalSpec, bitspecIrstream, definitions, parameterSpecs, null);
@@ -94,6 +94,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         this.bitspecIrstream = bitspecIrstream;
         this.initialDefinitions = definitions;
         this.decoderClass = decoderClass;
+        this.memoryVariables = new NameEngine();
         initializeDefinitions();
         this.parameterSpecs = parameterSpecs != null ? parameterSpecs : new ParameterSpecs();
         computeNormalForm();
@@ -137,8 +138,6 @@ public class Protocol extends IrpObject implements AggregateLister {
         });
         initializeDefinitions();
 
-        parameterSpecs = new ParameterSpecs(parseTree);
-        memoryVariables = new NameEngine();
         for (ParameterSpec parameter : parameterSpecs) {
             if (parameter.hasMemory()) {
                 String name = parameter.getName();
@@ -219,7 +218,6 @@ public class Protocol extends IrpObject implements AggregateLister {
 
         if (parameterSpecs.isEmpty()) {
             logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
-            parameterSpecs = new ParameterSpecs();
         }
         if (generalSpec == null) {
             // should have been caught during initial parsing

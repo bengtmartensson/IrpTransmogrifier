@@ -280,7 +280,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         IrSequence ending = toIrSequence(nameEngine, Pass.ending);
         saveMemoryVariables(nameEngine);
         IrpUtils.entering(logger, "toIrSignal");
-        return new IrSignal(intro, repeat, ending, getFrequency(), getDutyCycle());
+        return new IrSignal(intro, repeat, ending, getFrequencyWithDefault(), getDutyCycle());
     }
 
     public IrSignal toIrSignal(Map<String, Long> params) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException {

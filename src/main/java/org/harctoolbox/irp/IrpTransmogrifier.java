@@ -696,8 +696,10 @@ public final class IrpTransmogrifier {
 
         if (commandAnalyze.allDecodes && commandAnalyze.decoder != null)
             throw new UsageException("Cannot use both --alldecodes and --decode.");
-        if (commandAnalyze.allDecodes && commandAnalyze.bitUsage)
-                throw new UsageException("Bit usage report not possible together with --all.");
+        if (commandAnalyze.bitUsage && (commandAnalyze.allDecodes || commandAnalyze.eliminateVars))
+            throw new UsageException("Bit usage report not possible together with --all or --eliminate-vars");
+        if (commandAnalyze.parameterTable && commandAnalyze.eliminateVars)
+            throw new UsageException("Parameter table is meaninless together with --eliminate-vars");
 
         if (IrCoreUtils.numberTrue(commandAnalyze.input != null, commandAnalyze.namedInput != null, commandAnalyze.args != null) != 1)
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");

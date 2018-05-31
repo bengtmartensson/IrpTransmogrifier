@@ -205,9 +205,17 @@ public class IrpTransmogrifierNGTest {
     public void testRenderSilly() {
         System.out.println("renderSilly");
         IrpTransmogrifier instance = new IrpTransmogrifier();
-        IrpTransmogrifier.ProgramExitStatus status = instance.run("render -p -i silly");
+        IrpTransmogrifier.ProgramExitStatus status = instance.run("-i silly render -p");
         String expResult = "Parse error in \"silly\"";
         assertEquals(status.getMessage(), expResult);
+    }
+
+    @Test
+    public void testRenderI() {
+        System.out.println("renderI");
+        String result = IrpTransmogrifier.execute("--irp {38.4k,564}<1,-1|1,-5>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255] render -n D=12,F=34 -p");
+        String expResult = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 006C 0016 006C 0016 0016 0016 0016 0016 0016 0016 0016 0016 006C 0016 006C 0016 0016 0016 0016 0016 006C 0016 006C 0016 006C 0016 006C 0016 0016 0016 006C 0016 0016 0016 0016 0016 0016 0016 006C 0016 0016 0016 0016 0016 006C 0016 0016 0016 006C 0016 006C 0016 006C 0016 0016 0016 006C 0016 006C 0016 0342 015B 0057 0016 0E6C";
+        assertEquals(result, expResult);
     }
 
     @Test

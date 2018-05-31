@@ -665,17 +665,17 @@ public final class IrpTransmogrifier {
         if (finished)
             return;
 
-        if (commandRender.irp == null && (commandRender.random != commandRender.nameEngine.isEmpty()))
+        if (commandLineArgs.irp == null && (commandRender.random != commandRender.nameEngine.isEmpty()))
             throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
-        if (commandRender.irp != null) {
+        if (commandLineArgs.irp != null) {
             if (!commandRender.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
             try {
-                NamedProtocol protocol = new NamedProtocol("user-irp", commandRender.irp, "This IRP was entered at the command line of IrpTransmogrifier");
+                NamedProtocol protocol = new NamedProtocol("user-irp", commandLineArgs.irp, "This IRP was entered at the command line of IrpTransmogrifier");
                 render(protocol);
             } catch (ParseCancellationException ex) {
-                throw new IrpParseException(commandRender.irp, ex);
+                throw new IrpParseException(commandLineArgs.irp, ex);
             }
         } else {
             setupDatabase();
@@ -1190,10 +1190,13 @@ public final class IrpTransmogrifier {
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message. Deprecated; use the command \"help\" instead.")
         private boolean helpRequested = false;
 
-        @Parameter(names = {"-i", "--ini", "--inifile"},
+        @Parameter(names = {      "--ini", "--inifile"},
                 description = "Pathname of IRP database file in ini format. "
                 + "If not specified, an XML config file (using --configfile) will be used instead.")
         private String iniFile = null;//"src/main/config/IrpProtocols.ini";
+
+        @Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
+        private String irp = null;
 
         @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels.")
         private String logclasses = "";
@@ -1622,8 +1625,8 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-#", "--count" }, description = "Generate am IR sequence with count number of transmissions")
         private Integer count = null;
 
-        @Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
-        private String irp = null;
+        //@Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
+        //private String irp = null;
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();

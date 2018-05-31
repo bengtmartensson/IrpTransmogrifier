@@ -9,4 +9,5 @@ CONFIG=${IRPHOME}/../src/main/resources/IrpProtocols.xml
 STDIR=${IRPHOME}/../src/main/st
 export STDIR
 
-exec "${JAVA}" -jar "${JAR}" -c "${CONFIG}" "$@"
+#exec "${JAVA}" -jar "${JAR}" -c "${CONFIG}" "$@"
+exec "${JAVA}" -jar "${JAR}" "$@"

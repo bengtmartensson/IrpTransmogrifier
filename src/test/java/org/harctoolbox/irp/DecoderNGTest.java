@@ -26,7 +26,7 @@ public class DecoderNGTest {
 
     private final Decoder decoder;
 
-    public DecoderNGTest() throws IOException {
+    public DecoderNGTest() throws IOException, IrpParseException {
         decoder = new Decoder(CONFIG);
     }
 

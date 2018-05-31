@@ -47,7 +47,7 @@ public final class Decoder {
                     System.out.println(kvp);
                 });
             }
-        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException ex) {
+        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | IrpParseException ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
@@ -55,11 +55,11 @@ public final class Decoder {
 
     private final Map<String, NamedProtocol> parsedProtocols;
 
-    public Decoder(String irpDatabasePath) throws IOException {
+    public Decoder(String irpDatabasePath) throws IOException, IrpParseException {
         this(new IrpDatabase(irpDatabasePath), null);
     }
 
-    public Decoder(IrpDatabase irpDatabase) {
+    public Decoder(IrpDatabase irpDatabase) throws IrpParseException {
         this(irpDatabase, null);
     }
 
@@ -67,8 +67,9 @@ public final class Decoder {
      * This is the main constructor.
      * @param irpDatabase will be expanded.
      * @param names If non-null and non-empty, include only the protocols with these names.
+     * @throws org.harctoolbox.irp.IrpParseException
      */
-    public Decoder(IrpDatabase irpDatabase, Collection<String> names) {
+    public Decoder(IrpDatabase irpDatabase, Collection<String> names) throws IrpParseException {
         irpDatabase.expand();
         parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
         Collection<String> list = names != null ? names : irpDatabase.getNames();

@@ -334,7 +334,7 @@ public final class IrpTransmogrifier {
             // TODO: Improve error message
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
-            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Parse error in \"" + ex.getText() + "\"");
+            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Parse error in \"" + ex.getText() + "\": " + ex.getLocalizedMessage());
         } catch (NoDecoderMatchException ex) {
             return new ProgramExitStatus(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR,
                     "No decoder matched \"" + commandAnalyze.decoder +
@@ -420,12 +420,13 @@ public final class IrpTransmogrifier {
         return stringBuilder.toString();
     }
 
-    private void list() throws IOException, UsageException {
+    private void list() throws IOException, UsageException, IrpParseException {
         boolean finished = commandList.process(this);
         if (finished)
             return;
 
         setupDatabase();
+        irpDatabase.expand();
         if (!commandLineArgs.quiet) {
             commandList.protocols.stream().filter((protocol) -> (irpDatabase.isAlias(protocol))).forEachOrdered((protocol) -> {
                 out.println(protocol + " -> " + irpDatabase.expandAlias(protocol));
@@ -509,12 +510,13 @@ public final class IrpTransmogrifier {
         listProperty(propertyName, Long.toString(value));
     }
 
-    private void version() throws UsageException, IOException {
+    private void version() throws UsageException, IOException, IrpParseException {
         if (commandVersion.shortForm || commandLineArgs.quiet)
             out.println(Version.version);
         else {
             out.println(Version.versionString);
             setupDatabase();
+            irpDatabase.expand();
             out.println("Database: " + commandLineArgs.configFile + " version: " + irpDatabase.getConfigFileVersion());
 
             out.println("JVM: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("os.name") + "-" + System.getProperty("os.arch"));
@@ -523,12 +525,12 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void convertConfig() throws IOException, UsageException {
+    private void convertConfig() throws IOException, UsageException, IrpParseException {
         boolean finished = commandConvertConfig.process(this);
         if (finished)
             return;
 
-        setupDatabase(false); // checks exactly one of -c, -i given
+        setupDatabase(); // checks exactly one of -c, -i given
         if (commandConvertConfig.checkSorted)
             irpDatabase.checkSorted();
 
@@ -541,7 +543,7 @@ public final class IrpTransmogrifier {
             logger.log(Level.INFO, "Wrote {0}", commandLineArgs.output);
     }
 
-    private void code() throws UsageException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+    private void code() throws UsageException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
         boolean finished = commandCode.process(this);
         if (finished)
             return;
@@ -550,6 +552,7 @@ public final class IrpTransmogrifier {
             throw new UsageException("The --output and the --directory options are mutually exclusive.");
 
         setupDatabase();
+        irpDatabase.expand();
         List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (protocolNames.isEmpty())
             throw new UsageException("No protocols matched (forgot --regexp?)");
@@ -671,14 +674,16 @@ public final class IrpTransmogrifier {
         if (commandLineArgs.irp != null) {
             if (!commandRender.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
-            try {
-                NamedProtocol protocol = new NamedProtocol("user-irp", commandLineArgs.irp, "This IRP was entered at the command line of IrpTransmogrifier");
-                render(protocol);
-            } catch (ParseCancellationException ex) {
-                throw new IrpParseException(commandLineArgs.irp, ex);
-            }
-        } else {
+//            try {
+//                NamedProtocol protocol = new NamedProtocol("user-irp", commandLineArgs.irp, "This IRP was entered at the command line of IrpTransmogrifier");
+//                render(protocol);
+//            } catch (ParseCancellationException ex) {
+//                throw new IrpParseException(commandLineArgs.irp, ex);
+//            }
+        }
+        //else {
             setupDatabase();
+            irpDatabase.expand();
             List<String> list = irpDatabase.evaluateProtocols(commandRender.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
             if (list.isEmpty())
                 throw new UsageException("No protocol matched.");
@@ -687,7 +692,7 @@ public final class IrpTransmogrifier {
                 NamedProtocol protocol = irpDatabase.getNamedProtocolExpandAlias(proto);
                 render(protocol);
             }
-        }
+
     }
 
     private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException, IOException, NoDecoderMatchException {
@@ -918,7 +923,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void decode() throws IrpInvalidArgumentException, IOException, UsageException, InvalidArgumentException {
+    private void decode() throws IrpInvalidArgumentException, IOException, UsageException, InvalidArgumentException, IrpParseException {
         boolean finished = commandDecode.process(this);
         if (finished)
             return;
@@ -927,6 +932,7 @@ public final class IrpTransmogrifier {
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         setupDatabase();
+        irpDatabase.expand();
         List<String> protocolNamePatterns = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
         List<String> protocolsNames = irpDatabase.evaluateProtocols(protocolNamePatterns, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (protocolsNames.isEmpty())
@@ -1098,23 +1104,16 @@ public final class IrpTransmogrifier {
     }
 
     private void setupDatabase() throws IOException, UsageException {
-        setupDatabase(true);
+        if (IrCoreUtils.numberTrue(commandLineArgs.configFile != null, commandLineArgs.irp != null, commandLineArgs.configFile != null) > 1)
+            throw new UsageException("At most one of inifile, confile, and irp can be specified");
+
+        irpDatabase = commandLineArgs.iniFile != null ? IrpDatabase.readIni(commandLineArgs.iniFile)
+                : commandLineArgs.irp != null         ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
+                : commandLineArgs.configFile != null  ? new IrpDatabase(commandLineArgs.configFile)
+                : new IrpDatabase(getClass().getResourceAsStream(DEFAULT_CONFIG_FILE));
     }
 
-    private void setupDatabase(boolean expand) throws IOException, UsageException {
-        if (commandLineArgs.iniFile != null) {
-            if (commandLineArgs.configFile != null)
-                throw new UsageException("configfile and inifile cannot both be specified");
-            irpDatabase = IrpDatabase.readIni(commandLineArgs.iniFile);
-        } else {
-            irpDatabase = commandLineArgs.configFile == null
-                    ? new IrpDatabase(getClass().getResourceAsStream(DEFAULT_CONFIG_FILE))
-                    : new IrpDatabase(commandLineArgs.configFile);
-        }
-        if (expand) {
-            irpDatabase.expand();
-        }
-    }
+
 
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
 

@@ -201,12 +201,22 @@ public class IrpTransmogrifierNGTest {
         assertEquals(result, expResult);
     }
 
+    @Test(enabled = true)
+    public void testListIrpClassify() {
+        System.out.println("listIrpClassify");
+        String result = IrpTransmogrifier.execute("--irp {40.244k,398,msb}<1,-1|-1,1>(1,A:31,F:1,F:8,D:23,D:8,0:4,-19.5m)*{A=0x7fe08080}[F:0..1,D:0..255] list -c");
+        String expResult = "name=user_protocol"
+                + IrCoreUtils.LINE_SEPARATOR
+                + "classification=398\t40244\t\tBiphase\t\t\t\t\t\t\t\tSWD";
+        assertEquals(result, expResult);
+    }
+
     @Test
     public void testRenderSilly() {
         System.out.println("renderSilly");
         IrpTransmogrifier instance = new IrpTransmogrifier();
         IrpTransmogrifier.ProgramExitStatus status = instance.run("-i silly render -p");
-        String expResult = "Parse error in \"silly\"";
+        String expResult = "Parse error in \"silly\": `{' not found.";
         assertEquals(status.getMessage(), expResult);
     }
 

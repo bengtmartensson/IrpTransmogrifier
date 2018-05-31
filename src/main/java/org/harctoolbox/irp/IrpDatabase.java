@@ -202,6 +202,13 @@ public final class IrpDatabase {
         return new IrpDatabase(protocols, aliases, configFileVersion);
     }
 
+    public static IrpDatabase parseIrp(String protocolName, String irp, String documentation) {
+        Map<String, UnparsedProtocol> protocols = new HashMap<>(1);
+        UnparsedProtocol protocol = new UnparsedProtocol(protocolName, irp, documentation);
+        protocols.put(protocolName, protocol);
+        return new IrpDatabase(protocols, new HashMap<>(0), "-");
+    }
+
     private static void addProtocol(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, UnparsedProtocol proto) {
         if (!proto.isUsable() || proto.getName() == null || proto.getIrp() == null)
             return;
@@ -500,16 +507,15 @@ public final class IrpDatabase {
         return list;
     }
 
-    public void expand() {
-        protocols.keySet().forEach((protocol) -> {
+    public void expand() throws IrpParseException {
+        for (String protocol : protocols.keySet())
             expand(0, protocol);
-        });
     }
 
-    private void expand(int depth, String name) {
+    private void expand(int depth, String name) throws IrpParseException {
         UnparsedProtocol p = getUnparsedProtocol(name);
         if (!p.getIrp().contains("{"))
-            throw new ThisCannotHappenException("IRP `" + p.getIrp() + "' does not contain `{'.");
+            throw new IrpParseException(p.getIrp(), "`{' not found.");
 
         if (!p.getIrp().startsWith("{")) {
             String p_name = p.getIrp().substring(0, p.getIrp().indexOf('{')).trim();

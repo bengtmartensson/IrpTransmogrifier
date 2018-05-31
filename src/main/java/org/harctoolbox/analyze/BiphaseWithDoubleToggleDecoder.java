@@ -29,7 +29,7 @@ public final class BiphaseWithDoubleToggleDecoder extends AbstractBiphaseDecoder
     private final int oneAndAHalf;
 
     public BiphaseWithDoubleToggleDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full, int oneAndAHalf) {
-        super(analyzer, params, half, full);
+        super(analyzer, params, half, full, false);
         doubleLengthBitSpec = mkBitSpec(2*timebase, timebase, params.isInvert(), params.getBurstPrefs());
         this.oneAndAHalf = (oneAndAHalf < 2*full) ? oneAndAHalf : CANNOT_MATCH;
     }

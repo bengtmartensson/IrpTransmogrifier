@@ -20,11 +20,11 @@ package org.harctoolbox.analyze;
 public final class BiphaseDecoder extends AbstractBiphaseDecoder {
 
     public BiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
-        super(analyzer, params, half, full);
+        super(analyzer, params, half, full, false);
     }
 
     public BiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
-        super(analyzer, params);
+        super(analyzer, params, false);
     }
 
     @Override

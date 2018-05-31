@@ -49,7 +49,9 @@ public abstract class AbstractDecoder {
         Pwm4AltDecoder.class,
         XmpDecoder.class,
         BiphaseDecoder.class,
+        BiphaseInvertDecoder.class,
         BiphaseWithStartbitDecoder.class,
+        BiphaseWithStartbitInvertDecoder.class,
         BiphaseWithDoubleToggleDecoder.class,
         SerialDecoder.class,
     };

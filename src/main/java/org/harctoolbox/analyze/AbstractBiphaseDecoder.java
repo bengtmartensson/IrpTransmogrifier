@@ -58,16 +58,18 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
     protected final int half;
     protected final int full;
     protected ParameterData data;
+    private final boolean invert;
 
-    public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full)  {
+    public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full, boolean invert)  {
         super(analyzer, params);
-        bitSpec = mkBitSpec(timebase, timebase, params.isInvert(), params.getBurstPrefs());
+        this.invert = invert != params.isInvert();
+        bitSpec = mkBitSpec(timebase, timebase, this.invert, params.getBurstPrefs());
         this.half = half;
         this.full = full;
     }
 
-    public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params)  {
-        this(analyzer, params, analyzer.getTiming(0), analyzer.getTiming(1));
+    public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, boolean invert)  {
+        this(analyzer, params, analyzer.getTiming(0), analyzer.getTiming(1), invert);
     }
 
 
@@ -92,7 +94,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                             throw new ThisCannotHappenException();
 
                         if (isShort)
-                            if (params.isInvert()) {
+                            if (invert) {
                                 data.update(1);
                                 state = BiphaseState.zero;
                             } else {
@@ -106,7 +108,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                         }
                     } else {
                         items.add(newFlashOrGap(isFlash, time));
-                        if (params.isInvert() == isFlash)
+                        if (invert == isFlash)
                             foundStartBits++;
                         if (foundStartBits == startBits())
                             state = BiphaseState.zero;
@@ -117,7 +119,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                     if (!isFlash)
                         throw new ThisCannotHappenException();
 
-                    data.update(params.isInvert());
+                    data.update(invert);
                     if (isShort) {
                         state = BiphaseState.zero;
                     } else if (isLong) {
@@ -135,7 +137,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                     if (isFlash)
                         throw new ThisCannotHappenException();
 
-                    data.update(!params.isInvert());
+                    data.update(!invert);
                     if (isShort) {
                         state = BiphaseState.zero;
                     } else if (isLong) {

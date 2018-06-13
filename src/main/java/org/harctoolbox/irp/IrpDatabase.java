@@ -79,6 +79,7 @@ public final class IrpDatabase {
     public static final String MINIMUM_LEADOUT_NAME = "minimum-leadout";
     public static final String PREFER_OVER_NAME = "prefer-over";
     public static final String ALT_NAME_NAME = "alt_name";
+    public static final String REJECT_REPEATLESS_NAME = "reject-repeatless";
 
     static boolean isKnownKeyword(String key) {
         return key.equals(PROTOCOL_NAME)
@@ -715,7 +716,7 @@ public final class IrpDatabase {
         NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
             return new NamedProtocol(getName(), getCName(), getIrp(), getDocumentation(),
                     getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
-                    getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getProperties(PREFER_OVER_NAME), map);
+                    getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getFirstProperty(REJECT_REPEATLESS_NAME), getProperties(PREFER_OVER_NAME), map);
         }
 
         @Override

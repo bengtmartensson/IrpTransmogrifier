@@ -62,9 +62,10 @@ public final class NamedProtocol extends Protocol {
     private final boolean decodable;
     private final List<String> preferOver;
     private final Map<String, List<String>> auxParameters;
+    private final boolean rejectRepeatless;
 
     public NamedProtocol(String name, String cName, String irp, String documentation, String frequencyTolerance,
-            String absoluteTolerance, String relativeTolerance, String minimumLeadout, String decodable,
+            String absoluteTolerance, String relativeTolerance, String minimumLeadout, String decodable, String rejectRepeatless,
             List<String> preferOver, Map<String, List<String>> map)
             throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         super(irp);
@@ -77,6 +78,7 @@ public final class NamedProtocol extends Protocol {
         this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : null;
         this.minimumLeadout = minimumLeadout != null ? Double.parseDouble(minimumLeadout) : null;
         this.decodable = decodable == null || Boolean.parseBoolean(decodable);
+        this.rejectRepeatless = rejectRepeatless == null || Boolean.parseBoolean(rejectRepeatless);
         this.preferOver = preferOver;
         this.auxParameters = new HashMap<>(map.size());
         map.entrySet().stream().filter((kvp) -> (!IrpDatabase.isKnownKeyword(kvp.getKey()))).forEach((kvp) -> {
@@ -85,7 +87,7 @@ public final class NamedProtocol extends Protocol {
     }
 
     public NamedProtocol(String name, String irp, String documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
-        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, new HashMap<>(0));
+        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, null, new HashMap<>(0));
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted,
@@ -95,7 +97,7 @@ public final class NamedProtocol extends Protocol {
             //return null;
             throw new ProtocolNotDecodableException(name);
 
-        return super.recognize(irSignal, strict, loose, keepDefaulted,
+        return super.recognize(irSignal, strict || isRejectRepeats(), loose, keepDefaulted,
                 getFrequencyTolerance(userFrequencyTolerance), getAbsoluteTolerance(userAbsoluteTolerance),
                 getRelativeTolerance(userRelativeTolerance), getMinimumLeadout(userMinimumLeadout));
     }
@@ -174,6 +176,10 @@ public final class NamedProtocol extends Protocol {
 
     public boolean isDecodeable() {
         return decodable;
+    }
+
+    public boolean isRejectRepeats() {
+        return rejectRepeatless;
     }
 
     private double getDoubleWithSubstitute(Double userValue, Double standardValue, double fallback) {

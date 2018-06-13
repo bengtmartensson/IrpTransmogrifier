@@ -891,6 +891,24 @@ In ProntoEdit, DecodeIr's "Device" is called "Customer Code"; DecodeIr's "Subdev
         <irp:irp><![CDATA[{35.7k,msb}<50p,-120p|21p,-120p>(25:6,(H4-1):2,(H3-1):2,(H2-1):2,(H1-1):2,P:1,(D-1):3,F:2,0:2,sum:4,-1160p)*{   P=~(#(D-1)+#F):1,sum=9+((H4-1)*4+(H3-1)) + ((H2-1)*4+(H1-1)) + (P*8+(D-1)) + F*4}[H1:1..4, H2:1..4, H3:1..4, H4:1..4, D:1..6, F:0..2]]]></irp:irp>
         <irp:documentation>This protocol is/was used by the so-called RS-200 RF (433MHz) controlled switches, that was sold by Conrad Electronics. There is a "house number" consisting of for digits, each in the range 1 to 4. These are called H1, H2, H3, and H4 in the IRP. There is also a "device address". Officially, it ranges from 1 to 4, however, at least on the hardware I tried, 5 can also be used and assigned to a receiver. Also, 6 was working, and in fact controlled the "group" consisting of all devices with address 1,...,5. For 7 and 8, no function has been verified. F=0 is the power on command, F=1 the power off command, and F=2 the power toggle command.</irp:documentation>
     </irp:protocol>
+    <irp:protocol name="RTI_Relay">
+        <irp:irp><![CDATA[
+         {40.244k,398,msb}<1,-1|-1,1>(1,A:31,F:1,F:8,D:23,D:8,0:4,-19.5m)*{A=0x7fe08080}[F:0..1,D:0..255]
+        ]]>
+        </irp:irp>
+        <irp:documentation>Protocol used by RTI RCM-4 Relay module, see
+            <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=101276">this</a>.
+        </irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="RTI_Relay_alt">
+        <irp:parameter name="decodable">false</irp:parameter>
+        <irp:irp><![CDATA[
+         {40.244k,398,msb}<1,-1|-1,1>(1,A:31,F:1,F:8,D:23,D:8,0:4,-19.5m)*{A=0x7fe08080,D=2**(4-N)}[F:0..1,N:1..4]
+        ]]>
+        </irp:irp>
+        <irp:documentation>Different parametrization of RTI_Relay.
+        </irp:documentation>
+    </irp:protocol>
     <irp:protocol c-name="Sampo" name="Sampo">
         <irp:irp><![CDATA[{38.4k, 833}<1,-1|1,-3>(4,-4,D:6,F:6,S:6,~F:6,1,-39)*[D:0..63,S:0..63,F:0..63]]]></irp:irp>
         <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible.</irp:documentation>

@@ -582,9 +582,12 @@ public class Protocol extends IrpObject implements AggregateLister {
                 }
             }
             rest = decode(names, ending, IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
-            if (rest > 0) {
-                throw new SignalRecognitionException("Ending sequence was not fully matched");
-            }
+        }
+        if (rest > 0) {
+            if (strict)
+                throw new SignalRecognitionException("Ending sequence was not fully matched.");
+
+            logger.log(Level.WARNING, "Incomplete match; {0} input durations unmatched.", rest);
         }
         Map<String, Long> result = names.collectedNames();
         parameterSpecs.reduceNamesMap(result, keepDefaulted);
@@ -595,6 +598,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private void checkFrequency(Double frequency, double frequencyTolerance) throws SignalRecognitionException {
         boolean success = frequencyTolerance < 0
                 || (frequency != null && IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0));
+        logger.log(Level.FINE, "Frequency was checked, {0}OK.", success ? "" : "NOT ");
         if (!success)
             throw new SignalRecognitionException("Frequency does not match");
     }

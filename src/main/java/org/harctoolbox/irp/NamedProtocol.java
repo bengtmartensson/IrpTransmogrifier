@@ -78,7 +78,7 @@ public final class NamedProtocol extends Protocol {
         this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : null;
         this.minimumLeadout = minimumLeadout != null ? Double.parseDouble(minimumLeadout) : null;
         this.decodable = decodable == null || Boolean.parseBoolean(decodable);
-        this.rejectRepeatless = rejectRepeatless == null || Boolean.parseBoolean(rejectRepeatless);
+        this.rejectRepeatless = rejectRepeatless != null && Boolean.parseBoolean(rejectRepeatless);
         this.preferOver = preferOver;
         this.auxParameters = new HashMap<>(map.size());
         map.entrySet().stream().filter((kvp) -> (!IrpDatabase.isKnownKeyword(kvp.getKey()))).forEach((kvp) -> {

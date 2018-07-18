@@ -213,7 +213,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         if (!recognizeData.check(isOn())) {
             IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
             throw new SignalRecognitionException("Found flash when gap expected, or vice versa");
@@ -225,7 +225,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
             throw new SignalRecognitionException(ex);
         }
-        recognize(recognizeData, actual, wanted);
+        recognize(recognizeData, actual, wanted, isLast);
     }
 
     @Override
@@ -266,13 +266,13 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return 0;
     }
 
-    protected void recognize(RecognizeData recognizeData, double actual, double wanted) throws SignalRecognitionException {
+    protected void recognize(RecognizeData recognizeData, double actual, double wanted, boolean isLast) throws SignalRecognitionException {
         boolean equals = IrCoreUtils.approximatelyEquals(actual, wanted, recognizeData.getAbsoluteTolerance(), recognizeData.getRelativeTolerance());
         if (equals)
             recognizeData.consume();
         else if (actual > wanted && recognizeData.allowChopping())
             recognizeData.consume(wanted);
-        else if (recognizeData.leadoutOk())
+        else if (recognizeData.leadoutOk(isLast))
             recognizeData.consume();
         else
             throw new SignalRecognitionException("Duration does not parse");

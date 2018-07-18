@@ -191,8 +191,8 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.hasConsumed = hasConsumed;
     }
 
-    public boolean leadoutOk() {
-        return (position == irSequence.getLength() - 1) && (get() >= minimumLeadout);
+    public boolean leadoutOk(boolean isLast) {
+        return isLast && (get() >= minimumLeadout);
     }
 
     public boolean check(boolean on) {

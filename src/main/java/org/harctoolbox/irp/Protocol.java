@@ -620,7 +620,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     private void decode(RecognizeData recognizeData) throws SignalRecognitionException {
-        bitspecIrstream.decode(recognizeData, new ArrayList<>(0));
+        bitspecIrstream.decode(recognizeData, new ArrayList<>(0), true);
         recognizeData.finish();
 //        if (!recognizeData.isFinished())
 //            throw new SignalRecognitionException("IrSequence not fully matched");

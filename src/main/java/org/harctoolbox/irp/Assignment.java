@@ -152,7 +152,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         try {
             NameEngine nameEngine = recognizeData.getNameEngine();
             String nameString = name.toString();

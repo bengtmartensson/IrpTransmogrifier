@@ -86,7 +86,7 @@ public final class Extent extends Duration {
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         double physical = recognizeData.getExtentDuration();
         double theoretical;
         try {
@@ -95,7 +95,7 @@ public final class Extent extends Duration {
             throw new SignalRecognitionException(ex);
         }
         recognizeData.markExtentStart();
-        recognize(recognizeData, physical, theoretical);
+        recognize(recognizeData, physical, theoretical, isLast);
     }
 
     @Override

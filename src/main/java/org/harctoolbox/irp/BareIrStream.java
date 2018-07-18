@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -241,10 +242,12 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         IrSignal.Pass pass = null;
-        for (IrStreamItem irStreamItem : irStreamItems)
-            irStreamItem.decode(recognizeData, bitSpecStack);
+        for (Iterator<IrStreamItem> it = irStreamItems.iterator(); it.hasNext();) {
+            IrStreamItem irStreamItem = it.next();
+            irStreamItem.decode(recognizeData, bitSpecStack, isLast && !it.hasNext());
+        }
     }
 
     @Override

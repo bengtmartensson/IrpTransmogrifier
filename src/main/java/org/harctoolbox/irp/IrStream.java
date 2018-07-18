@@ -190,9 +190,9 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) throws SignalRecognitionException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs, boolean isLast) throws SignalRecognitionException {
         Pass pass = null;
-        bareIrStream.decode(recognizeData, bitSpecs);
+        bareIrStream.decode(recognizeData, bitSpecs, isLast);
     }
 
     @Override

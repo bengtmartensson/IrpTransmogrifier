@@ -139,7 +139,7 @@ public final class Variation extends IrpObject implements IrStreamItem {
 //    }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs) {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs, boolean isLast) {
         throw new ThisCannotHappenException("decode cannot be called on a protocol with variation.");
     }
 

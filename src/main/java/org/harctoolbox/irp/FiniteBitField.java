@@ -240,7 +240,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException {
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         try {
             BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
             int chunkSize = bitSpec.getChunkSize();
@@ -264,7 +264,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                     poppedStack.remove(poppedStack.size()-1);
 
                     try {
-                        bitSpec.get(bareIrStreamNo).decode(inData, poppedStack);
+                        bitSpec.get(bareIrStreamNo).decode(inData, poppedStack, false);
                         // match!
                         break;
                     } catch (SignalRecognitionException ex) {

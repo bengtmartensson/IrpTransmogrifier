@@ -122,7 +122,7 @@ public interface IrStreamItem extends XmlExport {
 
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException;
 
-    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException;
+    public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException;
 
     public boolean nonConstantBitFieldLength();
 

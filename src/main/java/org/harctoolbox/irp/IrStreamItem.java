@@ -138,7 +138,7 @@ public interface IrStreamItem extends XmlExport {
      * variables in the dictionary replaced by their values in the dictionary.
      * Does not change the containing object. May return the object itself,
      * or share sub-objects with it.
-     * @param constantVariables Map<String, Long> of variables to replace.
+     * @param constantVariables Map&lt;String, Long&gt; of variables to replace.
      * @return IrStreamItem of the same type.
      */
     public IrStreamItem substituteConstantVariables(Map<String, Long> constantVariables);

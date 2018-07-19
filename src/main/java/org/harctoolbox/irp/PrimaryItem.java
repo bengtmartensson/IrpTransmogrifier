@@ -90,7 +90,7 @@ public abstract class PrimaryItem extends IrpObject implements Numerical, Equati
      * variables in the dictionary replaced by their values in the dictionary.
      * Does not change the containing object. May return the object itself,
      * or share sub-objects with it.
-     * @param constantVariables Map<String, Long> of variables to replace.
+     * @param constantVariables Map&lt;String, Long&gt; of variables to replace.
      * @return PrimaryItem of the same type.
      */
     public abstract PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables);

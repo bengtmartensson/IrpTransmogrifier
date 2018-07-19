@@ -246,7 +246,7 @@ public final class BitSpec extends IrpObject implements AggregateLister {
      * Checks if the BitSpec is of type &lt;a|-a&gt; (a != 0)
      * @param nameEngine
      * @param generalSpec
-     * @param inverted If true then a > 0, i.e., starts with a flash.
+     * @param inverted If true then a &gt; 0, i.e., starts with a flash.
      * @return
      */
     public boolean isTrivial(GeneralSpec generalSpec, NameEngine nameEngine, boolean inverted) {

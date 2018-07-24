@@ -320,6 +320,10 @@ public final class IrSignal implements Cloneable {
         return map.get(pass).getLength();
     }
 
+    public boolean introOnly() {
+        return repeatSequence.isEmpty() && endingSequence.isEmpty();
+    }
+
     @Override
     public String toString() {
         return toString(false);

@@ -285,8 +285,8 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         if (map.isEmpty())
             return "";
         StringJoiner stringJoiner = new StringJoiner("," + separator, "{", "}");
-        map.entrySet().stream().forEach((kvp) -> {
-            stringJoiner.add(kvp.getKey() + "=" + kvp.getValue().toIrpString(radix));
+        map.keySet().stream().sorted().forEach((key) -> {
+            stringJoiner.add(key + "=" + map.get(key).toIrpString(radix));
         });
         return stringJoiner.toString();
     }

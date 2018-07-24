@@ -36,11 +36,11 @@ public final class RecognizeData extends Traverser implements Cloneable {
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
             double absoulteTolerance, double relativeTolerance, double minimumLeadout) {
-        this(generalSpec, definitions, irSequence, 0, nameMap, interleaving, absoulteTolerance, relativeTolerance, minimumLeadout);
+        this(generalSpec, definitions, irSequence, 0, interleaving, nameMap, absoulteTolerance, relativeTolerance, minimumLeadout);
     }
 
-    private RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position/*start, int length*/,
-            ParameterCollector parameterCollector, boolean interleaving, double absoluteTolerance, double relativeTolerance, double minimumLeadout) {
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position,
+            boolean interleaving, ParameterCollector parameterCollector, double absoluteTolerance, double relativeTolerance, double minimumLeadout) {
         super(generalSpec, definitions);
         danglingBitFieldData = new BitwiseParameter();
         this.position = position;

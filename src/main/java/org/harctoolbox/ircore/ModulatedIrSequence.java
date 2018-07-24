@@ -87,6 +87,19 @@ public final class ModulatedIrSequence extends IrSequence {
     }
 
     /**
+     *
+     * @param src
+     * @param start
+     * @param length
+     * @throws InvalidArgumentException
+     */
+    public ModulatedIrSequence(ModulatedIrSequence src, int start, int length) throws InvalidArgumentException {
+        super(src, start, length);
+        frequency = src.frequency;
+        dutyCycle = src.dutyCycle;
+    }
+
+    /**
      * Constructs a ModulatedIrSequence from its arguments.
      *
      * @param durations

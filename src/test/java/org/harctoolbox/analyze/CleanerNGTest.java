@@ -95,12 +95,8 @@ public class CleanerNGTest {
         System.out.println("clean");
         int absoluteTolerance = 60;
         double relativeTolerance = 0.1;
-        try {
-            IrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
-            Assert.assertTrue(result.approximatelyEquals(irSequence, 3.0, 0.01));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        IrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
+        Assert.assertTrue(result.approximatelyEquals(irSequence, 3.0, 0.01));
     }
 
     /**

@@ -112,12 +112,16 @@ public final class ParameterCollector implements Cloneable {
 
     public Map<String, Long> collectedNames() {
         Map<String, Long> names = new HashMap<>(map.size());
+        collectedNames(names);
+        return names;
+    }
+
+    public void collectedNames(Map<String, Long> names) {
         map.entrySet().forEach((kvp) -> {
             BitwiseParameter parameter = kvp.getValue();
             if (!parameter.isEmpty())
                 names.put(kvp.getKey(), parameter.getValue());
         });
-        return names;
     }
 
     void transferToNamesMap(Map<String, Long> nameEngine) {

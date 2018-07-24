@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -412,7 +413,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         List<Map<String, Object>> list = new ArrayList<>(irStreamItems.size());
         irStreamItems.stream().map((item) -> item.propertiesMap(generalSpec, nameEngine)).filter((m) -> (!m.isEmpty())).forEachOrdered((m) -> {
             if (m.containsKey("items"))
-                list.addAll((List<Map<String, Object>>) m.get("items"));
+                list.addAll((Collection<? extends Map<String, Object>>) m.get("items"));
             else
                 list.add(m);
         });

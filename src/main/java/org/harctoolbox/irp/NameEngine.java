@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
     private final static Logger logger = Logger.getLogger(NameEngine.class.getName());
 
     @SuppressWarnings("PackageVisibleField")
-    static NameEngine empty = new NameEngine();
+    public static final NameEngine empty = new NameEngine();
 
     public static NameEngine parseLoose(String str) throws InvalidNameException {
         NameEngine nameEngine = new NameEngine();
@@ -176,6 +176,14 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
     public boolean numericallyEquals(NameEngine other) {
         try {
             return numericallyEquals(other.toMap());
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    public boolean numericallyEquals(Decoder.Decode other) {
+        try {
+            return numericallyEquals(other.getMap());
         } catch (Exception ex) {
             return false;
         }

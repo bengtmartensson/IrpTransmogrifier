@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,36 +17,47 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
+/**
+ * This class makes a decoder of an IrpDatabase, or optionally a subset thereof.
+ * (The subset is essentially to make debugging more comfortable.)
+ * There are essentially two member functions, called {@code decode}, operating
+ * on {@link org.harctoolbox.ircore.IrSignal} or {@link org.harctoolbox.ircore.ModulatedIrSequence}
+ * respectively.
+ * These have slightly different semantics.
+ */
 public final class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
-    private static final String CONFIG_PATH = "src/main/resources/IrpProtocols.xml";
 
+    /**
+     * Allows to invoke the decoding from the command line.
+     * @param args Pronto hex type IR signal.
+     */
     public static void main(String[] args) {
         try {
-            Decoder decoder = new Decoder(CONFIG_PATH);
-            if (args.length == 0) {
-                decoder.testDecode(123);
-            } else {
-                IrSignal irSignal = Pronto.parse(args);
-                Map<String, Decode> decodes = decoder.decode(irSignal, true, false, true, true);
-                decodes.values().forEach((kvp) -> {
-                    System.out.println(kvp);
-                });
-            }
+            Decoder decoder = new Decoder();
+            IrSignal irSignal = Pronto.parse(args);
+            Map<String, Decode> decodes = decoder.decode(irSignal);
+            decodes.values().forEach((kvp) -> {
+                System.out.println(kvp);
+            });
         } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | IrpParseException ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
@@ -55,12 +66,26 @@ public final class Decoder {
 
     private final Map<String, NamedProtocol> parsedProtocols;
 
-    public Decoder(String irpDatabasePath) throws IOException, IrpParseException {
+    public Decoder(File irpDatabasePath) throws IOException, IrpParseException {
         this(new IrpDatabase(irpDatabasePath), null);
     }
 
     public Decoder(IrpDatabase irpDatabase) throws IrpParseException {
         this(irpDatabase, null);
+    }
+
+    public Decoder() throws IrpParseException, IOException {
+        this(new IrpDatabase());
+    }
+
+    /**
+     * Mainly for testing and debugging.
+     * @param names
+     * @throws java.io.IOException
+     * @throws org.harctoolbox.irp.IrpParseException
+     */
+    public Decoder(String... names) throws IOException, IrpParseException {
+        this(new IrpDatabase(), Arrays.asList(names));
     }
 
     /**
@@ -69,7 +94,7 @@ public final class Decoder {
      * @param names If non-null and non-empty, include only the protocols with these names.
      * @throws org.harctoolbox.irp.IrpParseException
      */
-    public Decoder(IrpDatabase irpDatabase, Collection<String> names) throws IrpParseException {
+    public Decoder(IrpDatabase irpDatabase, List<String> names) throws IrpParseException {
         irpDatabase.expand();
         parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
         Collection<String> list = names != null ? names : irpDatabase.getNames();
@@ -79,127 +104,175 @@ public final class Decoder {
                 if (namedProtocol.isDecodeable())
                     parsedProtocols.put(protocolName, namedProtocol);
             } catch (NameUnassignedException | UnknownProtocolException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
-                //ex.printStackTrace();
                 throw new ThisCannotHappenException(ex);
             }
         });
     }
 
-    public boolean testDecode() {
-        return testDecode(new Random());
-    }
-
-    public boolean testDecode(long seed) {
-        return testDecode(new Random(seed));
-    }
-
-    public boolean testDecode(Random random) {
-        try {
-            for (NamedProtocol protocol : parsedProtocols.values()) {
-                NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
-                IrSignal irSignal = protocol.toIrSignal(nameEngine);
-                Map<String, Decode> decodes = decode(irSignal, true, false, true, true);
-                boolean success = false;
-                for (Decode decode : decodes.values()) {
-                    System.out.println(decode);
-                    if (decode.same(protocol.getName(), nameEngine)) {
-                        success = true;
-                        break;
-                    }
-                }
-                if (!success) {
-                    System.out.println(">>>>>>>>> " + protocol.getName() + "\t" + nameEngine.toString());
-                    decodes.values().forEach((decode) -> {
-                        System.out.println("----------------> " + decode.toString());
-                    });
-
-                    return false;
+    /**
+     * Delivers a List of Map of Decodes from a ModulatedIrSequence.
+     * @param irSequence
+     * @param strict If true, intro-, repeat-, and ending sequences are required to match exactly.
+     * @param allDecodes If true, output all possible decodes. Otherwise, remove decodes according to prefer-over.
+     * @param removeDefaultedParameters If true, remove parameters with value equals to their default.
+     * @param frequencyTolerance
+     * @param absoluteTolerance
+     * @param relativeTolerance
+     * @param minimumLeadout
+     * @return List of Maps of decodes.
+     */
+    public List<Map<String, Decode>> decode(ModulatedIrSequence irSequence, boolean strict, boolean allDecodes, boolean removeDefaultedParameters,
+            Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
+        int pos = 0;
+        int oldPos;
+        List<Map<String, Decode>> list = new ArrayList<>(1);
+        do {
+            Map<String, Decode> decodes = new LinkedHashMap<>(8);
+            oldPos = pos;
+            for (NamedProtocol namedProtocol : parsedProtocols.values()) {
+                try {
+                    //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
+                    Decode decode = namedProtocol.recognize(irSequence, oldPos, strict,
+                            frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+                    if (removeDefaultedParameters)
+                        decode.removeDefaulteds();
+                    decodes.put(namedProtocol.getName(), decode);
+                } catch (SignalRecognitionException ex) {
+                    logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
+                } catch (NamedProtocol.ProtocolNotDecodableException ex) {
                 }
             }
+            if (!decodes.isEmpty()) {
+                if (!allDecodes)
+                    reduce(decodes);
+                pos = checkForConsistency(decodes);
+                list.add(decodes);
+            }
 
-            return true;
-        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException ex) {
-            throw new ThisCannotHappenException(ex);
-        }
+        } while (pos > oldPos && pos < irSequence.getLength() - 2);
+        return list;
     }
 
     /**
-     * Deliver a Map of Decodes
-     * @param irSignal IrSignal to be decoded.
+     * Delivers a Map of Decodes from an IrSignal.
+     * If {@code strict == true}, the intro, repeat, and ending sequences are required to match exactly.
+     * Otherwise, the irSignal's intro may match a Protocol's repeat, and a missing ending sequence is considered
+     * to match a Protocol's non-empty ending. on return, a dictionary (Map) is returned, containing all possible decodes of the given
+     * input signal.
+     * Unless {@code allDecodes == true}, decodes are eliminated from this list according to the
+     * NamedProtocol's {@code prefer-over} property.
+     * @param irSignal Input data
      * @param strict If true, intro-, repeat-, and ending sequences are required to match exactly.
-     * @param loose Accept certain looseness, like trailing "junk" durations. Not yet implemented.
      * @param allDecodes If true, output all possible decodes. Otherwise, remove decodes according to prefer-over.
-     * @param keepDefaultedParameters If false, remove parameters with value equals to their default.
+     * @param removeDefaultedParameters If true, parameters with value equals to their defaults in the Protocol are removed.
      * @param frequencyTolerance
      * @param absoluteTolerance
      * @param relativeTolerance
      * @param minimumLeadout
      * @return Map of decodes with protocol name as key.
      */
-    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean loose, boolean allDecodes, boolean keepDefaultedParameters,
+    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean allDecodes, boolean removeDefaultedParameters,
             Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
-        Map<String, Decode> output = new LinkedHashMap<>(8);
-        parsedProtocols.values().forEach((namedProtocol) -> {
-            Map<String, Long> parameters;
+        Map<String, Decode> decodes = new HashMap<>(8);
+        parsedProtocols.values().forEach((NamedProtocol namedProtocol) -> {
             try {
                 //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
-
-                parameters = namedProtocol.recognize(irSignal, strict, loose, keepDefaultedParameters,
+                Map<String, Long> params = namedProtocol.recognize(irSignal, strict,
                         frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-                if (parameters == null)
-                    throw new ThisCannotHappenException(namedProtocol.getName());
-                output.put(namedProtocol.getName(), new Decode(namedProtocol, parameters));
+                if (removeDefaultedParameters)
+                    namedProtocol.removeDefaulteds(params);
+                Decode decode = new Decode(namedProtocol, params);
+                decodes.put(namedProtocol.getName(), decode);
             } catch (DomainViolationException | SignalRecognitionException ex) {
                 logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
             } catch (NamedProtocol.ProtocolNotDecodableException ex) {
             }
         });
 
-        if (!allDecodes) {
-            List<String> protocols = new ArrayList<>(output.keySet());
-            protocols.forEach((name) -> {
-                Decode decode = output.get(name);
-                if (decode != null) {
-                    NamedProtocol prot = output.get(name).getNamedProtocol();
-                    if (prot != null) {
-                        List<String> preferOvers = prot.getPreferOver();
-                        if (preferOvers != null)
-                            preferOvers.forEach((protName) -> {
-                                output.remove(protName);
-                            });
-                    }
-                }
-            });
-        }
-
-        return output;
+        if (!allDecodes)
+            reduce(decodes);
+        return decodes;
     }
 
     public Map<String, Decode> decode(IrSignal irSignal) {
-        return decode(irSignal, true, false, false, false, null, null, null, null);
+        return decode(irSignal, false, false, true);
     }
 
-    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean loose, boolean allDecodes, boolean keepDefaultedParameters) {
-        return decode(irSignal, strict, loose, allDecodes, keepDefaultedParameters, null, null, null, null);
+    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean allDecodes, boolean removeDefaultedParameters) {
+        return decode(irSignal, strict, allDecodes, removeDefaultedParameters, null, null, null, null);
+    }
+
+    private void reduce(Map<String, Decode> decodes) {
+        List<String> protocols = new ArrayList<>(decodes.keySet());
+        protocols.forEach((name) -> {
+            Decode decode = decodes.get(name);
+            if (decode != null) {
+                NamedProtocol prot = decodes.get(name).getNamedProtocol();
+                if (prot != null) {
+                    List<String> preferOvers = prot.getPreferOver();
+                    if (preferOvers != null) {
+                        preferOvers.forEach((protName) -> {
+                            decodes.remove(protName);
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Basically for testing; therefore package private.
+     * @return the parsedProtocols
+     */
+    Collection<NamedProtocol> getParsedProtocols() {
+        return parsedProtocols.values();
+    }
+
+    private int checkForConsistency(Map<String, Decode> decodes) {
+        int min = 99999;
+        int max = -9999;
+        for (Decode decode : decodes.values()) {
+            min = Math.min(min, decode.endPos);
+            max = Math.max(max, decode.endPos);
+        }
+        if (min != max) {
+            logger.warning("Decodes of different length found. Keeping only the longest");
+            List<Decode> decs = new ArrayList<>(decodes.values());
+            for (Decode d : decs) {
+                if (d.getEndPos() < max)
+                    decodes.remove(d.namedProtocol.getName());
+            }
+        }
+        return max;
     }
 
     public static class Decode {
         private final NamedProtocol namedProtocol;
-        private final NameEngine nameEngine;
-        private final String notes;
+        //private final NameEngine nameEngine;
+        private final Map<String, Long> map;
+        private final int begPos;
+        private final int endPos;
+        private final int numberOfRepetitions;
 
-        public Decode(NamedProtocol namedProtocol, Map<String, Long> map) {
-            this(namedProtocol, new NameEngine(map), null);
-        }
-
-        public Decode(NamedProtocol namedProtocol, NameEngine nameEngine) {
-            this(namedProtocol, nameEngine, null);
-        }
-
-        public Decode(NamedProtocol namedProtocol, NameEngine nameEngine, String notes) {
+        public Decode(NamedProtocol namedProtocol, Map<String, Long> map, int begPos, int endPos, int numberOfRepetitions) {
             this.namedProtocol = namedProtocol;
-            this.nameEngine = nameEngine;
-            this.notes = notes == null ? "" : notes;
+            this.map = map;
+            this.begPos = begPos;
+            this.endPos = endPos;
+            this.numberOfRepetitions = numberOfRepetitions;
+        }
+
+        Decode(NamedProtocol namedProtocol, Map<String, Long> params) {
+            this(namedProtocol, params, -1, -1, 0);
+        }
+
+        Decode(NamedProtocol namedProtocol, Decode decode) {
+            this.namedProtocol = namedProtocol;
+            this.map = decode.map;
+            //this.notes = notes == null ? "" : notes;
+            this.begPos = decode.begPos;
+            this.endPos = decode.endPos;
+            this.numberOfRepetitions = decode.numberOfRepetitions;
         }
 
         public boolean same(String protocolName, NameEngine nameEngine) {
@@ -213,8 +286,10 @@ public final class Decoder {
         }
 
         public String toString(int radix) {
-            return namedProtocol.getName() + ": " + nameEngine.toIrpString(radix)
-                    + (notes.isEmpty() ? "" : " (" + notes + ")");
+            return namedProtocol.getName() + ": " + mapToString(radix)
+                    + (begPos != -1 ? (", beg=" + begPos) : "")
+                    + (endPos != -1 ? (", end=" + endPos) : "")
+                    + (numberOfRepetitions != 0 ? (", reps=" + numberOfRepetitions) : "");
         }
 
         /**
@@ -224,22 +299,48 @@ public final class Decoder {
             return namedProtocol;
         }
 
-        /**
-         * @return the nameEngine
-         */
-        public NameEngine getNameEngine() {
-            return nameEngine;
-        }
-
-        /**
-         * @return the notes
-         */
-        public String getNotes() {
-            return notes;
-        }
-
         public String getName() {
             return namedProtocol.getName();
+        }
+
+        /**
+         * @return the begPos
+         */
+        int getBegPos() {
+            return begPos;
+        }
+
+        /**
+         * @return the endPos
+         */
+        int getEndPos() {
+            return endPos;
+        }
+
+        /**
+         * @return the numberOfRepetitions
+         */
+        int getNumberOfRepetitions() {
+            return numberOfRepetitions;
+        }
+
+        @SuppressWarnings("ReturnOfCollectionOrArrayField")
+        Map<String, Long> getMap() {
+            return map;
+        }
+
+        private void removeDefaulteds() {
+            namedProtocol.removeDefaulteds(map);
+        }
+
+        private String mapToString(int radix) {
+            if (map.isEmpty())
+                return "";
+            StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
+            map.keySet().stream().sorted().forEach((key) -> {
+                stringJoiner.add(key + "=" + Long.toString(map.get(key), radix));
+            });
+            return stringJoiner.toString();
         }
     }
 }

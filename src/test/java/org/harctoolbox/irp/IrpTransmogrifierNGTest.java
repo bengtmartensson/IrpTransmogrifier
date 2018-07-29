@@ -169,11 +169,43 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testDecodeRc5() {
+        System.out.println("decodeRc5");
+        String args = "decode -p rc5 0000 0073 0000 000B 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "RC5: {D=7,F=5}");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeRc5_1() {
+        System.out.println("decodeRc5_1");
+        String args = "decode -p rc5 0000 0073 000B 0000 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "RC5: {D=7,F=5}, beg=0, end=22, reps=1");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeRc5_2() {
+        System.out.println("decodeRc5_2");
+        String args = "decode --strict -p rc5 0000 0073 000B 0000 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "RC5: {D=7,F=5}, beg=0, end=22, reps=1"); // this is wrong, really. FIXME
+    }
+
+    @Test(enabled = true)
     public void testDecodeRepeatedNec1() {
         System.out.println("decodeRepeatedNec1");
-        String args = "decode  -r  -- +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193";
+        String args = "decode -p nec1 -r  +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193";
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeNec1OneDitto() {
+        System.out.println("testDecodeNec1OneDitto");
+        String args = "decode -p nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=72, reps=1");
     }
 
     @Test(enabled = true)
@@ -182,6 +214,27 @@ public class IrpTransmogrifierNGTest {
         String args = "decode  -r  +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626";
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, null);
+    }
+
+    @Test(enabled = true)
+    public void testDecodeRecs80Junk() {
+        System.out.println("testDecodeRecs80Junk");
+        String recs80 = "+158 -7426 +158 -7426 +158 -7426 +158 -7426 +158 -4898 +158 -7426 +158 -7426 +158 -7426 +158 -4898 +158 -4898 +158 -4898 +158 -45000";
+        String junk = " 1234 5678";
+        String result = IrpTransmogrifier.execute("decode " + recs80);
+        assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=24, reps=1");
+        result = IrpTransmogrifier.execute("decode " + recs80 + junk);
+        assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=24, reps=1");
+        result = IrpTransmogrifier.execute("decode --strict" + recs80);
+        assertEquals(result, null);
+    }
+
+    @Test(enabled = true)
+    public void testDecodeRecs80Multiple() {
+        System.out.println("testDecodeRecs80Multiple");
+        String recs80Multiple = "+200 -7300 +200 -7350 +150 -4850 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +150 -7350 +200 -7350 +150 -4850 +200 -7300 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -4850 +200 -7350 +150 -30100 +150 -7350 +200 -4800 +200 -4850 +150 -7350 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -7350 +200 -30100 +200 -7350 +150 -4850 +200 -4800 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +200 -7300 +200 -4850 +150 -4850 +200 -7350 +150 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -7350 +150 -30100";
+        String result = IrpTransmogrifier.execute("decode  --keep-defaulted " + recs80Multiple);
+        assertEquals(result, "Signal 1:\n\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2\nSignal 2:\n\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
     }
 
     @Test(enabled = true)

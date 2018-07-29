@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ import org.xml.sax.SAXException;
 public final class IrpDatabase {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
 
+    public static final String STANDARD_CONFIG_PATH = "src/main/resources/IrpProtocols.xml";
     public static final String IRP_PROTOCOL_NS = "http://www.harctoolbox.org/irp-protocols";
     public static final String IRP_PROTOCOL_SCHEMA_LOCATION = "http://www.harctoolbox.org/schemas/irp-protocols.xsd";
     public static final String IRP_NAMESPACE_PREFIX = "irp";
@@ -261,11 +262,11 @@ public final class IrpDatabase {
 
     private Map<String, String> aliases;
 
-    private IrpDatabase() {
-        this.configFileVersion = "";
-        protocols = new LinkedHashMap<>(APRIORI_NUMBER_PROTOCOLS);
-        aliases = new LinkedHashMap<>(16);
-    }
+//    private IrpDatabase() {
+//        this.configFileVersion = "";
+//        protocols = new LinkedHashMap<>(APRIORI_NUMBER_PROTOCOLS);
+//        aliases = new LinkedHashMap<>(16);
+//    }
 
     public IrpDatabase(Reader reader) throws IOException {
         this(openXmlReader(reader));
@@ -281,6 +282,10 @@ public final class IrpDatabase {
 
     public IrpDatabase(String file) throws IOException {
         this(IrCoreUtils.getInputSteam(file));
+    }
+
+    public IrpDatabase() throws IOException {
+        this(new File(STANDARD_CONFIG_PATH));
     }
 
     /**

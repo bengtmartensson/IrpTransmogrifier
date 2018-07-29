@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -121,11 +121,6 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return str.toString();
     }
 
-//    @Override
-//    public String toIrpString() {
-//        return toString();
-//    }
-
     @Override
     public Element toElement(Document document) {
         Element el = super.toElement(document);
@@ -192,13 +187,7 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return weight;
     }
 
-    void reduceNamesMap(Map<String, Long> namesMap, boolean keepDefaulted) {
-        removeNotInParameterSpec(namesMap);
-        if (!keepDefaulted)
-            remoteDefaulteds(namesMap);
-    }
-
-    private void remoteDefaulteds(Map<String, Long> namesMap) {
+    public void removeDefaulteds(Map<String, Long> namesMap) {
         NameEngine nameEngine = new NameEngine(namesMap);
         List<String> names = new ArrayList<>(namesMap.keySet());
         names.forEach((String name) -> {
@@ -214,7 +203,7 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         });
     }
 
-    private void removeNotInParameterSpec(Map<String, Long> namesMap) {
+    public void removeNotInParameterSpec(Map<String, Long> namesMap) {
         List<String> names = new ArrayList<>(namesMap.keySet());
          names.stream().filter((name) -> (!map.containsKey(name))).forEach((name) -> {
             namesMap.remove(name);
@@ -231,12 +220,6 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         template.addAttribute("arg", list);
         return template.render();
     }
-
-//    void XXfillAttributes(ItemCodeGenerator template, String parameterSpecsName) {
-//        map.values().stream().forEach((ps) -> {
-//            template.addAggregate(parameterSpecsName + ".{name, min, max, memory}", ps.getName(), ps.getMin(), ps.getMax(), ps.hasMemory());
-//        });
-//    }
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {

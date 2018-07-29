@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -769,7 +769,7 @@ public final class IrpTransmogrifier {
         if (commandAnalyze.chop != null) {
             List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args), commandAnalyze.trailingGap);
             if (sequences.size() > 1)
-                throw new UsageException("Cannot use --chop together with several IR seqeunces");
+                throw new UsageException("Cannot use --chop together with several IR sequences");
             sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
             switch (sequences.size()) {
                 case 2:
@@ -810,8 +810,7 @@ public final class IrpTransmogrifier {
         Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
         irSequences.putAll(modulatedIrSequences);
         double sum = 0.0;
-        for (ModulatedIrSequence mis : modulatedIrSequences.values())
-            sum += mis.getFrequency();
+        sum = modulatedIrSequences.values().stream().map((mis) -> mis.getFrequency()).reduce(sum, (accumulator, _item) -> accumulator + _item);
 
         double frequency = sum / modulatedIrSequences.keySet().size();
         analyze(irSequences, frequency);
@@ -969,27 +968,62 @@ public final class IrpTransmogrifier {
         }
     }
 
-    @SuppressWarnings("AssignmentToMethodParameter")
-    private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws InvalidArgumentException {
-        if (commandDecode.repeatFinder || commandDecode.dumpRepeatfinder) {
-            // ignoring commandDecode.cleaner
+    private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
+        if (irSignal.introOnly()) {
             ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
-            RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            if (commandDecode.repeatFinder) {
+                RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
-            irSignal = repeatFinder.toIrSignalClean(sequence);
-            // logger.log(Level.INFO, "Repeat-reduced signal: {0}", irSignal.toString(true));
-            if (commandDecode.dumpRepeatfinder) {
-                out.println("RepeatReduced: " + irSignal);
-                out.println("RepeatData: " + repeatFinder.getRepeatFinderData());
+                IrSignal fixedIrSignal = repeatFinder.toIrSignalClean(sequence);
+                if (commandDecode.dumpRepeatfinder) {
+                    out.println("RepeatReduced: " + irSignal);
+                    out.println("RepeatData: " + repeatFinder.getRepeatFinderData());
+                }
+                decodeIrSignal(decoder, fixedIrSignal, name, maxNameLength);
+            } else {
+                decodeIrSequence(decoder, sequence, name, maxNameLength);
             }
-        } else if (commandDecode.cleaner) {
+        } else {
+            decodeIrSignal(decoder, irSignal, name, maxNameLength);
+        }
+    }
+
+    private void decodeIrSequence(Decoder decoder, ModulatedIrSequence irSequence, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
+        if (commandDecode.cleaner) {
+            irSequence = Cleaner.clean(irSequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            logger.log(Level.INFO, "Cleansed signal: {0}", irSequence.toString(true));
+        }
+
+        List<Map<String, Decoder.Decode>> decodes = decoder.decode(irSequence, commandDecode.strict, commandDecode.noPreferOver,
+                ! commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
+                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
+        if (decodes.size() == 1)
+            printDecodes(decodes.get(0), name, maxNameLength);
+        else {
+            for (int i = 0; i < decodes.size(); i++) {
+                out.println("Signal " + (i+1) + ":");
+                printDecodes(decodes.get(i), name, maxNameLength);
+            }
+        }
+    }
+
+
+    private void decodeIrSignal(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
+//        if (commandDecode.multiple)
+//            throw new UsageException("Cannot use --multiple with repeat- or ending sequences.");
+
+        if (commandDecode.cleaner) {
             irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
         }
 
-        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.strict, commandDecode.loose, commandDecode.noPreferOver,
-                commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
+        Map<String,Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.strict, commandDecode.noPreferOver,
+                ! commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
+        printDecodes(decodes, name, maxNameLength);
+    }
+
+    private void printDecodes(Map<String, Decoder.Decode> decodes, String name, int maxNameLength) {
         if (name != null)
             out.print(name + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
 
@@ -1442,12 +1476,10 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-i", "--input"}, description = "File/URL from which to take inputs, one per line.")
         private String input = null;
 
+        // NOTE: Removing defaulted parameter is the default from the command line. In the API, the parameter is called
+        // removeDefaulted and has the opposite semantics.
         @Parameter(names = { "-k", "--keep-defaulted"}, description = "In output, do not remove parameters that are equal to their defaults.")
         private boolean keepDefaultedParameters = false;
-
-        // Not implemented yet, therefore hidden
-        @Parameter(names = { "-l", "--loose", "--guess"}, hidden = true, description = "Accept certain looseness in decoding, like ending junk.")
-        private boolean loose = false;
 
         @Parameter(names = { "-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
         private String namedInput = null;

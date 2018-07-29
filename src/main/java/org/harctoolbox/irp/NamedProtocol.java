@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2018 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,9 +25,15 @@ import java.util.Objects;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * This class extends the Protocol class {@link Protocol} class with a few more
+ * properties, in particular a name. It corresponds to an entry in the protocol data
+ * base <code>IrpProtocols.xml</code>.
+ */
 public final class NamedProtocol extends Protocol {
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
 
@@ -90,16 +96,60 @@ public final class NamedProtocol extends Protocol {
         this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, null, new HashMap<>(0));
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout) throws DomainViolationException, SignalRecognitionException, ProtocolNotDecodableException {
+    /**
+     * This version overrides a version in {@link Protocol}. It uses protocol specific parameter values for
+     * <code>frequencyTolerance, absoluteTolerance, relativeTolerance</code>,
+     * and <code>minimumLeadout</code>, if defined.
+     * @param irSignal
+     * @param strict
+     * @return
+     * @throws SignalRecognitionException
+     */
+    @Override
+    public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException {
+        return recognize(irSignal, strict, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
+                IrCoreUtils.getAbsoluteTolerance(absoluteTolerance), IrCoreUtils.getRelativeTolerance(relativeTolerance),
+                IrCoreUtils.getMinimumLeadout(minimumLeadout));
+    }
+
+    public Map<String, Long> recognize(IrSignal irSignal, boolean strict,
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout)
+            throws DomainViolationException, SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
-            //return null;
             throw new ProtocolNotDecodableException(name);
 
-        return super.recognize(irSignal, strict || isRejectRepeats(), loose, keepDefaulted,
+        Map<String, Long> params = super.recognize(irSignal, strict || isRejectRepeats(),
                 getFrequencyTolerance(userFrequencyTolerance), getAbsoluteTolerance(userAbsoluteTolerance),
                 getRelativeTolerance(userRelativeTolerance), getMinimumLeadout(userMinimumLeadout));
+        return params;
+    }
+
+    /**
+     * Tries to match the ModulatedIrSequence in the argument, if match, return the matching parameters. If no match, throws exception.
+     * The ModulatedIrSequence should contain intro or (one or many) repeat sequences, and possibly an ending sequence.
+     * @param irSequence ModulatedIrSequence to be matched
+     * @param beginPos Where the match is effectively started, normally 0.
+     * @param strict If true, sequences must match fully; no unmatched "junk" at the end permitted.
+     * @param userFrequencyTolerance
+     * @param userAbsoluteTolerance
+     * @param userRelativeTolerance
+     * @param userMinimumLeadout
+     * @return Decoder.Decode object, containing matching data.
+     * @throws SignalRecognitionException
+     * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
+     */
+    public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, boolean strict,
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout)
+            throws SignalRecognitionException, ProtocolNotDecodableException {
+        if (!isDecodeable())
+            //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
+            throw new ProtocolNotDecodableException(name);
+
+        Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), strict,
+                getFrequencyTolerance(userFrequencyTolerance), getAbsoluteTolerance(userAbsoluteTolerance),
+                getRelativeTolerance(userRelativeTolerance), getMinimumLeadout(userMinimumLeadout));
+        return new Decoder.Decode(this, decode);
     }
 
     @Override
@@ -204,13 +254,6 @@ public final class NamedProtocol extends Protocol {
         return getDoubleWithSubstitute(userValue, minimumLeadout, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
-    @Override
-    public Map<String, Long> recognize(IrSignal irSignal, boolean strict, boolean loose, boolean keepDefaulted) throws SignalRecognitionException {
-        return recognize(irSignal, strict, loose, keepDefaulted, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
-                IrCoreUtils.getAbsoluteTolerance(absoluteTolerance), IrCoreUtils.getRelativeTolerance(relativeTolerance),
-                IrCoreUtils.getMinimumLeadout(minimumLeadout));
-    }
-
     List<String> getPreferOver() {
         return preferOver == null ? null : Collections.unmodifiableList(preferOver);
     }
@@ -274,5 +317,15 @@ public final class NamedProtocol extends Protocol {
         putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);
         map.putAll(parameters);
         return map;
+    }
+
+    /**
+     * This exception is thrown when trying to decode with a NamedProtocol having the {@code decodable} property {@code false}.
+     */
+    public static class ProtocolNotDecodableException extends IrpException {
+
+        ProtocolNotDecodableException(String name) {
+            super("Protocol " + name + " not decodable");
+        }
     }
 }

@@ -67,6 +67,9 @@ $(JAVA_PROTOCOL_TEST)/src/main/resources \
 $(JAVA_RENDERER_CODEDIR) $(JAVA_RENDERER_TESTDIR) $(JAVA_DECODER_CODEDIR) $(JAVA_DECODER_TESTDIR):
 	mkdir -p $@
 
+IrpProtocols.ini: src/main/resources/IrpProtocols.xml $(IRP_TRANSMOGRIFIER_JAR)
+	$(IRPTRANSMOGRIFIER) -c $< convert > $@
+
 # Only for Unix-like systems
 install: $(IRP_TRANSMOGRIFIER_JAR)
 	-mkdir -p $(INSTALLDIR)

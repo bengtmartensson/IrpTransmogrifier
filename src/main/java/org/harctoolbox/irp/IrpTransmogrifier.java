@@ -1138,8 +1138,8 @@ public final class IrpTransmogrifier {
     }
 
     private void setupDatabase() throws IOException, UsageException {
-        if (IrCoreUtils.numberTrue(commandLineArgs.configFile != null, commandLineArgs.irp != null, commandLineArgs.configFile != null) > 1)
-            throw new UsageException("At most one of inifile, confile, and irp can be specified");
+        if (IrCoreUtils.numberTrue(commandLineArgs.configFile != null, commandLineArgs.irp != null, commandLineArgs.iniFile != null) > 1)
+            throw new UsageException("At most one of inifile, configfile, and irp can be specified");
 
         irpDatabase = commandLineArgs.iniFile != null ? IrpDatabase.readIni(commandLineArgs.iniFile)
                 : commandLineArgs.irp != null         ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")

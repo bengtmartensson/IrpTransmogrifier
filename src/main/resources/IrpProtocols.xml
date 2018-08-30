@@ -3,7 +3,7 @@
 <irp:protocols xmlns="http://www.w3.org/1999/xhtml"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2017-10-15"
+               version="2018-08-06"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols file:///home/bengt/harctoolbox/IrpTransmogrifier/src/main/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
     <irp:protocol c-name="X48NEC1" name="48-NEC1">
@@ -917,6 +917,13 @@ In ProntoEdit, DecodeIr's "Device" is called "Customer Code"; DecodeIr's "Subdev
     <irp:protocol c-name="Sampo" name="Sampo">
         <irp:irp><![CDATA[{38.4k, 833}<1,-1|1,-3>(4,-4,D:6,F:6,S:6,~F:6,1,-39)*[D:0..63,S:0..63,F:0..63]]]></irp:irp>
         <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="Samsung_SMT_G" name="Samsung-SMT-G">
+        <irp:irp><![CDATA[
+{38.5k,497,msb}<1,-1|1,-3>(4497u,-4497u,D:16,1,-4497u,S:4,F:16,1,^120m)*[D:0..65335,S:0..15,F:0..65535]
+]]></irp:irp>
+        <irp:documentation>
+            <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=14220">Forum thread</a>.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Samsung20" name="Samsung20">
         <irp:parameter name="uei-executor">002F</irp:parameter>

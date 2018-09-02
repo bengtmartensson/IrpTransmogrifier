@@ -325,7 +325,7 @@ public final class Decoder {
         }
 
         @SuppressWarnings("ReturnOfCollectionOrArrayField")
-        Map<String, Long> getMap() {
+        public Map<String, Long> getMap() {
             return map;
         }
 

@@ -122,7 +122,7 @@ public class InterpretString {
      * @param invokeCleaner If the analyzer is invoked for cleaning the signals.
      * @return IrSignal signal constructed according to rules above.
      */
-    private static IrSignal interpretIrSequence(ModulatedIrSequence modulatedIrSequence, boolean invokeRepeatFinder, boolean invokeCleaner,
+    public static IrSignal interpretIrSequence(ModulatedIrSequence modulatedIrSequence, boolean invokeRepeatFinder, boolean invokeCleaner,
             double absoluteTolerance, double relativeTolerance) {
         ModulatedIrSequence cleaned = invokeCleaner ? Cleaner.clean(modulatedIrSequence, absoluteTolerance, relativeTolerance) : modulatedIrSequence;
         IrSignal irSignal = invokeRepeatFinder ? RepeatFinder.findRepeat(cleaned, absoluteTolerance, relativeTolerance) : new IrSignal(cleaned);

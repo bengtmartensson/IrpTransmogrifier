@@ -134,6 +134,10 @@ public class ParameterSpecNGTest {
         ParameterSpec instance = new ParameterSpec("S:0..255=255-D");
         Expression result = instance.getDefault();
         assertEquals(result.toIrpString(), "(255-D)");
+
+        instance = new ParameterSpec("S:0..255");
+        result = instance.getDefault();
+        assertTrue(result == null);
     }
 
     /**
@@ -199,5 +203,18 @@ public class ParameterSpecNGTest {
         }
         assertTrue(min < 0x0100000000000000L);
         assertTrue(max > 0x3F00000000000000L);
+    }
+
+    /**
+     * Test of isStandardName.
+     */
+    @Test
+    public void testIsStandardName() {
+        System.out.println("isStandardName");
+        assertTrue(ParameterSpec.isStandardName("D"));
+        assertTrue(ParameterSpec.isStandardName("S"));
+        assertTrue(ParameterSpec.isStandardName("F"));
+        assertTrue(ParameterSpec.isStandardName("T"));
+        assertFalse(ParameterSpec.isStandardName("X"));
     }
 }

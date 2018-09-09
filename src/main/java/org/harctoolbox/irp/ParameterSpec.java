@@ -26,10 +26,19 @@ import org.w3c.dom.Element;
 public final class ParameterSpec extends IrpObject {
     private static final int WEIGHT = 1;
     private static Random random;
+    private static final String[] standardNames = { "D", "S", "F", "T" };
 
     static {
         random = new Random();
     }
+
+    public static boolean isStandardName(String name) {
+        for (String n : standardNames)
+            if (name.equals(n))
+                return true;
+        return false;
+    }
+
     public static void initRandom(long seed) {
         random = new Random(seed);
     }

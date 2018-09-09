@@ -849,6 +849,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         return parameterSpecs.hasParameterMemory(parameterName);
     }
 
+    public Expression getParameterDefault(String parameterName) {
+        return parameterSpecs.getParameterDefault(parameterName);
+    }
+
     public long getParameterMax(String parameterName) {
         return parameterSpecs.getParameterMax(parameterName);
     }
@@ -859,5 +863,9 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public void removeDefaulteds(Map<String, Long> params) {
         getParameterSpecs().removeDefaulteds(params);
+    }
+
+    public boolean hasNonStandardParameters() {
+        return getParameterSpecs().hasNonStandardParameters();
     }
 }

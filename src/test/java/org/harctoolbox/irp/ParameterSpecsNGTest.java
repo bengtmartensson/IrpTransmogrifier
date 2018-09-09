@@ -83,4 +83,15 @@ public class ParameterSpecsNGTest {
 
     }
 
+    /**
+     * Test of hasNonStandardParameters method, of class ParameterSpecs.
+     */
+    @Test
+    public void testHasNonStandardParameters() {
+        System.out.println("hasNonStandardParameters");
+        assertFalse(rc5.hasNonStandardParameters());
+        assertFalse(nec1.hasNonStandardParameters());
+        ParameterSpecs instance = new ParameterSpecs("[D:0..255,S:0..255,Z:0..255]");
+        assertTrue(instance.hasNonStandardParameters());
+    }
 }

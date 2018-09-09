@@ -250,6 +250,11 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return parameterSpec != null && parameterSpec.hasMemory();
     }
 
+    public Expression getParameterDefault(String parameterName) {
+        ParameterSpec parameterSpec = getParameterSpec(parameterName);
+        return parameterSpec == null ? null : parameterSpec.getDefault();
+    }
+
     public long getParameterMax(String parameterName) throws NullPointerException {
         ParameterSpec parameterSpec = getParameterSpec(parameterName);
         return parameterSpec.getMax();
@@ -258,5 +263,9 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
     public long getParameterMin(String parameterName) throws NullPointerException {
         ParameterSpec parameterSpec = getParameterSpec(parameterName);
         return parameterSpec.getMin();
+    }
+
+    public boolean hasNonStandardParameters() {
+        return map.keySet().stream().anyMatch((name) -> (!ParameterSpec.isStandardName(name)));
     }
 }

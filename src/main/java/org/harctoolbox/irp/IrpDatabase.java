@@ -255,6 +255,15 @@ public final class IrpDatabase {
         }
     }
 
+    private static Map<String, UnparsedProtocol> toUnparsedProtocols(Map<String, String>protocols) {
+        Map<String, UnparsedProtocol> map = new HashMap<>(protocols.size());
+        protocols.entrySet().forEach((kvp) -> {
+            String name = kvp.getKey().toLowerCase(Locale.US);
+            map.put(name, new UnparsedProtocol(name, kvp.getValue(), null));
+        });
+        return map;
+    }
+
     private String configFileVersion;
 
     // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
@@ -285,7 +294,11 @@ public final class IrpDatabase {
     }
 
     public IrpDatabase() throws IOException {
-        this(new File(STANDARD_CONFIG_PATH));
+        this(new HashMap<String, UnparsedProtocol>(4), new HashMap<String, String>(0), "null");
+    }
+
+    public IrpDatabase(Map<String, String> protocols) {
+        this(toUnparsedProtocols(protocols), new HashMap<String, String>(0), "null");
     }
 
     /**

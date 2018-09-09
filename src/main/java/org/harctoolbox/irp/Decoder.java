@@ -74,8 +74,8 @@ public final class Decoder {
         this(irpDatabase, null);
     }
 
-    public Decoder() throws IrpParseException, IOException {
-        this(new IrpDatabase());
+    Decoder() throws IrpParseException, IOException {
+        this(new IrpDatabase(IrpDatabase.STANDARD_CONFIG_PATH));
     }
 
     /**
@@ -84,8 +84,8 @@ public final class Decoder {
      * @throws java.io.IOException
      * @throws org.harctoolbox.irp.IrpParseException
      */
-    public Decoder(String... names) throws IOException, IrpParseException {
-        this(new IrpDatabase(), Arrays.asList(names));
+    Decoder(String... names) throws IOException, IrpParseException {
+        this(new IrpDatabase(IrpDatabase.STANDARD_CONFIG_PATH), Arrays.asList(names));
     }
 
     /**

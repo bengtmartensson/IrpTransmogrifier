@@ -201,7 +201,7 @@ public class ProntoNGTest {
     @Test
     public void testToPrintString_IrSignal() {
         System.out.println("toPrintString");
-        String result = Pronto.toPrintString(nec1);
+        String result = Pronto.toString(nec1);
         assertEquals(result.substring(0, 358), NEC1_D12_S34_F56.substring(0, 358));
     }
 }

@@ -239,9 +239,9 @@ public abstract class Pronto {
      *
      * @param ccfString Input string, to be parsed/tested.
      * @return Integer array of numbers if successful, null if unsuccessful.
-     * @throws org.harctoolbox.ircore.IrpInvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
-    static int[] parseAsInts(String ccfString) throws NonProntoFormatException {
+    protected static int[] parseAsInts(String ccfString) throws NonProntoFormatException {
         String[] array = ccfString.trim().split("\\s+");
         return parseAsInts(array, 0);
     }
@@ -315,9 +315,9 @@ public abstract class Pronto {
      * @param irSignal
      * @return CCF string
      */
-    public static String toPrintString(IrSignal irSignal) {
+    public static String toString(IrSignal irSignal) {
         try {
-            return toPrintString(toArray(irSignal));
+            return toString(toArray(irSignal));
         } catch (InvalidArgumentException ex) {
             throw new ThisCannotHappenException(ex);
         }
@@ -328,7 +328,7 @@ public abstract class Pronto {
      * @param array CCF in form of an integer array.
      * @return CCF string.
      */
-    public static String toPrintString(int[] array) {
+    public static String toString(int[] array) {
         StringJoiner s = new StringJoiner(" ");
         for (int n : array)
             s.add(String.format(HEX_STRING_FORMAT, n));

@@ -29,8 +29,32 @@ public final class ModulatedIrSequence extends IrSequence {
     private static final double ALLOWED_FREQUENCY_DEVIATION = 0.05;
     private static final double ZEROMODULATION_LIMIT = 0.000001;
     public static final double DEFAULT_FREQUENCY = 38000.0;
+
     public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
+    }
+
+    /**
+     * Concatenates the IrSequences in the argument to a new sequence.
+     * Frequency and duty cycle are set to the average between minimum and maximum values by the components, if it makes sense.
+     * @param seqs One or more ModulatedIrSequences
+     * @return
+     */
+    public static ModulatedIrSequence concatenate(ModulatedIrSequence[] seqs) {
+        double minf = Double.MAX_VALUE;
+        double maxf = Double.MIN_VALUE;
+        double mindc = Double.MAX_VALUE;
+        double maxdc = Double.MIN_VALUE;
+        for (ModulatedIrSequence seq : seqs) {
+            minf = Math.min(minf, seq.frequency);
+            maxf = Math.max(maxf, seq.frequency);
+            mindc = Math.min(mindc, seq.frequency);
+            maxdc = Math.max(maxdc, seq.frequency);
+        }
+
+        double dutyCycle = mindc > 0 ? (mindc + maxdc)/2 : IrCoreUtils.INVALID;
+        double frequency = minf > 0 ? (minf + maxf)/2 : 0;
+        return new ModulatedIrSequence(IrSequence.concatenate(seqs), frequency, dutyCycle);
     }
 
     public static double getFrequencyWithDefault(Double frequency) {

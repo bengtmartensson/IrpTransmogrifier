@@ -572,6 +572,20 @@ public final class IrCoreUtils {
         return lowestYet;
     }
 
+    public static String basename(String filename) {
+        return (new File(filename)).getName().split("\\.")[0];
+    }
+
+    private static boolean hasExtension(String filename) {
+        int lastSeparator = filename.lastIndexOf(File.separator);
+        int lastPeriod = filename.lastIndexOf('.');
+        return lastPeriod > lastSeparator;
+    }
+
+    public static String addExtensionIfNotPresent(String filename, String extension) {
+        return filename + ((extension != null && !hasExtension(filename)) ? ('.' + extension) : "");
+    }
+
     private IrCoreUtils() {
     }
 }

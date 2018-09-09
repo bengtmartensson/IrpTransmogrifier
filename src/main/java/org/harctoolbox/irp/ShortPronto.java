@@ -216,14 +216,25 @@ public final class ShortPronto extends Pronto {
      * Computes the "short" Pronto form of some signals, if possible,.
      *
      * @param irSignal
+     * @param fallback If true, if no short form, return the long form, otherwise null.
+     * @return CCF as string, or null on failure.
+     */
+    public static String toString(IrSignal irSignal, boolean fallback) {
+        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal);
+        if (decodes.isEmpty())
+            return fallback ? Pronto.toString(irSignal) : null;
+        Decoder.Decode decode = decodes.values().iterator().next();
+        return toString(decode);
+    }
+
+    /**
+     * Computes the "short" Pronto form of some signals, if possible,.
+     *
+     * @param irSignal
      * @return CCF as string, or null on failure.
      */
     public static String toString(IrSignal irSignal) {
-        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal);
-        if (decodes.isEmpty())
-            return Pronto.toString(irSignal);
-        Decoder.Decode decode = decodes.values().iterator().next();
-        return toString(decode);
+        return toString(irSignal, true);
     }
 
     private static String toString(Decoder.Decode decode) {

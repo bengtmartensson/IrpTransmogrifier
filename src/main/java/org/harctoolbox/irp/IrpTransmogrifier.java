@@ -751,7 +751,7 @@ public final class IrpTransmogrifier {
     private void analyzePronto() throws InvalidArgumentException, InvalidArgumentException, Pronto.NonProntoFormatException, NoDecoderMatchException {
         IrSignal irSignal = Pronto.parse(commandAnalyze.args);
         if (commandAnalyze.introRepeatEnding)
-            logger.warning("--intro.repeat-ending ignored when using a Pronto Hex signal.");
+            logger.warning("--intro-repeat-ending ignored when using a Pronto Hex signal.");
         if (commandAnalyze.chop != null)
             logger.warning("--chop ignored when using a Pronto Hex signal.");
         analyze(irSignal);

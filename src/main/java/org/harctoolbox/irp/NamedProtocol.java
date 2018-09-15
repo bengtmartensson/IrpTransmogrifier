@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

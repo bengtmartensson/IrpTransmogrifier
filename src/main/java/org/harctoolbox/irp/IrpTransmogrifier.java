@@ -64,6 +64,7 @@ import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.lirc.LircCommand;
 import org.harctoolbox.lirc.LircConfigFile;
 import org.harctoolbox.lirc.LircIrp;

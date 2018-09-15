@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.XmlExport;
 
 /**
  * This interface describes the things that make up an IRStream.

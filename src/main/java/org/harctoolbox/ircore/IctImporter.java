@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
 
-package org.harctoolbox.irp;
+package org.harctoolbox.ircore;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,10 +35,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IrSequence;
-import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLengthException;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 
 /**
  * This class allows for import of IR sequences in the ICT Format, used by the IRScope.

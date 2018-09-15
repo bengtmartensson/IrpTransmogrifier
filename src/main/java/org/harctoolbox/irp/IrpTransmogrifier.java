@@ -55,6 +55,7 @@ import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.analyze.Cleaner;
 import org.harctoolbox.analyze.NoDecoderMatchException;
 import org.harctoolbox.analyze.RepeatFinder;
+import org.harctoolbox.ircore.IctImporter;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;

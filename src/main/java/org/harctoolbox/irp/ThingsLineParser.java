@@ -34,11 +34,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.IrSequence;
 
 public class ThingsLineParser<T> {
 
-    private final static Logger logger = Logger.getLogger(IrSequence.class.getName());
+    private final static Logger logger = Logger.getLogger(ThingsLineParser.class.getName());
     private final ThingParser parser;
 
     public ThingsLineParser(ThingParser thingParser) {

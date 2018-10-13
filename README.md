@@ -154,6 +154,8 @@ ending sequences of an IR signal.
 For raw sequences, an explicit modulation frequency can be given with
 the `--frequency` option. Otherwise the default frequency, 38000Hz,
 will be assumed.
+If this option is given together with a Pronto type signal (which contains
+a modulation frequency), it is ignored.
 
 Using the option `--input`, instead the content of a file can be taken
 as input, containing sequences to be analyzed, one per line, blank

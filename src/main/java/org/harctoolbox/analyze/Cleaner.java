@@ -44,11 +44,7 @@ public class Cleaner {
 
     public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
-        try {
-            return new IrSequence(cleaner.toDurations());
-        } catch (OddSequenceLengthException ex) {
-            throw new ThisCannotHappenException();
-        }
+        return cleaner.toIrSequence();
     }
 
     public static IrSequence clean(IrSequence irSequence) {
@@ -192,6 +188,14 @@ public class Cleaner {
 
     public String getName(int duration) {
         return mkName(getIndex(duration));
+    }
+
+    public IrSequence toIrSequence() {
+        try {
+            return new IrSequence(toDurations());
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException();
+        }
     }
 
     private int[] toDurations() {

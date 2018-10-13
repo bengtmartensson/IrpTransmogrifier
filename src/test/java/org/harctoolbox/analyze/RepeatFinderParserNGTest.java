@@ -1,0 +1,69 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.harctoolbox.analyze;
+
+import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrSignal;
+import static org.testng.Assert.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+/**
+ *
+ * @author bengt
+ */
+public class RepeatFinderParserNGTest {
+    public static final String nec = "0000 006C 0028 0000 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4"
+            + " 015B 0059 0016 0E6C"
+            + " 015B 0055 0016 0E6C"
+            + " 015B 0057 0016 0E6C";
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
+
+    public RepeatFinderParserNGTest() {
+    }
+
+    @BeforeMethod
+    public void setUpMethod() throws Exception {
+    }
+
+    @AfterMethod
+    public void tearDownMethod() throws Exception {
+    }
+
+    /**
+     * Test of toIrSignal method, of class RepeatFinderParser.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     */
+    @Test
+    public void testToIrSignal() throws InvalidArgumentException {
+        System.out.println("toIrSignal");
+        RepeatFinderParser instance = new RepeatFinderParser(nec);
+        IrSignal result = instance.toIrSignal();
+        assertEquals(result.getRepeatLength(), 4);
+    }
+
+    /**
+     * Test of toIrSignalClean method, of class RepeatFinderParser.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     */
+    @Test
+    public void testToIrSignalClean() throws InvalidArgumentException {
+        System.out.println("toIrSignalClean");
+        RepeatFinderParser instance = new RepeatFinderParser(nec);
+        IrSignal result = instance.toIrSignalClean();
+        assertEquals(result.getRepeatLength(), 4);
+    }
+}

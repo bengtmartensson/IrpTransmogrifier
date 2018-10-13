@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
  */
 
-package org.harctoolbox.irp;
+package org.harctoolbox.ircore;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -113,7 +113,7 @@ public class ThingsLineParser<T> {
                     break;
                 list.add(thing);
             } catch (Exception ex) {
-                logger.log(Level.WARNING, "{0}", ex.getMessage());
+                logger.log(Level.FINE, "{0}", ex.getMessage());
             }
         }
         return list;

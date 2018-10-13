@@ -99,6 +99,10 @@ public final class IrCoreUtils {
         return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
+    public static double getMinRepeatLastGap(Double userValue) {
+        return getDoubleWithSubstitute(userValue, IrCoreUtils.DEFAULT_MIN_REPEAT_LAST_GAP);
+    }
+
     /**
      * Convert its argument from seconds to microseconds.
      * @param secs seconds

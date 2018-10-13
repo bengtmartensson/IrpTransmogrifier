@@ -63,6 +63,8 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
+import org.harctoolbox.ircore.ProntoRawParser;
+import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.lirc.LircCommand;
@@ -676,24 +678,17 @@ public final class IrpTransmogrifier {
         if (commandLineArgs.irp != null) {
             if (!commandRender.protocols.isEmpty())
                 throw new UsageException("Cannot not use --irp together with named protocols");
-//            try {
-//                NamedProtocol protocol = new NamedProtocol("user-irp", commandLineArgs.irp, "This IRP was entered at the command line of IrpTransmogrifier");
-//                render(protocol);
-//            } catch (ParseCancellationException ex) {
-//                throw new IrpParseException(commandLineArgs.irp, ex);
-//            }
         }
-        //else {
-            setupDatabase();
-            irpDatabase.expand();
-            List<String> list = irpDatabase.evaluateProtocols(commandRender.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
-            if (list.isEmpty())
-                throw new UsageException("No protocol matched.");
-            for (String proto : list) {
-                //logger.info(proto);
-                NamedProtocol protocol = irpDatabase.getNamedProtocolExpandAlias(proto);
-                render(protocol);
-            }
+        setupDatabase();
+        irpDatabase.expand();
+        List<String> list = irpDatabase.evaluateProtocols(commandRender.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
+        if (list.isEmpty())
+            throw new UsageException("No protocol matched.");
+        for (String proto : list) {
+            //logger.info(proto);
+            NamedProtocol protocol = irpDatabase.getNamedProtocolExpandAlias(proto);
+            render(protocol);
+        }
 
     }
 
@@ -713,89 +708,48 @@ public final class IrpTransmogrifier {
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         if (commandAnalyze.input != null) {
-            ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>(
-                    (List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line, commandAnalyze.trailingGap); }
+            ThingsLineParser<ModulatedIrSequence> irSignalParser = new ThingsLineParser<>(
+                    (List<String> line) -> { return (new ProntoRawParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
             );
-            List<IrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
-            if (signals.isEmpty())
-                throw new InvalidArgumentException("No parseable sequences found.");
+            List<ModulatedIrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
             analyze(signals);
         } else if (commandAnalyze.namedInput != null) {
             try {
-                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandAnalyze.namedInput);
-                if (modSequences.isEmpty())
-                    throw new InvalidArgumentException("No parseable sequences found.");
+                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandAnalyze.namedInput, commandLineArgs.encoding);
                 analyze(modSequences);
             } catch (ParseException ex) {
                 logger.log(Level.INFO, "Parsing of {0} as ict failed", commandAnalyze.namedInput);
-                ThingsLineParser<IrSequence> irSignalParser = new ThingsLineParser<>(
-                        (List<String> line) -> { return IrSequenceParsers.parseProntoOrRaw(line, commandAnalyze.trailingGap); }
+                ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
+                        (List<String> line) -> { return (new ProntoRawParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
                 );
-                Map<String, IrSequence> signals = irSignalParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
+                Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
                 if (signals.isEmpty())
                     throw new InvalidArgumentException("No parseable sequences found.");
-                analyze(signals, commandAnalyze.frequency);
+                analyze(signals);
             }
         } else {
-            try {
-                analyzePronto();
-            } catch (Pronto.NonProntoFormatException ex) {
-                logger.log(Level.FINE, "Parsing as Pronto Hex failed, trying as raw.");
-                try {
-                    analyzeRaw();
-                } catch (NumberFormatException e) {
-                    throw new UsageException("Invalid signal, neither valid as Pronto nor as raw.");
+            ProntoRawParser parser = new ProntoRawParser(commandAnalyze.args);
+            if (commandAnalyze.introRepeatEnding) {
+                IrSignal irSignal = (commandAnalyze.chop != null)
+                        ? parser.toIrSignalChop(commandAnalyze.frequency, commandAnalyze.chop)
+                        : parser.toIrSignal(commandAnalyze.frequency, commandAnalyze.trailingGap);
+                analyze(irSignal);
+            } else if (commandAnalyze.chop != null) {
+                List<IrSequence> list = parser.toListChop(commandAnalyze.chop, commandAnalyze.trailingGap);
+                analyze(list);
+            } else {
+                List<IrSequence> list = parser.toList(commandAnalyze.trailingGap);
+                if (list.size() > 1)
+                    analyze(list);
+                else {
+                    IrSignal irSignal = parser.toIrSignal(commandAnalyze.frequency, commandAnalyze.trailingGap);
+                    if (irSignal != null)
+                        analyze(irSignal);
+                    else
+                        throw new UsageException("Invalid signal, neither valid as Pronto nor as raw.");
                 }
             }
         }
-    }
-
-    private void analyzePronto() throws InvalidArgumentException, InvalidArgumentException, Pronto.NonProntoFormatException, NoDecoderMatchException {
-        IrSignal irSignal = Pronto.parse(commandAnalyze.args);
-        if (commandAnalyze.introRepeatEnding)
-            logger.warning("--intro-repeat-ending ignored when using a Pronto Hex signal.");
-        if (commandAnalyze.chop != null)
-            logger.warning("--chop ignored when using a Pronto Hex signal.");
-        analyze(irSignal);
-    }
-
-    private void analyzeRaw() throws IrpInvalidArgumentException, UsageException, OddSequenceLengthException, InvalidArgumentException, NoDecoderMatchException {
-        if (commandAnalyze.introRepeatEnding)
-            analyzeIntroRepeatEnding();
-        else
-            analyzeSequences();
-    }
-
-    private void analyzeIntroRepeatEnding() throws UsageException, OddSequenceLengthException, InvalidArgumentException, NoDecoderMatchException {
-        IrSignal irSignal;
-        if (commandAnalyze.chop != null) {
-            List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args), commandAnalyze.trailingGap);
-            if (sequences.size() > 1)
-                throw new UsageException("Cannot use --chop together with several IR sequences");
-            sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
-            switch (sequences.size()) {
-                case 2:
-                    irSignal = new IrSignal(sequences.get(0), sequences.get(1), null, commandAnalyze.frequency);
-                    break;
-                case 3:
-                    irSignal = new IrSignal(sequences.get(0), sequences.get(1), sequences.get(2), commandAnalyze.frequency);
-                    break;
-                default:
-                    throw new UsageException("Wrong number of parts after chop = " + sequences.size());
-            }
-        } else
-            irSignal = IrSignalParsers.parseRaw(commandAnalyze.args, commandAnalyze.frequency, commandAnalyze.trailingGap);
-        analyze(irSignal);
-    }
-
-    private void analyzeSequences() throws UsageException, OddSequenceLengthException, NoDecoderMatchException {
-        List<IrSequence> sequences = IrSequenceParsers.parseIntoSeveral(String.join(" ", commandAnalyze.args), commandAnalyze.trailingGap);
-        if (commandAnalyze.chop != null) {
-            if (sequences.size() > 1)
-                throw new UsageException("Cannot use --chop together with several IR seqeunces");
-            sequences = sequences.get(0).chop(commandAnalyze.chop.doubleValue());
-        }
-        analyze(sequences);
     }
 
     private void analyze(IrSignal irSignal) throws NoDecoderMatchException {
@@ -808,22 +762,30 @@ public final class IrpTransmogrifier {
         analyze(analyzer, null);
     }
 
-    private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws NoDecoderMatchException {
+    private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws NoDecoderMatchException, InvalidArgumentException {
         Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
         irSequences.putAll(modulatedIrSequences);
-        double sum = 0.0;
-        sum = modulatedIrSequences.values().stream().map((mis) -> mis.getFrequency()).reduce(sum, (accumulator, _item) -> accumulator + _item);
-
-        double frequency = sum / modulatedIrSequences.keySet().size();
+        Double frequency;
+        try {
+            double sum = 0;
+            sum = modulatedIrSequences.values().stream().map((mis) -> mis.getFrequency()).reduce(sum, (accumulator, _item) -> accumulator + _item);
+            frequency = sum / modulatedIrSequences.keySet().size();
+        } catch (NullPointerException ex) {
+            frequency = null;
+        }
         analyze(irSequences, frequency);
     }
 
-    private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws NoDecoderMatchException {
+    private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws NoDecoderMatchException, InvalidArgumentException {
+        if (irSequences.isEmpty())
+            throw new InvalidArgumentException("No parseable sequences found.");
         Analyzer analyzer = new Analyzer(irSequences.values(), frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
     }
 
-    private void analyze(List<IrSequence> irSequences) throws NoDecoderMatchException {
+    private void analyze(List<? extends IrSequence> irSequences) throws NoDecoderMatchException, InvalidArgumentException {
+        if (irSequences.isEmpty())
+                throw new InvalidArgumentException("No parseable sequences found.");
         Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, null);
     }
@@ -942,14 +904,14 @@ public final class IrpTransmogrifier {
         Decoder decoder = new Decoder(irpDatabase, protocolsNames);
         if (commandDecode.input != null) {
             ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, commandDecode.trailingGap);
+                    return (new ProntoRawParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
             });
             List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding, false);
             for (IrSignal irSignal : signals)
                 decode(decoder, irSignal, null, 0);
         } else if (commandDecode.namedInput != null) {
             try {
-                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandDecode.namedInput);
+                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandDecode.namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(modSequences.keySet());
                 for (Map.Entry<String, ModulatedIrSequence> kvp : modSequences.entrySet()) {
                     IrSignal signal = new IrSignal(kvp.getValue());
@@ -957,7 +919,7 @@ public final class IrpTransmogrifier {
                 }
             } catch (ParseException ex) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                    return IrSignalParsers.parseProntoOrRawFromLines(line, commandDecode.frequency, commandDecode.trailingGap);
+                    return (new ProntoRawParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
                 });
                 Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
@@ -965,7 +927,8 @@ public final class IrpTransmogrifier {
                     decode(decoder, kvp.getValue(), kvp.getKey(), maxNameLength);
             }
         } else {
-            IrSignal irSignal = IrSignalParsers.parseProntoOrRaw(commandDecode.args, commandDecode.frequency, commandDecode.trailingGap);
+            ProntoRawParser prontoRawParser = new ProntoRawParser(commandDecode.args);
+            IrSignal irSignal = prontoRawParser.toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
             decode(decoder, irSignal, null, 0);
         }
     }
@@ -1292,7 +1255,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-b", "--bit-usage" }, description = "Create bit usage report. (Not with --all)")
         private boolean bitUsage = false;
 
-        @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold given as argument.")
+        @Parameter(names = { "-c", "--chop" }, description = "Chop input sequence into several using threshold (in milliseconds) given as argument.")
         private Integer chop = null;
 
         @Parameter(names = { "-C", "--clean" }, description = "Output the cleaned sequence(s).")
@@ -1362,7 +1325,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = {      "--timings"}, description = "Print the total timings of the compute IRP form.")
         private boolean timings = false;
 
-        @Parameter(names = {"-T", "--trailinggap"}, description = "Trailing gap (in micro seconds) added to sequences of odd length.")
+        @Parameter(names = {"-T", "--trailinggap"}, description = "Dummy trailing gap (in micro seconds) added to sequences of odd length.")
         private Double trailingGap = null;
 
         @Parameter(description = "durations in microseconds, or pronto hex.", required = false)
@@ -1468,6 +1431,9 @@ public final class IrpTransmogrifier {
     private static class CommandDecode extends MyCommand {
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over.")
         private boolean noPreferOver = false;
+
+//        @Parameter(names = { "-c", "--chop"}, description = "Chop input sequence into several using threshold (in milliseconds) given as argument.")
+//        private Integer chop = null;
 
         @Parameter(names = { "-c", "--clean"}, description = "Invoke cleaner on signal") // ignored with --repeat-finder
         private boolean cleaner = false;

@@ -217,9 +217,10 @@ public class IrSequenceNGTest {
 
     /**
      * Test of normalize method, of class IrSequence.
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
     @Test
-    public void testNormalize() {
+    public void testNormalize() throws OddSequenceLengthException {
         System.out.println("normalize");
         String in = "+8900, -4450 + 600, -1600 + 600, - 600 + 600, - 600\n"
                 + "+ 600, - 600 + 600, - 550 + 650, - 600 + 600";

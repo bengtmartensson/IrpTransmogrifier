@@ -66,17 +66,6 @@ public class IctImporter {
         return ictImporter.sequences;
     }
 
-    /**
-     * Equivalent to parse(urlOrFilename, "US-ASCII").
-     * @param urlOrFilename URL or Filename
-     * @return Map name -&gt; ModulatedIrSequence
-     * @throws IOException
-     * @throws ParseException
-     */
-    public static Map<String, ModulatedIrSequence> parse(String urlOrFilename) throws IOException, ParseException {
-        return parse(urlOrFilename, "US-ASCII");
-    }
-
     private int lineNumber;
     private int anonymousNumber;
     private int frequency = INVALID;

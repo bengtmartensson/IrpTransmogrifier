@@ -101,12 +101,17 @@ public class IrSequence implements Cloneable {
         checkOddLength(data.length);
     }
 
-    private static double[] fixOddLength(double[] data, Double dummyGapDuration) {
-        if (data.length % 2 != 0 && dummyGapDuration != null) {
-            double[] newData = new double[data.length + 1];
-            System.arraycopy(data, 0, newData, 0, data.length);
-            newData[data.length] = dummyGapDuration;
-            return newData;
+    private static double[] fixOddLength(double[] data, Double dummyGapDuration) throws OddSequenceLengthException {
+        if (data.length % 2 != 0) {
+            if (dummyGapDuration == null) {
+                checkOddLength(data);
+                return data;
+            } else {
+                double[] newData = new double[data.length + 1];
+                System.arraycopy(data, 0, newData, 0, data.length);
+                newData[data.length] = dummyGapDuration;
+                return newData;
+            }
         } else {
             return data;
         }
@@ -204,7 +209,7 @@ public class IrSequence implements Cloneable {
         return in.replaceAll("[+\\-,;\\s]+", " ").trim();
     }
 
-    public static String normalize(String in, Double dummyGap, boolean useSigns, String separator) {
+    public static String normalize(String in, Double dummyGap, boolean useSigns, String separator) throws OddSequenceLengthException {
         IrSequence irSequence = new IrSequence(in, dummyGap);
         return irSequence.toString(useSigns, separator, "", "");
     }
@@ -236,7 +241,7 @@ public class IrSequence implements Cloneable {
         setup(inData);
     }
 
-    public IrSequence(double[] inData, Double dummyGapDuration) {
+    public IrSequence(double[] inData, Double dummyGapDuration) throws OddSequenceLengthException {
         setup(fixOddLength(inData, dummyGapDuration));
     }
 
@@ -275,8 +280,9 @@ public class IrSequence implements Cloneable {
      * @param string String of durations, possibly "decorated".
      * @param dummyGapDuration if the string consists of an odd number of
      * numbers, a gap of this length is silently adding to the sequence.
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public IrSequence(String string, Double dummyGapDuration) {
+    public IrSequence(String string, Double dummyGapDuration) throws OddSequenceLengthException {
         this(toDoubles(string), dummyGapDuration);
     }
 
@@ -694,6 +700,10 @@ public class IrSequence implements Cloneable {
 
     public String toString(boolean alternatingSigns) {
         return toString(alternatingSigns, ",", "[", "]");
+    }
+
+    public String toString(boolean alternatingSigns, String separator) {
+        return toString(alternatingSigns, separator, "", "");
     }
 
     /**

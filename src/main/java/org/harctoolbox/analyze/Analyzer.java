@@ -43,7 +43,7 @@ public final class Analyzer extends Cleaner {
 
     private static final Logger logger = Logger.getLogger(Analyzer.class.getName());
 
-    public static int[] mkIndices(Collection<IrSequence> irSequenceList) {
+    public static int[] mkIndices(Collection<? extends IrSequence> irSequenceList) {
         int[] indices = new int[irSequenceList.size()];
         int i = 0;
         for (IrSequence irSequence : irSequenceList) {
@@ -66,11 +66,11 @@ public final class Analyzer extends Cleaner {
         this(Arrays.asList(irSequence), frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(Collection<IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    public Analyzer(Collection<? extends IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
         this(irSequenceList, mkIndices(irSequenceList), false, frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    private Analyzer(Collection<IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    private Analyzer(Collection<? extends IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
         super(IrSequence.toInts(irSequenceList), indices, signalMode, absoluteTolerance, relativeTolerance);
         if (frequency == null)
             logger.log(Level.FINE, String.format(Locale.US, "No frequency given, assuming default frequency = %d Hz", (int) ModulatedIrSequence.DEFAULT_FREQUENCY));

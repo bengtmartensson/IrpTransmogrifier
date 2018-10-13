@@ -144,7 +144,7 @@ public class IrSequence implements Cloneable {
         return x.doubleValue() < 0 == y.doubleValue() < 0;
     }
 
-    public static int[] toInts(Iterable<IrSequence> list) {
+    public static int[] toInts(Iterable<? extends IrSequence> list) {
         int length = 0;
         for (IrSequence seq : list)
             length += seq.getLength();

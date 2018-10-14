@@ -934,7 +934,7 @@ public final class IrpTransmogrifier {
     }
 
     private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
-        if (! commandDecode.strict && irSignal.introOnly()) {
+        if (! commandDecode.strict && (irSignal.introOnly() || irSignal.repeatOnly())) {
             ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
             if (commandDecode.repeatFinder) {
                 RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);

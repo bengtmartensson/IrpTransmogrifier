@@ -181,7 +181,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testDecodeRc5() {
         System.out.println("decodeRc5");
-        String args = "decode -p rc5 0000 0073 0000 000B 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
+        String args = "decode --strict -p rc5 0000 0073 0000 000B 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "RC5: {D=7,F=5}");
     }
@@ -250,6 +250,16 @@ public class IrpTransmogrifierNGTest {
         String recs80Multiple = "+200 -7300 +200 -7350 +150 -4850 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +150 -7350 +200 -7350 +150 -4850 +200 -7300 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -4850 +200 -7350 +150 -30100 +150 -7350 +200 -4800 +200 -4850 +150 -7350 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -7350 +200 -30100 +200 -7350 +150 -4850 +200 -4800 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +200 -7300 +200 -4850 +150 -4850 +200 -7350 +150 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -7350 +150 -30100";
         String result = IrpTransmogrifier.execute("decode  --keep-defaulted " + recs80Multiple);
         assertEquals(result, "Signal 1:\n\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2\nSignal 2:\n\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeSim2AsRepeat() {
+        System.out.println("testDecodeRecs80Multiple");
+        String sim2AsRepeat = "0000 006B 0000 0012 005D 006C 002F 002E 002F 002E 002F 006B 002F 006B 002F 002E 002F 006B 002F 006B 002F 006B 002F 006B 002F 002E 002F 006B 002F 002E 002F 002E 002F 002E 002F 002E 002F 006B 002E 0928";
+        String result = IrpTransmogrifier.execute("decode --proto sim2 " + sim2AsRepeat);
+        assertEquals(result, "SIM2: {D=236,F=133}, beg=0, end=36");
+        result = IrpTransmogrifier.execute("decode --proto sim2 --strict " + sim2AsRepeat);
+        assertEquals(result, "");
     }
 
     @Test(enabled = true)

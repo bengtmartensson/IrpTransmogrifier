@@ -324,6 +324,10 @@ public final class IrSignal implements Cloneable {
         return repeatSequence.isEmpty() && endingSequence.isEmpty();
     }
 
+    public boolean repeatOnly() {
+        return introSequence.isEmpty() && endingSequence.isEmpty();
+    }
+
     @Override
     public String toString() {
         return toString(false);

@@ -195,11 +195,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
-    public void testDecodeRc5_2() {
-        System.out.println("decodeRc5_2");
+    public void testDecodeRc5_2_strict() {
+        System.out.println("decodeRc5_2_strict");
         String args = "decode --strict -p rc5 0000 0073 000B 0000 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
         String result = IrpTransmogrifier.execute(args);
-        assertEquals(result, "RC5: {D=7,F=5}, beg=0, end=22, reps=1"); // this is wrong, really. FIXME
+        assertEquals(result, "");
+        args = "decode --strict -p rc5 0000 0073 0000 000B 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
+        result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "RC5: {D=7,F=5}");
     }
 
     @Test(enabled = true)
@@ -235,8 +238,10 @@ public class IrpTransmogrifierNGTest {
         assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=24, reps=1");
         result = IrpTransmogrifier.execute("decode " + recs80 + junk);
         assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=24, reps=1");
-        result = IrpTransmogrifier.execute("decode --strict" + recs80);
-        assertEquals(result, null);
+        result = IrpTransmogrifier.execute("decode --strict " + recs80);
+        assertEquals(result, "");
+        result = IrpTransmogrifier.execute("decode --strict [][" + recs80 + "]");
+        assertEquals(result, "RECS80: {D=6,F=56,T=1}");
     }
 
     @Test(enabled = true)

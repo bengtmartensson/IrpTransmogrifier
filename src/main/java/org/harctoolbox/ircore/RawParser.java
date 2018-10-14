@@ -18,6 +18,7 @@ package org.harctoolbox.ircore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class RawParser {
@@ -116,7 +117,7 @@ public class RawParser {
         return toList(null);
     }
 
-    public ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
+    public ModulatedIrSequence toModulatedIrSequenceAsRaw(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
         Double frequency = fallbackFrequency;
         String s = source.replace(",", " ").trim();
         if (s.startsWith("f=")) {
@@ -126,6 +127,17 @@ public class RawParser {
         }
         IrSequence irSequence = new IrSequence(s, dummyGap);
         return new ModulatedIrSequence(irSequence, frequency);
+    }
+
+    public ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
+        try {
+            IrSignal irSignal = toIrSignal(fallbackFrequency, dummyGap);
+            if (irSignal != null)
+               return irSignal.toModulatedIrSequence();
+        } catch (InvalidArgumentException | NumberFormatException ex) {
+        }
+
+        return toModulatedIrSequenceAsRaw(fallbackFrequency, dummyGap);
     }
 
     public final ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency) throws OddSequenceLengthException, InvalidArgumentException {

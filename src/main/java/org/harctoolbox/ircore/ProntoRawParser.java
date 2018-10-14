@@ -36,19 +36,6 @@ public class ProntoRawParser extends RawParser {
         return Pronto.parse(getSource());
     }
 
-    @Override
-    public ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
-        try {
-            IrSignal irSignal = toIrSignalAsPronto();
-            if (fallbackFrequency != null)
-                logger.log(Level.SEVERE, "Explicit frequency with a Pronto type signal meaningless, thus ignored.");
-            return irSignal.toModulatedIrSequence();
-        } catch (Pronto.NonProntoFormatException ex) {
-            // Signal does not look like Pronto, try it as raw
-            return super.toModulatedIrSequence(fallbackFrequency, dummyGap);
-        }
-    }
-
     /**
      * Tries to interpret the string argument as one of our known formats, and return an IrSignal.
      * First tries to interpret as Pronto.

@@ -55,7 +55,7 @@ public final class LircRemote {
     }
 
     public boolean isMode2() {
-        return driver == null && hasSaneTimingInfo();
+        return (driver == null || driver.equalsIgnoreCase("default")) && hasSaneTimingInfo();
     }
 
     public boolean hasFlag(String flag) {

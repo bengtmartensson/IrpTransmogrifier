@@ -133,7 +133,7 @@ public final class Number extends PrimaryItem {
 
     public String toString(int radix) {
         return IrCoreUtils.radixPrefix(radix) + (data instanceof Long
-                ? Long.toString((Long)data, radix)
+                ? Long.toUnsignedString((Long)data, radix)
                 : ((BigInteger) data).toString(radix));
     }
 

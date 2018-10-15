@@ -316,7 +316,7 @@ public final class IrpTransmogrifier {
                     default:
                         return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Unknown command: " + command);
                 }
-        } catch (UsageException | NameUnassignedException | UnknownProtocolException| FileNotFoundException ex) {
+        } catch (UsageException | NameUnassignedException | UnknownProtocolException| FileNotFoundException | DomainViolationException ex) {
             // Exceptions likely from silly user input, just print the exception
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (OddSequenceLengthException ex) {
@@ -329,7 +329,7 @@ public final class IrpTransmogrifier {
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | DomainViolationException | InvalidNameException | IrpInvalidArgumentException | UnsupportedRepeatException ex) {
+        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidNameException | IrpInvalidArgumentException | UnsupportedRepeatException ex) {
             //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
             // Likely a programming error or fatal error in the data base. Barf.
             ex.printStackTrace();

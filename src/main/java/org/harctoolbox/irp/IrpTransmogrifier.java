@@ -1086,7 +1086,7 @@ public final class IrpTransmogrifier {
             } catch (LircIrp.RawRemoteException ex) {
                 out.println("raw remote");
             } catch (LircIrp.LircCodeRemoteException ex) {
-                out.println("lirc code remote");
+                out.println("lirc code remote, does not contain relevant information.");
             } catch (NonUniqueBitCodeException ex) {
                 out.println("Non-unique bitcodes");
             }
@@ -1094,7 +1094,7 @@ public final class IrpTransmogrifier {
                 for (LircCommand cmd : rem.getCommands()) {
                     out.print(cmd.getName() + ":\t");
                     cmd.getCodes().forEach((x) -> {
-                        out.print(Long.toString(x, commandLirc.radix) + " ");
+                        out.print(IrCoreUtils.radixPrefix(commandLirc.radix) + Long.toUnsignedString(x, commandLirc.radix) + " ");
                     });
                     out.println();
                 }

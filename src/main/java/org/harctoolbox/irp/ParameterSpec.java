@@ -84,7 +84,7 @@ public final class ParameterSpec extends IrpObject {
     }
 
     public ParameterSpec(String name, boolean memory, int length) throws InvalidNameException {
-        this(name, memory, 0, (1 << length) - 1);
+        this(name, memory, 0, length == 64 ? -1L : (1 << length) - 1);
     }
 
     @Override

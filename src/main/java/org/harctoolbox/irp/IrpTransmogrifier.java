@@ -437,6 +437,8 @@ public final class IrpTransmogrifier {
             });
         }
         List<String> list = irpDatabase.evaluateProtocols(commandList.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
+        if (list.isEmpty())
+            throw new UsageException("No protocol matched.");
 
         for (String name : list) {
             String protocolName = irpDatabase.expandAlias(name);

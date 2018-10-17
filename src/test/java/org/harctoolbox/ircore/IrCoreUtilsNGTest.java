@@ -1,5 +1,6 @@
 package org.harctoolbox.ircore;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.testng.Assert;
@@ -155,11 +156,11 @@ public class IrCoreUtilsNGTest {
         Assert.assertFalse(IrCoreUtils.approximatelyEquals(99, 101, 1, 0));
     }
 
-    /**
+      /**
      * Test of reverse method, of class IrCoreUtils.
      */
     @Test
-    public void testReverse() {
+    public void testReverse_long_int() {
         System.out.println("reverse");
         long x = 73L;
         int width = 8;
@@ -168,6 +169,41 @@ public class IrCoreUtilsNGTest {
         assertEquals(result, expResult);
         assertEquals(IrCoreUtils.reverse(123, 8), 222);
         assertEquals(IrCoreUtils.reverse(1, 5), 16);
+    }
+
+    /**
+     * Test of reverse method, of class IrCoreUtils.
+     */
+    @Test
+    public void testReverse_BigInteger_int() {
+        System.out.println("reverse");
+        BigInteger x = BigInteger.valueOf(123);
+        int width = 8;
+        BigInteger expResult = BigInteger.valueOf(222);
+        BigInteger result = IrCoreUtils.reverse(x, width);
+        assertEquals(result, expResult);
+        x = new BigInteger("80000000000000000000000000000055", 16);
+        expResult = new BigInteger("AA000000", 16);//2852126720L);
+        result = IrCoreUtils.reverse(x, 32);
+        assertEquals(result, expResult);
+        x =         new BigInteger("80000000000000000000000000000055", 16);
+        expResult = new BigInteger("AA000000000000000000000000000001", 16);
+        result = IrCoreUtils.reverse(x, 128);
+        assertEquals(result, expResult);
+
+        x = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16);
+        expResult = x;
+        result = IrCoreUtils.reverse(x, 128);
+        assertEquals(result, expResult);
+
+        x = BigInteger.ONE;
+        expResult = new BigInteger("8000000000000000", 16);
+        result = IrCoreUtils.reverse(x, 64);
+        assertEquals(result, expResult);
+
+        expResult = new BigInteger("80000000000000000", 16);
+        result = IrCoreUtils.reverse(x, 68);
+        assertEquals(result, expResult);
     }
 
     /**
@@ -561,5 +597,72 @@ public class IrCoreUtilsNGTest {
         assertEquals(IrCoreUtils.approximateGreatestCommonDivider(list, 0.01), 2);
         list.add(3);
         assertEquals(IrCoreUtils.approximateGreatestCommonDivider(list, 0.01), 1);
+    }
+
+    /**
+     * Test of tabs method, of class IrCoreUtils.
+     */
+    @Test
+    public void testTabs() {
+        System.out.println("tabs");
+        int length = 5;
+        String expResult = "\t\t\t\t\t";
+        String result = IrCoreUtils.tabs(length);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of approximateGreatestCommonDivider method, of class IrCoreUtils.
+     */
+    @Test
+    public void testApproximateGreatestCommonDivider_3args() {
+        System.out.println("approximateGreatestCommonDivider");
+        int first = 300;
+        int second = 400;
+        double relTolerance = 0.05;
+        int expResult = 100;
+        int result = IrCoreUtils.approximateGreatestCommonDivider(first, second, relTolerance);
+        assertEquals(result, expResult);
+    }
+
+     /**
+     * Test of maxLength method, of class IrCoreUtils.
+     */
+    @Test
+    public void testMaxLength_StringArr() {
+        System.out.println("maxLength");
+        String[] strings = new String[] {"I", "am", "a", "very", "stable", "genious"};
+        int expResult = 7;
+        int result = IrCoreUtils.maxLength(strings);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of basename method, of class IrCoreUtils.
+     */
+    @Test
+    public void testBasename() {
+        System.out.println("basename");
+        String filename = "/a/b/c.d";
+        String expResult = "c";
+        String result = IrCoreUtils.basename(filename);
+        assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of addExtensionIfNotPresent method, of class IrCoreUtils.
+     */
+    @Test
+    public void testAddExtensionIfNotPresent() {
+        System.out.println("addExtensionIfNotPresent");
+        String filename = "xxx";
+        String extension = "y";
+        String expResult = "xxx.y";
+        String result = IrCoreUtils.addExtensionIfNotPresent(filename, extension);
+        assertEquals(result, expResult);
+        filename = "xxx.z";
+        expResult = "xxx.z";
+        result = IrCoreUtils.addExtensionIfNotPresent(filename, extension);
+        assertEquals(result, expResult);
     }
 }

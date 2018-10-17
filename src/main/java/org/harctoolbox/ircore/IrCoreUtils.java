@@ -427,8 +427,22 @@ public final class IrCoreUtils {
         return y;
     }
 
-    public static BigInteger reverse(BigInteger x, int width) throws ArithmeticException {
-        return BigInteger.valueOf(reverse(x.longValueExact(), width));
+    public static BigInteger reverse(BigInteger x, int width) {
+        try {
+            if (width < Long.SIZE)
+                return BigInteger.valueOf(reverse(x.longValueExact(), width));
+        } catch (ArithmeticException ex) {
+        }
+
+        // A very inefficient implementation, but executed quite seldomly
+        StringBuilder str = new StringBuilder(x.toString(2));
+        if (str.length() > width)
+            str.delete(0, str.length() - width);
+        else
+            while (str.length() < width)
+                str.insert(0, '0');
+        str.reverse();
+        return new BigInteger(str.toString(), 2);
     }
 
     /**

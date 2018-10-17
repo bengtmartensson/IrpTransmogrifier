@@ -205,6 +205,17 @@ end remote
         </xsl:comment>
     </xsl:template>
 
+    <!-- Nuke protocols with too many bits -->
+    <xsl:template match="NamedProtocol[Protocol/BitspecIrstream/IrStream/@numberOfBits &gt; 64]">
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: Too many bits (</xsl:text>
+            <xsl:value-of select="Protocol/BitspecIrstream/IrStream/@numberOfBits"/>
+            <xsl:text> &gt; 64)"</xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
     <!-- Nuke protocols with non-constant bitlength -->
     <xsl:template match="NamedProtocol[Protocol/BitspecIrstream/NormalForm/*/FiniteBitField/Width[not(Number)]]" priority="999">
         <xsl:comment>

@@ -196,12 +196,12 @@ end remote
         <xsl:apply-templates select="Protocol"/>
     </xsl:template>
 
-    <!-- Have not implemented definitions yet -->
-    <xsl:template match="NamedProtocol[Protocol/Definitions/Definition]" priority="11">
+    <!-- Have not implemented non-constant definitions yet -->
+    <xsl:template match="NamedProtocol[Protocol/Definitions/Definition/Expression[not(Number)]]" priority="11">
         <xsl:comment>
             <xsl:text> Protocol </xsl:text>
             <xsl:value-of select="@name"/>
-            <xsl:text> omitted: Definitions not yet implemented </xsl:text>
+            <xsl:text> omitted: Non-constant definitions not yet implemented </xsl:text>
         </xsl:comment>
     </xsl:template>
 
@@ -331,6 +331,7 @@ end remote
         <axsl:template>
             <xsl:attribute name="name">command-<xsl:value-of select="harctoolbox:canonical-name(../@name)"/></xsl:attribute>
             <xsl:apply-templates select="ParameterSpecs/ParameterSpec"/>
+            <xsl:apply-templates select="Definitions/Definition"/>
             <axsl:text xml:space="preserve">&#9;&#9;</axsl:text>
             <axsl:value-of select="translate(@name, ' ', '_')"/>
             <axsl:text>&#9;0x</axsl:text>
@@ -381,7 +382,8 @@ end remote
                     <xsl:value-of xml:space="skip" select="harctoolbox:canonical-name(../../../../@name)"/>
                 </xsl:attribute>
                 <xsl:apply-templates select="../../../ParameterSpecs/ParameterSpec" mode="inCodeWithoutDefaults"/>
-            </axsl:call-template>
+                <xsl:apply-templates select="../../../Definitions/Definition" mode="inCodeWithoutDefaults"/>
+           </axsl:call-template>
         </axsl:template>
     </xsl:template>
 
@@ -395,6 +397,7 @@ end remote
                     <xsl:value-of xml:space="skip" select="harctoolbox:canonical-name(../../../../@name)"/>
                 </xsl:attribute>
                 <xsl:apply-templates select="../../../ParameterSpecs/ParameterSpec" mode="inCodeWithDefaults"/>
+                <xsl:apply-templates select="../../../Definitions/Definition" mode="inCodeWithoutDefaults"/>
             </axsl:call-template>
         </axsl:template>
     </xsl:template>
@@ -411,6 +414,27 @@ end remote
                 <xsl:value-of select="@name"/>
             </xsl:attribute>
         </axsl:param>
+    </xsl:template>
+
+    <xsl:template match="Definition">
+        <axsl:param>
+            <xsl:attribute name="name">
+                <xsl:value-of select="Name/text()"/>
+            </xsl:attribute>
+        </axsl:param>
+    </xsl:template>
+
+    <xsl:template match="Definition" mode="inCodeWithoutDefaults">
+        <axsl:with-param>
+            <xsl:attribute name="name">
+                <xsl:value-of select="Name/text()"/>
+            </xsl:attribute>
+            <xsl:attribute name="select">
+                <xsl:text>number(</xsl:text>
+                <xsl:value-of select="Expression/Number/text()"/>
+                <xsl:text>)</xsl:text>
+            </xsl:attribute>
+        </axsl:with-param>
     </xsl:template>
 
     <xsl:template match="ParameterSpec" mode="inCodeWithoutDefaults">
@@ -744,6 +768,15 @@ end remote
 
     <xsl:template match="Extent" mode="flags">
         <xsl:text>|CONST_LENGTH</xsl:text>
+    </xsl:template>
+
+    <!-- Hardcoded special cases -->
+    <xsl:template match="Protocol[../@name='MCE']" priority='9999'>
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="../@name"/>
+            <xsl:text> omitted: Interleaved bitfields and durations </xsl:text>
+        </xsl:comment>
     </xsl:template>
 
 </xsl:transform>

@@ -216,6 +216,15 @@ end remote
         </xsl:comment>
     </xsl:template>
 
+    <!-- Nuke protocols with hierarchical BitspecIrstream -->
+    <xsl:template match="NamedProtocol[Protocol/BitspecIrstream/IrStream/BitspecIrstream]" priority='99'>
+        <xsl:comment>
+            <xsl:text> Protocol </xsl:text>
+            <xsl:value-of select="@name"/>
+            <xsl:text> omitted: Hierarchical BitspecIrStreams </xsl:text>
+        </xsl:comment>
+    </xsl:template>
+
     <!-- Nuke protocols with non-constant bitlength -->
     <xsl:template match="NamedProtocol[Protocol/BitspecIrstream/NormalForm/*/FiniteBitField/Width[not(Number)]]" priority="999">
         <xsl:comment>

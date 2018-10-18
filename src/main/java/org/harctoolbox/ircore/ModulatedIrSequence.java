@@ -202,6 +202,10 @@ public final class ModulatedIrSequence extends IrSequence {
         return toString(false);
     }
 
+    public IrSignal toIrSignal() {
+        return new IrSignal(this);
+    }
+
     /**
      * Compares two ModulatedIrSequences for (approximate) equality.
      *

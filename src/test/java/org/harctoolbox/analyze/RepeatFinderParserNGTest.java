@@ -5,8 +5,12 @@
  */
 package org.harctoolbox.analyze;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrSignalParser;
+import org.harctoolbox.ircore.ProntoParser;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -50,7 +54,9 @@ public class RepeatFinderParserNGTest {
     @Test
     public void testToIrSignal() throws InvalidArgumentException {
         System.out.println("toIrSignal");
-        RepeatFinderParser instance = new RepeatFinderParser(nec);
+        List<IrSignalParser> parsers = new ArrayList<>(1);
+        parsers.add(new ProntoParser(nec));
+        RepeatFinderParser instance = new RepeatFinderParser(parsers, nec);
         IrSignal result = instance.toIrSignal();
         assertEquals(result.getRepeatLength(), 4);
     }
@@ -62,7 +68,9 @@ public class RepeatFinderParserNGTest {
     @Test
     public void testToIrSignalClean() throws InvalidArgumentException {
         System.out.println("toIrSignalClean");
-        RepeatFinderParser instance = new RepeatFinderParser(nec);
+        List<IrSignalParser> parsers = new ArrayList<>(1);
+        parsers.add(new ProntoParser(nec));
+        RepeatFinderParser instance = new RepeatFinderParser(parsers, nec);
         IrSignal result = instance.toIrSignalClean();
         assertEquals(result.getRepeatLength(), 4);
     }

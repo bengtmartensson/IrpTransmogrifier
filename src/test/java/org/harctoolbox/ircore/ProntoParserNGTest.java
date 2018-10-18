@@ -7,9 +7,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class ProntoRawParserNGTest {
-
-    private static final String nec1_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+/**
+ *
+ * @author bengt
+ */
+public class ProntoParserNGTest {
+   private static final String nec1_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
     private static final String nec1_12_34_56_err = "0000 006C 0022 0003 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
     private static final String nec1_12_34_56_semantic = "0000 006C 0022 0002 15B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
     private static final String nec_raw = "+9024 -4512 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -44268";
@@ -22,7 +25,7 @@ public class ProntoRawParserNGTest {
     public static void tearDownClass() throws Exception {
     }
 
-    public ProntoRawParserNGTest() {
+    public ProntoParserNGTest() {
     }
 
     @BeforeMethod
@@ -41,8 +44,8 @@ public class ProntoRawParserNGTest {
     @Test
     public void testToIrSignalAsPronto() throws Pronto.NonProntoFormatException, InvalidArgumentException {
         System.out.println("toIrSignalAsPronto");
-        ProntoRawParser instance = new ProntoRawParser(nec1_12_34_56);
-        IrSignal result = instance.toIrSignalAsPronto();
+        MultiParser instance = ProntoParser.newProntoRawParser(nec1_12_34_56);
+        IrSignal result = instance.toIrSignal();
         assertNotNull(result);
     }
 
@@ -54,7 +57,7 @@ public class ProntoRawParserNGTest {
     @SuppressWarnings("UnusedAssignment")
     public void testToIrSignal() throws InvalidArgumentException {
         System.out.println("toIrSignal");
-        ProntoRawParser instance = new ProntoRawParser(nec1_12_34_56);
+        MultiParser instance = ProntoParser.newProntoRawParser(nec1_12_34_56);
         IrSignal result = instance.toIrSignal();
         assertNotNull(result);
 
@@ -62,7 +65,7 @@ public class ProntoRawParserNGTest {
         result = instance.toIrSignal(fallbackFrequency);
         assertNotNull(result);
 
-        instance = new ProntoRawParser(nec1_12_34_56_err);
+        instance = ProntoParser.newProntoRawParser(nec1_12_34_56_err);
         try {
             result = instance.toIrSignal(fallbackFrequency);
             fail();
@@ -70,11 +73,11 @@ public class ProntoRawParserNGTest {
             System.out.println(ex.getLocalizedMessage());
         }
 
-        instance = new ProntoRawParser(nec_raw);
+        instance = ProntoParser.newProntoRawParser(nec_raw);
         result = instance.toIrSignal(fallbackFrequency);
         assertNotNull(result);
 
-        instance = new ProntoRawParser(nec1_12_34_56_semantic);
+        instance = ProntoParser.newProntoRawParser(nec1_12_34_56_semantic);
         try {
             result = instance.toIrSignal(fallbackFrequency);
             fail();

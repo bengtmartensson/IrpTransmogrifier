@@ -25,12 +25,12 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.OddSequenceLengthException;
-import org.harctoolbox.ircore.ProntoRawParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 
-public class CleanerParser extends ProntoRawParser {
+public class CleanerParser extends MultiParser {
 
     private final static Logger logger = Logger.getLogger(CleanerParser.class.getName());
     private final double absoluteTolerance;
@@ -103,6 +103,7 @@ public class CleanerParser extends ProntoRawParser {
      * Same as ProntoRawParser, but cleans up the IrSignal.
      *
      * @param fallbackFrequency Modulation frequency to use, if it cannot be inferred from the first parameter.
+     * @param dummyGap
      * @return IrSignal, or null on failure.
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */

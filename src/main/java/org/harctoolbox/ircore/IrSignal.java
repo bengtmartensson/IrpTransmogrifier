@@ -146,21 +146,6 @@ public final class IrSignal implements Cloneable {
     public IrSignal(int[] durations, int noIntro, int noRepeat, double frequency) throws InvalidArgumentException {
         this(durations, noIntro, noRepeat, frequency, null);
     }
-    /**
-     * Constructs an IrSignal from its arguments.
-     *
-     * @param frequency
-     * @param dutyCycle
-     * @param introSequence
-     * @param repeatSequence
-     * @param endingSequence
-     * @throws OddSequenceLengthException
-     */
-    public IrSignal(String introSequence, String repeatSequence,
-            String endingSequence, double frequency, double dutyCycle) throws OddSequenceLengthException {
-        this(new IrSequence(introSequence), new IrSequence(repeatSequence),
-                new IrSequence(endingSequence), frequency, dutyCycle);
-    }
 
     /**
      * Constructs an IrSignal from its arguments.

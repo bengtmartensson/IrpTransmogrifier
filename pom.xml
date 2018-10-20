@@ -183,6 +183,10 @@
                                 </resource>
                                 <resource>
                                     <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>IrpProtocols.xml</include>
+                                        <include>IrpProtocols2html.xsl</include>
+                                    </includes>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
@@ -235,7 +239,9 @@
                 </executions>
                 <configuration>
                     <includes>
-                        <include>**/*.*</include>
+                        <include>IrpProtocols.xml</include>
+                        <include>girr.xml</include>
+                        <include>IrpProtocols2html.xsl</include>
                     </includes>
                 </configuration>
             </plugin>

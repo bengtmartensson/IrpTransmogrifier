@@ -181,13 +181,13 @@ public class DecoderNGTest {
         irSequence = new ModulatedIrSequence(IrSequence.concatenate(nec1Intro, rc5Seq), 37000d);
         result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         assertEquals(result.size(), 2);
-        assertEquals(result.get(0).size(), 5);
+        assertEquals(result.get(0).size(), 6);
         assertEquals(result.get(1).size(), 1);
 
         allDecodes = false;
         result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         assertEquals(result.size(), 2);
-        assertEquals(result.get(0).size(), 2);
+        assertEquals(result.get(0).size(), 3);
         assertEquals(result.get(1).size(), 1);
     }
 

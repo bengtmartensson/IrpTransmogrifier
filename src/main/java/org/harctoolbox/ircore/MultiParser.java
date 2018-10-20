@@ -18,17 +18,34 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class MultiParser extends RawParser {
+public class MultiParser extends AbstractIrParser {
 
-    private final Iterable<? extends IrSignalParser> parsers;
+    public static List<IrSignalParser> ircoreParsersList(String source) {
+        List<IrSignalParser> parsersList = new ArrayList<>(4);
+        parsersList.add(new ProntoParser(source));
+        parsersList.add(new BracketedIrSignalParser(source));
+        parsersList.add(new MultilineIrSignalParser(source));
+        return parsersList;
+    }
 
-    public MultiParser(Iterable<? extends IrSignalParser> parsers, String source) {
+    public static MultiParser newIrCoreParser(String source) {
+        return new MultiParser(ircoreParsersList(source), source);
+    }
+
+    public static MultiParser newIrCoreParser(List<? extends CharSequence> args) {
+        return newIrCoreParser(String.join(" ", args));
+    }
+
+    private final List<IrSignalParser> parsers;
+
+    public MultiParser(List<IrSignalParser> parsers, String source) {
         super(source);
         this.parsers = parsers;
     }
 
-    public MultiParser(Iterable<? extends IrSignalParser> parsers, Iterable<? extends CharSequence> args) {
+    public MultiParser(List<IrSignalParser> parsers, Iterable<? extends CharSequence> args) {
         this(parsers, String.join(" ", args));
     }
 
@@ -37,7 +54,11 @@ public class MultiParser extends RawParser {
     }
 
     public MultiParser(String source) {
-        this(new ArrayList<IrSignalParser>(0), source);
+        this(ircoreParsersList(source), source);
+    }
+
+    public void addParser(IrSignalParser newParser) {
+        parsers.add(0, newParser);
     }
 
     @Override
@@ -48,6 +69,45 @@ public class MultiParser extends RawParser {
                 return irSignal;
         }
 
-        return super.toIrSignal(fallbackFrequency, dummyGap);
+        return null;
+    }
+
+    @Override
+    public IrSequence toIrSequence(Double dummyGap) throws InvalidArgumentException {
+         for (IrSignalParser parser : parsers) {
+            IrSequence irSequence = parser.toIrSequence(dummyGap);
+            if (irSequence != null)
+                return irSequence;
+        }
+
+        return null;
+    }
+
+    @Override
+    public ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
+         for (IrSignalParser parser : parsers) {
+            ModulatedIrSequence modulatedirSequence = parser.toModulatedIrSequence(fallbackFrequency, dummyGap);
+            if (modulatedirSequence != null)
+                return modulatedirSequence;
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * @param dummyGap
+     * @return
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
+    @Override
+    public List<IrSequence> toList(Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
+        for (IrSignalParser parser : parsers) {
+            List<IrSequence> list = parser.toList(dummyGap);
+            if (list != null)
+                return list;
+        }
+
+        return null;
     }
 }

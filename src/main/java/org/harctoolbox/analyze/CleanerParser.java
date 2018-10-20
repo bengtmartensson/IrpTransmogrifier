@@ -24,6 +24,7 @@ import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrSignalParser;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.OddSequenceLengthException;
@@ -37,14 +38,14 @@ public class CleanerParser extends MultiParser {
     private final double relativeTolerance;
     private Cleaner cleaner = null;
 
-    public CleanerParser(String source, Double absoluteTolerance, Double relativeTolerance) {
-        super(source);
+    public CleanerParser(List<IrSignalParser> parsers, String source, Double absoluteTolerance, Double relativeTolerance) {
+        super(parsers, source);
         this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
     }
 
-    public CleanerParser(Iterable<? extends CharSequence> args, Double absoluteTolerance, Double relativeTolerance) {
-        super(args);
+    public CleanerParser(List<IrSignalParser> parsers, Iterable<? extends CharSequence> args, Double absoluteTolerance, Double relativeTolerance) {
+        super(parsers, args);
         this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
     }
@@ -54,20 +55,20 @@ public class CleanerParser extends MultiParser {
     }
 
     @Override
-    public IrSequence toIrSequence(Double dummyGap) throws OddSequenceLengthException {
+    public IrSequence toIrSequence(Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
         IrSequence irSequence = super.toIrSequence(dummyGap);
         cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
         return cleaner.toIrSequence();
     }
 
     @Override
-    public List<IrSequence> toList(Double dummmyGap) throws OddSequenceLengthException {
+    public List<IrSequence> toList(Double dummmyGap) throws OddSequenceLengthException, InvalidArgumentException {
         List<IrSequence> list = super.toList(dummmyGap);
         return clean(list);
     }
 
     @Override
-    public List<IrSequence> toListChop(double threshold, Double dummyGap) throws OddSequenceLengthException {
+    public List<IrSequence> toListChop(double threshold, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
         List<IrSequence> list = super.toListChop(threshold, dummyGap);
         return clean(list);
     }

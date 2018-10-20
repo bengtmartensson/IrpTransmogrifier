@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class ProntoParserNGTest {
-   private static final String nec1_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+    private static final String nec1_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
     private static final String nec1_12_34_56_err = "0000 006C 0022 0003 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
     private static final String nec1_12_34_56_semantic = "0000 006C 0022 0002 15B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
     private static final String nec_raw = "+9024 -4512 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -44268";
@@ -44,7 +44,7 @@ public class ProntoParserNGTest {
     @Test
     public void testToIrSignalAsPronto() throws Pronto.NonProntoFormatException, InvalidArgumentException {
         System.out.println("toIrSignalAsPronto");
-        MultiParser instance = ProntoParser.newProntoRawParser(nec1_12_34_56);
+        ProntoParser instance = new ProntoParser(nec1_12_34_56);
         IrSignal result = instance.toIrSignal();
         assertNotNull(result);
     }
@@ -57,7 +57,7 @@ public class ProntoParserNGTest {
     @SuppressWarnings("UnusedAssignment")
     public void testToIrSignal() throws InvalidArgumentException {
         System.out.println("toIrSignal");
-        MultiParser instance = ProntoParser.newProntoRawParser(nec1_12_34_56);
+        ProntoParser instance = new ProntoParser(nec1_12_34_56);
         IrSignal result = instance.toIrSignal();
         assertNotNull(result);
 
@@ -65,7 +65,7 @@ public class ProntoParserNGTest {
         result = instance.toIrSignal(fallbackFrequency);
         assertNotNull(result);
 
-        instance = ProntoParser.newProntoRawParser(nec1_12_34_56_err);
+        instance = new ProntoParser(nec1_12_34_56_err);
         try {
             result = instance.toIrSignal(fallbackFrequency);
             fail();
@@ -73,16 +73,11 @@ public class ProntoParserNGTest {
             System.out.println(ex.getLocalizedMessage());
         }
 
-        instance = ProntoParser.newProntoRawParser(nec_raw);
+        instance = new ProntoParser(nec_raw);
         result = instance.toIrSignal(fallbackFrequency);
-        assertNotNull(result);
-
-        instance = ProntoParser.newProntoRawParser(nec1_12_34_56_semantic);
-        try {
-            result = instance.toIrSignal(fallbackFrequency);
-            fail();
-        } catch (NumberFormatException ex) {
-            System.out.println(ex.getLocalizedMessage());
-        }
+        assertNull(result);
+        instance = new ProntoParser(nec1_12_34_56_semantic);
+        result = instance.toIrSignal(fallbackFrequency);
+        assertNull(result);
     }
 }

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
+import java.util.List;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -34,11 +35,11 @@ public class RepeatFinderParser extends MultiParser {
     private final double minRepeatLastGap;
     private RepeatFinder repeatFinder = null;
 
-    public RepeatFinderParser(Iterable<? extends IrSignalParser> parsers, String source) {
+    public RepeatFinderParser(List<IrSignalParser> parsers, String source) {
         this(parsers, source, null, null, null);
     }
 
-    public RepeatFinderParser(Iterable<? extends IrSignalParser> parsers, String source, Double absoluteTolerance, Double relativeTolerance, Double minRepeatLastGap) {
+    public RepeatFinderParser(List<IrSignalParser> parsers, String source, Double absoluteTolerance, Double relativeTolerance, Double minRepeatLastGap) {
         super(parsers, source);
         this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);

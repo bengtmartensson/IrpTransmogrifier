@@ -64,7 +64,6 @@ import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
-import org.harctoolbox.ircore.ProntoParser;
 import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
@@ -712,7 +711,7 @@ public final class IrpTransmogrifier {
 
         if (commandAnalyze.input != null) {
             ThingsLineParser<ModulatedIrSequence> irSignalParser = new ThingsLineParser<>(
-                    (List<String> line) -> { return (ProntoParser.newProntoRawParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
+                    (List<String> line) -> { return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
             );
             List<ModulatedIrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
             analyze(signals);
@@ -723,7 +722,7 @@ public final class IrpTransmogrifier {
             } catch (ParseException ex) {
                 logger.log(Level.INFO, "Parsing of {0} as ict failed", commandAnalyze.namedInput);
                 ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
-                        (List<String> line) -> { return (ProntoParser.newProntoRawParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
+                        (List<String> line) -> { return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
                 );
                 Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
                 if (signals.isEmpty())
@@ -731,7 +730,7 @@ public final class IrpTransmogrifier {
                 analyze(signals);
             }
         } else {
-            MultiParser parser = ProntoParser.newProntoRawParser(commandAnalyze.args);
+            MultiParser parser = MultiParser.newIrCoreParser(commandAnalyze.args);
             if (commandAnalyze.introRepeatEnding) {
                 IrSignal irSignal = (commandAnalyze.chop != null)
                         ? parser.toIrSignalChop(commandAnalyze.frequency, commandAnalyze.chop)
@@ -907,7 +906,7 @@ public final class IrpTransmogrifier {
         Decoder decoder = new Decoder(irpDatabase, protocolsNames);
         if (commandDecode.input != null) {
             ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                    return (ProntoParser.newProntoRawParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
+                    return (MultiParser.newIrCoreParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
             });
             List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding, false);
             for (IrSignal irSignal : signals)
@@ -922,7 +921,7 @@ public final class IrpTransmogrifier {
                 }
             } catch (ParseException ex) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                    return (ProntoParser.newProntoRawParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
+                    return (MultiParser.newIrCoreParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
                 });
                 Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
@@ -930,7 +929,7 @@ public final class IrpTransmogrifier {
                     decode(decoder, kvp.getValue(), kvp.getKey(), maxNameLength);
             }
         } else {
-            MultiParser prontoRawParser = ProntoParser.newProntoRawParser(commandDecode.args);
+            MultiParser prontoRawParser = MultiParser.newIrCoreParser(commandDecode.args);
             IrSignal irSignal = prontoRawParser.toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
             decode(decoder, irSignal, null, 0);
         }
@@ -1114,8 +1113,6 @@ public final class IrpTransmogrifier {
                 : commandLineArgs.configFile != null  ? new IrpDatabase(commandLineArgs.configFile)
                 : new IrpDatabase(getClass().getResourceAsStream(DEFAULT_CONFIG_FILE));
     }
-
-
 
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
 

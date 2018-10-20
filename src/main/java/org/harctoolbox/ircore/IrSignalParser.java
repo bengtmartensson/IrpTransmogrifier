@@ -17,9 +17,17 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
+import java.util.List;
+
 public interface IrSignalParser {
 
     public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException;
+
+    public IrSequence toIrSequence(Double dummyGap) throws InvalidArgumentException;
+
+    public ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException;
+
+    public List<IrSequence> toList(Double dummyGap) throws InvalidArgumentException;
 
     public String getName();
 }

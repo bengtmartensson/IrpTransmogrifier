@@ -65,7 +65,7 @@ public final class IrCoreUtils {
     public static final double DEFAULT_MINIMUM_LEADOUT = 20000;
 
     /**
-     * Default value for least value in a repeat.
+     * Default value for least value in a repeat in microseconds.
      */
     public static final double DEFAULT_MIN_REPEAT_LAST_GAP = 5000d;
 

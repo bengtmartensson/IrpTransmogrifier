@@ -17,24 +17,12 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ProntoParser extends RawParser implements IrSignalParser {
+public class ProntoParser extends AbstractIrParser implements IrSignalParser {
 
     private final static Logger logger = Logger.getLogger(ProntoParser.class.getName());
-
-    public static MultiParser newProntoRawParser(String source) {
-        List<IrSignalParser> parsers = new ArrayList<>(1);
-        parsers.add(new ProntoParser(source));
-        return new MultiParser(parsers, source);
-    }
-
-    public static MultiParser newProntoRawParser(Iterable<? extends CharSequence> args) {
-        return newProntoRawParser(String.join(" ", args));
-    }
 
     public ProntoParser(String source) {
         super(source);
@@ -47,7 +35,7 @@ public class ProntoParser extends RawParser implements IrSignalParser {
     /**
      * Tries to interpret the string argument as one of our known formats, and
      * return an IrSignal. First tries to interpret as Pronto. If this fails,
-     * falls back to RawParser.toIrSignal().
+ falls back to AbstractIrParser.toIrSignal().
      *
      * @param fallbackFrequency Modulation frequency to use, if it cannot be
      * inferred from the first parameter.
@@ -62,7 +50,7 @@ public class ProntoParser extends RawParser implements IrSignalParser {
             // If Pronto.NonProntoFormatException is not thrown, the signal is probably
             // an erroneous Pronto wannabe, do not catch other exceptions than Pronto.NonProntoFormatException
             if (fallbackFrequency != null)
-                logger.log(Level.WARNING, "Explicit frequency with a Pronto type signal meaningless, thus ignored.");
+                logger.log(Level.FINE, "Explicit frequency with a Pronto type signal meaningless, thus ignored.");
             return irSignal;
         } catch (Pronto.NonProntoFormatException ex) {
             // Signal does not look like Pronto, give up

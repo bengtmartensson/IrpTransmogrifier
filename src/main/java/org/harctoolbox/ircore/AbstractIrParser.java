@@ -20,32 +20,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class RawParser {
+public abstract class AbstractIrParser {
 
-    private final static Logger logger = Logger.getLogger(RawParser.class.getName());
-
-    private static String[] splitBracketed(String str) {
-        return str.startsWith("[")
-                ? str.replace("[", "").split("\\]")
-                : new String[]{str};
-    }
-
-    private static String[] splitLines(String str) {
-        return str.split("[\n\r]+");
-    }
+    private final static Logger logger = Logger.getLogger(AbstractIrParser.class.getName());
 
     // IRremote writes spaces after + and -, sigh...
-    private static String fixIrRemoteSilliness(String str) {
+    protected static String fixIrRemoteSilliness(String str) {
         return str.replaceAll("\\+\\s+", "+").replaceAll("-\\s+", "-");
     }
 
-    private static IrSignal mkIrSignal(List<IrSequence> list, Double frequency) throws OddSequenceLengthException {
+    protected static IrSignal mkIrSignal(List<IrSequence> list, Double frequency) throws OddSequenceLengthException {
           return (list.size() > 0 && list.size() <= 3)
                 ? new IrSignal(list.get(0), list.size() > 1 ? list.get(1) : null, list.size() > 2 ? list.get(2) : null, frequency, null)
                 : null;
     }
 
-    private static IrSignal mkIrSignal(String[] codes, Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException {
+    protected static IrSignal mkIrSignal(String[] codes, Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException {
         if (codes.length == 0 || codes.length > 3)
             return null;
 
@@ -62,15 +52,15 @@ public class RawParser {
      * Main constructor
      * @param source string to be paraed
      */
-    public RawParser(String source) {
-        this.source = fixIrRemoteSilliness(source).trim();
+    public AbstractIrParser(String source) {
+        this.source = source.trim();
     }
 
     /**
      * Equivalent to RawParser(String.join(" ", args));
      * @param args Will be concatenated, with space in between, then parsed.
      */
-    public RawParser(Iterable<? extends CharSequence> args) {
+    public AbstractIrParser(Iterable<? extends CharSequence> args) {
         this(String.join(" ", args));
     }
 
@@ -86,11 +76,11 @@ public class RawParser {
      * @return
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public List<IrSequence> toListChop(double threshold, Double dummyGap) throws OddSequenceLengthException {
+    public List<IrSequence> toListChop(double threshold, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
         return toIrSequence(dummyGap).chop(threshold);
     }
 
-    public final List<IrSequence> toListChop(double threshold) throws OddSequenceLengthException {
+    public final List<IrSequence> toListChop(double threshold) throws OddSequenceLengthException, InvalidArgumentException {
         return toListChop(threshold, null);
     }
 
@@ -100,8 +90,18 @@ public class RawParser {
      * @return
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public List<IrSequence> toList(Double dummyGap) throws OddSequenceLengthException {
-        String[] parts = splitBracketed(source);
+    public List<IrSequence> toList(Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
+        return null;
+    }
+
+    /**
+     *
+     * @param parts
+     * @param dummyGap
+     * @return
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
+    protected final List<IrSequence> toList(String[] parts, Double dummyGap) throws OddSequenceLengthException {
         List<IrSequence> result = new ArrayList<>(parts.length);
         for (String s : parts)
             try {
@@ -112,20 +112,8 @@ public class RawParser {
         return result;
     }
 
-    public final List<IrSequence> toList() throws OddSequenceLengthException {
+    public final List<IrSequence> toList() throws OddSequenceLengthException, InvalidArgumentException {
         return toList(null);
-    }
-
-    public ModulatedIrSequence toModulatedIrSequenceAsRaw(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
-        Double frequency = fallbackFrequency;
-        String s = source.replace(",", " ").trim();
-        if (s.startsWith("f=")) {
-            int pos = s.indexOf(' ', 3);
-            frequency = Double.parseDouble(s.substring(2, pos));
-            s = s.substring(pos + 1).trim();
-        }
-        IrSequence irSequence = new IrSequence(s, dummyGap);
-        return new ModulatedIrSequence(irSequence, frequency);
     }
 
     public ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
@@ -135,8 +123,7 @@ public class RawParser {
                return irSignal.toModulatedIrSequence();
         } catch (InvalidArgumentException | NumberFormatException ex) {
         }
-
-        return toModulatedIrSequenceAsRaw(fallbackFrequency, dummyGap);
+        return null;
     }
 
     public final ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency) throws OddSequenceLengthException, InvalidArgumentException {
@@ -155,36 +142,12 @@ public class RawParser {
         return source;
     }
 
-    public final IrSequence toIrSequence() throws OddSequenceLengthException {
+    public final IrSequence toIrSequence() throws OddSequenceLengthException, InvalidArgumentException {
         return toIrSequence(null);
     }
 
-    public IrSequence toIrSequence(Double dummyGap) throws OddSequenceLengthException {
+    public IrSequence toIrSequence(Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
         return new IrSequence(source, dummyGap);
-    }
-
-    // low-level
-    public final IrSignal toIrSignalAsMultiLine(Double fallbackFrequency) throws OddSequenceLengthException {
-        return toIrSignalAsMultiLine(fallbackFrequency, null);
-    }
-
-    private IrSignal toIrSignalAsMultiLine(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException {
-        if (source.startsWith("["))
-            return null;
-
-        return mkIrSignal(splitLines(source), fallbackFrequency, dummyGap);
-    }
-
-    // low level
-    public final IrSignal toIrSignalAsBracketedString(Double frequency, Double dummyGap) throws OddSequenceLengthException {
-        if (!source.startsWith("["))
-            return null;
-
-        return mkIrSignal(splitBracketed(source), frequency, dummyGap);
-    }
-
-    public final IrSignal toIrSignalAsBracketedString(Double frequency) throws OddSequenceLengthException {
-        return toIrSignalAsBracketedString(frequency, null);
     }
 
     public final IrSignal toIrSignal() throws OddSequenceLengthException, InvalidArgumentException {
@@ -208,14 +171,7 @@ public class RawParser {
         return toIrSignal(fallbackFrequency, null);
     }
 
-    public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException, NumberFormatException {
-        IrSignal irSignal = null;
-        try {
-            irSignal = toIrSignalAsBracketedString(fallbackFrequency, dummyGap);
-        } catch (OddSequenceLengthException ex) {
-        }
-        return (irSignal != null) ? irSignal : toIrSignalAsMultiLine(fallbackFrequency, dummyGap);
-    }
+    public abstract IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException, NumberFormatException;
 
     public IrSignal toIrSignalChop(Double fallbackFrequency, double threshold) throws OddSequenceLengthException, InvalidArgumentException {
         List<IrSequence> list = toListChop(threshold);

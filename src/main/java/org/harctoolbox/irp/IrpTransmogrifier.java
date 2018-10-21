@@ -1158,7 +1158,7 @@ public final class IrpTransmogrifier {
                 return NameEngine.parseLoose(value);
             } catch (ParseCancellationException ex) {
                 throw new ParameterException("Parse error as name engine: \"" + value + "\"");
-            } catch (IllegalArgumentException | InvalidNameException ex) {
+            } catch (IllegalArgumentException ex) {
                 throw new ParameterException(ex);
             }
         }

@@ -172,9 +172,13 @@ public class NameEngineNGTest {
             NameEngine result = NameEngine.parseLoose(str);
             assertEquals(result.toString(), expResult.toString());
 
+            String[] args = {"D=12", "F=64", "S=34", "X=78"};
+            result = NameEngine.parse(args);
+            assertEquals(result.toString(), expResult.toString());
+
             result = NameEngine.parseLoose("");
             assertEquals(result.toString(), "");
-            result = NameEngine.parseLoose(null);
+            result = NameEngine.parse(new String[0]);
             assertEquals(result.toString(), "");
         } catch (InvalidNameException ex) {
             Logger.getLogger(NameEngineNGTest.class.getName()).log(Level.SEVERE, null, ex);

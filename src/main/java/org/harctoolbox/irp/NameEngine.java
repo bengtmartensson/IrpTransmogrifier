@@ -44,19 +44,24 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
     @SuppressWarnings("PackageVisibleField")
     public static final NameEngine empty = new NameEngine();
 
-    public static NameEngine parseLoose(String str) throws InvalidNameException {
-        NameEngine nameEngine = new NameEngine();
+    public static NameEngine parseLoose(String str) {
         if (str == null || str.trim().isEmpty())
-            return nameEngine;
+            return new NameEngine();
 
         String payload = str.trim().replaceFirst("^\\{", "").replaceFirst("\\}$", "");
         String[] definitions = payload.split("[\\s,;]+");
+        return parse(definitions);
+    }
+
+    public static NameEngine parse(String[] definitions) {
+        NameEngine nameEngine = new NameEngine();
         for (String definition : definitions) {
             ParserDriver parserDriver = new ParserDriver(definition);
             nameEngine.parseDefinition(parserDriver.getParser().definition());
         }
         return nameEngine;
     }
+
     private static Element mkElement(Document document, Map.Entry<String, Expression> definition) {
         Element element = document.createElement("Definition");
         try {

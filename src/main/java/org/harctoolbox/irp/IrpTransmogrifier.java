@@ -1455,7 +1455,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all).")
         private String protocol = null;
 
-        @Parameter(names = { "-r", "--repeat-finder"}, description = "Invoke repeat finder on input sequence")
+        @Parameter(names = { "-r", "--repeatfinder"}, description = "Invoke repeat finder on input sequence")
         private boolean repeatFinder = false;
 
         @Parameter(names = { "-R", "--dump-repeatfinder" }, description = "Print the result of the repeatfinder.")

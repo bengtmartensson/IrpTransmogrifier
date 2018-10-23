@@ -254,9 +254,9 @@ public class IrpTransmogrifierNGTest {
 
     @Test(enabled = true)
     public void testDecodeSim2AsRepeat() {
-        System.out.println("testDecodeRecs80Multiple");
+        System.out.println("testDecodeSim2AsRepeat");
         String sim2AsRepeat = "0000 006B 0000 0012 005D 006C 002F 002E 002F 002E 002F 006B 002F 006B 002F 002E 002F 006B 002F 006B 002F 006B 002F 006B 002F 002E 002F 006B 002F 002E 002F 002E 002F 002E 002F 002E 002F 006B 002E 0928";
-        String result = IrpTransmogrifier.execute("decode --proto sim2 " + sim2AsRepeat);
+        String result = IrpTransmogrifier.execute("decode --proto sim2 --keep-defaulted " + sim2AsRepeat);
         assertEquals(result, "SIM2: {D=236,F=133}, beg=0, end=36");
         result = IrpTransmogrifier.execute("decode --proto sim2 --strict " + sim2AsRepeat);
         assertEquals(result, "");
@@ -344,7 +344,7 @@ public class IrpTransmogrifierNGTest {
     @Test
     public void testLirc() {
         System.out.println("lirc");
-        String result = IrpTransmogrifier.execute("lirc src/test/resources/RX-V995.lircd.conf");
+        String result = IrpTransmogrifier.execute("lirc src/test/lirc/RX-V995.lircd.conf");
         assertEquals(result, "yamaha-amp:	{38.0k,1,msb}<642u,-1600u|642u,-470u>(9067u,-4393u,pre_data:16,F:16,642u,-39597u,(9065u,-2139u,642u,-39597u)*){pre_data=0xa15e}[F:0x0..0xffff]");
     }
 

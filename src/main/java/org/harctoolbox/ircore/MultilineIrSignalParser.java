@@ -68,7 +68,11 @@ public class MultilineIrSignalParser extends AbstractIrParser implements IrSigna
 
     @Override
     public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException {
-        return mkIrSignal(splitLines(getSource()), fallbackFrequency, dummyGap);
+        try {
+            return mkIrSignal(splitLines(getSource()), fallbackFrequency, dummyGap);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     @Override

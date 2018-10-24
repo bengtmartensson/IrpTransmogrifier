@@ -3,7 +3,7 @@
 <irp:protocols xmlns="http://www.w3.org/1999/xhtml"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2018-10-20"
+               version="2018-10-24"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols file:///home/bengt/harctoolbox/IrpTransmogrifier/src/main/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
     <irp:protocol c-name="X48NEC1" name="48-NEC1">
@@ -144,6 +144,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:documentation/>
     </irp:protocol>
     <irp:protocol c-name="Bryston" name="Bryston">
+        <irp:parameter name="minimum-leadout">15000</irp:parameter>
         <irp:irp><![CDATA[{38.0k,315}<1,-6|6,-1>(D:10,F:8,-18m)* [D:0..1023,F:0..255]]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>

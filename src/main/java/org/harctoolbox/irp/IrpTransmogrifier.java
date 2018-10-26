@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -931,11 +932,14 @@ public final class IrpTransmogrifier {
         } else {
             MultiParser prontoRawParser = MultiParser.newIrCoreParser(commandDecode.args);
             IrSignal irSignal = prontoRawParser.toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
+            if (irSignal == null)
+                throw new UsageException("Could not parse as IrSignal: " + String.join(" ", commandDecode.args));
             decode(decoder, irSignal, null, 0);
         }
     }
 
     private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
+        Objects.requireNonNull(irSignal, "irSignal must be non-null");
         if (! commandDecode.strict && (irSignal.introOnly() || irSignal.repeatOnly())) {
             ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
             if (commandDecode.repeatFinder) {

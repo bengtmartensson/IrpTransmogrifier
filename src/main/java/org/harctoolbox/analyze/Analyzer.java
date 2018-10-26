@@ -53,6 +53,19 @@ public final class Analyzer extends Cleaner {
         return indices;
     }
 
+    public static Protocol selectBestProtocol(List<Protocol> protocols) {
+        Protocol bestSoFar = null;
+        int weight = Integer.MAX_VALUE;
+        for (Protocol protocol : protocols) {
+            int protocolWeight = protocol.weight();
+            if (protocolWeight < weight) {
+                bestSoFar = protocol;
+                weight = protocolWeight;
+            }
+        }
+        return bestSoFar;
+    }
+
     private List<Burst> pairs;
     private final RepeatFinder.RepeatFinderData[] repeatFinderData;
     private Double frequency;
@@ -261,6 +274,10 @@ public final class Analyzer extends Cleaner {
         return result;
     }
 
+    public List<Protocol> searchBestProtocol(AnalyzerParams analyzerParams) throws NoDecoderMatchException {
+        return searchBestProtocol(analyzerParams, null, false);
+    }
+
     public List<Protocol> searchProtocols(List<AbstractDecoder> decoders, int number) {
         List<Protocol> protocols = new ArrayList<>(decoders.size());
         decoders.forEach((decoder) -> {
@@ -277,17 +294,7 @@ public final class Analyzer extends Cleaner {
 
     public Protocol searchBestProtocol(List<AbstractDecoder> decoders, int number) {
         List<Protocol> protocols = searchProtocols(decoders, number);
-        Protocol bestSoFar = null;
-        int weight = Integer.MAX_VALUE;
-
-        for (Protocol protocol : protocols) {
-            int protocolWeight = protocol.weight();
-            if (protocolWeight < weight) {
-                bestSoFar = protocol;
-                weight = protocolWeight;
-            }
-        }
-        return bestSoFar;
+        return selectBestProtocol(protocols);
     }
 
     public void printStatistics(PrintStream out, AnalyzerParams params) {

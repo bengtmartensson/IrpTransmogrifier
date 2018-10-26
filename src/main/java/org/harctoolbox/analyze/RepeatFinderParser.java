@@ -92,6 +92,9 @@ public class RepeatFinderParser extends MultiParser {
                 ? irSignal.toModulatedIrSequence()
                 : toModulatedIrSequence(fallbackFrequency, dummyGap);
 
+        if (modulatedIrSequence == null)
+            return null;
+
         repeatFinder = new RepeatFinder(modulatedIrSequence, absoluteTolerance, relativeTolerance, minRepeatLastGap);
         return clean ? repeatFinder.toIrSignalClean(modulatedIrSequence) : repeatFinder.toIrSignal(modulatedIrSequence);
     }

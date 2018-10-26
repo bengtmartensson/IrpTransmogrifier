@@ -42,7 +42,7 @@ public class Cleaner {
     private static final int NO_LETTERS = 26;
     private static final int MAXSPAN = 4;
 
-    public static IrSequence clean(IrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+    public static IrSequence clean(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
         return cleaner.toIrSequence();
     }
@@ -51,7 +51,7 @@ public class Cleaner {
         return clean(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
-    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, double absoluteTolerance, double relativeTolerance) {
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
         return new ModulatedIrSequence(clean((IrSequence)irSequence, absoluteTolerance, relativeTolerance),
                 irSequence.getFrequency(), irSequence.getDutyCycle());
     }

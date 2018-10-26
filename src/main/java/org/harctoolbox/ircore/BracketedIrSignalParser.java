@@ -36,11 +36,22 @@ public class BracketedIrSignalParser extends AbstractIrParser implements IrSigna
     }
 
     @Override
-    public IrSignal toIrSignal(Double frequency, Double dummyGap) throws OddSequenceLengthException {
-        if (!getSource().startsWith("["))
+    public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException {
+        String s = getSource();
+        Double readFrequency = null;
+        if (s.startsWith("Freq=")) {
+            int pos = s.indexOf('H', 6);
+            readFrequency = Double.parseDouble(s.substring(5, pos));
+            s = s.substring(pos + 2).trim();
+        }
+        if (!s.startsWith("["))
             return null;
 
-        return mkIrSignal(splitBracketed(getSource()), frequency, dummyGap);
+        try {
+            return mkIrSignal(splitBracketed(s), readFrequency != null ? readFrequency : fallbackFrequency, dummyGap);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     @Override

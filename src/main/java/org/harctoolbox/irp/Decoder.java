@@ -203,11 +203,10 @@ public final class Decoder {
     }
 
     private void reduce(Map<String, Decode> decodes) {
-        List<String> protocols = new ArrayList<>(decodes.keySet());
-        protocols.forEach((name) -> {
-            Decode decode = decodes.get(name);
+        List<Decode> decs = new ArrayList<>(decodes.values());
+        decs.forEach((Decode decode) -> {
             if (decode != null) {
-                NamedProtocol prot = decodes.get(name).getNamedProtocol();
+                NamedProtocol prot = decode.getNamedProtocol();
                 if (prot != null) {
                     List<String> preferOvers = prot.getPreferOver();
                     if (preferOvers != null) {
@@ -282,12 +281,12 @@ public final class Decoder {
 
         @Override
         public String toString() {
-            return toString(10);
+            return toString(10, " ");
         }
 
-        public String toString(int radix) {
+        public String toString(int radix, String separator) {
             return namedProtocol.getName() + ": " + mapToString(radix)
-                    + (begPos != -1 ? (", beg=" + begPos) : "")
+                    + (begPos != -1 ? ("," + separator + "beg=" + begPos) : "")
                     + (endPos != -1 ? (", end=" + endPos) : "")
                     + (numberOfRepetitions != 0 ? (", reps=" + numberOfRepetitions) : "");
         }

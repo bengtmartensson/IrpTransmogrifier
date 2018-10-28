@@ -352,6 +352,8 @@ public class Cleaner {
 
     protected int getTimeBaseFromData(double relativeTolerance) {
         Integer min = timings.get(0);
+        if (min == 0)
+            throw new ThisCannotHappenException("min == 0");
         List<Integer> list = new ArrayList<>(timings.size());
         StringBuilder str = new StringBuilder(5*timings.size());
         timings.forEach((time) -> {

@@ -1,0 +1,26 @@
+?:		Epson: {D=9,OBC=2,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Mute:		Epson: {D=9,OBC=2,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+BNC:		Epson: {D=9,OBC=4,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Comp 1/2:		Epson: {D=9,OBC=5,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Down:		Epson: {D=5,OBC=2,S=1,T1=0,T2=0},	beg=0, end=30, reps=1
+Left:		Epson: {D=5,OBC=2,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Right:		Epson: {D=5,OBC=2,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Up:		Epson: {D=5,OBC=2,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+EasyMP:		Epson: {D=9,OBC=5,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Enter:		Epson: {D=5,OBC=4,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Esc:		Epson: {D=5,OBC=2,S=5,T1=1,T2=1},	beg=0, end=30, reps=1
+Zoom -:		Epson: {D=9,OBC=2,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Zoom +:		Epson: {D=9,OBC=2,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Freeze:		Epson: {D=9,OBC=0,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+HDMI:		Epson: {D=9,OBC=5,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Menu:		Epson: {D=9,OBC=2,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Page Dn:		Epson: {D=9,OBC=2,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Page Up:		Epson: {D=9,OBC=2,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Pointer:		Epson: {D=9,OBC=2,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Power Toggle:		Epson: {D=9,OBC=2,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Search:		Epson: {D=9,OBC=7,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+S video:		Epson: {D=9,OBC=4,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+User:		Epson: {D=9,OBC=3,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Video 1/2:		Epson: {D=9,OBC=4,S=5,T1=1,T2=0},	beg=0, end=30, reps=1
+Vol -:		Epson: {D=9,OBC=0,S=5,T1=0,T2=0},	beg=0, end=30, reps=1
+Vol +:		Epson: {D=9,OBC=0,S=5,T1=1,T2=0},	beg=0, end=30, reps=1

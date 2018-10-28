@@ -94,6 +94,8 @@ public final class RepeatFinder {
     private RepeatFinderData repeatFinderData;
 
     public RepeatFinder(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance, double minRepeatLastGap) {
+        if (irSequence == null)
+            throw new NullPointerException("IrSequence must be non-null.");
         this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
         this.minRepeatLastGap = minRepeatLastGap;
@@ -176,7 +178,7 @@ public final class RepeatFinder {
     }
 
     public IrSignal toIrSignalClean(ModulatedIrSequence irSequence) {
-        return repeatFinderData.chopIrSequence(Cleaner.clean(irSequence, (int) absoluteTolerance, relativeTolerance));
+        return repeatFinderData.chopIrSequence(Cleaner.clean(irSequence, absoluteTolerance, relativeTolerance));
     }
 
     public RepeatFinderData getRepeatFinderData() {

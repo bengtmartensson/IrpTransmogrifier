@@ -191,15 +191,18 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         NameEngine nameEngine = new NameEngine(namesMap);
         List<String> names = new ArrayList<>(namesMap.keySet());
         names.forEach((String name) -> {
-            Expression expression = map.get(name).getDefault();
-            if (!(expression == null))
-                try {
-                    long deflt = expression.toNumber(nameEngine);
-                    if (namesMap.get(name) == deflt)
-                        namesMap.remove(name);
-                } catch (NameUnassignedException ex) {
-                    throw new ThisCannotHappenException();
-                }
+            ParameterSpec parameterSpec = map.get(name);
+            if (parameterSpec != null) {
+                Expression expression = parameterSpec.getDefault();
+                if (!(expression == null))
+                    try {
+                        long deflt = expression.toNumber(nameEngine);
+                        if (namesMap.get(name) == deflt)
+                            namesMap.remove(name);
+                    } catch (NameUnassignedException ex) {
+                        throw new ThisCannotHappenException();
+                    }
+            }
         });
     }
 

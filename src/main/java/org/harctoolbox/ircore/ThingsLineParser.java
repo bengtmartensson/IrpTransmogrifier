@@ -112,7 +112,7 @@ public class ThingsLineParser<T> {
                 if (thing == null)
                     break;
                 list.add(thing);
-            } catch (Exception ex) {
+            } catch (IOException | InvalidArgumentException ex) {
                 logger.log(Level.FINE, "{0}", ex.getMessage());
             }
         }
@@ -131,9 +131,10 @@ public class ThingsLineParser<T> {
                 continue;
             String name = line;
             try {
-                T thing = parseThing(in, true);
-                map.put(name, thing);
-            } catch (Exception ex) {
+                T thing = parseThing(in, false);
+                if (thing != null)
+                   map.put(name, thing);
+            } catch (NumberFormatException | InvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}", ex.getMessage());
             }
         }
@@ -141,7 +142,7 @@ public class ThingsLineParser<T> {
     }
 
     @SuppressWarnings("unchecked")
-    T parseThing(BufferedReader in, boolean multiLines) throws Exception {
+    T parseThing(BufferedReader in, boolean multiLines) throws IOException, InvalidArgumentException {
         ArrayList<String> list = new ArrayList<>(multiLines ? 4 : 1);
         String line;
         do {
@@ -160,6 +161,6 @@ public class ThingsLineParser<T> {
     }
 
     public interface ThingParser {
-        public Object newThing(List<String> list) throws Exception;
+        public Object newThing(List<String> list) throws InvalidArgumentException;
     }
 }

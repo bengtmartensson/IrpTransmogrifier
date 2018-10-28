@@ -37,12 +37,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -217,6 +219,77 @@ public final class XmlUtils {
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
             throw new ThisCannotHappenException(ex);
+        }
+    }
+
+    /**
+     * Version with XSLT support.
+     * @param ostr
+     * @param document
+     * @param encoding
+     * @param xslt Stylesheet transforming the document
+     * @param parameters
+     * @param binary
+     * @throws TransformerException
+     * @throws IOException
+     */
+    public static void printDOM(OutputStream ostr, Document document, String encoding, Document xslt, Map<String, String> parameters, boolean binary) throws TransformerException, IOException {
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer tr;
+            if (xslt == null) {
+                tr = factory.newTransformer();
+
+                tr.setOutputProperty(OutputKeys.METHOD, "xml");
+                tr.setOutputProperty(OutputKeys.ENCODING, encoding);
+
+            } else {
+                if (parameters != null)
+                    parameters.entrySet().stream().map((kvp) -> {
+                        Element e = xslt.createElementNS(XmlUtils.XSLT_NAMESPACE_URI, "xsl:param");
+                        e.setAttribute("name", kvp.getKey());
+                        e.setAttribute("select", kvp.getValue());
+                        return e;
+                    }).forEachOrdered((e) -> {
+                        xslt.getDocumentElement().insertBefore(e, xslt.getDocumentElement().getFirstChild());
+                    });
+                NodeList nodeList = xslt.getDocumentElement().getElementsByTagNameNS(XmlUtils.XSLT_NAMESPACE_URI, "output");
+                if (nodeList.getLength() > 0) {
+                    Element e = (Element) nodeList.item(0);
+                    e.setAttribute("encoding", encoding);
+                }
+                //if (debug)
+                //    XmlUtils.printDOM(new File("stylesheet-params.xsl"), xslt);
+                tr = factory.newTransformer(new DOMSource(xslt));
+            }
+            tr.setOutputProperty(OutputKeys.INDENT, "yes");
+            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            if (binary) {
+                DOMResult domResult = new DOMResult();
+                tr.transform(new DOMSource(document), domResult);
+                Document newDoc = (Document) domResult.getNode();
+                //if (debug)
+                //    XmlUtils.printDOM(new File("girr-binary.xml"), newDoc);
+                NodeList byteElements = newDoc.getDocumentElement().getElementsByTagName("byte");
+                for (int i = 0; i < byteElements.getLength(); i++) {
+                    int val = Integer.parseInt(byteElements.item(i).getTextContent());
+                    ostr.write(val);
+                }
+            } else
+                tr.transform(new DOMSource(document), new StreamResult(ostr));
+        } finally {
+            if (parameters != null && xslt != null) {
+                NodeList nl = xslt.getDocumentElement().getChildNodes();
+                // Must remove children in backward order not to invalidate nl, #139.
+                for (int i = nl.getLength() - 1; i >= 0; i--) {
+                    Node n = nl.item(i);
+                    if (n.getNodeType() != Node.ELEMENT_NODE)
+                        continue;
+                    Element e = (Element) n;
+                    if (e.getLocalName().equals("param") && parameters.containsKey(e.getAttribute("name")))
+                        xslt.getDocumentElement().removeChild(n);
+                }
+            }
         }
     }
 

@@ -1,0 +1,32 @@
+Power:		NEC2-f16: {D=248,F=1848,S=199},	beg=0, end=204, reps=3
+0:		Pioneer-Mix: {D0=248,F0=240},	beg=0, end=272, reps=2
+1:		Pioneer-Mix: {D0=248,F0=248},	beg=0, end=272, reps=2
+2:		Pioneer-Mix: {D0=248,F0=244},	beg=0, end=408, reps=4
+3:		Pioneer-Mix: {D0=248,F0=252},	beg=0, end=476, reps=5
+4:		Pioneer-Mix: {D0=248,F0=242},	beg=0, end=476, reps=5
+5:		Pioneer-Mix: {D0=248,F0=250},	beg=0, end=476, reps=5
+6:		Pioneer-Mix: {D0=248,F0=246},	beg=0, end=476, reps=5
+7:		Pioneer-Mix: {D0=248,F0=254},	beg=0, end=476, reps=5
+8:		Pioneer-Mix: {D0=248,F0=241},	beg=0, end=476, reps=5
+9:		Pioneer-Mix: {D0=248,F0=249},	beg=0, end=408, reps=4
+Up:		NEC2-f16: {D=248,F=2358,S=199},	beg=0, end=340, reps=5
+Down:		NEC2-f16: {D=248,F=3123,S=199},	beg=0, end=476, reps=7
+Left:	
+Right:		NEC2-f16: {D=248,F=2613,S=199},	beg=0, end=476, reps=7
+Select:		NEC2-f16: {D=248,F=1593,S=199},	beg=0, end=476, reps=7
+Vol+:		NEC2-f16: {D=248,F=3028,S=39},	beg=0, end=204, reps=3
+Vol-:		NEC2-f16: {D=248,F=988,S=39},	beg=0, end=204, reps=3
+Mute:		NEC2-f16: {D=248,F=1880,S=167},	beg=0, end=204, reps=3
+CH+:		NEC2-f16: {D=248,F=3538,S=39},	beg=0, end=476, reps=7
+CH-:		NEC2-f16: {D=248,F=1498,S=39},	beg=0, end=476, reps=7
+Last_CH:		NEC2-f16: {D=248,F=2868,S=199},	beg=0, end=476, reps=7
+Exit:		NEC2-f16: {D=248,F=3378,S=199},	beg=0, end=340, reps=5
+Menu:		NEC2-f16: {D=248,F=3283,S=39},	beg=0, end=476, reps=7
+Program Guide:		NEC2-f16: {D=248,F=1338,S=199},	beg=0, end=476, reps=7
+Info/Display:		NEC2-f16: {D=248,F=318,S=199},	beg=0, end=476, reps=7
+Red:		NEC2-f16: {D=248,F=2103,S=199},	beg=0, end=204, reps=3
+Green:		NEC2-f16: {D=248,F=1083,S=199},	beg=0, end=204, reps=3
+Yellow:		NEC2-f16: {D=248,F=2008,S=39},	beg=0, end=204, reps=3
+Blue:		NEC2-f16: {D=248,F=573,S=199},	beg=0, end=204, reps=3
+White:		NEC2-f16: {D=248,F=63,S=199},	beg=0, end=204, reps=3
+TV/Radio:		NEC2-f16: {D=248,F=2518,S=39},	beg=0, end=204, reps=3

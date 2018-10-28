@@ -68,7 +68,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze2() {
         System.out.println("analyze2");
-        String args = "analyze --radix 16 --chop 30000 --ire --maxparameterwidth 32 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
+        String args = "-r 0.1 -a 100.0 analyze --radix 16 --chop 30000 --ire --maxparameterwidth 32 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{573,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m,(16,-4,1,-96m)*){A=0x30441ce3}");
     }
@@ -79,7 +79,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze2_1() {
         System.out.println("analyze2_1");
-        String args = "analyze --radix 16 --chop 30000 --maxparameterwidth 32 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
+        String args = "-r 0.1 -a 100.0 analyze --radix 16 --chop 30000 --maxparameterwidth 32 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result,
                 "#0\t{573,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m){A=0x30441ce3}"
@@ -94,7 +94,7 @@ public class IrpTransmogrifierNGTest {
                 "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
                 + "[+9024 -4512 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -39756]";
         String result = IrpTransmogrifier.execute(args);
-        assertEquals(result, "{569,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m,(16,-8,B:32,1,-39.756m)*){A=0x30441ce3,B=0xff00ff}");
+        assertEquals(result, "{569,msb}<1,-1|1,-3>(16,-8,A:32,1,-42m,(16,-8,B:32,1,-42m)*){A=0x30441ce3,B=0xff00ff}");
     }
 
     @Test(enabled = true)
@@ -104,7 +104,7 @@ public class IrpTransmogrifierNGTest {
                 "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
                 + "[+9024 -4512 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -39756]";
         String result = IrpTransmogrifier.execute(args);
-        assertEquals(result, "{569,msb}<1,-1|1,-3>(16,-8,0x30441ce3:32,1,-44m,(16,-8,0xff00ff:32,1,-39.756m)*)");
+        assertEquals(result, "{569,msb}<1,-1|1,-3>(16,-8,0x30441ce3:32,1,-42m,(16,-8,0xff00ff:32,1,-42m)*)");
     }
 
     @Test(enabled = true)
@@ -137,7 +137,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze5() {
         System.out.println("analyze5");
-        String args = "ana "
+        String args = "-a 100.0 -r 0.1 ana "
                 + "+1740 -1839 +1576 -1576 +1576 -1576 +1576 -1609 +1642 -1839 +1871 -1707 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1740 +1609 -1576 +1674 -3185 +1609 -1576 +1609 -1707 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1740 +1609 -1576 +1674 -1871 +1609 -1609 +1674 -1871 +1609 -1576 +1609 -1740 +1609 -1576 +1674 -3185 +1609 -1576 +1674 -1871 +1609 -1609 +1674 -1871 +1609 -1576 +1674 -3185 +1609 -1576 +1674 -3185 +1609 -1576 +1609 -1707 +1609 -1576 +1674 -3185 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1740 +1609 -1576 +1609 -1707 +1609 -1576 +1609 -1740 +1609 -1576 +1674 -3185 +1609 -1576 +1609 -1740 +1609 -1576 +1674 -1871 +1609 -1609 +1674 -1871 +1609 -1576 +1674 -3185 +1609 -1576 +1674 -3185 +1609 -1576 +1674 -1871 +1609 -1576 +1674 -3185 +1609 -1576 +1576 -1576 +1576 -1740 +1642 -1871 +1576 -1576 +1576 -1609 +1642 -1871 +1707 -1871 +1609 -1609 +1576 -1576 +1576 -3251 +1740 -3185 +1576 -1576 +1576 -1609 +1642 -1839 +1707 -3185 +1609 -1576 +1576 -1576 +1576 -3284 +1576 -1740";
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{1628,msb}<1,-1|1,-2>(A:5,1,-1,B:17,1,-1,C:1,1,-1,D:5,1,-1,E:1,1,-1,F:25,1,-1,G:1,1,-1,H:5,1,-1,I:5,1,-1,J:2,1,-1,1,-1,K:12){A=0x0,B=0x800,C=0x0,D=0x2,E=0x0,F=0xa20008,G=0x0,H=0xa,I=0x8,J=0x0,K=0x312}");
@@ -146,10 +146,10 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze6() {
         System.out.println("analyze6");
-        String args = "analyze --maxparameterwidth 32 " + ACDATA;
+        String args = "-a 100.0 -r 0.1 analyze --maxparameterwidth 32 " + ACDATA;
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:32,B:32,C:32,D:16,4,-10m){A=0xc4d36480,B=0x4c0b0,C=0x40000000,D=0x1e3}");
-        args = "analyze --maxparameterwidth 1024 --decoder pwm2 " + ACDATA;
+        args = "-a 100.0 -r 0.1 analyze --maxparameterwidth 1024 --decoder pwm2 " + ACDATA;
         result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:112,4,-10m){A=0xc4d364800004c0b04000000001e3}");
    }
@@ -249,14 +249,15 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testDecodeRecs80Multiple");
         String recs80Multiple = "+200 -7300 +200 -7350 +150 -4850 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +150 -7350 +200 -7350 +150 -4850 +200 -7300 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -4850 +200 -7350 +150 -30100 +150 -7350 +200 -4800 +200 -4850 +150 -7350 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -7350 +200 -30100 +200 -7350 +150 -4850 +200 -4800 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +200 -7300 +200 -4850 +150 -4850 +200 -7350 +150 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -7350 +150 -30100";
         String result = IrpTransmogrifier.execute("decode  --keep-defaulted " + recs80Multiple);
-        assertEquals(result, "Signal 1:\n\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2\nSignal 2:\n\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
+        System.out.println(result);
+        assertEquals(result, "multiple decodes:\nSig1:\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2\nSig2:\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
     }
 
     @Test(enabled = true)
     public void testDecodeSim2AsRepeat() {
-        System.out.println("testDecodeRecs80Multiple");
+        System.out.println("testDecodeSim2AsRepeat");
         String sim2AsRepeat = "0000 006B 0000 0012 005D 006C 002F 002E 002F 002E 002F 006B 002F 006B 002F 002E 002F 006B 002F 006B 002F 006B 002F 006B 002F 002E 002F 006B 002F 002E 002F 002E 002F 002E 002F 002E 002F 006B 002E 0928";
-        String result = IrpTransmogrifier.execute("decode --proto sim2 " + sim2AsRepeat);
+        String result = IrpTransmogrifier.execute("decode --proto sim2 --keep-defaulted " + sim2AsRepeat);
         assertEquals(result, "SIM2: {D=236,F=133}, beg=0, end=36");
         result = IrpTransmogrifier.execute("decode --proto sim2 --strict " + sim2AsRepeat);
         assertEquals(result, "");
@@ -344,7 +345,7 @@ public class IrpTransmogrifierNGTest {
     @Test
     public void testLirc() {
         System.out.println("lirc");
-        String result = IrpTransmogrifier.execute("lirc src/test/resources/RX-V995.lircd.conf");
+        String result = IrpTransmogrifier.execute("lirc src/test/lirc/RX-V995.lircd.conf");
         assertEquals(result, "yamaha-amp:	{38.0k,1,msb}<642u,-1600u|642u,-470u>(9067u,-4393u,pre_data:16,F:16,642u,-39597u,(9065u,-2139u,642u,-39597u)*){pre_data=0xa15e}[F:0x0..0xffff]");
     }
 

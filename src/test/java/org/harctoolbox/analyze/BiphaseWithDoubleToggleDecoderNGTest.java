@@ -2,6 +2,8 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.IrpException;
@@ -18,6 +20,9 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class BiphaseWithDoubleToggleDecoderNGTest {
+
+    private static final double absoluteTolerance = 100.0;
+    private static final double relativeTolerance = 0.1;
 
     private static final int[] rc6_255_0_0 = new int[]{
         2664, 888, 444, 888, 444, 444, 444, 444, 444, 888, 1332, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 888, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 83912
@@ -54,7 +59,8 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
     }
 
     private static Protocol parse(int[] data) throws OddSequenceLengthException, DecodeException {
-        Analyzer analyzer = new Analyzer(data);
+        Analyzer analyzer = new Analyzer(new IrSequence(data), ModulatedIrSequence.DEFAULT_FREQUENCY, false, absoluteTolerance, relativeTolerance);
+
         List<Integer> widths = new ArrayList<>(8);
         widths.add(1);
         widths.add(3);
@@ -85,14 +91,10 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
     }
 
     @Test
-    public void testParserc6_255_0_0() {
-        try {
-            System.out.println("processrc6_255_0_0");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_255_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,^107m){A=1,B=0,C=0,D=255,E=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParserc6_255_0_0() throws IrpException, OddSequenceLengthException, DecodeException {
+        System.out.println("processrc6_255_0_0");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_255_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,^107m){A=1,B=0,C=0,D=255,E=0}");
     }
 
     @Test

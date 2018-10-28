@@ -1,0 +1,16 @@
+STANDBY:		SIM2: {F=10},	beg=0, end=36
+1:		SIM2: {F=1},	beg=0, end=36
+2:		SIM2: {F=2},	beg=0, end=36
+3:		SIM2: {F=3},	beg=0, end=36
+4:		SIM2: {F=4},	beg=0, end=36
+5:		SIM2: {F=5},	beg=0, end=36
+6:		SIM2: {F=6},	beg=0, end=36
+7:		SIM2: {F=7},	beg=0, end=36
+8:		SIM2: {F=8},	beg=0, end=36
+9:		SIM2: {F=9},	beg=0, end=36
+RI2 ? 1:		SIM2: {F=129},	beg=0, end=36
+RI2 ? 2:		SIM2: {F=130},	beg=0, end=36
+RI2 ? 3:		SIM2: {F=131},	beg=0, end=36
+RI2 ? 4:		SIM2: {F=132},	beg=0, end=36
+RI2 ? 5:		SIM2: {F=133},	beg=0, end=36
+RI2 ? 6:		SIM2: {F=134},	beg=0, end=36

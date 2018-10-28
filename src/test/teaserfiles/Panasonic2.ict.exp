@@ -1,0 +1,5 @@
+Vol+:		Panasonic2: {D=128,F=32,S=72,X=0},	beg=0, end=232, reps=2
+Vol-:		Panasonic2: {D=128,F=33,S=72,X=0},	beg=0, end=348, reps=3
+Mute:		Panasonic2: {D=128,F=121,S=72,X=0},	beg=0, end=348, reps=3
+Power:		Panasonic2: {D=128,F=61,S=72,X=0},	beg=0, end=348, reps=3
+Input:		Panasonic2: {D=128,F=109,S=72,X=0},	beg=0, end=232, reps=2

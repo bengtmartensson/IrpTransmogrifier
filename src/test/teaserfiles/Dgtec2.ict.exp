@@ -1,0 +1,30 @@
+0 (multiple decodes):
+Sig1:		Dgtec: {D=129,F=0},	beg=0, end=52
+Sig2:		Dgtec: {D=129,F=0},	beg=52, end=104
+Sig3:		Dgtec: {D=129,F=0},	beg=104, end=156
+Sig4:		Dgtec: {D=129,F=0},	beg=156, end=208
+1 (multiple decodes):
+Sig1:		Dgtec: {D=129,F=1},	beg=0, end=52
+Sig2:		Dgtec: {D=129,F=1},	beg=52, end=104
+Sig3:		Dgtec: {D=129,F=1},	beg=104, end=156
+Sig4:		Dgtec: {D=129,F=1},	beg=156, end=208
+Sig5:		Dgtec: {D=129,F=1},	beg=208, end=260
+2:		Dgtec: {D=129,F=2},	beg=0, end=52
+3 (multiple decodes):
+Sig1:		Dgtec: {D=129,F=3},	beg=0, end=52
+Sig2:		Dgtec: {D=129,F=3},	beg=52, end=104
+4:		Dgtec: {D=129,F=4},	beg=0, end=52
+5 (multiple decodes):
+Sig1:		Dgtec: {D=129,F=5},	beg=0, end=52
+Sig2:		Dgtec: {D=129,F=5},	beg=52, end=104
+Vol+ (multiple decodes):
+Sig1:		Dgtec: {D=129,F=20},	beg=0, end=52
+Sig2:		Dgtec: {D=129,F=20},	beg=52, end=104
+Sig3:		Dgtec: {D=129,F=20},	beg=104, end=156
+Sig4:		Dgtec: {D=129,F=20},	beg=156, end=208
+Sig5:		Dgtec: {D=129,F=20},	beg=208, end=260
+Vol- (multiple decodes):
+Sig1:		Dgtec: {D=129,F=21},	beg=0, end=52
+Sig2:		Dgtec: {D=129,F=21},	beg=52, end=104
+Sig3:		Dgtec: {D=129,F=21},	beg=104, end=156
+Sig4:		Dgtec: {D=129,F=21},	beg=156, end=208

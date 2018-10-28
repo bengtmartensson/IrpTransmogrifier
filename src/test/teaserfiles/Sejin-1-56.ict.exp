@@ -1,0 +1,38 @@
+Power:		Sejin-1-56: {D=0,F=0,S=87},	beg=0, end=210, reps=7
+Mute:		Sejin-1-56: {D=0,F=0,S=73},	beg=0, end=238, reps=7
+Vol +:		Sejin-1-56: {D=0,F=2,S=68},	beg=0, end=238, reps=7
+Vol -:		Sejin-1-56: {D=0,F=2,S=84},	beg=0, end=238, reps=7
+Menu:		Sejin-1-56: {D=0,F=0,S=83},	beg=0, end=224, reps=7
+Ch +:		Sejin-1-56: {D=0,F=2,S=88},	beg=0, end=238, reps=7
+Ch -:		Sejin-1-56: {D=0,F=2,S=73},	beg=0, end=238, reps=7
+CS:		Sejin-1-56: {D=0,F=2,S=83},	beg=0, end=224, reps=7
+Rewind:		Sejin-1-56: {D=0,F=0,S=121},	beg=0, end=238, reps=7
+Play/Pause:		Sejin-1-56: {D=0,F=0,S=123},	beg=0, end=224, reps=7
+Stop:		Sejin-1-56: {D=0,F=0,S=89},	beg=0, end=238, reps=7
+Fast Forward:		Sejin-1-56: {D=0,F=0,S=120},	beg=0, end=238, reps=7
+Back:		Sejin-1-56: {D=0,F=0,S=72},	beg=0, end=224, reps=7
+URL:		Sejin-1-56: {D=0,F=8,S=84},	beg=0, end=238, reps=7
+Next:		Sejin-1-56: {D=0,F=0,S=88},	beg=0, end=238, reps=7
+Up:		Sejin-1-56: {D=0,F=0,S=92},	beg=0, end=224, reps=7
+Down:		Sejin-1-56: {D=0,F=0,S=82},	beg=0, end=238, reps=7
+Left:		Sejin-1-56: {D=0,F=0,S=13},	beg=0, end=238, reps=7
+Right:		Sejin-1-56: {D=0,F=0,S=4},	beg=0, end=238, reps=7
+OK:		Sejin-1-56: {D=0,F=0,S=11},	beg=0, end=224, reps=7
+Character Input:		Sejin-1-56: {D=0,F=2,S=72},	beg=0, end=238, reps=7
+Clear:		Sejin-1-56: {D=0,F=0,S=76},	beg=0, end=224, reps=7
+Space:		Sejin-1-56: {D=0,F=0,S=5},	beg=0, end=238, reps=7
+1:		Sejin-1-56: {D=0,F=0,S=98},	beg=0, end=238, reps=7
+2:		Sejin-1-56: {D=0,F=0,S=99},	beg=0, end=224, reps=7
+3:		Sejin-1-56: {D=0,F=0,S=100},	beg=0, end=238, reps=7
+4:		Sejin-1-56: {D=0,F=0,S=101},	beg=0, end=238, reps=7
+5:		Sejin-1-56: {D=0,F=0,S=69},	beg=0, end=238, reps=7
+6:		Sejin-1-56: {D=0,F=0,S=70},	beg=0, end=238, reps=7
+7:		Sejin-1-56: {D=0,F=0,S=102},	beg=0, end=224, reps=7
+8:		Sejin-1-56: {D=0,F=0,S=104},	beg=0, end=238, reps=7
+9:		Sejin-1-56: {D=0,F=0,S=105},	beg=0, end=238, reps=7
+0 (Part 1):		Sejin-1-56: {D=0,F=0,S=107},	beg=0, end=256, reps=8
+0 (Part 3):		Sejin-1-56: {D=0,F=0,S=107},	beg=0, end=32, reps=1
+*:		Sejin-1-56: {D=0,F=0,S=66},	beg=0, end=238, reps=7
+#:		Sejin-1-56: {D=0,F=0,S=84},	beg=0, end=238, reps=7
+LEO-NET:		Sejin-1-56: {D=0,F=2,S=82},	beg=0, end=238, reps=7
+Help ?:		Sejin-1-56: {D=0,F=0,S=68},	beg=0, end=238, reps=7

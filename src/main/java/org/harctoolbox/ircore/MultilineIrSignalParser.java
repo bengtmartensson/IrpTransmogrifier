@@ -55,20 +55,32 @@ public class MultilineIrSignalParser extends AbstractIrParser implements IrSigna
 
     @Override
     public ModulatedIrSequence toModulatedIrSequence(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException, InvalidArgumentException {
-        Double frequency = fallbackFrequency;
-        String s = getSource().replace(",", " ").trim();
-        if (s.startsWith("f=")) {
-            int pos = s.indexOf(' ', 3);
-            frequency = Double.parseDouble(s.substring(2, pos));
-            s = s.substring(pos + 1).trim();
+        try {
+            Double frequency = fallbackFrequency;
+            String s = getSource().replace(",", " ").trim();
+            if (s.startsWith("f=")) {
+                int pos = s.indexOf(' ', 3);
+                frequency = Double.parseDouble(s.substring(2, pos));
+                s = s.substring(pos + 1).trim();
+            } else if (s.startsWith("Freq=")) {
+                int pos = s.indexOf('H', 6);
+                frequency = Double.parseDouble(s.substring(5, pos));
+                s = s.substring(pos + 2).trim();
+            }
+            IrSequence irSequence = new IrSequence(s, dummyGap);
+            return new ModulatedIrSequence(irSequence, frequency);
+        } catch (NumberFormatException ex) {
+            throw new InvalidArgumentException(ex);
         }
-        IrSequence irSequence = new IrSequence(s, dummyGap);
-        return new ModulatedIrSequence(irSequence, frequency);
     }
 
     @Override
     public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws OddSequenceLengthException {
-        return mkIrSignal(splitLines(getSource()), fallbackFrequency, dummyGap);
+        try {
+            return mkIrSignal(splitLines(getSource()), fallbackFrequency, dummyGap);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     @Override

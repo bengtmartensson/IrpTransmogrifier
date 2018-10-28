@@ -1,0 +1,9 @@
+Power:		Fujitsu: {D=132,F=0},	beg=0, end=100, reps=1
+Menu:		Fujitsu: {D=132,F=64},	beg=0, end=100, reps=1
+Vol+:		Fujitsu: {D=132,F=32},	beg=0, end=100, reps=1
+Vol-:		Fujitsu: {D=132,F=33},	beg=0, end=100, reps=1
+Adj+:		Fujitsu: {D=132,F=65},	beg=0, end=100, reps=1
+Adj-:		Fujitsu: {D=132,F=66},	beg=0, end=100, reps=1
+Mode:		Fujitsu: {D=132,F=3},	beg=0, end=100, reps=1
+Set:		Fujitsu: {D=132,F=91},	beg=0, end=100, reps=1
+Wide:		Fujitsu: {D=132,F=128},	beg=0, end=100, reps=1

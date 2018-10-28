@@ -1,0 +1,11 @@
+Power:		NEC2-f16: {D=1,F=61185},	beg=0, end=204, reps=3
+0:		NEC2-f16: {D=1,F=27945},	beg=0, end=408, reps=6
+1:		NEC2-f16: {D=1,F=64800},	beg=0, end=408, reps=6
+2:		NEC2-f16: {D=1,F=60705},	beg=0, end=408, reps=6
+3:		NEC2-f16: {D=1,F=56370},	beg=0, end=408, reps=6
+4:		NEC2-f16: {D=1,F=52515},	beg=0, end=408, reps=6
+5:		NEC2-f16: {D=1,F=48420},	beg=0, end=408, reps=6
+6:		NEC2-f16: {D=1,F=44325},	beg=0, end=408, reps=6
+7:		NEC2-f16: {D=1,F=40230},	beg=0, end=408, reps=6
+8:		NEC2-f16: {D=1,F=36135},	beg=0, end=408, reps=6
+9:		NEC2-f16: {D=1,F=32040},	beg=0, end=408, reps=6

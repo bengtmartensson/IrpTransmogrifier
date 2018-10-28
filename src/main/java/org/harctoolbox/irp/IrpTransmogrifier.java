@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -931,11 +932,14 @@ public final class IrpTransmogrifier {
         } else {
             MultiParser prontoRawParser = MultiParser.newIrCoreParser(commandDecode.args);
             IrSignal irSignal = prontoRawParser.toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
+            if (irSignal == null)
+                throw new UsageException("Could not parse as IrSignal: " + String.join(" ", commandDecode.args));
             decode(decoder, irSignal, null, 0);
         }
     }
 
     private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
+        Objects.requireNonNull(irSignal, "irSignal must be non-null");
         if (! commandDecode.strict && (irSignal.introOnly() || irSignal.repeatOnly())) {
             ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
             if (commandDecode.repeatFinder) {
@@ -964,21 +968,20 @@ public final class IrpTransmogrifier {
         List<Map<String, Decoder.Decode>> decodes = decoder.decode(irSequence, commandDecode.strict, commandDecode.noPreferOver,
                 ! commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
-        if (decodes.size() == 1)
+        if (decodes.isEmpty())
+            printDecodes(null, name, maxNameLength);
+        else if (decodes.size() == 1)
             printDecodes(decodes.get(0), name, maxNameLength);
         else {
+            out.println(name != null ? (name + " (multiple decodes):") : ("multiple decodes:"));
             for (int i = 0; i < decodes.size(); i++) {
-                out.println("Signal " + (i+1) + ":");
-                printDecodes(decodes.get(i), name, maxNameLength);
+                printDecodes(decodes.get(i), "Sig" + (i+1), maxNameLength);
             }
         }
     }
 
 
     private void decodeIrSignal(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
-//        if (commandDecode.multiple)
-//            throw new UsageException("Cannot use --multiple with repeat- or ending sequences.");
-
         if (commandDecode.cleaner) {
             irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
@@ -992,31 +995,35 @@ public final class IrpTransmogrifier {
 
     private void printDecodes(Map<String, Decoder.Decode> decodes, String name, int maxNameLength) {
         if (name != null)
-            out.print(name + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
+            out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
 
-        decodes.values().forEach((kvp) -> {
-            out.println("\t" + kvp.toString(commandDecode.radix));
-        });
-        if (decodes.isEmpty())
+        if (decodes != null)
+            decodes.values().forEach((kvp) -> {
+                out.println("\t" + kvp.toString(commandDecode.radix, commandLineArgs.tsvOptimize ? "\t" : " "));
+            });
+        if (decodes == null || decodes.isEmpty())
             out.println();
     }
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight, boolean printTimings) {
-        if (protocol != null) {
-            Protocol actualProtocol = commandAnalyze.eliminateVars ? protocol.substituteConstantVariables() : protocol;
-            out.println(actualProtocol.toIrpString(radix, usePeriods, commandLineArgs.tsvOptimize));
-            if (printWeight)
-                out.println("weight = " + protocol.weight() + "\t" + protocol.getDecoderName());
-            if (printTimings) {
-                try {
-                    IrSignal irSignal = protocol.toIrSignal(new NameEngine());
-                    int introDuration = (int) irSignal.getIntroSequence().getTotalDuration();
-                    int repeatDuration = (int) irSignal.getRepeatSequence().getTotalDuration();
-                    int endingDuration = (int) irSignal.getEndingSequence().getTotalDuration();
-                    out.println("timings = (" + introDuration + ", " + repeatDuration + ", " + endingDuration + ").");
-                } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException ex) {
-                    throw new ThisCannotHappenException(ex);
-                }
+        if (protocol == null) {
+            out.println();
+            return;
+        }
+
+        Protocol actualProtocol = commandAnalyze.eliminateVars ? protocol.substituteConstantVariables() : protocol;
+        out.println(actualProtocol.toIrpString(radix, usePeriods, commandLineArgs.tsvOptimize));
+        if (printWeight)
+            out.println("weight = " + protocol.weight() + "\t" + protocol.getDecoderName());
+        if (printTimings) {
+            try {
+                IrSignal irSignal = protocol.toIrSignal(new NameEngine());
+                int introDuration = (int) irSignal.getIntroSequence().getTotalDuration();
+                int repeatDuration = (int) irSignal.getRepeatSequence().getTotalDuration();
+                int endingDuration = (int) irSignal.getEndingSequence().getTotalDuration();
+                out.println("timings = (" + introDuration + ", " + repeatDuration + ", " + endingDuration + ").");
+            } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException ex) {
+                throw new ThisCannotHappenException(ex);
             }
         }
     }
@@ -1455,7 +1462,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all).")
         private String protocol = null;
 
-        @Parameter(names = { "-r", "--repeat-finder"}, description = "Invoke repeat finder on input sequence")
+        @Parameter(names = { "-r", "--repeatfinder"}, description = "Invoke repeat finder on input sequence")
         private boolean repeatFinder = false;
 
         @Parameter(names = { "-R", "--dump-repeatfinder" }, description = "Print the result of the repeatfinder.")

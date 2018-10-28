@@ -326,7 +326,7 @@ public class MultiParserNGTest {
      */
     @Test
     public void testToIrSignal_Double_double() throws OddSequenceLengthException, InvalidArgumentException {
-        System.out.println("toIrSignal");
+        System.out.println("toIrSignal_Double_double");
         Double fallbackFrequency = null;
         double threshold = 30000.0;
         MultiParser instance = MultiParser.newIrCoreParser(nec1Repeat);
@@ -335,5 +335,19 @@ public class MultiParserNGTest {
         fallbackFrequency = 12345.0;
         result = instance.toIrSignal(fallbackFrequency, threshold);
         assertEquals(result.getFrequency(), fallbackFrequency, 0.000001);
+    }
+
+    /**
+     * Test of toIrSignal method, of class RawParser.
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
+    @Test
+    public void testToIrSignal_Double_double_silly() throws OddSequenceLengthException, InvalidArgumentException {
+        System.out.println("toIrSignal_Double_double_silly");
+        Double fallbackFrequency = null;
+        double threshold = 30000.0;
+        MultiParser instance = MultiParser.newIrCoreParser("blah blah");
+        IrSignal result = instance.toIrSignal(fallbackFrequency, threshold);
+        assertNull(result);
     }
 }

@@ -1,0 +1,44 @@
+unnamed_0 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=24,D=0,F=72},	beg=14, end=26
+Sig3:		GwtS: {CRC=50,D=12,F=100},	beg=26, end=42
+unnamed_1 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=24,D=0,F=72},	beg=14, end=26
+Sig3:		GwtS: {CRC=27,D=12,F=190},	beg=26, end=40
+unnamed_2 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=24,D=0,F=72},	beg=14, end=26
+Sig3:		GwtS: {CRC=45,D=12,F=106},	beg=26, end=46
+unnamed_3 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=0,D=0,F=72},	beg=14, end=24
+Sig3:		GwtS: {CRC=12,D=12,F=226},	beg=24, end=36
+unnamed_4 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=23,D=0,F=72},	beg=14, end=28
+Sig3:		GwtS: {CRC=58,D=12,F=180},	beg=28, end=44
+unnamed_5 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=23,D=0,F=72},	beg=14, end=28
+Sig3:		GwtS: {CRC=29,D=12,F=240},	beg=28, end=40
+unnamed_6 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=23,D=0,F=72},	beg=14, end=28
+Sig3:		GwtS: {CRC=10,D=12,F=54},	beg=28, end=44
+unnamed_7 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=23,D=0,F=72},	beg=14, end=28
+Sig3:		GwtS: {CRC=48,D=12,F=78},	beg=28, end=42
+unnamed_8 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=23,D=0,F=72},	beg=14, end=28
+Sig3:		GwtS: {CRC=4,D=12,F=168},	beg=28, end=42
+unnamed_9 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=20,D=0,F=72},	beg=14, end=28
+Sig3:		GwtS: {CRC=205,D=12,F=22},	beg=28, end=44
+unnamed_10 (multiple decodes):
+Sig1:		GwtS: {CRC=0,D=150,F=66},	beg=0, end=14
+Sig2:		GwtS: {CRC=20,D=0,F=72},	beg=14, end=28
+Sig3:		GwtS: {CRC=96,D=12,F=132},	beg=28, end=40

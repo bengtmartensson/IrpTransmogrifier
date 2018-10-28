@@ -1,0 +1,45 @@
+0:		Humax 4Phase: {D=7,F=10,S=32,T=1},	beg=0, end=66, reps=2
+1:		Humax 4Phase: {D=7,F=1,S=32,T=1},	beg=0, end=20
+2:		Humax 4Phase: {D=7,F=2,S=32,T=1},	beg=0, end=66, reps=2
+3:		Humax 4Phase: {D=7,F=3,S=32,T=1},	beg=0, end=60, reps=2
+4:	
+5:	
+6:		Humax 4Phase: {D=7,F=6,S=32,T=1},	beg=0, end=60, reps=2
+7:		Humax 4Phase: {D=7,F=7,S=32,T=1},	beg=0, end=60, reps=2
+8:		Humax 4Phase: {D=7,F=8,S=32,T=1},	beg=0, end=66, reps=2
+9:		Humax 4Phase: {D=7,F=9,S=32,T=1},	beg=0, end=60, reps=2
+Archive:		Humax 4Phase: {D=7,F=50,S=32,T=1},	beg=0, end=60, reps=2
+Back:		Humax 4Phase: {D=7,F=26,S=32,T=1},	beg=0, end=60, reps=2
+Delete:		Humax 4Phase: {D=7,F=29,S=32,T=1},	beg=0, end=60, reps=2
+DVR:		Humax 4Phase: {D=7,F=31,S=32,T=1},	beg=0, end=60, reps=2
+E-Mail:		Humax 4Phase: {D=7,F=45,S=32,T=1},	beg=0, end=60, reps=2
+EPG:		Humax 4Phase: {D=7,F=52,S=32,T=1},	beg=0, end=60, reps=2
+Exit:		Humax 4Phase: {D=7,F=46,S=32,T=1},	beg=0, end=60, reps=2
+Fastext Blue:		Humax 4Phase: {D=7,F=24,S=32,T=1},	beg=0, end=60, reps=2
+Fastext Green:		Humax 4Phase: {D=7,F=28,S=32,T=1},	beg=0, end=60, reps=2
+Fastext Red:		Humax 4Phase: {D=7,F=18,S=32,T=1},	beg=0, end=60, reps=2
+FastextYellow:		Humax 4Phase: {D=7,F=17,S=32,T=1},	beg=0, end=18
+Help:		Humax 4Phase: {D=7,F=37,S=32,T=1},	beg=0, end=60, reps=2
+Info:		Humax 4Phase: {D=7,F=23,S=32,T=1},	beg=0, end=40, reps=1
+iTV:		Humax 4Phase: {D=7,F=36,S=32,T=1},	beg=0, end=20
+Menu:		Humax 4Phase: {D=7,F=30,S=32,T=1},	beg=0, end=60, reps=2
+MenuDown:		Humax 4Phase: {D=7,F=13,S=32,T=1},	beg=0, end=60, reps=2
+MenuLeft:		Humax 4Phase: {D=7,F=14,S=32,T=1},	beg=0, end=60, reps=2
+MenuRight:		Humax 4Phase: {D=7,F=16,S=32,T=1},	beg=0, end=40, reps=1
+MenuUp:		Humax 4Phase: {D=7,F=12,S=32,T=1},	beg=0, end=60, reps=2
+Mute:		Humax 4Phase: {D=7,F=27,S=32,T=1},	beg=0, end=54, reps=2
+Ok:		Humax 4Phase: {D=7,F=15,S=32,T=1},	beg=0, end=60, reps=2
+Pause:		Humax 4Phase: {D=7,F=44,S=32,T=1},	beg=0, end=60, reps=2
+Play:		Humax 4Phase: {D=7,F=38,S=32,T=1},	beg=0, end=60, reps=2
+Power:		Humax 4Phase: {D=7,F=11,S=32,T=1},	beg=0, end=60, reps=2
+ProgramDown:		Humax 4Phase: {D=7,F=22,S=32,T=1},	beg=0, end=60, reps=2
+ProgramUp:		Humax 4Phase: {D=7,F=20,S=32,T=1},	beg=0, end=60, reps=2
+Record:		Humax 4Phase: {D=7,F=43,S=32,T=1},	beg=0, end=60, reps=2
+Search:		Humax 4Phase: {D=7,F=25,S=32,T=1},	beg=0, end=54, reps=2
+SearchForward:	
+SearchReverse:		Humax 4Phase: {D=7,F=40,S=32,T=1},	beg=0, end=66, reps=2
+Stop:		Humax 4Phase: {D=7,F=42,S=32,T=1},	beg=0, end=66, reps=2
+Text:		Humax 4Phase: {D=7,F=35,S=32,T=1},	beg=0, end=60, reps=2
+TV/Radio:		Humax 4Phase: {D=7,F=0,S=32,T=1},	beg=0, end=66, reps=2
+VolumeDown:		Humax 4Phase: {D=7,F=21,S=32,T=1},	beg=0, end=20
+VolumeUp:		Humax 4Phase: {D=7,F=19,S=32,T=1},	beg=0, end=18

@@ -1,0 +1,14 @@
+Device Code: 0C Function: 38:		DirecTV_3_FG: {D=12,F=56}
+Device Code: 0C Function: 3A:		DirecTV_3_FG: {D=12,F=58}
+Device Code: 0C Function: 3C:		DirecTV_3_FG: {D=12,F=60}
+Device Code: 0C Function: 3D:		DirecTV_3_FG: {D=12,F=61}
+Device Code: 0C Function: 3F:		DirecTV_3_FG: {D=12,F=63}
+Device Code: 0C Function: 80:		DirecTV_3_FG: {D=12,F=128}
+Device Code: 0C Function: 81:		DirecTV_3_FG: {D=12,F=129}
+Device Code: 0D Function: 38:		DirecTV_3_FG: {D=13,F=56}
+Device Code: 0D Function: 3A:		DirecTV_3_FG: {D=13,F=58}
+Device Code: 0D Function: 3C:		DirecTV_3_FG: {D=13,F=60}
+Device Code: 0D Function: 3D:		DirecTV_3_FG: {D=13,F=61}
+Device Code: 0D Function: 3F:		DirecTV_3_FG: {D=13,F=63}
+Device Code: 0D Function: 80:		DirecTV_3_FG: {D=13,F=128}
+Device Code: 0D Function: 81:		DirecTV_3_FG: {D=13,F=129}

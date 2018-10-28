@@ -1,0 +1,25 @@
+Power:		Sharp: {D=1,F=22},	beg=0, end=64, reps=1
+Input Cycle:		Sharp: {D=1,F=19},	beg=0, end=64, reps=1
+1:		Sharp: {D=1,F=1},	beg=0, end=64, reps=1
+2:		Sharp: {D=1,F=2},	beg=0, end=64, reps=1
+3:		Sharp: {D=1,F=3},	beg=0, end=64, reps=1
+4:		Sharp: {D=1,F=4},	beg=0, end=64, reps=1
+5:		Sharp: {D=1,F=5},	beg=0, end=64, reps=1
+6:		Sharp: {D=1,F=6},	beg=0, end=64, reps=1
+7:		Sharp: {D=1,F=7},	beg=0, end=64, reps=1
+8:		Sharp: {D=1,F=8},	beg=0, end=64, reps=1
+9:		Sharp: {D=1,F=9},	beg=0, end=64, reps=1
+0:		Sharp: {D=1,F=10},	beg=0, end=64, reps=1
+100:		Sharp: {D=1,F=11},	beg=0, end=64, reps=1
+QV:		Sharp: {D=1,F=47},	beg=0, end=64, reps=1
+Preview:		Sharp: {D=1,F=28},	beg=0, end=64, reps=1
+Menu:		Sharp: {D=1,F=32},	beg=0, end=64, reps=1
+Display:		Sharp: {D=1,F=27},	beg=0, end=64, reps=1
+Up:		Sharp: {D=1,F=17},	beg=0, end=64, reps=1
+Down:		Sharp: {D=1,F=18},	beg=0, end=64, reps=1
+Left:		Sharp: {D=1,F=21},	beg=0, end=64, reps=1
+Ch+:		Sharp: {D=1,F=17},	beg=0, end=64, reps=1
+Ch-:		Sharp: {D=1,F=18},	beg=0, end=64, reps=1
+Right:		Sharp: {D=1,F=20},	beg=0, end=64, reps=1
+Vol+:		Sharp: {D=1,F=20},	beg=0, end=64, reps=1
+Vol-:		Sharp: {D=1,F=21},	beg=0, end=64, reps=1

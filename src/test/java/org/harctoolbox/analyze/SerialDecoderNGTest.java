@@ -2,6 +2,8 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.InvalidNameException;
@@ -20,6 +22,9 @@ import org.testng.annotations.Test;
 
 public class SerialDecoderNGTest {
 
+    private static final double absoluteTolerance = 100.0;
+    private static final double relativeTolerance = 0.1;
+
     private static final int[] pctv_12_34 = new int[] {
         1664, 6656, 832, 1664, 1664, 4160, 832, 2496, 832, 1664, 1664, 100000
     };
@@ -35,7 +40,7 @@ public class SerialDecoderNGTest {
     private final Analyzer pctv;
     private final Analyzer.AnalyzerParams paramsPctv;
     public SerialDecoderNGTest() throws OddSequenceLengthException {
-        pctv = new Analyzer(pctv_12_34);
+        pctv = new Analyzer(new IrSequence(pctv_12_34), ModulatedIrSequence.DEFAULT_FREQUENCY, false, absoluteTolerance, relativeTolerance);
         List<Integer> widths = new ArrayList<>(5);
         widths.add(2);
         widths.add(8);

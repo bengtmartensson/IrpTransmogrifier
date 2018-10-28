@@ -244,7 +244,7 @@ public class ProtocolNGTest {
                 + " 0006 000A 0006 0015 0006 000A 0006 0015" // F
                 + " 0006 0C90");
         NameEngine nameEngine = new NameEngine("{D=12,S=56,F=34,T=1,X=73}");
-        Map<String, Long> recognizeData = nokia32.recognize(signal);
+        Map<String, Long> recognizeData = nokia32.recognize(signal, true, 1000.0, 100.0, 0.04, 50000.0);
         assertTrue(nameEngine.numericallyEquals(recognizeData));
     }
 
@@ -348,7 +348,7 @@ public class ProtocolNGTest {
         System.out.println("recognizeAmino");
         IrSignal aminoD12F34 = Pronto.parse("0000 006F 001C 001C 0046 003C 0028 000A 000A 0014 000A 000A 0014 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 0B83 0046 003C 0028 000A 000A 0014 000A 000A 0014 0014 000A 000A 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 000A 0014 0014 000A 000A 000A 000A 0014 0014 0014 000A 000A 000A 000A 000A 000A 000A 000A 0014 000A 000A 000A 000A 000A 0B83");
         NameEngine nameEngine = new NameEngine("{D=12,F=34}");
-        Map<String, Long> recognizeData = amino.recognize(aminoD12F34);
+        Map<String, Long> recognizeData = amino.recognize(aminoD12F34, true, 1000.0, 100.0, 0.1, 50000.0);
         assertTrue(nameEngine.numericallyEquals(recognizeData));
     }
 
@@ -717,7 +717,7 @@ public class ProtocolNGTest {
         System.out.println("recognizeRc5x");
         IrSignal irSignal = Pronto.parse("0000 0073 0000 000F 0040 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 00C0 0040 0040 0040 0040 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0AA8");
         NameEngine nameEngine = new NameEngine("{D=28, S=106, F=15}");
-        Map<String, Long> recognizeData = rc5x.recognize(irSignal, true);
+        Map<String, Long> recognizeData = rc5x.recognize(irSignal, true, 1000.0, 100.0, 0.1, 50000.0);
         rc5x.removeDefaulteds(recognizeData);
         assertTrue(nameEngine.numericallyEquals(recognizeData));
     }

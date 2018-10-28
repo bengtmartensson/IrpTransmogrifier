@@ -1,0 +1,8 @@
+0:		Aiwa: {D=8,F=0,S=0},	beg=0, end=100, reps=3
+1:		Aiwa: {D=8,F=1,S=0},	beg=0, end=100, reps=3
+up:		Aiwa2: {D=102,F=151,S=0},	beg=0, end=264, reps=3
+down:		Aiwa2: {D=102,F=152,S=0},	beg=0, end=264, reps=3
+OK:		Aiwa2: {D=102,F=155,S=0},	beg=0, end=176, reps=2
+left:		Aiwa: {D=8,F=21,S=0},	beg=0, end=100, reps=3
+right:		Aiwa: {D=8,F=18,S=0},	beg=0, end=100, reps=3
+Vol up:		Aiwa: {D=8,F=26,S=0},	beg=0, end=104, reps=4

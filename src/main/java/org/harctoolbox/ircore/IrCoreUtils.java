@@ -52,7 +52,7 @@ public final class IrCoreUtils {
     /**
      * Default relative tolerance as a number between 0 and 1.
      */
-    public static final double DEFAULT_RELATIVE_TOLERANCE = 0.1;
+    public static final double DEFAULT_RELATIVE_TOLERANCE = 0.3;
 
     /**
      * Default absolute tolerance for frequency comparison.
@@ -189,6 +189,9 @@ public final class IrCoreUtils {
     }
 
     private static String chars(int length, byte value) {
+        if (length <= 0)
+            return "";
+
         byte[] buf = new byte[length];
         for (int i = 0; i < length; i++)
             buf[i] = value;

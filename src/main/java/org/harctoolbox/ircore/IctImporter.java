@@ -166,7 +166,9 @@ public class IctImporter {
             else if (chunks[0].startsWith("#"))
                 ; // Comment, ignore
             else
-                logger.log(Level.WARNING, "Ignored line: {0}", lineNumber);
+                // Use Integer.toString explicitly, to avoid digit group separator (,)
+                // (which is confusing in many cultures)
+                logger.log(Level.WARNING, "Ignored line: {0}", Integer.toString(lineNumber));
         }
         processSignal(data, name);
         if (noSamples != sampleCount) {

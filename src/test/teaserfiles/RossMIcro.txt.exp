@@ -1,0 +1,16 @@
+DecodeIs, Dev, S, OBC:	
+segagamepad_D0S0F220: segagamepad Device: 0.0 Function: 220 S=0:	
+segagamepad_D0S0F208: segagamepad Device: 0.0 Function: 208 S=0:	
+segagamepad_D0S0F116: segagamepad Device: 0.0 Function: 116 S=0:	
+segagamepad_D0S0F5: segagamepad Device: 0.0 Function: 5 S=0:	
+segagamepad_D0S1F2: segagamepad Device: 0.1 Function: 2 S=1:	
+segagamepad_D0S1F206: segagamepad Device: 0.1 Function: 206 S=1:	
+segagamepad_D0S1F139: segagamepad Device: 0.1 Function: 139 S=1:	
+segagamepad_D0S1F153: segagamepad Device: 0.1 Function: 153 S=1:	
+segagamepad_D1S0F39: segagamepad Device: 1.0 Function: 39 S=0:	
+segagamepad_D1S0F92: segagamepad Device: 1.0 Function: 92 S=0:	
+segagamepad_D1S0F132: segagamepad Device: 1.0 Function: 132 S=0:	
+segagamepad_D1S0F170: segagamepad Device: 1.0 Function: 170 S=0:	
+segagamepad_D1S1F190: segagamepad Device: 1.1 Function: 190 S=1:	
+segagamepad_D1S1F220: segagamepad Device: 1.1 Function: 220 S=1:	
+segagamepad_D1S1F75: segagamepad Device: 1.1 Function: 75 S=1:	

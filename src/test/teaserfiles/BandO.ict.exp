@@ -1,0 +1,49 @@
+TV:		B&O: {D=0,F=128},	beg=0, end=44
+TV_Power:		B&O: {D=15,F=12},	beg=0, end=44
+TV_Vol_Up (multiple decodes):
+Sig1:		B&O: {D=0,F=96},	beg=0, end=44
+Sig2:		B&O repeat: {D=0,F=96},	beg=44, end=86
+Sig3:		B&O repeat: {D=0,F=96},	beg=86, end=128
+Sig4:		B&O repeat: {D=0,F=96},	beg=128, end=170
+TV_Up_Arrow (multiple decodes):
+Sig1:		B&O: {D=0,F=30},	beg=0, end=44
+Sig2:		B&O repeat: {D=0,F=114},	beg=44, end=86
+Sig3:		B&O repeat: {D=0,F=114},	beg=86, end=128
+Sig4:		B&O repeat: {D=0,F=114},	beg=128, end=170
+TV_Green (multiple decodes):
+Sig1:		B&O: {D=0,F=213},	beg=0, end=44
+Sig2:		B&O repeat: {D=0,F=118},	beg=44, end=86
+Sig3:		B&O repeat: {D=0,F=118},	beg=86, end=128
+Sig4:		B&O repeat: {D=0,F=118},	beg=128, end=170
+TV_0:		B&O: {D=0,F=0},	beg=0, end=44
+TV_1:		B&O: {D=0,F=1},	beg=0, end=44
+TV_2:		B&O: {D=0,F=2},	beg=0, end=44
+RADIO:		B&O: {D=1,F=129},	beg=0, end=44
+RADIO_Power:		B&O: {D=15,F=12},	beg=0, end=44
+RADIO_Vol_Up (multiple decodes):
+Sig1:		B&O: {D=1,F=96},	beg=0, end=44
+Sig2:		B&O repeat: {D=1,F=96},	beg=44, end=86
+Sig3:		B&O repeat: {D=1,F=96},	beg=86, end=128
+Sig4:		B&O repeat: {D=1,F=96},	beg=128, end=170
+RADIO_Up_Arrow (multiple decodes):
+Sig1:		B&O: {D=1,F=30},	beg=0, end=44
+Sig2:		B&O repeat: {D=1,F=114},	beg=44, end=86
+Sig3:		B&O repeat: {D=1,F=114},	beg=86, end=128
+Sig4:		B&O repeat: {D=1,F=114},	beg=128, end=170
+RADIO_Green (multiple decodes):
+Sig1:		B&O: {D=1,F=213},	beg=0, end=44
+Sig2:		B&O repeat: {D=1,F=118},	beg=44, end=86
+Sig3:		B&O repeat: {D=1,F=118},	beg=86, end=128
+Sig4:		B&O repeat: {D=1,F=118},	beg=128, end=170
+RADIO_0:		B&O: {D=1,F=0},	beg=0, end=44
+V.TAPE2:		B&O repeat: {D=37,F=48},	beg=0, end=42
+V.TAPE2_Vol_Up (multiple decodes):
+Sig1:		B&O: {D=0,F=96},	beg=0, end=44
+Sig2:		B&O repeat: {D=0,F=96},	beg=44, end=86
+Sig3:		B&O repeat: {D=0,F=96},	beg=86, end=128
+Sig4:		B&O repeat: {D=0,F=96},	beg=128, end=170
+V.TAPE2_Up_Arrow:	
+V.TAPE2_Right_Arrow:		B&O repeat: {D=37,F=38},	beg=0, end=42
+V.TAPE2_GO:		B&O repeat: {D=37,F=38},	beg=0, end=42
+V.TAPE2_Green:		B&O repeat: {D=37,F=58},	beg=0, end=42
+V.TAPE2_0:	

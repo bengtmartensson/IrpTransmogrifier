@@ -1,0 +1,5 @@
+Vol+:		Teac-K: {D=0,F=32,S=4},	beg=0, end=152, reps=13
+Vol-:		Teac-K: {D=0,F=48,S=4},	beg=0, end=128, reps=7
+Mute:		Teac-K: {D=0,F=16,S=4},	beg=0, end=124, reps=6
+Input:		Teac-K: {D=0,F=19,S=4},	beg=0, end=128, reps=7
+Power:		Teac-K: {D=0,F=0,S=4},	beg=0, end=120, reps=5

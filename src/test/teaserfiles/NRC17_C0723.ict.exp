@@ -1,0 +1,10 @@
+1:		NRC17: {D=92,F=1},	beg=0, end=356, reps=9
+2:		NRC17: {D=92,F=2},	beg=0, end=248, reps=6
+8:		NRC17: {D=92,F=8},	beg=0, end=218, reps=5
+9:		NRC17: {D=92,F=9},	beg=0, end=218, reps=5
+Up:		NRC17: {D=92,F=14},	beg=0, end=214, reps=6
+Down:		NRC17: {D=92,F=15},	beg=0, end=228, reps=5
+Left:		NRC17: {D=92,F=47},	beg=0, end=188, reps=4
+Right:		NRC17: {D=92,F=46},	beg=0, end=208, reps=5
+OK  (single press):		NRC17: {D=92,F=48},	beg=0, end=98, reps=1
+Vol+ (single press):		NRC17: {D=92,F=22},	beg=0, end=96, reps=1

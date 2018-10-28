@@ -1,0 +1,10 @@
+play:		Ortek: {D=213,F=25,S=42},	beg=0, end=80, reps=2
+pause:		Ortek: {D=213,F=29,S=42},	beg=0, end=80, reps=2
+Rewind:		Ortek: {D=213,F=26,S=42},	beg=0, end=80, reps=2
+FFWD:		Ortek: {D=213,F=27,S=42},	beg=0, end=80, reps=2
+Up:		Ortek: {D=213,F=18,S=42},	beg=0, end=80, reps=2
+Down:		Ortek: {D=213,F=19,S=42},	beg=0, end=80, reps=2
+Left:		Ortek: {D=213,F=20,S=42},	beg=0, end=80, reps=2
+Right:		Ortek: {D=213,F=21,S=42},	beg=0, end=80, reps=2
+Pg Up:		Ortek: {D=213,F=5,S=42},	beg=0, end=80, reps=2
+Pg Dn:		Ortek: {D=213,F=6,S=42},	beg=0, end=80, reps=2

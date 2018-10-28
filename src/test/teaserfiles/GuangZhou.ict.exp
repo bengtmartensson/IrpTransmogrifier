@@ -1,0 +1,34 @@
+Power:		GuangZhou: {D=17,F=16,S=65},	beg=0, end=102, reps=4
+TV:		GuangZhou: {D=17,F=35,S=65},	beg=0, end=102, reps=4
+Guide:		GuangZhou: {D=17,F=26,S=65},	beg=0, end=102, reps=4
+Mail:		GuangZhou: {D=17,F=25,S=65},	beg=0, end=102, reps=4
+Like:		GuangZhou: {D=17,F=23,S=65},	beg=0, end=102, reps=4
+Mute:		GuangZhou: {D=17,F=17,S=65},	beg=0, end=102, reps=4
+Info:		GuangZhou: {D=17,F=27,S=65},	beg=0, end=102, reps=4
+Back:		GuangZhou: {D=17,F=28,S=65},	beg=0, end=102, reps=4
+Exit:		GuangZhou: {D=17,F=29,S=65},	beg=0, end=102, reps=4
+Up:		GuangZhou: {D=17,F=30,S=65},	beg=0, end=102, reps=4
+Down:		GuangZhou: {D=17,F=31,S=65},	beg=0, end=102, reps=4
+Left:		GuangZhou: {D=17,F=32,S=65},	beg=0, end=102, reps=4
+Right:	
+Vol Up:		GuangZhou: {D=17,F=19,S=65},	beg=0, end=102, reps=4
+Vol Down:		GuangZhou: {D=17,F=20,S=65},	beg=0, end=102, reps=4
+Main Page:		GuangZhou: {D=17,F=24,S=65},	beg=0, end=102, reps=4
+Page Up:		GuangZhou: {D=17,F=21,S=65},	beg=0, end=102, reps=4
+Page Down:		GuangZhou: {D=17,F=22,S=65},	beg=0, end=102, reps=4
+Red:		GuangZhou: {D=17,F=42,S=65},	beg=0, end=102, reps=4
+Green:		GuangZhou: {D=17,F=43,S=65},	beg=0, end=102, reps=4
+Yellow:		GuangZhou: {D=17,F=44,S=65},	beg=0, end=102, reps=4
+Blue:		GuangZhou: {D=17,F=45,S=65},	beg=0, end=102, reps=4
+1:		GuangZhou: {D=17,F=47,S=65},	beg=0, end=102, reps=4
+2:		GuangZhou: {D=17,F=48,S=65},	beg=0, end=102, reps=4
+3:		GuangZhou: {D=17,F=49,S=65},	beg=0, end=102, reps=4
+4:		GuangZhou: {D=17,F=50,S=65},	beg=0, end=102, reps=4
+5:		GuangZhou: {D=17,F=51,S=65},	beg=0, end=102, reps=4
+6:		GuangZhou: {D=17,F=52,S=65},	beg=0, end=102, reps=4
+7:		GuangZhou: {D=17,F=53,S=65},	beg=0, end=102, reps=4
+8:		GuangZhou: {D=17,F=54,S=65},	beg=0, end=102, reps=4
+9:		GuangZhou: {D=17,F=55,S=65},	beg=0, end=102, reps=4
+*:		GuangZhou: {D=17,F=56,S=65},	beg=0, end=102, reps=4
+0:		GuangZhou: {D=17,F=46,S=65},	beg=0, end=102, reps=4
+#:		GuangZhou: {D=17,F=57,S=65},	beg=0, end=102, reps=4

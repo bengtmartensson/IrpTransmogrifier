@@ -1,0 +1,9 @@
+1:		TDC-38: {D=6,F=2,S=10},	beg=0, end=168, reps=6
+2:		TDC-38: {D=6,F=5,S=10},	beg=0, end=130, reps=5
+3:		TDC-38: {D=6,F=6,S=10},	beg=0, end=112, reps=4
+4:		TDC-38: {D=6,F=9,S=10},	beg=0, end=130, reps=5
+Up:		TDC-38: {D=6,F=25,S=10},	beg=0, end=104, reps=4
+Down:		TDC-38: {D=6,F=26,S=10},	beg=0, end=130, reps=5
+Left:		TDC-38: {D=6,F=29,S=10},	beg=0, end=130, reps=5
+Right:		TDC-38: {D=6,F=33,S=10},	beg=0, end=156, reps=6
+OK:		TDC-38: {D=6,F=30,S=10},	beg=0, end=140, reps=5

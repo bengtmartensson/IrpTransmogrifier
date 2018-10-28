@@ -139,7 +139,7 @@ public class DecoderNGTest {
         assertTrue(nrc17NameEngine.numericallyEquals(first));
         assertEquals(first.getBegPos(), 0);
         assertEquals(first.getEndPos(), 164);
-        assertEquals(first.getNumberOfRepetitions(), 2);
+        assertEquals(first.getNumberOfRepetitions(), 3);
 
         irSequence = new ModulatedIrSequence(nrc17Intro, NRC17_FREQUENCY);
         result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
@@ -187,7 +187,7 @@ public class DecoderNGTest {
         allDecodes = false;
         result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         assertEquals(result.size(), 2);
-        assertEquals(result.get(0).size(), 3);
+        assertEquals(result.get(0).size(), 1);
         assertEquals(result.get(1).size(), 1);
     }
 

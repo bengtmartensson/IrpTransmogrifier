@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -78,9 +78,9 @@ public final class NameOrNumber extends IrpObject implements Floatable {
         return thing.toIrpString(radix);
     }
 
-    double toRawNumber() {
+    double toRawNumber() throws InvalidArgumentException {
         if (!(thing instanceof NumberWithDecimals))
-            throw new ThisCannotHappenException("NumberWithDecimals expected");
+            throw new InvalidArgumentException("NumberWithDecimals expected");
         return ((NumberWithDecimals) thing).toFloat();
     }
 

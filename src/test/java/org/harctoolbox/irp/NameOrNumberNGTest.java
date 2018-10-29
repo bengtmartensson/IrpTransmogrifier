@@ -1,8 +1,10 @@
 package org.harctoolbox.irp;
 
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -10,7 +12,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class NameOrNumberNGTest {
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -68,5 +70,21 @@ public class NameOrNumberNGTest {
         System.out.println("toIrpString");
         assertEquals(a.toIrpString(), "A");
         assertEquals(b.toIrpString(), "13.1415926");
+    }
+
+    /**
+     * Test of toRawNumber method, of class NameOrNumber.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     */
+    @Test
+    public void testToRawNumber() throws InvalidArgumentException {
+        System.out.println("toRawNumber");
+
+        assertEquals(b.toRawNumber(), 13.1415926);
+        try {
+            a.toRawNumber();
+            fail();
+        } catch (InvalidArgumentException ex) {
+        }
     }
 }

@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -311,7 +312,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         return unit;
     }
 
-    public double getTimeInUnits() {
+    public double getTimeInUnits() throws InvalidArgumentException {
         return nameOrNumber.toRawNumber();
     }
 

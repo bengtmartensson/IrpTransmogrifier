@@ -2,13 +2,10 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
-import org.harctoolbox.irp.InvalidNameException;
-import org.harctoolbox.irp.IrpInvalidArgumentException;
-import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.Protocol;
-import org.harctoolbox.irp.UnsupportedRepeatException;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -42,7 +39,7 @@ public class BiphaseDecoderNGTest {
     private final Analyzer.AnalyzerParams paramsRc5;
     private final Analyzer.AnalyzerParams paramsRc6;
 
-    public BiphaseDecoderNGTest() throws OddSequenceLengthException {
+    public BiphaseDecoderNGTest() throws OddSequenceLengthException, InvalidArgumentException {
         rc5 = new Analyzer(rc5_12_3_1);
         rc6 = new Analyzer(rc6_12_3_1);
         List<Integer> widths = new ArrayList<>(4);
@@ -64,32 +61,25 @@ public class BiphaseDecoderNGTest {
 
     /**
      * Test of process method, of class BiphaseDecoder.
+     * @throws java.lang.Exception
      */
     @Test
-    public void testParseRc5() {
-        try {
-            System.out.println("processRc5");
-            BiphaseDecoder decoder = new BiphaseDecoder(rc5, paramsRc5);
-            Protocol result = decoder.parse()[0];
-            System.out.println("Expect warning for missing parameterspec");
-            Protocol expResult = new Protocol("{36k,msb,889}<1,-1|-1,1>(A:1,B:1,C:1,D:5,E:6,^114m){A=1,B=1,C=1,D=12,E=3}");
-            assertEquals(result, expResult);
-        } catch (DecodeException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnsupportedRepeatException ex) {
-            fail();
-        }
+    public void testParseRc5() throws Exception {
+        System.out.println("processRc5");
+        BiphaseDecoder decoder = new BiphaseDecoder(rc5, paramsRc5);
+        Protocol result = decoder.parse()[0];
+        System.out.println("Expect warning for missing parameterspec");
+        Protocol expResult = new Protocol("{36k,msb,889}<1,-1|-1,1>(A:1,B:1,C:1,D:5,E:6,^114m){A=1,B=1,C=1,D=12,E=3}");
+        assertEquals(result, expResult);
     }
 
     @Test
-    public void testParseRc6() {
-        try {
-            System.out.println("processRc6");
-            AbstractBiphaseDecoder decoder = new BiphaseDecoder(rc6, paramsRc6);
-            Protocol result = decoder.parse()[0];
-            System.out.println("Expect warning for missing parameterspec");
-            Protocol expResult = new Protocol("{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:4,-2,2,B:16,^107m){A=8,B=30723}");
-            assertEquals(result, expResult);
-        } catch (DecodeException | InvalidNameException | IrpInvalidArgumentException | NameUnassignedException | UnsupportedRepeatException ex) {
-            fail();
-        }
+    public void testParseRc6() throws Exception {
+        System.out.println("processRc6");
+        AbstractBiphaseDecoder decoder = new BiphaseDecoder(rc6, paramsRc6);
+        Protocol result = decoder.parse()[0];
+        System.out.println("Expect warning for missing parameterspec");
+        Protocol expResult = new Protocol("{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:4,-2,2,B:16,^107m){A=8,B=30723}");
+        assertEquals(result, expResult);
     }
 }

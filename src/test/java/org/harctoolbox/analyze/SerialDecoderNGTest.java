@@ -2,16 +2,11 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
-import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
-import org.harctoolbox.irp.InvalidNameException;
-import org.harctoolbox.irp.IrpInvalidArgumentException;
-import org.harctoolbox.irp.NameUnassignedException;
-import org.harctoolbox.irp.NonUniqueBitCodeException;
 import org.harctoolbox.irp.Protocol;
-import org.harctoolbox.irp.UnsupportedRepeatException;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -39,7 +34,7 @@ public class SerialDecoderNGTest {
 
     private final Analyzer pctv;
     private final Analyzer.AnalyzerParams paramsPctv;
-    public SerialDecoderNGTest() throws OddSequenceLengthException {
+    public SerialDecoderNGTest() throws InvalidArgumentException {
         pctv = new Analyzer(new IrSequence(pctv_12_34), ModulatedIrSequence.DEFAULT_FREQUENCY, false, absoluteTolerance, relativeTolerance);
         List<Integer> widths = new ArrayList<>(5);
         widths.add(2);
@@ -63,16 +58,12 @@ public class SerialDecoderNGTest {
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      */
     @Test
-    public void testParse() throws IrpInvalidArgumentException {
-        try {
-            System.out.println("parse");
-            SerialDecoder decoder = new SerialDecoder(pctv, paramsPctv);
-            Protocol result = decoder.parse()[0];
-            System.out.println("Expect warnings on missing ParameterSpec");
-            Protocol expResult = new Protocol("{38.4k,832,lsb}<-1|1>(A:2,B:8,C:1,D:8,E:8,F:2,-100m){A=3,B=0,C=1,D=12,E=34,F=3}");
-            assertEquals(result, expResult);
-        } catch (DecodeException | InvalidNameException | NameUnassignedException | UnsupportedRepeatException | NonUniqueBitCodeException ex) {
-            fail();
-        }
+    public void testParse() throws Exception {
+        System.out.println("parse");
+        SerialDecoder decoder = new SerialDecoder(pctv, paramsPctv);
+        Protocol result = decoder.parse()[0];
+        System.out.println("Expect warnings on missing ParameterSpec");
+        Protocol expResult = new Protocol("{38.4k,832,lsb}<-1|1>(A:2,B:8,C:1,D:8,E:8,F:2,-100m){A=3,B=0,C=1,D=12,E=34,F=3}");
+        assertEquals(result, expResult);
     }
 }

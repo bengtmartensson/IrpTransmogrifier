@@ -1,9 +1,8 @@
 package org.harctoolbox.analyze;
 
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.OddSequenceLengthException;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -38,18 +37,15 @@ public class AnalyzerNGTest {
 
     /**
      * Test of repeatReducedIrSignal method, of class Analyzer.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     @Test
-    public void testRepeatReducedIrSignal() {
-        try {
-            System.out.println("repeatReducedIrSignal");
-            IrSequence irSequence = new IrSequence(ALLDATA);
-            Analyzer instance = new Analyzer(irSequence, 38400d, true);
-            IrSignal expResult = new IrSignal(new IrSequence(INTRODATA), new IrSequence(REPEATDATA), new IrSequence(), 38400d);
-            IrSignal result = instance.repeatReducedIrSignal(0);
-            assertTrue(result.approximatelyEquals(expResult));
-        } catch (OddSequenceLengthException ex) {
-            throw new ThisCannotHappenException(ex);
-        }
+    public void testRepeatReducedIrSignal() throws InvalidArgumentException {
+        System.out.println("repeatReducedIrSignal");
+        IrSequence irSequence = new IrSequence(ALLDATA);
+        Analyzer instance = new Analyzer(irSequence, 38400d, true);
+        IrSignal expResult = new IrSignal(new IrSequence(INTRODATA), new IrSequence(REPEATDATA), new IrSequence(), 38400d);
+        IrSignal result = instance.repeatReducedIrSignal(0);
+        assertTrue(result.approximatelyEquals(expResult));
     }
 }

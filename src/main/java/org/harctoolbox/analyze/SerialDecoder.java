@@ -19,6 +19,7 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BareIrStream;
@@ -70,7 +71,7 @@ public final class SerialDecoder extends AbstractDecoder {
                 int noBits;
                 try {
                     noBits = (int) Math.round(duration.getTimeInUnits());
-                } catch (Exception ex) {
+                } catch (InvalidArgumentException ex) {
                     throw new ThisCannotHappenException(ex);
                 }
                 int amount = isFlash ? (int) IrCoreUtils.ones(noBits) : 0;

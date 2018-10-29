@@ -42,21 +42,21 @@ public class Cleaner {
     private static final int NO_LETTERS = 26;
     private static final int MAXSPAN = 4;
 
-    public static IrSequence clean(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+    public static IrSequence clean(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         Cleaner cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
         return cleaner.toIrSequence();
     }
 
-    public static IrSequence clean(IrSequence irSequence) {
+    public static IrSequence clean(IrSequence irSequence) throws InvalidArgumentException {
         return clean(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
-    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         return new ModulatedIrSequence(clean((IrSequence)irSequence, absoluteTolerance, relativeTolerance),
                 irSequence.getFrequency(), irSequence.getDutyCycle());
     }
 
-    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) {
+    public static ModulatedIrSequence clean(ModulatedIrSequence irSequence) throws InvalidArgumentException {
         return clean(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
@@ -86,15 +86,19 @@ public class Cleaner {
     private int[] indices; // ending indicies
     private boolean signalMode;
 
-    public Cleaner(IrSequence irSequence) {
+    public Cleaner(IrSequence irSequence) throws InvalidArgumentException {
         this(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
-    public Cleaner(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+    public Cleaner(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         this(irSequence.toInts(), new int[]{ irSequence.getLength() }, false, absoluteTolerance, relativeTolerance);
     }
 
-    protected Cleaner(int[] data, int[] indices, boolean signalMode, Double absoluteTolerance, Double relativeTolerance) {
+    protected Cleaner(int[] data, int[] indices, boolean signalMode, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
+        for (int x : data)
+            if (x == 0)
+                throw new InvalidArgumentException("Data contains duration of length 0");
+
         rawData = data;
         this.indices = indices;
         this.signalMode = signalMode;

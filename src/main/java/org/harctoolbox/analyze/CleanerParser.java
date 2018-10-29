@@ -73,7 +73,7 @@ public class CleanerParser extends MultiParser {
         return clean(list);
     }
 
-    private List<IrSequence> clean(List<IrSequence> list) {
+    private List<IrSequence> clean(List<IrSequence> list) throws InvalidArgumentException {
         IrSequence total = IrSequence.concatenate(list);
         cleaner = new Cleaner(total, absoluteTolerance, relativeTolerance);
         IrSequence cleanedTotal = cleaner.toIrSequence();

@@ -2,6 +2,7 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
@@ -58,7 +59,7 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
     public static void tearDownClass() throws Exception {
     }
 
-    private static Protocol parse(int[] data) throws OddSequenceLengthException, DecodeException {
+    private static Protocol parse(int[] data) throws OddSequenceLengthException, DecodeException, InvalidArgumentException {
         Analyzer analyzer = new Analyzer(new IrSequence(data), ModulatedIrSequence.DEFAULT_FREQUENCY, false, absoluteTolerance, relativeTolerance);
 
         List<Integer> widths = new ArrayList<>(8);
@@ -76,7 +77,7 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
         return result;
     }
 
-    private static void testStuff(int[] data, String expected) throws IrpException, OddSequenceLengthException, DecodeException {
+    private static void testStuff(int[] data, String expected) throws IrpException, OddSequenceLengthException, DecodeException, InvalidArgumentException {
         Protocol result = parse(data);
         Protocol expResult = new Protocol(expected);
         assertEquals(result, expResult);
@@ -91,86 +92,58 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
     }
 
     @Test
-    public void testParserc6_255_0_0() throws IrpException, OddSequenceLengthException, DecodeException {
+    public void testParserc6_255_0_0() throws IrpException, OddSequenceLengthException, DecodeException, InvalidArgumentException {
         System.out.println("processrc6_255_0_0");
         System.out.println("Expect warning for missing parameterspec");
         testStuff(rc6_255_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,^107m){A=1,B=0,C=0,D=255,E=0}");
     }
 
     @Test
-    public void testParserc6_255_0_1() {
-        try {
-            System.out.println("processrc6_255_0_1");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_255_0_1, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,^107m){A=1,B=0,C=1,D=255,E=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParserc6_255_0_1() throws Exception {
+        System.out.println("processrc6_255_0_1");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_255_0_1, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,^107m){A=1,B=0,C=1,D=255,E=0}");
     }
 
     @Test
-    public void testParserc6_m_32_0_0_0_0_0_0() {
-        try {
-            System.out.println("processrc6_255_0_1");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_m_32_0_0_0_0_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=0,D=0,E=0,F=0,G=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParserc6_m_32_0_0_0_0_0_0() throws Exception {
+        System.out.println("processrc6_255_0_1");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_m_32_0_0_0_0_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=0,D=0,E=0,F=0,G=0}");
     }
 
     @Test
-    public void testParserrc6_m_32_0_0_1_0_0_0() {
-        try {
-            System.out.println("processrc6_m_32_0_0_1_0_0_0");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_m_32_0_0_1_0_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=1,D=0,E=0,F=0,G=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParserrc6_m_32_0_0_1_0_0_0() throws Exception {
+        System.out.println("processrc6_m_32_0_0_1_0_0_0");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_m_32_0_0_1_0_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=1,D=0,E=0,F=0,G=0}");
     }
 
     @Test
-    public void testParserc6_m_32_0_0_0_7_0_0() {
-        try {
-            System.out.println("processrc6_m_32_0_0_0_7_0_0");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_m_32_0_0_0_7_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=7,C=0,D=0,E=0,F=0,G=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParserc6_m_32_0_0_0_7_0_0() throws Exception {
+        System.out.println("processrc6_m_32_0_0_0_7_0_0");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_m_32_0_0_0_7_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=7,C=0,D=0,E=0,F=0,G=0}");
     }
 
     @Test
-    public void testParserrc6_m_32_0_0_1_7_0_0() {
-        try {
-            System.out.println("processrc6_m_32_0_0_1_7_0_0");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_m_32_0_0_1_7_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=7,C=1,D=0,E=0,F=0,G=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParserrc6_m_32_0_0_1_7_0_0() throws Exception {
+        System.out.println("processrc6_m_32_0_0_1_7_0_0");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_m_32_0_0_1_7_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=7,C=1,D=0,E=0,F=0,G=0}");
     }
 
     @Test
-    public void testParserrc6_m_32_0_0_0_0_255_0() {
-        try {
-            System.out.println("processrc6_255_0_1");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_m_32_0_0_0_0_255_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=0,D=255,E=0,F=0,G=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParserrc6_m_32_0_0_0_0_255_0() throws Exception {
+        System.out.println("processrc6_255_0_1");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_m_32_0_0_0_0_255_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=0,D=255,E=0,F=0,G=0}");
     }
 
     @Test
-    public void testParsercrc6_m_32_0_1_0_255_0_0() {
-        try {
-            System.out.println("processrc6_255_0_1");
-            System.out.println("Expect warning for missing parameterspec");
-            testStuff(rc6_m_32_0_1_0_255_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=1,D=255,E=0,F=0,G=0}");
-        } catch (IrpException | DecodeException | OddSequenceLengthException ex) {
-            fail();
-        }
+    public void testParsercrc6_m_32_0_1_0_255_0_0() throws Exception {
+        System.out.println("processrc6_255_0_1");
+        System.out.println("Expect warning for missing parameterspec");
+        testStuff(rc6_m_32_0_1_0_255_0_0, "{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:1,B:3,<-2,2|2,-2>(C:1),D:8,E:8,F:8,G:8,^107m){A=1,B=0,C=1,D=255,E=0,F=0,G=0}");
     }
 }

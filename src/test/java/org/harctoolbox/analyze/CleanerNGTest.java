@@ -46,9 +46,10 @@ public class CleanerNGTest {
 
     /**
      * Test of clean method, of class Cleaner.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     @Test
-    public void testClean_IrSequence() {
+    public void testClean_IrSequence() throws InvalidArgumentException {
         System.out.println("clean");
         final double absolute = 60.0;
         final double relative = 0.1;
@@ -77,9 +78,10 @@ public class CleanerNGTest {
 //    }
     /**
      * Test of toTimingsString method, of class Cleaner.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     @Test
-    public void testToTimingsString() {
+    public void testToTimingsString() throws InvalidArgumentException {
         System.out.println("toTimingsString");
         Cleaner instance = new Cleaner(noisy, 60d, 0.2);
         String expResult = "ED AA AA AB AB AA AA AA AA AA AB AA AA AA AB AA AA AA AA AA AB AB AB AA AA AB AB AB AA AA AA AB AB AF EC AG EC AG EC AG EC AG";
@@ -89,9 +91,10 @@ public class CleanerNGTest {
 
     /**
      * Test of clean method, of class Cleaner.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     @Test
-    public void testClean_3args_1() {
+    public void testClean_3args_1() throws InvalidArgumentException {
         System.out.println("clean");
         double absoluteTolerance = 60.0;
         double relativeTolerance = 0.1;
@@ -101,9 +104,10 @@ public class CleanerNGTest {
 
     /**
      * Test of clean method, of class Cleaner.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     @Test
-    public void testClean_3args_2() {
+    public void testClean_3args_2() throws InvalidArgumentException {
         System.out.println("clean");
         double absoluteTolerance = 280.0;
         double relativeTolerance = 0.1;

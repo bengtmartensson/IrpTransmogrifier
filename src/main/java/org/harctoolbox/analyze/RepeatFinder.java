@@ -79,11 +79,11 @@ public final class RepeatFinder {
     public static IrSignal findRepeat(ModulatedIrSequence irSequence) {
         return findRepeat(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
-    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         RepeatFinder repeatFinder = new RepeatFinder(irSequence, absoluteTolerance, relativeTolerance);
         return repeatFinder.toIrSignalClean(irSequence);
     }
-    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence) {
+    public static IrSignal findRepeatClean(ModulatedIrSequence irSequence) throws InvalidArgumentException {
         return findRepeatClean(irSequence, defaultAbsoluteTolerance, defaultRelativeTolerance);
     }
 
@@ -177,7 +177,7 @@ public final class RepeatFinder {
         return repeatFinderData.chopIrSequence(irSequence);
     }
 
-    public IrSignal toIrSignalClean(ModulatedIrSequence irSequence) {
+    public IrSignal toIrSignalClean(ModulatedIrSequence irSequence) throws InvalidArgumentException {
         return repeatFinderData.chopIrSequence(Cleaner.clean(irSequence, absoluteTolerance, relativeTolerance));
     }
 

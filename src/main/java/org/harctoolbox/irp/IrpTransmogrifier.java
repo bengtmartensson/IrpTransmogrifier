@@ -755,7 +755,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    private void analyze(IrSignal irSignal) throws NoDecoderMatchException {
+    private void analyze(IrSignal irSignal) throws NoDecoderMatchException, InvalidArgumentException {
         Analyzer analyzer;
         if (commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder) {
             IrSequence irSequence = irSignal.toModulatedIrSequence();

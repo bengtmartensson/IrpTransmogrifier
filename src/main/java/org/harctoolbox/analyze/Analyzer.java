@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -71,19 +72,19 @@ public final class Analyzer extends Cleaner {
     private Double frequency;
     private List<Burst> sortedBursts;
 
-    public Analyzer(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) {
+    public Analyzer(IrSignal irSignal, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         this(irSignal.toIrSequences(), mkIndices(irSignal.toIrSequences()), true, irSignal.getFrequency(), false, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         this(Arrays.asList(irSequence), frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(Collection<? extends IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    public Analyzer(Collection<? extends IrSequence> irSequenceList, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         this(irSequenceList, mkIndices(irSequenceList), false, frequency, invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    private Analyzer(Collection<? extends IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    private Analyzer(Collection<? extends IrSequence> irSequenceList, int[] indices, boolean signalMode, Double frequency, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         super(IrSequence.toInts(irSequenceList), indices, signalMode, absoluteTolerance, relativeTolerance);
         if (frequency == null)
             logger.log(Level.FINE, String.format(Locale.US, "No frequency given, assuming default frequency = %d Hz", (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
@@ -94,27 +95,27 @@ public final class Analyzer extends Cleaner {
         createPairs();
     }
 
-    public Analyzer(ModulatedIrSequence irSequence, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) {
+    public Analyzer(ModulatedIrSequence irSequence, boolean invokeRepeatFinder, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         this(irSequence, irSequence.getFrequency(), invokeRepeatFinder, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) {
+    public Analyzer(IrSequence irSequence, boolean invokeRepeatFinder) throws InvalidArgumentException {
         this(irSequence, null, invokeRepeatFinder, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
-    public Analyzer(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) {
+    public Analyzer(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance) throws InvalidArgumentException {
         this(irSequence, null, false, absoluteTolerance, relativeTolerance);
     }
 
-    public Analyzer(IrSequence irSequence) {
+    public Analyzer(IrSequence irSequence) throws InvalidArgumentException {
         this(irSequence, null, false, null, null);
     }
 
-    public Analyzer(int[] data) throws OddSequenceLengthException {
+    public Analyzer(int[] data) throws OddSequenceLengthException, InvalidArgumentException {
         this(new IrSequence(data), null, false, null, null);
     }
 
-    public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder) {
+    public Analyzer(IrSequence irSequence, Double frequency, boolean invokeRepeatFinder) throws InvalidArgumentException {
         this(irSequence, frequency, invokeRepeatFinder, null, null);
     }
 

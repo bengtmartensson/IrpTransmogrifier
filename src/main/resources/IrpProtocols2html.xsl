@@ -47,7 +47,15 @@ this program. If not, see http://www.gnu.org/licenses/.
                     padding-top: 1ex;
                     }
                     div.protocol-title {
-                    font-size: 150%;
+                    font-size: 120%;
+                    font-weight: bold;
+
+                    }
+                    div.alias {
+                    padding-top: 1ex;
+                    }
+                    div.alias-title {
+                    font-size: 120%;
                     font-weight: bold;
 
                     }
@@ -70,10 +78,18 @@ this program. If not, see http://www.gnu.org/licenses/.
 
                 <xsl:apply-templates select="irp:protocols" mode="toc"/>
                 <xsl:apply-templates select="irp:protocols"/>
-                <h1>
+                <h2>
+                    <xsl:attribute name="id">Aliases</xsl:attribute>
+                    <xsl:text>Aliases</xsl:text>
+                </h2>
+                <xsl:text>
+                <!-- Better to have them sorted all together. -->
+                </xsl:text>
+                <xsl:apply-templates select="irp:protocols/irp:protocol/irp:parameter[@name='alt_name']"/>
+                <h2>
                     <xsl:attribute name="id">Glossary</xsl:attribute>
                     <xsl:text>Glossary</xsl:text>
-                </h1>
+                </h2>
                 <dl>
                     <dt>
                         <xsl:attribute name="id">DecodeIR</xsl:attribute>
@@ -102,7 +118,7 @@ this program. If not, see http://www.gnu.org/licenses/.
                 <dl>
                     <dt>
                         <xsl:attribute name="id">repeat</xsl:attribute>
-                        <xsl:text>repeat (ditto)</xsl:text>
+                        <xsl:text>ditto</xsl:text>
                     </dt>
                     <dd>Simple sequence, without information, that is repeated as repeat sequence. For an example, see <a href="#NEC1">NEC1</a>.</dd>
                 </dl>
@@ -111,7 +127,7 @@ this program. If not, see http://www.gnu.org/licenses/.
                         <xsl:attribute name="id">spurious</xsl:attribute>
                         <xsl:text>spurious decodes</xsl:text>
                     </dt>
-                    <dd>An imperfectly measured signal that incorrectly matches a protocol.</dd>
+                    <dd>An imperfectly measured signal that incorrectly matches a protocol (false positive).</dd>
                 </dl>
 
             </body>
@@ -128,9 +144,13 @@ this program. If not, see http://www.gnu.org/licenses/.
                     <xsl:text>Glossary</xsl:text>
                 </a>
             </li>
-
+            <h3>Protocols</h3>
             <xsl:apply-templates select="irp:protocol" mode="toc">
                 <xsl:sort select="@name"/>
+            </xsl:apply-templates>
+            <h3>Aliases</h3>
+            <xsl:apply-templates select="irp:protocol[irp:parameter[@name='alt_name']]" mode="aliastoc">
+                <xsl:sort select="irp:parameter[@name='alt_name']/text()"/>
             </xsl:apply-templates>
         </ul>
     </xsl:template>
@@ -148,6 +168,18 @@ this program. If not, see http://www.gnu.org/licenses/.
                     <xsl:value-of select="@name"/>
                 </xsl:attribute>
                 <xsl:value-of select="@name"/>
+            </a>
+        </li>
+    </xsl:template>
+
+    <xsl:template match="irp:protocol[irp:parameter[@name='alt_name']]" mode="aliastoc">
+        <li>
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:text>#</xsl:text>
+                    <xsl:value-of select="irp:parameter[@name='alt_name']/text()"/>
+                </xsl:attribute>
+                <xsl:value-of select="irp:parameter[@name='alt_name']/text()"/>
             </a>
         </li>
     </xsl:template>
@@ -201,6 +233,28 @@ this program. If not, see http://www.gnu.org/licenses/.
                 <xsl:text>: </xsl:text>
             </span>
             <xsl:value-of select="text()"/>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="irp:parameter[@name='alt_name']">
+        <div>
+            <xsl:attribute name="class">alias</xsl:attribute>
+            <xsl:attribute name="id">
+                <xsl:value-of select="text()"/>
+            </xsl:attribute>
+            <div>
+                <xsl:attribute name="class">alias-title</xsl:attribute>
+                <xsl:value-of select="text()"/>
+            </div>
+
+            <xsl:text>Alternative name for </xsl:text>
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:text>#</xsl:text>
+                    <xsl:value-of select="../@name"/>
+                </xsl:attribute>
+                <xsl:value-of select="../@name"/>
+            </a>
         </div>
     </xsl:template>
 </xsl:stylesheet>

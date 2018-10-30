@@ -198,6 +198,10 @@ public final class IrSignal implements Cloneable {
         map.put(Pass.ending, this.endingSequence);
     }
 
+    public IrSignal setFrequency(Double newFrequency) {
+        return new IrSignal(introSequence, repeatSequence, endingSequence, newFrequency != null ? newFrequency : frequency);
+    }
+
     public Double getFrequency() {
         return frequency;
     }

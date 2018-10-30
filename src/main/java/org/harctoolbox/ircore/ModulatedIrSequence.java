@@ -206,6 +206,10 @@ public final class ModulatedIrSequence extends IrSequence {
         return new IrSignal(this);
     }
 
+    public ModulatedIrSequence setFrequency(Double newFrequency) {
+        return new ModulatedIrSequence(this, newFrequency != null ? newFrequency : this.frequency);
+    }
+
     /**
      * Compares two ModulatedIrSequences for (approximate) equality.
      *

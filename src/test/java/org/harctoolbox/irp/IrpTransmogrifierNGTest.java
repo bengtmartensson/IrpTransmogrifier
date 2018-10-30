@@ -179,6 +179,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testAnalyze10() {
+        System.out.println("analyze10");
+        String args = "analyze -f 12345 " + BIPHASE;
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "{12.3k,398,msb}<1,-1|-1,1>(A:63,B:13,-19.456m)*{A=0x7ff0404040400004,B=0x80}");
+    }
+
+    @Test(enabled = true)
     public void testDecodeRc5() {
         System.out.println("decodeRc5");
         String args = "decode --strict -p rc5 0000 0073 0000 000B 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
@@ -251,6 +259,16 @@ public class IrpTransmogrifierNGTest {
         String result = IrpTransmogrifier.execute("decode  --keep-defaulted " + recs80Multiple);
         System.out.println(result);
         assertEquals(result, "multiple decodes:\nSig1:\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2\nSig2:\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeFrequency() {
+        System.out.println("testDecodeFrequency");
+        String amino = "0000 004A 001B 001C 0069 005A 002D 000F 000F 000F 001E 000F 000F 000F 000F 000F 000F 001E 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 001E 001E 000F 000F 001E 000F 000F 000F 000F 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 001E 001E 001E 001E 1157 0069 005A 002D 000F 000F 000F 001E 000F 000F 000F 000F 001E 000F 000F 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 001E 001E 000F 000F 001E 000F 000F 000F 000F 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 001E 000F 000F 000F 000F 001E 1157";
+        String result = IrpTransmogrifier.execute("decode " + amino);
+        assertEquals(result, "Amino-56: {D=3,F=157}");
+        result = IrpTransmogrifier.execute("decode -f 38k " + amino);
+        assertEquals(result, "Amino: {D=3,F=157}");
     }
 
     @Test(enabled = true)

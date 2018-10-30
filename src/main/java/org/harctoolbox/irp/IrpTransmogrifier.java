@@ -143,6 +143,16 @@ public final class IrpTransmogrifier {
         return result;
     }
 
+    private static Double frequencyAverage(Collection<ModulatedIrSequence> seqs) {
+        if (seqs.isEmpty())
+            return null;
+
+        double sum = 0;
+        for (ModulatedIrSequence seq : seqs)
+            sum += seq.getFrequency();
+        return sum / seqs.size();
+    }
+
     private PrintStream out;
     private IrpDatabase irpDatabase;
     private JCommander argumentParser;
@@ -714,8 +724,8 @@ public final class IrpTransmogrifier {
             ThingsLineParser<ModulatedIrSequence> irSignalParser = new ThingsLineParser<>(
                     (List<String> line) -> { return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
             );
-            List<ModulatedIrSequence> signals = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
-            analyze(signals);
+            List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
+            analyze(modSeqs, frequencyAverage(modSeqs));
         } else if (commandAnalyze.namedInput != null) {
             try {
                 Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandAnalyze.namedInput, commandLineArgs.encoding);
@@ -757,39 +767,37 @@ public final class IrpTransmogrifier {
 
     private void analyze(IrSignal irSignal) throws NoDecoderMatchException, InvalidArgumentException {
         Analyzer analyzer;
+        Double freq = possiblyOverrideWithAnalyzeFrequency(irSignal.getFrequency());
         if (commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder) {
             IrSequence irSequence = irSignal.toModulatedIrSequence();
-            analyzer = new Analyzer(irSequence, commandAnalyze.frequency, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            analyzer = new Analyzer(irSequence, freq, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         } else
-            analyzer = new Analyzer(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            analyzer = new Analyzer(irSignal.setFrequency(freq), commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, null);
     }
 
     private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws NoDecoderMatchException, InvalidArgumentException {
         Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
         irSequences.putAll(modulatedIrSequences);
-        Double frequency;
-        try {
-            double sum = 0;
-            sum = modulatedIrSequences.values().stream().map((mis) -> mis.getFrequency()).reduce(sum, (accumulator, _item) -> accumulator + _item);
-            frequency = sum / modulatedIrSequences.keySet().size();
-        } catch (NullPointerException ex) {
-            frequency = null;
-        }
+        Double frequency = possiblyOverrideWithAnalyzeFrequency(frequencyAverage(modulatedIrSequences.values()));
         analyze(irSequences, frequency);
     }
 
     private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws NoDecoderMatchException, InvalidArgumentException {
         if (irSequences.isEmpty())
             throw new InvalidArgumentException("No parseable sequences found.");
-        Analyzer analyzer = new Analyzer(irSequences.values(), frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer analyzer = new Analyzer(irSequences.values(), possiblyOverrideWithAnalyzeFrequency(frequency), commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
     }
 
     private void analyze(List<? extends IrSequence> irSequences) throws NoDecoderMatchException, InvalidArgumentException {
+        analyze(irSequences, commandAnalyze.frequency);
+    }
+
+    private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws NoDecoderMatchException, InvalidArgumentException {
         if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
-        Analyzer analyzer = new Analyzer(irSequences, commandAnalyze.frequency, commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+        Analyzer analyzer = new Analyzer(irSequences, possiblyOverrideWithAnalyzeFrequency(frequency), commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, null);
     }
 
@@ -911,14 +919,14 @@ public final class IrpTransmogrifier {
             });
             List<IrSignal> signals = irSignalParser.readThings(commandDecode.input, commandLineArgs.encoding, false);
             for (IrSignal irSignal : signals)
-                decode(decoder, irSignal, null, 0);
+                decode(decoder, irSignal.setFrequency(commandDecode.frequency), null, 0);
         } else if (commandDecode.namedInput != null) {
             try {
                 Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandDecode.namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(modSequences.keySet());
                 for (Map.Entry<String, ModulatedIrSequence> kvp : modSequences.entrySet()) {
-                    IrSignal signal = new IrSignal(kvp.getValue());
-                    decode(decoder, signal, kvp.getKey(), maxNameLength);
+                    ModulatedIrSequence modSeq = kvp.getValue().setFrequency(commandDecode.frequency);
+                    decode(decoder, new IrSignal(modSeq), kvp.getKey(), maxNameLength);
                 }
             } catch (ParseException ex) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
@@ -927,14 +935,14 @@ public final class IrpTransmogrifier {
                 Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
                 for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
-                    decode(decoder, kvp.getValue(), kvp.getKey(), maxNameLength);
+                    decode(decoder, kvp.getValue().setFrequency(commandDecode.frequency), kvp.getKey(), maxNameLength);
             }
         } else {
             MultiParser prontoRawParser = MultiParser.newIrCoreParser(commandDecode.args);
             IrSignal irSignal = prontoRawParser.toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
             if (irSignal == null)
                 throw new UsageException("Could not parse as IrSignal: " + String.join(" ", commandDecode.args));
-            decode(decoder, irSignal, null, 0);
+            decode(decoder, irSignal.setFrequency(commandDecode.frequency), null, 0);
         }
     }
 
@@ -1119,6 +1127,10 @@ public final class IrpTransmogrifier {
                 : commandLineArgs.irp != null         ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
                 : commandLineArgs.configFile != null  ? new IrpDatabase(commandLineArgs.configFile)
                 : new IrpDatabase(getClass().getResourceAsStream(DEFAULT_CONFIG_FILE));
+    }
+
+    private Double possiblyOverrideWithAnalyzeFrequency(Double frequency) {
+        return commandAnalyze.frequency != null ? commandAnalyze.frequency : frequency;
     }
 
     public static class LevelParser implements IStringConverter<Level> { // MUST be public

@@ -326,6 +326,14 @@
             <artifactId>antlr4</artifactId>
             <version>4.7</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <!-- Reduces the size of the jar-with-dependencies from 14MiB to 2.6MiB.
+                    wish I know why it is needed... -->
+                    <groupId>com.ibm.icu</groupId>
+                    <artifactId>icu4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>

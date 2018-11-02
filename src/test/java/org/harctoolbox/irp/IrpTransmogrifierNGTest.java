@@ -258,7 +258,9 @@ public class IrpTransmogrifierNGTest {
         String recs80Multiple = "+200 -7300 +200 -7350 +150 -4850 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +150 -7350 +200 -7350 +150 -4850 +200 -7300 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -4850 +200 -7350 +150 -30100 +150 -7350 +200 -4800 +200 -4850 +150 -7350 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -7350 +200 -30100 +200 -7350 +150 -4850 +200 -4800 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +200 -7300 +200 -4850 +150 -4850 +200 -7350 +150 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -7350 +150 -30100";
         String result = IrpTransmogrifier.execute("decode  --keep-defaulted " + recs80Multiple);
         System.out.println(result);
-        assertEquals(result, "multiple decodes:\nSig1:\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2\nSig2:\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
+        assertEquals(result, "multiple decodes:" + IrCoreUtils.LINE_SEPARATOR
+                + "Sig1:\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2" + IrCoreUtils.LINE_SEPARATOR
+                + "Sig2:\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
     }
 
     @Test(enabled = true)

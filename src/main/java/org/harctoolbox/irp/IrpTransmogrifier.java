@@ -1045,7 +1045,7 @@ public final class IrpTransmogrifier {
         String text = String.join(" ", commandExpression.expressions).trim();
         Expression expression = Expression.newExpressionEOF(text);
         long result = expression.toNumber(nameEngine);
-        out.println(result);
+        out.println(Long.toString(result, commandExpression.radix));
         if (commandExpression.stringTree)
             out.println(expression.toStringTree());
 
@@ -1519,6 +1519,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Define a name engine to use for evaluating.", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
+
+        @Parameter(names = { "-r", "--radix"}, description = "Radix for outputting result.")
+        private int radix = 10;
 
         @Parameter(names = { "--stringtree" }, description = "Output stringtree.")
         private boolean stringTree = false;

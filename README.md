@@ -117,7 +117,17 @@ The program is capable of reading and translating to and from the old format, su
 ## Installation
 Unpack the binary distribution in a new, empty directory. Start the program by invoking the wrapper
 (`irptransmobrifier.bat` on Windows, `irptransmogrifier.sh` on Unix-like systems like Linux and MacOS.)
-from the command line. Do not double click the wrappers, since this program runs only from the command line.
+from the command line.
+Modify and/or relocate the wrapper(s) if desired or necessary.
+Do not double click the wrappers, since this program runs only from the command line.
+
+## Building from sources
+The project uses [Maven](https://maven.apache.org/) as build system. Any modern IDE should be able
+to open/import and build it (as Maven project). Of course, Maven can also be run from the command line,
+like
+
+    mvn install
+
 
 ## Usage
 Using from the command line, this is a command with subcommands. Before the sub command,
@@ -263,6 +273,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
   Options:
     -a, --absolutetolerance
       Absolute tolerance in microseconds, used when comparing durations.
+      Default: 100.0.
     -c, --configfile
       Pathname of IRP database file in XML format. Default is the one in the 
       jar file.
@@ -270,11 +281,15 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       Encoding used in generated output.
       Default: UTF-8
     -f, --frequencytolerance
-      Frequency tolerance in Hz. Negative disables frequency check.
+      Frequency tolerance in Hz. Negative disables frequency check. Default:
+      2000.0.
     -h, --help, -?
-      Display help message (deprecated; use the command "help" instead).
-    -i, --ini, --inifile
-      Pathname of IRP database file in ini format.
+      Display help message. Deprecated; use the command "help" instead.
+    --ini, --inifile
+      Pathname of IRP database file in ini format. If not specified, an XML
+      config file (using --configfile) will be used instead.
+    -i, --irp
+      Explicit IRP string to use as protocol definition.
     --logclasses
       List of (fully qualified) classes and their log levels.
       Default: <empty string>
@@ -288,12 +303,12 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       } 
       Default: WARNING
     --min-leadout
-      Threshold for leadout when decoding.
+      Threshold for leadout when decoding. Default: 20000.0.
     -g, --minrepeatgap
       Minumum gap at end of repetition
       Default: 5000.0
     -o, --output
-      Name of output file (default: stdout).
+      Name of output file. Default: stdout.
     -q, --quiet
       Quitest possible operation, typically to be used from scripts.
       Default: false
@@ -301,9 +316,10 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       Interpret protocol/decoder argument as regular expressions.
       Default: false
     -r, --relativetolerance
-      Relative tolerance as a number < 1
+      Relative tolerance as a number < 1. Default: 0.3.
     --seed
-      Set seed for pseudo random number generation (default: random).
+      Set seed for the pseudo random number generation. If not specified, will
+      be random, different between program invocations.
     -s, --sort
       Sort the protocols alphabetically on output.
       Default: false
@@ -315,10 +331,10 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       URL-decode protocol names, (understanding %20 for example).
       Default: false
     -v, --version
-      Report version (deprecated; use command version instead).
+      Report version. Deprecated; use the command "version" instead.
       Default: false
     -x, --xmllog
-      Log in XML format.
+      Write the log in XML format.
       Default: false
   Commands:
     help      Describe the syntax of program and commands.
@@ -328,6 +344,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print a possibly longer documentation for the present command.
           -h, -?, --help
             Print help for this command.
+          -c, --common, --options
+            Describe the common options only.
+            Default: false
           -s, --short
             Produce a short usage message.
             Default: false
@@ -365,6 +384,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -i, --irp
             List IRP form.
             Default: false
+          -m, --mindiff
+            Display minimal difference between contained durations.
+            Default: false
           --name
             List protocol name, also if --quiet is given.
             Default: false
@@ -393,13 +415,14 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print a possibly longer documentation for the present command.
           -h, -?, --help
             Print help for this command.
-          -i, --irp
-            Explicit IRP string to use as protocol definition.
           -n, --nameengine
             Name Engine to use
             Default: <empty string>
           --number-repeats
             Generate an IR sequence containing the given number of repeats
+          -P, --printparameters, --parameters
+            Print used parameters values
+            Default: false
           -p, --pronto, --ccf, --hex
             Generate Pronto hex.
             Default: false
@@ -445,7 +468,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           --radix
             Radix used for printing of output parameters.
             Default: 10
-          -r, --repeat-finder
+          -r, --repeatfinder
             Invoke repeat finder on input sequence
             Default: false
           -s, --strict
@@ -465,8 +488,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Create bit usage report. (Not with --all)
             Default: false
           -c, --chop
-            Chop input sequence into several using threshold given as 
-            argument. 
+            Chop input sequence into several using threshold (in milliseconds)
+            given as argument.
           -C, --clean
             Output the cleaned sequence(s).
             Default: false
@@ -531,8 +554,12 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -t, --timebase
             Force time unit , in microseconds (no suffix), or in periods (with 
             suffix "p").
+          --timings
+            Print the total timings of the compute IRP form.
+            Default: false
           -T, --trailinggap
-            Trailing gap (in micro seconds) added to sequences of odd length.
+            Dummy trailing gap (in micro seconds) added to sequences of odd
+            length.
 
     code      Generate code for the given target(s)
       Usage: code [options] protocols
@@ -553,7 +580,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -s, --stdirectory
             Directory containing st (string template) files for code 
             generation. 
-            Default: <system dependent>
+            Default: <installation dependent>
         * -t, --target
             Target(s) for code generation. Use ? for a list.
             Default: []
@@ -587,6 +614,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -n, --nameengine
             Define a name engine to use for evaluating.
             Default: <empty string>
+          -r, --radix
+            Radix for outputting result.
+            Default: 10
           --stringtree
             Output stringtree.
             Default: false
@@ -594,7 +624,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Generate XML and write to file argument.
 
     lirc      Convert Lirc configuration files to IRP form.
-      Usage: lirc [options] Lirc config files/directories/URLs); empty for 
+      Usage: lirc [options] Lirc config files/directories/URLs; empty for
             <stdin>. 
         Options:
           -c, --commands

@@ -427,8 +427,20 @@ public final class IrpDatabase {
         return protocols.get(name.toLowerCase(Locale.US));
     }
 
-    public Set<String> getNames() {
+    /**
+     * Returns the keys of the protocol data base, which happens to be the protocol names converted to lower case.
+     * @return
+     */
+    public Set<String> getKeys() {
         return protocols.keySet();
+    }
+
+    public List<String> getNames() {
+        List<String> answer = new ArrayList<>(protocols.size());
+        protocols.values().forEach((prot) -> {
+            answer.add(prot.getName());
+        });
+        return answer;
     }
 
     public Set<String> getAliases() {
@@ -560,7 +572,7 @@ public final class IrpDatabase {
 
     public List<String> evaluateProtocols(List<String> protocols, boolean sort, boolean regexp, boolean urlDecode) {
         List<String> list = (protocols == null || protocols.isEmpty())
-                ? new ArrayList<>(getNames()) : getMatchingNames(protocols, regexp, urlDecode);
+                ? new ArrayList<>(getKeys()) : getMatchingNames(protocols, regexp, urlDecode);
         if (sort)
             Collections.sort(list);
         return list;

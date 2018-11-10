@@ -109,9 +109,9 @@ public class IrpDatabaseNGTest {
      * Test of getNames method, of class IrpDatabase.
      */
     @Test
-    public void testGetNames() {
-        System.out.println("getNames");
-        Set result = instance.getNames();
+    public void testGetKeys() {
+        System.out.println("getKeys");
+        Set<String> result = instance.getKeys();
         assertTrue(result.size() > 100);
     }
 

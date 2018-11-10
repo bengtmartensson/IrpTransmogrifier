@@ -97,7 +97,7 @@ public final class Decoder {
     public Decoder(IrpDatabase irpDatabase, List<String> names) throws IrpParseException {
         irpDatabase.expand();
         parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
-        Collection<String> list = names != null ? names : irpDatabase.getNames();
+        Collection<String> list = names != null ? names : irpDatabase.getKeys();
         list.forEach((protocolName) -> {
             try {
                 NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(protocolName);

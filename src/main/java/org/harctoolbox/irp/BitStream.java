@@ -46,8 +46,8 @@ final class BitStream extends IrpObject implements Evaluatable {
             throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
 
         data = BigInteger.valueOf((generalSpec != null && generalSpec.getBitDirection() == BitDirection.msb)
-                    ? bitField.toNumber(nameEngine)
-                    : IrCoreUtils.reverse(bitField.toNumber(nameEngine), (int) bitField.getWidth(nameEngine)));
+                    ? bitField.toLong(nameEngine)
+                    : IrCoreUtils.reverse(bitField.toLong(nameEngine), (int) bitField.getWidth(nameEngine)));
         length = bitField.getWidth(nameEngine);
 
     }

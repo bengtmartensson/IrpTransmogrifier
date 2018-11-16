@@ -130,9 +130,9 @@ final class ThreePartExpression extends Expression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        long left = op1.toNumber(nameEngine);
-        long right = op2.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        long left = op1.toLong(nameEngine);
+        long right = op2.toLong(nameEngine);
 
         switch (operator) {
 
@@ -194,15 +194,15 @@ final class ThreePartExpression extends Expression {
     public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws NameUnassignedException {
         switch (operator) {
             case "+":
-                return rhs - op2.toNumber(nameEngine);
+                return rhs - op2.toLong(nameEngine);
             case "-":
-                return rhs + op2.toNumber(nameEngine);
+                return rhs + op2.toLong(nameEngine);
             case "*":
-                return (rhs / op2.toNumber(nameEngine)) & bitmask;
+                return (rhs / op2.toLong(nameEngine)) & bitmask;
             case "/":
-                return (rhs * op2.toNumber(nameEngine)) & bitmask;
+                return (rhs * op2.toLong(nameEngine)) & bitmask;
             case "^":
-                return (rhs ^ op2.toNumber(nameEngine)) & bitmask;
+                return (rhs ^ op2.toLong(nameEngine)) & bitmask;
             default:
                 return null;
         }

@@ -117,7 +117,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
                 throw new ThisCannotHappenException();
             }
             try {
-                long expected = expression.toNumber(parameterCollector.toNameEngine());
+                long expected = expression.toLong(parameterCollector.toNameEngine());
                 parameter.checkConsistency(name, expected);
             } catch (NameUnassignedException ex) {
                 // It has an expression, but is not presently checkable.

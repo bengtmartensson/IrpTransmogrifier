@@ -133,8 +133,8 @@ public abstract class Expression extends PrimaryItem {
     }
 
     @Override
-    public long toNumber() throws NameUnassignedException {
-        return toNumber(NameEngine.empty);
+    public long toLong() throws NameUnassignedException {
+        return toLong(NameEngine.empty);
     }
 
     @Override

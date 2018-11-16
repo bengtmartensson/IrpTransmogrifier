@@ -86,8 +86,8 @@ final class BitFieldExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        return bitField.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        return bitField.toLong(nameEngine);
     }
 
     @Override

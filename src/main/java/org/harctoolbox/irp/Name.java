@@ -67,9 +67,9 @@ public final class Name extends PrimaryItem implements Floatable {
     }
 
 
-    public static long toNumber(IrpParser.NameContext ctx, NameEngine nameEngine) throws NameUnassignedException {
+    public static long toLong(IrpParser.NameContext ctx, NameEngine nameEngine) throws NameUnassignedException {
         Expression exp = nameEngine.get(toString(ctx));
-        return exp.toNumber(nameEngine);
+        return exp.toLong(nameEngine);
     }
 
     public static String toString(IrpParser.NameContext ctx) {
@@ -128,13 +128,13 @@ public final class Name extends PrimaryItem implements Floatable {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
         Expression expression = nameEngine.get(getName());
-        return expression.toNumber(nameEngine);
+        return expression.toLong(nameEngine);
     }
 
     @Override
-    public long toNumber() throws NameUnassignedException {
+    public long toLong() throws NameUnassignedException {
         throw new NameUnassignedException(name);
     }
 
@@ -147,7 +147,7 @@ public final class Name extends PrimaryItem implements Floatable {
 
     @Override
     public double toFloat(GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
-        return toNumber(nameEngine);
+        return toLong(nameEngine);
     }
 
     /**

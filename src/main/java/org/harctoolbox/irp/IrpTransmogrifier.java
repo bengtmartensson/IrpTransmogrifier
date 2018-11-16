@@ -885,7 +885,7 @@ public final class IrpTransmogrifier {
                         try {
                             String name = definition.getKey();
                             int length = protocol.guessParameterLength(name);
-                            long num = definition.getValue().toNumber();
+                            long num = definition.getValue().toLong();
                             out.print("\t" + IrCoreUtils.formatIntegerWithLeadingZeros(num, commandAnalyze.radix, length));
                         } catch (NameUnassignedException ex) {
                             throw new ThisCannotHappenException(ex);
@@ -1044,7 +1044,7 @@ public final class IrpTransmogrifier {
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
         Expression expression = Expression.newExpressionEOF(text);
-        long result = expression.toNumber(nameEngine);
+        long result = expression.toLong(nameEngine);
         out.println(Long.toString(result, commandExpression.radix));
         if (commandExpression.stringTree)
             out.println(expression.toStringTree());
@@ -1066,7 +1066,7 @@ public final class IrpTransmogrifier {
         NameEngine nameEngine = commandBitField.nameEngine;
         String text = String.join("", commandBitField.bitField).trim();
         BitField bitfield = BitField.newBitField(text);
-        long result = bitfield.toNumber(nameEngine);
+        long result = bitfield.toLong(nameEngine);
         listProperty("integer value", result);
         if (bitfield instanceof FiniteBitField) {
             FiniteBitField fbf = (FiniteBitField) bitfield;

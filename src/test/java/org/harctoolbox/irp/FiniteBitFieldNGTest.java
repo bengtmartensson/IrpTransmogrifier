@@ -34,23 +34,23 @@ public class FiniteBitFieldNGTest {
     }
 
     /**
-     * Test of toNumber method, of class FiniteBitField.
+     * Test of toLong method, of class FiniteBitField.
      */
     @Test
     public void testToNumber() {
-        System.out.println("toNumber");
+        System.out.println("toLong");
         try {
 
 //            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
-//            assertEquals(instance.toNumber(nameEngine), 31L);
+//            assertEquals(instance.toLong(nameEngine), 31L);
 //            FiniteBitField fbf = new FiniteBitField("~D:-6:2");
-            assertEquals(instance.toNumber(nameEngine), 31L);
+            assertEquals(instance.toLong(nameEngine), 31L);
         } catch (NameUnassignedException ex) {
             fail();
         }
         try {
             FiniteBitField fbf = new FiniteBitField("~foobar:-6:2");
-            fbf.toNumber(nameEngine);
+            fbf.toLong(nameEngine);
             fail();
         } catch (NameUnassignedException ex) {
         }

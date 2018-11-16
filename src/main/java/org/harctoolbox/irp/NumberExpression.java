@@ -69,13 +69,13 @@ final class NumberExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public long toNumber() {
-        return number.toNumber();
+    public long toLong() {
+        return number.toLong();
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) {
-        return number.toNumber();
+    public long toLong(NameEngine nameEngine) {
+        return number.toLong();
     }
 
     @Override

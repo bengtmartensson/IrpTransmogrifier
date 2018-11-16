@@ -52,8 +52,8 @@ public final class InfiniteBitField extends BitField {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        long x = data.toNumber(nameEngine) >>> chop.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        long x = data.toLong(nameEngine) >>> chop.toLong(nameEngine);
         if (complement)
             x = ~x;
 
@@ -69,14 +69,14 @@ public final class InfiniteBitField extends BitField {
     public String toString(NameEngine nameEngine) {
         String chopString;
         try {
-            chopString = Long.toString(chop.toNumber(nameEngine));
+            chopString = Long.toString(chop.toLong(nameEngine));
         } catch (NameUnassignedException ex) {
             chopString = chop.toIrpString(10);
         }
 
         String dataString;
         try {
-            dataString = Long.toString(data.toNumber(nameEngine));
+            dataString = Long.toString(data.toLong(nameEngine));
         } catch (NameUnassignedException ex) {
             dataString = data.toIrpString(10);
         }
@@ -96,7 +96,7 @@ public final class InfiniteBitField extends BitField {
         Element dataElement = document.createElement("Data");
         dataElement.appendChild(data.toElement(document));
         element.appendChild(dataElement);
-        if (!(chop instanceof Number && ((Number) chop).toNumber() == 0)) {
+        if (!(chop instanceof Number && ((Number) chop).toLong() == 0)) {
             Element chopElement = document.createElement("Chop");
             chopElement.appendChild(chop.toElement(document));
             element.appendChild(chopElement);

@@ -34,14 +34,14 @@ public class InfiniteBitFieldNGTest {
     }
 
     /**
-     * Test of toNumber method, of class InfiniteBitField.
+     * Test of toLong method, of class InfiniteBitField.
      */
     @Test
     public void testToNumber() {
-        System.out.println("toNumber");
+        System.out.println("toLong");
         long result = 0;
         try {
-            result = instance.toNumber(nameEngine);
+            result = instance.toLong(nameEngine);
         } catch (NameUnassignedException ex) {
             fail();
         }

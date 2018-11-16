@@ -78,16 +78,16 @@ public class NameNGTest {
     }
 
     /**
-     * Test of toNumber method, of class Name.
+     * Test of toLong method, of class Name.
      */
     @Test
     public void testToNumber_NameEngine() {
         try {
-            System.out.println("toNumber");
+            System.out.println("toLong");
             NameEngine nameEngine = new NameEngine("{A = B * C, B = 2, C=3}");
             Name instance = new Name("A");
             long expResult = 6L;
-            long result = instance.toNumber(nameEngine);
+            long result = instance.toLong(nameEngine);
             assertEquals(result, expResult);
         } catch (InvalidNameException | NameUnassignedException ex) {
             fail();

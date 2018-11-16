@@ -108,8 +108,8 @@ final class FivePartExpression extends Expression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        long ctrl = conditional.toNumber(nameEngine);
-        return ctrl != 0L ? trueExp.toNumber(nameEngine) : falseExp.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        long ctrl = conditional.toLong(nameEngine);
+        return ctrl != 0L ? trueExp.toLong(nameEngine) : falseExp.toLong(nameEngine);
     }
 }

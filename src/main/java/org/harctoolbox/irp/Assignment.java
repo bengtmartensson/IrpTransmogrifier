@@ -35,7 +35,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
 
     public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         Assignment assignment = new Assignment(str);
-        return assignment.toNumber(nameEngine);
+        return assignment.toLong(nameEngine);
     }
 
     private Name name;
@@ -94,13 +94,13 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        return value.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        return value.toLong(nameEngine);
     }
 
     @Override
-    public long toNumber() throws NameUnassignedException {
-        return toNumber(NameEngine.empty);
+    public long toLong() throws NameUnassignedException {
+        return toLong(NameEngine.empty);
     }
 
     public String getName() {
@@ -115,7 +115,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     @Override
     public void render(RenderData renderData, List<BitSpec> bitSpecs) throws NameUnassignedException {
         NameEngine nameEngine = renderData.getNameEngine();
-        long val = value.toNumber(nameEngine);
+        long val = value.toLong(nameEngine);
         try {
             nameEngine.define(name.toString(), val);
         } catch (InvalidNameException ex) {
@@ -156,7 +156,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
         try {
             NameEngine nameEngine = recognizeData.getNameEngine();
             String nameString = name.toString();
-            long val = value.toNumber(recognizeData.toNameEngine());
+            long val = value.toLong(recognizeData.toNameEngine());
             if (nameEngine.containsKey(nameString))
                 nameEngine.define(nameString, val);
             else

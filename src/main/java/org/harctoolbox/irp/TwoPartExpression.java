@@ -103,8 +103,8 @@ final class TwoPartExpression extends Expression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        long op = operand.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        long op = operand.toLong(nameEngine);
 
         switch (operator) {
             case '!':

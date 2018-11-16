@@ -61,7 +61,7 @@ public abstract class BitField extends IrpObject implements Numerical {
 
     public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         BitField bitField = newBitField(str);
-        return bitField.toNumber(nameEngine);
+        return bitField.toLong(nameEngine);
     }
 
     static Expression newExpression(IrpParser.BitfieldContext ctx) {
@@ -99,8 +99,8 @@ public abstract class BitField extends IrpObject implements Numerical {
     }
 
     @Override
-    public long toNumber() throws NameUnassignedException {
-        return toNumber(NameEngine.empty);
+    public long toLong() throws NameUnassignedException {
+        return toLong(NameEngine.empty);
     }
 
     public abstract String toString(NameEngine nameEngine);
@@ -113,7 +113,7 @@ public abstract class BitField extends IrpObject implements Numerical {
 
     public boolean hasChop() {
         try {
-            return chop.toNumber() != 0;
+            return chop.toLong() != 0;
         } catch (NameUnassignedException ex) {
             return true;
         }
@@ -133,7 +133,7 @@ public abstract class BitField extends IrpObject implements Numerical {
         map.put("data", data.propertiesMap(eval, generalSpec, nameEngine));
         //map.put("width", width.propertiesMap(true, generalSpec));
         try {
-            long num = chop.toNumber(null);
+            long num = chop.toLong(null);
             if (num != 0)
                 map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         } catch (NameUnassignedException ex) {

@@ -63,7 +63,7 @@ public class NameEngineNGTest {
             names.define(name, value);
             //System.out.println(instance.get(name));
             Assert.assertTrue(names.containsKey(name));
-            Assert.assertEquals(names.toNumber(name), value);
+            Assert.assertEquals(names.toLong(name), value);
         } catch (InvalidNameException | NameUnassignedException ex) {
             Assert.fail("testDefine valid failed.");
         }
@@ -81,7 +81,7 @@ public class NameEngineNGTest {
         //instance.parseDefinitions(str);
         Assert.assertTrue(names.containsKey("answer"));
         Assert.assertTrue(names.containsKey("sheldon"));
-        Assert.assertEquals(names.toNumber("diff"), 31);
+        Assert.assertEquals(names.toLong("diff"), 31);
     }
 
     /**
@@ -99,26 +99,26 @@ public class NameEngineNGTest {
             fail();
         }
         try {
-            assertEquals(names.get(name).toNumber(), value);
+            assertEquals(names.get(name).toLong(), value);
         } catch (NameUnassignedException ex) {
             fail();
         }
         try {
-            assertEquals(names.get("Z").toNumber(), value);
+            assertEquals(names.get("Z").toLong(), value);
             fail();
         } catch (NameUnassignedException ex) {
         }
     }
 
     /**
-     * Test of toNumber method, of class NameEngine.
+     * Test of toLong method, of class NameEngine.
      */
     @Test
     public void testToNumber() {
-        System.out.println("toNumber");
+        System.out.println("toLong");
         long result;
         try {
-            result = instance.toNumber("F");
+            result = instance.toLong("F");
             assertEquals(result, 255);
         } catch (NameUnassignedException ex) {
             fail();

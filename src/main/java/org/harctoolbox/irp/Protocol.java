@@ -143,7 +143,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         for (ParameterSpec parameter : parameterSpecs) {
             if (parameter.hasMemory()) {
                 String name = parameter.getName();
-                long initVal = parameter.getDefault().toNumber(null);
+                long initVal = parameter.getDefault().toLong(null);
                 memoryVariables.define(name, initVal);
             }
         }
@@ -369,7 +369,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     long getMemoryVariable(String name) throws NameUnassignedException {
-        return memoryVariables.get(name).toNumber();
+        return memoryVariables.get(name).toLong();
     }
 
     boolean hasMemoryVariable(String name) {

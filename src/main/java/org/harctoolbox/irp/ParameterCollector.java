@@ -168,7 +168,7 @@ public final class ParameterCollector implements Cloneable {
             String name = kvp.getKey();
             BitwiseParameter param = kvp.getValue();
             Expression expression = definitions.get(name);
-            long expected = expression.toNumber(nameEngine);
+            long expected = expression.toLong(nameEngine);
             param.checkConsistency(name, expected);
         }
     }

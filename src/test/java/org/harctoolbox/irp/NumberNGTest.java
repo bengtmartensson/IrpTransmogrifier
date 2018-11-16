@@ -62,12 +62,12 @@ public class NumberNGTest {
     }
 
     /**
-     * Test of toNumber method, of class Number.
+     * Test of toLong method, of class Number.
      */
     @Test
     public void testToNumber_0args() {
-        System.out.println("toNumber");
-        assertEquals(instance.toNumber(), 0xdeadbeefL);
+        System.out.println("toLong");
+        assertEquals(instance.toLong(), 0xdeadbeefL);
     }
 
     /**

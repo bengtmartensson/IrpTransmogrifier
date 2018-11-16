@@ -103,7 +103,7 @@ public final class ParameterSpec extends IrpObject {
                 throw new NameUnassignedException(name, true);
         }
 
-        Long value = nameEngine.get(name.getName()).toNumber(nameEngine);
+        Long value = nameEngine.get(name.getName()).toLong(nameEngine);
         checkDomain(value);
     }
 
@@ -113,7 +113,7 @@ public final class ParameterSpec extends IrpObject {
     }
 
     public boolean isWithinDomain(long x) {
-        return min.toNumber() <= x && x <= max.toNumber();
+        return min.toLong() <= x && x <= max.toLong();
     }
 
     @Override
@@ -144,11 +144,11 @@ public final class ParameterSpec extends IrpObject {
     }
 
     public long getMin() {
-        return min.toNumber();
+        return min.toLong();
     }
 
     public long getMax() {
-        return max.toNumber();
+        return max.toLong();
     }
 
     public boolean hasMemory() {

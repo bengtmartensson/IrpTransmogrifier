@@ -138,12 +138,12 @@ public final class Number extends PrimaryItem {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws ArithmeticException {
+    public long toLong(NameEngine nameEngine) throws ArithmeticException {
         return longValueExact();
     }
 
     @Override
-    public long toNumber() throws ArithmeticException {
+    public long toLong() throws ArithmeticException {
         return longValueExact();
     }
 

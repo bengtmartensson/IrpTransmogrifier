@@ -196,7 +196,7 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
                 Expression expression = parameterSpec.getDefault();
                 if (!(expression == null))
                     try {
-                        long deflt = expression.toNumber(nameEngine);
+                        long deflt = expression.toLong(nameEngine);
                         if (namesMap.get(name) == deflt)
                             namesMap.remove(name);
                     } catch (NameUnassignedException ex) {

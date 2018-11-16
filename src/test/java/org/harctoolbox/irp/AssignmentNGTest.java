@@ -42,14 +42,14 @@ public class AssignmentNGTest {
     }
 
     /**
-     * Test of toNumber method, of class Assignment.
+     * Test of toLong method, of class Assignment.
      */
     @Test
     public void testToNumber() {
         try {
-            System.out.println("toNumber");
+            System.out.println("toLong");
             Assignment instance = new Assignment("x = answer*sheldon");
-            long result = instance.toNumber(nameEngine);
+            long result = instance.toLong(nameEngine);
             assertEquals(result, 42*73);
         } catch (NameUnassignedException ex) {
             fail();

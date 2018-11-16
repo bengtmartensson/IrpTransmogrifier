@@ -120,13 +120,13 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        long x = data.toNumber(nameEngine) >> chop.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        long x = data.toLong(nameEngine) >> chop.toLong(nameEngine);
         if (complement)
             x = ~x;
-        x &= ((1L << width.toNumber(nameEngine)) - 1L);
+        x &= ((1L << width.toLong(nameEngine)) - 1L);
         if (reverse)
-            x = IrCoreUtils.reverse(x, (int) width.toNumber(nameEngine));
+            x = IrCoreUtils.reverse(x, (int) width.toLong(nameEngine));
 
         return x;
     }
@@ -144,8 +144,8 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     public String toBinaryString(NameEngine nameEngine) throws NameUnassignedException {
-        String str = Long.toBinaryString(toNumber(nameEngine));
-        int wid = (int) width.toNumber(nameEngine);
+        String str = Long.toBinaryString(toLong(nameEngine));
+        int wid = (int) width.toLong(nameEngine);
         int len = str.length();
         if (len > wid)
             return str.substring(len - wid);
@@ -158,7 +158,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public long getWidth(NameEngine nameEngine) throws NameUnassignedException {
-        return width.toNumber(nameEngine);
+        return width.toLong(nameEngine);
     }
 
     @Override
@@ -166,7 +166,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         String chopString = "";
         if (hasChop()) {
             try {
-                chopString =Long.toString(chop.toNumber(nameEngine));
+                chopString =Long.toString(chop.toLong(nameEngine));
             } catch (NameUnassignedException ex) {
                 chopString = chop.toIrpString(10);
             }
@@ -175,14 +175,14 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
         String dataString;
         try {
-            dataString = Long.toString(data.toNumber(nameEngine));
+            dataString = Long.toString(data.toLong(nameEngine));
         } catch (NameUnassignedException ex) {
             dataString = data.toIrpString(10);
         }
 
         String widthString;
         try {
-            widthString = Long.toString(width.toNumber(nameEngine));
+            widthString = Long.toString(width.toLong(nameEngine));
         } catch (NameUnassignedException ex) {
             widthString = width.toIrpString(10);
         }
@@ -245,7 +245,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
             BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
             int chunkSize = bitSpec.getChunkSize();
             long payload = 0L;
-            int numWidth = (int) width.toNumber(recognizeData.toNameEngine());
+            int numWidth = (int) width.toLong(recognizeData.toNameEngine());
             BitwiseParameter danglingData = recognizeData.getDanglingBitFieldData();
             if (!danglingData.isEmpty()) {
                 payload = danglingData.getValue();
@@ -293,8 +293,8 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                 payload = IrCoreUtils.reverse(payload, noChunks);
             if (this.complement)
                 payload = ~payload;
-            payload <<= (int) chop.toNumber(recognizeData.toNameEngine());
-            long bitmask = IrCoreUtils.ones((int) width.toNumber(recognizeData.toNameEngine())) << chop.toNumber(recognizeData.toNameEngine());
+            payload <<= (int) chop.toLong(recognizeData.toNameEngine());
+            long bitmask = IrCoreUtils.ones((int) width.toLong(recognizeData.toNameEngine())) << chop.toLong(recognizeData.toNameEngine());
             payload &= bitmask;
 
             // We now have the "equation" data == payload, we are turning that into an assignment
@@ -321,7 +321,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                         recognizeData.add(name.toString(), rhs);
                 } else if (expression instanceof Number) {
                     // check, barf if not OK
-                    long expected = this.toNumber(recognizeData.getParameterCollector().toNameEngine());
+                    long expected = this.toLong(recognizeData.getParameterCollector().toNameEngine());
                     if (expected != rhs)
                         throw new SignalRecognitionException("Constant FiniteBitField did not evaluated to expected value");
                 } else
@@ -357,7 +357,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public int weight() {
         try {
-            return super.weight() + (int) width.toNumber()/8;
+            return super.weight() + (int) width.toLong()/8;
         } catch (NameUnassignedException ex) {
             // Something weird has happened
             logger.log(Level.WARNING, "Cannot compute weight of {0}", toString());
@@ -398,7 +398,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public boolean nonConstantBitFieldLength() {
         try {
-            width.toNumber();
+            width.toLong();
         } catch (NameUnassignedException ex) {
             return true;
         }
@@ -408,7 +408,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public Integer guessParameterLength(String name) {
         try {
-            return data.toString().equals(name) ? (int) width.toNumber() : null;
+            return data.toString().equals(name) ? (int) width.toLong() : null;
         } catch (NameUnassignedException ex) {
             return null;
         }

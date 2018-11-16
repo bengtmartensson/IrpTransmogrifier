@@ -27,7 +27,7 @@ public interface Numerical {
      * @return result, long.
      * @throws org.harctoolbox.irp.NameUnassignedException
      */
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException;
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException;
 
-    public long toNumber() throws NameUnassignedException;
+    public long toLong() throws NameUnassignedException;
 }

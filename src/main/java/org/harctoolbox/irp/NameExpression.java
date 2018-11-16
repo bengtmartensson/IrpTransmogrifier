@@ -81,8 +81,8 @@ final class NameExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public long toNumber(NameEngine nameEngine) throws NameUnassignedException {
-        return name.toNumber(nameEngine);
+    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        return name.toLong(nameEngine);
     }
 
     @Override

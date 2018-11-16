@@ -32,18 +32,18 @@ public class ExpressionNGTest {
     }
 
     /**
-     * Test of toNumber method, of class Expression.
+     * Test of toLong method, of class Expression.
      */
     @Test
     public void testToNumber() {
-        System.out.println("toNumber");
+        System.out.println("toLong");
         try {
-            assertEquals(Expression.newExpression("A+2*B*C").toNumber(nameEngine), 24);
+            assertEquals(Expression.newExpression("A+2*B*C").toLong(nameEngine), 24);
         } catch (NameUnassignedException ex) {
             fail();
         }
         try {
-            Expression.newExpression("A+2*B*C+").toNumber(nameEngine);
+            Expression.newExpression("A+2*B*C+").toLong(nameEngine);
             fail();
         } catch (ParseCancellationException ex) {
         } catch (NameUnassignedException ex) {
@@ -51,8 +51,8 @@ public class ExpressionNGTest {
         }
 
         try {
-            assertEquals(Expression.newExpression("2**3").toNumber(), 8);
-            assertEquals(Expression.newExpression("2**3**3").toNumber(), 134217728);
+            assertEquals(Expression.newExpression("2**3").toLong(), 8);
+            assertEquals(Expression.newExpression("2**3**3").toLong(), 134217728);
         } catch (NameUnassignedException ex) {
             fail();
         }
@@ -70,28 +70,28 @@ public class ExpressionNGTest {
     }
 
     /**
-     * Test of toNumber method, of class Expression.
+     * Test of toLong method, of class Expression.
      */
     @Test
     public void testToNumber_0args() {
-        System.out.println("toNumber");
+        System.out.println("toLong");
         Expression instance = Expression.newExpression("A+2*B*C");
         try {
-            instance.toNumber();
+            instance.toLong();
             fail();
         } catch (NameUnassignedException ex) {
         }
     }
 
     /**
-     * Test of toNumber method, of class Expression.
+     * Test of toLong method, of class Expression.
      */
     @Test
     public void testToNumber_NameEngine() {
         try {
-            System.out.println("toNumber");
+            System.out.println("toLong");
             Expression instance = Expression.newExpression("A+2*B*C");
-            long result = instance.toNumber(nameEngine);
+            long result = instance.toLong(nameEngine);
             assertEquals(result, 24);
         } catch (NameUnassignedException ex) {
             fail();

@@ -193,24 +193,24 @@ public class ProtocolNGTest {
         // New protocol, no assignment to toggle
         NameEngine nameEngine = new NameEngine("{D=12,F=56}");
         IrSignal result = rc5.toIrSignal(nameEngine);
-        assertEquals(nameEngine.get("T").toNumber(), 1L);
+        assertEquals(nameEngine.get("T").toLong(), 1L);
         assertEquals(rc5.getMemoryVariable("T"), 1L);
         assertTrue(result.approximatelyEquals(rc5D12F56T0));
 
         result = rc5.toIrSignal(nameEngine);
-        assertEquals(nameEngine.get("T").toNumber(), 0L);
+        assertEquals(nameEngine.get("T").toLong(), 0L);
         assertEquals(rc5.getMemoryVariable("T"), 0L);
         assertTrue(result.approximatelyEquals(rc5D12F56T1));
 
         nameEngine = new NameEngine("{D=12,F=56,T=1}");
         result = rc5.toIrSignal(nameEngine);
         assertTrue(result.approximatelyEquals(rc5D12F56T1));
-        assertEquals(nameEngine.get("T").toNumber(), 0L);
+        assertEquals(nameEngine.get("T").toLong(), 0L);
         assertEquals(rc5.getMemoryVariable("T"), 0L);
 
         nameEngine = new NameEngine("{D=12,F=56, T=0}");
         result = rc5.toIrSignal(nameEngine);
-        assertEquals(nameEngine.get("T").toNumber(), 1L);
+        assertEquals(nameEngine.get("T").toLong(), 1L);
         assertEquals(rc5.getMemoryVariable("T"), 1L);
         assertTrue(result.approximatelyEquals(rc5D12F56T0));
     }

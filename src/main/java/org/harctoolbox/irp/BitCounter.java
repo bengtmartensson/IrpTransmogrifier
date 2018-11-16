@@ -35,7 +35,7 @@ public class BitCounter {
             NameEngine definitions = protocol.getDefinitions();
             for (Map.Entry<String, Expression> kvp : definitions) {
                 String name = kvp.getKey();
-                long value = kvp.getValue().toNumber();
+                long value = kvp.getValue().toLong();
                 if (!result.containsKey(name)) {
                     Integer length = protocol.guessParameterLength(name);
                     result.put(name, length != null ? new BitCounter(length, false) : new BitCounter(true));

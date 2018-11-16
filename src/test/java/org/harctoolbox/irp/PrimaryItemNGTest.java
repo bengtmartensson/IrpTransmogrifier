@@ -40,7 +40,7 @@ public class PrimaryItemNGTest {
         try {
             System.out.println("newPrimaryItem");
             PrimaryItem result = PrimaryItem.newPrimaryItem(42);
-            assertEquals(result.toNumber(nameEngine), 42);
+            assertEquals(result.toLong(nameEngine), 42);
         } catch (NameUnassignedException ex) {
             fail();
         }
@@ -56,13 +56,13 @@ public class PrimaryItemNGTest {
             System.out.println("newPrimaryItem");
             PrimaryItem result = PrimaryItem.newPrimaryItem("A");
             assertTrue(result instanceof Name);
-            assertEquals(result.toNumber(nameEngine), 7);
+            assertEquals(result.toLong(nameEngine), 7);
             result = PrimaryItem.newPrimaryItem("54321");
             assertTrue(result instanceof Number);
-            assertEquals(result.toNumber(nameEngine), 54321);
+            assertEquals(result.toLong(nameEngine), 54321);
             result = PrimaryItem.newPrimaryItem("(#A)");
             assertTrue(result instanceof Expression);
-            assertEquals(result.toNumber(nameEngine), 3);
+            assertEquals(result.toLong(nameEngine), 3);
         } catch (InvalidNameException | NameUnassignedException ex) {
             fail();
         }

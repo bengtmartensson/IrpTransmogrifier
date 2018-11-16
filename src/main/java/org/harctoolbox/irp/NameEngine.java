@@ -144,10 +144,10 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             try {
                 String name = kvp.getKey();
-                long value = kvp.getValue().toNumber(this);
+                long value = kvp.getValue().toLong(this);
                 Expression expr = other.get(name);
-                if (value != expr.toNumber(other)) {
-                    logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toNumber(other)});
+                if (value != expr.toLong(other)) {
+                    logger.log(Level.INFO, "Variable \"{0}\" valued {1} instead of {2}", new Object[]{name, value, expr.toLong(other)});
                     return false;
                 }
             } catch (NameUnassignedException ex) {
@@ -166,7 +166,7 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         for (Map.Entry<String, Expression> kvp : map.entrySet()) {
             try {
                 String name = kvp.getKey();
-                long value = kvp.getValue().toNumber(this);
+                long value = kvp.getValue().toLong(this);
 
                 if (value != other.get(name))
                     return false;
@@ -276,9 +276,9 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         return expression;
     }
 
-    public long toNumber(String name) throws NameUnassignedException {
+    public long toLong(String name) throws NameUnassignedException {
         Expression expression = get(name);
-        return expression.toNumber(this);
+        return expression.toLong(this);
     }
 
     public boolean containsKey(String name) {
@@ -319,7 +319,7 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         HashMap<String, Long> result = new HashMap<>(map.size());
         map.entrySet().forEach((kvp) -> {
             try {
-                result.put(kvp.getKey(), kvp.getValue().toNumber(this));
+                result.put(kvp.getKey(), kvp.getValue().toLong(this));
             } catch (NameUnassignedException ex) {
                 throw new ThisCannotHappenException(ex);
             }
@@ -337,9 +337,9 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
             Expression val = kvp.getValue();
             if (map.containsKey(name)) {
                 try {
-                    if (map.get(name).toNumber(this) != val.toNumber(nameEngine)) {
+                    if (map.get(name).toLong(this) != val.toLong(nameEngine)) {
                         logger.log(Level.FINER, "Name conflict {0}", name);
-                        throw new ParameterInconsistencyException(name, map.get(name).toNumber(this), val.toNumber(nameEngine));
+                        throw new ParameterInconsistencyException(name, map.get(name).toLong(this), val.toLong(nameEngine));
                     }
                 } catch (NameUnassignedException ex) {
                     throw new ThisCannotHappenException(ex);
@@ -378,7 +378,7 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
             Expression exp = kvp.getValue();
             long val;
             try {
-                val = exp.toNumber();
+                val = exp.toLong();
                 result.put(name, val);
             } catch (NameUnassignedException ex) {
             }

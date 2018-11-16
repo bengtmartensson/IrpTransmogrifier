@@ -66,6 +66,19 @@ public class IctImporter {
         return ictImporter.sequences;
     }
 
+    /**
+     * Reads an ICT file from URL or file, produces a map of ModulatedIrSequence-s.
+     * @param urlOrFilename URL or Filename
+     * @return Map name -&gt; ModulatedIrSequence
+     * @throws IOException
+     * @throws UnsupportedEncodingException
+     * @throws ParseException
+     */
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
+    public static Map<String, ModulatedIrSequence> parse(String urlOrFilename) throws IOException, UnsupportedEncodingException, ParseException {
+        return parse(urlOrFilename, IrCoreUtils.DEFAULT_CHARSET_NAME);
+    }
+
     private int lineNumber;
     private int anonymousNumber;
     private int frequency = INVALID;

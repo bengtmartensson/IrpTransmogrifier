@@ -82,6 +82,14 @@ public final class Number extends PrimaryItem {
         }
     }
 
+    private static String pad(String rawString, int length, double noBits) {
+        StringBuilder str = new StringBuilder(rawString);
+        int effectiveLength = (int) Math.ceil(length/noBits);
+        while (str.length() < effectiveLength)
+            str.insert(0, '0');
+        return str.toString();
+    }
+
     private java.lang.Number data;
 
     public Number(java.lang.Number n) {
@@ -200,5 +208,10 @@ public final class Number extends PrimaryItem {
     @Override
     public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
         return this;
+    }
+
+    public String formatIntegerWithLeadingZeros(int radix, int length) {
+        return data instanceof Long ? IrCoreUtils.formatIntegerWithLeadingZeros(data.longValue(), radix, length)
+                : pad(((BigInteger) data).toString(radix), length, Math.log(radix)/Math.log(2.0));
     }
 }

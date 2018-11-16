@@ -882,14 +882,10 @@ public final class IrpTransmogrifier {
                     Protocol protocol = protocols.get(i);
                     NameEngine definitions = protocol.getDefinitions();
                     for (Map.Entry<String, Expression> definition : definitions) {
-                        try {
-                            String name = definition.getKey();
-                            int length = protocol.guessParameterLength(name);
-                            long num = definition.getValue().toLong();
-                            out.print("\t" + IrCoreUtils.formatIntegerWithLeadingZeros(num, commandAnalyze.radix, length));
-                        } catch (NameUnassignedException ex) {
-                            throw new ThisCannotHappenException(ex);
-                        }
+                        String name = definition.getKey();
+                        int length = protocol.guessParameterLength(name);
+                        Number num = definition.getValue().toNumber();
+                        out.print("\t" + num.formatIntegerWithLeadingZeros(commandAnalyze.radix, length));
                     }
                     out.println();
                 }

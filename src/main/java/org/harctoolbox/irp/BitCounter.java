@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,7 +34,7 @@ public class BitCounter {
             NameEngine definitions = protocol.getDefinitions();
             for (Map.Entry<String, Expression> kvp : definitions) {
                 String name = kvp.getKey();
-                long value = kvp.getValue().toLong();
+                Number value = kvp.getValue().toNumber();
                 if (!result.containsKey(name)) {
                     Integer length = protocol.guessParameterLength(name);
                     result.put(name, length != null ? new BitCounter(length, false) : new BitCounter(true));
@@ -101,12 +100,23 @@ public class BitCounter {
         numberBits = Math.max(numberBits, bitNo);
     }
 
+    public void aggregate(Number x, int length) {
+        Number left = x;
+        int bitNo = 0;
+        while (!left.isZero() || bitNo < length) {
+            table.put(bitNo, getCount(bitNo).update((int) left.and(1)));
+            left = left.shiftRight(1);
+            bitNo++;
+        }
+        numberBits = Math.max(numberBits, bitNo);
+    }
+
     public void aggregate(long x) {
         aggregate(x, numberBits);
     }
 
-    public void aggregate(BigInteger x) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void aggregate(Number x) {
+        aggregate(x, numberBits);
     }
 
     public static enum BitCounterType {

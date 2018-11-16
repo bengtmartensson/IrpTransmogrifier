@@ -79,6 +79,11 @@ final class NumberExpression extends PrimaryItemExpression {
     }
 
     @Override
+    public Number toNumber() {
+        return number;
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element el = super.toElement(document);
         el.appendChild(number.toElement(document));

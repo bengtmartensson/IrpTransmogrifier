@@ -124,11 +124,27 @@ public final class Number extends PrimaryItem {
         }
     }
 
+    public boolean isZero() {
+        return data instanceof Long ? data.longValue() == 0 : data.equals(BigInteger.ZERO);
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 67 * hash + Objects.hashCode(this.data);
         return hash;
+    }
+
+    public Number shiftRight(int n) {
+        return data instanceof Long
+                ? new Number(((Long)data) >> n)
+                : new Number(((BigInteger) data).shiftRight(n));
+    }
+
+    long and(long mask) {
+         return data instanceof Long
+                ? (Long)data & mask
+                : ((BigInteger) data).and(BigInteger.valueOf(mask)).longValueExact();
     }
 
     public String toString(int radix) {

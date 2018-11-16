@@ -137,6 +137,11 @@ public abstract class Expression extends PrimaryItem {
         return toLong(NameEngine.empty);
     }
 
+    // presently implemented only in NumberExpression
+    public Number toNumber() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     @Override
     public Map<String, Object> propertiesMap(int noProperites) {
         return IrpUtils.propertiesMap(noProperites, "Expression");

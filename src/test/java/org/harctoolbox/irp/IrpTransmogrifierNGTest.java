@@ -173,7 +173,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze9() {
         System.out.println("analyze9");
-        String args = "analyze " + BIPHASE;
+        String args = "analyze --maxparameterwidth 63 " + BIPHASE;
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{40.2k,398,msb}<1,-1|-1,1>(A:63,B:13,-19.456m)*{A=0x7ff0404040400004,B=0x80}");
     }
@@ -181,7 +181,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze10() {
         System.out.println("analyze10");
-        String args = "analyze -f 12345 " + BIPHASE;
+        String args = "analyze -f 12345 --maxparameterwidth 63 " + BIPHASE;
         String result = IrpTransmogrifier.execute(args);
         assertEquals(result, "{12.3k,398,msb}<1,-1|-1,1>(A:63,B:13,-19.456m)*{A=0x7ff0404040400004,B=0x80}");
     }

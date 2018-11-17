@@ -17,11 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  *
@@ -73,20 +72,16 @@ public class BitCounter {
         return table.containsKey(n) ? table.get(n) : unassigned;
     }
 
-    public List<String> toStringList() {
-        List<String> result = new ArrayList<>(numberBits);
+    public String toString(CharSequence delimiter) {
+        StringJoiner str = new StringJoiner(delimiter);
         for (int i = numberBits - 1; i >= 0; i--)
-            result.add(getCount(i).toString());
-        return result;
+            str.add(getCount(i).toString());
+        return str.toString();
     }
 
     @Override
     public String toString() {
         return toString("");
-    }
-
-    public String toString(String separator) {
-        return String.join(separator, toStringList());
     }
 
     public void aggregate(long x, int length) {

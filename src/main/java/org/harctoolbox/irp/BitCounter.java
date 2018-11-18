@@ -25,9 +25,9 @@ import java.util.StringJoiner;
 /**
  *
  */
-public class BitCounter {
+public final class BitCounter {
 
-    public static Map<String, BitCounter> scrutinizeProtocols(Iterable<Protocol> protocols) throws NameUnassignedException {
+    public static Map<String, BitCounter> scrutinizeProtocols(Iterable<Protocol> protocols) {
         LinkedHashMap<String, BitCounter> result = new LinkedHashMap<>(4);
         for (Protocol protocol : protocols) {
             NameEngine definitions = protocol.getDefinitions();
@@ -68,14 +68,19 @@ public class BitCounter {
         this(length, false);
     }
 
-    private BitCounterType getCount(int n) {
-        return table.containsKey(n) ? table.get(n) : unassigned;
+    public int getNumberBits() {
+        return numberBits;
+    }
+
+    public BitCounterType getType(int n) {
+        BitCounterType val = table.get(n);
+        return val != null ? val : unassigned;
     }
 
     public String toString(CharSequence delimiter) {
         StringJoiner str = new StringJoiner(delimiter);
         for (int i = numberBits - 1; i >= 0; i--)
-            str.add(getCount(i).toString());
+            str.add(getType(i).toString());
         return str.toString();
     }
 
@@ -88,7 +93,7 @@ public class BitCounter {
         long left = x;
         int bitNo = 0;
         while (left != 0 || bitNo < length) {
-            table.put(bitNo, getCount(bitNo).update((int) left & 1));
+            table.put(bitNo, getType(bitNo).update((int) left & 1));
             left >>= 1;
             bitNo++;
         }
@@ -99,7 +104,7 @@ public class BitCounter {
         Number left = x;
         int bitNo = 0;
         while (!left.isZero() || bitNo < length) {
-            table.put(bitNo, getCount(bitNo).update((int) left.and(1)));
+            table.put(bitNo, getType(bitNo).update((int) left.and(1)));
             left = left.shiftRight(1);
             bitNo++;
         }

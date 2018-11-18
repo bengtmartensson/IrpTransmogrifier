@@ -148,8 +148,12 @@ public final class IrpTransmogrifier {
             return null;
 
         double sum = 0;
-        for (ModulatedIrSequence seq : seqs)
-            sum += seq.getFrequency();
+        for (ModulatedIrSequence seq : seqs) {
+            Double freq = seq.getFrequency();
+            if (freq == null)
+                return null;
+            sum += freq;
+        }
         return sum / seqs.size();
     }
 
@@ -796,7 +800,7 @@ public final class IrpTransmogrifier {
 
     private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws NoDecoderMatchException, InvalidArgumentException {
         if (irSequences.isEmpty())
-                throw new InvalidArgumentException("No parseable sequences found.");
+            throw new InvalidArgumentException("No parseable sequences found.");
         Analyzer analyzer = new Analyzer(irSequences, possiblyOverrideWithAnalyzeFrequency(frequency), commandAnalyze.repeatFinder || commandAnalyze.dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
         analyze(analyzer, null);
     }
@@ -859,16 +863,22 @@ public final class IrpTransmogrifier {
             }
 
             if (commandAnalyze.bitUsage) {
-                try {
-                    out.println();
-                    out.println("Bit usage analysis:");
-                    Map<String, BitCounter> bitStatistics = BitCounter.scrutinizeProtocols(protocols);
-                    bitStatistics.entrySet().forEach((kvp) -> {
-                        out.println(kvp.getKey() + "\t" + kvp.getValue().toString());
-                    });
-                } catch (NameUnassignedException ex) {
-                    throw new ThisCannotHappenException(ex);
+                out.println();
+                out.println("Bit usage analysis:");
+                Map<String, BitCounter> bitStatistics = BitCounter.scrutinizeProtocols(protocols);
+                bitStatistics.entrySet().forEach((kvp) -> {
+                    out.println(kvp.getKey() + "\t" + kvp.getValue().toString() + (commandAnalyze.lsb ? " (note: lsb-first)" : ""));
+                });
+                //#if duplicates
+                out.println("Duplicates analysis:");
+                DuplicateFinder duplicateFinder = new DuplicateFinder(protocols, bitStatistics);
+                Map<String, DuplicateFinder.DuplicateCollection> duplicates = duplicateFinder.getDuplicates();
+                for (Map.Entry<String, DuplicateFinder.DuplicateCollection> kvp : duplicates.entrySet()) {
+                    out.println(kvp.getKey() + "\t" + kvp.getValue().toString()
+                            + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
+                            + (commandAnalyze.lsb ? " (note: lsb-first)" : ""));
                 }
+                //#endif duplicates
             }
 
             if (commandAnalyze.parameterTable) {

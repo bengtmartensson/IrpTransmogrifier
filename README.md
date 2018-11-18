@@ -170,7 +170,9 @@ a modulation frequency), it is ignored.
 Using the option `--input`, instead the content of a file can be taken
 as input, containing sequences to be analyzed, one per line, blank
 lines ignored. Using the option `--namedinput`, the sequences may have
-names, immediately preceeding the signal.
+names, immediately preceeding the sequence.
+In both cases, the data is taken as IrSequences.
+IrSignals, with intro-, repeat-, and ending, are coerced into IrSequences.
 
 In the Harctoolbox world, IR sequences start with a flash (mark) and ends with a
 non-zero gap (space). In some other "worlds", the last gap is omitted. These signal

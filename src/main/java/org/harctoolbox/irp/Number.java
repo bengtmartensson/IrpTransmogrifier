@@ -214,4 +214,10 @@ public final class Number extends PrimaryItem {
         return data instanceof Long ? IrCoreUtils.formatIntegerWithLeadingZeros(data.longValue(), radix, length)
                 : pad(((BigInteger) data).toString(radix), length, Math.log(radix)/Math.log(2.0));
     }
+
+    public boolean testBit(int n) {
+         return data instanceof Long
+                ? (((Long)data) & (1L << n)) != 0
+                : ((BigInteger) data).testBit(n);
+    }
 }

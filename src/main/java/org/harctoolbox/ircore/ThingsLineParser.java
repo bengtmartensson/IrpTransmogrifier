@@ -131,7 +131,7 @@ public class ThingsLineParser<T> {
                 continue;
             String name = line;
             try {
-                T thing = parseThing(in, false);
+                T thing = parseThing(in, true);
                 if (thing != null)
                    map.put(name, thing);
             } catch (NumberFormatException | InvalidArgumentException ex) {

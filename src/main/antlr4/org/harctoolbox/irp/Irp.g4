@@ -233,7 +233,6 @@ number:
     | 'UINT16_MAX'
     | 'UINT24_MAX'
     | 'UINT32_MAX'
-    | 'UINT48_MAX'
     | 'UINT64_MAX'
 ;
 

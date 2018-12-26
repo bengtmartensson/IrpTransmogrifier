@@ -103,7 +103,7 @@ public class IrSequence implements Cloneable {
 
     private static double[] fixOddLength(double[] data, Double dummyGapDuration) throws OddSequenceLengthException {
         if (data.length % 2 != 0) {
-            if (dummyGapDuration == null) {
+            if (dummyGapDuration == null || data.length < 2) {
                 checkOddLength(data);
                 return data;
             } else {

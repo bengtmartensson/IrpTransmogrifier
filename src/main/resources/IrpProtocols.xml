@@ -1012,6 +1012,7 @@ In ProntoEdit, DecodeIr's "Device" is called "Customer Code"; DecodeIr's "Subdev
             </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Sharp" name="Sharp">
+        <irp:parameter name="prefer-over">Sharp{1}</irp:parameter>
         <irp:irp><![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,1:2,1,-165,D:5,~F:8,2:2,1,-165)*[D:0..31,F:0..255]]]></irp:irp>
         <irp:documentation>A Sharp signal, which is identical to <a href="#Denon">Denon</a>, has two halves, either one of which is enough to fully decode the information. A significant fraction of Sharp learned signals contain just one half or have the halves separated so that DecodeIr can't process them together. When one half is seen separate from the other, DecodeIr will name the protocol Sharp{1} or Sharp{2} depending on which half is decoded. Sharp, Sharp{1} and Sharp{2} all represent the same protocol when they are correct.  But only Sharp is robust. A Sharp{1} or Sharp{2} decode might be <A href="#spurious">spurious</A>.</irp:documentation>
     </irp:protocol>

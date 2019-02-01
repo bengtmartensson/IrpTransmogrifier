@@ -137,7 +137,7 @@ public class Cleaner {
         int last = -99999;
         for (int d : sorted) {
             if (!IrCoreUtils.approximatelyEquals(d, last, (int) absoluteTolerance, relativeTolerance)) {
-                int representative = d + (int) absoluteTolerance;
+                int representative = d /*+ (int) absoluteTolerance*/;
                 dumbTimings.add(representative);
                 last = representative;
             }

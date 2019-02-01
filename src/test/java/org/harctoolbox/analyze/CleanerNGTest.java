@@ -96,7 +96,7 @@ public class CleanerNGTest {
     @Test
     public void testClean_3args_1() throws InvalidArgumentException {
         System.out.println("clean");
-        double absoluteTolerance = 60.0;
+        double absoluteTolerance = 120.0;
         double relativeTolerance = 0.1;
         IrSequence result = Cleaner.clean(noisy, absoluteTolerance, relativeTolerance);
         Assert.assertTrue(result.approximatelyEquals(irSequence, 3.0, 0.01));

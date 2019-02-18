@@ -7,7 +7,7 @@ BROWSELINK := /usr/local/bin/irpbrowse
 
 BROWSE := xdg-open	
 JAVA := java
-SAXON_JAR := /usr/local/saxon/saxon9he.jar
+SAXON_JAR := /opt/saxon/saxon9he.jar
 
 IRPHOME := $(abspath $(MYDIR)../target)
 IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml 

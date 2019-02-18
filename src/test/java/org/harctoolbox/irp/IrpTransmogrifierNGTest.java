@@ -20,6 +20,8 @@ public class IrpTransmogrifierNGTest {
     private static final String ACDATA = "3120, 1588, 548, 1068, 524, 1064, 548, 300, 528, 292, 544, 300, 524, 1064, 548, 300, 528, 320, 528, 1060, 520, 1092, 528, 292, 524, 1092, 520, 300, 528, 320, 524, 1064, 520, 1096, 524, 296, 540, 1076, 528, 1056, 552, 296, 520, 300, 548, 1068, 524, 320, 528, 292, 524, 1092, 528, 292, 524, 324, 524, 296, 520, 328, 520, 300, 544, 300, 528, 320, 528, 292, 524, 324, 524, 296, 520, 328, 516, 304, 524, 320, 528, 292, 576, 272, 524, 296, 552, 296, 528, 320, 528, 292, 524, 320, 528, 1060, 528, 320, 528, 292, 576, 1040, 520, 1068, 544, 300, 524, 296, 552, 296, 520, 300, 548, 300, 528, 320, 524, 1060, 524, 324, 520, 1068, 524, 1092, 520, 300, 524, 320, 528, 292, 576, 272, 524, 296, 552, 1064, 524, 320, 528, 292, 524, 328, 520, 296, 520, 328, 520, 300, 524, 320, 528, 292, 576, 272, 524, 296, 572, 276, 520, 324, 520, 300, 528, 320, 528, 292, 524, 320, 528, 292, 524, 324, 520, 300, 580, 268, 528, 292, 576, 272, 520, 324, 524, 296, 520, 328, 520, 300, 528, 316, 528, 292, 524, 324, 524, 296, 572, 276, 520, 300, 576, 272, 524, 320, 548, 272, 556, 292, 556, 264, 548, 1064, 528, 1060, 520, 1068, 556, 1060, 520, 324, 552, 272, 576, 268, 560, 1028, 572, 1044, 524, 10000";
     private static final String ACDATA1 = "4400,4250, 550,1600, 550,1600, 550,1600, 550,1550, 600,500, 550,500, 550,1600, 550,500, 550,550, 550,500, 550,500, 600,500, 550,1600, 550,1550, 550,550, 550,1600, 550,500, 550,500, 550,550, 550,500, 550,550, 550,1550, 550,550, 550,1550, 600,1550, 550,1600, 550,1600, 550,1600, 550,1550, 600,500, 550,1600, 550,500, 550,500, 550,550, 550,500, 600,450, 600,500, 550,500, 550,550, 550,1550, 550,550, 550,1600, 550,1550, 550,1600, 550,550, 550,500, 550,500, 550,550, 550,500, 550,500, 600,500, 550,500, 550,550, 550,500, 550,500, 600,500, 550,500, 550,550, 550,500, 550,500, 600,500, 550,500, 550,550, 550,500, 550,500, 550,550, 550,1600, 550,500, 550,500, 600,500, 550,500, 550,1600, 550,550, 500,550, 550,500, 550,550, 500,550, 550,550, 500,1600, 550,550, 500,550, 550,1600, 550,500, 550,1600, 550,550, 500,550, 550,1550, 550,550, 550";
     private static final String BIPHASE = "0000 0067 0000 0045 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 031F";
+    private static final String NEC1INTRO = "+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293";
+    private static final String NEC1DITTO = "+9041 -2267 +626 -96193";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -199,7 +201,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeRc5_1");
         String args = "decode -p rc5 0000 0073 000B 0000 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
         String result = IrpTransmogrifier.execute(args);
-        assertEquals(result, "RC5: {D=7,F=5}, beg=0, end=22, reps=1");
+        assertEquals(result, "RC5: {D=7,F=5}, beg=0, end=21, reps=1");
     }
 
     @Test(enabled = true)
@@ -226,7 +228,19 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testDecodeNec1OneDitto");
         String args = "decode -p nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193";
         String result = IrpTransmogrifier.execute(args);
-        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=72, reps=1");
+        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeNec1OneDittoNec1TwoDittoJunk() {
+        System.out.println("testDecodeNec1OneDittoNec1TwoDittoJunk");
+        String sequence = NEC1INTRO + " " + NEC1DITTO + " " + NEC1INTRO + " " + NEC1DITTO + " " + NEC1DITTO + "+1234 -54678";
+        String args = "decode -p nec1 " + sequence;
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {UNDECODED. length=78}");
+        args = "decode -p nec1 --recursive " + sequence;
+        result = IrpTransmogrifier.execute(args);
+        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {NEC1: {D=12,F=56,S=34}, beg=72, end=147, reps=2 {UNDECODED. length=2}}");
     }
 
     @Test(enabled = true)
@@ -243,9 +257,9 @@ public class IrpTransmogrifierNGTest {
         String recs80 = "+158 -7426 +158 -7426 +158 -7426 +158 -7426 +158 -4898 +158 -7426 +158 -7426 +158 -7426 +158 -4898 +158 -4898 +158 -4898 +158 -45000";
         String junk = " 1234 5678";
         String result = IrpTransmogrifier.execute("decode " + recs80);
-        assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=24, reps=1");
+        assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=23, reps=1");
         result = IrpTransmogrifier.execute("decode " + recs80 + junk);
-        assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=24, reps=1");
+        assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=23, reps=1 {UNDECODED. length=2}");
         result = IrpTransmogrifier.execute("decode --strict " + recs80);
         assertEquals(result, "");
         result = IrpTransmogrifier.execute("decode --strict [][" + recs80 + "]");
@@ -256,11 +270,29 @@ public class IrpTransmogrifierNGTest {
     public void testDecodeRecs80Multiple() {
         System.out.println("testDecodeRecs80Multiple");
         String recs80Multiple = "+200 -7300 +200 -7350 +150 -4850 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +150 -7350 +200 -7350 +150 -4850 +200 -7300 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -4850 +200 -7350 +150 -30100 +150 -7350 +200 -4800 +200 -4850 +150 -7350 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +150 -7350 +200 -30100 +200 -7350 +150 -4850 +200 -4800 +200 -7350 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -7350 +200 -30100 +200 -7300 +200 -4850 +150 -4850 +200 -7350 +150 -4850 +150 -4850 +200 -4800 +200 -4850 +150 -4850 +200 -4800 +200 -7350 +150 -30100";
-        String result = IrpTransmogrifier.execute("decode  --keep-defaulted " + recs80Multiple);
+        String result = IrpTransmogrifier.execute("decode --keep-defaulted --recursive " + recs80Multiple);
         System.out.println(result);
-        assertEquals(result, "multiple decodes:" + IrCoreUtils.LINE_SEPARATOR
-                + "Sig1:\tRECS80: {D=2,F=1,T=1}, beg=0, end=48, reps=2" + IrCoreUtils.LINE_SEPARATOR
-                + "Sig2:\tRECS80: {D=2,F=1,T=0}, beg=48, end=120, reps=3");
+        assertEquals(result, "RECS80: {D=2,F=1,T=1}, beg=0, end=47, reps=2 {RECS80: {D=2,F=1,T=0}, beg=48, end=119, reps=3}");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeAkaiMitsubishi() {
+        System.out.println("testDecodeAkaiMitsubishi");
+        String akaiMitsubishi = "0000 006C 0000 0011 000A 0047 000A 0047 000A 0047 000A 001E 000A 001E 000A 001E 000A 0047 000A 001E 000A 0047 000A 0047 000A 0047 000A 001E 000A 0047 000A 001E 000A 001E 000A 001E 000A 031D";
+        String result = IrpTransmogrifier.execute("-f -1 decode " + akaiMitsubishi);
+        System.out.println(result);
+        assertEquals(result,"Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeAkaiMitsubishiAll() {
+        System.out.println("testDecodeAkaiMitsubishiAll");
+        String akaiMitsubishi = "0000 006C 0000 0011 000A 0047 000A 0047 000A 0047 000A 001E 000A 001E 000A 001E 000A 0047 000A 001E 000A 0047 000A 0047 000A 0047 000A 001E 000A 0047 000A 001E 000A 001E 000A 001E 000A 031D";
+        String result = IrpTransmogrifier.execute("-f -1 decode -a " + akaiMitsubishi);
+        System.out.println(result);
+        assertEquals(result,
+                "Akai: {D=7,F=104}, beg=0, end=21, reps=1 {UNDECODED. length=12}" + IrCoreUtils.LINE_SEPARATOR
+                + "  Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
     }
 
     @Test(enabled = true)
@@ -278,7 +310,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testDecodeSim2AsRepeat");
         String sim2AsRepeat = "0000 006B 0000 0012 005D 006C 002F 002E 002F 002E 002F 006B 002F 006B 002F 002E 002F 006B 002F 006B 002F 006B 002F 006B 002F 002E 002F 006B 002F 002E 002F 002E 002F 002E 002F 002E 002F 006B 002E 0928";
         String result = IrpTransmogrifier.execute("decode --proto sim2 --keep-defaulted " + sim2AsRepeat);
-        assertEquals(result, "SIM2: {D=236,F=133}, beg=0, end=36");
+        assertEquals(result, "SIM2: {D=236,F=133}, beg=0, end=35");
         result = IrpTransmogrifier.execute("decode --proto sim2 --strict " + sim2AsRepeat);
         assertEquals(result, "");
     }

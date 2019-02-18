@@ -7,7 +7,7 @@ function generate {
 }
 
 function decodeNamed {
-    $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --namedinput "$1" | diff - "$1".exp
+    $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --namedinput "$1" | diff -w - "$1".exp
 }
 
 #TRANSMOGRIFY=generate

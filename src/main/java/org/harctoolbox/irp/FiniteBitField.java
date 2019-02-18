@@ -314,7 +314,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                     // perform assignment
 
                     Name name = (Name) expression;
-                    logger.log(Level.FINE, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(10), payload, bitmask});
+                    logger.log(Level.FINER, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(10), payload, bitmask});
                     if (data instanceof Name)
                         recognizeData.add(name.toString(), rhs, bitmask);
                     else

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, 2018 Bengt Martensson.
+Copyright (C) 2017, 2018, 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -979,31 +979,24 @@ public final class IrpTransmogrifier {
             logger.log(Level.INFO, "Cleansed signal: {0}", irSequence.toString(true));
         }
 
-        List<Map<String, Decoder.Decode>> decodes = decoder.decode(irSequence, commandDecode.strict, commandDecode.noPreferOver,
-                ! commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
-                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
-        if (decodes.isEmpty())
-            printDecodes(null, name, maxNameLength);
-        else if (decodes.size() == 1)
-            printDecodes(decodes.get(0), name, maxNameLength);
-        else {
-            out.println(name != null ? (name + " (multiple decodes):") : ("multiple decodes:"));
-            for (int i = 0; i < decodes.size(); i++) {
-                printDecodes(decodes.get(i), "Sig" + (i+1), maxNameLength);
-            }
-        }
+        Decoder.DecoderParameters decoderParams = newDecoderParameters();
+        Decoder.DecodeTree decodes = decoder.decode(irSequence, decoderParams, 0);
+        printDecodes(decodes, name, maxNameLength);
     }
 
+    private Decoder.DecoderParameters newDecoderParameters() {
+        return new Decoder.DecoderParameters(commandDecode.strict, commandDecode.noPreferOver,
+                ! commandDecode.keepDefaultedParameters, commandDecode.recursive, commandLineArgs.frequencyTolerance,
+                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
+    }
 
     private void decodeIrSignal(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
         if (commandDecode.cleaner) {
             irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
         }
-
-        Map<String,Decoder.Decode> decodes = decoder.decode(irSignal, commandDecode.strict, commandDecode.noPreferOver,
-                ! commandDecode.keepDefaultedParameters, commandLineArgs.frequencyTolerance,
-                commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
+        Decoder.DecoderParameters params = newDecoderParameters();
+        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, params);
         printDecodes(decodes, name, maxNameLength);
     }
 
@@ -1011,12 +1004,36 @@ public final class IrpTransmogrifier {
         if (name != null)
             out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
 
-        if (decodes != null)
-            decodes.values().forEach((kvp) -> {
-                out.println("\t" + kvp.toString(commandDecode.radix, commandLineArgs.tsvOptimize ? "\t" : " "));
-            });
+        if (decodes == null || decodes.isEmpty()) {
+            out.println();
+            return;
+        }
+
+        decodes.values().forEach((kvp) -> {
+            out.println("\t" + kvp.toString(commandDecode.radix, commandLineArgs.tsvOptimize ? "\t" : " "));
+        });
+    }
+
+    private void printDecodes(Decoder.DecodeTree decodes, String name, int maxNameLength) {
+        if (name != null)
+            out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
+
         if (decodes == null || decodes.isEmpty())
             out.println();
+        else {
+            boolean first = true;
+            for (Decoder.TrunkDecodeTree decode : decodes) {
+                printDecodes(decode, first ? 0 : maxNameLength + 2);
+                first = false;
+            }
+        }
+    }
+
+    private void printDecodes(Decoder.TrunkDecodeTree decode, int indent) {
+        if (commandLineArgs.tsvOptimize)
+            out.println((indent > 0 ? "\t" : "") + decode.toString(commandDecode.radix, "\t"));
+        else
+            out.println(IrCoreUtils.spaces(indent) + decode.toString(commandDecode.radix, " "));
     }
 
     private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight, boolean printTimings) {
@@ -1488,6 +1505,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = {"--radix" }, description = "Radix used for printing of output parameters.")
         private int radix = 10;
+
+        @Parameter(names = {"--recursive" }, description = "Apply decoder recursively, (for long signals).")
+        private boolean recursive = false;
 
         @Parameter(names = { "-s", "--strict"}, description = "Require intro- and repeat sequences to match exactly.")
         private boolean strict = false;

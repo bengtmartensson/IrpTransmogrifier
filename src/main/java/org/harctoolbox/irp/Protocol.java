@@ -647,16 +647,13 @@ public class Protocol extends IrpObject implements AggregateLister {
 
         Map<String, Long> parameters = names.collectedNames();
 
-        //IrpUtils.exiting(logger, Level.FINE, "recognize", result);
-        Decoder.Decode decode = new Decoder.Decode(null, parameters, beginPos, pos, noRepeatsMatched);
-
-        return decode;
+        return new Decoder.Decode(null, parameters, beginPos, pos - 1, noRepeatsMatched);
     }
 
     private void checkFrequency(Double frequency, double frequencyTolerance) throws SignalRecognitionException {
         boolean success = frequencyTolerance < 0
                 || (frequency != null && IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0));
-        logger.log(Level.FINE, "Frequency was checked, {0}OK.", success ? "" : "NOT ");
+        logger.log(Level.FINEST, "Frequency was checked, {0}OK.", success ? "" : "NOT ");
         if (!success)
             throw new SignalRecognitionException("Frequency does not match");
     }

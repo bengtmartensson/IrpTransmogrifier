@@ -1,7 +1,6 @@
 package org.harctoolbox.irp;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.harctoolbox.ircore.InvalidArgumentException;
@@ -71,7 +70,7 @@ public class DecoderNGTest {
             for (NamedProtocol protocol : decoder.getParsedProtocols()) {
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);
-                Map<String, Decode> decodes = decoder.decode(irSignal, true, true, true);
+                Map<String, Decode> decodes = decoder.decode(irSignal, true, true, true, true);
                 boolean success = false;
                 for (Decode decode : decodes.values()) {
                     System.out.println(decode);
@@ -99,13 +98,13 @@ public class DecoderNGTest {
     public void testDecode() throws InvalidArgumentException, Pronto.NonProntoFormatException {
         System.out.println("decode");
         IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C");
-        Map<String, Decode> result = decoder.decode(irSignal, true, false, false);
+        Map<String, Decode> result = decoder.decode(irSignal, true, false, false, true);
         assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35,S=243}");
-        result = decoder.decode(irSignal, true, false, true);
+        result = decoder.decode(irSignal, true, false, true, true);
         assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35}");
-        result = decoder.decode(irSignal, true, true, false);
+        result = decoder.decode(irSignal, true, true, false, true);
         assertEquals(result.size(), 2);
     }
 
@@ -129,26 +128,29 @@ public class DecoderNGTest {
         boolean strict = true;
         boolean allDecodes = true;
         boolean removeDefaultedParameters = false;
+        boolean recursive = true;
         Double frequencyTolerance = null;
         Double absoluteTolerance = null;
         Double relativeTolerance = null;
         Double minimumLeadout = null;
         Decoder instance = new Decoder("NRC17");
-        List<Map<String, Decode>> result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        Decode first = result.get(0).get("NRC17");
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Decoder.DecodeTree result = instance.decode(irSequence, params, 0);
+        Decode first = result.getDecode(0);
         assertTrue(nrc17NameEngine.numericallyEquals(first));
         assertEquals(first.getBegPos(), 0);
-        assertEquals(first.getEndPos(), 164);
+        assertEquals(first.getEndPos(), 163);
         assertEquals(first.getNumberOfRepetitions(), 3);
 
         irSequence = new ModulatedIrSequence(nrc17Intro, NRC17_FREQUENCY);
-        result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = instance.decode(irSequence, params, 0);
         assertEquals(result.size(), 0);
 
         strict = false;
-        result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = instance.decode(irSequence, params, 0);
         assertEquals(result.size(), 1);
-        first = result.get(0).get("NRC17");
+        first = result.getDecode(0);
         assertTrue(nrc17NameEngine.numericallyEquals(first));
     }
 
@@ -164,31 +166,34 @@ public class DecoderNGTest {
         boolean strict = true;
         boolean allDecodes = true;
         boolean removeDefaultedParameters = true;
+        boolean recursive = true;
         Double frequencyTolerance = null;
         Double absoluteTolerance = null;
         Double relativeTolerance = null;
         Double minimumLeadout = null;
-        Decoder instance = new Decoder();
-        List<Map<String, Decode>> result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        assertEquals(result.size(), 0);
+        Decoder instance = new Decoder(/*"nec1", "rc5"*/);
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Decoder.DecodeTree result = instance.decode(irSequence, params, 0);
+        assertTrue(result.isEmpty());
 
         strict = false;
-        result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        assertEquals(result.size(), 2);
-        assertEquals(result.get(0).size(), 2);
-        assertEquals(result.get(1).size(), 1);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = instance.decode(irSequence, params, 0);
+        assertEquals(result.size(), 8);
+        Decoder.TrunkDecodeTree first = result.getAlternative("NEC1");
+        assertEquals(first.getName(), "NEC1");
+        Decoder.TrunkDecodeTree second = first.getRest().getAlternative("RC5");
+        assertEquals(second.getName(), "RC5");
 
         irSequence = new ModulatedIrSequence(IrSequence.concatenate(nec1Intro, rc5Seq), 37000d);
-        result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        assertEquals(result.size(), 2);
-        assertEquals(result.get(0).size(), 6);
-        assertEquals(result.get(1).size(), 1);
+        result = instance.decode(irSequence, params, 0);
+        assertEquals(result.size(), 7);
 
         allDecodes = false;
-        result = instance.decode(irSequence, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        assertEquals(result.size(), 2);
-        assertEquals(result.get(0).size(), 1);
-        assertEquals(result.get(1).size(), 1);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = instance.decode(irSequence, params, 0);
+        System.out.println(result);
+        assertEquals(result.size(), 1);
     }
 
     /**
@@ -201,6 +206,7 @@ public class DecoderNGTest {
         Decoder dec = new Decoder("NRC17");
         boolean allDecodes = true;
         boolean removeDefaultedParameters = false;
+        boolean recursive = true;
         Double frequencyTolerance = null;
         Double absoluteTolerance = null;
         Double relativeTolerance = null;
@@ -208,27 +214,33 @@ public class DecoderNGTest {
 
         IrSignal irSignal = new IrSignal(nrc17Intro, nrc17Repeat, nrc17Ending, NRC17_FREQUENCY);
         boolean strict = true;
-        Map<String, Decode> result = dec.decode(irSignal, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Map<String, Decode> result = dec.decode(irSignal, params);
         assertTrue(nrc17NameEngine.numericallyEquals(result.get("NRC17")));
 
         irSignal = new IrSignal(nrc17Intro, nrc17Repeat, null, NRC17_FREQUENCY);
         strict = true;
-        result = dec.decode(irSignal, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = dec.decode(irSignal, params);
         assertEquals(0, result.size());
         strict = false;
-        result = dec.decode(irSignal, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = dec.decode(irSignal, params);
         assertTrue(nrc17NameEngine.numericallyEquals(result.get("NRC17")));
 
         dec = new Decoder("RC5");
         irSignal = new IrSignal(rc5Seq, null, null, RC5_FREQUENCY);
         strict = true;
-        result = dec.decode(irSignal, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = dec.decode(irSignal, params);
         assertEquals(0, result.size());
         strict = false;
-        result = dec.decode(irSignal, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = dec.decode(irSignal, params);
         assertTrue(rc5NameEngineWithDefault.numericallyEquals(result.get("RC5")));
         removeDefaultedParameters = true;
-        result = dec.decode(irSignal, strict, allDecodes, removeDefaultedParameters, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        result = dec.decode(irSignal, params);
         assertTrue(rc5NameEngine.numericallyEquals(result.get("RC5")));
     }
 }

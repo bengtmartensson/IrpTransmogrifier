@@ -380,6 +380,19 @@ public class IrSequence implements Cloneable {
     }
 
     /**
+     * For the frequency given as argument, computes an array of durations in number of periods in the given frequency.
+     * @param frequency Frequency in Hz.
+     * @return integer array of durations in periods of frequency.
+     */
+    public final int[] toPulses(double frequency) {
+        int[] array = new int[data.length];
+        for (int i = 0; i < data.length; i++)
+            array[i] = (int) Math.round(Math.abs(frequency*data[i]/1000000.0));
+
+        return array;
+    }
+
+    /**
      * Returns an IrSequence consisting of this sequence, with repetitions
      * copies of the first argument appended.
      * @param tail IrSequence to be appended.

@@ -257,6 +257,15 @@ public final class IrSignal implements Cloneable {
         return introSequence.get(i);
     }
 
+    /**
+     * Returns the data in the intro sequence, as a sequence of pulses in the used frequency.
+     * @see IrSequence
+     * @return integer array of pulses
+     */
+    public int[] getIntroPulses() {
+        return introSequence.toPulses(frequency);
+    }
+
     public int getRepeatLength() {
         return repeatSequence.getLength();
     }
@@ -269,6 +278,15 @@ public final class IrSignal implements Cloneable {
         return repeatSequence.get(i);
     }
 
+    /**
+     * Returns the data in the intro sequence, as a sequence of pulses in the used frequency.
+     * @see IrSequence
+     * @return integer array of pulses
+     */
+    public int[] getRepeatPulses() {
+        return repeatSequence.toPulses(frequency);
+    }
+
     public int getEndingLength() {
         return endingSequence.getLength();
     }
@@ -279,6 +297,15 @@ public final class IrSignal implements Cloneable {
 
     public double getEndingDouble(int i) {
         return endingSequence.get(i);
+    }
+
+    /**
+     * Returns the data in the intro sequence, as a sequence of pulses in the used frequency.
+     * @see IrSequence
+     * @return integer array of pulses
+     */
+    public int[] getEndingPulses() {
+        return endingSequence.toPulses(frequency);
     }
 
     /**

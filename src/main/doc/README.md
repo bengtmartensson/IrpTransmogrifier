@@ -590,7 +590,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -s, --stdirectory
             Directory containing st (string template) files for code 
             generation. 
-            Default: <installation dependent>
+            Default: /usr/local/share/irptransmogrifier/st
         * -t, --target
             Target(s) for code generation. Use ? for a list.
             Default: []

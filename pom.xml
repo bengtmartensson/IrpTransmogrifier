@@ -92,6 +92,19 @@
                                 </fileMapper>
                             </fileMappers>
                         </transformationSet>
+                        <transformationSet>
+                            <dir>src/main/xdocs</dir>
+                            <outputDir>${project.build.directory}/generated-documents</outputDir>
+                            <includes>
+                                <include>${project.name}.xml</include>
+                            </includes>
+                            <stylesheet>tools/xdoc2html.xsl</stylesheet>
+                            <fileMappers>
+                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                                    <targetExtension>.html</targetExtension>
+                                </fileMapper>
+                            </fileMappers>
+                        </transformationSet>
                     </transformationSets>
                     <catalogs>
                         <catalog>../harctoolboxbundle/schemas/catalog.xml</catalog>

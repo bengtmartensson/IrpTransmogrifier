@@ -144,7 +144,10 @@ public final class RecognizeData extends Traverser implements Cloneable {
         return Duration.isOn(position);
     }
 
-    public double get() {
+    public double get() throws SignalRecognitionException {
+        if (position >= irSequence.getLength())
+            throw new SignalRecognitionException("IrSequence too short");
+
         return  Math.abs(irSequence.get(position)) - getHasConsumed();
     }
 
@@ -191,7 +194,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.hasConsumed = hasConsumed;
     }
 
-    public boolean leadoutOk(boolean isLast) {
+    public boolean leadoutOk(boolean isLast) throws SignalRecognitionException {
         return isLast && (get() >= minimumLeadout);
     }
 

@@ -296,6 +296,24 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testDecodeSony15() {
+        System.out.println("testDecodeSony15");
+        String sony15 = "0000 0068 0010 0000 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0100";
+        String result = IrpTransmogrifier.execute("decode -p sony15 " + sony15);
+        System.out.println(result);
+        assertEquals(result, "Sony15: {D=164,F=61}, beg=0, end=31, reps=1");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeSony15NoLeadout() {
+        System.out.println("testDecodeSony15NoLeadout");
+        String sony15 = "0000 0068 0010 0000 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0018";
+        String result = IrpTransmogrifier.execute("decode -p sony15 " + sony15);
+        System.out.println(result);
+        assertEquals(result, "");
+    }
+
+    @Test(enabled = true)
     public void testDecodeFrequency() {
         System.out.println("testDecodeFrequency");
         String amino = "0000 004A 001B 001C 0069 005A 002D 000F 000F 000F 001E 000F 000F 000F 000F 000F 000F 001E 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 001E 001E 000F 000F 001E 000F 000F 000F 000F 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 001E 001E 001E 001E 1157 0069 005A 002D 000F 000F 000F 001E 000F 000F 000F 000F 001E 000F 000F 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 000F 001E 001E 000F 000F 001E 000F 000F 000F 000F 001E 001E 000F 000F 000F 000F 000F 000F 000F 000F 001E 000F 000F 000F 000F 001E 1157";

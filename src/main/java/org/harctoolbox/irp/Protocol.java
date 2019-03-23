@@ -843,6 +843,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         return parameterSpecs.hasParameter(name);
     }
 
+    public boolean hasParameterDefault(String name) {
+        return parameterSpecs.hasParameterDefault(name);
+    }
+
     public boolean hasParameterMemory(String parameterName) {
         return parameterSpecs.hasParameterMemory(parameterName);
     }

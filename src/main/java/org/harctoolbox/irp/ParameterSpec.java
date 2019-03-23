@@ -143,6 +143,10 @@ public final class ParameterSpec extends IrpObject {
         return deflt;
     }
 
+    public boolean hasDefault() {
+        return deflt != null;
+    }
+
     public long getMin() {
         return min.toLong();
     }

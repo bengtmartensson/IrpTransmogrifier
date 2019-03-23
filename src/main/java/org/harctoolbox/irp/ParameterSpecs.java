@@ -258,6 +258,11 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return parameterSpec == null ? null : parameterSpec.getDefault();
     }
 
+    public boolean hasParameterDefault(String parameterName) {
+        ParameterSpec parameterSpec = getParameterSpec(parameterName);
+        return parameterSpec != null && parameterSpec.hasDefault();
+    }
+
     public long getParameterMax(String parameterName) throws NullPointerException {
         ParameterSpec parameterSpec = getParameterSpec(parameterName);
         return parameterSpec.getMax();

@@ -44,7 +44,8 @@ public final class IrpUtils {
     public final static int EXIT_IO_ERROR              = 7;
     public final static int EXIT_XML_ERROR             = 8;
     public final static int EXIT_DYNAMICLINK_ERROR     = 9;
-    public final static int EXIT_THISCANNOTHAPPEN      = 10;
+    public final static int EXIT_THIS_CANNOT_HAPPEN    = 10;
+    public final static int EXIT_INTERRUPTED           = 11;
     public final static int EXIT_RESTART               = 99; // An invoking script is supposed to restart the program
 
     public final static String JP1_WIKI_URL = "http://www.hifi-remote.com/wiki/index.php?title=Main_Page";

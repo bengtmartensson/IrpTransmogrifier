@@ -175,7 +175,7 @@ public final class XmlUtils {
         return index;
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) {
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements, String doctypeSystemid) {
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             if (encoding != null)
@@ -185,6 +185,8 @@ public final class XmlUtils {
             if (cdataElements != null)
                 tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
             tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            if (doctypeSystemid != null)
+                tr.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doctypeSystemid);
             tr.transform(new DOMSource(doc), new StreamResult(ostr));
         } catch (TransformerException ex) {
             logger.log(Level.SEVERE, "{0}", ex.getMessage());
@@ -192,8 +194,17 @@ public final class XmlUtils {
         }
     }
 
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) {
+        printDOM(ostr, doc, encoding, cdataElements, null);
+    }
+
+    public static void printDOM(File file, Document doc, String encoding, String cdataElements, String doctypeSystemid) throws FileNotFoundException {
+        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements, doctypeSystemid);
+        logger.log(Level.INFO, "File {0} written.", file);
+    }
+
     public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException {
-        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements);
+        printDOM(file, doc, encoding, cdataElements, null);
         logger.log(Level.INFO, "File {0} written.", file);
     }
 
@@ -206,7 +217,7 @@ public final class XmlUtils {
     // since it would been too error prone.
 
     public static void printDOM(File file, Document doc) throws FileNotFoundException {
-        printDOM(file, doc, null, null);
+        printDOM(file, doc, null, null, null);
     }
 
     public static void printDOM(Document doc) {

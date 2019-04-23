@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.harctoolbox</groupId>
             <artifactId>IrpTransmogrifier</artifactId>
-            <version>0.0.1dev</version>
+            <version>0.2.1dev</version>
             <type>jar</type>
         </dependency>
         <dependency>

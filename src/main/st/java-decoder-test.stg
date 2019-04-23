@@ -29,6 +29,7 @@ package org.harctoolbox.decoders;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.irp.*;
 import static org.testng.Assert.assertEquals;
@@ -55,7 +56,7 @@ ClassBody() ::= <<
 >>
 
 DeclareParameterlessConstructor() ::= <<
-public <ClassName()>() throws IOException, IrpException, SAXException {
+public <ClassName()>() throws IOException, IrpException, SAXException, IrpParseException {
     irpDatabase = new IrpDatabase(configFile);
     irpDatabase.expand();
     protocol = irpDatabase.getNamedProtocol("<metaData.protocolName>");
@@ -95,8 +96,9 @@ public void testDecodeSignalExhaustive() throws IrpException {
  @Test(enabled = true)
  public void testDecodeSignal() throws IrpException {
     System.out.println("decodeSignal@<metaData.protocolName>");
+    Random rng = new Random(1L);
     for (int i = 0; i \< noRandomTests; i++) {
-        Map\<String, Long> params = protocol.randomParameters();
+        Map\<String, Long> params = protocol.randomParameters(rng);
         IrSignal irSignal = protocol.toIrSignal(new NameEngine(params));
         Map\<String, Long> result = <DecoderClassName()>.decodeSignal(irSignal);
         assertEquals(result, params);

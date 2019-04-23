@@ -823,6 +823,7 @@ Many Pioneer commands are sent as combinations of two different Pioneer signals.
     </irp:protocol>
     <irp:protocol c-name="RC5x" name="RC5x">
         <irp:parameter name="uei-executor">00F2</irp:parameter>
+        <irp:parameter name="relative-tolerance">0.18</irp:parameter>
         <irp:irp><![CDATA[{36k,msb,889}<1,-1|-1,1>((1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T) [D:0..31,S:0..127,F:0..63,T@:0..1=0]]]></irp:irp>
         <irp:documentation>In Philips' (the creator of the protocol) terminology, "D" is called "System", "S" is called "Command", and is called "Data".</irp:documentation>
     </irp:protocol>

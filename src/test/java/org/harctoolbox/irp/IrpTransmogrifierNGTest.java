@@ -197,6 +197,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testDecodeRc5x() {
+        System.out.println("decodeRc5x");
+        String args = "decode --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "RC5x: {D=5,F=32,S=108,T=1}");
+    }
+
+    @Test(enabled = true)
     public void testDecodeRc5_1() {
         System.out.println("decodeRc5_1");
         String args = "decode -p rc5 0000 0073 000B 0000 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";

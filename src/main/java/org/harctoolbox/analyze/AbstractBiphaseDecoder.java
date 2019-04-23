@@ -89,29 +89,38 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
 
             switch (state) {
                 case start:
-                    if (startBits() == 0) {
-                        if (!isFlash)
-                            throw new ThisCannotHappenException();
-
-                        if (isShort)
-                            if (invert) {
-                                data.update(1);
+                    switch (startBits()) {
+                        case 0:
+                            if (!isFlash)
+                                throw new ThisCannotHappenException();
+                            if (isShort)
+                                if (invert) {
+                                    data.update(1);
+                                    state = BiphaseState.zero;
+                                } else {
+                                    state = BiphaseState.pendingFlash;
+                                }
+                            else {
+                                saveParameter(data, items, params.getBitDirection());
+                                data = new ParameterData();
+                                items.add(newFlash(time));
                                 state = BiphaseState.zero;
-                            } else {
-                                state = BiphaseState.pendingFlash;
                             }
-                        else {
-                            saveParameter(data, items, params.getBitDirection());
-                            data = new ParameterData();
-                            items.add(newFlash(time));
-                            state = BiphaseState.zero;
-                        }
-                    } else {
-                        items.add(newFlashOrGap(isFlash, time));
-                        if (invert == isFlash)
-                            foundStartBits++;
-                        if (foundStartBits == startBits())
-                            state = BiphaseState.zero;
+                            break;
+                        case 1:
+                            items.add(newFlashOrGap(isFlash, half));
+                            if (invert == isFlash)
+                                foundStartBits++;
+                            state = time == half ? BiphaseState.zero
+                                    : isFlash ? BiphaseState.pendingFlash : BiphaseState.pendingFlash ;
+                            break;
+                        default:
+                            items.add(newFlashOrGap(isFlash, time));
+                            if (invert == isFlash)
+                                foundStartBits += Math.round(((double) time) / half);
+                            if (foundStartBits == startBits())
+                                state = BiphaseState.zero;
+                            break;
                     }
                     break;
 

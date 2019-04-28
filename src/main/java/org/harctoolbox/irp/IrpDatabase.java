@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
 public final class IrpDatabase {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
 
-    public static final String STANDARD_CONFIG_PATH = "src/main/resources/IrpProtocols.xml";
+    public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml";
     public static final String IRP_PROTOCOL_NS = "http://www.harctoolbox.org/irp-protocols";
     public static final String IRP_PROTOCOL_SCHEMA_LOCATION = "http://www.harctoolbox.org/schemas/irp-protocols.xsd";
     public static final String IRP_NAMESPACE_PREFIX = "irp";
@@ -265,6 +265,10 @@ public final class IrpDatabase {
         return map;
     }
 
+    private static InputStream mkStream(String file) throws FileNotFoundException {
+        return (file == null || file.isEmpty()) ? IrpDatabase.class.getResourceAsStream(DEFAULT_CONFIG_FILE) : IrCoreUtils.getInputSteam(file);
+    }
+
     private String configFileVersion;
 
     // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
@@ -291,7 +295,7 @@ public final class IrpDatabase {
     }
 
     public IrpDatabase(String file) throws IOException {
-        this(IrCoreUtils.getInputSteam(file));
+        this(mkStream(file));
     }
 
     public IrpDatabase() throws IOException {

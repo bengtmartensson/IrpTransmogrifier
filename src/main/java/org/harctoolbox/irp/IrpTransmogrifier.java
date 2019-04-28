@@ -1148,8 +1148,7 @@ public final class IrpTransmogrifier {
 
         irpDatabase = commandLineArgs.iniFile != null ? IrpDatabase.readIni(commandLineArgs.iniFile)
                 : commandLineArgs.irp != null         ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
-                : commandLineArgs.configFile != null  ? new IrpDatabase(commandLineArgs.configFile)
-                : new IrpDatabase(getClass().getResourceAsStream(DEFAULT_CONFIG_FILE));
+                : new IrpDatabase(commandLineArgs.configFile);
     }
 
     private Double possiblyOverrideWithAnalyzeFrequency(Double frequency) {

@@ -236,8 +236,8 @@ public final class IrpTransmogrifier {
 
         try {
             argumentParser.parse(args);
-        } catch (ParameterException ex) {
-            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+        } catch (ParameterException | NumberFormatException ex) {
+            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getMessage());
         }
 
         try {

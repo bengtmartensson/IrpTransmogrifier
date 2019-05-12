@@ -38,6 +38,11 @@ all-protocols.xml: $(IRP_TRANSMOGRIFIER_JAR)
 lirc.xml: all-protocols.xml ${LIRC_TRANSFORM}
 	$(SAXON) -s:$< -xsl:${LIRC_TRANSFORM} -o:$@
 
+install-lirc.xml: ../harctoolboxbundle/IrScrutinizer/src/main/config/exportformats.d/lirc.xml lirc.xml
+
+../harctoolboxbundle/IrScrutinizer/src/main/config/exportformats.d/lirc.xml: lirc.xml
+	cp $< $@
+
 javacodetest: javarendertest javadecodertest $(JAVA_PROTOCOL_TEST)/pom.xml $(IRPPROTOCOLS_XML)
 	(cd $(JAVA_PROTOCOL_TEST); mvn test)
 

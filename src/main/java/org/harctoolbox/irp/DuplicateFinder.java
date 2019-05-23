@@ -31,22 +31,28 @@ public final class DuplicateFinder {
     private final Map<String, DuplicateCollection> result;
     private final Iterable<Protocol> protocols;
 
-    public DuplicateFinder(Iterable<Protocol> protocols, Map<String, BitCounter> bitUsage) {
+    /**
+     * Constructor
+     * @param protocols
+     * @param bitUsage
+     * @throws NameUnassignedException Thrown if not all protocols contain all variables in bitUsage.
+     */
+    public DuplicateFinder(Iterable<Protocol> protocols, Map<String, BitCounter> bitUsage) throws NameUnassignedException {
         this.protocols = protocols;
         counter = 0;
         result = new LinkedHashMap<>(bitUsage.size());
-        bitUsage.entrySet().forEach((kvp) -> {
+        for (Map.Entry<String, BitCounter> kvp : bitUsage.entrySet()) {
             String name = kvp.getKey();
             DuplicateCollection duplicates = findDuplicates(name, kvp.getValue());
             result.put(name, duplicates);
-        });
+        }
     }
 
-    public DuplicateFinder(String varName, Iterable<Protocol> protocols) {
+    public DuplicateFinder(String varName, Iterable<Protocol> protocols) throws NameUnassignedException {
         this(protocols, BitCounter.scrutinizeProtocols(protocols));
     }
 
-    private DuplicateCollection findDuplicates(String name, BitCounter bitCounter) {
+    private DuplicateCollection findDuplicates(String name, BitCounter bitCounter) throws NameUnassignedException {
         DuplicateCollection duplicates = new DuplicateCollection(bitCounter);
         int pos = bitCounter.getNumberBits() - 1;
         while (pos > 0) {
@@ -61,7 +67,7 @@ public final class DuplicateFinder {
         return duplicates;
     }
 
-    private DuplicateEntry findDuplicate(String name, BitCounter bitCounter, int pos) {
+    private DuplicateEntry findDuplicate(String name, BitCounter bitCounter, int pos) throws NameUnassignedException {
         List<DuplicateEntry.Occurance> occurances = new ArrayList<>(8);
         occurances.add(new DuplicateEntry.Occurance(pos));
 
@@ -85,7 +91,7 @@ public final class DuplicateFinder {
         return occurances.size() > 1 ? new DuplicateEntry(1, occurances, counter++) : null;
     }
 
-    private CompareType compare(String name, int pos, int i) {
+    private CompareType compare(String name, int pos, int i) throws NameUnassignedException {
         boolean identical = true;
         boolean inverted = true;
         for (Protocol protocol : protocols) {
@@ -101,13 +107,9 @@ public final class DuplicateFinder {
                 : CompareType.none;
     }
 
-    private boolean compare(String name, Protocol protocol, int pos, int i) {
-        try {
-            Number x = protocol.getDefinitions().get(name).toNumber();
-            return x.testBit(pos) == x.testBit(i);
-        } catch (NameUnassignedException ex) {
-            throw new ThisCannotHappenException(ex);
-        }
+    private boolean compare(String name, Protocol protocol, int pos, int i) throws NameUnassignedException {
+        Number x = protocol.getDefinitions().get(name).toNumber();
+        return x.testBit(pos) == x.testBit(i);
     }
 
     public Map<String, DuplicateCollection> getDuplicates() {

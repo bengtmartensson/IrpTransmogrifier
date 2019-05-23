@@ -870,13 +870,17 @@ public final class IrpTransmogrifier {
                     out.println(kvp.getKey() + "\t" + kvp.getValue().toString() + (commandAnalyze.lsb ? " (note: lsb-first)" : ""));
                 });
                 //#if duplicates
-                out.println("Duplicates analysis:");
-                DuplicateFinder duplicateFinder = new DuplicateFinder(protocols, bitStatistics);
-                Map<String, DuplicateFinder.DuplicateCollection> duplicates = duplicateFinder.getDuplicates();
-                for (Map.Entry<String, DuplicateFinder.DuplicateCollection> kvp : duplicates.entrySet()) {
-                    out.println(kvp.getKey() + "\t" + kvp.getValue().toString()
-                            + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
-                            + (commandAnalyze.lsb ? " (note: lsb-first)" : ""));
+                try {
+                    DuplicateFinder duplicateFinder = new DuplicateFinder(protocols, bitStatistics);
+                    out.println("Duplicates analysis:");
+                    Map<String, DuplicateFinder.DuplicateCollection> duplicates = duplicateFinder.getDuplicates();
+                    for (Map.Entry<String, DuplicateFinder.DuplicateCollection> kvp : duplicates.entrySet()) {
+                        out.println(kvp.getKey() + "\t" + kvp.getValue().toString()
+                                + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
+                                + (commandAnalyze.lsb ? " (note: lsb-first)" : ""));
+                    }
+                } catch (NameUnassignedException ex) {
+                    logger.warning("Duplicates analysis not possible due to different variables in the protocols.");
                 }
                 //#endif duplicates
             }

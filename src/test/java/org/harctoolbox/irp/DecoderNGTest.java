@@ -70,7 +70,7 @@ public class DecoderNGTest {
             for (NamedProtocol protocol : decoder.getParsedProtocols()) {
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);
-                Map<String, Decode> decodes = decoder.decode(irSignal, true, true, true, true);
+                Map<String, Decode> decodes = decoder.decode(irSignal, true, true, true, true, null, null, null, null);
                 boolean success = false;
                 for (Decode decode : decodes.values()) {
                     System.out.println(decode);
@@ -98,13 +98,13 @@ public class DecoderNGTest {
     public void testDecode() throws InvalidArgumentException, Pronto.NonProntoFormatException {
         System.out.println("decode");
         IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C");
-        Map<String, Decode> result = decoder.decode(irSignal, true, false, false, true);
+        Map<String, Decode> result = decoder.decode(irSignal, true, false, false, true, null, null, null, null);
         assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35,S=243}");
-        result = decoder.decode(irSignal, true, false, true, true);
+        result = decoder.decode(irSignal, true, false, true, true, null, null, null, null);
         assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35}");
-        result = decoder.decode(irSignal, true, true, false, true);
+        result = decoder.decode(irSignal, true, true, false, true, null, null, null, null);
         assertEquals(result.size(), 2);
     }
 

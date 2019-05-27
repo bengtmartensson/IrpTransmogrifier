@@ -196,11 +196,13 @@ public final class Decoder {
     }
 
     public Map<String, Decode> decode(IrSignal irSignal) {
-        return decode(irSignal, false, false, true, false);
+        return decode(irSignal, false, false, true, false, null, null, null, null);
     }
 
-    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive) {
-        DecoderParameters params = new DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive);
+    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive,
+            Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
+        DecoderParameters params = new DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive,
+                frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         return decode(irSignal, params);
     }
 
@@ -265,11 +267,7 @@ public final class Decoder {
         }
 
         public DecoderParameters() {
-            this(false, false, true, false);
-        }
-
-        public DecoderParameters(boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive) {
-            this(strict, allDecodes, removeDefaultedParameters, recursive, null, null, null, null);
+            this(false, false, true, false, null, null, null, null);
         }
 
         /**

@@ -12,10 +12,11 @@ import org.testng.annotations.Test;
  * @author bengt
  */
 public class ProntoParserNGTest {
-    private static final String nec1_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
-    private static final String nec1_12_34_56_err = "0000 006C 0022 0003 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
-    private static final String nec1_12_34_56_semantic = "0000 006C 0022 0002 15B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
-    private static final String nec_raw = "+9024 -4512 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -44268";
+    private static final String NEC1_12_34_56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+    private static final String NEC1_12_34_56_WRONG_COUNT = "0000 006C 0022 0003 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+    private static final String NEC1_12_34_56_SEMANITC = "0000 006C 0022 0002 15B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+    private static final String NEC1_12_34_56_SILLY_NUMBER = "0000 006C 0022 0002 Z15B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
+    private static final String NEC1_RAW = "+9024 -4512 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -44268";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -44,7 +45,7 @@ public class ProntoParserNGTest {
     @Test
     public void testToIrSignalAsPronto() throws Pronto.NonProntoFormatException, InvalidArgumentException {
         System.out.println("toIrSignalAsPronto");
-        ProntoParser instance = new ProntoParser(nec1_12_34_56);
+        ProntoParser instance = new ProntoParser(NEC1_12_34_56);
         IrSignal result = instance.toIrSignal();
         assertNotNull(result);
     }
@@ -57,7 +58,7 @@ public class ProntoParserNGTest {
     @SuppressWarnings("UnusedAssignment")
     public void testToIrSignal() throws InvalidArgumentException {
         System.out.println("toIrSignal");
-        ProntoParser instance = new ProntoParser(nec1_12_34_56);
+        ProntoParser instance = new ProntoParser(NEC1_12_34_56);
         IrSignal result = instance.toIrSignal();
         assertNotNull(result);
 
@@ -65,7 +66,7 @@ public class ProntoParserNGTest {
         result = instance.toIrSignal(fallbackFrequency);
         assertNotNull(result);
 
-        instance = new ProntoParser(nec1_12_34_56_err);
+        instance = new ProntoParser(NEC1_12_34_56_WRONG_COUNT);
         try {
             result = instance.toIrSignal(fallbackFrequency);
             fail();
@@ -73,11 +74,63 @@ public class ProntoParserNGTest {
             System.out.println(ex.getLocalizedMessage());
         }
 
-        instance = new ProntoParser(nec_raw);
+        instance = new ProntoParser(NEC1_RAW);
         result = instance.toIrSignal(fallbackFrequency);
         assertNull(result);
-        instance = new ProntoParser(nec1_12_34_56_semantic);
+        instance = new ProntoParser(NEC1_12_34_56_SEMANITC);
         result = instance.toIrSignal(fallbackFrequency);
+        assertNull(result);
+    }
+
+    /**
+     * Test of parse method, of class ProntoParser.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     */
+    @Test
+    public void testParse() throws InvalidArgumentException {
+        System.out.println("parse");
+
+        // Correct one
+        IrSignal result;
+        result = ProntoParser.parse(NEC1_12_34_56);
+        assertNotNull(result);
+
+        result = ProntoParser.parse(NEC1_RAW);
+        assertNull(result);
+
+        try {
+            result = ProntoParser.parse("0000 006c 0000 0000");
+            fail();
+        } catch (InvalidArgumentException ex) {
+            assertEquals(ex.getMessage(), "Pronto Hex is invalid since it is just 4 < 6 numbers long.");
+        }
+        assertNull(result);
+
+        try {
+            ProntoParser.parse("0123 006c 0002 0000 1111 1111 1111 1111");
+            fail();
+        } catch (InvalidArgumentException ex) {
+            assertEquals(ex.getMessage(), "Pronto Hex type 0x0123 not supported.");
+        }
+
+        try {
+            ProntoParser.parse("0123 006c 0002 0000 1111 1111 1111 1111 1111");
+            fail();
+        } catch (InvalidArgumentException ex) {
+            assertEquals(ex.getMessage(), "Pronto Hex is invalid since it has an odd number (9) of durations.");
+        }
+
+        result = ProntoParser.parse("0123 006c 0002 000 1111 1111 1111 1111");
+        assertNull(result);
+
+        try {
+            ProntoParser.parse(NEC1_12_34_56_WRONG_COUNT);
+            fail();
+        } catch (InvalidArgumentException ex) {
+            assertEquals(ex.getMessage(), "Inconsistent length in Pronto Hex (claimed 37 pairs, was 36 pairs).");
+        }
+
+        result = ProntoParser.parse(NEC1_12_34_56_SILLY_NUMBER);
         assertNull(result);
     }
 }

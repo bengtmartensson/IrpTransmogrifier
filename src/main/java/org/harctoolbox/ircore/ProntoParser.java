@@ -24,6 +24,17 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
 
     private final static Logger logger = Logger.getLogger(ProntoParser.class.getName());
 
+    /**
+     * Mainly for testing.
+     * @param str
+     * @return
+     * @throws InvalidArgumentException
+     */
+    public static IrSignal parse(String str) throws InvalidArgumentException {
+        ProntoParser instance = new ProntoParser(str);
+        return instance.toIrSignal();
+    }
+
     public ProntoParser(String source) {
         super(source);
     }
@@ -33,15 +44,13 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
     }
 
     /**
-     * Tries to interpret the string argument as one of our known formats, and
-     * return an IrSignal. First tries to interpret as Pronto. If this fails,
- falls back to AbstractIrParser.toIrSignal().
+     * Tries to interpret the string argument as Pronto.
      *
      * @param fallbackFrequency Modulation frequency to use, if it cannot be
      * inferred from the first parameter.
      * @param dummyGap
      * @return IrSignal, or null on failure.
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
+     * @throws org.harctoolbox.ircore.InvalidArgumentException If the signal looks like a Pronto, but is not correctly parseable.
      */
     @Override
     public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
@@ -54,7 +63,7 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
             return irSignal;
         } catch (Pronto.NonProntoFormatException ex) {
             // Signal does not look like Pronto, give up
-            logger.log(Level.FINER, "Tried as Pronto, gave up");
+            logger.log(Level.FINER, "Tried as Pronto, gave up ({0})", ex.getMessage());
             return null;
         }
     }

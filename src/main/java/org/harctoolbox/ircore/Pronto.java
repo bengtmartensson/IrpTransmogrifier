@@ -150,10 +150,10 @@ public abstract class Pronto {
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IrSignal parse(int[] ccf) throws OddSequenceLengthException, InvalidArgumentException {
-        if (ccf.length < 4)
-            throw new InvalidArgumentException("CCF is invalid since less than 4 numbers long.");
+        if (ccf.length < 6)
+            throw new InvalidArgumentException("Pronto Hex is invalid since it is just " + ccf.length + " < 6 numbers long.");
         if (ccf.length % 2 != 0)
-            throw new OddSequenceLengthException("CCF is invalid since it has an odd number ("
+            throw new OddSequenceLengthException("Pronto Hex is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
         int index = 0;
 
@@ -162,7 +162,7 @@ public abstract class Pronto {
         int introLength = ccf[index++];
         int repeatLength = ccf[index++];
         if (index + 2*(introLength+repeatLength) != ccf.length)
-            throw new InvalidArgumentException("Inconsistent length in CCF (claimed "
+            throw new InvalidArgumentException("Inconsistent length in Pronto Hex (claimed "
                     + (introLength + repeatLength) + " pairs, was " + (ccf.length - 4)/2 + " pairs).");
         IrSignal irSignal = null;
 
@@ -179,7 +179,7 @@ public abstract class Pronto {
                 break;
 
             default:
-                throw new InvalidArgumentException("CCF type 0x" + Integer.toHexString(type) + " not supported");
+                throw new InvalidArgumentException("Pronto Hex type 0x" + formatInteger(type) + " not supported.");
                 // ... but see the class org.harctoolbox.irp.ShortPronto...
         }
         return irSignal;
@@ -260,14 +260,12 @@ public abstract class Pronto {
 
         for (int i = begin; i < array.length; i++) {
             String string = array[i];
-            if (string == null || string.isEmpty())
-                throw new NonProntoFormatException("Empty or null string");
-            if (string.charAt(0) == '-' || string.charAt(0) == '+' || string.length() != CHARS_IN_DIGIT)
-                throw new NonProntoFormatException(string);
+            if (string == null || string.isEmpty() || string.charAt(0) == '-' || string.charAt(0) == '+' || string.length() != CHARS_IN_DIGIT)
+                throw new NonProntoFormatException(string, i);
             try {
                 ccf[i] = Integer.parseInt(string, 16);
             } catch (NumberFormatException ex) {
-                throw new NonProntoFormatException(ex);
+                throw new NonProntoFormatException(string, i);
             }
         }
         return ccf;
@@ -353,8 +351,8 @@ public abstract class Pronto {
 
     public static class NonProntoFormatException extends IrCoreException {
 
-        public NonProntoFormatException(String string) {
-            super("\"" + string + "\" is not a four digit hexadecimal string");
+        public NonProntoFormatException(String string, int pos) {
+            super("Position " + pos + ": \"" + string + "\" is not a four digit hexadecimal string.");
         }
 
         private NonProntoFormatException(NumberFormatException ex) {

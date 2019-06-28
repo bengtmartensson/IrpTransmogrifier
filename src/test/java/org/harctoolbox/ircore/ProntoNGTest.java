@@ -164,13 +164,13 @@ public class ProntoNGTest {
 
         // odd length
         try {
-            String ccfString = "0000 006C 0022 0002 015B";
+            String ccfString = "0000 006C 0022 0002 1111 2222 015B";
             Pronto.parse(ccfString);
             fail();
         } catch (Pronto.NonProntoFormatException ex) {
             fail();
         } catch (InvalidArgumentException ex) {
-            assertEquals(ex.getMessage(), "CCF is invalid since it has an odd number (5) of durations.");
+            assertEquals(ex.getMessage(), "Pronto Hex is invalid since it has an odd number (7) of durations.");
         }
 
         try {
@@ -181,7 +181,7 @@ public class ProntoNGTest {
         } catch (Pronto.NonProntoFormatException ex) {
             fail();
         } catch (InvalidArgumentException ex) {
-            assertEquals(ex.getMessage(), "Inconsistent length in CCF (claimed 34 pairs, was 36 pairs).");
+            assertEquals(ex.getMessage(), "Inconsistent length in Pronto Hex (claimed 34 pairs, was 36 pairs).");
         }
 
         try {
@@ -189,7 +189,7 @@ public class ProntoNGTest {
             Pronto.parse(ccfString);
             fail();
         } catch (Pronto.NonProntoFormatException ex) {
-            assertEquals(ex.getMessage(), "java.lang.NumberFormatException: For input string: \"015G\"");
+            assertEquals(ex.getMessage(), "Position 4: \"015G\" is not a four digit hexadecimal string.");
         } catch (InvalidArgumentException ex) {
             fail();
         }

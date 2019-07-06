@@ -30,7 +30,7 @@ public final class ModulatedIrSequence extends IrSequence {
     private static final double ZEROMODULATION_LIMIT = 0.000001;
     public static final double DEFAULT_FREQUENCY = 38000.0;
     public static final double DEFAULT_DUTYCYCLE = 0.4;
-    private static final double DEFAULT_DEMODULATE_THRESHOLD = 35.0;
+    public static final double DEFAULT_DEMODULATE_THRESHOLD = 35.0;
 
     public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
@@ -250,7 +250,8 @@ public final class ModulatedIrSequence extends IrSequence {
     @Override
     public String toString(boolean alternatingSigns) {
         return "{"
-                + (frequency != null ? (Integer.toString((int)Math.round(frequency)) + ",") : "")
+                + (frequency != null ? (Integer.toString((int) Math.round(frequency)) + ",") : "")
+                + (dutyCycle != null ? (Integer.toString((int) Math.round(100 * dutyCycle)) + "%,") : "")
                 + super.toString(alternatingSigns)
                 + "}";
     }

@@ -191,6 +191,7 @@ public final class IrpTransmogrifier {
      * @param args program args
      * @return
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     public ProgramExitStatus run(String[] args) {
         this.originalArguments = args.clone();
         commandLineArgs = new CommandLineArgs();
@@ -874,11 +875,11 @@ public final class IrpTransmogrifier {
                     DuplicateFinder duplicateFinder = new DuplicateFinder(protocols, bitStatistics);
                     out.println("Duplicates analysis:");
                     Map<String, DuplicateFinder.DuplicateCollection> duplicates = duplicateFinder.getDuplicates();
-                    for (Map.Entry<String, DuplicateFinder.DuplicateCollection> kvp : duplicates.entrySet()) {
+                    duplicates.entrySet().forEach((kvp) -> {
                         out.println(kvp.getKey() + "\t" + kvp.getValue().toString()
                                 + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
                                 + (commandAnalyze.lsb ? " (note: lsb-first)" : ""));
-                    }
+                    });
                 } catch (NameUnassignedException ex) {
                     logger.warning("Duplicates analysis not possible due to different variables in the protocols.");
                 }
@@ -977,6 +978,7 @@ public final class IrpTransmogrifier {
         }
     }
 
+    @SuppressWarnings("AssignmentToMethodParameter")
     private void decodeIrSequence(Decoder decoder, ModulatedIrSequence irSequence, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
         if (commandDecode.cleaner) {
             irSequence = Cleaner.clean(irSequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
@@ -994,6 +996,7 @@ public final class IrpTransmogrifier {
                 commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout);
     }
 
+    @SuppressWarnings("AssignmentToMethodParameter")
     private void decodeIrSignal(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws UsageException, InvalidArgumentException {
         if (commandDecode.cleaner) {
             irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012, 2014, 2016, 2017 Bengt Martensson.
+Copyright (C) 2012, 2014, 2016, 2017, 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ public final class ModulatedIrSequence extends IrSequence {
     private static final double ALLOWED_FREQUENCY_DEVIATION = 0.05;
     private static final double ZEROMODULATION_LIMIT = 0.000001;
     public static final double DEFAULT_FREQUENCY = 38000.0;
+    public static final double DEFAULT_DUTYCYCLE = 0.4;
+    private static final double DEFAULT_DEMODULATE_THRESHOLD = 35.0;
 
     public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
@@ -68,6 +70,58 @@ public final class ModulatedIrSequence extends IrSequence {
      */
     public static boolean isValidDutyCycle(Double dutyCycle) {
         return dutyCycle == null || (dutyCycle > 0 && dutyCycle < 1);
+    }
+
+    /**
+     * From a (non-modulated) IrSequence, consisting of on- and off-periods,
+     * remove the modulation and determine a modulation frequency and duty cycle,
+     * gathered from the statistics of the input IrSequence.
+     * @param irSequence input signal
+     * @param threshold Gaps less or equal to this quantity are squashed into a modulated flash.
+     * @return ModulatedIrSequence
+     */
+    public static ModulatedIrSequence demodulate(IrSequence irSequence, double threshold) {
+        List<Double> list = new ArrayList<>(128);
+        double pending = 0.0;
+        double sumPulses = 0.0;
+        double sumOn = 0.0;
+        int numberPulses = 0;
+        int begFlash = 0;
+        for (int i = 0; i < irSequence.getLength(); i += 2) {
+            pending += irSequence.get(i);
+            if (irSequence.get(i+1) > threshold) {
+                list.add(pending);
+                list.add(irSequence.get(i+1));
+                pending = 0;
+                begFlash = i;
+            } else {
+                pending += irSequence.get(i+1);
+                if (i > begFlash) {
+                    sumPulses += irSequence.get(i) + irSequence.get(i + 1);
+                    sumOn += irSequence.get(i);
+                    numberPulses++;
+                }
+            }
+        }
+
+        double freq = numberPulses/IrCoreUtils.microseconds2seconds(sumPulses);
+        double dutyCycle = sumOn/sumPulses;
+
+        try {
+            IrSequence seq = new IrSequence(list);
+            return new ModulatedIrSequence(seq, freq, dutyCycle);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
+    }
+
+    /**
+     * Equivalent to the two parameter version with a default threshold.
+     * @param irSequence input signal, modulated
+     * @return ModulatedIrSignal
+     */
+    public static ModulatedIrSequence demodulate(IrSequence irSequence) {
+        return demodulate(irSequence, DEFAULT_DEMODULATE_THRESHOLD);
     }
 
     /**
@@ -189,6 +243,10 @@ public final class ModulatedIrSequence extends IrSequence {
         return dutyCycle;
     }
 
+    public double getDutyCycleWithDefault() {
+        return dutyCycle != null ? dutyCycle : DEFAULT_DUTYCYCLE;
+    }
+
     @Override
     public String toString(boolean alternatingSigns) {
         return "{"
@@ -217,17 +275,52 @@ public final class ModulatedIrSequence extends IrSequence {
      * @param absoluteTolerance tolerance threshold in microseconds.
      * @param relativeTolerance relative threshold, between 0 and 1.
      * @param frequencyTolerance tolerance (absolute) for frequency in Hz.
+     * @param dutyCycleTolerance tolerance (absolute) for duty cycle (&lt; 1).
+     * @return equality within tolerance.
+     */
+    public boolean approximatelyEquals(ModulatedIrSequence irSequence, double absoluteTolerance,
+            double relativeTolerance, double frequencyTolerance, double dutyCycleTolerance) {
+        return IrCoreUtils.approximatelyEquals(this.getFrequency(), irSequence.getFrequency(), frequencyTolerance, 0.0)
+                && IrCoreUtils.approximatelyEquals(this.getDutyCycle(), irSequence.getDutyCycle(), dutyCycleTolerance, 0.0)
+                && super.approximatelyEquals(irSequence, absoluteTolerance, relativeTolerance);
+    }
+
+    /**
+     * Compares two ModulatedIrSequences for (approximate) equality.
+     *
+     * @param irSequence to be compared against this.
+     * @param absoluteTolerance tolerance threshold in microseconds.
+     * @param relativeTolerance relative threshold, between 0 and 1.
+     * @param frequencyTolerance
      * @return equality within tolerance.
      */
     public boolean approximatelyEquals(ModulatedIrSequence irSequence, double absoluteTolerance,
             double relativeTolerance, double frequencyTolerance) {
-        return IrCoreUtils.approximatelyEquals(this.getFrequency(), irSequence.getFrequency(), IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE, 0d)
-                && super.approximatelyEquals(irSequence, absoluteTolerance, relativeTolerance);
+        return approximatelyEquals(irSequence, absoluteTolerance, relativeTolerance, frequencyTolerance, IrCoreUtils.DEFAULT_DUTYCYCLE_TOLERANCE);
     }
 
-    public boolean approximatelyEquals(ModulatedIrSequence instance) {
-        return approximatelyEquals(instance, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE,
-                IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE);
+    /**
+     * Compares two ModulatedIrSequences for (approximate) equality.
+     *
+     * @param irSequence to be compared against this.
+     * @param absoluteTolerance tolerance threshold in microseconds.
+     * @param relativeTolerance relative threshold, between 0 and 1.
+     * @return equality within tolerance.
+     */
+    public boolean approximatelyEquals(ModulatedIrSequence irSequence, double absoluteTolerance,
+            double relativeTolerance) {
+        return approximatelyEquals(irSequence, absoluteTolerance, relativeTolerance, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE, IrCoreUtils.DEFAULT_DUTYCYCLE_TOLERANCE);
+    }
+
+    /**
+     * Compares two ModulatedIrSequences for (approximate) equality.
+     *
+     * @param irSequence to be compared against this.
+     * @return equality within tolerance.
+     */
+    public boolean approximatelyEquals(ModulatedIrSequence irSequence) {
+        return approximatelyEquals(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE,
+                IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE, IrCoreUtils.DEFAULT_DUTYCYCLE_TOLERANCE);
     }
 
     /**
@@ -278,5 +371,56 @@ public final class ModulatedIrSequence extends IrSequence {
     public ModulatedIrSequence clone() {
         ModulatedIrSequence result = (ModulatedIrSequence) super.clone();
         return result;
+    }
+
+    /**
+     * Generates a IrSequence, consisting of on- and off-periods,
+     * containing the modulation, as per the modulation frequency and duty cycle.
+     * If the latter is not present in the calling object,
+     * a default (currently 0.4 = 40%) is used.
+     * @return (non-modulated) IrSequence
+     */
+    public IrSequence modulate() {
+        List<Double> list = new ArrayList<>(1024);
+        for (int i = 0; i < getLength(); i += 2) {
+            List<Double> pulse = flash(get(i));
+            if (pulse.size() % 2 == 1) {
+                // ends with flash, slam the gap onto the end
+                pulse.add(get(i+1));
+            } else {
+                // ends with gap, extend that
+                double lastGap = pulse.get(pulse.size()-1);
+                lastGap += get(i+1);
+                pulse.set(pulse.size()-1, lastGap);
+            }
+            list.addAll(pulse);
+        }
+        try {
+            return new IrSequence(list);
+        } catch (OddSequenceLengthException ex) {
+            throw new ThisCannotHappenException();
+        }
+    }
+
+    private List<Double> flash(double duration) {
+        double dutyCyc = getDutyCycleWithDefault();
+        double periodTime = 1000000.0 / frequency;
+        double onPeriod = periodTime * dutyCyc;
+        double offPeriod = periodTime * (1.0 - dutyCyc);
+        List<Double> list = new ArrayList<>(128);
+        double left = duration;
+        while (left > periodTime) {
+            list.add(onPeriod);
+            list.add(offPeriod);
+            left -= periodTime;
+        }
+        if (left < onPeriod)
+            list.add(left);
+        else {
+            list.add(onPeriod);
+            left -= onPeriod;
+            list.add(left);
+        }
+        return list;
     }
 }

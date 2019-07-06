@@ -60,6 +60,11 @@ public final class IrCoreUtils {
     public static final double DEFAULT_FREQUENCY_TOLERANCE = 2000;
 
     /**
+     * Default absolute tolerance for duty cycles.
+     */
+    public static final double DEFAULT_DUTYCYCLE_TOLERANCE = 0.3;
+
+    /**
      * Default threshold value for lead-out in microseconds.
      */
     public static final double DEFAULT_MINIMUM_LEADOUT = 20000;

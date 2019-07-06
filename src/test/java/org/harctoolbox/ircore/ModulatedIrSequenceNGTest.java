@@ -1,21 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.harctoolbox.ircore;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author bengt
- */
 public class ModulatedIrSequenceNGTest {
 
     @BeforeClass
@@ -52,5 +44,34 @@ public class ModulatedIrSequenceNGTest {
         } catch (OddSequenceLengthException ex) {
             fail();
         }
+    }
+
+    /**
+     * Test of modulate method, of class ModulatedIrSequence.
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
+    @Test
+    public void testModulate() throws OddSequenceLengthException {
+        System.out.println("modulate");
+        double[] data = new double[] {100, 100, 105, 100, 92, 100};
+
+        ModulatedIrSequence instance = new ModulatedIrSequence(data, 100000.0);
+        IrSequence expResult = new IrSequence(new double[]{4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,106,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,101,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,2,100});
+        IrSequence result = instance.modulate();
+        assertTrue(expResult.approximatelyEquals(result));
+    }
+
+    /**
+     * Test of demodulate method, of class ModulatedIrSequence.
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
+    @Test
+    public void testDemodulate_IrSequence_double() throws OddSequenceLengthException {
+        System.out.println("demodulate");
+        IrSequence irSequence = new IrSequence(new double[]{4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,106,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,101,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,4,6,2,100});
+        double threshold = 20.0;
+        ModulatedIrSequence expResult = new ModulatedIrSequence(new double[]{94, 106, 104, 101, 92, 100}, 100000.0, 0.4);
+        ModulatedIrSequence result = ModulatedIrSequence.demodulate(irSequence, threshold);
+        assertTrue(expResult.approximatelyEquals(result, 0, 0.001, 0.001, 0.001));
     }
 }

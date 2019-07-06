@@ -107,7 +107,7 @@
                         </transformationSet>
                     </transformationSets>
                     <catalogs>
-                        <catalog>${project.build.directory}/../schemas/catalog.xml</catalog>
+                        <catalog>schemas/catalog.xml</catalog>
                     </catalogs>
                 </configuration>
 

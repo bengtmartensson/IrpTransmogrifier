@@ -107,7 +107,7 @@
                         </transformationSet>
                     </transformationSets>
                     <catalogs>
-                        <catalog>../harctoolboxbundle/schemas/catalog.xml</catalog>
+                        <catalog>${project.build.directory}/../schemas/catalog.xml</catalog>
                     </catalogs>
                 </configuration>
 

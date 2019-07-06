@@ -292,7 +292,7 @@ public final class IrpTransmogrifier {
                     : argumentParser.getParsedCommand();
 
             if (command == null)
-                return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "No command given.");
+                return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Usage: " + PROGRAMNAME + " [options] <command> [command_options]");
             else // For findbugs...
                 switch (command) {
                     case "analyze":
@@ -416,7 +416,7 @@ public final class IrpTransmogrifier {
     }
 
     private void shortUsage() {
-        out.println("Usage: " + PROGRAMNAME + " [options] [command] [command_options]");
+        out.println("Usage: " + PROGRAMNAME + " [options] <command> [command_options]");
         out.println("Commands:");
 
         List<String> commands = new ArrayList<>(argumentParser.getCommands().keySet());

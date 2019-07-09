@@ -88,7 +88,13 @@ public final class DuplicateFinder {
             }
         }
 
-        return occurances.size() > 1 ? new DuplicateEntry(1, occurances, counter++) : null;
+        DuplicateEntry answer;
+        if (occurances.size() > 1) {
+            answer = new DuplicateEntry(1, occurances, counter);
+            counter++;
+        } else
+            answer = null;
+        return answer;
     }
 
     private CompareType compare(String name, int pos, int i) throws NameUnassignedException {

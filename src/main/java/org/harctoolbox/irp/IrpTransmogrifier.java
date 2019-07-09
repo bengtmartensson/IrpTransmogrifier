@@ -539,7 +539,8 @@ public final class IrpTransmogrifier {
             out.println(Version.versionString);
             setupDatabase();
             irpDatabase.expand();
-            out.println("Database: " + commandLineArgs.configFile + " version: " + irpDatabase.getConfigFileVersion());
+            out.println("Database: " + (commandLineArgs.configFile != null ? commandLineArgs.configFile : "")
+                    + " version: " + irpDatabase.getConfigFileVersion());
 
             out.println("JVM: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("os.name") + "-" + System.getProperty("os.arch"));
             out.println();

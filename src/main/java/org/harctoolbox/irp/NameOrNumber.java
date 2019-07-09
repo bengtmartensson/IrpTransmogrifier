@@ -104,4 +104,9 @@ public final class NameOrNumber extends IrpObject implements Floatable {
         hash = 97 * hash + Objects.hashCode(this.thing);
         return hash;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return thing.constant(nameEngine);
+    }
 }

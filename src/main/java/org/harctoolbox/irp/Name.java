@@ -150,6 +150,16 @@ public final class Name extends PrimaryItem implements Floatable {
         return toLong(nameEngine);
     }
 
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        try {
+            Expression expression = nameEngine.get(getName());
+            return expression.constant(nameEngine);
+        } catch (NameUnassignedException ex) {
+            return false;
+        }
+    }
+
     /**
      * @return the name
      */

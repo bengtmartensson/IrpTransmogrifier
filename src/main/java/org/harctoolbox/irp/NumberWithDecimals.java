@@ -116,4 +116,9 @@ public final class NumberWithDecimals extends IrpObject implements Floatable {
         hash = 37 * hash + (int) (Double.doubleToLongBits(this.data) ^ (Double.doubleToLongBits(this.data) >>> 32));
         return hash;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return true;
+    }
 }

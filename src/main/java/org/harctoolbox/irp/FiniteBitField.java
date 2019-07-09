@@ -418,4 +418,9 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
         return new TreeSet<>();
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return super.constant(nameEngine) && width.constant(nameEngine);
+    }
 }

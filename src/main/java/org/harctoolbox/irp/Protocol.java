@@ -177,6 +177,20 @@ public class Protocol extends IrpObject implements AggregateLister {
         normalFormVariation = new Variation(intro, repeat, ending);
     }
 
+    public boolean constantSequence(IrSignal.Pass pass) {
+        BareIrStream sequence = bitspecIrstream.extractPass(pass);
+        BitspecIrstream bitspecIrStream = new BitspecIrstream(bitspecIrstream.getBitSpec(), new IrStream(sequence));
+        return bitspecIrStream.constant(definitions);
+    }
+
+    public boolean constantNonEmptySequence(IrSignal.Pass pass) {
+        BareIrStream sequence = bitspecIrstream.extractPass(pass);
+        if (sequence.isEmpty(definitions))
+            return false;
+        BitspecIrstream bitspecIrStream = new BitspecIrstream(bitspecIrstream.getBitSpec(), new IrStream(sequence));
+        return bitspecIrStream.constant(definitions);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Protocol))
@@ -726,6 +740,8 @@ public class Protocol extends IrpObject implements AggregateLister {
         str.append(startsWithFlash() ? "SWD\t" : "\t");
         str.append(hasVariation() ? "variation\t" : "\t");
         str.append(isRPlus() ? "R+" : "");
+        str.append(constantNonEmptySequence(Pass.intro) ? "constIntro" : "");
+        str.append(constantNonEmptySequence(Pass.repeat) ? "constRepeat" : "");
         return str.toString();
     }
 

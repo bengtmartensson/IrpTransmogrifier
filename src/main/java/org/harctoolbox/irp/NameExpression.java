@@ -106,4 +106,9 @@ final class NameExpression extends PrimaryItemExpression {
     public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
         return name.substituteConstantVariables(constantVariables);
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return name.constant(nameEngine);
+    }
 }

@@ -9,6 +9,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
@@ -909,5 +910,19 @@ public class ProtocolNGTest {
         //TreeSet<Double> durations = prot.allDurationsInMicros();
         double min = nec1.minDurationDiff();
         assertEquals(min, 564.0, 0.00001);
+    }
+
+    /**
+     * Test of constantSequence method, of class Protocol.
+     */
+    @Test
+    public void testConstantSequence() {
+        System.out.println("constantSequence");
+        boolean result = nec1.constantSequence(IrSignal.Pass.intro);
+        assertFalse(result);
+        result = nec1.constantSequence(IrSignal.Pass.repeat);
+        assertTrue(result);
+        result = nec1.constantSequence(IrSignal.Pass.ending);
+        assertTrue(result);
     }
 }

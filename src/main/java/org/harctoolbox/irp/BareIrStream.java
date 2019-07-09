@@ -462,4 +462,9 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         });
         return result;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return irStreamItems.stream().noneMatch((irStreamItem) -> (!irStreamItem.constant(nameEngine)));
+    }
 }

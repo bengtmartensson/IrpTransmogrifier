@@ -220,4 +220,9 @@ public final class Number extends PrimaryItem {
                 ? (((Long)data) & (1L << n)) != 0
                 : ((BigInteger) data).testBit(n);
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return true;
+    }
 }

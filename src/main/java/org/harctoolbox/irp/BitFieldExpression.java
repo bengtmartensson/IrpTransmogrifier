@@ -101,4 +101,9 @@ final class BitFieldExpression extends PrimaryItemExpression {
     public PrimaryItem leftHandSide() {
         return bitField.data;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return bitField.constant(nameEngine);
+    }
 }

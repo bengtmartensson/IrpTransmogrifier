@@ -121,4 +121,9 @@ final class NumberExpression extends PrimaryItemExpression {
     public PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables) {
         return this;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return true;
+    }
 }

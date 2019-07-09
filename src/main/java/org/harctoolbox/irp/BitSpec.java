@@ -390,4 +390,8 @@ public final class BitSpec extends IrpObject implements AggregateLister {
 
         return result;
     }
+
+    public boolean constant(NameEngine nameEngine) {
+        return bitCodes.stream().noneMatch((bitCode) -> (!bitCode.constant(nameEngine)));
+    }
 }

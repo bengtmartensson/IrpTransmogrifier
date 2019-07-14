@@ -718,6 +718,8 @@ public final class IrpTransmogrifier {
 
         if (commandAnalyze.allDecodes && commandAnalyze.decoder != null)
             throw new UsageException("Cannot use both --alldecodes and --decode.");
+        if (commandAnalyze.allDecodes && commandAnalyze.girr)
+            throw new UsageException("Cannot use both --alldecodes and --girr.");
         if (commandAnalyze.bitUsage && (commandAnalyze.allDecodes || commandAnalyze.eliminateVars))
             throw new UsageException("Bit usage report not possible together with --all or --eliminate-vars");
         if (commandAnalyze.parameterTable && commandAnalyze.eliminateVars)
@@ -853,6 +855,14 @@ public final class IrpTransmogrifier {
             }
         } else {
             List<Protocol> protocols = analyzer.searchBestProtocol(params, commandAnalyze.decoder, commandLineArgs.regexp);
+
+            if (commandAnalyze.girr) {
+                System.err.println("NOTE: --girr supresses all other output!");
+                Document doc = ProtocolListDomFactory.protocolListToDom(protocols, names, commandAnalyze.radix);
+                XmlUtils.printDOM(out, doc, commandLineArgs.encoding, "");
+                return;
+            }
+
             int maxNameLength = IrCoreUtils.maxLength(names);
             for (int i = 0; i < protocols.size(); i++) {
                 if (protocols.size() > 1)
@@ -1322,6 +1332,9 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
         private Double frequency = null;
+
+        @Parameter(names = { "-g", "--girr"}, description = "Generate Girr file.")
+        private boolean girr = false;
 
         @Parameter(names = { "-i", "--input"}, description = "File/URL from which to take inputs, one sequence per line.")
         private String input = null;

@@ -109,9 +109,9 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 43 * hash + (int) (Double.doubleToLongBits(this.us) ^ (Double.doubleToLongBits(this.us) >>> 32));
-        hash = 43 * hash + (int) (Double.doubleToLongBits(this.time_periods) ^ (Double.doubleToLongBits(this.time_periods) >>> 32));
-        hash = 43 * hash + (int) (Double.doubleToLongBits(this.time_units) ^ (Double.doubleToLongBits(this.time_units) >>> 32));
+        hash = 43 * hash + IrCoreUtils.hashForDouble(this.us);
+        hash = 43 * hash + IrCoreUtils.hashForDouble(this.time_periods);
+        hash = 43 * hash + IrCoreUtils.hashForDouble(this.time_units);
         hash = 43 * hash + Objects.hashCode(this.nameOrNumber);
         hash = 43 * hash + Objects.hashCode(this.unit);
         return hash;

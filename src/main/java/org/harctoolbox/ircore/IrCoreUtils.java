@@ -612,6 +612,10 @@ public final class IrCoreUtils {
         return filename + ((extension != null && !hasExtension(filename)) ? ('.' + extension) : "");
     }
 
+    public static int hashForDouble(Double d) {
+        return d == null ? 0 : d.hashCode();
+    }
+
     private IrCoreUtils() {
     }
 }

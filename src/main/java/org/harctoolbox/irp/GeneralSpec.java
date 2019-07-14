@@ -153,10 +153,10 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 67 * hash + (int) (Double.doubleToLongBits(this.frequency) ^ (Double.doubleToLongBits(this.frequency) >>> 32));
-        hash = 67 * hash + (int) (Double.doubleToLongBits(this.dutyCycle) ^ (Double.doubleToLongBits(this.dutyCycle) >>> 32));
+        hash = 67 * hash + IrCoreUtils.hashForDouble(this.frequency);
+        hash = 67 * hash + IrCoreUtils.hashForDouble(this.dutyCycle);
         hash = 67 * hash + Objects.hashCode(this.bitDirection);
-        hash = 67 * hash + (int) (Double.doubleToLongBits(this.unit) ^ (Double.doubleToLongBits(this.unit) >>> 32));
+        hash = 67 * hash + IrCoreUtils.hashForDouble(this.unit);
         return hash;
     }
 

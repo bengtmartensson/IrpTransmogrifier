@@ -94,6 +94,7 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     public int hashCode() {
         int hash = 3;
         hash = 59 * hash + Objects.hashCode(this.repeatMarker);
+        hash = 59 * hash + Objects.hashCode(this.bareIrStream);
         return hash;
     }
 

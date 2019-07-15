@@ -293,15 +293,16 @@ public abstract class Pronto {
 
         int[] data = new int[4 + irSignal.getIntroLength() + irSignal.getRepeatLength()];
         int index = 0;
-        data[index++] = irSignal.getFrequency() > 0 ? LEARNED_CODE : LEARNED_UNMODULATED_CODE;
-        data[index++] = frequencyCode(irSignal.getFrequency());
+        int frequency = irSignal.getFrequencyWithDefault().intValue();
+        data[index++] = frequency > 0 ? LEARNED_CODE : LEARNED_UNMODULATED_CODE;
+        data[index++] = frequencyCode(frequency);
         data[index++] = irSignal.getIntroLength()/2;
         data[index++] = irSignal.getRepeatLength()/2;
         for (int i = 0; i < irSignal.getIntroLength(); i++)
-            data[index++] = pulsesMicroSeconds(irSignal.getIntroDouble(i), irSignal.getFrequency());
+            data[index++] = pulsesMicroSeconds(irSignal.getIntroDouble(i), frequency);
 
         for (int i = 0; i < irSignal.getRepeatLength(); i++)
-            data[index++] = pulsesMicroSeconds(irSignal.getRepeatDouble(i), irSignal.getFrequency());
+            data[index++] = pulsesMicroSeconds(irSignal.getRepeatDouble(i), frequency);
 
         return data;
     }

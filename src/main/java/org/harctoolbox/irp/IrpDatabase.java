@@ -411,7 +411,7 @@ public final class IrpDatabase {
     }
 
     public boolean isKnown(String protocol) {
-        return protocols.containsKey(protocol.toLowerCase(Locale.US));
+        return protocol != null && protocols.containsKey(protocol.toLowerCase(Locale.US));
     }
 
     public boolean isKnownExpandAlias(String protocol) {

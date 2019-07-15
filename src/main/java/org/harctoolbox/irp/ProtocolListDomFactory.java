@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -93,8 +94,9 @@ public class ProtocolListDomFactory {
 
     private Element rawToElement(IrSequence irSequence) {
         Element raw = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "raw");
-        if (analyzer.getFrequency() != null)
-            raw.setAttribute("frequency", analyzer.getFrequency().toString());
+        raw.setAttribute("frequency",
+                Integer.toString(analyzer.getFrequency() != null
+                        ? analyzer.getFrequency().intValue() : (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
         Element intro = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "intro");
         raw.appendChild(intro);
         Text content = doc.createTextNode(irSequence.toString(true, " ", "", ""));

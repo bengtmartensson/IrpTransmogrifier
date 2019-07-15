@@ -858,7 +858,7 @@ public final class IrpTransmogrifier {
 
             if (commandAnalyze.girr) {
                 System.err.println("NOTE: --girr supresses all other output!");
-                Document doc = ProtocolListDomFactory.protocolListToDom(protocols, names, commandAnalyze.radix);
+                Document doc = ProtocolListDomFactory.protocolListToDom(analyzer, protocols, names, commandAnalyze.radix);
                 XmlUtils.printDOM(out, doc, commandLineArgs.encoding, "");
                 return;
             }

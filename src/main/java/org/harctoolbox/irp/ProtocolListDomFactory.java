@@ -20,15 +20,17 @@ package org.harctoolbox.irp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.harctoolbox.analyze.Analyzer;
+import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 public class ProtocolListDomFactory {
 
-    public static Document protocolListToDom(List<Protocol> protocols, String[] names, int radix) {
-        ProtocolListDomFactory factory = new ProtocolListDomFactory(protocols, names, radix);
+    public static Document protocolListToDom(Analyzer analyzer, List<Protocol> protocols, String[] names, int radix) {
+        ProtocolListDomFactory factory = new ProtocolListDomFactory(analyzer, protocols, names, radix);
         return factory.getDocument();
     }
 
@@ -36,13 +38,15 @@ public class ProtocolListDomFactory {
     private Document doc;
     private String[] names;
     private int radix;
+    private Analyzer analyzer;
     private List<Protocol> protocols;
 
-    private ProtocolListDomFactory(List<Protocol> protocols, String[] names, int radix) {
-        if (protocols.size() != names.length)
-            throw new ThisCannotHappenException();
+    private ProtocolListDomFactory(Analyzer analyzer, List<Protocol> protocols, String[] names, int radix) {
+        if (protocols.size() != names.length || analyzer.getNoSequences() != names.length)
+            throw new IllegalArgumentException();
 
         this.protocolsWithoutDefs = new HashMap<>(8);
+        this.analyzer = analyzer;
         this.protocols = protocols;
         this.names = names;
         this.radix = radix;
@@ -69,24 +73,40 @@ public class ProtocolListDomFactory {
         commandSet.setAttribute("name", "commandSet");
         remote.appendChild(commandSet);
         for (int i = 0; i< names.length; i++)
-            commandSet.appendChild(commandToElement(protocols.get(i), names[i]));
+            commandSet.appendChild(commandToElement(protocols.get(i), names[i], analyzer.cleanedIrSequence(i)));
 
         return remote;
     }
 
-    private Element commandToElement(Protocol protocol, String name) {
+    private Element commandToElement(Protocol protocol, String name, IrSequence irSequence) {
         Element command = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "command");
         command.setAttribute("name", name);
         Element parameters = parametersToElement(protocol);
         command.appendChild(parameters);
+        Element raw = rawToElement(irSequence);
+        if (raw != null) {
+            command.appendChild(raw);
+            command.setAttribute("master", "raw");
+        }
         return command;
+    }
+
+    private Element rawToElement(IrSequence irSequence) {
+        Element raw = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "raw");
+        if (analyzer.getFrequency() != null)
+            raw.setAttribute("frequency", analyzer.getFrequency().toString());
+        Element intro = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "intro");
+        raw.appendChild(intro);
+        Text content = doc.createTextNode(irSequence.toString(true, " ", "", ""));
+        intro.appendChild(content);
+        return raw;
     }
 
     private Element parametersToElement(Protocol protocol) {
         Element parameters = defsToElement(protocol.getDefinitions());
         Protocol withoutDefs = new Protocol(protocol.getGeneralSpec(), protocol.getBitspecIrstream(), new NameEngine(), null);
 
-        parameters.setAttribute("protocol", formatKey(withoutDefs.hashCode()));
+        parameters.setAttribute("protocol", formatProtocolnameFromHash(withoutDefs.hashCode()));
         return parameters;
     }
 
@@ -110,7 +130,7 @@ public class ProtocolListDomFactory {
         Element protocolsElement = doc.createElementNS(XmlUtils.IRP_NAMESPACE, "irp:protocols");
         protocolsWithoutDefs.entrySet().forEach((proto) -> {
             Element protocolElement = doc.createElementNS(XmlUtils.IRP_NAMESPACE, "irp:protocol");
-            protocolElement.setAttribute("name", formatKey(proto.getKey()));
+            protocolElement.setAttribute("name", formatProtocolnameFromHash(proto.getKey()));
             protocolsElement.appendChild(protocolElement);
             Element irp = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "irp:irp");
             irp.appendChild(doc.createCDATASection(proto.getValue().toIrpString(radix)));
@@ -123,7 +143,7 @@ public class ProtocolListDomFactory {
         return doc;
     }
 
-    private String formatKey(Integer key) {
+    private String formatProtocolnameFromHash(Integer key) {
         return "p_" + Integer.toUnsignedString(key, 16);
     }
 }

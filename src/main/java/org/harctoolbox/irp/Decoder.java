@@ -26,10 +26,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -46,6 +48,20 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
  */
 public final class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
+
+    private static Pattern debugProtocolNamePattern= null;
+
+    /**
+     * For debugging only.
+     * @param regexp
+     */
+    public static void setDebugProtocolRegExp(String regexp) {
+        debugProtocolNamePattern = (regexp == null || regexp.isEmpty()) ? null :  Pattern.compile(regexp);
+    }
+
+    public static String getDebugProtocolRegExp() {
+        return debugProtocolNamePattern != null ? debugProtocolNamePattern.pattern() : null;
+    }
 
     /**
      * Allows to invoke the decoding from the command line.
@@ -176,7 +192,10 @@ public final class Decoder {
         Map<String, Decode> decodes = new HashMap<>(8);
         parsedProtocols.values().forEach((NamedProtocol namedProtocol) -> {
             try {
-                //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
+                if (debugProtocolNamePattern != null)
+                    if (debugProtocolNamePattern.matcher(namedProtocol.getName().toLowerCase(Locale.US)).matches())
+                        // This is intended to put a debugger breakpoint here
+                        logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
                 Map<String, Long> params = namedProtocol.recognize(irSignal, parameters.isStrict(),
                         parameters.getFrequencyTolerance(), parameters.getAbsoluteTolerance(), parameters.getRelativeTolerance(), parameters.getMinimumLeadout());
                 if (parameters.isRemoveDefaultedParameters())

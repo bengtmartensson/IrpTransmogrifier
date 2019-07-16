@@ -1014,7 +1014,7 @@ public final class IrpTransmogrifier {
             logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
         }
         Decoder.DecoderParameters params = newDecoderParameters();
-        Map<String, Decoder.Decode> decodes = decoder.decode(irSignal, params);
+        Map<String, Decoder.Decode> decodes = decoder.decodeIrSignal(irSignal, params);
         printDecodes(decodes, name, maxNameLength);
     }
 

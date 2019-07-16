@@ -71,7 +71,7 @@ public final class Decoder {
         try {
             Decoder decoder = new Decoder();
             IrSignal irSignal = Pronto.parse(args);
-            Map<String, Decode> decodes = decoder.decode(irSignal);
+            Map<String, Decode> decodes = decoder.decodeIrSignal(irSignal);
             decodes.values().forEach((kvp) -> {
                 System.out.println(kvp);
             });
@@ -178,6 +178,10 @@ public final class Decoder {
         return new TrunkDecodeTree(decode, rest);
     }
 
+    // Decoding an IrSignal is pretty different from decoding an IrSequence.
+    // For example, the return type is completely different.
+    // Therefore use different names; do not call all "decode".
+
     /**
      * Delivers a Map of Decodes from an IrSignal.
      * If {@code strict == true}, the intro, repeat, and ending sequences are required to match exactly.
@@ -190,7 +194,7 @@ public final class Decoder {
      * @param parameters
      * @return Map of decodes with protocol name as key.
      */
-    public Map<String, Decode> decode(IrSignal irSignal, DecoderParameters parameters) {
+    public Map<String, Decode> decodeIrSignal(IrSignal irSignal, DecoderParameters parameters) {
         Map<String, Decode> decodes = new HashMap<>(8);
         parsedProtocols.values().forEach((NamedProtocol namedProtocol) -> {
             try {
@@ -216,15 +220,8 @@ public final class Decoder {
         return decodes;
     }
 
-    public Map<String, Decode> decode(IrSignal irSignal) {
-        return decode(irSignal, false, false, true, false, null, null, null, null);
-    }
-
-    public Map<String, Decode> decode(IrSignal irSignal, boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive,
-            Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
-        DecoderParameters params = new DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive,
-                frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        return decode(irSignal, params);
+    public Map<String, Decode> decodeIrSignal(IrSignal irSignal) {
+        return decodeIrSignal(irSignal, new DecoderParameters());
     }
 
     private void reduce(Map<String, Decode> decodes) {
@@ -253,14 +250,14 @@ public final class Decoder {
     }
     public static class DecoderParameters {
 
-        private final boolean strict;
-        private final boolean allDecodes;
-        private final boolean removeDefaultedParameters;
-        private final boolean recursive;
-        private final Double frequencyTolerance;
-        private final Double absoluteTolerance;
-        private final Double relativeTolerance;
-        private final Double minimumLeadout;
+        private boolean strict;
+        private boolean allDecodes;
+        private boolean removeDefaultedParameters;
+        private boolean recursive;
+        private Double frequencyTolerance;
+        private Double absoluteTolerance;
+        private Double relativeTolerance;
+        private Double minimumLeadout;
         /**
          *
          * @param strict If true, intro-, repeat-, and ending sequences are
@@ -345,6 +342,62 @@ public final class Decoder {
          */
         public Double getMinimumLeadout() {
             return minimumLeadout;
+        }
+
+        /**
+         * @param strict the strict to set
+         */
+        public void setStrict(boolean strict) {
+            this.strict = strict;
+        }
+
+        /**
+         * @param allDecodes the allDecodes to set
+         */
+        public void setAllDecodes(boolean allDecodes) {
+            this.allDecodes = allDecodes;
+        }
+
+        /**
+         * @param removeDefaultedParameters the removeDefaultedParameters to set
+         */
+        public void setRemoveDefaultedParameters(boolean removeDefaultedParameters) {
+            this.removeDefaultedParameters = removeDefaultedParameters;
+        }
+
+        /**
+         * @param recursive the recursive to set
+         */
+        public void setRecursive(boolean recursive) {
+            this.recursive = recursive;
+        }
+
+        /**
+         * @param frequencyTolerance the frequencyTolerance to set
+         */
+        public void setFrequencyTolerance(Double frequencyTolerance) {
+            this.frequencyTolerance = frequencyTolerance;
+        }
+
+        /**
+         * @param absoluteTolerance the absoluteTolerance to set
+         */
+        public void setAbsoluteTolerance(Double absoluteTolerance) {
+            this.absoluteTolerance = absoluteTolerance;
+        }
+
+        /**
+         * @param relativeTolerance the relativeTolerance to set
+         */
+        public void setRelativeTolerance(Double relativeTolerance) {
+            this.relativeTolerance = relativeTolerance;
+        }
+
+        /**
+         * @param minimumLeadout the minimumLeadout to set
+         */
+        public void setMinimumLeadout(Double minimumLeadout) {
+            this.minimumLeadout = minimumLeadout;
         }
     }
 

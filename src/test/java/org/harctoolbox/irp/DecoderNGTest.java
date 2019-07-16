@@ -137,7 +137,7 @@ public class DecoderNGTest {
         Double minimumLeadout = null;
         Decoder instance = new Decoder("NRC17");
         Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        Decoder.DecodeTree result = instance.decode(irSequence, params, 0);
+        Decoder.DecodeTree result = instance.decode(irSequence, params);
         Decode first = result.getDecode(0);
         assertTrue(nrc17NameEngine.numericallyEquals(first));
         assertEquals(first.getBegPos(), 0);
@@ -145,12 +145,12 @@ public class DecoderNGTest {
         assertEquals(first.getNumberOfRepetitions(), 3);
 
         irSequence = new ModulatedIrSequence(nrc17Intro, NRC17_FREQUENCY);
-        result = instance.decode(irSequence, params, 0);
+        result = instance.decode(irSequence, params);
         assertEquals(result.size(), 0);
 
         strict = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = instance.decode(irSequence, params, 0);
+        result = instance.decode(irSequence, params);
         assertEquals(result.size(), 1);
         first = result.getDecode(0);
         assertTrue(nrc17NameEngine.numericallyEquals(first));
@@ -175,12 +175,12 @@ public class DecoderNGTest {
         Double minimumLeadout = null;
         Decoder instance = new Decoder(/*"nec1", "rc5"*/);
         Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        Decoder.DecodeTree result = instance.decode(irSequence, params, 0);
+        Decoder.DecodeTree result = instance.decode(irSequence, params);
         assertTrue(result.isEmpty());
 
         strict = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = instance.decode(irSequence, params, 0);
+        result = instance.decode(irSequence, params);
         assertEquals(result.size(), 8);
         Decoder.TrunkDecodeTree first = result.getAlternative("NEC1");
         assertEquals(first.getName(), "NEC1");
@@ -188,12 +188,12 @@ public class DecoderNGTest {
         assertEquals(second.getName(), "RC5");
 
         irSequence = new ModulatedIrSequence(IrSequence.concatenate(nec1Intro, rc5Seq), 37000d);
-        result = instance.decode(irSequence, params, 0);
+        result = instance.decode(irSequence, params);
         assertEquals(result.size(), 7);
 
         allDecodes = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = instance.decode(irSequence, params, 0);
+        result = instance.decode(irSequence, params);
         System.out.println(result);
         assertEquals(result.size(), 1);
     }

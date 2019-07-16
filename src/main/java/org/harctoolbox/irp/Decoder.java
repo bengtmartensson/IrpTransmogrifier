@@ -130,11 +130,10 @@ public final class Decoder {
      * Delivers a List of Map of Decodes from a ModulatedIrSequence.
      * @param irSequence
      * @param params
-     * @param level
      * @return List of decodes.
      */
-    public DecodeTree decode(ModulatedIrSequence irSequence, DecoderParameters params, int level) {
-        return decode(irSequence, 0, params, level);
+    public DecodeTree decode(ModulatedIrSequence irSequence, DecoderParameters params) {
+        return decode(irSequence, 0, params, 0);
     }
 
     private DecodeTree /*List<Map<String, Decode>>*/ decode(ModulatedIrSequence irSequence, int position, DecoderParameters params, int level) {

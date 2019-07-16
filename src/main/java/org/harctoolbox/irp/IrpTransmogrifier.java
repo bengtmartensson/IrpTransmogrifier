@@ -987,7 +987,7 @@ public final class IrpTransmogrifier {
         }
 
         Decoder.DecoderParameters decoderParams = newDecoderParameters();
-        Decoder.DecodeTree decodes = decoder.decode(irSequence, decoderParams, 0);
+        Decoder.DecodeTree decodes = decoder.decode(irSequence, decoderParams);
         printDecodes(decodes, name, maxNameLength);
     }
 

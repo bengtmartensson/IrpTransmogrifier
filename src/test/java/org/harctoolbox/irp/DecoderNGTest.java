@@ -66,11 +66,14 @@ public class DecoderNGTest {
     }
 
     private boolean testDecode(Random random) {
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        params.setFrequencyTolerance(1.0);
+        params.setAllDecodes(true);
         try {
             for (NamedProtocol protocol : decoder.getParsedProtocols()) {
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);
-                Map<String, Decode> decodes = decoder.decode(irSignal, true, true, true, true, null, null, null, null);
+                Map<String, Decode> decodes = decoder.decodeIrSignal(irSignal, params);
                 boolean success = false;
                 for (Decode decode : decodes.values()) {
                     System.out.println(decode);
@@ -99,15 +102,19 @@ public class DecoderNGTest {
         System.out.println("decode");
         Decoder.setDebugProtocolRegExp("^nec[0-9]$");
         IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C");
-        Map<String, Decode> result = decoder.decode(irSignal, true, false, false, true, null, null, null, null);
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        params.setRemoveDefaultedParameters(false);
+        Map<String, Decode> result = decoder.decodeIrSignal(irSignal, params);
         assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35,S=243}");
         Decoder.setDebugProtocolRegExp(null);
-        result = decoder.decode(irSignal, true, false, true, true, null, null, null, null);
+        params.setRemoveDefaultedParameters(true);
+        result = decoder.decodeIrSignal(irSignal, params);
         assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35}");
-        result = decoder.decode(irSignal, true, true, false, true, null, null, null, null);
-        assertEquals(result.size(), 2);
+        params.setAllDecodes(true);
+        result = decoder.decodeIrSignal(irSignal, params);
+        assertEquals(result.size(), 3);
     }
 
     /**
@@ -217,32 +224,32 @@ public class DecoderNGTest {
         IrSignal irSignal = new IrSignal(nrc17Intro, nrc17Repeat, nrc17Ending, NRC17_FREQUENCY);
         boolean strict = true;
         Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        Map<String, Decode> result = dec.decode(irSignal, params);
+        Map<String, Decode> result = dec.decodeIrSignal(irSignal, params);
         assertTrue(nrc17NameEngine.numericallyEquals(result.get("NRC17")));
 
         irSignal = new IrSignal(nrc17Intro, nrc17Repeat, null, NRC17_FREQUENCY);
         strict = true;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = dec.decode(irSignal, params);
+        result = dec.decodeIrSignal(irSignal, params);
         assertEquals(0, result.size());
         strict = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = dec.decode(irSignal, params);
+        result = dec.decodeIrSignal(irSignal, params);
         assertTrue(nrc17NameEngine.numericallyEquals(result.get("NRC17")));
 
         dec = new Decoder("RC5");
         irSignal = new IrSignal(rc5Seq, null, null, RC5_FREQUENCY);
         strict = true;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = dec.decode(irSignal, params);
+        result = dec.decodeIrSignal(irSignal, params);
         assertEquals(0, result.size());
         strict = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = dec.decode(irSignal, params);
+        result = dec.decodeIrSignal(irSignal, params);
         assertTrue(rc5NameEngineWithDefault.numericallyEquals(result.get("RC5")));
         removeDefaultedParameters = true;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        result = dec.decode(irSignal, params);
+        result = dec.decodeIrSignal(irSignal, params);
         assertTrue(rc5NameEngine.numericallyEquals(result.get("RC5")));
     }
 }

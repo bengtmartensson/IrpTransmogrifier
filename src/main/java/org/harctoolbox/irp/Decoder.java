@@ -144,7 +144,10 @@ public final class Decoder {
 
         parsedProtocols.values().forEach((namedProtocol) -> {
             try {
-                //logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
+                if (debugProtocolNamePattern != null)
+                    if (debugProtocolNamePattern.matcher(namedProtocol.getName().toLowerCase(Locale.US)).matches())
+                        // This is intended to put a debugger breakpoint here
+                        logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
                 TrunkDecodeTree decode = tryNamedProtocol(namedProtocol, irSequence, position, params, level);
                 list.add(decode);
             } catch (SignalRecognitionException ex) {

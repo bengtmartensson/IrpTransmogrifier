@@ -66,6 +66,12 @@ public final class XmlUtils {
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 
+    private static boolean debug = false;
+
+    public static void setDebug(boolean dbg) {
+        debug = dbg;
+    }
+
     public static Document parseStringToXmlDocument(String string, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {
         try {
             InputStream stream = new ByteArrayInputStream(string.getBytes("UTF-8"));
@@ -245,6 +251,9 @@ public final class XmlUtils {
      * @throws IOException
      */
     public static void printDOM(OutputStream ostr, Document document, String encoding, Document xslt, Map<String, String> parameters, boolean binary) throws TransformerException, IOException {
+        if (debug)
+            XmlUtils.printDOM(new File("document.xml"), document);
+
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer tr;
@@ -269,8 +278,8 @@ public final class XmlUtils {
                     Element e = (Element) nodeList.item(0);
                     e.setAttribute("encoding", encoding);
                 }
-                //if (debug)
-                //    XmlUtils.printDOM(new File("stylesheet-params.xsl"), xslt);
+                if (debug)
+                    XmlUtils.printDOM(new File("stylesheet-params.xsl"), xslt);
                 tr = factory.newTransformer(new DOMSource(xslt));
             }
             tr.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -279,8 +288,8 @@ public final class XmlUtils {
                 DOMResult domResult = new DOMResult();
                 tr.transform(new DOMSource(document), domResult);
                 Document newDoc = (Document) domResult.getNode();
-                //if (debug)
-                //    XmlUtils.printDOM(new File("girr-binary.xml"), newDoc);
+                if (debug)
+                    XmlUtils.printDOM(new File("girr-binary.xml"), newDoc);
                 NodeList byteElements = newDoc.getDocumentElement().getElementsByTagName("byte");
                 for (int i = 0; i < byteElements.getLength(); i++) {
                     int val = Integer.parseInt(byteElements.item(i).getTextContent());

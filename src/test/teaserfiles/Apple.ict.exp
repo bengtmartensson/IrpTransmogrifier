@@ -1,8 +1,0 @@
-Play:		Apple: {F=2,PairID=0},	beg=0, end=80, reps=3
-Up:		Apple: {F=5,PairID=0},	beg=0, end=72, reps=1
-Down:		Apple: {F=6,PairID=0},	beg=0, end=72, reps=1
-Left:		Apple: {F=4,PairID=0},	beg=0, end=68
-Right:		Apple: {F=3,PairID=0},	beg=0, end=68
-OK:		Apple: {F=2,PairID=0},	beg=0, end=80, reps=3
-Vol+:		NEC1-f16: {D=146,F=32,S=192},	beg=0, end=76, reps=2
-Vol-:	

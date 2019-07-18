@@ -1,6 +1,0 @@
-Input:		NEC1-f16: {D=51,F=20533},	beg=0, end=80, reps=3
-Power off:		NEC1-f16: {D=28,F=20533},	beg=0, end=80, reps=3
-Power On:		NEC1-f16: {D=28,F=20533},	beg=0, end=80, reps=3
-Vol+:		NEC2-f16: {D=161,F=20533},	beg=0, end=136, reps=2
-Vol-:		NEC2-f16: {D=162,F=20533},	beg=0, end=136, reps=2
-Mute:		NEC1-f16: {D=48,F=20533},	beg=0, end=84, reps=4

@@ -1,6 +1,0 @@
-Vol+ (multiple decodes):
-Sig1:		B&O: {D=0,F=96},	beg=0, end=44
-Sig2:		B&O repeat: {D=0,F=96},	beg=44, end=86
-Sig3:		B&O repeat: {D=0,F=96},	beg=86, end=128
-Sig4:		B&O repeat: {D=0,F=96},	beg=128, end=170
-Sig5:		B&O: {D=0,F=96},	beg=170, end=214

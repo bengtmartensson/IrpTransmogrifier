@@ -1,0 +1,6 @@
+org.harctoolbox.analyze
+org.harctoolbox.decoders
+org.harctoolbox.ircore
+org.harctoolbox.irp
+org.harctoolbox.lirc
+org.harctoolbox.renderers

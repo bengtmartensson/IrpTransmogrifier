@@ -1,7 +1,0 @@
-1:		RC5-7F-57: {D=17,F=34,T=1},	beg=0, end=132, reps=6
-2:		RC5-7F-57: {D=17,F=36},	beg=0, end=120, reps=6
-Up:		RC5-7F-57: {D=17,F=0,T=1},	beg=0, end=78, reps=3
-Down:		RC5-7F-57: {D=17,F=3},	beg=0, end=24, reps=1
-Left:		RC5-7F-57: {D=17,F=5,T=1},	beg=0, end=48, reps=2
-Right:		RC5-7F-57: {D=17,F=6},	beg=0, end=44, reps=2
-OK:		RC5-7F-57: {D=17,F=63,T=1},	beg=0, end=78, reps=3

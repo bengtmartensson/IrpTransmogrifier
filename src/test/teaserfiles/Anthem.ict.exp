@@ -1,9 +1,0 @@
-Play:		Anthem: {D=186,F=32,S=34},	beg=0, end=204, reps=1
-Stop:		Anthem: {D=186,F=35,S=34},	beg=0, end=408, reps=2
-rwd:		Anthem: {D=186,F=31,S=34},	beg=0, end=408, reps=2
-FFWD:		Anthem: {D=186,F=33,S=34},	beg=0, end=204, reps=1
-up:		Anthem: {D=186,F=24,S=34},	beg=0, end=408, reps=2
-down:		Anthem: {D=186,F=25,S=34},	beg=0, end=408, reps=2
-left:		Anthem: {D=186,F=26,S=34},	beg=0, end=204, reps=1
-right:		Anthem: {D=186,F=27,S=34},	beg=0, end=408, reps=2
-OK:		Anthem: {D=186,F=28,S=34},	beg=0, end=408, reps=2

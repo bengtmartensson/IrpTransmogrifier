@@ -3,6 +3,7 @@
 # output, for example to the lirc.xml file.
 
 MYDIR := $(dir $(firstword $(MAKEFILE_LIST)))
+TOP := $(realpath $(MYDIR)..)
 
 include $(MYDIR)/paths.mk
 include $(MYDIR)/java-test-renderer-protocols.mk
@@ -19,6 +20,9 @@ JAVA_DECODER_TESTDIR := $(JAVA_PROTOCOL_TEST)/src/test/java/org/harctoolbox/deco
 
 IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml
 
+GH_PAGES := $(TOP)/gh-pages
+ORIGINURL := $(shell git remote get-url origin)
+
 default: $(IRP_TRANSMOGRIFIER_JAR)
 	$(IRPTRANSMOGRIFIER) --help
 
@@ -28,9 +32,22 @@ $(IRP_TRANSMOGRIFIER_JAR):
 $(IRP_TRANSMOGRIFIER_JAR)-test:
 	mvn install -Dmaven.test.skip=false
 
-apidoc:
-	mvn javadoc:javadoc
+apidoc: target/site/apidocs
 	$(BROWSE) target/site/apidocs/index.html
+
+javadoc: target/site/apidocs
+
+target/site/apidocs:
+	mvn javadoc:javadoc
+
+gh-pages: target/site/apidocs
+	rm -rf $(GH_PAGES)
+	git clone --depth 1 -b gh-pages ${ORIGINURL} ${GH_PAGES}
+	cd ${GH_PAGES}
+	cp -rf ../target/apidoc/* .
+	git add *
+	git commit -a -m "Update of API documentation"
+	echo Now perform \"git push\" from ${GH_PAGES}
 
 all-protocols.xml: $(IRP_TRANSMOGRIFIER_JAR)
 	$(IRPTRANSMOGRIFIER) -o $@ code --target xml
@@ -99,5 +116,6 @@ clean:
 	mvn clean
 	rm -f all-protocols.xml lirc.xml
 	rm -rf $(JAVA_PROTOCOL_TEST)
+	rm -rf $(GH_PAGES)
 
 .PHONY: clean $(IRP_TRANSMOGRIFIER_JAR)-test

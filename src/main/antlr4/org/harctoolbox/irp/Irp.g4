@@ -112,7 +112,6 @@ bitfield:
 // abstract class PrimaryItem implements Numerical
 primary_item:
     name
-//    | DOLLAR_ID
     | number
     | para_expression
 ;

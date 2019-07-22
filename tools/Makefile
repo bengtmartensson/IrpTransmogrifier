@@ -9,8 +9,14 @@ include $(MYDIR)/paths.mk
 include $(MYDIR)/java-test-renderer-protocols.mk
 include $(MYDIR)/java-test-decoder-protocols.mk
 
+EXTRACT_VERSION := $(TOP)/tools/extract_project_version.xsl
+VERSION := $(shell $(XSLTPROC) $(EXTRACT_VERSION) pom.xml)
+IRPHOME := $(TOP)/target
+IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
+XSLT_DIR := $(IRPHOME)/xslt
+LIRC_TRANSFORM=$(XSLT_DIR)/lirc.xsl
 IRP_TRANSMOGRIFIER_JAR := $(IRPHOME)/IrpTransmogrifier-$(VERSION)-jar-with-dependencies.jar
-
+IRPTRANSMOGRIFIER := $(JAVA) -jar $(IRP_TRANSMOGRIFIER_JAR) --loglevel warning --url-decode
 JAVA_PROTOCOL_TEST := JavaTestProtocol
 
 JAVA_RENDERER_CODEDIR := $(JAVA_PROTOCOL_TEST)/src/main/java/org/harctoolbox/renderers
@@ -43,10 +49,10 @@ target/site/apidocs:
 gh-pages: target/site/apidocs
 	rm -rf $(GH_PAGES)
 	git clone --depth 1 -b gh-pages ${ORIGINURL} ${GH_PAGES}
-	cd ${GH_PAGES}
-	cp -rf ../target/apidoc/* .
-	git add *
-	git commit -a -m "Update of API documentation"
+	( cd ${GH_PAGES} ; \
+	cp -rf ../target/site/apidocs/* . ; \
+	git add * ; \
+	git commit -a -m "Update of API documentation" )
 	echo Now perform \"git push\" from ${GH_PAGES}
 
 all-protocols.xml: $(IRP_TRANSMOGRIFIER_JAR)

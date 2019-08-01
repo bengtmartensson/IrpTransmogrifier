@@ -23,7 +23,9 @@ public class MultilineIrSignalParser extends AbstractIrParser implements IrSigna
     //private final static Logger logger = Logger.getLogger(AbstractIrParser.class.getName());
 
     private static String[] splitLines(String str) {
-        return str.split("[\n\r]+");
+        String[] arr = str.split("[\n\r]+");
+        return arr.length <= 3 ? arr : new String[] { str };
+
     }
 
     /**

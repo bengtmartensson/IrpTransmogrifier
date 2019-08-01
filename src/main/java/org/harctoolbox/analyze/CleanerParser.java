@@ -121,6 +121,8 @@ public class CleanerParser extends MultiParser {
     }
 
     private IrSignal clean(IrSignal irSignal) throws InvalidArgumentException {
+        if (irSignal == null)
+            return null;
         IrSequence irSequence = irSignal.toModulatedIrSequence();
         cleaner = new Cleaner(irSequence, absoluteTolerance, relativeTolerance);
         IrSequence cleansed = cleaner.toIrSequence();

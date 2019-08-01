@@ -93,6 +93,7 @@
                             </fileMappers>
                         </transformationSet>
                         <transformationSet>
+                            <xincludeAware>true</xincludeAware>
                             <dir>src/main/xdocs</dir>
                             <outputDir>${project.build.directory}/generated-documents</outputDir>
                             <includes>

@@ -25,9 +25,17 @@
                 <include>*jar-with-dependencies.jar</include>
                 <include>*.xml</include>
                 <include>*.html</include>
-                <include>*.md</include>
+                <!--include>*.md</include-->
                 <include>*.xsl</include>
                 <include>*.bat</include>
+            </includes>
+            <lineEnding>keep</lineEnding>
+        </fileSet>
+        <fileSet>
+            <directory>target/generated-documents</directory>
+            <outputDirectory/>
+            <includes>
+                <include>${project.name}.html</include>
             </includes>
             <lineEnding>keep</lineEnding>
         </fileSet>
@@ -41,13 +49,13 @@
             <fileMode>555</fileMode>
         </fileSet>
 
-        <fileSet>
+        <!--fileSet>
             <directory>target/st</directory>
             <outputDirectory>st</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/xslt</directory>
             <outputDirectory>xslt</outputDirectory>
-        </fileSet>
+        </fileSet-->
     </fileSets>
 </assembly>

@@ -171,7 +171,6 @@ public final class IrpTransmogrifier {
     private CommandBitField commandBitField;
     private CommandExpression commandExpression;
     private CommandLirc commandLirc;
-    private CommandConvertConfig commandConvertConfig;
     private String[] originalArguments;
 
     public IrpTransmogrifier() {
@@ -231,9 +230,6 @@ public final class IrpTransmogrifier {
 
         commandLirc = new CommandLirc();
         argumentParser.addCommand(commandLirc);
-
-        commandConvertConfig = new CommandConvertConfig();
-        argumentParser.addCommand(commandConvertConfig);
 
         try {
             argumentParser.parse(args);
@@ -325,9 +321,6 @@ public final class IrpTransmogrifier {
                         break;
                     case "version":
                         version();
-                        break;
-                    case "convertconfig":
-                        convertConfig();
                         break;
                     default:
                         return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Unknown command: " + command);
@@ -447,6 +440,13 @@ public final class IrpTransmogrifier {
 
         setupDatabase();
         irpDatabase.expand();
+        if (commandList.checkSorted) {
+            if (irpDatabase.checkSorted())
+                out.println("Protol data base is sorted.");
+            else
+                out.println("Protol data base is NOT sorted.");
+        }
+
         if (!commandLineArgs.quiet) {
             commandList.protocols.stream().filter((protocol) -> (irpDatabase.isAlias(protocol))).forEachOrdered((protocol) -> {
                 out.println(protocol + " -> " + irpDatabase.expandAlias(protocol));
@@ -546,24 +546,6 @@ public final class IrpTransmogrifier {
             out.println();
             out.println(Version.licenseString);
         }
-    }
-
-    private void convertConfig() throws IOException, UsageException, IrpParseException {
-        boolean finished = commandConvertConfig.process(this);
-        if (finished)
-            return;
-
-        setupDatabase(); // checks exactly one of -c, -i given
-        if (commandConvertConfig.checkSorted)
-            irpDatabase.checkSorted();
-
-        if (commandLineArgs.iniFile != null)
-            XmlUtils.printDOM(out, irpDatabase.toDocument(), commandLineArgs.encoding, "{" + IrpDatabase.IRP_PROTOCOL_NS + "}irp");
-        else
-            irpDatabase.printAsIni(out);
-
-        if (commandLineArgs.output != null)
-            logger.log(Level.INFO, "Wrote {0}", commandLineArgs.output);
     }
 
     private void code() throws UsageException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
@@ -1231,7 +1213,7 @@ public final class IrpTransmogrifier {
                 description = "Frequency tolerance in Hz. Negative disables frequency check. Default: " + IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE + ".")
         private Double frequencyTolerance = null;
 
-        @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minumum gap at end of repetition")
+        @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minumum gap at end of repetition.")
         private double minRepeatGap = IrCoreUtils.DEFAULT_MIN_REPEAT_LAST_GAP;
 
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message. Deprecated; use the command \"help\" instead.")
@@ -1624,6 +1606,9 @@ public final class IrpTransmogrifier {
         //@Parameter(names = { "-b", "--browse" }, description = "Open the protoocol data base file in the browser")
         //private boolean browse = false;
 
+        @Parameter(names = {       "--checksorted"}, description = "Check if the protocol are alphabetically.")
+        private boolean checkSorted = false;
+
         @Parameter(names = { "-c", "--classify"}, description = "Classify the protocol(s).")
         private boolean classify = false;
 
@@ -1728,19 +1713,6 @@ public final class IrpTransmogrifier {
         @Override
         public String description() {
             return "This command returns the version. and licensing information for the program.";
-        }
-    }
-
-    @Parameters(commandNames = {"convertconfig"}, commandDescription = "Convert an IrpProtocols.ini-file to an IrpProtocols.xml, or vice versa.")
-    @SuppressWarnings("ClassMayBeInterface")
-    private static class CommandConvertConfig extends MyCommand {
-
-        @Parameter(names = { "-c", "--check" }, description = "Check that the protocols in the input file are alphabetically ordered.")
-        private boolean checkSorted = false;
-
-        @Override
-        public String description() {
-            return "This command converts between the xml form and the ini form on IrpProtocols.";
         }
     }
 

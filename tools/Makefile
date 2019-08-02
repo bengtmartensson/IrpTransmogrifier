@@ -16,6 +16,7 @@ IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
 XSLT_DIR := $(IRPHOME)/xslt
 LIRC_TRANSFORM=$(XSLT_DIR)/lirc.xsl
 IRP_TRANSMOGRIFIER_JAR := $(IRPHOME)/IrpTransmogrifier-$(VERSION)-jar-with-dependencies.jar
+IRP_TRANSMOGRIFIER_BIN := $(IRPHOME)/IrpTransmogrifier-$(VERSION)-bin.zip
 IRPTRANSMOGRIFIER := $(JAVA) -jar $(IRP_TRANSMOGRIFIER_JAR) --loglevel warning --url-decode
 JAVA_PROTOCOL_TEST := JavaTestProtocol
 
@@ -32,7 +33,7 @@ ORIGINURL := $(shell git remote get-url origin)
 default: $(IRP_TRANSMOGRIFIER_JAR)
 	$(IRPTRANSMOGRIFIER) --help
 
-$(IRP_TRANSMOGRIFIER_JAR):
+$(IRP_TRANSMOGRIFIER_JAR) $(IRP_TRANSMOGRIFIER_BIN):
 	mvn install -Dmaven.test.skip=true
 
 $(IRP_TRANSMOGRIFIER_JAR)-test:
@@ -92,20 +93,14 @@ $(IRPPROTOCOLS_XML): | $(JAVA_PROTOCOL_TEST)/src/main/resources
 
 $(JAVA_PROTOCOL_TEST) \
 $(JAVA_PROTOCOL_TEST)/src/main/resources \
-$(JAVA_RENDERER_CODEDIR) $(JAVA_RENDERER_TESTDIR) $(JAVA_DECODER_CODEDIR) $(JAVA_DECODER_TESTDIR):
+$(JAVA_RENDERER_CODEDIR) $(JAVA_RENDERER_TESTDIR) $(JAVA_DECODER_CODEDIR) $(JAVA_DECODER_TESTDIR) \
+$(INSTALLDIR):
 	mkdir -p $@
 
-IrpProtocols.ini: src/main/resources/IrpProtocols.xml $(IRP_TRANSMOGRIFIER_JAR)
-	$(IRPTRANSMOGRIFIER) -c $< convert > $@
-
 # Only for Unix-like systems
-install: $(IRP_TRANSMOGRIFIER_JAR)
-	-mkdir -p $(INSTALLDIR)
-	-rm -rf $(INSTALLDIR)
-	-mkdir $(INSTALLDIR)
-	cp target/IrpTransmogrifier-$(VERSION)-bin.zip $(INSTALLDIR)
-	( cd $(INSTALLDIR); jar xf IrpTransmogrifier-$(VERSION)-bin.zip; rm IrpTransmogrifier-$(VERSION)-bin.zip )
-	cp tools/Makefile tools/paths.mk $(INSTALLDIR)
+install: $(IRP_TRANSMOGRIFIER_BIN) | $(INSTALLDIR)
+	-rm -rf $(INSTALLDIR)/*
+	( cd $(INSTALLDIR); jar xf $< )
 	ln -sf $(INSTALLDIR)/irptransmogrifier.sh $(BINLINK)
 	echo \#!/bin/sh > $(BROWSELINK)
 	echo $(BROWSE) $(INSTALLDIR)/IrpProtocols.html >> $(BROWSELINK)

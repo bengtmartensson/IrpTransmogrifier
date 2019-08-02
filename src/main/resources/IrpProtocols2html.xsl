@@ -149,8 +149,8 @@ this program. If not, see http://www.gnu.org/licenses/.
                 <xsl:sort select="@name"/>
             </xsl:apply-templates>
             <h3>Aliases</h3>
-            <xsl:apply-templates select="irp:protocol[irp:parameter[@name='alt_name']]" mode="aliastoc">
-                <xsl:sort select="irp:parameter[@name='alt_name']/text()"/>
+            <xsl:apply-templates select="irp:protocol/irp:parameter[@name='alt_name']" mode="aliastoc">
+                <xsl:sort select="text()"/>
             </xsl:apply-templates>
         </ul>
     </xsl:template>
@@ -172,14 +172,14 @@ this program. If not, see http://www.gnu.org/licenses/.
         </li>
     </xsl:template>
 
-    <xsl:template match="irp:protocol[irp:parameter[@name='alt_name']]" mode="aliastoc">
+    <xsl:template match="irp:parameter[@name='alt_name']" mode="aliastoc">
         <li>
             <a>
                 <xsl:attribute name="href">
                     <xsl:text>#</xsl:text>
-                    <xsl:value-of select="irp:parameter[@name='alt_name']/text()"/>
+                    <xsl:value-of select="../@name"/>
                 </xsl:attribute>
-                <xsl:value-of select="irp:parameter[@name='alt_name']/text()"/>
+                <xsl:value-of select="text()"/>
             </a>
         </li>
     </xsl:template>

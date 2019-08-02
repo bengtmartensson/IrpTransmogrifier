@@ -64,7 +64,7 @@ order_item:
 ;
 
 // 3.2
-// abstract class Duration implements Numerical
+// abstract class Duration
 // Note: spec did not consider extent as a duration
 duration:
     flash
@@ -84,7 +84,7 @@ gap:
     '-' name_or_number ('m' | 'u' | 'p')?
 ;
 
-// class NameOrNumber implements Floatable
+// class NameOrNumber
 // Extension: Spec allowed number (integers) only
 name_or_number:
     name
@@ -101,15 +101,15 @@ extent:
 ;
 
 //  5.2
-// abstact class BitField extends IrpObject implements Numerical
-// class FiniteBitField extends BitField implements IrStreamItem
+// abstact class BitField extends IrpObject
+// class FiniteBitField extends BitField
 // class InfiniteBitField extends BitField
 bitfield:
     '~'? primary_item ':' '-'? primary_item (':' primary_item)? # finite_bitfield
     | '~'? primary_item '::' primary_item                    # infinite_bitfield
 ;
 
-// abstract class PrimaryItem implements Numerical
+// abstract class PrimaryItem
 primary_item:
     name
     | number
@@ -140,7 +140,7 @@ irstream_item:
 ;
 
 // 7.4
-// class BitSpec implements IrStreamItem
+// class BitSpec
 bitspec:
     '<'  bare_irstream ('|' bare_irstream)* '>'
 ;
@@ -160,7 +160,7 @@ bitspec_irstream:
 ;
 
 // 9.2
-// class Expression implements Numerical, InfixCode
+// class Expression
 // para_expression is called expression in spec
 para_expression:
     '(' expression ')'
@@ -223,7 +223,7 @@ alternative:
 ;
 
 // 13.2
-// class Number implements Numerical,InfixCode
+// class Number
 number:
       INT
     | HEXINT
@@ -243,7 +243,7 @@ number_with_decimals:
 
 // Due to the lexer, have to take special precautions to allow name-s
 // to be called k, u, m, p, lsb, or msb. See Parr p.209-211.
-// class Name implements Numerical,InfixCode
+// class Name
 name:
     ID
     | 'k'
@@ -266,7 +266,7 @@ parameter_spec:
     | name '@' ':' number '..' number  '=' expression
 ;
 
-// class FloatNumber implements Floatable
+// class FloatNumber
 float_number:
     '.' INT
     | INT '.' INT

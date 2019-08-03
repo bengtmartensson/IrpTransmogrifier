@@ -97,8 +97,9 @@ this program. If not, see http://www.gnu.org/licenses/.
                     </dt>
                     <dd>Library for the decoding of
                         IrSequences. Originally written by John Fine, extended by others; used
-                        by many widely spread programs as a shared library (IrScrutinizer, IrpMaster, IrScope, RemoteMaster), often using
-                        Java Native Interface. The current version is 2.45. <a href="http://www.hifi-remote.com/wiki/index.php?title=DecodeIR">Current official documentation</a>.
+                        by many widely spread programs as a shared library (IrScrutinizer version 1, IrpMaster, IrScope, RemoteMaster), often using
+                        Java Native Interface. The current (and most likely final) version is 2.45, released in January 2015.
+                        <a href="http://www.hifi-remote.com/wiki/index.php?title=DecodeIR">Current official documentation</a>.
                         License: public domain. <a
                             href="http://www.hifi-remote.com/forums/dload.php?action=file&amp;file_id=13104">Binaries for Windows, Linux, and Mac</a>,
                         <a
@@ -110,9 +111,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
                 <dt id="Executor">Executor</dt>
                 <dd>An embedded "program" for the rendering and transmission of one
-                    or several protocols. One executor can manage several protocols; also,
-                    for one protocol there may be several alternative executors. An executer has its own parametrization,
-                    more-or-less similar to the parametrization of the protocol. Used in UEI Remotes
+                    or several protocols on an embedded processor. One executor can manage several protocols; also,
+                    for one protocol there may be several alternative executors. An executer has its own parameterization,
+                    more-or-less similar to the parameterization of the protocol.
+                    Used in UEI Remotes
                     and RemoteMaster.
                 </dd>
                 <dl>
@@ -120,7 +122,7 @@ this program. If not, see http://www.gnu.org/licenses/.
                         <xsl:attribute name="id">repeat</xsl:attribute>
                         <xsl:text>ditto</xsl:text>
                     </dt>
-                    <dd>Simple sequence, without information, that is repeated as repeat sequence. For an example, see <a href="#NEC1">NEC1</a>.</dd>
+                    <dd>Simple sequence, without payload information, that is repeated as repeat sequence. For an example, see <a href="#NEC1">NEC1</a>.</dd>
                 </dl>
                 <dl>
                     <dt>

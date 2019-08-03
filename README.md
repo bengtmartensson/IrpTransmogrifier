@@ -41,7 +41,7 @@ In the present implementation, only one infinite repeat is allowed.
 one infinite repeat is not known to me.) Also, individual bitfields are restricted to 63 bits of length or less.
 (This is inherited from the use of Java's long type. It [may be removed in the future](https://github.com/bengtmartensson/IrpTransmogrifier/issues/38).)
 With the exception of these restriction, the implementations should be complete, down to specification holes.
-There are also a few extensions to the IRP notation as described in the [official documenation](http://www.hifi-remote.com/wiki/index.php/IRP_Notation).
+There are also a few extensions to the IRP notation as described in the [official documentation](http://www.hifi-remote.com/wiki/index.php/IRP_Notation).
 
 In IrScrutinizer, the word "generate" is used instead of "render". These words can be considered as synonyms (here).
 
@@ -56,10 +56,10 @@ Non-recognizable protocols are to be marked by setting the `decodable` parameter
 To be recognizable, the IRP protocol should preferably adhere to some additional rules:
 
 * The "+" form of repetitions is discouraged in favor of the "*" form.
-* The width and shift of a Bitfield must be constant
-* The decoder is capable of _simple_ equation solving (e.g. `Arctech`), but not of complicated equation solving (e.g. `Fujitsu_Aircon`).
+* The width and shift of a Bitfield must be constant.
+* The decoder is capable of _simple_ equation solving (e.g. `Arctech`), but not of complicated equation solving.
 
-Presently all but two protocols (`zenith`, `nec1-shirrif`, (bitfield width as parameter), `fujitsu_aircon` (would require non-trivial equation solving))
+Presently all but two protocols (`zenith`, `nec1-shirriff`, (bitfield width as parameter), `fujitsu_aircon` (would require non-trivial equation solving))
 are recognizable.  It is not guaranteed that new protocols automatically will be recognizable.
 
 #### Loose matches, Guessing
@@ -117,8 +117,6 @@ Arbitrary string-valued parameters are permitted. It is up to an interpreting pr
 
 There is also an XSLT stylesheet, which technically translates the XML to HTML, allowing for a user
 friendly reading of IrpProtocols.xml in the browser.
-
-The program is capable of reading and translating to and from the old format, sub-command `convertconfig`.
 
 ## Installation
 Unpack the binary distribution in a new, empty directory. Start the program by invoking the wrapper
@@ -222,10 +220,6 @@ As an alternatively, the "expression" command may be used.
 ## Subcommand code
 Used for generating code for different targets.
 
-## Subcommand convertconfig
-This command converts between the xml form and the ini form on IrpProtocols.
-decode --desc
-
 ## Subcommand decode
 The "decode" command takes as input one or several sequences or signals,
 and output one or many protocol/parameter combinations that corresponds
@@ -318,7 +312,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     --min-leadout
       Threshold for leadout when decoding. Default: 20000.0.
     -g, --minrepeatgap
-      Minumum gap at end of repetition
+      Minumum gap at end of repetition.
       Default: 5000.0
     -o, --output
       Name of output file. Default: stdout.
@@ -378,6 +372,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     list      List protocols and their properites
       Usage: list [options] List of protocols (default all)
         Options:
+          --checksorted
+            Check if the protocol are alphabetically.
+            Default: false
           -c, --classify
             Classify the protocol(s).
             Default: false
@@ -596,7 +593,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -s, --stdirectory
             Directory containing st (string template) files for code
             generation.
-            Default: <installation dependent>
+            Default: /home/bengt/harctoolbox/IrpTransmogrifier/tools/../src/main/st
         * -t, --target
             Target(s) for code generation. Use ? for a list.
             Default: []
@@ -645,19 +642,6 @@ Usage: IrpTransmogrifier [options] [command] [command options]
         Options:
           -c, --commands
             Also list the commands if the remotes.
-            Default: false
-          --describe
-            Print a possibly longer documentation for the present command.
-          -h, -?, --help
-            Print help for this command.
-
-    convertconfig      Convert an IrpProtocols.ini-file to an
-            IrpProtocols.xml, or vice versa.
-      Usage: convertconfig [options]
-        Options:
-          -c, --check
-            Check that the protocols in the input file are alphabetically
-            ordered.
             Default: false
           --describe
             Print a possibly longer documentation for the present command.

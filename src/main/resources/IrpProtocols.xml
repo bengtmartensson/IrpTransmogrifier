@@ -941,6 +941,7 @@ Note (BM): One entry split into two.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="Replay" name="Replay">
         <irp:parameter name="alt_name">RC6-6-24</irp:parameter>
+        <irp:parameter name="alt_name">RC6A</irp:parameter>
         <irp:parameter name="uei-executor">0092</irp:parameter>
         <irp:irp><![CDATA[{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,6:3,<-2,2|2,-2>(T:1),D:8,S:8,F:8,-100m/*???*/)*[D:0..255,S:0..255,F:0..255,T@:0..1=0]]]></irp:irp>
         <irp:documentation>Replay is a member of the RC6 family.  Technically it is RC6-6-24, but DecodeIr will always display the name as "Replay".  ProntoEdit calls this protocol "RC6 mode 6A" and KM has it under the alternate name "RC-6a" as well as its primary name "Replay".  RM has it under the alternate name "RC6-M-24n" as well as its primary name "Replay".

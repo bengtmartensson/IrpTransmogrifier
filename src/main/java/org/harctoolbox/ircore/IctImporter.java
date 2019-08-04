@@ -95,10 +95,12 @@ public class IctImporter {
     private void load(String urlOrFilename, String charSetName) throws UnsupportedEncodingException, IOException, ParseException {
         if (urlOrFilename.equals("-"))
             load(new InputStreamReader(System.in, charSetName));
-        try {
-            loadURL(urlOrFilename, charSetName);
-        } catch (MalformedURLException ex) {
-            load(new File(urlOrFilename), charSetName);
+        else {
+            try {
+                loadURL(urlOrFilename, charSetName);
+            } catch (MalformedURLException ex) {
+                load(new File(urlOrFilename), charSetName);
+            }
         }
     }
 

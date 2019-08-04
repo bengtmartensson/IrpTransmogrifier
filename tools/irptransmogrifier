@@ -1,11 +1,11 @@
 #!/bin/sh
 # Ad hoc wrapper, for development
 JAVA=java
-VERSION=`xpath -q -e  '/project/version/text()' pom.xml`
-IRPHOME="$(dirname -- "$(readlink -f -- "${0}")" )"
-JAR=${IRPHOME}/../target/IrpTransmogrifier-${VERSION}-jar-with-dependencies.jar
-CONFIG=${IRPHOME}/../src/main/resources/IrpProtocols.xml
-STDIR=${IRPHOME}/../src/main/st
+IRPHOME="$(dirname $(dirname -- "$(readlink -f -- "${0}")" ) )"
+VERSION=`xpath -q -e  '/project/version/text()' ${IRPHOME}/pom.xml`
+JAR=${IRPHOME}/target/IrpTransmogrifier-${VERSION}-jar-with-dependencies.jar
+CONFIG=${IRPHOME}/src/main/resources/IrpProtocols.xml
+STDIR=${IRPHOME}/src/main/st
 export STDIR
 
 #exec "${JAVA}" -jar "${JAR}" -c "${CONFIG}" "$@"

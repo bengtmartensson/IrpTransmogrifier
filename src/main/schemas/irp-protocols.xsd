@@ -15,8 +15,9 @@
     <xs:annotation>
         <xs:documentation>
             <html:div>
-                The Girr format
-                is documented at <html:a href="http://www.harctoolbox.org/Girr.html">www.harctoolbox.org/Girr.html</html:a>
+                This document determines and documents the format of the protocol data base IrpProtocols.xml as used in
+                <html:a href="http://www.harctoolbox.org/IrpTransmogrifier.html">IrpTransmogrifier</html:a>,
+                (and possibly other programs).
             </html:div>
         </xs:documentation>
     </xs:annotation>
@@ -26,11 +27,11 @@
     <xs:import namespace="http://www.w3.org/2001/XInclude" schemaLocation="https://www.w3.org/2001/XInclude/XInclude.xsd"/>
 
     <xs:element name="protocols">
+        <xs:annotation>
+            <xs:documentation>Collection of IR protocols.
+            </xs:documentation>
+        </xs:annotation>
         <xs:complexType>
-            <xs:annotation>
-                <xs:documentation>The collection of protocols.
-                </xs:documentation>
-            </xs:annotation>
             <xs:sequence>
                 <xs:element ref="adminData" minOccurs="0"/>
                 <xs:choice maxOccurs="unbounded">
@@ -43,10 +44,10 @@
     </xs:element>
 
     <xs:element name="protocol">
+        <xs:annotation>
+            <xs:documentation>Describes one IR protocol in IRP form.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
-            <xs:annotation>
-                <xs:documentation>One protocol in IRP form.</xs:documentation>
-            </xs:annotation>
             <xs:sequence maxOccurs="unbounded">
                 <xs:choice>
                     <xs:element ref="irp"/>
@@ -61,14 +62,17 @@
     </xs:element>
 
     <xs:element name="irp">
+        <xs:annotation>
+            <xs:documentation>Contains the IRP form of the protocol, as CDATA.</xs:documentation>
+        </xs:annotation>
         <xs:complexType mixed="true"/>
     </xs:element>
 
     <xs:element name="documentation">
+        <xs:annotation>
+            <xs:documentation>Textual notes to the protocol, possibly using formatting in (X)HTML.</xs:documentation>
+        </xs:annotation>
         <xs:complexType mixed="true">
-            <xs:annotation>
-                <xs:documentation>Textual notes, possibly using formatting in HTML.</xs:documentation>
-            </xs:annotation>
             <xs:sequence>
                 <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
             </xs:sequence>
@@ -77,44 +81,51 @@
     </xs:element>
 
     <xs:element name="parameter">
+        <xs:annotation>
+            <xs:documentation>A parameter has a name, given as attribute, and a value, CDATA content of the element.
+The semantic interpretation is determined by the reading program.</xs:documentation>
+        </xs:annotation>
         <xs:complexType mixed="true">
             <xs:attribute name="name" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 
     <xs:attributeGroup name="version">
+        <xs:annotation>
+            <xs:documentation>Version of the document, as attribute.</xs:documentation>
+        </xs:annotation>
         <xs:attribute name="version" type="xs:string">
-            <xs:annotation>
-                <xs:documentation>Version of the document.</xs:documentation>
-            </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
 
     <xs:attributeGroup name="name">
+        <xs:annotation>
+            <xs:documentation>Name of the protocol. May contain "funny" characters.</xs:documentation>
+        </xs:annotation>
         <xs:attribute name="name" type="xs:string">
-            <xs:annotation>
-                <xs:documentation>Name of the protocol.</xs:documentation>
-            </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
 
     <xs:attributeGroup name="c-name">
+        <xs:annotation>
+            <xs:documentation>Name of the protocol, as valid C identifier. For protocol names which are already valid C identifiers, this need not be given.</xs:documentation>
+        </xs:annotation>
         <xs:attribute name="c-name" type="xs:string">
-            <xs:annotation>
-                <xs:documentation>Name of the protocol, as used in code.</xs:documentation>
-            </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
 
     <xs:attributeGroup name="usable">
+        <xs:annotation>
+            <xs:documentation>Setting this to false "comments out" the protocol.</xs:documentation>
+        </xs:annotation>
         <xs:attribute name="usable" type="xs:boolean">
-            <xs:annotation>
-                <xs:documentation>Setting this to false disables the protocol.</xs:documentation>
-            </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
 
     <xs:element name="adminData">
+         <xs:annotation>
+            <xs:documentation>This element may optionally contain administrative data.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="creationData" minOccurs="0"/>
@@ -130,7 +141,7 @@
 
     <xs:element name="creationData">
         <xs:annotation>
-            <xs:documentation>Describes how, from what, and by whom the document was created.</xs:documentation>
+            <xs:documentation>Describes how, from what, and/or by whom the document was created.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:attribute name="creatingUser" type="xs:string" use="optional">
@@ -165,7 +176,7 @@
             </xs:attribute>
             <xs:attribute name="tool2Version" type="xs:string" use="optional">
             <xs:annotation>
-                    <xs:documentation>Version of creating tool.</xs:documentation>
+                    <xs:documentation>Version of secondary creating tool.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>
@@ -173,7 +184,7 @@
 
     <xs:element name="versioningData">
         <xs:annotation>
-            <xs:documentation>Versioning data; semanics is still to be determined.</xs:documentation>
+            <xs:documentation>Versioning data; semantics is still to be determined.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -184,7 +195,7 @@
 
     <xs:element name="notes">
         <xs:annotation>
-            <xs:documentation>Textual notes, possibly using formatting in HTML.</xs:documentation>
+            <xs:documentation>Textual notes, possibly using formatting in (X)HTML.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:sequence>

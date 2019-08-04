@@ -1,8 +1,8 @@
-Metz 0::		Metz19: {D=1,F=0},	beg=0, end=84, reps=2
-Metz 1:		Metz19: {D=1,F=1,T=1},	beg=0, end=84, reps=2
-Metz 2::		Metz19: {D=1,F=2},	beg=0, end=84, reps=2
-Metz Cursor Down:		Metz19: {D=1,F=23},	beg=0, end=84, reps=2
-Metz Cursor Up:		Metz19: {D=1,F=22},	beg=0, end=84, reps=2
-Metz Menu:		Metz19: {D=1,F=37,T=1},	beg=0, end=84, reps=2
-Off Device Code: 1 (0x01) Function: 50 (0x32):		Metz19: {D=1,F=50},	beg=0, end=42, reps=1
-On Device Code: 1 (0x01) Function: 51 (0x33):		Metz19: {D=1,F=51},	beg=0, end=42, reps=1
+Metz 0::	Metz19: {D=1,F=0},	beg=0, end=83, reps=2
+Metz 1:	Metz19: {D=1,F=1,T=1},	beg=0, end=83, reps=2
+Metz 2::	Metz19: {D=1,F=2},	beg=0, end=83, reps=2
+Metz Cursor Down:	Metz19: {D=1,F=23},	beg=0, end=83, reps=2
+Metz Cursor Up:	Metz19: {D=1,F=22},	beg=0, end=83, reps=2
+Metz Menu:	Metz19: {D=1,F=37,T=1},	beg=0, end=83, reps=2
+Off Device Code: 1 (0x01) Function: 50 (0x32):	Metz19: {D=1,F=50},	beg=0, end=41, reps=1
+On Device Code: 1 (0x01) Function: 51 (0x33):	Metz19: {D=1,F=51},	beg=0, end=41, reps=1

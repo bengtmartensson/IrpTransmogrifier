@@ -3,11 +3,11 @@
 IRPTRANSMOGRIFIER=../../../tools/irptransmogrifier
 
 function generate {
-    $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --namedinput "$1" > "$1".exp
+    $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --recursive --namedinput "$1" > "$1".exp
 }
 
 function decodeNamed {
-    $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --namedinput "$1" | diff -w - "$1".exp
+    $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --recursive --namedinput "$1" | tee "$1.log" | diff -w - "$1".exp
 }
 
 #TRANSMOGRIFY=generate
@@ -51,7 +51,7 @@ $TRANSMOGRIFY DirecTV_Pronto.txt
 $TRANSMOGRIFY DishPlayer.ict
 $TRANSMOGRIFY Dish_Network.ict
 $TRANSMOGRIFY Dysan_Pronto.txt
-$TRANSMOGRIFY Elan.ict
+$TRANSMOGRIFY Elan.ict --frequencytolerance -1
 $TRANSMOGRIFY Emerson_0282.ict
 $TRANSMOGRIFY EpsonPowerLiteEMP835.ict
 $TRANSMOGRIFY EpsonPowerLiteEMP835_svideo.ict

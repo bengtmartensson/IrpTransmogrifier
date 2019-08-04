@@ -1,31 +1,14 @@
-Setup 170_91 175_36 (multiple decodes):
-Sig1:		Pioneer-Mix: {D=175,D0=170,F=36,F0=91},	beg=0, end=136
-Sig2:		NEC: {D=170,F=91},	beg=136, end=204
-Sig3:		NEC: {D=175,F=36},	beg=204, end=272
-Sig4:		NEC: {D=170,F=91},	beg=272, end=340
-Sig5:		NEC: {D=175,F=36},	beg=340, end=408
-Return 170_91 175_34 (multiple decodes):
-Sig1:		Pioneer-Mix: {D=175,D0=170,F=34,F0=91},	beg=0, end=136
-Sig2:		NEC: {D=170,F=91},	beg=136, end=204
-Sig3:		NEC: {D=175,F=34},	beg=204, end=272
-Sig4:		NEC: {D=170,F=91},	beg=272, end=340
-Sig5:		NEC: {D=175,F=34},	beg=340, end=408
-Tune down 179_39:		Pioneer-Mix: {D0=170,F0=39},	beg=0, end=476, reps=5
-Right 170_36:		Pioneer-Mix: {D0=170,F0=36},	beg=0, end=680, reps=8
-Play 170_69:		Pioneer-Mix: {D0=170,F0=69},	beg=0, end=612, reps=7
-Dialog 165_159 165_ 222 (multiple decodes):
-Sig1:		Pioneer-Mix: {D0=165,F=222,F0=159},	beg=0, end=136
-Sig2:		NEC: {D=165,F=159},	beg=136, end=204
-Sig3:		NEC: {D=165,F=222},	beg=204, end=272
-Sig4:		NEC: {D=165,F=159},	beg=272, end=340
-Sig5:		NEC: {D=165,F=222},	beg=340, end=408
-Sig6:		NEC: {D=165,F=159},	beg=408, end=476
-Sig7:		NEC: {D=165,F=222},	beg=476, end=544
-Phase 165_90 165_203 (multiple decodes):
-Sig1:		Pioneer-Mix: {D0=165,F=203,F0=90},	beg=0, end=136
-Sig2:		NEC: {D=165,F=90},	beg=136, end=204
-Sig3:		NEC: {D=165,F=203},	beg=204, end=272
-Sig4:		NEC: {D=165,F=90},	beg=272, end=340
-Sig5:		NEC: {D=165,F=203},	beg=340, end=408
-Sig6:		NEC: {D=165,F=90},	beg=408, end=476
-Sig7:		NEC: {D=165,F=203},	beg=476, end=544
+Setup 170_91 175_36:	NEC: {D=170,F=91},	beg=0, end=67	{NEC: {D=175,F=36},	beg=68, end=135	{NEC: {D=170,F=91},	beg=136, end=203	{NEC: {D=175,F=36},	beg=204, end=271	{NEC: {D=170,F=91},	beg=272, end=339	{NEC: {D=175,F=36},	beg=340, end=407}}}}}
+	Pioneer-Mix: {D=175,D0=170,F=36,F0=91},	beg=0, end=135	{NEC: {D=170,F=91},	beg=136, end=203	{NEC: {D=175,F=36},	beg=204, end=271	{NEC: {D=170,F=91},	beg=272, end=339	{NEC: {D=175,F=36},	beg=340, end=407}}}}
+Return 170_91 175_34:	NEC: {D=170,F=91},	beg=0, end=67	{NEC: {D=175,F=34},	beg=68, end=135	{NEC: {D=170,F=91},	beg=136, end=203	{NEC: {D=175,F=34},	beg=204, end=271	{NEC: {D=170,F=91},	beg=272, end=339	{NEC: {D=175,F=34},	beg=340, end=407}}}}}
+	Pioneer-Mix: {D=175,D0=170,F=34,F0=91},	beg=0, end=135	{NEC: {D=170,F=91},	beg=136, end=203	{NEC: {D=175,F=34},	beg=204, end=271	{NEC: {D=170,F=91},	beg=272, end=339	{NEC: {D=175,F=34},	beg=340, end=407}}}}
+Tune down 179_39:	NEC: {D=170,F=39},	beg=0, end=67	{NEC: {D=170,F=39},	beg=68, end=135	{NEC: {D=170,F=39},	beg=136, end=203	{NEC: {D=170,F=39},	beg=204, end=271	{NEC: {D=170,F=39},	beg=272, end=339	{NEC: {D=170,F=39},	beg=340, end=407	{NEC: {D=170,F=39},	beg=408, end=475}}}}}}
+	Pioneer-Mix: {D0=170,F0=39},	beg=0, end=475, reps=5
+Right 170_36:	NEC: {D=170,F=36},	beg=0, end=67	{NEC: {D=170,F=36},	beg=68, end=135	{NEC: {D=170,F=36},	beg=136, end=203	{NEC: {D=170,F=36},	beg=204, end=271	{NEC: {D=170,F=36},	beg=272, end=339	{NEC: {D=170,F=36},	beg=340, end=407	{NEC: {D=170,F=36},	beg=408, end=475	{NEC: {D=170,F=36},	beg=476, end=543	{NEC: {D=170,F=36},	beg=544, end=611	{NEC: {D=170,F=36},	beg=612, end=679}}}}}}}}}
+	Pioneer-Mix: {D0=170,F0=36},	beg=0, end=679, reps=8
+Play 170_69:	NEC: {D=170,F=69},	beg=0, end=67	{NEC: {D=170,F=69},	beg=68, end=135	{NEC: {D=170,F=69},	beg=136, end=203	{NEC: {D=170,F=69},	beg=204, end=271	{NEC: {D=170,F=69},	beg=272, end=339	{NEC: {D=170,F=69},	beg=340, end=407	{NEC: {D=170,F=69},	beg=408, end=475	{NEC: {D=170,F=69},	beg=476, end=543	{NEC: {D=170,F=69},	beg=544, end=611}}}}}}}}
+	Pioneer-Mix: {D0=170,F0=69},	beg=0, end=611, reps=7
+Dialog 165_159 165_ 222:	NEC: {D=165,F=159},	beg=0, end=67	{NEC: {D=165,F=222},	beg=68, end=135	{NEC: {D=165,F=159},	beg=136, end=203	{NEC: {D=165,F=222},	beg=204, end=271	{NEC: {D=165,F=159},	beg=272, end=339	{NEC: {D=165,F=222},	beg=340, end=407	{NEC: {D=165,F=159},	beg=408, end=475	{NEC: {D=165,F=222},	beg=476, end=543}}}}}}}
+	Pioneer-Mix: {D0=165,F=222,F0=159},	beg=0, end=135	{NEC: {D=165,F=159},	beg=136, end=203	{NEC: {D=165,F=222},	beg=204, end=271	{NEC: {D=165,F=159},	beg=272, end=339	{NEC: {D=165,F=222},	beg=340, end=407	{NEC: {D=165,F=159},	beg=408, end=475	{NEC: {D=165,F=222},	beg=476, end=543}}}}}}
+Phase 165_90 165_203:	NEC: {D=165,F=90},	beg=0, end=67	{NEC: {D=165,F=203},	beg=68, end=135	{NEC: {D=165,F=90},	beg=136, end=203	{NEC: {D=165,F=203},	beg=204, end=271	{NEC: {D=165,F=90},	beg=272, end=339	{NEC: {D=165,F=203},	beg=340, end=407	{NEC: {D=165,F=90},	beg=408, end=475	{NEC: {D=165,F=203},	beg=476, end=543}}}}}}}
+	Pioneer-Mix: {D0=165,F=203,F0=90},	beg=0, end=135	{NEC: {D=165,F=90},	beg=136, end=203	{NEC: {D=165,F=203},	beg=204, end=271	{NEC: {D=165,F=90},	beg=272, end=339	{NEC: {D=165,F=203},	beg=340, end=407	{NEC: {D=165,F=90},	beg=408, end=475	{NEC: {D=165,F=203},	beg=476, end=543}}}}}}

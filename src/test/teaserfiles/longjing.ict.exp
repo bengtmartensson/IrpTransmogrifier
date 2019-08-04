@@ -1,28 +1,26 @@
-unnamed_0:		Digivision: {D=79,Dev2=67,Dev3=78,F=15},	beg=0, end=90, reps=1
+unnamed_0:	Digivision: {D=79,Dev2=67,Dev3=78,F=15},	beg=0, end=89, reps=1
 unnamed_1:	
-unnamed_2:		Digivision: {D=79,Dev2=67,Dev3=78,F=12},	beg=0, end=90, reps=1
-unnamed_3:		Digivision: {D=79,Dev2=67,Dev3=78,F=43},	beg=0, end=90, reps=1
-unnamed_4:		Digivision: {D=79,Dev2=67,Dev3=78,F=37},	beg=0, end=90, reps=1
-unnamed_5:		Digivision: {D=79,Dev2=67,Dev3=78,F=41},	beg=0, end=90, reps=1
-unnamed_6:		Digivision: {D=79,Dev2=67,Dev3=78,F=40},	beg=0, end=90, reps=1
-unnamed_7:		Digivision: {D=79,Dev2=67,Dev3=78,F=11},	beg=0, end=90, reps=1
-unnamed_8:		Digivision: {D=79,Dev2=67,Dev3=78,F=27},	beg=0, end=90, reps=1
-unnamed_9:		Digivision: {D=79,Dev2=67,Dev3=78,F=44},	beg=0, end=90, reps=1
-unnamed_10:		Digivision: {D=79,Dev2=67,Dev3=78,F=10},	beg=0, end=90, reps=1
+unnamed_2:	Digivision: {D=79,Dev2=67,Dev3=78,F=12},	beg=0, end=89, reps=1
+unnamed_3:	Digivision: {D=79,Dev2=67,Dev3=78,F=43},	beg=0, end=89, reps=1
+unnamed_4:	Digivision: {D=79,Dev2=67,Dev3=78,F=37},	beg=0, end=89, reps=1
+unnamed_5:	Digivision: {D=79,Dev2=67,Dev3=78,F=41},	beg=0, end=89, reps=1
+unnamed_6:	Digivision: {D=79,Dev2=67,Dev3=78,F=40},	beg=0, end=89, reps=1
+unnamed_7:	Digivision: {D=79,Dev2=67,Dev3=78,F=11},	beg=0, end=89, reps=1
+unnamed_8:	Digivision: {D=79,Dev2=67,Dev3=78,F=27},	beg=0, end=89, reps=1
+unnamed_9:	Digivision: {D=79,Dev2=67,Dev3=78,F=44},	beg=0, end=89, reps=1
+unnamed_10:	Digivision: {D=79,Dev2=67,Dev3=78,F=10},	beg=0, end=89, reps=1
 unnamed_11:	
 unnamed_12:	
 unnamed_13:	
 unnamed_14:	
-unnamed_15:		Digivision: {D=79,Dev2=67,Dev3=78,F=33},	beg=0, end=90, reps=1
-unnamed_16:		Digivision: {D=79,Dev2=67,Dev3=78,F=35},	beg=0, end=90, reps=1
-unnamed_17:		Digivision: {D=79,Dev2=67,Dev3=78,F=34},	beg=0, end=90, reps=1
-unnamed_18 (multiple decodes):
-Sig1:		Digivision: {D=79,Dev2=67,Dev3=78,F=29},	beg=0, end=94, reps=2
-Sig2:		Digivision: {D=79,Dev2=67,Dev3=78,F=30},	beg=94, end=184, reps=1
-unnamed_19:		Digivision: {D=79,Dev2=67,Dev3=78,F=31},	beg=0, end=90, reps=1
-unnamed_20:		Digivision: {D=79,Dev2=67,Dev3=78,F=32},	beg=0, end=90, reps=1
-unnamed_21:		Digivision: {D=79,Dev2=67,Dev3=78,F=17},	beg=0, end=90, reps=1
-unnamed_22:		Digivision: {D=79,Dev2=67,Dev3=78,F=18},	beg=0, end=90, reps=1
-unnamed_23:		Digivision: {D=79,Dev2=67,Dev3=78,F=19},	beg=0, end=90, reps=1
-unnamed_24:		Digivision: {D=79,Dev2=67,Dev3=78,F=20},	beg=0, end=90, reps=1
-unnamed_25:		Digivision: {D=79,Dev2=67,Dev3=78,F=21},	beg=0, end=90, reps=1
+unnamed_15:	Digivision: {D=79,Dev2=67,Dev3=78,F=33},	beg=0, end=89, reps=1
+unnamed_16:	Digivision: {D=79,Dev2=67,Dev3=78,F=35},	beg=0, end=89, reps=1
+unnamed_17:	Digivision: {D=79,Dev2=67,Dev3=78,F=34},	beg=0, end=89, reps=1
+unnamed_18:	Digivision: {D=79,Dev2=67,Dev3=78,F=29},	beg=0, end=93, reps=2	{Digivision: {D=79,Dev2=67,Dev3=78,F=30},	beg=94, end=183, reps=1}
+unnamed_19:	Digivision: {D=79,Dev2=67,Dev3=78,F=31},	beg=0, end=89, reps=1
+unnamed_20:	Digivision: {D=79,Dev2=67,Dev3=78,F=32},	beg=0, end=89, reps=1
+unnamed_21:	Digivision: {D=79,Dev2=67,Dev3=78,F=17},	beg=0, end=89, reps=1
+unnamed_22:	Digivision: {D=79,Dev2=67,Dev3=78,F=18},	beg=0, end=89, reps=1
+unnamed_23:	Digivision: {D=79,Dev2=67,Dev3=78,F=19},	beg=0, end=89, reps=1
+unnamed_24:	Digivision: {D=79,Dev2=67,Dev3=78,F=20},	beg=0, end=89, reps=1
+unnamed_25:	Digivision: {D=79,Dev2=67,Dev3=78,F=21},	beg=0, end=89, reps=1

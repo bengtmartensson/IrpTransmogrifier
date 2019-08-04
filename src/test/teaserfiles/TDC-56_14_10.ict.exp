@@ -1,7 +1,7 @@
-1:		TDC-56: {D=14,F=2,S=10},	beg=0, end=140, reps=5
-2:		TDC-56: {D=14,F=3,S=10},	beg=0, end=140, reps=5
-Up:		TDC-56: {D=14,F=21,S=10},	beg=0, end=120, reps=5
-Down:		TDC-56: {D=14,F=25,S=10},	beg=0, end=104, reps=4
-Left:		TDC-56: {D=14,F=22,S=10},	beg=0, end=52, reps=2
-Right:		TDC-56: {D=14,F=24,S=10},	beg=0, end=28, reps=1
-OK:		TDC-56: {D=14,F=23,S=10},	beg=0, end=130, reps=5
+1:	TDC-56: {D=14,F=2,S=10},	beg=0, end=139, reps=5
+2:	TDC-56: {D=14,F=3,S=10},	beg=0, end=139, reps=5
+Up:	TDC-56: {D=14,F=21,S=10},	beg=0, end=119, reps=5
+Down:	TDC-56: {D=14,F=25,S=10},	beg=0, end=103, reps=4
+Left:	TDC-56: {D=14,F=22,S=10},	beg=0, end=51, reps=2
+Right:	TDC-56: {D=14,F=24,S=10},	beg=0, end=27, reps=1
+OK:	TDC-56: {D=14,F=23,S=10},	beg=0, end=129, reps=5

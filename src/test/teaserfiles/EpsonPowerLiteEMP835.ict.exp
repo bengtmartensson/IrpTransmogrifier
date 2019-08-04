@@ -1,29 +1,29 @@
-svideo:		Epson: {D=9,F1=3,F2=2,OBC=4,S=5,T1=1,T2=0},	beg=0, end=150, reps=4
-power:		Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=150, reps=4
-note:		Epson: {D=9,F1=2,F2=2,OBC=7,S=5,T1=0,T2=0},	beg=0, end=150, reps=4
-1:		Epson: {D=9,F1=2,F2=2,OBC=0,S=5,T1=0,T2=0},	beg=0, end=120, reps=3
-2:		Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-3:		Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-4:		Epson: {D=9,F1=2,F2=2,OBC=3,S=5,T1=0,T2=0},	beg=0, end=120, reps=3
-5:		Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=120, reps=3
-6:		Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-7:		Epson: {D=9,F1=3,F2=2,OBC=3,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-8:		Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-9:		Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=180, reps=5
-video:		Epson: {D=9,F1=3,F2=2,OBC=4,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-EZ-MP:		Epson: {D=9,F1=2,F2=2,OBC=5,S=5,T1=0,T2=0},	beg=0, end=120, reps=3
-comp1:		Epson: {D=9,F1=3,F2=2,OBC=5,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-comp2:		Epson: {D=9,F1=2,F2=2,OBC=5,S=5,T1=0,T2=0},	beg=0, end=150, reps=4
-Menu:		Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=120, reps=3
-help:		Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=150, reps=4
-page down-:		Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-Ezoom-:		Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=120, reps=3
-Freeze:		Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=150, reps=4
-Page up +:		Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=120, reps=3
-Ezoom+:		Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=120, reps=3
-Resize:		Epson: {D=9,F1=2,F2=2,OBC=0,S=5,T1=0,T2=0},	beg=0, end=150, reps=4
-AVMute:		Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=150, reps=4
-Enter:		Epson: {D=5,OBC=4,S=5,T1=1,T2=0},	beg=0, end=120, reps=4
-PnP:		Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=150, reps=4
-Esc:		Epson: {D=5,OBC=2,S=5,T1=1,T2=1},	beg=0, end=120, reps=4
-Color + mode:		Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=90, reps=3
+svideo:	Epson: {D=9,F1=3,F2=2,OBC=4,S=5,T1=1,T2=0},	beg=0, end=149, reps=4
+power:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=149, reps=4
+note:	Epson: {D=9,F1=2,F2=2,OBC=7,S=5,T1=0,T2=0},	beg=0, end=149, reps=4
+1:	Epson: {D=9,F1=2,F2=2,OBC=0,S=5,T1=0,T2=0},	beg=0, end=119, reps=3
+2:	Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+3:	Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+4:	Epson: {D=9,F1=2,F2=2,OBC=3,S=5,T1=0,T2=0},	beg=0, end=119, reps=3
+5:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=119, reps=3
+6:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+7:	Epson: {D=9,F1=3,F2=2,OBC=3,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+8:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+9:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=179, reps=5
+video:	Epson: {D=9,F1=3,F2=2,OBC=4,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+EZ-MP:	Epson: {D=9,F1=2,F2=2,OBC=5,S=5,T1=0,T2=0},	beg=0, end=119, reps=3
+comp1:	Epson: {D=9,F1=3,F2=2,OBC=5,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+comp2:	Epson: {D=9,F1=2,F2=2,OBC=5,S=5,T1=0,T2=0},	beg=0, end=149, reps=4
+Menu:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=119, reps=3
+help:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=149, reps=4
+page down-:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+Ezoom-:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=119, reps=3
+Freeze:	Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=149, reps=4
+Page up +:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=119, reps=3
+Ezoom+:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=119, reps=3
+Resize:	Epson: {D=9,F1=2,F2=2,OBC=0,S=5,T1=0,T2=0},	beg=0, end=149, reps=4
+AVMute:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=149, reps=4
+Enter:	Epson: {D=5,OBC=4,S=5,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=8}
+PnP:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=149, reps=4
+Esc:	Epson: {D=5,OBC=2,S=5,T1=1,T2=1},	beg=0, end=119, reps=4	{UNDECODED. length=8}
+Color + mode:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}

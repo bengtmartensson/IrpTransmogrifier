@@ -1,9 +1,9 @@
-0:		CanalSat: {D=1,F=0,S=6,T=0},	beg=0, end=42
-1:		CanalSat: {D=1,F=1,S=6,T=0},	beg=0, end=40
-2:		CanalSat: {D=1,F=2,S=6,T=0},	beg=0, end=40
-3:		CanalSat: {D=1,F=3,S=6,T=0},	beg=0, end=40
-4:		CanalSat: {D=1,F=4,S=6,T=0},	beg=0, end=40
+0:	CanalSat: {D=1,F=0,S=6,T=0},	beg=0, end=41	{UNDECODED. length=84}
+1:	CanalSat: {D=1,F=1,S=6,T=0},	beg=0, end=39	{UNDECODED. length=160}
+2:	CanalSat: {D=1,F=2,S=6,T=0},	beg=0, end=39	{UNDECODED. length=160}
+3:	CanalSat: {D=1,F=3,S=6,T=0},	beg=0, end=39	{UNDECODED. length=240}
+4:	CanalSat: {D=1,F=4,S=6,T=0},	beg=0, end=39	{UNDECODED. length=240}
 5:	
 Vol+:	
-Vol-:		CanalSat: {D=1,F=21,S=6,T=0},	beg=0, end=36
+Vol-:	CanalSat: {D=1,F=21,S=6,T=0},	beg=0, end=35	{UNDECODED. length=144}
 Mute:	

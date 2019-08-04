@@ -1,8 +1,8 @@
-0:		Tivo: {F=49,U=0},	beg=0, end=96, reps=7
-1:		Tivo: {F=40,U=0},	beg=0, end=92, reps=6
-2:		Tivo: {F=41,U=0},	beg=0, end=84, reps=4
-9:		Tivo: {F=48,U=0},	beg=0, end=84, reps=4
-Play:		Tivo: {F=33,U=0},	beg=0, end=80, reps=3
-Pause:		Tivo: {F=35,U=0},	beg=0, end=84, reps=4
-Up:		Tivo: {F=20,U=0},	beg=0, end=84, reps=4
-Down:		Tivo: {F=22,U=0},	beg=0, end=84, reps=4
+0:	Tivo: {F=49,U=0},	beg=0, end=95, reps=7
+1:	Tivo: {F=40,U=0},	beg=0, end=91, reps=6
+2:	Tivo: {F=41,U=0},	beg=0, end=83, reps=4
+9:	Tivo: {F=48,U=0},	beg=0, end=83, reps=4
+Play:	Tivo: {F=33,U=0},	beg=0, end=79, reps=3
+Pause:	Tivo: {F=35,U=0},	beg=0, end=83, reps=4
+Up:	Tivo: {F=20,U=0},	beg=0, end=83, reps=4
+Down:	Tivo: {F=22,U=0},	beg=0, end=83, reps=4

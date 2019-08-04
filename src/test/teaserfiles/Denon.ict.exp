@@ -1,30 +1,10 @@
-0 (multiple decodes):
-Sig1:		Denon: {D=8,F=129},	beg=0, end=192, reps=3
-Sig2:		Denon{1}: {D=8,F=129},	beg=192, end=224, reps=1
-1 (multiple decodes):
-Sig1:		Denon: {D=8,F=130},	beg=0, end=192, reps=3
-Sig2:		Denon{1}: {D=8,F=130},	beg=192, end=224, reps=1
-2 (multiple decodes):
-Sig1:		Denon: {D=8,F=131},	beg=0, end=128, reps=2
-Sig2:		Denon{1}: {D=8,F=131},	beg=128, end=160, reps=1
-3 (multiple decodes):
-Sig1:		Denon: {D=8,F=132},	beg=0, end=128, reps=2
-Sig2:		Denon{1}: {D=8,F=132},	beg=128, end=160, reps=1
-up (multiple decodes):
-Sig1:		Denon: {D=8,F=172},	beg=0, end=128, reps=2
-Sig2:		Denon{1}: {D=8,F=172},	beg=128, end=160, reps=1
-down (multiple decodes):
-Sig1:		Denon: {D=8,F=173},	beg=0, end=192, reps=3
-Sig2:		Denon{1}: {D=8,F=173},	beg=192, end=224, reps=1
-left (multiple decodes):
-Sig1:		Denon: {D=8,F=175},	beg=0, end=128, reps=2
-Sig2:		Denon{1}: {D=8,F=175},	beg=128, end=160, reps=1
-right (multiple decodes):
-Sig1:		Denon: {D=8,F=174},	beg=0, end=192, reps=3
-Sig2:		Denon{1}: {D=8,F=174},	beg=192, end=224, reps=1
-OK (multiple decodes):
-Sig1:		Denon: {D=8,F=187},	beg=0, end=64, reps=1
-Sig2:		Denon{1}: {D=8,F=187},	beg=64, end=96, reps=1
-Menu (multiple decodes):
-Sig1:		Denon: {D=8,F=145},	beg=0, end=64, reps=1
-Sig2:		Denon{1}: {D=8,F=145},	beg=64, end=96, reps=1
+0:	Denon: {D=8,F=129},	beg=0, end=191, reps=3	{Denon{1}: {D=8,F=129},	beg=192, end=223, reps=1}
+1:	Denon: {D=8,F=130},	beg=0, end=191, reps=3	{Denon{1}: {D=8,F=130},	beg=192, end=223, reps=1}
+2:	Denon: {D=8,F=131},	beg=0, end=127, reps=2	{Denon{1}: {D=8,F=131},	beg=128, end=159, reps=1}
+3:	Denon: {D=8,F=132},	beg=0, end=127, reps=2	{Denon{1}: {D=8,F=132},	beg=128, end=159, reps=1}
+up:	Denon: {D=8,F=172},	beg=0, end=127, reps=2	{Denon{1}: {D=8,F=172},	beg=128, end=159, reps=1}
+down:	Denon: {D=8,F=173},	beg=0, end=191, reps=3	{Denon{1}: {D=8,F=173},	beg=192, end=223, reps=1}
+left:	Denon: {D=8,F=175},	beg=0, end=127, reps=2	{Denon{1}: {D=8,F=175},	beg=128, end=159, reps=1}
+right:	Denon: {D=8,F=174},	beg=0, end=191, reps=3	{Denon{1}: {D=8,F=174},	beg=192, end=223, reps=1}
+OK:	Denon: {D=8,F=187},	beg=0, end=63, reps=1	{Denon{1}: {D=8,F=187},	beg=64, end=95, reps=1}
+Menu:	Denon: {D=8,F=145},	beg=0, end=63, reps=1	{Denon{1}: {D=8,F=145},	beg=64, end=95, reps=1}

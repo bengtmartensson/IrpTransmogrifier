@@ -1,7 +1,7 @@
-rc6_D231F195:		RC6: {D=231,F=195},	beg=0, end=38, reps=1
-rc6_D231F196:		RC6: {D=231,F=196},	beg=0, end=38, reps=1
-rc6_D231F197:		RC6: {D=231,F=197},	beg=0, end=36, reps=1
-rc6_D231F198:		RC6: {D=231,F=198},	beg=0, end=38, reps=1
-rc6_D231F199:		RC6: {D=231,F=199},	beg=0, end=38, reps=1
-rc6_D231F200:		RC6: {D=231,F=200},	beg=0, end=38, reps=1
-rc6_D231F201:		RC6: {D=231,F=201},	beg=0, end=36, reps=1
+rc6_D231F195:	RC6: {D=231,F=195},	beg=0, end=37, reps=1
+rc6_D231F196:	RC6: {D=231,F=196},	beg=0, end=37, reps=1
+rc6_D231F197:	RC6: {D=231,F=197},	beg=0, end=35, reps=1
+rc6_D231F198:	RC6: {D=231,F=198},	beg=0, end=37, reps=1
+rc6_D231F199:	RC6: {D=231,F=199},	beg=0, end=37, reps=1
+rc6_D231F200:	RC6: {D=231,F=200},	beg=0, end=37, reps=1
+rc6_D231F201:	RC6: {D=231,F=201},	beg=0, end=35, reps=1

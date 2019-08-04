@@ -1,10 +1,10 @@
-0:		PaceMSS: {D=0,F=0,T=1},	beg=0, end=78, reps=3
-1:		PaceMSS: {D=0,F=1,T=0},	beg=0, end=104, reps=4
-2:		PaceMSS: {D=0,F=2,T=1},	beg=0, end=78, reps=3
-3:		PaceMSS: {D=0,F=3,T=0},	beg=0, end=130, reps=5
-4:		PaceMSS: {D=0,F=4,T=1},	beg=0, end=104, reps=4
-20:		PaceMSS: {D=0,F=20,T=0},	beg=0, end=104, reps=4
-21:		PaceMSS: {D=0,F=21,T=1},	beg=0, end=78, reps=3
-22:		PaceMSS: {D=0,F=22,T=0},	beg=0, end=130, reps=5
-126:		PaceMSS: {D=0,F=126,T=1},	beg=0, end=104, reps=4
+0:	PaceMSS: {D=0,F=0,T=1},	beg=0, end=77, reps=3
+1:	PaceMSS: {D=0,F=1,T=0},	beg=0, end=103, reps=4
+2:	PaceMSS: {D=0,F=2,T=1},	beg=0, end=77, reps=3
+3:	PaceMSS: {D=0,F=3,T=0},	beg=0, end=129, reps=5
+4:	PaceMSS: {D=0,F=4,T=1},	beg=0, end=103, reps=4
+20:	PaceMSS: {D=0,F=20,T=0},	beg=0, end=103, reps=4
+21:	PaceMSS: {D=0,F=21,T=1},	beg=0, end=77, reps=3
+22:	PaceMSS: {D=0,F=22,T=0},	beg=0, end=129, reps=5
+126:	PaceMSS: {D=0,F=126,T=1},	beg=0, end=103, reps=4
 127:	

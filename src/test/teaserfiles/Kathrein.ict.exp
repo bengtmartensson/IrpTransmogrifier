@@ -1,11 +1,11 @@
-Vol+:		Kathrein: {D=0,F=21},	beg=0, end=152, reps=4
-Vol-:		Kathrein: {D=0,F=22},	beg=0, end=132, reps=3
-Up:		Dgtec: {D=240,F=14},	beg=0, end=52
-down:		Dgtec: {D=240,F=24},	beg=0, end=52
-left:		Dgtec: {D=240,F=22},	beg=0, end=52
-right:		Dgtec: {D=240,F=21},	beg=0, end=52
-OK:		Dgtec: {D=240,F=14},	beg=0, end=52
-Ch+:		Kathrein: {D=0,F=23},	beg=0, end=132, reps=3
-Ch-:		Kathrein: {D=0,F=24},	beg=0, end=132, reps=3
-0:		Dgtec: {D=240,F=0},	beg=0, end=52
-1:		Dgtec: {D=240,F=1},	beg=0, end=52
+Vol+:	Kathrein: {D=0,F=21},	beg=0, end=151, reps=4
+Vol-:	Kathrein: {D=0,F=22},	beg=0, end=131, reps=3
+Up:	Dgtec: {D=240,F=14},	beg=0, end=51
+down:	Dgtec: {D=240,F=24},	beg=0, end=51
+left:	Dgtec: {D=240,F=22},	beg=0, end=51
+right:	Dgtec: {D=240,F=21},	beg=0, end=51
+OK:	Dgtec: {D=240,F=14},	beg=0, end=51
+Ch+:	Kathrein: {D=0,F=23},	beg=0, end=131, reps=3
+Ch-:	Kathrein: {D=0,F=24},	beg=0, end=131, reps=3
+0:	Dgtec: {D=240,F=0},	beg=0, end=51
+1:	Dgtec: {D=240,F=1},	beg=0, end=51

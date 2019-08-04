@@ -18,9 +18,7 @@ mts:
 12:	
 ch+:	
 ch-:	
-guide (multiple decodes):
-Sig1:		GwtS: {CRC=175,D=112,F=239},	beg=0, end=14
-Sig2:		Matsui: {D=2,F=2},	beg=14, end=36, reps=1
+guide:	GwtS: {CRC=175,D=112,F=239},	beg=0, end=13	{Matsui: {D=2,F=2},	beg=14, end=35, reps=1}
 exit:	
 up:	
 down:	

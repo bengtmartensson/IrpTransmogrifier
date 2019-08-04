@@ -1,13 +1,15 @@
-Vol+ NEC2:		Pioneer-Mix: {D0=31,F0=223},	beg=0, end=272, reps=2
-Vol- NEC2:		Pioneer-Mix: {D0=31,F0=95},	beg=0, end=204, reps=1
-Mute:		NECx2: {D=67,F=57,S=83},	beg=0, end=204, reps=3
-Up:		NECx2: {D=67,F=13,S=83},	beg=0, end=272, reps=4
-Down:		NECx2: {D=67,F=21,S=83},	beg=0, end=272, reps=4
-Left:		NECx2: {D=67,F=37,S=83},	beg=0, end=68, reps=1
-Right:		NECx2: {D=67,F=29,S=83},	beg=0, end=68, reps=1
-OK:		NECx2: {D=67,F=5,S=83},	beg=0, end=204, reps=3
-Play:		NECx2: {D=44,F=4,S=44},	beg=0, end=68, reps=1
-Pause:		NECx2: {D=44,F=79,S=44},	beg=0, end=68, reps=1
-Rewind:		NECx2: {D=44,F=6,S=44},	beg=0, end=68, reps=1
-FFWD:		NECx2: {D=44,F=7,S=44},	beg=0, end=68, reps=1
-Stop:		NECx2: {D=44,F=5,S=44},	beg=0, end=68, reps=1
+Vol+ NEC2:	NEC: {D=31,F=223},	beg=0, end=67	{NEC: {D=31,F=223},	beg=68, end=135	{NEC: {D=31,F=223},	beg=136, end=203	{NEC: {D=31,F=223},	beg=204, end=271}}}
+	Pioneer-Mix: {D0=31,F0=223},	beg=0, end=271, reps=2
+Vol- NEC2:	NEC: {D=31,F=95},	beg=0, end=67	{NEC: {D=31,F=95},	beg=68, end=135	{NEC: {D=31,F=95},	beg=136, end=203}}
+	Pioneer-Mix: {D0=31,F0=95},	beg=0, end=203, reps=1
+Mute:	NECx2: {D=67,F=57,S=83},	beg=0, end=203, reps=3
+Up:	NECx2: {D=67,F=13,S=83},	beg=0, end=271, reps=4
+Down:	NECx2: {D=67,F=21,S=83},	beg=0, end=271, reps=4
+Left:	NECx2: {D=67,F=37,S=83},	beg=0, end=67, reps=1
+Right:	NECx2: {D=67,F=29,S=83},	beg=0, end=67, reps=1
+OK:	NECx2: {D=67,F=5,S=83},	beg=0, end=203, reps=3
+Play:	NECx2: {D=44,F=4,S=44},	beg=0, end=67, reps=1	{UNDECODED. length=18}
+Pause:	NECx2: {D=44,F=79,S=44},	beg=0, end=67, reps=1	{UNDECODED. length=18}
+Rewind:	NECx2: {D=44,F=6,S=44},	beg=0, end=67, reps=1	{UNDECODED. length=18}
+FFWD:	NECx2: {D=44,F=7,S=44},	beg=0, end=67, reps=1	{UNDECODED. length=18}
+Stop:	NECx2: {D=44,F=5,S=44},	beg=0, end=67, reps=1	{UNDECODED. length=6}

@@ -1,11 +1,22 @@
-Power:		NEC2-f16: {D=1,F=61185},	beg=0, end=204, reps=3
-0:		NEC2-f16: {D=1,F=27945},	beg=0, end=408, reps=6
-1:		NEC2-f16: {D=1,F=64800},	beg=0, end=408, reps=6
-2:		NEC2-f16: {D=1,F=60705},	beg=0, end=408, reps=6
-3:		NEC2-f16: {D=1,F=56370},	beg=0, end=408, reps=6
-4:		NEC2-f16: {D=1,F=52515},	beg=0, end=408, reps=6
-5:		NEC2-f16: {D=1,F=48420},	beg=0, end=408, reps=6
-6:		NEC2-f16: {D=1,F=44325},	beg=0, end=408, reps=6
-7:		NEC2-f16: {D=1,F=40230},	beg=0, end=408, reps=6
-8:		NEC2-f16: {D=1,F=36135},	beg=0, end=408, reps=6
-9:		NEC2-f16: {D=1,F=32040},	beg=0, end=408, reps=6
+Power:	NEC1-rnc: {D=1,F=1},	beg=0, end=67	{NEC1-rnc: {D=1,F=1},	beg=68, end=135	{NEC1-rnc: {D=1,F=1},	beg=136, end=203	NEC2-f16: {D=1,F=61185},	beg=136, end=203, reps=1}	NEC2-f16: {D=1,F=61185},	beg=68, end=203, reps=2}
+	NEC2-f16: {D=1,F=61185},	beg=0, end=203, reps=3
+0:	NEC1-rnc: {D=1,F=41},	beg=0, end=67	{NEC1-rnc: {D=1,F=41},	beg=68, end=135	{NEC1-rnc: {D=1,F=41},	beg=136, end=203	{NEC1-rnc: {D=1,F=41},	beg=204, end=271	{NEC1-rnc: {D=1,F=41},	beg=272, end=339	{NEC1-rnc: {D=1,F=41},	beg=340, end=407	NEC2-f16: {D=1,F=27945},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=27945},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=27945},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=27945},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=27945},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=27945},	beg=0, end=407, reps=6
+1:	NEC1-rnc: {D=1,F=32},	beg=0, end=67	{NEC1-rnc: {D=1,F=32},	beg=68, end=135	{NEC1-rnc: {D=1,F=32},	beg=136, end=203	{NEC1-rnc: {D=1,F=32},	beg=204, end=271	{NEC1-rnc: {D=1,F=32},	beg=272, end=339	{NEC1-rnc: {D=1,F=32},	beg=340, end=407	NEC2-f16: {D=1,F=64800},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=64800},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=64800},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=64800},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=64800},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=64800},	beg=0, end=407, reps=6
+2:	NEC1-rnc: {D=1,F=33},	beg=0, end=67	{NEC1-rnc: {D=1,F=33},	beg=68, end=135	{NEC1-rnc: {D=1,F=33},	beg=136, end=203	{NEC1-rnc: {D=1,F=33},	beg=204, end=271	{NEC1-rnc: {D=1,F=33},	beg=272, end=339	{NEC1-rnc: {D=1,F=33},	beg=340, end=407	NEC2-f16: {D=1,F=60705},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=60705},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=60705},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=60705},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=60705},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=60705},	beg=0, end=407, reps=6
+3:	NEC1-rnc: {D=1,F=50},	beg=0, end=67	{NEC1-rnc: {D=1,F=50},	beg=68, end=135	{NEC1-rnc: {D=1,F=50},	beg=136, end=203	{NEC1-rnc: {D=1,F=50},	beg=204, end=271	{NEC1-rnc: {D=1,F=50},	beg=272, end=339	{NEC1-rnc: {D=1,F=50},	beg=340, end=407	NEC2-f16: {D=1,F=56370},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=56370},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=56370},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=56370},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=56370},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=56370},	beg=0, end=407, reps=6
+4:	NEC1-rnc: {D=1,F=35},	beg=0, end=67	{NEC1-rnc: {D=1,F=35},	beg=68, end=135	{NEC1-rnc: {D=1,F=35},	beg=136, end=203	{NEC1-rnc: {D=1,F=35},	beg=204, end=271	{NEC1-rnc: {D=1,F=35},	beg=272, end=339	{NEC1-rnc: {D=1,F=35},	beg=340, end=407	NEC2-f16: {D=1,F=52515},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=52515},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=52515},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=52515},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=52515},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=52515},	beg=0, end=407, reps=6
+5:	NEC1-rnc: {D=1,F=36},	beg=0, end=67	{NEC1-rnc: {D=1,F=36},	beg=68, end=135	{NEC1-rnc: {D=1,F=36},	beg=136, end=203	{NEC1-rnc: {D=1,F=36},	beg=204, end=271	{NEC1-rnc: {D=1,F=36},	beg=272, end=339	{NEC1-rnc: {D=1,F=36},	beg=340, end=407	NEC2-f16: {D=1,F=48420},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=48420},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=48420},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=48420},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=48420},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=48420},	beg=0, end=407, reps=6
+6:	NEC1-rnc: {D=1,F=37},	beg=0, end=67	{NEC1-rnc: {D=1,F=37},	beg=68, end=135	{NEC1-rnc: {D=1,F=37},	beg=136, end=203	{NEC1-rnc: {D=1,F=37},	beg=204, end=271	{NEC1-rnc: {D=1,F=37},	beg=272, end=339	{NEC1-rnc: {D=1,F=37},	beg=340, end=407	NEC2-f16: {D=1,F=44325},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=44325},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=44325},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=44325},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=44325},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=44325},	beg=0, end=407, reps=6
+7:	NEC1-rnc: {D=1,F=38},	beg=0, end=67	{NEC1-rnc: {D=1,F=38},	beg=68, end=135	{NEC1-rnc: {D=1,F=38},	beg=136, end=203	{NEC1-rnc: {D=1,F=38},	beg=204, end=271	{NEC1-rnc: {D=1,F=38},	beg=272, end=339	{NEC1-rnc: {D=1,F=38},	beg=340, end=407	NEC2-f16: {D=1,F=40230},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=40230},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=40230},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=40230},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=40230},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=40230},	beg=0, end=407, reps=6
+8:	NEC1-rnc: {D=1,F=39},	beg=0, end=67	{NEC1-rnc: {D=1,F=39},	beg=68, end=135	{NEC1-rnc: {D=1,F=39},	beg=136, end=203	{NEC1-rnc: {D=1,F=39},	beg=204, end=271	{NEC1-rnc: {D=1,F=39},	beg=272, end=339	{NEC1-rnc: {D=1,F=39},	beg=340, end=407	NEC2-f16: {D=1,F=36135},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=36135},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=36135},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=36135},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=36135},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=36135},	beg=0, end=407, reps=6
+9:	NEC1-rnc: {D=1,F=40},	beg=0, end=67	{NEC1-rnc: {D=1,F=40},	beg=68, end=135	{NEC1-rnc: {D=1,F=40},	beg=136, end=203	{NEC1-rnc: {D=1,F=40},	beg=204, end=271	{NEC1-rnc: {D=1,F=40},	beg=272, end=339	{NEC1-rnc: {D=1,F=40},	beg=340, end=407	NEC2-f16: {D=1,F=32040},	beg=340, end=407, reps=1}	NEC2-f16: {D=1,F=32040},	beg=272, end=407, reps=2}	NEC2-f16: {D=1,F=32040},	beg=204, end=407, reps=3}	NEC2-f16: {D=1,F=32040},	beg=136, end=407, reps=4}	NEC2-f16: {D=1,F=32040},	beg=68, end=407, reps=5}
+	NEC2-f16: {D=1,F=32040},	beg=0, end=407, reps=6

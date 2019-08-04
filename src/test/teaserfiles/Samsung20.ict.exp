@@ -1,8 +1,8 @@
-Vol+:		Samsung20: {D=1,F=56,S=0},	beg=0, end=264, reps=6
-Vol-:		Samsung20: {D=1,F=57,S=0},	beg=0, end=176, reps=4
-Mute:		Samsung20: {D=1,F=52,S=0},	beg=0, end=176, reps=4
-Up:		Samsung20: {D=1,F=54,S=0},	beg=0, end=264, reps=6
-Down:		Samsung20: {D=1,F=55,S=0},	beg=0, end=176, reps=4
-Left:		Samsung20: {D=1,F=57,S=0},	beg=0, end=220, reps=5
-Right:		Samsung20: {D=1,F=56,S=0},	beg=0, end=220, reps=5
-Info:		Samsung20: {D=1,F=59,S=0},	beg=0, end=264, reps=6
+Vol+:	Samsung20: {D=1,F=56,S=0},	beg=0, end=263, reps=6
+Vol-:	Samsung20: {D=1,F=57,S=0},	beg=0, end=175, reps=4
+Mute:	Samsung20: {D=1,F=52,S=0},	beg=0, end=175, reps=4
+Up:	Samsung20: {D=1,F=54,S=0},	beg=0, end=263, reps=6
+Down:	Samsung20: {D=1,F=55,S=0},	beg=0, end=175, reps=4
+Left:	Samsung20: {D=1,F=57,S=0},	beg=0, end=219, reps=5
+Right:	Samsung20: {D=1,F=56,S=0},	beg=0, end=219, reps=5
+Info:	Samsung20: {D=1,F=59,S=0},	beg=0, end=263, reps=6

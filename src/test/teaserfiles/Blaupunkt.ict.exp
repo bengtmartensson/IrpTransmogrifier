@@ -1,5 +1,5 @@
-Ch+:		Blaupunkt: {D=2,F=21},	beg=0, end=92, reps=2
-Ch-:		Blaupunkt: {D=2,F=20},	beg=0, end=92, reps=2
-Play:		Blaupunkt: {D=2,F=10},	beg=0, end=108, reps=3
-Stop:		Blaupunkt: {D=2,F=12},	beg=0, end=98, reps=2
-Pause:		Blaupunkt: {D=2,F=11},	beg=0, end=116, reps=3
+Ch+:	Blaupunkt: {D=2,F=21},	beg=0, end=91, reps=2
+Ch-:	Blaupunkt: {D=2,F=20},	beg=0, end=91, reps=2
+Play:	Blaupunkt: {D=2,F=10},	beg=0, end=107, reps=3
+Stop:	Blaupunkt: {D=2,F=12},	beg=0, end=97, reps=2
+Pause:	Blaupunkt: {D=2,F=11},	beg=0, end=115, reps=3

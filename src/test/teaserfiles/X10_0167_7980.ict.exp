@@ -1,6 +1,4 @@
 1:	
-CH+ (multiple decodes):
-Sig1:		X10_8: {F=10},	beg=0, end=20, reps=1
-Sig2:		X10: {F=26},	beg=20, end=44, reps=1
+CH+:	X10_8: {F=10},	beg=0, end=19, reps=1	{X10: {F=26},	beg=20, end=43, reps=1}
 Power:	
 2:	

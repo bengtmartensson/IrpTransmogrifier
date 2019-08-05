@@ -1213,13 +1213,13 @@ public final class IrpTransmogrifier {
                 description = "Frequency tolerance in Hz. Negative disables frequency check. Default: " + IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE + ".")
         private Double frequencyTolerance = null;
 
-        @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minumum gap at end of repetition.")
+        @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minimum gap required to end a repetition.")
         private double minRepeatGap = IrCoreUtils.DEFAULT_MIN_REPEAT_LAST_GAP;
 
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message. Deprecated; use the command \"help\" instead.")
         private boolean helpRequested = false;
 
-        @Parameter(names = {      "--ini", "--inifile"},
+        @Parameter(names = {      "--ini", "--inifile"}, hidden = true,
                 description = "Pathname of IRP database file in ini format. "
                 + "If not specified, an XML config file (using --configfile) will be used instead.")
         private String iniFile = null;//"src/main/config/IrpProtocols.ini";
@@ -1628,7 +1628,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "--istring"}, hidden = true, description = "test toIrpString.")
         private boolean is = false;
 
-        @Parameter(names = { "-m", "--mindiff"}, description = "Display minimal difference between contained durations.")
+        @Parameter(names = { "-m", "--mindiff"}, description = "Compute minimal difference between contained durations.")
         private boolean minDiff = false;
 
         @Parameter(names = { "-n", "--normalform"}, description = "List the normal form.")

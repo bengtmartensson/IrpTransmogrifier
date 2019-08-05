@@ -48,7 +48,7 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         if (str == null || str.trim().isEmpty())
             return new NameEngine();
 
-        String payload = str.trim().replaceFirst("^\\{", "").replaceFirst("\\}$", "");
+        String payload = str.trim().replaceFirst("^\\{", "").replaceFirst("\\}$", "").replaceAll("\\s*=\\s*", "=");
         String[] definitions = payload.split("[\\s,;]+");
         return parse(definitions);
     }

@@ -292,9 +292,6 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       2000.0.
     -h, --help, -?
       Display help message. Deprecated; use the command "help" instead.
-    --ini, --inifile
-      Pathname of IRP database file in ini format. If not specified, an XML
-      config file (using --configfile) will be used instead.
     -i, --irp
       Explicit IRP string to use as protocol definition.
     --logclasses
@@ -312,7 +309,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     --min-leadout
       Threshold for leadout when decoding. Default: 20000.0.
     -g, --minrepeatgap
-      Minumum gap at end of repetition.
+      Minimum gap required to end a repetition.
       Default: 5000.0
     -o, --output
       Name of output file. Default: stdout.
@@ -395,7 +392,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             List IRP form.
             Default: false
           -m, --mindiff
-            Display minimal difference between contained durations.
+            Compute minimal difference between contained durations.
             Default: false
           --name
             List protocol name, also if --quiet is given.

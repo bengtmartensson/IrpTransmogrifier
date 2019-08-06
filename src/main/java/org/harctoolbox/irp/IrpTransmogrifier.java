@@ -422,7 +422,8 @@ public final class IrpTransmogrifier {
         out.println();
         out.println("Use");
         out.println("    \"" + PROGRAMNAME + " help\" for the full syntax,");
-        out.println("    \"" + PROGRAMNAME + " help <command>\" for a particular command.");
+        out.println("    \"" + PROGRAMNAME + " help <command>\" for a particular command,");
+        out.println("    \"" + PROGRAMNAME + " <command> --describe\" for a description,");
         out.println("    \"" + PROGRAMNAME + " help --common\" for the common options.");
     }
 
@@ -1431,7 +1432,8 @@ public final class IrpTransmogrifier {
                     "The \"bitfield\" command computes the value and the binary form corresponding to the bitfield given as input. "
                     + "Using the --nameengine argument, the bitfield can also refer to names. "
                     + "\n\n"
-                    + "As an alternatively, the \"expression\" command may be used."
+                    + "As an alternatively, the \"expression\" command may be used. "
+                    + "However, a bitfield has a length, which an expression, evaluating to an integer value, does not."
                     ;
         }
     }
@@ -1700,14 +1702,19 @@ public final class IrpTransmogrifier {
                     + "The parameters can be either given directly with the -n option,"
                     + "or the --random option can be used to generate random, but valid parameters"
                     + "With the --count or --number-repeats option, instead an IR sequence is computed,"
-                    + "containing the desired number of repeats.";
+                    + "containing the desired number of repeats.\n\n"
+                    + "The syntax of the name engine is as in the IRP specification, for example: --nameengine {D=12,F=34}. "
+                    + "For convenience, the braces may be left out. Space around the equal sign \"=\" and "
+                    + "around the comma \",\" is allowed, as long as the name engine is still only one argument in the sense of the shell -- "
+                    + "it may need to be enclosed within single or double quotes."
+                    ;
         }
     }
 
-    @Parameters(commandNames = {"version"}, commandDescription = "Report version")
+    @Parameters(commandNames = {"version"}, commandDescription = "Report version and license.")
     private static class CommandVersion extends MyCommand {
 
-        @Parameter(names = { "-s", "--short" }, description = "Issue only the version number of the program proper")
+        @Parameter(names = { "-s", "--short" }, description = "Issue only the version number of the program proper.")
         private boolean shortForm = false;
 
         @Override

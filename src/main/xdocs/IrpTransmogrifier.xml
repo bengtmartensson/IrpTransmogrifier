@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-stylesheet type="text/xsl" href="xdoc2html.xsl"?>
 <!DOCTYPE document PUBLIC "-//APACHE//DTD Documentation V2.0//EN" "http://forrest.apache.org/dtd/document-v20.dtd">
-<document>
+<document xmlns:xi="http://www.w3.org/2001/XInclude">
     <header>
         <title>IrpTransmogrifier: Parser for IRP notation protocols, with rendering, code generation, and recognition applications.</title>
     </header>
     <body>
         <note>Possibly you should not read this document! If your are
             looking for a user friendly GUI program for generating, decoding, and analyzing IR signals etc,
-            please try the program <a href="IrScrutinizer.html">IrScrutinizer</a>, and get
+            please try the GUI program <a href="IrScrutinizer.html">IrScrutinizer</a>, and get
             back here if (and only if) you want to know the detail on IR signal
-            generation.
+            generation and analysis.
         </note>
 
         <section>
@@ -21,7 +21,7 @@
                     <th>Description</th>
                 </tr>
                 <tr>
-                    <td>2019-07-23</td>
+                    <td>2019-08-06</td>
                     <td>Initial version, for IrpTransmogrifier Version 1.0.0.</td>
                 </tr>
             </table>
@@ -35,37 +35,33 @@
         </section>
         <section>
             <title>Introduction</title>
-            <p>IrTransmogrifier is a software that, with the use of a data base of IR protocols,
+            <!--p>IrTransmogrifier is a software that, with the use of a data base of IR protocols,
             can generate, decode, and analyze IR signals. It can be used as am interactive command line program,
-            and through its API, be embedded in a larger GUI program, like IrScrutinizer.</p>
+            and through its API, be embedded in a larger GUI program, like <a href="IrScrutinizer.html">IrScrutinizer</a>.</p-->
             <p>The <em>IRP notation</em> is a domain specific language for describing IR
                 protocols, i.e. ways of mapping a number of parameters to infrared
                 signals. It is a very powerful, slightly cryptic, way of describing
-                IR protocols, that was first developed by John Fine in a series of postings on a restricted Yahoo forum on March 13, 2003 and a few following days.
+                IR protocols, that was first developed by John Fine in 2003.
                 In early 2010, Graham Dixon (mathdon in the <a
                     href="http://www.hifi-remote.com/forums">JP1-Forum</a>) wrote a <a
                     href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation">specification</a>.
-                Both this, and the present program, are Java programs/libraries,
-                    written in pure Java. It can be used as a command
-                line program, or it can
-                be used through its API.
             </p>
             <p>This project does not contain a graphical user interface (GUI). See <a
                     href="#Main+principles">Main principles</a> for a background. Instead, the
-                accompanying program <a href="IrScrutinizer.html">IrScrutinizer</a> provides a GUI.
+                accompanying program <a href="IrScrutinizer.html">IrScrutinizer</a> provides GUI access to most of the functionallity described here.
             </p>
 
-            <p>This is a new program, written from scratch, that is intended to replace IrpMaster, DecodeIR, and (most of) ExchangeIR,
-                and much more, like potentially replacing "all" hand written decoders/renders.
+            <p>This is a new program, written from scratch, that is intended to replace <a href="Glossary.html#IrpMaster">IrpMaster</a>,
+            <a href="http://localhost:8888/Glossary.html#DecodeIR">DecodeIR</a>, and (most of) <a href="http://localhost:8888/Glossary.html#ExchangeIr">ExchangeIR</a>,
+                and much more, like potentially replacing hand written decoders/renders.
                 The project consists of an API library that is also callable from the command line as a command line program.
-                The library has been integrated in user-friendly GUI programs, IrScrutinizer.
             </p>
 
             <p>For understanding this document and program, a basic understanding
                 of IR protocol is assumed. However, the program
                 can be successfully used just by understanding that an "IRP protocol"
                 is a
-                "program" in a particular "domain specific language" for turning a
+                "program" in a particular domain specific language for turning a
                 number of parameters into an IR signal, and the
                 present program is a compiler/interpreter/decompiler of that language. Some parts
                 of this document requires more IRP knowledge, however.
@@ -73,52 +69,79 @@
             <section>
                 <title>Background</title>
                 <p>
-                    This program can be considered as a successor of [IrpMaster](http://www.harctoolbox.org/IrpMaster,html).
-                    The Irp parser therein is based upon a [ANTLR3 grammar](http://www.antlr.org). The "new version"
+                    This program can be considered as a successor of <a href="Glossary.html#IrpMaster">IrpMaster</a>.
+                    The IRP parser therein is based upon a <a href="http://www.antlr.org">ANTLR</a>, using the now obsolete version 3.
+                    The "new version"
                     ANTLR4 is really not a new version, but a completely different tool, fixing most of the quirks that were irritating
                     in IrpMaster (like the "ugliness" of embedding actions within the grammar and no left recursion).
                     Unfortunately, this means that using version 4 instead of version 3 is not like updating a compiler or such,
                     but necessitates a complete rewrite of the grammar and the actions.</p>
 
-                <p>It turned out that IrScrutionizer 1.*.* (i.e. the version based upon IrpMaster for generating and
-                    <a href="http://localhost:8888/Glossary.html#DecodeIR">DecodeIR</a> for decoding)
-                    had a fundamental problem: Although DecodeIR and IrpMaster (through the data base <code>IrpProtocols.ini</code>)
+                <p>It turned out that IrScrutionizer version 1 (i.e. the version based upon IrpMaster for generating and
+                    <a href="Glossary.html#DecodeIR">DecodeIR</a> for decoding)
+                    had a fundamental problem: Although DecodeIR and IrpMaster (the latter through the data base <code>IrpProtocols.ini</code>)
                     agree on most (but not all) protocols, they relied upon two different, dis-coupled sources of protocol information.
                     If the data base for the sending protocols were changed or extended, this affected sending only,
                     while decoding was not changed, and potentially conflicted with the sending protocols.
-                    Also, both DecodeIR and the Analyzer,  that was used in IrScrutinizer 1.*.*, have shown to be
+                    Also, both DecodeIR and the IR Analyzer, used in IrScrutinizer versions before 1.3, have shown to be
                     essentially impossible to maintain and extend.
                 </p>
             </section>
             <section>
                 <title>Dependencies</title>
-                <p>The program depends on ANTLR 4 and JCommander, described below.
-                    Except for building and testing of the program, and of course the Java framework,
-                    there are no other dependencies. In particular, to avoid circular dependencies, it does not depend on any other Harctoolbox software.
+                <p>
+                    The program is written entirely in Java, using no native libraries.
+                    Except for building (using Maven and a number of its plugins), testing of the program (using TextNG),
+                    and of course the Java framework,
+                    it depends on <a href="https://www.antlr.org/">ANTLR4</a>,  <a href="https://www.stringtemplate.org/">StringTemplate</a>,
+                    and the command line decoder <a href="http://jcommander.org/">JCommander</a>.
+                    In particular, to avoid circular dependencies,
+                    it does not depend on any other <a href="http://www.harctoolbox.org">Harctoolbox software</a>.
                 </p>
             </section>
 
             <section>
                 <title>Documentation principles</title>
                 <p>The role of program documentation has changed considerably the last few decades.
-                    Ideally, a well designed program does not need any documentation at all.
-                    Unfortunately, non-trivial problems almost never have trivial solutions,
-                    so some sort of documentation is almost always necessary for sufficiently
+                    Ideally, a program does not need any documentation at all, if its operation is entirely obvious.
+                    Unfortunately, as non-trivial problems almost never have trivial solutions,
+                    so some sort of documentation is almost always necessary for programs solving
                     complex programs.
                     The next best thing is that the program contains its own documentation,
                     for GUI programs through tool-tips, info-popups etc, for command line programs
                     through help texts. This can contain precise information over the syntax and semantic
                     of, for example, commands. Since they are integrated in the program and maintained
                     together with the program source, it is less likely that it lacks behind the actual program behavior,
-                    than in the traditional program manual.</p>
+                    than in the traditional program manual like this.
+                    They may also change faster than this reference manual.
+                </p>
+                <p>
+                    Documentation for API, and structures like XML Schemas should preferably be integrated into the source itself,
+                    using technologies like Javadoc, Doxygen, and, for XML documents, including Schemas etc,
+                    be documented using the available documentation elements.
+                </p>
 
-                <p>The program documentation, on paper or electronically, should play another role
+                <p>
+                    Separate program documentation, on paper or electronically (like the present document),
+                    should then play another role
                     than in the last century. It should be centered around explaining the concepts
                     of the program, the "why", and not the "how". Some details that cannot in a natural way be explained
-                    within the program can also be covered.</p>
+                    within the program with a few sentences can also be covered.
+                </p>
 
-                <p>The current document is written in that spirit. We do not explain the details of
-                    all the commands, at least as long as it is (almost) obvious.</p>
+                <p>
+                    The present document is written in that spirit. We do not explain
+                    all commands and parameters, at least not the ones that are (more-or-less) obvious.
+                </p>
+                <p>
+                    Since a text like this is unlikely to be read sequentially from start to finish,
+                    redundancy and repetitions are not considered evil and a sign of stylistic inaptitude,
+                    like in other type of documents.
+                </p>
+                <p>
+                    All sort of suggestions for improving the documentation are always welcome.
+                    Also, reports of useless or misleading error messages, as well as suggestion on improving them, are solicited.
+                </p>
 
                 <p>One or more tutorial Youtube videos are planned, explaining the program and its principles more informally.</p>
             </section>
@@ -137,10 +160,11 @@
                 <p>
                     The program, as well as this document, is copyright by myself. Of
                     course, it is
-                    based upon the <a href="#Specification_of_IRP_Notation">IRP
-                        documentation</a>, but is to be considered original work. The "database
+                    based upon the <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation">IRP
+                        specification</a>, but is to be considered original work. The "database
                     file" <code>IrpProtocols.xml</code> is derived from many sources, in particular <a
-                        href="#DecodeIR.html">DecodeIR.html</a>, so I do not claim copyright.</p>
+                        href="http://www.hifi-remote.com/wiki/index.php/DecodeIR">DecodeIR.html</a> (which is public domain), so I do not claim copyright,
+                        but place it in the public domain.</p>
 
                 <p>The program uses some third-party project. It depends on <a
                         href="http://www.antlr.org/">ANTLR4</a> (<a href="https://github.com/antlr/antlr4/blob/master/LICENSE.txt">license</a>),
@@ -155,6 +179,8 @@
                         href="http://www.gnu.org/licenses/gpl.html">GNU General Public License version
                         3</a>, making everyone free to use, study, improve, etc., under certain
                     conditions.</p>
+
+                    <p>Data and code generated by the program can be used without any restrictions.</p>
             </section>
         </section>
 
@@ -162,61 +188,61 @@
             <title>Main principles</title>
             <section>
                 <title>Design principles</title>
-                <p>It is my opinion that it is better to get the functionality and the
-                    API right, before you do a graphical user interface (GUI). It is much
-                    easier and logical to put a GUI on top of a sane API, then to try to
+                <p>It is
+                    easier and more logical to put a GUI on top of a sane API, then to try to
                     extract API functionality from a program that was never designed
-                    sanely but built around the GUI. (Look at WinZip for a good example of
-                    the latter. Or almost any Windows program, commercial or freeware...)</p>
-                <p>
-                    I have tried to follow the IRP document, Section 1 -- 13, as closely as possible, in
-                    particular with respect to the grammar and the syntax.</p>
+                    sanely but built around and into the GUI.
+                    The goal of <em>this</em> project is an API and a command line program.
+                </p>
                 <section>
                     <title>Performance considerations</title>
                     <p>
-                        Performance consideration, both time and space, were given minimal priorities. As it stands,
-                        rendering a single IR signal typically takes less than 1 ms, so this
-                        seems justified.
-                        However, the decoding mechanism is intrinsically much slower that DecodeIR due to
-                        the method used. A single decode can take several hundred milli-seconds.
-                        However, in normal interactive use of IrScrutinizer, this is not user noticeable.
+                        Performance consideration, both time and space, were given secondary priorities.
+                        However, the decoding mechanism is intrinsically much slower that DecodeIR.
+                        A single decode can take several hundred milli-seconds.
+                        However, in normal interactive use from the command line or through IrScrutinizer, this does not introduced
+                        any noticeable delays.
                     </p>
+                </section>
+                <section>
+                    <title>IR signal formats</title>
+                    <p>The current program reads raw format, and
+                        <a href="Glossary.html#ProntoHex">Pronto Hex format</a> IR signals.
+                        These formats can also be output. Although many more formats exist, it is not planned
+                        to extend this. The "conversion expert" is IrScrutinizer,
+                        which is even symbolized by its icon,
+                        the <a href="https://en.wikipedia.org/wiki/List_of_races_and_species_in_The_Hitchhiker%27s_Guide_to_the_Galaxy#Babel_fish">Babel fish</a>.</p>
                 </section>
                 <section>
                     <title>Data types</title>
                     <p>
                         Everything that is a physical quantity
-                        (durations and frequency), are real numbers (in the code double
-                        precision numbers), and are internally represented as a double.</p>
+                        (durations and frequency), are real numbers (in the Java code <code>double</code>),
+                    </p>
                     <p>Durations are always given in micro seconds. Unless in a context where the
                         IRP says otherwise, all others quantities are given
-                        in (pure) SI units without prefix. So is duty cycle and relative tolerance both a real
+                        in (pure) SI units without prefix. So are duty cycle and relative tolerance both a real
                         number between 0 and 1, not a number of percents. Modulation frequency is given in Hz, not it kHz
-                        (unless in the GeneralSpec).
-                    </p>
-                    <p>
-                        Integer quantities are in principle arbitrarily large, but in some cases limited to 63 bits.
+                        (unless in the <code>GeneralSpec</code>).
                     </p>
                     <p>Integer literals can be given in base 16 (using prefix "0x"), base 8 (using prefix "0"),
                         base 2 (using prefix "0b"), as well as in base 10 (no prefix, omitting leading zeros).</p>
                     <p>
-                        All "integer quantities" like expressions, where previously done in Java's long
-                        format, 64 bits long, amounting to 63 bits plus sign.
-                        Using this principle, all parameters are limited to Java's long, and can thus be
-                        no larger than  2^63-1 = 9223372036854775807.</p>
-
-                    <p>Work is ongoing to remove this restriction, by, alternatively using Java's <code>BigInteger</code>.
-                        At the time of this writing, this is only partially implemented.
+                        Integer quantities are in principle arbitrarily large, but in most cases limited to 63 bits,
+                        since the implementation uses Java's <code>long</code>, 64 bits long, amounting to 63 bits plus sign.
+                        (Work is ongoing to remove this restriction, by, alternatively using Java's <code>BigInteger</code>.)
                     </p>
                 </section>
                 <section>
                     <title>Internationalization</title>
                     <p>
                         Being a command line program and API library, this project is not a
-                        a candidate for internationalization.</p>
+                        a candidate for internationalization.
+                    </p>
                 </section>
             </section>
         </section>
+
         <section>
             <title>Theory and general concepts</title>
             <section>
@@ -226,7 +252,8 @@
                     <p>
                         Sequence of time durations, in general in expressed microseconds,
                         together with a modulation frequency.
-                        The even numbered entries normally denote times when the IR light is on (modulated), called "flashes" or sometimes "marks",
+                        The even numbered entries normally denote times when the IR light is on (considering modulation),
+                        called "flashes" or sometimes "marks",
                         the other denote off-periods, "gaps" or "spaces". They always start with a flash, and end with a gap.
                     </p>
                 </section>
@@ -252,95 +279,412 @@
                         Any of these can be empty, but not both the intro and the repeat. A
                         non-empty ending sequence is only meaningful with a non-empty repeat.
                     </p>
+                    <p>
+                        By "sending an IrSignal <em>n</em> times" we shall mean sending an IrSequence consisting
+                        of one copy of the intro sequence, <em>n</em> - 1 copies of the repeat sequence,
+                        and one copy of the ending sequence, unless the intro sequence is empty, in which case
+                        the IrSequence has <em>n</em> repeats, followed by the ending sequence.
+                    </p>
+                </section>
+
+                <section id="NumEqDurations">
+                    <title>Numerical equality between durations</title>
+                    <p>Two durations <em>d1</em> and <em>d2</em> are considered numerically equal,
+                        if <em>either</em> the difference is absolute less or equal than <code>absolutetolerance</code>
+                        <em>or</em> the difference divided by the largest is less than or equal than <code>relativetolerance</code>.
+                        (see <code>IrCoreUtils.approximatelyEquals</code>).
+                    </p>
+                </section>
+
+                <section>
+                    <title>Parsing of IR signals as text</title>
+                    <p>We need a new simple format for raw IR signals:</p>
+                    <section id="BracketedRawFormat">
+                        <title>Bracketed raw format</title>
+                        <p>Simple text format for formatting of a raw IR signal, introduced
+                            with the current program.
+                            Intro-, repeat, and (optionally) ending sequences are enclosed by brackets ("[]", sometimes called "square brackets"
+                            or "square parenthesis"). Signs ("+" for flashes, "-" for gaps), as well as interleaved commands or semicolons,
+                            are accepted, but ignored (even if they are not interleaved). Optionally, the beginning sequence can be preceeded by
+                            <code>Freq=</code><em>frequency_in_Hz</em><code>Hz</code>
+                            giving the modulation frequency. If not explicitly given,
+                            a default value (dependent on the reading program) is assumed.</p>
+                                <p>Example (an RC5-signal):</p>
+                                <source>Freq=36000Hz[][+889,-889,+1778,-889,+889,-889,+889,-889,+889,-889,+889,-889,+889,-889,+889,-889,+889,-889,+889,-889,+889,-889,+889,-889,+889,-90886][]</source>
+                    </section>
+
+                    <p>
+                        Although we only consider the Pronto Hex and the raw form,
+                        parsing of text representation is a non-trivial task.
+                        IrpTransmogrifier presently contains three different parsers,
+                        tried in order until one succeeds.
+                        These are classes implementing the interface <code>IrSignalParser</code>,
+                        namely:
+                    </p>
+                    <dl>
+                        <dt>ProntoParser</dt>
+                        <dd>Tries to interpret its argument as <a href="Glossary.html#ProntoHex">Pronto Hex</a>,
+                            possibly after concatenating all lines of its argument.</dd>
+                        <dt>BracketedIrSignalParser</dt>
+                        <dd>Tries to parse an IrSignal in the <a href="#BracketedRawFormat">bracketed text format</a>,
+                            as defined above.</dd>
+                        <dt>MultilineIrSignalParser</dt>
+                        <dd>
+                            If the number of lines is 1, 2, or 3, these are considered intro-,
+                            repeat-, and ending sequence respectively. If there are more lines, these
+                            are concatenated, and considered an intro-sequence,
+                            without repeat-, and ending sequence.
+                        </dd>
+                    </dl>
+                    <p>
+                        Programs can add other formats and their corresponding parsers.
+                        For an example, in IrScrutinizer, a parser for the <a href="Glossary.html#sendir">Global Caché sendir format</a> is added,
+                        see <code>org.harctoolbox.irscrutinizer.Interpretstring.interpretString()</code>.
+                    </p>
+                </section>
+
+                <section>
+                    <title>Cleaner</title>
+                    <p>
+                        Physically measured IR signals/sequences are in general <a href="Glossary.html#DirtySignal">"dirty"</a>,
+                        consisting of a number of close, but not quite equal, measured durations. To be useful for further processing,
+                        the signal/sequence needs to be <a href="Glossary.html#CleansedSignal">cleaned</a>.
+                        The naive way to implementing such a cleaning algorithm is to round off all durations to a multiple of an
+                        (more ore less arbitrarily selected) time unit. The cleaner in IrpTransmogrifier takes a more sophisticatedly
+                        approach:
+                        The collected durations found in the sequence(s)
+                        are bundled into "bins" (disjoint intervals), according to
+                        <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">this closeness concept</a>.
+                        Every duration belonging to a bin is "close" (determined by those parameters) to the bin
+                        middle. All the durations within the bin are then replaced by the average of its
+                        members. It is thus not guaranteed that the distance between a duration and its replacement
+                        will be consistent with <code>absolutetolerance</code> and <code>relativetolerance</code>.
+                    </p>
+                    <p>
+                        If invoked on a number of IR signals/sequences, the histogram is formed over all sequences, and the corresponding
+                        "cleaning" then applied to the individual signals/sequences.
+                    </p>
+                    <p>
+                        The cleaner is not a separate function in the command line program,
+                        but can be invoked together with the <code>decode</code> and <code>analyze</code> commands.
+                    </p>
                 </section>
 
                 <section>
                     <title>Repeat finder</title>
+                    <p>
+                        A repeat finder is a program that, when fed with an IrSequence,
+                        tries to identify a repeating subsequence in it,
+                        returning an IrSignal containing intro-, repeat-, and ending sequence,
+                        compatible with the given input data.
+                        IrpTransmogrifier can optionally run its data for the decode and analyze command
+                        though its built-in repeat finder. The repeat finder is configurable using the following parameters:
+                    </p>
+                    <dl>
+                        <dt>
+                            <code>absolutetolerance</code>
+                        </dt>
+                        <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
+
+                        <dt>
+                            <code>relativetolerance</code>
+                        </dt>
+                        <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
+                        <dt>
+                            <code>minrepeatgap</code>
+                        </dt>
+                        <dd>Minimum gap required to end a repetition. Default: 5000.0.</dd>
+                    </dl>
+                    <p>
+                        The repeat finder
+                    </p>
                 </section>
 
                 <section>
-                    <title>Protocol data base</title>
-                </section>
+                    <title>The Configuration file/IRP protocol database</title>
+                    <p>
+                        The configuration file <code>IrpProtocols.ini</code> of IrpMaster has been replaced by an XML file,
+                        called <code>IrpProtocols.xml</code>. The XML format
+                        is defined by the <a href="Glossary.html#XMLSchema">W3C schema</a>
+                        <a href="http://www.harctoolbox.org/schemas/irp-protocols.xsd">irp-protocols</a>,
+                        having the XML name space <code>http://www.harctoolbox.org/irp-protocols</code>.
+                        This format has many advantages over
+                        the previous, simpler, format, as it gives access to different XML technologies,
+                        for example for formatting and transforming.
+                        It can contain embedded (X)HTLM fragments,
+                        useful for for writing documentation fragments.
+                        It also can contain different parameters that can be used by different programs, for example, tolerance parameters
+                        for decoding.
+                        For this, arbitrary string-valued parameters are permitted. It is up to an interpreting program to determine the semantic.
+                        Within IrpTransmogrifier, this is used for providing protocol-specific values to the parameters.
+                    </p>
 
-                <section>
-                    <title>Writing protocol for decoding</title>
+                    <p>
+                        There is also an XSLT stylesheet <code>IrpProtocols2html.xsl</code>,
+                        which translates this file to readable HTML, for reading in a HTML browser.
+                        This makes it possible to browse the said file in an XSLT-enabled browser just by opening it.
+                    </p>
+
+                    <p>The syntax and most of the semantics,
+                        are given in <a href="http://www.harctoolbox.org/schemas/irp-protocols.xsd">the schema</a>,
+                        and are therefore not repeated here.</p>
+                    <section>
+                        <title>Protocol parameters</title>
+                        <section>
+                            <title>Name</title>
+                            <p>The name of the protocol, given as attribute <code>name</code> is folded to lowercase
+                                for searches  and  comparisons. Searches and comparisons therefore done case insensitively.</p>
+                            <p>The following parameters may be given for any protocol in the data base.
+                                They override the global values for the current protocol.</p>
+                            <dl>
+                                <dt id="absolutetolerance">
+                                    <code>absolutetolerance</code>
+                                </dt>
+                                <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
+
+                                <dt id="relativetolerance">
+                                    <code>relativetolerance</code>
+                                </dt>
+                                <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
+
+                                <dt id="frequency-tolerance">
+                                    <code>frequency-tolerance</code>
+                                </dt>
+                                <dd>Tolerance in Hz for frequency comparisons. Set to -1 to disable frequency check. Current default: 2000.0.</dd>
+
+                                <dt id="minimum-leadout">
+                                    <code>minimum-leadout</code>
+                                </dt>
+                                <dd>Minimal duration in micro seconds that is accepted as final duration. Current default: 20000.0.</dd>
+
+                                <dt id="prefer-over">
+                                    <code>prefer-over</code>
+                                </dt>
+                                <dd>If a signal has multiple decodes,
+                                    the present protocol is preferred over the one mentioned as <code>prefer-over</code>.
+                                    May be given several times. (Normally, a special protol should be preferred over a more general one.)
+                                </dd>
+
+                                <dt id="alt_name">
+                                    <code>alt_name</code>
+                                </dt>
+                                <dd>Alternative name, ("alias", "synonym") for the present protocol.</dd>
+
+                                <dt id="reject-repeatless">
+                                    <code>reject-repeatless</code>
+                                </dt>
+                                <dd>When decoding, normally the repeat sequence may match 0 times, i.e. not at all.
+                                    If this parameter is <code>true</code>  at least one repeat must be present for a match to be recognized.
+                                    (Strictly speaking, this would have been possible to achieve by using "+" instead of "*" for the repeat indicator,
+                                    but this would have other disadvantages.)
+                                </dd>
+                                <dt id="decodable">
+                                    <code>decodable</code>
+                                </dt>
+                                <dd>Setting this to <code>false</code> prohibits the program from trying to use this protocol for <a href="#Decoding">decoding</a>.
+                                    Normally, this is only used when the IRP form makes protocol decoding impossible or not feasible.
+                                </dd>
+                                <!--dt>minrepeatgap</dt>
+                                <dd>Minumum gap at end of repetition. Default: 5000.0.</dd-->
+                            </dl>
+                            <p>
+                                Other parameters are allowed, but ignored. They may be used by another program.
+                                Also, new parameters may be introduced in the future.
+                            </p>
+                        </section>
+                    </section>
                 </section>
             </section>
         </section>
 
         <section>
             <title>Use cases</title>
-            <p>
-                The reason for this project is not (just) to migrate IrpMaster to ANTLR4 -- version 3 is still operational,
-                and no more broken than it was at the start. There are a number of interesting use cases for a nice parser/tree traverser:</p>
-
+            <p>In this section, we will discuss the different use cases from a high-level, theoretical standpoint,
+                without delving into the usage of the program.
+                The subsequent section <a href="#Subcommands">Subcommands</a>,
+                which to a certain degree mirrors the present, will cover the usage of the program.</p>
             <section>
                 <title>Rendering</title>
-                <p>This use case corresponds to IrpMaster. It is probably to be implemented as a traversing of the parse tree of an IRP protocol,
-                    with numerical values assigned to the parameters.</p>
-
-                <p>In the present implementation, only one infinite repeat is allowed.
-                    (A realistic protocol, or use case, requiring more than
-                    one infinite repeat is not known to me.) Also, individual bitfields are restricted to 63 bits of length or less.
-                    (This is inherited from the use of Java's long type. It [may be removed in the future](https://github.com/bengtmartensson/IrpTransmogrifier/issues/38).)
-                    With the exception of these restriction, the implementations should be complete, down to specification holes.
-                    There are also a few extensions to the IRP notation as described in the [official documenation](http://www.hifi-remote.com/wiki/index.php/IRP_Notation).</p>
-
-                <p>In IrScrutinizer, the word "generate" is used instead of "render". These words can be considered as synonyms (here).</p>
-            </section>
-
-            <section>
-                <title>Recognition</title>
                 <p>
-                    This use case corresponds to a dynamic version of DecodeIR: given a numerical IR signal,
-                    find the parameter/protocol combination(s) that could have generated the given signal.
-                    This is implemented by trying to parse the given signal with respect to the candidate protocols.
-                    It is thus very systematic, but [comparatively slow](https://github.com/bengtmartensson/IrpTransmogrifier/issues/44).</p>
-
-                <p>
-                    It is not claimed that all protocols in the protocol data base are recognizable.
-                    Non-recognizable protocols are to be marked by setting the <code>decodable</code> parameter to <code>false</code>.
-                    To be recognizable, the IRP protocol should preferably adhere to some additional rules:
-
+                    Given a protocol name (present in the protocol data base), and a set of valid parameter values,
+                    an IrSignal is computed. This use case corresponds to IrpMaster (or <a href="Glossary.html#MakeHex">MakeHex</a>).
                 </p>
-                <ul>
-                    <li>The "+" form of repetitions is discouraged in favor of the "*" form.</li>
-                    <li>The width and shift of a Bitfield must be constant</li>
-                    <li>The decoder is capable of _simple_ equation solving (e.g. <code>Arctech</code>),
-                        but not of complicated equation solving (e.g. <code>Fujitsu_Aircon</code>).</li>
-                </ul>
-
                 <p>
-                    Presently all but two protocols (<code>zenith</code>, <code>nec1-shirrif</code>, (bitfield width as parameter), <code>fujitsu_aircon</code> (would require non-trivial equation solving))
-                    are recognizable.  It is not guaranteed that new protocols automatically will be recognizable.</p>
+                    In IrScrutinizer, the word "generate" is used instead of "render". These words can be considered as synonyms.
+                </p>
             </section>
 
             <section>
-                <title>Loose matches, Guessing</title>
-                <p>
-                    Many captured signals are not quite correct according to their protocol. However, the firmware in a receiving device is often "forgiving",
-                    and accepts slightly flawed signals. It is thus desirable for a program of this type to find a near match, "guess", when an real match fails.
-                    The program currently does not implement this, however, it is [planned](https://github.com/bengtmartensson/IrpTransmogrifier/issues/42).</p>
+                <title>Decoding</title>
+                <section>
+                    <title>General</title>
+                    <p>
+                        This use case corresponds to DecodeIR: given a numerical IR signal/sequence,
+                        find one (or more) parameter/protocol combination(s) that could have generated the given signal.
+                        This is implemented by trying to parse the given signal with respect to candidate protocols, per default all.
+                        It is thus very robust, systematic, and customizable, but comparatively slow.
+                    </p>
+
+                    <p>While every conforming IRP form with only one repeat also can be usable for rendering,
+                        the same is unfortunately not true for decoding. A few protocols cannot be used for decoding.
+                        Non-recognizable protocols are marked by setting the <code>decodable</code> parameter to <code>false</code>.
+                        To be useful for decoding, the IRP protocol should adhere to some additional rules:
+                    </p>
+                    <ul>
+                        <li>Non-deterministic grammars must be avoided.</li>
+                        <li>The "+" form of repetitions is discouraged in favor of the "*" form.</li>
+                        <li>The width and shift of a Bitfield must be constant (i.e. not dependent on protocol parameter).</li>
+                        <li>The decoder is capable of <em>simple</em> equation solving (e.g. <code>Arctech</code>),
+                            but not of complicated equation solving (e.g. <code>Fujitsu_Aircon_old</code>).</li>
+                    </ul>
+
+                    <p>
+                        Presently all but the protocols <code>zenith</code>, <code>nec1-shirrif</code>, (non-constant bitfield width);
+                        <code>RTI_Relay_alt</code>, <code>fujitsu_aircon_old</code>
+                        (would require non-trivial equation solving))
+                        are decodable. (Note how the non-decodable protocols <code>RTI_Relay_alt</code> and <code>fujitsu_aircond_old</code>
+                        was made decodable (<code>RTI_Relay</code> and <code>fujitsu_aircon</code>) by a changed parameterization.)
+                    </p>
+                </section>
+                <section>
+                    <title>Multiple decodes</title>
+                    <p>In many cases, a signal produces more than one decode. This is not necessarily an error nor a deficiency of the decoder.
+                        However, many protocols are effectively a special case of another protocol, for example,
+                        an signal that decodes to the Apple protocol by mathematical necessity also is a valid  NEC1-f16 signal.
+                        It thus makes sense have an Apple decode to "override" a NEC1-f16 decode.
+                        Exactly this is achieved by the <code>prefer-over</code> parameter.
+                        With this mechanism, the preferences are under control of the configuration file,
+                        not hard soldered into the program code as in DecodeIR.
+                    </p>
+                </section>
+
+                <section>
+                    <title>Loose matches, "Guessing"</title>
+                    <p>
+                        Many captured signals are not quite correct according to their protocol.
+                        However, in order to give the user maximal comfort,
+                        the firmware in a receiving device is in general more or less "forgiving",
+                        and accepts slightly flawed signals. The degree of "forgiveness" should be balanced against the
+                        possibility of "false positives": that the device erroneously considers "noise" of some form
+                        (often commands for a different device) as one of its commands.
+                        It is thus desirable for a program of this type to find a near match, "guess", when an "pure" match fails.
+                    </p>
+
+                    <p>Generally speaking, it is my principle to "make everything as simple as possible, <em>but not simpler</em>".
+                        Sometimes a signal has several decodes, or none at all. Sometimes only a part of the data is used for the match.
+                        In these cases, the program always prefer to tell the truth (and the full truth) to the user,
+                        instead of, in the name of user friendlyness, to perform questionable simplifications.
+                        Unfortunately, a badly informed user tend to prefer a program delivering exactly one answer to
+                        every question over a program presenting the full truth.
+                    </p>
+
+                    <p>There are a few different issues:</p>
+
+                    <section>
+                        <title>Matching of durations, non-leadouts</title>
+                        <p>Non-ending durations are matched according to
+                            <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">this method</a>,
+                        using the parameters <code>absolutetolerance</code> and <code>relativetolerance</code>.</p>
+                    </section>
+
+                    <section>
+                        <title>Matching of ending durations</title>
+                        <p>The ending duration has a slightly different role.
+                            When capturing, the ending duration is the time you have verified that nothing more is coming,
+                            not a real measurement.
+                            (Some "communities", like Lirc and IrRemote, do not consider an ending duration at all.)
+                            For this reason, it does not make sense to check the ending duration the same way as the other,
+                            non-ending durations. There is instead a parameter <code>minimum-leadout</code>
+                            (possibly protocol dependent); the ending duration is considered as passed if it is longer or equal to
+                            <code>minimum-leadout</code>.
+                        </p>
+                    </section>
+
+                    <section>
+                        <title>Matching of modulation frequency</title>
+                        <p>There is a parameter <code>frequencytolerance</code>, default 2000Hz. The frequency test is considered
+                        passed if the absolute difference between measured and expected frequency is less or equal to
+                        <code>frequencytolerance</code>. Setting <code>frequencytolerance</code> negative disables the
+                        frequency test, i.e., all values pass the test.
+                        </p>
+                    </section>
+
+                    <section>
+                        <title>Matching of IR Signals (Intro-, Repeat, and Ending sequence)</title>
+                        <p>
+                            The task is to match an IR signal (with intro-, repeat- and ending sequence) to a protocol,
+                            turn out, "practically" to be more involved than just matching the different sequence to each other.
+                            The to-be-matched signal is often empirically measured, and its decomposition into sequences the result
+                            of entering a measured signal into a <a href="#Repeat+finder">repeat finder</a>.
+                            For a short measured sequence, the repeat part may not be identified as such.
+                            For a decoding program to be considered practically usable, this problem, and related problems,
+                            must be addressed and handled correctly.
+                        </p>
+                    </section>
+
+                    <section>
+                        <title>Matching  of IR Sequences</title>
+                        <p>
+                            Decoding an IR Sequence (not decomposed into intro-, repeat-, and ending sequence) can be a complicated undertaking.
+                            In the most general case, there may be several decodes, each decode matches one intro-,
+                            zero or more repeats-, and one ending sequence.
+                            After this decode, the remainder (what is left after decoding the first part) of the sequence
+                            is another IR sequence that is to be decoded in the same way, leading to an exponential combinatorial growth...
+                        </p>
+                    </section>
+                </section>
             </section>
 
             <section>
                 <title>Code generation for rendering and/or decoding</title>
                 <p>
-                    For a particular protocol, generate target code (C, C++, Java, Python,...) that can render or decode signals
+                    The task is: For a particular protocol and a particular target (C, C++, Java, Python,...),
+                    generate target code that can render or decode signals
                     with the selected protocol. As opposed to the previous use cases, efficency (memory, execution time) (for the generated code) is potentially
-                    an issue. This should be able to generate protocol renders for e.g. the Arduino libraries IrRemote, IrLib, and AGirs.
+                    an issue.
+                </p>
+                <p>
+                    The target dependent code is not considered a part of this project,
+                    and will be handled in another project(s).
+                </p>
+                <p>
+                    Two mechanisms are available, XML and StringTemplate, described in the following two sections.
+                </p>
+                <section>
+                    <title>Code generation with XML</title>
+                    <p>The program generates basically an XML version of <code>IrpProtocols.xml</code>
+                        (with the IRP protocol replaced by a much more "parsed" XML version).
+                        It is the task of the user to supply am XML transformation, for example using XSLT,
+                        that transfers the XML file to the expected target format.
+                        The program does not come with an XSLT engine, so this has to be invoked independently on the XML export.
+                    </p>
+                    <p>
+                        This is presently used for generating the Lirc export format
+                        (which is basically another XSLT transformation) of IrScrutinizer.
+                    </p>
+                </section>
+                <section>
+                    <title>Code generation using StringTemplate</title>
+                    <p>
+                        For code generation, the template engine <a href="http://www.stringtemplate.org/">StringTemplate</a>
+                        can also be used. As opposed to the XML case, the program contains the transformation engine.
+                    </p>
+                </section>
+            </section>
+<!--
+            just invokes the template, without caring what it does; if it generates a renderer or decoder.
+                </p>
+                    The user is instead governs this by invoking the style sheets or templates (s)he want using the <code>- -target</code> (<code>-t</code>) option to the <code>code</code> sub subcommand.
+                    (For this reason, there is no <code>- -renderer</code> or <code>- -decoder</code> option to the <code>code</code> sub command.)
+                    It is also possible to pass
+                    target-specific parameters to the code generators using the <code>- -parameter</code> (<code>-p</code>) argument.
+                </p>
+
+                    This should be able to generate protocol renders for e.g. the Arduino libraries IrRemote, and AGirs.
                     At least in the first version, not all protocols describable by IRPs need to be supported. Not implemented in the first phase: Protocols with hierarchical bitspecs
                     (rc6*, replay, arctech, entone), protocols with bitspec lenght as parameter (zenith, nec1-shirrif). Also default are not implemented, e.g. NEC1 has to be
                     called with 3 parameters.</p>
 
-                <p>
-                    Two mechanisms are available: XML and [Stringtemplate](http://www.stringtemplate.org/).
-                    The program does not come with an XSLT engine, so this has to be invoked independently on the XML export.
-                    The program just invokes the template, without caring what it does; if it generates a renderer or decoder.
-                    The user is instead governs this by invoking the style sheets or templates (s)he want using the <code>--target</code> (<code>-t</code>) option to the <code>code</code> sub subcommand.
-                    (For this reason, there is no <code>--renderer</code> or <code>--decoder</code> option to the <code>code</code> sub command.)
-                    It is also possible to pass
-                    target-specific parameters to the code generators using the <code>--parameter</code> (<code>-p</code>) argument.</p>
 
                 <p>Targets:</p>
                 <dl>
@@ -363,400 +707,55 @@
                     <li>[IRremote](https://github.com/z3t0/Arduino-IRremote)</li>
                     <li>Linux kernel modules in [linux/drivers/media/rc](https://github.com/torvalds/linux/tree/master/drivers/media/rc) (decoding only).</li>
                 </ul>
-            </section>
+            </section-->
 
             <section>
                 <title>General code analysis</title>
                 <p>
                     Not really connected to parsing IRP, but fits in the general framework.
                     This has been inspired by to the Analyzer and the RepeatFinder in
-                    <a href="http://www.hifi-remote.com/forums/dload.php?action=file&amp;file_id=8460">Graham Dixon's ExchangeIR</a>
-                    <a href="https://sourceforge.net/p/controlremote/code/HEAD/tree/trunk/exchangeir/">(Java translation)</a>.</p>
-                <section>
-                    <title>Subcommand analyze</title>
-                    <p>
-                        The "analyze" command takes as input one or several sequences or signals,
-                        and computes an IRP form that corresponds to the given input (within
-                        the specified tolerances). The input can be given either as Pronto
-                        Hex or in raw form, optionally with signs (ignored). Several raw
-                        format input sequences can be given by enclosing the individual sequences
-                        in brackets ("[]"). However, if using the <code>--intro-repeat-ending</code> option,
-                        the sequences are instead interpreted as intro-, repeat-, and (optionally)
-                        ending sequences of an IR signal.</p>
-
-                    <p>
-                        For raw sequences, an explicit modulation frequency can be given with
-                        the <code>--frequency</code> option. Otherwise the default frequency, 38000Hz,
-                        will be assumed.
-                        If this option is given together with a Pronto type signal (which contains
-                        a modulation frequency), it is ignored.</p>
-
-                    <p>Using the option <code>--input</code>, instead the content of a file can be taken
-                        as input, containing sequences to be analyzed, one per line, blank
-                        lines ignored. Using the option <code>--namedinput</code>, the sequences may have
-                        names, immediately preceeding the sequence.
-                        In both cases, the data is taken as IrSequences.
-                        IrSignals, with intro-, repeat-, and ending, are coerced into IrSequences.</p>
-
-                    <p>
-                        In the Harctoolbox world, IR sequences start with a flash (mark) and ends with a
-                        non-zero gap (space). In some other "worlds", the last gap is omitted. These signal
-                        are in general rejected. The option <code>--trailinggap duration</code> adds a dummy duration
-                        to the end of each IR sequence lacking a final gap.</p>
-
-                    <p>Input sequences can be pre-processed using the options <code>--chop</code>, <code>--clean</code>,
-                        and <code>--repeatfinder</code>
-                    </p>
-
-                    <p>The cleaner works according to this idea: The collected durations found in the sequence(s)
-                        are bundled into "bins" (disjoint intervals), according to <code>absolutetolerance</code> and <code>relativetolerance</code>.
-                        Every duration belonging to a bin is "close" (determined by those parameters) to the bin
-                        middle. All the durations within the bin are then replaced by the average of its
-                        members. It is thus not guaranteed that the distance between a duration and its replacement
-                        will be consistent with <code>absolutetolerance</code> and <code>relativetolerance</code>.</p>
-
-                    <p>
-                        The input sequence(s) are matched using different "decoders". Normally
-                        the "best" decoder match is output. With the <code>--all</code> option, all decoder
-                        matches are output.</p>
-
-                    <p>The options <code>--statistics</code> and <code>--dump-repeatfinder</code> (the latter forces
-                        the repeatfinder to be on) can be used to print extra information.
-                        The common options <code>--absolutetolerance</code>, <code>--relativetolerance</code>, <code>--minrepeatgap</code>
-                        determine how the repeat finder breaks the input data. The options
-                        <code>--extent</code>, <code>--invert</code>, <code>--lsb</code>, <code>--maxmicroseconds</code>, <code>--maxparameterwidth</code>,
-                        <code>--maxroundingerror</code>, <code>--maxunits</code>, <code>--parameterwidths</code>, <code>--radix</code>, and <code>--timebase</code>
-                        determine how the computed IRP is displayed.</p>
-                </section>
-
-            </section>
-            <section>
-                <title>Protocol Data Base</title>
+                    <a href="http://www.hifi-remote.com/forums/dload.php?action=file&amp;file_id=8460">Graham Dixon's ExchangeIR</a>.
+                </p>
                 <p>
-                    The "ini"-file <code>IrpProtocols.ini</code> of IrpMaster has been replaced by an XML file,
-                    per default called <code>IrpProtocols.xml</code>. The XML format
-                    is defined by the W3C schema [irp-protocols](http://www.harctoolbox.org/schemas/irp-protocols.xsd), and has the name space
-                    <code>http://www.harctoolbox.org/irp-protocols</code>. This format has many advantages in
-                    comparison with the simpler previous format, for example, it can contain embedded XHTLM fragments,
-                    for writing documentation.
-                    It also can contain different parameters that can be used by different programs, for example, tolerance parameters
-                    for decoding.
-                    Arbitrary string-valued parameters are permitted. It is up to an interpreting program to determine the semantic.
-                    Within IrpTransmogrifier, this is used for providing protocol-specific values for the parameters
-                    absolutetolerance, relativetolerance  TODO.
-
+                    Theoretically speaking, this is an <a href="https://en.wikipedia.org/wiki/Inverse_problem">Inverse problem</a>.
+                    Given one or many IR signals/sequences, the problem is to find out what could have generated it, in the form of an IRP protocol.
+                    This problem in general does not have a unique solution; instead the "simplest" one is selected out of the possible solutions.
                 </p>
 
                 <p>
-                    There is also an XSLT stylesheet, which technically translates the XML to HTML, allowing for creating an
-                    HTML version of <code>IrpProtocols.xml</code>, for reading in a HTML browser.</p>
-                <p>
-                    Using the sub-command <code>convertconfig</code>,
-                    the program is capable of reading and translating to and from the old format <code>IrpProtocols.ini</code>.
+                    In a way, this is a more abstracted version of the decoding problem.
+                    There are around 10 different "template IRP" (for example, different forms of bi-phase and PWM modulation) that are tried.
+                    For every of those templates, a quantity, "weight" is computed, quantifying (in a somewhat arbitrary manner)
+                    how "complicated" the answer is. The template with the least weight is selected.
                 </p>
-            </section>
-
-            <section>
-                <title>Installation</title>
                 <p>
-                    Unpack the binary distribution in a new, empty directory. Start the program by invoking the wrapper
-                    (<code>irptransmobrifier.bat</code> on Windows, <code>irptransmogrifier.sh</code> on Unix-like systems like Linux and MacOS.)
-                    from the command line.
-                    Modify and/or relocate the wrapper(s) if desired or necessary.
-                    Do not double click the wrappers, since this program runs only from the command line.</p>
+                    The form of the final answer can be influenced by a number of different parameters.
+                </p>
 
-                <section>
-                    <title>Building from sources</title>
-                    <p>
-                        The project uses [Maven](https://maven.apache.org/) as build system. Any modern IDE should be able
-                        to open/import and build it (as Maven project). Of course, Maven can also be run from the command line,
-                        like</p>
-                    <source>
-                        mvn install
-                    </source>
-                </section>
-                <section>
-                    <title>Dependencies</title>
-
-
-                    <section>
-                        <title>Usage</title>
-                        <p>
-                            Using from the command line, this is a command with subcommands. Before the sub command,
-                            common options can be given. After the command, command-specific options can be specified.
-                            Commands and option names can be abbreviated, as long as the abbreviation is unique.
-                            They are matched case sensitively, and can be abbreviated as long as the abbreviation is unambiguous.
-                        </p>
-                        <p>
-                            The command
-
-                            irptransmogrifier help --short
-                            lists the subcommands.
-                            A command like
-
-                            irptransmogrifier analyze --help
-                            gives the usage for the subcommand <code>analyze</code>,
-                            while a command like
-
-                            irptransmogrifier analyze --help
-                            gives a possibly somewhat longer description for the subcommand <code>analyze</code>.
-
-
-                            The subcommands are briefly described next.</p>
-
-                    </section>
-
-                    <section>
-                        <title>Subcommand bitfield</title>
-                        <p>
-                            The "bitfield" command computes the value and the binary form corresponding
-                            to the bitfield given as input. Using the <code>--nameengine</code> argument,
-                            the bitfield can also refer to names.</p>
-
-                        <p>
-                            As an alternatively, the "expression" command may be used.</p>
-                    </section>
-
-                    <section>
-                        <title>Subcommand code</title>
-                        <p>
-                            Used for generating code for different targets.</p>
-                    </section>
-
-                    <section>
-                        <title>Subcommand convertconfig</title>
-                        <p>This command converts between the xml form and the ini form on IrpProtocols.
-                            decode --desc</p>
-                    </section>
-
-                    <section>
-                        <title>Subcommand decode</title>
-                        <p>
-                            The "decode" command takes as input one or several sequences or signals,
-                            and output one or many protocol/parameter combinations that corresponds
-                            to the given input (within the specified tolerances). The input can
-                            be given either as Pronto Hex or in raw form, optionally with signs
-                            (ignored). Several raw format input sequences can be given by enclosing
-                            the individual sequences in brackets ("[]").</p>
-
-                        <p>
-                            For raw sequences, an explicit modulation frequency can be given with
-                            the <code>--frequency</code> option. Otherwise the default frequency, 38000Hz,
-                            will be assumed.</p>
-
-                        <p>
-                            Using the option <code>--input</code>, instead the content of a file can be taken
-                            as input, containing sequences to be analyzed, one per line, blank
-                            lines ignored. Using the option <code>--namedinput</code>, the sequences may have
-                            names, immediately preceeding the signal.</p>
-
-                        <p>
-                            In the Harctoolbox world, IR sequences start with a flash (mark) and ends with a
-                            non-zero gap (space). In some other "worlds", the last gap is omitted. These signal
-                            are in general rejected. The option <code>--trailinggap duration</code> adds a dummy duration
-                            to the end of each IR sequence lacking a final gap.</p>
-
-                        <p>
-                            Input sequences can be pre-processed using the options <code>--clean</code>, and
-                            <code>--repeatfinder</code>.</p>
-
-                        <p>
-                            The common options <code>--absolutetolerance</code>, <code>--relativetolerance</code>, <code>--minrepeatgap</code>
-                            determine how the repeat finder breaks the input data.</p>
-
-                    </section>
-                    <section>
-                        <title>Subcommand help</title>
-                        <p>This command list the syntax for the command(s) given as argument,
-                            default all. Also see the option <code>--describe</code>.</p>
-
-                    </section>
-                    <section>
-                        <title>Subcommand lirc</title>
-                        <p>
-                            This command reads a Lirc configuration, from a file, directory, or
-                            an URL, and computes a correponding IRP form.</p>
-                    </section>
-                    <section>
-                        <title>Subcommand list</title>
-                        <p>
-                            This command list miscellaneous properties of the protocol(s) given
-                            as arguments.</p>
-                    </section>
-                    <section>
-                        <title>Subcommand render</title>
-                        <p>
-                            This command is used to compute an IR signal from one or more protocols
-                            ("render" it). The protocol can be given either by name(s) (or regular
-                            expression if using the <code>--regexp</code> option), or, using the <code>--irp</code> options,
-                            given explicitly as an IRP form. The parameters can be either given
-                            directly with the -n option,or the <code>--random</code> option can be used to
-                            generate random, but valid parameters. With the <code>--count</code> or <code>--number-repeats</code>
-                            option, instead an IR sequence is computed,containing the desired
-                            number of repeats.</p>
-                    </section>
-
-                    <section>
-                        <title>Subcommand version</title>
-                        <p>
-                            Reports version number and license.</p>
-                    </section>
-                </section>
             </section>
         </section>
 
-        <section>
-            <title>Installing</title>
-            <p>There is no "installer" for IrpTransmogrifier.
-                The normal way to install the program is to <a href="IrScrutinizer.html#Installation">install IrScrutinizer</a>.
-                This will install a wrapper for IrpTransmogrifier too.
-                (However the st- and xslt-files, <!-- TODO Link -->
-                are not included.)
-            </p>
-
-            <p>
-                On Github, the
-                <a href="https://github.com/bengtmartensson/IrpTransmogrifier/releases/latest">latest official source- and binary distribution</a>
-                is found. Also, the <a href="https://github.com/bengtmartensson/IrpTransmogrifier/releases/tag/ci-build">development version</a> can be found.
-            </p>
-
-            <p>In all cases, there is a wrapper, <code>irptransmogrifier.bat</code> (for Windows) or <code>irscrutinizer.sh</code> (for other systems),
-                that is used to execute the pure-java IrpTransmogrifier program.</p>
-        </section>
-        <section>
-            <title>Usage of the program from the command line</title>
-            <p>I will next describe how to invoke the program from the command line.
-                Elementary knowledge of command line usage is assumed.</p>
-            <p>
-                There is a lot of functionality crammed in the command line interface.
-                The usage message of the program gives an extremely brief summary:</p>
-
-            <p>
-                In the simplest and most general form, parameter assignments are made
-                on the command line in one argument of the type <em>
-                    <code>name=value</code>
-                </em>. On both sides of the
-                "="-signs, there should not be any spaces. (More precisely, it is
-                required that all assignments are made within a single "argument" to
-                the program, which is determined by the command line interpreter. Thus
-                writing the arguments within single or double quotes, extra spaces can
-                be parsed.) After named parameters are given (possibly none), up to
-                four "standard" parameters can be given. These are, in order D, S, F,
-                and T (which per convention in the JP1 community stands for
-                "Device", "Subdevice", "Function" (also called OBC or command number),
-                and "Toggle"). If using -1 as the value, that parameter is considered
-                as not being assigned. One value without name defaults to <code>F</code>,
-                two values defaults to <code>D</code> and <code>F</code>, three values defaults to <code>D</code>, <code>S</code>,
-                and <code>F</code>, and four to <code>D</code>, <code>S</code>, <code>F</code>, and <code>T</code>, in the order given.
-                For example,</p>
-                <source>E=12 34 -1 56 1</source>
-                <p>
-                    assigns the value 12 to E, the value 34 to
-                    D, the value of 56 to F, and 1 to T, while S is not assigned anything
-                    at all. Parameters can be given not only in decimal notation, but also
-                    as hexadecimal (using prefix 0x) binary (using prefix 0b or %), or
-                    octal (using prefix 0). </p>
-                <p>
-                    If the command line cannot be parsed the usage message will be printed.
-                    If you are unsure of exactly what is wrong, consider issuing "<code>-d
-                        1</code>" (the debug option with argument 1) as the first argument on
-                    the command line, which may produce more verbose error messages. </p>
-                <p>
-                    Using the <code>-r</code> or <code>--raw</code> option, the output is
-                    given in "raw form" (in JP1-Forum jargon, this is a sequence of
-                    positive numbers (indicating "flashes", or on-times in micro seconds)
-                    and negative numbers (indicating "gaps" or off-times, where the
-                    absolute value indicates the duration in micro seconds. Carrier
-                    frequency is specified separately). Alternatively, or additionally,
-                    using the <code>-p</code> or <code>--pronto</code> option, output is
-                    produced in the so-called Pronto format, see e.g. <a
-                        href="http://www.hifi-remote.com/wiki/index.php?title=Working_With_Pronto_Hex">this
-                        document</a>. This format is popular in several IR using Internet
-                    communities, like <a href="http://www.promixis.com">Promixis</a>
-                    (known for their (commercial) products Girder and NetRemote), as well
-                    as <a href="http://www.eventghost.net">EventGhost</a>. Optionally,
-                    these can be wrapped into an XML skeleton, offering an ideal platform
-                    for translating to every other IR format this planet has encountered.
-                    If desired, the output of the program is directed to a particular named
-                    file using the <code>-o </code>
-                    <em>
-                        <code>filename</code>
-                    </em>
-                    or <code>--output </code>
-                    <em>
-                        <code>filename</code>
-                    </em>
-                    option. (There is also a possibility (using the <code>--ict</code> or
-                    <code>-I</code> option) to generate output files in <a
-                        href="http://www.hifi-remote.com/wiki/index.php?title=IR_Scope_and_IR_Widget_User%27s_Guide">IRScope's
-                        ict-format</a>, but I am not sure this was as wise design decision: it
-                    may be a better idea to generate additional formats by post-processing
-                    the XML file.)</p>
-        </section>
-        <section>
-            <title>Iterating over input parameter ranges</title>
-            <p>Either for generating configuration files for other programs, or for
-                testing, there is a very advanced feature for looping over input
-                parameter sets. For all of the parameters to a protocol, instead of a
-                single value, a set can be given. The program then computes all IR
-                signals/sequences belonging to the <a
-                    href="http://en.wikipedia.org/wiki/Cartesian_product">Cartesian product</a>
-                of the input parameter sets. There are five types of parameter
-                sets:</p>
-            <ol>
-                <li>Of course, there is the singleton set, just consisting of one
-                    value</li>
-                <li>There is also a possibility to give some arbitrary values,
-                    separated by commas. Actually, the commas even separate sets, in the
-                    sense of the current paragraph.</li>
-                <li>An interval, optionally with a stride different from 1, can be
-                    given, either as <code>min..max++increment</code> or
-                    <code>min:max++increment</code>, or alternatively, simply as *, which will get
-                    the min and max values from the parameter's parameter specs.  </li>
-                <li>Also, a set can be given as <code>a:b&lt;&lt;c</code>,
-                    which has the following semantics: starting with <code>a</code>, this
-                    is shifted to the left by <code>c</code> bits, until <code>b</code>
-                    has been exceeded (reminding of the left-shift operator <code>&lt;&lt;</code>
-                    found in languages such as C).</li>
-                <li>Finally, <code>a:b#c</code> generates c pseudo random numbers between a and b
-                    (inclusive). The "pseudo random" numbers are completely
-                    deterministically determined from the seed, optionally given with the
-                    <code>--seed</code> option. As of version 0.2.2 <code>a</code> and
-                    <code>b></code> are optional. If left out, the values are taken as from the protocol parameters min
-                    and max respectively, just as with the <code>*</code> form.</li>
-            </ol>
-            <p>
-                See the test file <code>test.sh</code> (include in the distributions) for some examples.
-                Of course, using the command line, some of the involved characters,
-                most notably the *, has a meaning to the command line interpreter and
-                may need "escaping" by a backslash character, or double or single
-                quotes.</p>
-            <p>
-                There is also an option, denoted -<code>#</code> or <code>--repetitions
-                </code>taking an integer argument, that will compute that many "copies"
-                of the IR signal or sequence. This may be of interest for signals that
-                are non-constant (toggles being the simplest example) or for profiling
-                the program.</p>
-        </section>
-        <section>
-            <title>Debugging/logging possibilities</title>
-            <p>
-                TO BE WRITTEN
-            </p>
-        </section>
-        <section>
-            <title>Third-party Java archives (jars)</title>
-            <p>
-                The program depends on <a href="https://www.antlr.org">ANTLR4</a> (<a href="https://github.com/antlr/antlr4/blob/master/LICENSE.txt">license</a>),
-                <a href="https://www.stringtemplate.org/">Stringtemplate</a> (<a href="https://github.com/antlr/stringtemplate4/blob/master/LICENSE.txt">license</a>),
-                as well as the command line decoder <a href="http://jcommander.org/">JCommander</a>
-                (licensed under the <a href="https://github.com/cbeust/jcommander/blob/master/license.txt">Apache 2 license</a>).</p>
-            <p>
-                When using Maven for building, these are automatically downloaded and installed.
-            </p>
-        </section>
-        <section>
+      <section>
             <title>Extensions to, and deviation from, IRP semantic and syntax</title>
+            <p>This implementation of the IRP has a number of extensions, and a few deviations to the <a
+                    href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation">current
+                    specification version 2</a>.
+                These will be described in detail next.</p>
+            <p>For the complete syntax, see
+                <a href="#Appendix%3A+ANTLR4+Grammar">the ANTLR grammar</a>.
+            </p>
+            <section>
+                <title>Data types</title>
+                <p>While the original specification uses exclusively unsigned integers,
+                    here numbers that are intrinsically "physical" (modulation frequency,
+                    durations, duty cycle) are floating numbers, in the code <code>double</code>.
+                </p>
+                <p>Integer numbers are in general implemented with Java's <code>long</code>,
+                effectively limiting the number of bits to 63. In the future,
+                it is <a href="https://github.com/bengtmartensson/IrpTransmogrifier/issues/38">planned</a>
+                to remove this restriction, using Java's
+                <a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigInteger.html">BigInteger</a>.</p>
+            </section>
             <section>
                 <title>Repetitions</title>
                 <p>Possibly the major difficulty in turning the IRP Specification into
@@ -771,11 +770,11 @@
                     Probably 99% of all IR signals fit into the intro/repetition scheme,
                     allowing ending sequence in addition should leave very few practically
                     used IR signals left. In "abstract" IRP notation, these are of the form
-                    A,(B)*,C with A, B, and C being (possibly empty) "bare irstreams".</p>
+                    A,(B)*,C with A, B, and C being (possibly empty) "bare irstream"s.</p>
                 <p>
                     In contrast, the IRP notation reminds of they syntax and
-                    semantics of regular expressions: There may be any numbers, and they
-                    can even be hierarchical. There certainly does not appear to be a
+                    semantics of regular expressions: There may be any numbers of (infinite) repeats, and they
+                    can even be hierarchical (repetitions within repetitions). There does not appear to be a
                     consensus on how this extremely general notation should be
                     practically thought of as a generator of IR signals.</p>
                 <p>
@@ -790,10 +789,8 @@
                 <p>
                     In the first, now obsolete, version of the IRP notation the parameters
                     of a protocol had to be declared with the allowed max- and min-value. This is
-                    not present in the <a
-                        href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation">current
-                        specification version 2</a>. I
-                    have reinvented this, using the name parameter_spec. For example, the
+                    not present in the current specification version. I
+                    have re-introduced this, using the name <code>parameter_spec</code>. For example, the
                     well known NEC1 protocol, the Parameter Spec reads:
                     <code>[D:0..255,S:0..255=255-D,F:0..255]</code>. (D, S, and F have the
                     semantics of device, sub-device, and function or
@@ -806,9 +803,10 @@
                     concerning not assigned values. It is the duty of the IRP author to
                     ensure that all variables that are referenced within the main
                     body of the IRP are defined either within the parameter specs, defined
-                    with "definitions" (Chapter 10 of the specification), or assigned in
+                    with "definitions" (<a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#Definitions">Chapter 10</a>
+                    of the specification), or assigned in
                     assignments before usage, otherwise a run-time error will occur
-                    (technically an <code>NameUnassignedException</code> will be thrown). </p>
+                    (in the code, a <code>NameUnassignedException</code> will be thrown). </p>
                 <p>
                     The preferred ordering of the parameters is: D, S (if present), F, T
                     (if present), then the rest in alphabetical order,</p>
@@ -817,18 +815,20 @@
                     explained in the <a href="#Persistency+of+variables">following section</a>:</p>
                   <source>
 parameter_specs:
-    '[' parameter_spec (',' parameter_spec )* ']' | '['  ']'
+    '[' parameter_spec (',' parameter_spec )* ']'
+    | '['  ']'
 
 parameter_spec:
-     name     ':' number '.' '.' number ('=' bare_expression)?
-   | name '@' ':' number '.' '.' number '=' bare_expression
+      name     ':' number '..' number ('=' expression)?
+    | name '@' ':' number '..' number  '=' expression
                   </source>
             </section>
             <section>
-                <title>The GeneralSpec</title>
+                <title>GeneralSpec</title>
                 <p>
-                    For the implementation, I allow the four parts (three in the original
-                    specification) to be given in any order, if at all, but I do not
+                    For the implementation, I allow the four parts
+                    (three in the <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#The_GeneralSpec_section">original
+                    specification</a>) to be given in any order, if at all, but I do not
                     disallow multiple occurrences &#x2014; it is quite hard to implement cleanly and
                     simply not worth it. (For example, ANTLR does not implement exclusions. The only
                     language/grammar I know with that property is SGML, which is probably
@@ -837,14 +837,14 @@ parameter_spec:
                 </p>
                 <p>
                     The default frequency is 38kHz, not 0kHz as in the specification.
-                    It is encouraged to use the default, not an explicit "38k", for the cases of
-                    modulation frequency not reasonable well known, but close enough to 38kHz.
+                    For the cases of modulation frequency not "really" known, but "sufficiently close" to 38kHz,
+                    it is recommended to rely on the default, not to state "38k" explicitly,
                 </p>
                 <section>
                     <title>GeneralSpecs, duty cycle</title>
                     <p>
-                        Without any very good reason, I allow a duty cycle in percent to be
-                        given within the GeneralSpec, for example as <code>{37k,123,msb,33%}</code>.
+                        Without any very good use case, I allow a duty cycle in percent to be
+                        given within the <code>GeneralSpec</code>, for example as <code>{37k,123,msb,33%}</code>.
                         It is currently not used for anything, but preserved through the processing and
                         can be retrieved using API-functions. If some, possibly future, hardware needs
                         it, it is there.</p>
@@ -853,29 +853,38 @@ parameter_spec:
             <section>
                 <title>Persistency of variables</title>
                 <p>
-                    Graham, in the specification and in following forum contributions,
-                    appears to consider all variables in a IRP description as intrinsically
+                    In the specification and in forum contributions,
+                    all variables in a IRP description appears to consider as intrinsically
                     persistent: They do not need explicit initialization, if they are not,
                     they are initialized to an undefined, random value. This may be a
                     reasonable model for a particular physical remote control, however,
-                    from a scientific standpoint it is less attractive. I have a way of
+                    from a scientific standpoint it is less attractive.
+                    In the current work, there is a way of
                     denoting a variable, typically a toggle of some sort, as persistent by
                     appending an "@" to its name in the parameter specs. An initial value
-                    (with syntax as default value) is here mandatory. It is set to its
-                    initial value by the constructor of the Protocol class. Calling the
-                    renderIrSignal(...) function or such of the Protocol instance typically
-                    updates the value (as given in an assignment, a 0-1 toggle goes like
+                    (with syntax as default value in the parameter spec) is here mandatory.
+                    For example, a toggle is typically declared as <code>[T@:0..1=0]
+                    </code>in the parameter specs.
+                    It is set to its
+                    initial value the first time the protocol is used. Rendering
+                    such a protocol typically
+                    updates the value, as given in an assignment, a 0-1 toggle goes like
                     T=1-T). As opposed to variables that has not been declared as
-                    persistent, it (normally) retains its value between the invocations of
-                    renderIrSignal(...).  A toggle is typically declared as <code>[T@:0..1=0]
-                    </code>in the parameter specs.</p>
+                    persistent, it retains its value between the invocations.
+                </p>
+                <p>
+                    An instance of the Protocol class keeps the corresponding protocols's persistence variables
+                    values between invocations, unless explicitly changed by parameter assignments.
+                    As a command line program, this does not take effect, however.
+                </p>
             </section>
             <section>
                 <title>Comments</title>
                 <p>
                     Comments in the C syntax (starting with <code>/*</code> and ended by
                     <code>*/</code>) are allowed and ignored.
-                    Also, C++-style comments ("//" until end of line) are accepted.
+                    Also, C++-style comments ("//", extends to the end of line) are accepted.
+                    (In the specifications, embedding comments in the IRP is not present.)
                 </p>
             </section>
             <section>
@@ -887,7 +896,8 @@ parameter_spec:
 
             <section>
                 <title>Extents</title>
-                <p>The specification writes ``<em>An extent has a scope which consists of a
+                <p>The <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#Description_3">specification</a>
+                writes ``<em>An extent has a scope which consists of a
                         consecutive range of items that immediately precede the extent in the order of
                         transmission in the signal. ... The precise scope of an extent has to be
                         defined in the context in which it is used.</em>'', and, to my best knowledge,
@@ -905,25 +915,25 @@ parameter_spec:
                 <p>
                     It turned out that the <a
                         href="#Preprocessing+and+inheritance">preprocessing/inheritance
-                        concept</a> necessitated allowing several definition objects. These are
+                        concept</a> necessitated allowing several
+                        <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#Definitions">definition objects</a>. These are
                     simply evaluated in the order they are encountered, possibly
                     overwriting previous content. </p>
             </section>
             <section>
                 <title>Names</title>
                 <p>
-                    Previous programs, like makehex have only allowed one-letter
-                    names. However, in  <a
-                        href="http://www.hifi-remote.com/wiki/index.php?title=DecodeIR">DecodeIR.html</a>
-                    there are some multi-letter names. The
-                    IRP documentation allows multi-letter names, using only capital
-                    letters. I have, admittedly somewhat arbitrarily, extended it to the
+                    The
+                    <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#Formal_syntax_13">IRP documentation defines a name</a>
+                    as starting with an uppercase letter,
+                    followed by an arbitrary number of uppercase letters and digits.
+                    I have, admittedly somewhat arbitrarily, extended it to the
                     C-name syntax: Letters (both upper and lower cases) and digits allowed,
                     starting with letter. Underscore "_" counts as letter. Case is
                     significant.</p>
             </section>
             <section>
-                <title>Namespaces</title>
+                <title>Name spaces</title>
                 <p>
                     There is a difference in between the IRP documentation and the
                     implementation of the Makehex program, in that the former has one name
@@ -935,42 +945,55 @@ parameter_spec:
             <section>
                 <title>Expressions</title>
                 <p>
-                    Some extensions to the expressions have been made. Note that, informally speaking,
+                    Several extensions to the <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#Expressions">expressions</a>
+                    have been made. Note that, informally speaking,
                     an expression is an integer, that, in different contexts are differently interpreted: as integer value,
                     (potentially infinite) bit pattern (using 2-complement representation),
                     and logical (0 is <code>false</code>, everything else is <code>true</code>).
                 </p>
+                <p>For a summary of the complete syntax of <code>expression</code>, see
+                <a href="#Appendix%3A+ANTLR4+Grammar">the grammar</a>.
+                </p>
                 <section>
                     <title>Terminology</title>
-                    <p>In the code, we use the terms <em>para_expression</em> and <em>expression</em>
+                    <p>
+                        In this project, we use the terms <em>para_expression</em>
+                        (denoting an <code>expression</code> enclosed within parentheses) and <em>expression</em>
                         instead of the specification's <em>expression</em> and <em>bare_expression</em>,
-                        since it was felt that the latter was too far away from normal-day usage.</p>
+                        since it was felt that the latter was wieldy and incompatible with normal-day usage.
+                    </p>
                 </section>
                 <section>
                     <title>Literals</title>
+                    <p>
+                        Numerical literals can be given not only on base 10 (as in the
+                        <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#Formal_syntax_13">specification</a>), but also in bases
+                        2 (with prefix <code>0b</code>), base 8 (prefix <code>0</code>), as well as base 16 (prefix <code>0x</code>).
+                    </p>
                     <p>A few pre-defined literals are introduced for convenience and readability.
                         These are:</p>
                     <ul>
                         <li>
-                            <code>UINT8_MAX</code> 2^8 - 1 = 255,
+                            <code>UINT8_MAX</code> 2^8 - 1 = 0xFF = 255,
                         </li>
                         <li>
-                            <code>UINT16_MAX</code> = 2^16 - 1 = 65535,</li>
+                            <code>UINT16_MAX</code> = 2^16 - 1 = 0xFFFF = 65535,</li>
                         <li>
-                            <code>UINT24_MAX</code> = 2^24 - 1 = 16777215,</li>
+                            <code>UINT24_MAX</code> = 2^24 - 1 = 0xFFFFFF = 16777215,</li>
                         <li>
-                            <code>UINT32_MAX</code> = 2^32 - 1 = 4294967295, and</li>
+                            <code>UINT32_MAX</code> = 2^32 - 1 = 0xFFFFFFFF = 4294967295, and</li>
                         <li>
-                            <code>UINT64_MAX</code> = 2^64 - 1 = 18446744073709551615.</li>
+                            <code>UINT64_MAX</code> = 2^64 - 1 = 0xFFFFFFFFFFFFFFFF = 18446744073709551615.</li>
                     </ul>
                 </section>
                 <section>
                     <title>Unary operators</title>
-                    <p>In addition to the specification's unary minus ("-"), some additional unary operators have been implemented, described next.</p>
+                    <p>In addition to the specification's unary minus ("-"),
+                        some additional unary operators have been implemented, described next.</p>
                     <section>
-                        <title>Logical not, "!"</title>
+                        <title>Logical NOT, "!"</title>
                         <p>The exclamation point, logical not, acts like in C:
-                            it turns everything that evaluates to 0 (zero) into 1 (<code>true</code>),
+                            it turns everything that evaluates to 0 (zero, <code>false</code>) into 1 (<code>true</code>),
                         everything else to 0 (<code>false</code>).</p>
                     </section>
                     <section>
@@ -980,17 +1003,13 @@ parameter_spec:
                         </p>
                     </section>
                     <section>
-                        <title>BitCount Function</title>
+                        <title>BitCount Function "#"</title>
                         <p>
-                            Generally, I think you should be very reluctant to add "nice features"
-                            to something like IRP. However, in the applications in DecodeIR.html,
-                            the phrase "number of ones", often modulo 2 ("parity"), occurs
-                            frequently in the more complicated protocols. This is awkward and
-                            error prone to implement using expressions, for example: <code>F:1 + F:1:1 +
-                                F:1:2 + F:1:3 + F:1:4 + F:1:5 + F:1:6 + F:1:7</code>. Instead, I have introduced the BitCount function, denoted by "#".
-                            Thus, odd parity of <code>F</code>
-                            will be <code>#F%1</code>, even parity <code>1-#F%2</code>. It is
-                            implemented by translating to the <a
+                            IrpMaster introduced the BitCount function as a unitary operator, denoted by "#".
+                            This is useful in many situations,
+                            for example, odd parity of <code>F</code>
+                            can be expressed as <code>#F%2</code>, even parity as <code>1-#F%2</code>. It is
+                            implemented through the <a
                                 href="http://download.oracle.com/javase/6/docs/api/java/lang/Long.html#bitCount%28long%29">Java Long.bitCount</a>-function.
                         </p>
                     </section>
@@ -998,38 +1017,55 @@ parameter_spec:
 
                 <section>
                     <title>Binary operators</title>
+                    <p>There are also some added binary operators, which will be described next.</p>
+                    <p>The specification contains the <em>bitwise</em> operators "&amp;", "|", and "^", having the
+                        syntax and semantics of C. In addition, the current implementation adds the following two <em>logical</em> operators.</p>
                     <section>
-                        <title>Shift operators</title>
+                        <title>Logical AND, "&amp;&amp;"</title>
+                        <p>The logical operator &amp;&amp; (with short-circuiting as in C and Perl) works as follows:
+                            To evaluate the expression <code>A &amp;&amp; B</code>, first <code>A</code> is checked for being 0 or
+                            not. If 0, then A (which happens to be 0) (<code>false</code>) is returned, <em>without evaluating</em>
+                            <code>B</code>. If
+                            however, <code>A</code> is nonzero, <code>B</code> is evaluated, and that is returned.</p>
+                    </section>
+                    <section>
+                        <title>Logical OR, "||"</title>
+                        <p>The logical operator || (with short-circuiting as in C and Perl) works as follows:
+                            To evaluate expression <code>A || B</code>, first <code>A</code> is checked for being 0 or
+                            not. If non-zero, then A is returned, <em>without evaluating</em>
+                            <code>B</code>. If
+                            however, <code>A</code> is 0, <code>B</code> is evaluated, and that is returned.</p>
+                    </section>
+                    <section>
+                        <title>Left shift "&lt;&lt;"</title>
                         <p>
-                            Although not present in the specification,
-                            IrpTransmogrifier implements the shift operators "&lt;&lt;" (left shift)
-                            and "&gt;&gt;" ((arithmetic) right shift), with syntax and semantics as in the C programming language.
+                            The left shift operators "&lt;&lt;" is implemented,
+                            with syntax and semantics as in the C and Java programming languages.
                             (See <a
                                 href="http://www.hifi-remote.com/forums/viewtopic.php?t=11850">this
                                 discussion</a>.)</p>
                     </section>
                     <section>
-                        <title>Binary logical operators</title>
+                        <title>Right shift "&gt;&gt;"</title>
                         <p>
-                            In the light of <a
-                                href="http://www.hifi-remote.com/forums/viewtopic.php?t=13374&amp;start=17">current
-                                discussion on the F12 protocol</a>,
-                            the logical operators <code>&amp;&amp;, ||</code>, and <code>?:</code>, would be useful,
-                            having
-                            their <a href="https://en.wikipedia.org/wiki/Short-circuit_evaluation">short circuiting semantics</a>,
-                            like in languages such as C and Perl.
-                            Recall, the expression <code>A &amp;&amp; B</code> is evaluated as follows: First <code>A</code> is checked for being 0 or
-                            not. If 0, then 0 (<code>false</code>) is returned, without even evaluating <code>B</code>. If
-                            however, <code>A</code> is nonzero, <code>B</code> is evaluated, possibly to a
-                            "funny" type and that is returned.</p>
+                            The (arithmetic) right shift operator "&gt;&gt;" with syntax and semantics as "&gt;&gt;"
+                            (<em>not</em> "&gt;&gt;&gt;", denoting logical shift) in the Java programming language.
+                            (Differently put, it preserves the leading bit, not shifting in 0.)</p>
+                    </section>
+                    <section>
+                        <title>Numerical comparison operators, "&lt;", "&lt;=",  "&gt;", "&gt;="</title>
+                        <p>
+                            The comparison operators have been added. They have the same syntax and semantics as in C,
+                            taking two numerical operators to 0 (false) or 1 (true).
+                        </p>
                     </section>
                 </section>
                 <section>
                     <title>Ternary operator</title>
                     <section>
                         <title>Conditional operator ?:</title>
-                        <p>Similarly, the ternary operator "A ? B : C", returning B if A is true (non-zero),
-                            otherwise C, has been implemented, and turns out often to be useful.
+                        <p>Similarly, the ternary operator <code>A ? B : C</code>, returning B if A is true (non-zero),
+                            otherwise C, has been implemented.
                             As opposed to other operators (with the exception of exponentiation "**"), it is right associative.
                         </p>
                     </section>
@@ -1060,7 +1096,7 @@ parameter_spec:
                     spec removed &#x2014; parameter specs are not sensible to inherit. The
                     process is then repeated up until, currently, 5 times. </p>
                 <p>
-                    The preprocessing takes place in the class IrpMaster, in its role as
+                    The preprocessing takes place in the class <code>IrpDatabase</code>, in its role as
                     data base manager for IRP protocols.</p>
                 <section>
                     <title>Example</title>
@@ -1070,7 +1106,7 @@ parameter_spec:
                     <source>
                         [protocol]
                         name=metanec
-                        irp={38.4k,564}&lt;1,-1|1,-3&gt;(16,-8,A:32,1,-78,(16,-4,1,-173)*)[A:0..4294967295]
+                        irp={38.4k,564}&lt;1,-1|1,-3&gt;(16,-8,A:32,1,-78,(16,-4,1,-173)*)[A:0..UINT32_MAX]
                     </source>
                     <p>
                         having an unspecified 32 bit payload, to be subdivided by its "inherited
@@ -1103,110 +1139,338 @@ parameter_spec:
                         manner. </p>
                 </section>
             </section>
+        </section>
+
+        <section>
+            <title>Installation</title>
             <section>
-                <title>The Configuration file/IRP protocol database</title>
+                <title>Installation of binaries</title>
                 <p>
-                    There is presently not a "official" IRP database. <a href="#MakeHex">MakeHex
-                    </a>comes with a number of protocol files with the <code>.irp</code>-extension,
-                    but that is another, obsolete and much less powerful format.
-                    The <a
-                        href="#DecodeIR.html">DecodeIR.html</a>-file presently comes closest:
-                    it has a number (upper two-digit) of IRPs, however, often not even
-                    syntactically confirming to the <a
-                        href="#Specification_of_IRP_Notation">specification</a>, and often
-                    with the description of the protocol at least partially in prose ("C
-                    is the number of ..."), parseable only by humans, not by programs. </p>
+                    The normal way to install the program is to <a href="IrScrutinizer.html#Installation">install IrScrutinizer</a>,
+                    version 2.0.0 or later.
+                    For the Windows and the generic binary distribution,
+                    this will install a wrapper for IrpTransmogrifier too.
+                    The AppImage will start IrpTransmogrifier instead of IrScrutinizer,
+                    if called with the last component of the name equals to
+                    <code>irptransmogrifier</code> (for example, through a link ending with that name).
+                    (However, the MacOS installation presently does not support command line IrpTransmogrifier.)
+                    <!--(However the st- and xslt-files, <!- - TODO Link - ->
+                    are not included.)-->
+                </p>
                 <p>
-                    Possibly as an intermediate solution, I invented the
-                    <code>IrpProtocols.ini</code> file. This file
-                    has a format similar to ini-files under Windows. For every protocol, it
-                    contains name and an IRP-string, possibly also a documentation string.
-                    The latter can, in principle, contain HTML elements, i.e. it can be an
-                    HTML fragment. </p>
+                    If this is not possible or wanted, IrpTransmogrifier can of course be installed separately.
+                    The program is basically just an executable jar-file.
+                    There is no "installer". Instead,
+                    unpack the binary distribution in a new, empty directory. Start the program by invoking the wrapper
+                    (<code>irptransmobrifier.bat</code> on Windows, <code>irptransmogrifier.sh</code> on Unix-like systems like Linux and MacOS.)
+                    from the command line.
+                    Modify and/or relocate the wrapper(s) if desired or necessary.
+                    Do not double click the wrappers, since this program runs only from the command line.
+                </p>
+                <p>The program requires Java 8 JRE or later to run. (The 64-bit Linux AppImage comes with its own Java.)</p>
             </section>
+
             <section>
-                <title>Syntax and semantics of the <code>IrpProtocols.xml</code> file</title>
+                <title>Building from sources</title>
                 <p>
-                    Every protocol is described in a section starting with the key
-                    <code>[protocol]</code>. Then there are a few keywords describing different
-                    properties:</p>
+                    On Github, the
+                    <a href="https://github.com/bengtmartensson/IrpTransmogrifier/releases/latest">latest official source- and binary distribution</a>
+                    is found. Also, the <a href="https://github.com/bengtmartensson/IrpTransmogrifier/releases/tag/ci-build">built development version</a> can be found.
+                </p>
+
+                <p>
+                    The project uses <a href="https://maven.apache.org/">Maven</a> as its build system.
+                    Any modern IDE should be able to open/import and build it as Maven project.
+                    Of course, Maven can also be run from the command line, like</p>
+                <source>
+                    mvn install
+                </source>
+                <section>
+                    <title>Third-party Java dependencies (jars)</title>
+                    <p>
+                        The program depends on <a href="https://www.antlr.org">ANTLR4</a>,
+                        <a href="https://www.stringtemplate.org/">Stringtemplate</a>,
+                        as well as the command line decoder <a href="http://jcommander.org/">JCommander</a>.
+                        When using Maven for building, these are automatically downloaded and installed to a local repository.
+                    </p>
+                </section>
+            </section>
+        </section>
+
+        <section>
+            <title>Usage of the program from the command line</title>
+            <p>
+                Next it will be described how to invoke the program from the command line.
+                The reader is assumed to possess an elementary command of the command line usage.
+            </p>
+
+            <p>
+                The usage message from <code>irptransmogrifier help --short</code> gives an extremely brief summary:
+            </p>
+            <source><![CDATA[
+Usage: IrpTransmogrifier [options] <command> [command_options]
+Commands:
+   analyze         Analyze signal: tries to find an IRP form with parameters
+   bitfield        Evaluate bitfield given as argument.
+   code            Generate code for the given target(s)
+   decode          Decode IR signal given as argument
+   expression      Evaluate expression given as argument.
+   help            Describe the syntax of program and commands.
+   lirc            Convert Lirc configuration files to IRP form.
+   list            List protocols and their properites
+   render          Render signal from parameters
+   version         Report version
+
+Use
+    "IrpTransmogrifier help" for the full syntax,
+    "IrpTransmogrifier help <command>" for a particular command.
+    "IrpTransmogrifier <command> --describe" for a description,
+    "IrpTransmogrifier help --common" for the common options.
+]]></source>
+<p>
+    Using from the command line, this is a program with sub commands. Before the sub command,
+    common options can be given. After the command, command-specific options can be specified.
+    Commands and option names can be abbreviated, as long as the abbreviation is unique.
+    They are matched case sensitively, and can be abbreviated as long as the abbreviation is unambiguous.
+</p>
+<p>
+    All options have a long form, starting with two dashes, like <code>--sort</code>.
+    (In rare cases, there might be more than one long name.)
+    They can be abbreviated as long as the abbreviation remains unique. Most options also
+    have a short, one letter form, starting with a single dash (like <code>-s</code>).
+    For brevity, this document will not mention the short form. This information, if required,
+    can instead be easily found using the <code>help</code> command.
+</p>
+<p>
+    The subcommands are briefly described next.
+</p>
+<section>
+    <title>analyze</title>
+    <p>The "analyze" command takes as input one or several sequences or signals,
+and computes an IRP form that corresponds to the given input (within
+the specified tolerances). The input can be given either as Pronto
+Hex or in raw form, optionally with signs (ignored). Several raw
+format input sequences can be given by enclosing the individual sequences
+in brackets ("[]"). However, if using the --intro-repeat-ending option,
+the sequences are instead interpreted as intro-, repeat-, and (optionally)
+        ending sequences of an IR signal. </p>
+
+<p>
+For raw sequences, an explicit modulation frequency can be given with
+the --frequency option. Otherwise the default frequency, 38000Hz,
+will be assumed.
+</p>
+
+<p>
+Using the option --input, instead the content of a file can be taken
+as input, containing sequences to be analyzed, one per line, blank
+lines ignored. Using the option --namedinput, the sequences may have
+names, immediately preceeding the signal. </p>
+
+<p>
+Input sequences can be pre-processed using the options --chop, --clean,
+and --repeatfinder. </p>
+
+<p>
+The input sequence(s) are matched using different "decoders". Normally
+the "best" decoder match is output. With the --all option, all decoder
+matches are output. Using the --decode option, the used decoders
+can be further limited. The presently available decoders are: TrivialDecoder,
+Pwm2Decoder, Pwm4Decoder, Pwm4AltDecoder, XmpDecoder, BiphaseDecoder,
+BiphaseInvertDecoder, BiphaseWithStartbitDecoder, BiphaseWithStartbitInvertDecoder,
+BiphaseWithDoubleToggleDecoder, SerialDecoder.</p>
+
+<p>
+The options --statistics and --dump-repeatfinder (the latter forces
+the repeatfinder to be on) can be used to print extra information.
+The common options --absolutetolerance, --relativetolerance, --minrepeatgap
+determine how the repeat finder breaks the input data. The options
+--extent, --invert, --lsb, --maxmicroseconds, --maxparameterwidth,
+--maxroundingerror, --maxunits, --parameterwidths, --radix, and --timebase
+determine how the computed IRP is displayed.
+</p>
+                </section>
+<!--
+            just invokes the template, without caring what it does; if it generates a renderer or decoder.
+                </p>
+                    The user is instead governs this by invoking the style sheets or templates (s)he want using the <code>- -target</code> (<code>-t</code>) option to the <code>code</code> sub subcommand.
+                    (For this reason, there is no <code>- -renderer</code> or <code>- -decoder</code> option to the <code>code</code> sub command.)
+                    It is also possible to pass
+                    target-specific parameters to the code generators using the <code>- -parameter</code> (<code>-p</code>) argument.
+                </p>
+
+                    This should be able to generate protocol renders for e.g. the Arduino libraries IrRemote, and AGirs.
+                    At least in the first version, not all protocols describable by IRPs need to be supported. Not implemented in the first phase: Protocols with hierarchical bitspecs
+                    (rc6*, replay, arctech, entone), protocols with bitspec lenght as parameter (zenith, nec1-shirrif). Also default are not implemented, e.g. NEC1 has to be
+                    called with 3 parameters.</p>
+
+
+                <p>Targets:</p>
+                <dl>
+                    <dt>Lircd.conf(http://lirc.org/html/lircd.conf.html)</dt>
+                    <dd>generation from IrScrutinizer. This is based on an XSLT-transformation (<code>lirc.xsd</code>) and generates
+                        [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/harctoolboxbundle/blob/master/IrScrutinizer/src/main/config/exportformats.d/lirc.xml).
+                        Handling of definitions as well as expressions as bitfields not implemented, as well as a few other things (search for "omitted" in the above file),
+                        otherwise works. "90% complete", see [this issue](https://github.com/bengtmartensson/IrpTransmogrifier/issues/6).
+                        To create: see (or execute) the shell script <code>tools/generate-lirc.sh</code>. In short, this generates the xml export, and then invokes
+                        xslt transformations on that xml file.</dd>
+                    <dt>Java</dt>
+                    <dd>Essentially for testing. This is essentially working both for rendering and decoding, including a generated test rig
+                        (see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest)). Targets: <code>java-decoder java-decoder-test java-renderer java-renderer-test</code>.
+                        Not quite finished, see [this issue](https://github.com/bengtmartensson/IrpTransmogrifier/issues/25).</dd>
+                </dl>
+
+                <p>Some possible future targets:</p>
                 <ul>
-                    <li>
-                        <code>name</code> The name of the protocol. This is folded to lowercase
-                        for searches  and  comparisons.  </li>
-                    <li>
-                        <code>irp</code> The IRP string representation. This may continue over
-                        several lines if the line feeds are escaped by a backslash ("\"), i.e. having
-                        the backspace as last character on the line.</li>
+                    <li>[Infrared4Arduino](https://github.com/bengtmartensson/Infrared4Arduino).</li>
+                    <li>[IRremote](https://github.com/z3t0/Arduino-IRremote)</li>
+                    <li>Linux kernel modules in [linux/drivers/media/rc](https://github.com/torvalds/linux/tree/master/drivers/media/rc) (decoding only).</li>
                 </ul>
-                <p>
-                    Other keywords are allowed, but ignored. Then, optionally, there may be
-                    a section <code>[documentation]</code>, that, in principle, could contain
-                    e.g. an HTML-fragment. The documentation section continues until the next
-                    <code>[protocol]</code> is encountered.</p>
-            </section>
-            <!--section>
-                <title>Requirements for an IRP data base</title>
-                <p>
-                    I have created the present <code>IrpProtocols.ini</code> by hand editing the
-                    DecodeIR.html-file.
-                    I would welcome if the community can settle for one endorsed format for
-                    such a data base. It can be one file, or many files: One file per
-                    protocol is easier for the developer, in particular if several
-                    developers are using a version management system (with or without file
-                    locking), but less convenient for the user.</p>
-                <p>
-                    It would be highly desirable in the future to be able just to maintain
-                    one file (or set of files). Some possibilities for this are:</p>
-                <ol>
-                    <li>Have one master file, for example in XML format, that after
-                        preprocessing <em>generates</em> both DecodeIR.html, and a protocol description
-                        file. There is also the possibility of having a program like IrpMaster parsing the master file directly.</li>
-                    <li>Extend <code>protocol.ini</code>("belonging to RemoteMaster")
-                        with the IRP information. Leaves the problem of duplicated
-                        "documentation" between DecodeIR.html and protocols.ini.</li>
-                    <li>Formalizing the IRP-Strings within <a
-                            href="#DecodeIR.html">DecodeIR.html</a>, e.g. by using div or span elements
-                        with class-attributes, (and formatting with, for example, better CSS style
-                        sheets) so that the IRP information can be unambiguously read out.</li>
-                </ol>
             </section-->
+            <section>
+                <title>
+                    <code>bitfield</code>
+                </title>
+                <p>
+                    The "bitfield" command computes the value and the binary form corresponding
+                    to the bitfield given as input. Using the <code>--nameengine</code> argument,
+                    the bitfield can also refer to names.
+                </p>
+                <p>
+                    As an alternatively, the <command>expression</command> command sometimes may be used. However, a bitfield has a length,
+                    which an expression, evaluating to an integer value, does not.
+                </p>
+            </section>
+
+            <section>
+                <title>
+                    <code>code</code>
+                </title>
+                <p>
+                    Used for generating code for different targets.
+                </p>
+            </section>
+
+            <section>
+                <title>
+                    <code>decode</code>
+                </title>
+                <p>
+                    The "decode" command takes as input one or several sequences or signals,
+                    and output one or many protocol/parameter combinations that corresponds
+                    to the given input (within the specified tolerances). The input can
+                    be given either as Pronto Hex or in raw form, optionally with signs
+                    (ignored). Several raw format input sequences can be given by enclosing
+                    the individual sequences in brackets ("[]").</p>
+
+                <p>
+                    For raw sequences, an explicit modulation frequency can be given with
+                    the <code>--frequency</code> option. Otherwise the default frequency, 38000Hz,
+                    will be assumed.</p>
+
+                <p>
+                    Using the option <code>--input</code>, instead the content of a file can be taken
+                    as input, containing sequences to be analyzed, one per line, blank
+                    lines ignored. Using the option <code>--namedinput</code>, the sequences may have
+                    names, immediately preceeding the signal.</p>
+
+                <p>
+                    In the Harctoolbox world, IR sequences start with a flash (mark) and ends with a
+                    non-zero gap (space). In some other "worlds", the last gap is omitted. These signal
+                    are in general rejected. The option <code>--trailinggap duration</code> adds a dummy duration
+                    to the end of each IR sequence lacking a final gap.</p>
+
+                <p>
+                    Input sequences can be pre-processed using the options <code>--clean</code>, and
+                    <code>--repeatfinder</code>.</p>
+
+                <p>
+                    The common options <code>--absolutetolerance</code>, <code>--relativetolerance</code>, <code>--minrepeatgap</code>
+                    determine how the repeat finder breaks the input data.</p>
+                    <p>
+                        It is <a href="https://github.com/bengtmartensson/IrpTransmogrifier/issues/43">planned</a>
+                        that a future version of the program will offer more useful logging facilities,
+                        offering a simple way to scrutinize unexpected (non-) decodes.
+                    </p>
+
+            </section>
+            <section>
+                <title>
+                    <code>help</code>
+                </title>
+                <p>This command list the syntax for the command(s) given as argument,
+                    default all. Also see the option <code>--describe</code>.</p>
+
+            </section>
+            <section>
+                <title>
+                    <code>lirc</code>
+                </title>
+                <p>
+                    This command reads a Lirc configuration, from a file, directory, or
+                    an URL, and computes a correponding IRP form. No attempt is made
+                    to clean up, for example by rounding times or finding a largest common
+                    divider.
+                </p>
+            </section>
+            <section>
+                <title>
+                    <code>list</code>
+                </title>
+                <p>
+                    This command list miscellaneous properties of the protocol(s) given
+                    as arguments.</p>
+            </section>
+            <section>
+                <title>
+                    <code>render</code>
+                </title>
+                <p>
+                    This command is used to compute an IR signal from one or more protocols,
+                    "render" it. The protocol can be given either by name(s) (or regular
+                    expression if using the <code>--regexp</code> option), or, using the <code>--irp</code> options,
+                    given explicitly as an IRP form. The parameters can be either given
+                    directly with the <code>--nameengine</code> option,
+                    or the <code>--random</code> option can be used to
+                    generate random, but valid parameters. With the <code>--count</code> or <code>--number-repeats</code>
+                    option, instead an IR sequence is computed, containing the desired
+                    number of repeats.</p>
+
+                    <p>
+                        The syntax of the name engine is as in the IRP specification, for example: <code>--nameengine {D=12,F=34}</code>.
+                        For convenience, the braces may be left out. Space around the equal sign "=" and
+                        around the comma "," is allowed, as long as the name engine is still only one argument in the sense of the shell
+                        &mdash; it may need to be enclosed within single or double quotes.
+                    </p>
+            </section>
+
+            <section>
+                <title>
+                    <code>version</code>
+                </title>
+                <p>
+                    Reports version number and license.
+                </p>
+            </section>
+        </section>
+
+        <section>
+            <title>Debugging/logging possibilities</title>
+            <p>
+                TO BE WRITTEN. Cf. <a href="https://github.com/bengtmartensson/IrpTransmogrifier/issues/43">issue #43</a>.
+            </p>
         </section>
 
         <section>
             <title>The API</title>
-            <!--p>
-                The Java programmer can access the functionality through a number of
-                API functions. </p>
             <p>
-                The class <code>IrpMaster</code> is the data base manager. The class
-                is immutable, constructed from a file name (or an InputStream), and can
-                deliver assorted pieces of information from the data base. Most
-                interesting is the <code>newProtocol()</code>-function that generates
-                a Protocol-object from parsing the IRP-string associated with the
-                requested protocol name. It contains a very elaborate
-                <code>main()</code>-function for command line use &mdash; strictly speaking
-                this is "the program" that is described herein. Actually, that
-                <code>main()</code>-function does not necessarily belong to the <code>IrpMaster</code> class, but could be located
-                somewhere else.</p>
-            <p>
-                Instances of the Protocol class are constructed (essentially) from a
-                String, containing the IRP representation to be parsed. Once
-                constructed (and IRP-String parsed), the Protocol instances can render
-                IrSignals and IrSequences for many different parameter values. This is
-                done with the <code>render(...)</code> and <code>renderIrSignal(...)</code>
-                functions, producing <code>IrSequences</code> and <code>IrSignals</code>
-                respectively:</p>
-            <p>
-                An <code>IrSequence</code> is a sequence of pulse pairs. It does not know
-                weather it is supposed to repeat or not. In contrast, an <code>IrSignal</code>
-                has one introductory <code>IrSequence</code>, one repetition
-                <code>IrSequence</code> (either, but not both, of these can be empty), and an
-                (in most cases empty) ending <code>IrSequence</code>. </p-->
+                A Java programmer can access the functionality through a number of
+                API functions.
+            </p>
             <p>
                 The API is documented in standard Javadoc style, which can be installed
                 from the source package, just like any other Java package. For the
-                convenience of the reader, the Javadoc API documentation is also
+                convenience of the user, the Javadoc API documentation is also
                 available <a href="https://bengtmartensson.github.io/IrpTransmogrifier/">here</a>
                 (development version only).</p>
 
@@ -1248,5 +1512,23 @@ parameter_spec:
                       translation</a> by myself.</li>
           </ol>
       </section-->
+        <section>
+            <title>Appendix: ANTLR4 Grammar</title>
+            <p>
+                This appendix shows the grammar file for IRP. It is used to generate the Java code for the IRP parser.
+                It is also (in contrast to the ANTLR3 grammar used in IrpMaster) quite readable for humans.
+            </p>
+            <source>
+<xi:include href="../antlr4/org/harctoolbox/irp/Irp.g4" parse="text"> <!-- Processing in source tree -->
+    <xi:fallback>
+<xi:include href="../../../../IrpTransmogrifier/src/main/antlr4/org/harctoolbox/irp/Irp.g4" parse="text"> <!-- Processing in www.harctoolbox.org -->
+<xi:fallback>
+    File Irp.g4 not found
+</xi:fallback>
+</xi:include>
+    </xi:fallback>
+</xi:include>
+            </source>
+        </section>
     </body>
 </document>

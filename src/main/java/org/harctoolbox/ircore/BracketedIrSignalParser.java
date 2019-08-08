@@ -41,8 +41,16 @@ public class BracketedIrSignalParser extends AbstractIrParser implements IrSigna
         Double readFrequency = null;
         if (s.startsWith("Freq=")) {
             int pos = s.indexOf('H', 6);
-            readFrequency = Double.parseDouble(s.substring(5, pos));
-            s = s.substring(pos + 2).trim();
+            if (pos != -1) {
+                readFrequency = Double.parseDouble(s.substring(5, pos));
+                s = s.substring(pos + 2).trim();
+            } else {
+                pos = s.indexOf('[', 6);
+                if (pos != -1) {
+                    readFrequency = Double.parseDouble(s.substring(5, pos));
+                    s = s.substring(pos).trim();
+                }
+            }
         }
         if (!s.startsWith("["))
             return null;

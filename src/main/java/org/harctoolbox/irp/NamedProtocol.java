@@ -66,7 +66,7 @@ public final class NamedProtocol extends Protocol {
     private final Double relativeTolerance;
     private final Double frequencyTolerance;
     private final Double minimumLeadout;
-    private final boolean decodable;
+    private final boolean decodable; // If true, the parameter values overwrite protocol specific values.
     private final List<String> preferOver;
     private final Map<String, List<String>> auxParameters;
     private final boolean rejectRepeatless;
@@ -114,15 +114,15 @@ public final class NamedProtocol extends Protocol {
     }
 
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout)
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout, boolean override)
             throws DomainViolationException, SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             throw new ProtocolNotDecodableException(name);
 
         Map<String, Long> params = super.recognize(irSignal, strict || isRejectRepeats(),
-                getFrequencyTolerance(userFrequencyTolerance), getAbsoluteTolerance(userAbsoluteTolerance),
-                getRelativeTolerance(userRelativeTolerance), getMinimumLeadout(userMinimumLeadout));
+                getFrequencyTolerance(userFrequencyTolerance, override), getAbsoluteTolerance(userAbsoluteTolerance, override),
+                getRelativeTolerance(userRelativeTolerance, override), getMinimumLeadout(userMinimumLeadout, override));
         return params;
     }
 
@@ -136,20 +136,22 @@ public final class NamedProtocol extends Protocol {
      * @param userAbsoluteTolerance
      * @param userRelativeTolerance
      * @param userMinimumLeadout
+     * @param override If true, the parameter values in the call overwrite protocol specific values.
      * @return Decoder.Decode object, containing matching data.
      * @throws SignalRecognitionException
      * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
      */
     public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, boolean strict,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout)
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance,
+            Double userMinimumLeadout, boolean override)
             throws SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             throw new ProtocolNotDecodableException(name);
 
         Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), strict,
-                getFrequencyTolerance(userFrequencyTolerance), getAbsoluteTolerance(userAbsoluteTolerance),
-                getRelativeTolerance(userRelativeTolerance), getMinimumLeadout(userMinimumLeadout));
+                getFrequencyTolerance(userFrequencyTolerance, override), getAbsoluteTolerance(userAbsoluteTolerance, override),
+                getRelativeTolerance(userRelativeTolerance, override), getMinimumLeadout(userMinimumLeadout, override));
         return new Decoder.Decode(this, decode);
     }
 
@@ -233,26 +235,36 @@ public final class NamedProtocol extends Protocol {
         return rejectRepeatless;
     }
 
+    private double getDoubleWithSubstitute(Double userValue, Double standardValue, double fallback, boolean override) {
+        return override ? getDoubleWithSubstitute(userValue, standardValue, fallback) : getDoubleWithSubstituteNoOverride(userValue, standardValue, fallback);
+    }
+
+    private double getDoubleWithSubstituteNoOverride(Double userValue, Double standardValue, double fallback) {
+        return standardValue != null ? standardValue
+                : userValue != null ? userValue
+                : fallback;
+    }
+
     private double getDoubleWithSubstitute(Double userValue, Double standardValue, double fallback) {
         return userValue != null ? userValue
                 : standardValue != null ? standardValue
                 : fallback;
     }
 
-    public double getRelativeTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
+    public double getRelativeTolerance(Double userValue, boolean override) throws NumberFormatException {
+        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, override);
     }
 
-    public double getAbsoluteTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE);
+    public double getAbsoluteTolerance(Double userValue, boolean override) throws NumberFormatException {
+        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, override);
     }
 
-    public double getFrequencyTolerance(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE);
+    public double getFrequencyTolerance(Double userValue, boolean override) throws NumberFormatException {
+        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE, override);
     }
 
-    public double getMinimumLeadout(Double userValue) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, minimumLeadout, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
+    public double getMinimumLeadout(Double userValue, boolean override) throws NumberFormatException {
+        return getDoubleWithSubstitute(userValue, minimumLeadout, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT, override);
     }
 
     List<String> getPreferOver() {

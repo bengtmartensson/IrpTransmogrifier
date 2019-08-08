@@ -168,7 +168,8 @@ public final class Decoder {
     private TrunkDecodeTree tryNamedProtocol(NamedProtocol namedProtocol, ModulatedIrSequence irSequence, int position, DecoderParameters params, int level)
             throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
         Decode decode = namedProtocol.recognize(irSequence, position, params.isStrict(),
-                params.getFrequencyTolerance(), params.getAbsoluteTolerance(), params.getRelativeTolerance(), params.getMinimumLeadout());
+                params.getFrequencyTolerance(), params.getAbsoluteTolerance(), params.getRelativeTolerance(),
+                params.getMinimumLeadout(), params.isOverride());
         if (params.isRemoveDefaultedParameters())
             decode.removeDefaulteds();
         if (!params.recursive || decode.endPos == irSequence.getLength() - 1)
@@ -203,7 +204,8 @@ public final class Decoder {
                         // This is intended to put a debugger breakpoint here
                         logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
                 Map<String, Long> params = namedProtocol.recognize(irSignal, parameters.isStrict(),
-                        parameters.getFrequencyTolerance(), parameters.getAbsoluteTolerance(), parameters.getRelativeTolerance(), parameters.getMinimumLeadout());
+                        parameters.getFrequencyTolerance(), parameters.getAbsoluteTolerance(), parameters.getRelativeTolerance(),
+                        parameters.getMinimumLeadout(), parameters.isOverride());
                 if (parameters.isRemoveDefaultedParameters())
                     namedProtocol.removeDefaulteds(params);
                 Decode decode = new Decode(namedProtocol, params);
@@ -258,6 +260,7 @@ public final class Decoder {
         private Double absoluteTolerance;
         private Double relativeTolerance;
         private Double minimumLeadout;
+        private boolean override;
         /**
          *
          * @param strict If true, intro-, repeat-, and ending sequences are
@@ -271,9 +274,10 @@ public final class Decoder {
          * @param absoluteTolerance
          * @param relativeTolerance
          * @param minimumLeadout
+         * @param override If true, the given parameters override parameter specific parameter values.
          */
         public DecoderParameters(boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive,
-                Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
+                Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout, boolean override) {
             this.strict = strict;
             this.allDecodes = allDecodes;
             this.removeDefaultedParameters = removeDefaultedParameters;
@@ -282,10 +286,16 @@ public final class Decoder {
             this.absoluteTolerance = absoluteTolerance;
             this.relativeTolerance = relativeTolerance;
             this.minimumLeadout = minimumLeadout;
+            this.override = override;
         }
 
         public DecoderParameters() {
-            this(false, false, true, false, null, null, null, null);
+            this(false, false, true, false, null, null, null, null, true);
+        }
+
+        public DecoderParameters(boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive,
+                Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
+            this(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, true);
         }
 
         /**
@@ -345,6 +355,13 @@ public final class Decoder {
         }
 
         /**
+         * @return the override
+         */
+        public boolean isOverride() {
+            return override;
+        }
+
+        /**
          * @param strict the strict to set
          */
         public void setStrict(boolean strict) {
@@ -398,6 +415,10 @@ public final class Decoder {
          */
         public void setMinimumLeadout(Double minimumLeadout) {
             this.minimumLeadout = minimumLeadout;
+        }
+
+        public void setOverride(boolean override) {
+            this.override = override;
         }
     }
 

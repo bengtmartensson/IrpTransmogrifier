@@ -56,7 +56,7 @@ public final class Decoder {
      * @param regexp
      */
     public static void setDebugProtocolRegExp(String regexp) {
-        debugProtocolNamePattern = (regexp == null || regexp.isEmpty()) ? null :  Pattern.compile(regexp);
+        debugProtocolNamePattern = (regexp == null || regexp.isEmpty()) ? null :  Pattern.compile(regexp.toLowerCase(Locale.US));
     }
 
     public static String getDebugProtocolRegExp() {

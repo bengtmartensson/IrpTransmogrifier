@@ -24,6 +24,14 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/xdocs</directory>
+            </resource>
+        </resources>
         <plugins><!-- Generate Version.java from Version.xml using mkVersion.xsl. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -203,6 +211,13 @@
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>
+                                <resource>
+                                    <directory>src/main/xdocs</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>${project.name}.xml</include>
+                                    </includes>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -252,10 +267,11 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <resourcesDirectory>target</resourcesDirectory> <!-- Pretty awful, use while only one resourcesDirectory permitted -->
                     <includes>
                         <include>IrpProtocols.xml</include>
-                        <include>girr.xml</include>
                         <include>IrpProtocols2html.xsl</include>
+                        <include>IrpTransmogrifier.xml</include>
                     </includes>
                 </configuration>
             </plugin>

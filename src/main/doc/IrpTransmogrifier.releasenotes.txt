@@ -1,3 +1,9 @@
 Release Notes for IrpTransmogrifier 1.0.0.
 
+2019-08-11: Version 1.0.1
+
+* Allow for decode parameter not to override protocol specific values (API only).
+ (#112) (necessitated by IrScrutinizer issue #308).
+* Robustness fix to BracketedIrSignalParser.
+
 2019-08-06: Initial version 1.0.0.

@@ -1520,16 +1520,7 @@ determine how the computed IRP is displayed.
                 It is also (in contrast to the ANTLR3 grammar used in IrpMaster) quite readable for humans.
             </p>
             <source>
-                <xi:include href="../antlr4/org/harctoolbox/irp/Irp.g4" parse="text"> <!-- Processing in source tree -->
-                    <xi:fallback>
-                        <xi:include href="../../../../IrpTransmogrifier/src/main/antlr4/org/harctoolbox/irp/Irp.g4" parse="text"> <!-- Processing in www.harctoolbox.org -->
-                            <xi:fallback>
-                                <a href="http://www.harctoolbox.org/IrpTransmogrifier.html#Appendix:+ANTLR4+Grammar">Irp.g4 on harctoolbox.org</a>.
-                                <!--    File Irp.g4 not found -->
-                            </xi:fallback>
-                        </xi:include>
-                    </xi:fallback>
-                </xi:include>
+<xi:include href="../../../../IrpTransmogrifier/src/main/antlr4/org/harctoolbox/irp/Irp.g4" parse="text"/>
             </source>
         </section>
     </body>

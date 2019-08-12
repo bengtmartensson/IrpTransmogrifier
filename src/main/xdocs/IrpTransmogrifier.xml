@@ -1338,7 +1338,7 @@ determine how the computed IRP is displayed.
                     the bitfield can also refer to names.
                 </p>
                 <p>
-                    As an alternatively, the <command>expression</command> command sometimes may be used. However, a bitfield has a length,
+                    As an alternatively, the <code>expression</code> command sometimes may be used. However, a bitfield has a length,
                     which an expression, evaluating to an integer value, does not.
                 </p>
             </section>

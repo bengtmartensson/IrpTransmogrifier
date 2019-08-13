@@ -93,7 +93,7 @@ public final class LircConfigFile {
                 readConfig(dictionary, file, charsetName);
             }
         } else
-            throw new IOException("File or directory " + filename.getCanonicalPath() + " not existing, or not a normal file");
+            throw new FileNotFoundException("File or directory " + filename.getCanonicalPath() + " not existing, or not a normal file");
     }
 
     static void readConfig(Map<String, LircRemote> dictionary, File filename) throws IOException {

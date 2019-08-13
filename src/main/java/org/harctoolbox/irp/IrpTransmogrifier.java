@@ -164,6 +164,7 @@ public final class IrpTransmogrifier {
     private CommandList commandList;
     private CommandRender commandRender;
     private CommandDecode commandDecode;
+    private CommandDemodulate commandDemodulate;
     private CommandAnalyze commandAnalyze;
     private CommandCode commandCode;
     private CommandBitField commandBitField;
@@ -213,6 +214,9 @@ public final class IrpTransmogrifier {
 
         commandDecode = new CommandDecode();
         argumentParser.addCommand(commandDecode);
+
+        commandDemodulate = new CommandDemodulate();
+        argumentParser.addCommand(commandDemodulate);
 
         commandAnalyze = new CommandAnalyze();
         argumentParser.addCommand(commandAnalyze);
@@ -301,6 +305,9 @@ public final class IrpTransmogrifier {
                         break;
                     case "decode":
                         decode();
+                        break;
+                    case "demodulate":
+                        demodulate();
                         break;
                     case "expression":
                         expression();
@@ -635,8 +642,8 @@ public final class IrpTransmogrifier {
         if (commandRender.printParameters)
             out.println(nameEngine.toString());
 
-        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns && !commandRender.printParameters)
-            logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, or --printparameters to get output.");
+        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns && !commandRender.modulate && !commandRender.printParameters)
+            logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, --modulate, or --printparameters to get output.");
         IrSignal irSignal = protocol.toIrSignal(nameEngine);
 
         if (commandRender.count != null) {
@@ -645,8 +652,11 @@ public final class IrpTransmogrifier {
             renderPrint(irSignal.toModulatedIrSequence(commandRender.count));
         } else if (commandRender.numberRepeats != null)
             renderPrint(irSignal.toModulatedIrSequence(true, commandRender.numberRepeats, true));
-        else
+        else {
+            if (commandRender.modulate)
+                throw new UsageException("--modulate is only supported together with --number-repeats or --count.");
             renderPrint(irSignal);
+        }
     }
 
     private void renderPrint(IrSignal irSignal) {
@@ -665,6 +675,8 @@ public final class IrpTransmogrifier {
             out.println(irSequence.toString(false));
         if (commandRender.pronto)
             out.println(Pronto.toString(new IrSignal(irSequence)));
+        if (commandRender.modulate)
+            out.println(irSequence.modulate().toString(true));
     }
 
     private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
@@ -1031,6 +1043,16 @@ public final class IrpTransmogrifier {
                 throw new ThisCannotHappenException(ex);
             }
         }
+    }
+
+    private void demodulate() throws OddSequenceLengthException {
+        boolean finished = commandDemodulate.process(this);
+        if (finished)
+            return;
+
+        IrSequence irSequence = new IrSequence(commandDemodulate.args.toArray(new String[commandDemodulate.args.size()]));
+        ModulatedIrSequence demodulated = ModulatedIrSequence.demodulate(irSequence, commandDemodulate.threshold);
+        out.println(demodulated.toString(true));
     }
 
     private void expression() throws FileNotFoundException, NameUnassignedException, IrpParseException {
@@ -1508,6 +1530,23 @@ public final class IrpTransmogrifier {
         }
     }
 
+    @Parameters(commandNames = { "demodulate" }, commandDescription = "Demodulate IrSequence given as argument.")
+    private static class CommandDemodulate extends MyCommand {
+
+        @Parameter(names = { "-t", "--threshold" }, description = "Threshold used for demodulating, in micro seconds.", converter = NameEngineParser.class)
+        private double threshold = ModulatedIrSequence.DEFAULT_DEMODULATE_THRESHOLD;
+
+        @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = true)
+        private List<String> args;
+
+        @Override
+        public String description() {
+            return "This command demodulates its argument IrSequence, emulating the use of a demodulating IR receiver. "
+                    + "This means that all gaps less than or equal to the threshold are squeezed into the preceeding flash. "
+                    + "Typically the threshold is taken around the period of the expected modulation frequency.";
+        }
+    }
+
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression given as argument.")
     private static class CommandExpression extends MyCommand {
 
@@ -1645,6 +1684,9 @@ public final class IrpTransmogrifier {
 
         //@Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
         //private String irp = null;
+
+        @Parameter(names = { "-m", "--modulate" }, description = "Generate modulated form")
+        private boolean modulate = false;
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();

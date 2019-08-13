@@ -37,4 +37,6 @@ public interface Floatable {
     public Element toElement(Document document);
 
     public String toIrpString(int radix);
+
+    public boolean constant(NameEngine nameEngine);
 }

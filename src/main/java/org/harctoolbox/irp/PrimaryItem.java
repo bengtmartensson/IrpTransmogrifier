@@ -94,4 +94,6 @@ public abstract class PrimaryItem extends IrpObject implements Numerical, Equati
      * @return PrimaryItem of the same type.
      */
     public abstract PrimaryItem substituteConstantVariables(Map<String, Long> constantVariables);
+
+    public abstract boolean constant(NameEngine nameEngine);
 }

@@ -112,4 +112,9 @@ final class FivePartExpression extends Expression {
         long ctrl = conditional.toLong(nameEngine);
         return ctrl != 0L ? trueExp.toLong(nameEngine) : falseExp.toLong(nameEngine);
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return trueExp.constant(nameEngine) && falseExp.constant(nameEngine);
+    }
 }

@@ -332,4 +332,9 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
         return bareIrStream.allDurationsInMicros(generalSpec, nameEngine);
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return bareIrStream.constant(nameEngine);
+    }
 }

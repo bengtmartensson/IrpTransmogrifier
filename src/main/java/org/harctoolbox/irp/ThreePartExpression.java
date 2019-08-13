@@ -212,4 +212,9 @@ final class ThreePartExpression extends Expression {
     public PrimaryItem leftHandSide() {
         return op1;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return op1.constant(nameEngine) && op1.constant(nameEngine);
+    }
 }

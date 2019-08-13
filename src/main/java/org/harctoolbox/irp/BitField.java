@@ -152,4 +152,8 @@ public abstract class BitField extends IrpObject implements Numerical {
     }
 
     public abstract BitField substituteConstantVariables(Map<String, Long> constantVariables);
+
+    public boolean constant(NameEngine nameEngine) {
+        return data.constant(nameEngine) && chop.constant(nameEngine);
+    }
 }

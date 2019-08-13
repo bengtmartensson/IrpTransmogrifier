@@ -155,4 +155,7 @@ public abstract class Expression extends PrimaryItem {
     public boolean isNumericLiteral() {
         return false;
     }
+
+    @Override
+    public abstract boolean constant(NameEngine nameEngine);
 }

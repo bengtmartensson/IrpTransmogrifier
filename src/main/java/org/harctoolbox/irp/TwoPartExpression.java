@@ -146,4 +146,9 @@ final class TwoPartExpression extends Expression {
     public PrimaryItem leftHandSide() {
         return operand;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return operand.constant(nameEngine);
+    }
 }

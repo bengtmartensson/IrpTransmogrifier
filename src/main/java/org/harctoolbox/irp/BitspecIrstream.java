@@ -345,4 +345,9 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         result.addAll(irStreamDurations);
         return result;
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return bitSpec.constant(nameEngine) && irStream.constant(nameEngine);
+    }
 }

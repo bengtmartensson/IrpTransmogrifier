@@ -107,6 +107,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
+    public boolean constant(NameEngine nameEngine) {
+        return nameOrNumber == null || nameOrNumber.constant(nameEngine);
+    }
+
+    @Override
     public int hashCode() {
         int hash = 5;
         hash = 43 * hash + IrCoreUtils.hashForDouble(this.us);

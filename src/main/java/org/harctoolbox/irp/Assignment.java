@@ -230,4 +230,9 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine) {
         return new TreeSet<>();
     }
+
+    @Override
+    public boolean constant(NameEngine nameEngine) {
+        return true;
+    }
 }

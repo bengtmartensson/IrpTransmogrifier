@@ -63,6 +63,12 @@ public final class XmlUtils {
     public static final String SCHEMA_LOCATION_ATTRIBUTE_NAME       = "xsi:schemaLocation";
     public static final String XML_LANG_ATTRIBUTE_NAME              = XML_NS_PREFIX + ":lang";
     public static final String ENGLISH                              = "en";
+    public final static String GIRR_NAMESPACE                       = "http://www.harctoolbox.org/Girr";
+    public final static String IRP_NAMESPACE                       = "http://www.harctoolbox.org/irp-protocols";
+    public final static String XML_SCHEMA_INSTANCE                  = "http://www.w3.org/2001/XMLSchema-instance";
+    public final static String GIRR_COMMENT                         = "This file is in the Girr (General IR Remote) format, see http://www.harctoolbox.org/Girr.html";
+    public final static String GIRR_SCHEMA_LOCATION                 = "http://www.harctoolbox.org/Girr http://www.harctoolbox.org/schemas/girr_ns.xsd";
+    public final static String IRP_SCHEMA_LOCATION                  = "http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd";
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 

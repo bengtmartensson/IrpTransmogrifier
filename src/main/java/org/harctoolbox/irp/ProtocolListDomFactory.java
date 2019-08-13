@@ -36,21 +36,23 @@ public class ProtocolListDomFactory {
     }
 
     private Map<Integer, Protocol> protocolsWithoutDefs;
-    private Document doc;
-    private String[] names;
-    private int radix;
-    private Analyzer analyzer;
-    private List<Protocol> protocols;
+    private final Document doc;
+    private final String[] names;
+    private final int radix;
+    private final Analyzer analyzer;
+    private final List<Protocol> protocols;
+    private int counter;
 
     private ProtocolListDomFactory(Analyzer analyzer, List<Protocol> protocols, String[] names, int radix) {
-        if (protocols.size() != names.length || analyzer.getNoSequences() != names.length)
-            throw new IllegalArgumentException();
+//        if (protocols.size() != names.length || analyzer.getNoSequences() != names.length)
+//            throw new IllegalArgumentException();
 
         this.protocolsWithoutDefs = new HashMap<>(8);
         this.analyzer = analyzer;
         this.protocols = protocols;
         this.names = names;
         this.radix = radix;
+        this.counter = 0;
 
         doc = XmlUtils.newDocument(true);
         doc.appendChild(doc.createComment(XmlUtils.GIRR_COMMENT));
@@ -73,15 +75,16 @@ public class ProtocolListDomFactory {
         Element commandSet = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "commandSet");
         commandSet.setAttribute("name", "commandSet");
         remote.appendChild(commandSet);
-        for (int i = 0; i< names.length; i++)
-            commandSet.appendChild(commandToElement(protocols.get(i), names[i], analyzer.cleanedIrSequence(i)));
+        for (int i = 0; i< protocols.size(); i++)
+            commandSet.appendChild(commandToElement(protocols.get(i), names != null ? names[i] : null, analyzer.cleanedIrSequence(i)));
 
         return remote;
     }
 
     private Element commandToElement(Protocol protocol, String name, IrSequence irSequence) {
         Element command = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "command");
-        command.setAttribute("name", name);
+        String commandName = name != null ? name : ("unnamed_" + Integer.toString(counter++));
+        command.setAttribute("name", commandName);
         Element parameters = parametersToElement(protocol);
         command.appendChild(parameters);
         Element raw = rawToElement(irSequence);

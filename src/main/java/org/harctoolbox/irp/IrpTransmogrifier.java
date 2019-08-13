@@ -155,6 +155,11 @@ public final class IrpTransmogrifier {
         return sum / seqs.size();
     }
 
+    private static void checkForOption(String functionName, List<String> args) throws UsageException {
+        if (args != null && !args.isEmpty() && args.get(0).startsWith("-"))
+            throw new UsageException("Unknown option to " + functionName + ": " + args.get(0));
+    }
+
     private PrintStream out;
     private IrpDatabase irpDatabase;
     private JCommander argumentParser;
@@ -705,6 +710,7 @@ public final class IrpTransmogrifier {
     }
 
     private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException, IOException, NoDecoderMatchException {
+        checkForOption("analyze", commandAnalyze.args);
         boolean finished = commandAnalyze.process(this);
         if (finished)
             return;
@@ -907,6 +913,7 @@ public final class IrpTransmogrifier {
     }
 
     private void decode() throws IrpInvalidArgumentException, IOException, UsageException, InvalidArgumentException, IrpParseException {
+        checkForOption("decode", commandDecode.args);
         boolean finished = commandDecode.process(this);
         if (finished)
             return;

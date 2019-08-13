@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017, 2018 Bengt Martensson.
+Copyright (C) 2017, 2018, 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,12 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -63,8 +61,6 @@ public final class IrpDatabase {
     public static final String IRP_PROTOCOL_SCHEMA_LOCATION = "http://www.harctoolbox.org/schemas/irp-protocols.xsd";
     public static final String IRP_NAMESPACE_PREFIX = "irp";
     private static final int MAX_RECURSION_DEPTH = 5;
-    private static final int APRIORI_NUMBER_PROTOCOLS = 200;
-    private static final String INI_CHARSET = "WINDOWS-1252"; // Don't ever consider making this configurable!!
 
     public static final String UNNAMED = "unnamed_protocol";
     public static final String PROTOCOL_NAME = "protocol";
@@ -119,90 +115,6 @@ public final class IrpDatabase {
             logger.log(Level.SEVERE, null, ex);
             return null;
         }
-    }
-
-    public static IrpDatabase readIni(String datafile) throws IOException {
-        try (InputStreamReader is = new InputStreamReader(IrCoreUtils.getInputSteam(datafile), INI_CHARSET)) {
-            return readIni(is);
-        }
-    }
-
-    public static IrpDatabase readIni(Reader reader) throws IOException {
-        Map<String, UnparsedProtocol> protocols = new LinkedHashMap<>(APRIORI_NUMBER_PROTOCOLS);
-        Map<String, String> aliases = new LinkedHashMap<>(16);
-        BufferedReader in = new BufferedReader(reader);
-        Map<String, String> currentProtocol = null;
-        String configFileVersion = null;
-        int lineNo = 0;
-        boolean isDocumentation = false;
-        StringBuilder documentation = new StringBuilder(1000);
-        while (true) {
-            String lineRead = in.readLine();
-            if (lineRead == null)
-                break;
-            lineNo++;
-            String line = lineRead.trim();
-            logger.log(Level.FINEST, "Line {0}: {1}", new Object[]{lineNo, line});
-            if (line.startsWith("#"))
-                // comment, ignore
-                continue;
-
-            String[] kw = line.split("=", 2);
-            String keyword = kw[0].toLowerCase(Locale.US);
-            String payload = kw.length > 1 ? kw[1].trim() : null;
-            while (payload != null && payload.endsWith("\\")) {
-                payload = payload.substring(0, payload.length() - 1);
-                payload = payload.trim();
-                String continuation = in.readLine();
-                if (continuation != null)
-                    continuation = continuation.trim();
-                payload += continuation;
-                lineNo++;
-            }
-
-            if (line.equals("[version]")) {
-                configFileVersion = in.readLine();
-                lineNo++;
-            } else if (line.equals("[protocol]")) {
-                if (currentProtocol != null) {
-                    currentProtocol.put(DOCUMENTATION_NAME, documentation.toString().trim());
-                    addProtocol(protocols, aliases, new UnparsedProtocol(currentProtocol));
-                }
-                currentProtocol = new HashMap<>(UnparsedProtocol.APRIORI_SIZE);
-                documentation = new StringBuilder(1000);
-                isDocumentation = false;
-            } else if (isDocumentation && currentProtocol != null) {
-                // Everything is added to the documentation
-                if (line.isEmpty())
-                    documentation.append("\n\n");
-                else {
-                    if (documentation.length() > 0 && !documentation.substring(documentation.length() - 1).equals("\n"))
-                        documentation.append(" ");
-                    documentation.append(line);
-                }
-            } else if (line.equals("[documentation]")) {
-                if (currentProtocol != null)
-                    isDocumentation = true;
-            } else if (keyword.equals("name")) {
-                if (currentProtocol != null)
-                    currentProtocol.put(NAME_NAME, payload);
-            } else if (keyword.equals("irp")) {
-                if (currentProtocol != null)
-                    currentProtocol.put(IRP_NAME, payload);
-            } else if (keyword.equals(USABLE_NAME)) {
-                if (currentProtocol != null)
-                    currentProtocol.put(keyword, payload);
-            } else if (keyword.length() > 1) {
-                if (currentProtocol != null)
-                    currentProtocol.put(keyword, payload);
-            } else if (!line.isEmpty())
-                logger.log(Level.FINER, "Ignored line: {0}", line);
-        }
-        if (currentProtocol != null) {
-            currentProtocol.put(DOCUMENTATION_NAME, documentation.toString().trim());
-            addProtocol(protocols, aliases, new UnparsedProtocol(currentProtocol));
-        }
-        return new IrpDatabase(protocols, aliases, configFileVersion);
     }
 
     public static IrpDatabase parseIrp(String protocolName, String irp, String documentation) {
@@ -275,12 +187,6 @@ public final class IrpDatabase {
     private Map<String, UnparsedProtocol> protocols;
 
     private Map<String, String> aliases;
-
-//    private IrpDatabase() {
-//        this.configFileVersion = "";
-//        protocols = new LinkedHashMap<>(APRIORI_NUMBER_PROTOCOLS);
-//        aliases = new LinkedHashMap<>(16);
-//    }
 
     public IrpDatabase(Reader reader) throws IOException {
         this(openXmlReader(reader));
@@ -595,34 +501,6 @@ public final class IrpDatabase {
     public String getNormalFormIrp(String protocolName, int radix) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         Protocol protocol = getProtocol(protocolName);
         return protocol.normalFormIrpString(radix);
-    }
-
-    public void printAsIni(PrintStream out) {
-        out.println("# Generated by " + Version.versionString);
-        out.println("[version]");
-        out.println(getConfigFileVersion());
-        protocols.keySet().forEach((protocol) -> {
-            printAsIni(out, protocol);
-        });
-    }
-
-    private void printAsIni(PrintStream out, String protocol) {
-        out.println("[" + PROTOCOL_NAME + "]");
-        UnparsedProtocol prot = getUnparsedProtocol(protocol);
-        prot.map.entrySet().forEach((kvp) -> { // assume that "name" comes first
-            String key = kvp.getKey();
-            if (!key.equals(DOCUMENTATION_NAME))
-                kvp.getValue().forEach((value) -> {
-                    out.println(key + "=" + value);
-                });
-        });
-
-        String doc = prot.getDocumentation();
-        if (doc != null && ! doc.trim().isEmpty()) {
-            out.println("[documentation]");
-            out.println(doc);
-        }
-        out.println();
     }
 
     public boolean checkSorted() {

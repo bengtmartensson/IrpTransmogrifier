@@ -1117,11 +1117,10 @@ public final class IrpTransmogrifier {
     }
 
     private void setupDatabase() throws IOException, UsageException {
-        if (IrCoreUtils.numberTrue(commandLineArgs.configFile != null, commandLineArgs.irp != null, commandLineArgs.iniFile != null) > 1)
-            throw new UsageException("At most one of inifile, configfile, and irp can be specified");
+        if (commandLineArgs.configFile != null && commandLineArgs.irp != null)
+            throw new UsageException("At most one of configfile and irp can be specified");
 
-        irpDatabase = commandLineArgs.iniFile != null ? IrpDatabase.readIni(commandLineArgs.iniFile)
-                : commandLineArgs.irp != null         ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
+        irpDatabase = commandLineArgs.irp != null ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
                 : new IrpDatabase(commandLineArgs.configFile);
     }
 
@@ -1202,11 +1201,6 @@ public final class IrpTransmogrifier {
 
         @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message. Deprecated; use the command \"help\" instead.")
         private boolean helpRequested = false;
-
-        @Parameter(names = {      "--ini", "--inifile"}, hidden = true,
-                description = "Pathname of IRP database file in ini format. "
-                + "If not specified, an XML config file (using --configfile) will be used instead.")
-        private String iniFile = null;//"src/main/config/IrpProtocols.ini";
 
         @Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
         private String irp = null;

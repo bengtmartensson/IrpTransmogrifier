@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,7 +55,6 @@ import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.analyze.Cleaner;
 import org.harctoolbox.analyze.NoDecoderMatchException;
 import org.harctoolbox.analyze.RepeatFinder;
-import org.harctoolbox.ircore.IctImporter;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -716,19 +714,13 @@ public final class IrpTransmogrifier {
             List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
             analyze(modSeqs, frequencyAverage(modSeqs));
         } else if (commandAnalyze.namedInput != null) {
-            try {
-                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandAnalyze.namedInput, commandLineArgs.encoding);
-                analyze(modSequences);
-            } catch (ParseException ex) {
-                logger.log(Level.INFO, "Parsing of {0} as ict failed", commandAnalyze.namedInput);
-                ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
-                        (List<String> line) -> { return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
-                );
-                Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
-                if (signals.isEmpty())
-                    throw new InvalidArgumentException("No parseable sequences found.");
-                analyze(signals);
-            }
+            ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
+                (List<String> line) -> { return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
+            );
+            Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(commandAnalyze.namedInput, commandLineArgs.encoding);
+            if (signals.isEmpty())
+                throw new InvalidArgumentException("No parseable sequences found.");
+            analyze(signals);
         } else {
             MultiParser parser = MultiParser.newIrCoreParser(commandAnalyze.args);
             if (commandAnalyze.introRepeatEnding) {
@@ -916,22 +908,13 @@ public final class IrpTransmogrifier {
             for (IrSignal irSignal : signals)
                 decode(decoder, irSignal.setFrequency(commandDecode.frequency), null, 0);
         } else if (commandDecode.namedInput != null) {
-            try {
-                Map<String, ModulatedIrSequence> modSequences = IctImporter.parse(commandDecode.namedInput, commandLineArgs.encoding);
-                int maxNameLength = IrCoreUtils.maxLength(modSequences.keySet());
-                for (Map.Entry<String, ModulatedIrSequence> kvp : modSequences.entrySet()) {
-                    ModulatedIrSequence modSeq = kvp.getValue().setFrequency(commandDecode.frequency);
-                    decode(decoder, new IrSignal(modSeq), kvp.getKey(), maxNameLength);
-                }
-            } catch (ParseException ex) {
-                ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
-                    return (MultiParser.newIrCoreParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
-                });
-                Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
-                int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
-                for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
-                    decode(decoder, kvp.getValue().setFrequency(commandDecode.frequency), kvp.getKey(), maxNameLength);
-            }
+            ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
+                return (MultiParser.newIrCoreParser(line)).toIrSignal(commandDecode.frequency, commandDecode.trailingGap);
+            });
+            Map<String, IrSignal> signals = irSignalParser.readNamedThings(commandDecode.namedInput, commandLineArgs.encoding);
+            int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
+            for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
+                decode(decoder, kvp.getValue().setFrequency(commandDecode.frequency), kvp.getKey(), maxNameLength);
         } else {
             MultiParser prontoRawParser = MultiParser.newIrCoreParser(commandDecode.args);
             IrSignal irSignal = prontoRawParser.toIrSignal(commandDecode.frequency, commandDecode.trailingGap);

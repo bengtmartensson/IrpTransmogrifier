@@ -1322,7 +1322,7 @@ public final class IrpTransmogrifier {
         @Parameter(names = { "-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
         private Double frequency = null;
 
-        @Parameter(names = { "-g", "--girr"}, description = "Generate Girr file.")
+        @Parameter(names = { "-g", "--girr"}, description = "Generate Girr file (EXPERIMENTAL).")
         private boolean girr = false;
 
         @Parameter(names = { "-i", "--input"}, description = "File/URL from which to take inputs, one sequence per line.")
@@ -1550,7 +1550,7 @@ public final class IrpTransmogrifier {
         }
     }
 
-    @Parameters(commandNames = { "demodulate" }, commandDescription = "Demodulate IrSequence given as argument.")
+    @Parameters(commandNames = { "demodulate" }, commandDescription = "Demodulate IrSequence given as argument (EXPERIMENTAL).")
     private static class CommandDemodulate extends MyCommand {
 
         @Parameter(names = { "-t", "--threshold" }, description = "Threshold used for demodulating, in micro seconds.", converter = NameEngineParser.class)
@@ -1705,7 +1705,7 @@ public final class IrpTransmogrifier {
         //@Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
         //private String irp = null;
 
-        @Parameter(names = { "-m", "--modulate" }, description = "Generate modulated form")
+        @Parameter(names = { "-m", "--modulate" }, description = "Generate modulated form (EXPERIMENTAL)")
         private boolean modulate = false;
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)

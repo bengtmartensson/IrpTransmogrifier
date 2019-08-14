@@ -83,15 +83,14 @@ public class ProtocolListDomFactory {
 
     private Element commandToElement(Protocol protocol, String name, IrSequence irSequence) {
         Element command = doc.createElementNS(XmlUtils.GIRR_NAMESPACE, "command");
+        @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
         String commandName = name != null ? name : ("unnamed_" + Integer.toString(counter++));
         command.setAttribute("name", commandName);
         Element parameters = parametersToElement(protocol);
         command.appendChild(parameters);
         Element raw = rawToElement(irSequence);
-        if (raw != null) {
-            command.appendChild(raw);
-            command.setAttribute("master", "raw");
-        }
+        command.appendChild(raw);
+        command.setAttribute("master", "raw");
         return command;
     }
 
@@ -128,10 +127,9 @@ public class ProtocolListDomFactory {
 
     private Element mkProtocols() {
         protocolsWithoutDefs = new HashMap<>(4);
-        for (Protocol protocol : protocols) {
-            Protocol withoutDefs = new Protocol(protocol.getGeneralSpec(), protocol.getBitspecIrstream(), new NameEngine(), null);
+        protocols.stream().map((protocol) -> new Protocol(protocol.getGeneralSpec(), protocol.getBitspecIrstream(), new NameEngine(), null)).forEachOrdered((withoutDefs) -> {
             protocolsWithoutDefs.put(withoutDefs.hashCode(), withoutDefs);
-        }
+        });
         Element protocolsElement = doc.createElementNS(XmlUtils.IRP_NAMESPACE, "irp:protocols");
         protocolsWithoutDefs.entrySet().forEach((proto) -> {
             Element protocolElement = doc.createElementNS(XmlUtils.IRP_NAMESPACE, "irp:protocol");

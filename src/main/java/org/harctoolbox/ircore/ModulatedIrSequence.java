@@ -247,8 +247,7 @@ public final class ModulatedIrSequence extends IrSequence {
         return dutyCycle != null ? dutyCycle : DEFAULT_DUTYCYCLE;
     }
 
-    @Override
-    public String toString(boolean alternatingSigns) {
+    public String toStringFrequency(boolean alternatingSigns) {
         return "{"
                 + (frequency != null ? (Integer.toString((int) Math.round(frequency)) + ",") : "")
                 + (dutyCycle != null ? (Integer.toString((int) Math.round(100 * dutyCycle)) + "%,") : "")
@@ -256,9 +255,8 @@ public final class ModulatedIrSequence extends IrSequence {
                 + "}";
     }
 
-    @Override
-    public String toString() {
-        return toString(false);
+    public String toStringFrequency() {
+        return toStringFrequency(false);
     }
 
     public IrSignal toIrSignal() {

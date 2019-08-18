@@ -286,7 +286,7 @@ public final class XmlUtils {
                 }
                 if (debug)
                     XmlUtils.printDOM(new File("stylesheet-params.xsl"), xslt);
-                tr = factory.newTransformer(new DOMSource(xslt));
+                tr = factory.newTransformer(new DOMSource(xslt, xslt.getDocumentURI()));
             }
             tr.setOutputProperty(OutputKeys.INDENT, "yes");
             tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");

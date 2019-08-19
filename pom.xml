@@ -31,6 +31,9 @@
             <resource>
                 <directory>src/main/xdocs</directory>
             </resource>
+            <resource>
+                <directory>src/main/schemas</directory>
+            </resource>
         </resources>
         <plugins><!-- Generate Version.java from Version.xml using mkVersion.xsl. -->
             <plugin>
@@ -218,6 +221,12 @@
                                         <include>${project.name}.xml</include>
                                     </includes>
                                 </resource>
+                                <resource>
+                                    <directory>src/main/schemas</directory>
+                                    <includes>
+                                        <include>irp-protocols.xsd</include>
+                                    </includes>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -272,6 +281,7 @@
                         <include>IrpProtocols.xml</include>
                         <include>IrpProtocols2html.xsl</include>
                         <include>IrpTransmogrifier.xml</include>
+                        <include>irp-protocols.xsd</include>
                     </includes>
                 </configuration>
             </plugin>

@@ -22,11 +22,11 @@
             <directory>target</directory>
             <outputDirectory/>
             <includes>
-                <include>*jar-with-dependencies.jar</include>
+                <include>*.jar</include>
                 <include>*.xml</include>
                 <include>*.html</include>
-                <!--include>*.md</include-->
                 <include>*.xsl</include>
+                <include>*.xsd</include>
                 <include>*.bat</include>
             </includes>
             <lineEnding>keep</lineEnding>

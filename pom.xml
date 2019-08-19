@@ -118,9 +118,11 @@
                             </fileMappers>
                         </transformationSet>
                     </transformationSets>
-                    <catalogs>
-                        <catalog>schemas/catalog.xml</catalog>
-                    </catalogs>
+
+                    <!-- Uncomment to use local versions of the schemas/DTDs -->
+                    <!--catalogs>
+                        <catalog>../schemas/catalog.xml</catalog>
+                    </catalogs-->
                 </configuration>
 
                 <dependencies>

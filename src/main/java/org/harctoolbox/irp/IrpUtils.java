@@ -33,20 +33,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
  */
 public final class IrpUtils {
 
-    // Symbolic names for exit statii
-    public final static int EXIT_SUCCESS               = 0;
-    public final static int EXIT_USAGE_ERROR           = 1;
-    public final static int EXIT_SEMANTIC_USAGE_ERROR  = 2;
-    public final static int EXIT_FATAL_PROGRAM_FAILURE = 3;
-    public final static int EXIT_INTERNAL_FAILURE      = 4;
-    public final static int EXIT_CONFIG_READ_ERROR     = 5;
-    public final static int EXIT_CONFIG_WRITE_ERROR    = 6;
-    public final static int EXIT_IO_ERROR              = 7;
-    public final static int EXIT_XML_ERROR             = 8;
-    public final static int EXIT_DYNAMICLINK_ERROR     = 9;
-    public final static int EXIT_THIS_CANNOT_HAPPEN    = 10;
-    public final static int EXIT_INTERRUPTED           = 11;
-    public final static int EXIT_RESTART               = 99; // An invoking script is supposed to restart the program
+    // The symbolic names for exit statii now in org.harctoolbox.cmdline.ExitStatus.
 
     public final static String JP1_WIKI_URL = "http://www.hifi-remote.com/wiki/index.php?title=Main_Page";
     public final static String IRP_NOTATION_URL = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";

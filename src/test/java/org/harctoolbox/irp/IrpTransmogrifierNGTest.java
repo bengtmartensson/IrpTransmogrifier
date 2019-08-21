@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -381,7 +382,7 @@ public class IrpTransmogrifierNGTest {
     public void testRenderSilly() {
         System.out.println("renderSilly");
         IrpTransmogrifier instance = new IrpTransmogrifier();
-        IrpTransmogrifier.ProgramExitStatus status = instance.run("-i silly render -p");
+        ProgramExitStatus status = instance.run("-i silly render -p".split(" "));
         String expResult = "Parse error in \"silly\": `{' not found.";
         assertEquals(status.getMessage(), expResult);
     }

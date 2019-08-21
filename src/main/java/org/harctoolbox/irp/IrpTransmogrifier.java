@@ -23,13 +23,11 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,6 +53,11 @@ import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.analyze.Cleaner;
 import org.harctoolbox.analyze.NoDecoderMatchException;
 import org.harctoolbox.analyze.RepeatFinder;
+import org.harctoolbox.cmdline.AbstractCommand;
+import org.harctoolbox.cmdline.CmdLineProgram;
+import org.harctoolbox.cmdline.CmdUtils;
+import org.harctoolbox.cmdline.ProgramExitStatus;
+import org.harctoolbox.cmdline.UsageException;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -78,43 +81,28 @@ import org.w3c.dom.Document;
  * Basically, there should not be "too much" business logic here; we construct element and call its
  * member functions, defined elsewhere.
  */
-public final class IrpTransmogrifier {
+public final class IrpTransmogrifier implements CmdLineProgram {
 
     // No need to make these settable, at least not presently
     public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml"; // in jar-file
-    public static final String DEFAULT_CHARSET = "UTF-8"; // Just for runMain
     private static final String PROGRAMNAME = Version.appName;
 
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
 
     static String execute(String commandLine) {
-        return execute(commandLine.split("\\s+"));
+        return execute(CmdUtils.shellSplit(commandLine));
     }
 
     static String execute(String[] args) {
-        try {
-            ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
-            try (PrintStream outStream = new PrintStream(outBytes, false, DEFAULT_CHARSET)) {
-                IrpTransmogrifier instance = new IrpTransmogrifier(outStream);
-                ProgramExitStatus status = instance.run(args);
-                if (!status.isSuccess())
-                    return null;
-
-                outStream.flush();
-            }
-            return new String(outBytes.toByteArray(), DEFAULT_CHARSET).trim();
-        } catch (UnsupportedEncodingException ex) {
-            throw new ThisCannotHappenException(ex);
-        }
+        return CmdUtils.execute(IrpTransmogrifier.class, args);
     }
 
-    // Allow for parallel execition of several instances -- main is static.
     /**
      *
      * @param args
      * @param out
      */
-    public static void main(String[] args, PrintStream out) {
+    private static void main(String[] args, PrintStream out) {
         IrpTransmogrifier instance = new IrpTransmogrifier(out);
         ProgramExitStatus status = instance.run(args);
         out.close();
@@ -125,10 +113,7 @@ public final class IrpTransmogrifier {
         main(args, System.out);
     }
 
-    public static void main(String cmdLine, PrintStream printStream) {
-        main(cmdLine.split("\\s+"), printStream);
-    }
-
+    // TODO: nuke
     private static Map<String, String> assembleParameterMap(List<String> paramStrings) throws UsageException {
         HashMap<String, String> result = new HashMap<>(paramStrings.size());
         for (String s : paramStrings) {
@@ -141,23 +126,11 @@ public final class IrpTransmogrifier {
         return result;
     }
 
-    private static Double frequencyAverage(Collection<ModulatedIrSequence> seqs) {
-        if (seqs.isEmpty())
-            return null;
-
-        double sum = 0;
-        for (ModulatedIrSequence seq : seqs) {
-            Double freq = seq.getFrequency();
-            if (freq == null)
-                return null;
-            sum += freq;
-        }
-        return sum / seqs.size();
-    }
-
-    private static void checkForOption(String functionName, List<String> args) throws UsageException {
-        if (args != null && !args.isEmpty() && args.get(0).startsWith("-"))
-            throw new UsageException("Unknown option to " + functionName + ": " + args.get(0));
+    private static String padString(String name, int length) {
+        StringBuilder stringBuilder = new StringBuilder(name);
+        while (stringBuilder.length() < length)
+            stringBuilder.append(" ");
+        return stringBuilder.toString();
     }
 
     private PrintStream out;
@@ -175,7 +148,7 @@ public final class IrpTransmogrifier {
     private CommandBitField commandBitField;
     private CommandExpression commandExpression;
     private CommandLirc commandLirc;
-    private String[] originalArguments;
+    private String[] originalArguments; // Really necessary?
 
     public IrpTransmogrifier() {
         this(System.out);
@@ -185,106 +158,31 @@ public final class IrpTransmogrifier {
         this.out = out;
     }
 
-    public ProgramExitStatus run(String cmdLine) {
-        return run(cmdLine.split("\\s+"));
-    }
-
     /**
      *
      * @param args program args
      * @return
      */
     @SuppressWarnings("CallToPrintStackTrace")
+    @Override
     public ProgramExitStatus run(String[] args) {
         this.originalArguments = args.clone();
-        commandLineArgs = new CommandLineArgs();
-        argumentParser = new JCommander(commandLineArgs);
-        argumentParser.setProgramName(PROGRAMNAME);
-        argumentParser.setAllowAbbreviatedOptions(true);
-
-        // The ordering in the following lines is the order the commands
-        // will be listed in the help. Keep this order in a logical order.
-        // In the rest of the file, these are ordered alphabetically.
-        commandHelp = new CommandHelp();
-        argumentParser.addCommand(commandHelp);
-
-        commandVersion = new CommandVersion();
-        argumentParser.addCommand(commandVersion);
-
-        commandList = new CommandList();
-        argumentParser.addCommand(commandList);
-
-        commandRender = new CommandRender();
-        argumentParser.addCommand(commandRender);
-
-        commandDecode = new CommandDecode();
-        argumentParser.addCommand(commandDecode);
-
-        commandDemodulate = new CommandDemodulate();
-        argumentParser.addCommand(commandDemodulate);
-
-        commandAnalyze = new CommandAnalyze();
-        argumentParser.addCommand(commandAnalyze);
-
-        commandCode = new CommandCode();
-        argumentParser.addCommand(commandCode);
-
-        commandBitField = new CommandBitField();
-        argumentParser.addCommand(commandBitField);
-
-        commandExpression = new CommandExpression();
-        argumentParser.addCommand(commandExpression);
-
-        commandLirc = new CommandLirc();
-        argumentParser.addCommand(commandLirc);
+        setupArgParser();
 
         try {
             argumentParser.parse(args);
         } catch (ParameterException | NumberFormatException ex) {
-            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getMessage());
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getMessage());
         }
 
         try {
-            if (commandLineArgs.logformat != null)
-                System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", commandLineArgs.logformat);
-            Logger topLevelLogger = Logger.getLogger("");
-            Formatter formatter = commandLineArgs.xmlLog ? new XMLFormatter() : new SimpleFormatter();
-            Handler[] handlers = topLevelLogger.getHandlers();
-            for (Handler handler : handlers)
-                topLevelLogger.removeHandler(handler);
-
-            String[] logclasses = commandLineArgs.logclasses.split("\\|");
-            @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-            List<Logger> loggers = new ArrayList<>(logclasses.length);
-            for (String logclass : logclasses) {
-                String[] classLevel = logclass.trim().split(":");
-                if (classLevel.length < 2)
-                    continue;
-
-                Logger log = Logger.getLogger(classLevel[0].trim());
-                loggers.add(log); // stop them from being garbage collected
-                Level level = Level.parse(classLevel[1].trim().toUpperCase(Locale.US));
-                log.setLevel(level);
-                log.setUseParentHandlers(false);
-                Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
-                handler.setLevel(level);
-                handler.setFormatter(formatter);
-                log.addHandler(handler);
-            }
-
-            Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
-            handler.setFormatter(formatter);
-            topLevelLogger.addHandler(handler);
-
-            handler.setLevel(commandLineArgs.logLevel);
-            topLevelLogger.setLevel(commandLineArgs.logLevel);
+            setupLoggers();
 
             if (commandLineArgs.seed != null)
                 ParameterSpec.initRandom(commandLineArgs.seed);
 
             if (commandLineArgs.output != null)
                 out = IrCoreUtils.getPrintSteam(commandLineArgs.output);
-            //IrpTransmogrifier instance = new IrpTransmogrifier(ps);
 
             RepeatFinder.setDefaultMinRepeatLastGap(commandLineArgs.minRepeatGap); // Parallelization problem
 
@@ -296,7 +194,7 @@ public final class IrpTransmogrifier {
                     : argumentParser.getParsedCommand();
 
             if (command == null)
-                return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Usage: " + PROGRAMNAME + " [options] <command> [command_options]");
+                return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Usage: " + PROGRAMNAME + " [options] <command> [command_options]");
             else // For findbugs...
                 switch (command) {
                     case "analyze":
@@ -333,13 +231,13 @@ public final class IrpTransmogrifier {
                         version();
                         break;
                     default:
-                        return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Unknown command: " + command);
+                        return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Unknown command: " + command);
                 }
         } catch (UsageException | NameUnassignedException | UnknownProtocolException| FileNotFoundException | DomainViolationException ex) {
             // Exceptions likely from silly user input, just print the exception
-            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (OddSequenceLengthException ex) {
-            return new ProgramExitStatus(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR,
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR,
                     ex.getLocalizedMessage() + ". Consider using --trailinggap.");
         } catch (ParseCancellationException | InvalidArgumentException ex) {
             // When we get here,
@@ -347,26 +245,27 @@ public final class IrpTransmogrifier {
             // stderr; that is good enough for now.
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
-            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidNameException | IrpInvalidArgumentException | UnsupportedRepeatException ex) {
             //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
             // Likely a programming error or fatal error in the data base. Barf.
             ex.printStackTrace();
-            return new ProgramExitStatus(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());
         } catch (IrpParseException ex) {
             // TODO: Improve error message
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
-            return new ProgramExitStatus(IrpUtils.EXIT_USAGE_ERROR, "Parse error in \"" + ex.getText() + "\": " + ex.getLocalizedMessage());
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Parse error in \"" + ex.getText() + "\": " + ex.getLocalizedMessage());
         } catch (NoDecoderMatchException ex) {
-            return new ProgramExitStatus(IrpUtils.EXIT_SEMANTIC_USAGE_ERROR,
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR,
                     "No decoder matched \"" + commandAnalyze.decoder +
                     "\". Use \"--decoder list\" to list the available decoders.");
         }
         return new ProgramExitStatus();
     }
 
-    private String usageString(String command) {
+    @Override
+    public String usageString(String command) {
         StringBuilder stringBuilder = new StringBuilder(10000);
         if (command == null)
             argumentParser.usage(stringBuilder);
@@ -426,7 +325,7 @@ public final class IrpTransmogrifier {
         List<String> commands = new ArrayList<>(argumentParser.getCommands().keySet());
         Collections.sort(commands);
         commands.forEach((cmd) -> {
-            out.println("   " + padString(cmd) + argumentParser.getCommandDescription(cmd));
+            out.println("   " + padString(cmd, 16) + argumentParser.getCommandDescription(cmd));
         });
 
         out.println();
@@ -435,13 +334,6 @@ public final class IrpTransmogrifier {
         out.println("    \"" + PROGRAMNAME + " help <command>\" for a particular command,");
         out.println("    \"" + PROGRAMNAME + " <command> --describe\" for a description,");
         out.println("    \"" + PROGRAMNAME + " help --common\" for the common options.");
-    }
-
-    private String padString(String name) {
-        StringBuilder stringBuilder = new StringBuilder(name);
-        while (stringBuilder.length() < 16)
-            stringBuilder.append(" ");
-        return stringBuilder.toString();
     }
 
     private void list() throws IOException, UsageException, IrpParseException {
@@ -710,7 +602,7 @@ public final class IrpTransmogrifier {
     }
 
     private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException, IOException, NoDecoderMatchException {
-        checkForOption("analyze", commandAnalyze.args);
+        CmdUtils.checkForOption("analyze", commandAnalyze.args);
         boolean finished = commandAnalyze.process(this);
         if (finished)
             return;
@@ -732,7 +624,7 @@ public final class IrpTransmogrifier {
                     (List<String> line) -> { return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
             );
             List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(commandAnalyze.input, commandLineArgs.encoding, false);
-            analyze(modSeqs, frequencyAverage(modSeqs));
+            analyze(modSeqs, ModulatedIrSequence.frequencyAverage(modSeqs));
         } else if (commandAnalyze.namedInput != null) {
             ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
                 (List<String> line) -> { return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(commandAnalyze.frequency, commandAnalyze.trailingGap); }
@@ -780,7 +672,7 @@ public final class IrpTransmogrifier {
     private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws NoDecoderMatchException, InvalidArgumentException {
         Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
         irSequences.putAll(modulatedIrSequences);
-        Double frequency = possiblyOverrideWithAnalyzeFrequency(frequencyAverage(modulatedIrSequences.values()));
+        Double frequency = possiblyOverrideWithAnalyzeFrequency(ModulatedIrSequence.frequencyAverage(modulatedIrSequences.values()));
         analyze(irSequences, frequency);
     }
 
@@ -913,7 +805,7 @@ public final class IrpTransmogrifier {
     }
 
     private void decode() throws IrpInvalidArgumentException, IOException, UsageException, InvalidArgumentException, IrpParseException {
-        checkForOption("decode", commandDecode.args);
+        CmdUtils.checkForOption("decode", commandDecode.args);
         boolean finished = commandDecode.process(this);
         if (finished)
             return;
@@ -1167,6 +1059,90 @@ public final class IrpTransmogrifier {
         return commandAnalyze.frequency != null ? commandAnalyze.frequency : frequency;
     }
 
+    @Override
+    public PrintStream getOutputStream() {
+        return out;
+    }
+
+    private void setupArgParser() {
+           commandLineArgs = new CommandLineArgs();
+        argumentParser = new JCommander(commandLineArgs);
+        argumentParser.setProgramName(PROGRAMNAME);
+        argumentParser.setAllowAbbreviatedOptions(true);
+
+        // The ordering in the following lines is the order the commands
+        // will be listed in the help. Keep this order in a logical order.
+        // In the rest of the file, these are ordered alphabetically.
+        commandHelp = new CommandHelp();
+        argumentParser.addCommand(commandHelp);
+
+        commandVersion = new CommandVersion();
+        argumentParser.addCommand(commandVersion);
+
+        commandList = new CommandList();
+        argumentParser.addCommand(commandList);
+
+        commandRender = new CommandRender();
+        argumentParser.addCommand(commandRender);
+
+        commandDecode = new CommandDecode();
+        argumentParser.addCommand(commandDecode);
+
+        commandDemodulate = new CommandDemodulate();
+        argumentParser.addCommand(commandDemodulate);
+
+        commandAnalyze = new CommandAnalyze();
+        argumentParser.addCommand(commandAnalyze);
+
+        commandCode = new CommandCode();
+        argumentParser.addCommand(commandCode);
+
+        commandBitField = new CommandBitField();
+        argumentParser.addCommand(commandBitField);
+
+        commandExpression = new CommandExpression();
+        argumentParser.addCommand(commandExpression);
+
+        commandLirc = new CommandLirc();
+        argumentParser.addCommand(commandLirc);
+    }
+
+    private void setupLoggers() throws IOException {
+        if (commandLineArgs.logformat != null)
+            System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", commandLineArgs.logformat);
+        Logger topLevelLogger = Logger.getLogger("");
+        Formatter formatter = commandLineArgs.xmlLog ? new XMLFormatter() : new SimpleFormatter();
+        Handler[] handlers = topLevelLogger.getHandlers();
+        for (Handler handler : handlers)
+            topLevelLogger.removeHandler(handler);
+
+        String[] logclasses = commandLineArgs.logclasses.split("\\|");
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+        List<Logger> loggers = new ArrayList<>(logclasses.length);
+        for (String logclass : logclasses) {
+            String[] classLevel = logclass.trim().split(":");
+            if (classLevel.length < 2)
+                continue;
+
+            Logger log = Logger.getLogger(classLevel[0].trim());
+            loggers.add(log); // stop them from being garbage collected
+            Level level = Level.parse(classLevel[1].trim().toUpperCase(Locale.US));
+            log.setLevel(level);
+            log.setUseParentHandlers(false);
+            Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
+            handler.setLevel(level);
+            handler.setFormatter(formatter);
+            log.addHandler(handler);
+        }
+
+        Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();
+        handler.setFormatter(formatter);
+        topLevelLogger.addHandler(handler);
+
+        handler.setLevel(commandLineArgs.logLevel);
+        topLevelLogger.setLevel(commandLineArgs.logLevel);
+    }
+
     public static class LevelParser implements IStringConverter<Level> { // MUST be public
 
         @Override
@@ -1295,7 +1271,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters")
-    private static class CommandAnalyze extends MyCommand {
+    private static class CommandAnalyze extends AbstractCommand {
 
         @Parameter(names = { "-a", "--all" }, description = "List all decoder outcomes, instead of only the one with lowest weight.")
         private boolean allDecodes = false;
@@ -1415,7 +1391,6 @@ public final class IrpTransmogrifier {
                     ;
         }
 
-        @Override
         public boolean process(IrpTransmogrifier instance) {
             boolean result = super.process(instance);
             if (result)
@@ -1431,7 +1406,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "bitfield" }, commandDescription = "Evaluate bitfield given as argument.")
-    private static class CommandBitField extends MyCommand {
+    private static class CommandBitField extends AbstractCommand {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Define a name engine for resolving the bitfield.", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
@@ -1458,7 +1433,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"code"}, commandDescription = "Generate code for the given target(s)")
-    private static class CommandCode extends MyCommand {
+    private static class CommandCode extends AbstractCommand {
 
         @Parameter(names = { "-d", "--directory" }, description = "Directory in whicht the generate output files will be written, if not using the --output option.")
         private String directory = null;
@@ -1480,7 +1455,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"decode"}, commandDescription = "Decode IR signal given as argument")
-    private static class CommandDecode extends MyCommand {
+    private static class CommandDecode extends AbstractCommand {
         @Parameter(names = { "-a", "--all", "--no-prefer-over"}, description = "Output all decodes; ignore prefer-over.")
         private boolean noPreferOver = false;
 
@@ -1551,12 +1526,13 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "demodulate" }, commandDescription = "Demodulate IrSequence given as argument (EXPERIMENTAL).")
-    private static class CommandDemodulate extends MyCommand {
+    private static class CommandDemodulate extends AbstractCommand {
 
         @Parameter(names = { "-t", "--threshold" }, description = "Threshold used for demodulating, in micro seconds.", converter = NameEngineParser.class)
         private double threshold = ModulatedIrSequence.DEFAULT_DEMODULATE_THRESHOLD;
 
         @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = true)
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
         private List<String> args;
 
         @Override
@@ -1568,7 +1544,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "expression" }, commandDescription = "Evaluate expression given as argument.")
-    private static class CommandExpression extends MyCommand {
+    private static class CommandExpression extends AbstractCommand {
 
         @Parameter(names = { "-n", "--nameengine" }, description = "Define a name engine to use for evaluating.", converter = NameEngineParser.class)
         private NameEngine nameEngine = new NameEngine();
@@ -1597,7 +1573,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
-    private static class CommandHelp extends MyCommand {
+    private static class CommandHelp extends AbstractCommand {
 
         @Parameter(names = { "-c", "--common", "--options"}, description = "Describe the common options only.")
         private boolean commonOptions = false;
@@ -1617,7 +1593,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = { "lirc" }, commandDescription = "Convert Lirc configuration files to IRP form.")
-    private static class CommandLirc extends MyCommand {
+    private static class CommandLirc extends AbstractCommand {
 
         @Parameter(names = { "-c", "--commands" }, description = "Also list the commands if the remotes.")
         private boolean commands = false;
@@ -1638,7 +1614,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")
-    private static class CommandList extends MyCommand {
+    private static class CommandList extends AbstractCommand {
 
         // not yet implemented
         //@Parameter(names = { "-b", "--browse" }, description = "Open the protoocol data base file in the browser")
@@ -1697,7 +1673,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"render"}, commandDescription = "Render signal from parameters")
-    private static class CommandRender extends MyCommand {
+    private static class CommandRender extends AbstractCommand {
 
         @Parameter(names = { "-#", "--count" }, description = "Generate am IR sequence with count number of transmissions")
         private Integer count = null;
@@ -1751,7 +1727,7 @@ public final class IrpTransmogrifier {
     }
 
     @Parameters(commandNames = {"version"}, commandDescription = "Report version and license.")
-    private static class CommandVersion extends MyCommand {
+    private static class CommandVersion extends AbstractCommand {
 
         @Parameter(names = { "-s", "--short" }, description = "Issue only the version number of the program proper.")
         private boolean shortForm = false;
@@ -1759,96 +1735,6 @@ public final class IrpTransmogrifier {
         @Override
         public String description() {
             return "This command returns the version. and licensing information for the program.";
-        }
-    }
-
-    private static abstract class MyCommand {
-        @Parameter(names = { "-h", "-?", "--help" }, help = true, description = "Print help for this command.")
-        @SuppressWarnings("FieldMayBeFinal")
-        private boolean help = false;
-
-        @Parameter(names = { "--describe" }, help = true, description = "Print a possibly longer documentation for the present command.")
-        @SuppressWarnings("FieldMayBeFinal")
-        private boolean description = false;
-
-        /**
-         * Returns a possibly longer documentation of the command.
-         * @return Documentation string;
-         */
-        // Please override!
-        public String description() {
-            return "Documentation for this command has not yet been written.\nUse --help for the syntax of the command.";
-        }
-
-        public boolean process(IrpTransmogrifier instance) {
-            if (help) {
-                instance.out.println(instance.usageString(this.getClass().getSimpleName().substring(7).toLowerCase(Locale.US)));
-                return true;
-            }
-            if (description) {
-                IrCoreUtils.trivialFormatter(instance.out, description(), 65);
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private static class UsageException extends Exception {
-
-        UsageException(String message) {
-            super(message);
-        }
-    }
-
-    public static class ProgramExitStatus {
-
-        private static void doExit(int exitCode) {
-            System.exit(exitCode);
-        }
-
-        static void die(int exitStatus, String message) {
-            new ProgramExitStatus(exitStatus, message).die();
-        }
-
-        private final int exitStatus;
-        private final String message;
-
-        ProgramExitStatus(int exitStatus, String message) {
-            this.exitStatus = exitStatus;
-            this.message = message;
-        }
-
-        ProgramExitStatus() {
-            this(IrpUtils.EXIT_SUCCESS, null);
-        }
-
-        /**
-         * @return the exitStatus
-         */
-        int getExitStatus() {
-            return exitStatus;
-        }
-
-        /**
-         * @return the message
-         */
-        String getMessage() {
-            return message;
-        }
-
-        boolean isSuccess() {
-            return exitStatus == IrpUtils.EXIT_SUCCESS;
-        }
-
-        void die() {
-            PrintStream stream = exitStatus == IrpUtils.EXIT_SUCCESS ? System.out : System.err;
-            if (message != null && !message.isEmpty())
-                stream.println(message);
-            if (exitStatus == IrpUtils.EXIT_USAGE_ERROR) {
-                stream.println();
-                stream.println("Use \"" + PROGRAMNAME + " help\" or \"" + PROGRAMNAME + " help --short\"\nfor command syntax.");
-            }
-            doExit(exitStatus);
         }
     }
 }

@@ -17,8 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import com.beust.jcommander.IParameterValidator;
-import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -56,7 +54,12 @@ import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.cmdline.AbstractCommand;
 import org.harctoolbox.cmdline.CmdLineProgram;
 import org.harctoolbox.cmdline.CmdUtils;
+import org.harctoolbox.cmdline.CommandCommonOptions;
+import org.harctoolbox.cmdline.CommandRender;
+import org.harctoolbox.cmdline.FrequencyParser;
+import org.harctoolbox.cmdline.NameEngineParser;
 import org.harctoolbox.cmdline.ProgramExitStatus;
+import org.harctoolbox.cmdline.Renderer;
 import org.harctoolbox.cmdline.UsageException;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -65,7 +68,6 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.OddSequenceLengthException;
-import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
@@ -136,7 +138,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     private PrintStream out;
     private IrpDatabase irpDatabase;
     private JCommander argumentParser;
-    private CommandLineArgs commandLineArgs;
+    private CommandCommonOptions commandLineArgs;
     private CommandHelp commandHelp;
     private CommandVersion commandVersion;
     private CommandList commandList;
@@ -194,45 +196,49 @@ public final class IrpTransmogrifier implements CmdLineProgram {
                     : argumentParser.getParsedCommand();
 
             if (command == null)
-                return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Usage: " + PROGRAMNAME + " [options] <command> [command_options]");
-            else // For findbugs...
-                switch (command) {
-                    case "analyze":
-                        analyze();
-                        break;
-                    case "bitfield":
-                        bitfield();
-                        break;
-                    case "code":
-                        code();
-                        break;
-                    case "decode":
-                        decode();
-                        break;
-                    case "demodulate":
-                        demodulate();
-                        break;
-                    case "expression":
-                        expression();
-                        break;
-                    case "help":
-                        help();
-                        break;
-                    case "lirc":
-                        lirc();
-                        break;
-                    case "list":
-                        list();
-                        break;
-                    case "render":
-                        render();
-                        break;
-                    case "version":
-                        version();
-                        break;
-                    default:
-                        return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Unknown command: " + command);
-                }
+                return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Command missing.");
+
+            boolean processed = processHelpAndDescription(command);
+            if (processed)
+                return new ProgramExitStatus();
+
+            switch (command) {
+                case "analyze":
+                    analyze();
+                    break;
+                case "bitfield":
+                    bitfield();
+                    break;
+                case "code":
+                    code();
+                    break;
+                case "decode":
+                    decode();
+                    break;
+                case "demodulate":
+                    demodulate();
+                    break;
+                case "expression":
+                    expression();
+                    break;
+                case "help":
+                    help();
+                    break;
+                case "lirc":
+                    lirc();
+                    break;
+                case "list":
+                    list();
+                    break;
+                case "render":
+                    render();
+                    break;
+                case "version":
+                    version();
+                    break;
+                default:
+                    return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Unknown command: " + command);
+            }
         } catch (UsageException | NameUnassignedException | UnknownProtocolException| FileNotFoundException | DomainViolationException ex) {
             // Exceptions likely from silly user input, just print the exception
             return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
@@ -275,9 +281,9 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void help() {
-        boolean finished = commandHelp.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandHelp.process(this);
+//        if (finished)
+//            return;
 
         if (commandHelp.shortForm) {
             shortUsage();
@@ -310,7 +316,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
      * so this implementation is pretty gross.
      */
     private void commonOptions() {
-        CommandLineArgs cla = new CommandLineArgs();
+        CommandCommonOptions cla = new CommandCommonOptions();
         JCommander parser = new JCommander(cla);
         StringBuilder str = new StringBuilder(2500);
         parser.usage(str);
@@ -319,7 +325,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void shortUsage() {
-        out.println("Usage: " + PROGRAMNAME + " [options] <command> [command_options]");
+        out.println("Usage: " + PROGRAMNAME + " [options] [command] [command options]");
         out.println("Commands:");
 
         List<String> commands = new ArrayList<>(argumentParser.getCommands().keySet());
@@ -337,12 +343,12 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void list() throws IOException, UsageException, IrpParseException {
-        boolean finished = commandList.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandList.process(this);
+//        if (finished)
+//            return;
 
         setupDatabase();
-        irpDatabase.expand();
+        //irpDatabase.expand();
         if (commandList.checkSorted) {
             if (irpDatabase.checkSorted())
                 out.println("Protol data base is sorted.");
@@ -441,7 +447,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         else {
             out.println(Version.versionString);
             setupDatabase();
-            irpDatabase.expand();
+            //irpDatabase.expand();
             out.println("Database: " + (commandLineArgs.configFile != null ? commandLineArgs.configFile : "")
                     + " version: " + irpDatabase.getConfigFileVersion());
 
@@ -452,15 +458,15 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void code() throws UsageException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
-        boolean finished = commandCode.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandCode.process(this);
+//        if (finished)
+//            return;
 
         if (commandCode.directory != null && commandLineArgs.output != null)
             throw new UsageException("The --output and the --directory options are mutually exclusive.");
 
         setupDatabase();
-        irpDatabase.expand();
+        //irpDatabase.expand();
         List<String> protocolNames = irpDatabase.evaluateProtocols(commandCode.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (protocolNames.isEmpty())
             throw new UsageException("No protocols matched (forgot --regexp?)");
@@ -529,83 +535,11 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
     }
 
-    private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException {
-        NameEngine nameEngine = !commandRender.nameEngine.isEmpty() ? commandRender.nameEngine
-                : commandRender.random ? new NameEngine(protocol.randomParameters())
-                        : new NameEngine();
-        if (commandRender.random)
-            logger.log(Level.INFO, nameEngine.toString());
-
-        if (commandRender.printParameters)
-            out.println(nameEngine.toString());
-
-        if (!commandRender.pronto && !commandRender.raw && !commandRender.rawWithoutSigns && !commandRender.modulate && !commandRender.printParameters)
-            logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, --modulate, or --printparameters to get output.");
-        IrSignal irSignal = protocol.toIrSignal(nameEngine);
-
-        if (commandRender.count != null) {
-            if (commandRender.numberRepeats != null)
-                throw new UsageException("Can only specify one of --number-repeats and --count.");
-            renderPrint(irSignal.toModulatedIrSequence(commandRender.count));
-        } else if (commandRender.numberRepeats != null)
-            renderPrint(irSignal.toModulatedIrSequence(true, commandRender.numberRepeats, true));
-        else {
-            if (commandRender.modulate)
-                throw new UsageException("--modulate is only supported together with --number-repeats or --count.");
-            renderPrint(irSignal);
-        }
-    }
-
-    private void renderPrint(IrSignal irSignal) {
-        if (commandRender.raw)
-            out.println(irSignal.toString(true));
-        if (commandRender.rawWithoutSigns)
-            out.println(irSignal.toString(false));
-        if (commandRender.pronto)
-            out.println(Pronto.toString(irSignal));
-    }
-
-    private void renderPrint(ModulatedIrSequence irSequence) {
-        if (commandRender.raw)
-            out.println(irSequence.toString(true));
-        if (commandRender.rawWithoutSigns)
-            out.println(irSequence.toString(false));
-        if (commandRender.pronto)
-            out.println(Pronto.toString(new IrSignal(irSequence)));
-        if (commandRender.modulate)
-            out.println(irSequence.modulate().toString(true));
-    }
-
-    private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
-        boolean finished = commandRender.process(this);
-        if (finished)
-            return;
-
-        if (commandLineArgs.irp == null && (commandRender.random != commandRender.nameEngine.isEmpty()))
-            throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
-
-        if (commandLineArgs.irp != null) {
-            if (!commandRender.protocols.isEmpty())
-                throw new UsageException("Cannot not use --irp together with named protocols");
-        }
-        setupDatabase();
-        irpDatabase.expand();
-        List<String> list = irpDatabase.evaluateProtocols(commandRender.protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
-        if (list.isEmpty())
-            throw new UsageException("No protocol matched.");
-        for (String proto : list) {
-            //logger.info(proto);
-            NamedProtocol protocol = irpDatabase.getNamedProtocolExpandAlias(proto);
-            render(protocol);
-        }
-
-    }
-
     private void analyze() throws IrpInvalidArgumentException, UsageException, InvalidArgumentException, IOException, NoDecoderMatchException {
         CmdUtils.checkForOption("analyze", commandAnalyze.args);
-        boolean finished = commandAnalyze.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandAnalyze.process(this);
+//        if (finished)
+//            return;
 
         if (commandAnalyze.allDecodes && commandAnalyze.decoder != null)
             throw new UsageException("Cannot use both --alldecodes and --decode.");
@@ -806,15 +740,15 @@ public final class IrpTransmogrifier implements CmdLineProgram {
 
     private void decode() throws IrpInvalidArgumentException, IOException, UsageException, InvalidArgumentException, IrpParseException {
         CmdUtils.checkForOption("decode", commandDecode.args);
-        boolean finished = commandDecode.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandDecode.process(this);
+//        if (finished)
+//            return;
 
         if (IrCoreUtils.numberTrue(commandDecode.input != null, commandDecode.namedInput != null, commandDecode.args != null) != 1)
             throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
         setupDatabase();
-        irpDatabase.expand();
+        //irpDatabase.expand();
         List<String> protocolNamePatterns = commandDecode.protocol == null ? null : Arrays.asList(commandDecode.protocol.split(","));
         List<String> protocolsNames = irpDatabase.evaluateProtocols(protocolNamePatterns, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (protocolsNames.isEmpty())
@@ -955,9 +889,9 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void demodulate() throws OddSequenceLengthException {
-        boolean finished = commandDemodulate.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandDemodulate.process(this);
+//        if (finished)
+//            return;
 
         IrSequence irSequence = new IrSequence(commandDemodulate.args.toArray(new String[commandDemodulate.args.size()]));
         ModulatedIrSequence demodulated = ModulatedIrSequence.demodulate(irSequence, commandDemodulate.threshold);
@@ -965,9 +899,9 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void expression() throws FileNotFoundException, NameUnassignedException, IrpParseException {
-        boolean finished = commandExpression.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandExpression.process(this);
+//        if (finished)
+//            return;
 
         NameEngine nameEngine = commandExpression.nameEngine;
         String text = String.join(" ", commandExpression.expressions).trim();
@@ -987,9 +921,9 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void bitfield() throws FileNotFoundException, UsageException, NameUnassignedException {
-        boolean finished = commandBitField.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandBitField.process(this);
+//        if (finished)
+//            return;
 
         NameEngine nameEngine = commandBitField.nameEngine;
         String text = String.join("", commandBitField.bitField).trim();
@@ -1010,9 +944,9 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void lirc() throws IOException {
-        boolean finished = commandLirc.process(this);
-        if (finished)
-            return;
+//        boolean finished = commandLirc.process(this);
+//        if (finished)
+//            return;
 
         List<LircRemote> list;
         if (commandLirc.files.isEmpty())
@@ -1047,12 +981,13 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         }
     }
 
-    private void setupDatabase() throws IOException, UsageException {
+    private void setupDatabase() throws IOException, UsageException, IrpParseException {
         if (commandLineArgs.configFile != null && commandLineArgs.irp != null)
             throw new UsageException("At most one of configfile and irp can be specified");
 
         irpDatabase = commandLineArgs.irp != null ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
                 : new IrpDatabase(commandLineArgs.configFile);
+        irpDatabase.expand();
     }
 
     private Double possiblyOverrideWithAnalyzeFrequency(Double frequency) {
@@ -1065,7 +1000,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void setupArgParser() {
-           commandLineArgs = new CommandLineArgs();
+        commandLineArgs = new CommandCommonOptions();
         argumentParser = new JCommander(commandLineArgs);
         argumentParser.setProgramName(PROGRAMNAME);
         argumentParser.setAllowAbbreviatedOptions(true);
@@ -1143,134 +1078,27 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         topLevelLogger.setLevel(commandLineArgs.logLevel);
     }
 
-    public static class LevelParser implements IStringConverter<Level> { // MUST be public
+    private void render() throws IrpParseException, UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, DomainViolationException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+//        boolean finished = commandRender.process(this);
+//        if (finished)
+//            return;
+        setupDatabase();
+        //irpDatabase.expand();
+        Renderer.render(out, irpDatabase, commandRender, commandLineArgs);
+    }
 
-        @Override
-        public Level convert(String value) {
-            try {
-                return Level.parse(value.toUpperCase(Locale.US));
-            } catch (IllegalArgumentException ex) {
-                throw new ParameterException(ex);
-            }
+    private boolean processHelpAndDescription(String commandName) {
+        try {
+            JCommander jCommander = argumentParser.getCommands().get(commandName);
+            AbstractCommand command = (AbstractCommand) jCommander.getObjects().get(0);
+            return command.process(this);
+        } catch (SecurityException | IllegalArgumentException ex) {
+            Logger.getLogger(IrpTransmogrifier.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ThisCannotHappenException();
         }
     }
 
-    public static class FrequencyParser implements IStringConverter<Double> { // MUST be public
-
-        @Override
-        public Double convert(String value) {
-            return value.toLowerCase(Locale.US).endsWith("k")
-                    ? IrCoreUtils.khz2Hz(Double.parseDouble(value.substring(0, value.length() - 1)))
-                    : Double.parseDouble(value);
-        }
-    }
-
-    public static class LessThanOne implements IParameterValidator { // MUST be public
-
-        @Override
-        public void validate(String name, String value) throws ParameterException {
-            try {
-            double d = Double.parseDouble(value);
-            if (d < 0 || d >= 1)
-                throw new ParameterException("Parameter " + name + " must be  be between 0 and 1 (found " + value +")");
-            } catch (NumberFormatException ex) {
-                throw new ParameterException("Parameter " + name + " must be a double (found " + value +")");
-            }
-        }
-    }
-
-    public static class NameEngineParser implements IStringConverter<NameEngine> { // MUST be public
-
-        @Override
-        public NameEngine convert(String value) {
-            try {
-                return NameEngine.parseLoose(value);
-            } catch (ParseCancellationException ex) {
-                throw new ParameterException("Parse error as name engine: \"" + value + "\"");
-            } catch (IllegalArgumentException ex) {
-                throw new ParameterException(ex);
-            }
-        }
-    }
-
-    // The reaining classes are ordered alphabetically
-    private final static class CommandLineArgs {
-
-        // JCommander does not know about our defaults being null, so handle this explicitly-
-        @Parameter(names = {"-a", "--absolutetolerance"},
-                description = "Absolute tolerance in microseconds, used when comparing durations. Default: " + IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE + ".")
-        private Double absoluteTolerance = null;
-
-        @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
-        private String configFile = null;
-
-        @Parameter(names = { "-e", "--encoding" }, description = "Encoding used in generated output.")
-        private String encoding = "UTF-8";
-
-        @Parameter(names = {"-f", "--frequencytolerance"}, converter = FrequencyParser.class,
-                description = "Frequency tolerance in Hz. Negative disables frequency check. Default: " + IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE + ".")
-        private Double frequencyTolerance = null;
-
-        @Parameter(names = {"-g", "--minrepeatgap"}, description = "Minimum gap required to end a repetition.")
-        private double minRepeatGap = IrCoreUtils.DEFAULT_MIN_REPEAT_LAST_GAP;
-
-        @Parameter(names = {"-h", "--help", "-?"}, help = true, description = "Display help message. Deprecated; use the command \"help\" instead.")
-        private boolean helpRequested = false;
-
-        @Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
-        private String irp = null;
-
-        @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels.")
-        private String logclasses = "";
-
-        @Parameter(names = {"-L", "--logfile"}, description = "Log file. If empty, log to stderr.")
-        private String logfile = null;
-
-        @Parameter(names = {"-F", "--logformat"}, description = "Log format, as in class java.util.logging.SimpleFormatter.")
-        private String logformat = "[%2$s] %4$s: %5$s%n";
-
-        @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
-                description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
-        private Level logLevel = Level.WARNING;
-
-        @Parameter(names = { "--min-leadout"},
-                description = "Threshold for leadout when decoding. Default: " + IrCoreUtils.DEFAULT_MINIMUM_LEADOUT + ".")
-        private Double minLeadout = null;
-
-        @Parameter(names = { "-o", "--output" }, description = "Name of output file. Default: stdout.")
-        private String output = null;
-
-        @Parameter(names = { "-q", "--quiet" }, description = "Quitest possible operation, typically to be used from scripts.")
-        private boolean quiet = false;
-
-        @Parameter(names = {"-r", "--relativetolerance"}, validateWith = LessThanOne.class,
-                description = "Relative tolerance as a number < 1. Default: " + IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE + ".")
-        private Double relativeTolerance = null;
-
-        @Parameter(names = { "--regexp" }, description = "Interpret protocol/decoder argument as regular expressions.")
-        private boolean regexp = false;
-
-        @Parameter(names = {"-s", "--sort"}, description = "Sort the protocols alphabetically on output.")
-        private boolean sort = false;
-
-        @Parameter(names = {"--seed"},
-                description = "Set seed for the pseudo random number generation. If not specified, will be random, different between program invocations.")
-        private Long seed = null;
-
-        @Parameter(names = {"-t", "--tsv", "--csv"}, description = "Use tabs in output to optimize for the import in spreadsheet programs as cvs.")
-        private boolean tsvOptimize = false;
-
-        @Parameter(names = {"-u", "--url-decode"}, description = "URL-decode protocol names, (understanding %20 for example).")
-        private boolean urlDecode = false;
-
-        @Parameter(names = {"-v", "--version"}, description = "Report version. Deprecated; use the command \"version\" instead.")
-        private boolean versionRequested = false;
-
-        @Parameter(names = {"-x", "--xmllog"}, description = "Write the log in XML format.")
-        private boolean xmlLog = false;
-    }
-
-    @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters")
+    @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters.")
     private static class CommandAnalyze extends AbstractCommand {
 
         @Parameter(names = { "-a", "--all" }, description = "List all decoder outcomes, instead of only the one with lowest weight.")
@@ -1391,13 +1219,14 @@ public final class IrpTransmogrifier implements CmdLineProgram {
                     ;
         }
 
-        public boolean process(IrpTransmogrifier instance) {
+        @Override
+        public boolean process(CmdLineProgram instance) {
             boolean result = super.process(instance);
             if (result)
                 return true;
 
             if (decoder != null && (decoder.equals("list") || decoder.equals("help") || decoder.equals("?"))) {
-                IrCoreUtils.trivialFormatter(instance.out,
+                IrCoreUtils.trivialFormatter(instance.getOutputStream(),
                         "Available decoders: " + String.join(", ", AbstractDecoder.decoderNames()), 65);
                 return true;
             }
@@ -1613,7 +1442,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         }
     }
 
-    @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites")
+    @Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites.")
     private static class CommandList extends AbstractCommand {
 
         // not yet implemented
@@ -1669,60 +1498,6 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         @Override
         public String description() {
             return "This command list miscellaneous properties of the protocol(s) given as arguments.";
-        }
-    }
-
-    @Parameters(commandNames = {"render"}, commandDescription = "Render signal from parameters")
-    private static class CommandRender extends AbstractCommand {
-
-        @Parameter(names = { "-#", "--count" }, description = "Generate am IR sequence with count number of transmissions")
-        private Integer count = null;
-
-        //@Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
-        //private String irp = null;
-
-        @Parameter(names = { "-m", "--modulate" }, description = "Generate modulated form (EXPERIMENTAL)")
-        private boolean modulate = false;
-
-        @Parameter(names = { "-n", "--nameengine" }, description = "Name Engine to use", converter = NameEngineParser.class)
-        private NameEngine nameEngine = new NameEngine();
-
-        @Parameter(names = { "-p", "--pronto", "--ccf", "--hex" }, description = "Generate Pronto hex.")
-        private boolean pronto = false;
-
-        @Parameter(names = { "-P", "--printparameters", "--parameters" }, description = "Print used parameters values")
-        private boolean printParameters = false;
-
-        @Parameter(names = { "-r", "--signed-raw" }, description = "Generate raw form.")
-        private boolean raw = false;
-
-        @Parameter(names = { "-R", "--raw-without-signs" }, description = "Generate raw form without signs.")
-        private boolean rawWithoutSigns = false;
-
-        @Parameter(names = { "--random" }, description = "Generate random, valid, parameters")
-        private boolean random = false;
-
-        @Parameter(names = { "--number-repeats" }, description = "Generate an IR sequence containing the given number of repeats")
-        private Integer numberRepeats = null;
-
-        @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
-        private List<String> protocols = new ArrayList<>(0);
-
-        @Override
-        public String description() {
-            return "This command is used to compute an IR signal from one or more protocols "
-                    + "(\"render\" it). The protocol can be given either by name(s) "
-                    + "(or regular expression if using the --regexp option), or, using the "
-                    + "--irp options, given explicitly as an IRP form. "
-                    + "The parameters can be either given directly with the -n option,"
-                    + "or the --random option can be used to generate random, but valid parameters"
-                    + "With the --count or --number-repeats option, instead an IR sequence is computed,"
-                    + "containing the desired number of repeats.\n\n"
-                    + "The syntax of the name engine is as in the IRP specification, for example: --nameengine {D=12,F=34}. "
-                    + "For convenience, the braces may be left out. Space around the equal sign \"=\" and "
-                    + "around the comma \",\" is allowed, as long as the name engine is still only one argument in the sense of the shell -- "
-                    + "it may need to be enclosed within single or double quotes."
-                    ;
         }
     }
 

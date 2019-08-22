@@ -82,7 +82,7 @@ public class ProgramExitStatus {
             stream.println();
             stream.println(programName != null
                     ? ("Use \"" + programName + " help\" or \"" + programName + " help --short\"\nfor command syntax.")
-                    : "Useage error.");
+                    : "Usage error.");
        }
         doExit(exitStatus);
     }

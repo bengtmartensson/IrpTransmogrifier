@@ -340,7 +340,7 @@ public final class DuplicateFinder {
             });
         }
 
-        String getRecommendedParameterWidthsAsString() {
+        public String getRecommendedParameterWidthsAsString() {
             List<Integer> lst = getRecommendedParameterWidths();
             StringJoiner stringJoiner = new StringJoiner(",");
             lst.forEach((x) -> {

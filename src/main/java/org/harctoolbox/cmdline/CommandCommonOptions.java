@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import org.harctoolbox.ircore.IrCoreUtils;
 
 @SuppressWarnings("PublicField")
+
 public class CommandCommonOptions {
 
     // JCommander does not know about our defaults being null, so handle this explicitly-

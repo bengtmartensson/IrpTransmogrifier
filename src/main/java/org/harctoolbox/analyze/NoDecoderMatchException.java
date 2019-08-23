@@ -22,7 +22,7 @@ package org.harctoolbox.analyze;
  */
 final public class NoDecoderMatchException extends Exception {
 
-    NoDecoderMatchException() {
-        super();
+    NoDecoderMatchException(String name, boolean isRegexp) {
+        super(name + (isRegexp ? " (regular expression)" : ""));
     }
 }

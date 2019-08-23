@@ -453,7 +453,7 @@ public final class Decoder {
             decodes.add(decode);
         }
 
-        boolean isEmpty() {
+        public boolean isEmpty() {
             return decodes.isEmpty();
         }
 

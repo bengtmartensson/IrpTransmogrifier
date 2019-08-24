@@ -119,6 +119,10 @@ public final class Analyzer extends Cleaner {
         this(irSequence, frequency, invokeRepeatFinder, null, null);
     }
 
+    public Analyzer(IrSignal irSignal) throws InvalidArgumentException {
+       this(irSignal, null, null);
+    }
+
     /**
      * Return bursts order after their frequency.
      * @param i

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2018 Bengt Martensson.
+Copyright (C) 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,18 +17,18 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-public final class BiphaseWithStartbitInvertDecoder extends AbstractBiphaseDecoder {
+public final class BiphaseWithTwoDurationsDecoder extends AbstractBiphaseDecoder {
 
-    public BiphaseWithStartbitInvertDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
-        super(analyzer, params, half, full, true);
+    public BiphaseWithTwoDurationsDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
+        super(analyzer, params, half, full, false);
     }
 
-    public BiphaseWithStartbitInvertDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
-        super(analyzer, params, true);
+    public BiphaseWithTwoDurationsDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+        super(analyzer, params, false);
     }
 
     @Override
-    protected int startBits() {
-        return 1;
+    protected int startDurations() {
+        return 2;
     }
 }

@@ -28,7 +28,7 @@ public final class BiphaseDecoder extends AbstractBiphaseDecoder {
     }
 
     @Override
-    protected int startBits() {
+    protected int startDurations() {
         return 0;
     }
 }

@@ -55,7 +55,7 @@ public final class BiphaseWithDoubleToggleDecoder extends AbstractBiphaseDecoder
 
             switch (state) {
                 case start:
-                    if (startBits() == 0) {
+                    if (startDurations() == 0) {
                         if (!isFlash)
                             throw new ThisCannotHappenException();
 
@@ -76,7 +76,7 @@ public final class BiphaseWithDoubleToggleDecoder extends AbstractBiphaseDecoder
                         items.add(newFlashOrGap(isFlash, time));
                         if (params.isInvert() == isFlash)
                             foundStartBits++;
-                        if (foundStartBits == startBits())
+                        if (foundStartBits == startDurations())
                             state = BiphaseWithDoubleToggleState.zero;
                     }
                     break;
@@ -181,7 +181,7 @@ public final class BiphaseWithDoubleToggleDecoder extends AbstractBiphaseDecoder
     }
 
     @Override
-    protected int startBits() {
+    protected int startDurations() {
         return 0;
     }
 

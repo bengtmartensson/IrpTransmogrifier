@@ -50,8 +50,10 @@ public abstract class AbstractDecoder {
         XmpDecoder.class,
         BiphaseDecoder.class,
         BiphaseInvertDecoder.class,
-        BiphaseWithStartbitDecoder.class,
-        BiphaseWithStartbitInvertDecoder.class,
+        BiphaseWithDurationDecoder.class,
+        BiphaseWithDurationInvertDecoder.class,
+        BiphaseWithTwoDurationsDecoder.class,
+        BiphaseWithTwoDurationsInvertDecoder.class,
         BiphaseWithDoubleToggleDecoder.class,
         SerialDecoder.class,
     };

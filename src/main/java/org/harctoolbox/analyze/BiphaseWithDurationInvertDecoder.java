@@ -17,18 +17,18 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-public final class BiphaseInvertDecoder extends AbstractBiphaseDecoder {
+public final class BiphaseWithDurationInvertDecoder extends AbstractBiphaseDecoder {
 
-    public BiphaseInvertDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
+    public BiphaseWithDurationInvertDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
         super(analyzer, params, half, full, true);
     }
 
-    public BiphaseInvertDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+    public BiphaseWithDurationInvertDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
         super(analyzer, params, true);
     }
 
     @Override
     protected int startDurations() {
-        return 0;
+        return 1;
     }
 }

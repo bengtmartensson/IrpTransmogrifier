@@ -17,18 +17,18 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.analyze;
 
-public final class BiphaseWithStartbitDecoder extends AbstractBiphaseDecoder {
+public final class BiphaseWithDurationDecoder extends AbstractBiphaseDecoder {
 
-    public BiphaseWithStartbitDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
+    public BiphaseWithDurationDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full) {
         super(analyzer, params, half, full, false);
     }
 
-    public BiphaseWithStartbitDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
+    public BiphaseWithDurationDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params) {
         super(analyzer, params, false);
     }
 
     @Override
-    protected int startBits() {
+    protected int startDurations() {
         return 1;
     }
 }

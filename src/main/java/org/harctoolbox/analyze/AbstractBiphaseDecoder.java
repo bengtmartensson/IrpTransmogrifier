@@ -72,7 +72,6 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
         this(analyzer, params, analyzer.getTiming(0), analyzer.getTiming(1), invert);
     }
 
-
     @Override
     protected List<IrStreamItem> parse(int beg, int length) throws DecodeException {
         List<IrStreamItem> items = new ArrayList<>(2*length);
@@ -89,38 +88,27 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
 
             switch (state) {
                 case start:
-                    switch (startBits()) {
-                        case 0:
-                            if (!isFlash)
-                                throw new ThisCannotHappenException();
-                            if (isShort)
-                                if (invert) {
-                                    data.update(1);
-                                    state = BiphaseState.zero;
-                                } else {
-                                    state = BiphaseState.pendingFlash;
-                                }
-                            else {
-                                saveParameter(data, items, params.getBitDirection());
-                                data = new ParameterData();
-                                items.add(newFlash(time));
+                    if (startDurations() == 0) {
+                        if (!isFlash)
+                            throw new ThisCannotHappenException();
+                        if (isShort) {
+                            if (invert) {
+                                data.update(1);
                                 state = BiphaseState.zero;
+                            } else {
+                                state = BiphaseState.pendingFlash;
                             }
-                            break;
-                        case 1:
-                            items.add(newFlashOrGap(isFlash, half));
-                            if (invert == isFlash)
-                                foundStartBits++;
-                            state = time == half ? BiphaseState.zero
-                                    : isFlash ? BiphaseState.pendingFlash : BiphaseState.pendingGap ;
-                            break;
-                        default:
-                            items.add(newFlashOrGap(isFlash, time));
-                            if (invert == isFlash)
-                                foundStartBits += Math.round(((double) time) / half);
-                            if (foundStartBits == startBits())
-                                state = BiphaseState.zero;
-                            break;
+                        } else {
+                            saveParameter(data, items, params.getBitDirection());
+                            data = new ParameterData();
+                            items.add(newFlash(time));
+                            state = BiphaseState.zero;
+                        }
+                    } else {
+                        items.add(newFlashOrGap(isFlash, time));
+                        foundStartBits++;
+                        if (foundStartBits == startDurations())
+                            state = BiphaseState.zero;
                     }
                     break;
 
@@ -183,7 +171,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
         return items;
     }
 
-    protected abstract int startBits();
+    protected abstract int startDurations();
 
     private enum BiphaseState {
         start,

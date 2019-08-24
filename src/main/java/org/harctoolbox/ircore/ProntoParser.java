@@ -24,15 +24,14 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
 
     private final static Logger logger = Logger.getLogger(ProntoParser.class.getName());
 
-    /**
-     * Mainly for testing.
-     * @param str
-     * @return
-     * @throws InvalidArgumentException
-     */
     public static IrSignal parse(String str) throws InvalidArgumentException {
         ProntoParser instance = new ProntoParser(str);
         return instance.toIrSignal();
+    }
+
+    public static IrSignal parseDiscardingExcess(String str) throws InvalidArgumentException {
+        ProntoParser instance = new ProntoParser(str);
+        return instance.toIrSignal(null, null, true);
     }
 
     public ProntoParser(String source) {
@@ -54,8 +53,12 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
      */
     @Override
     public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
+        return toIrSignal(fallbackFrequency, dummyGap, false);
+    }
+
+    private IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap, boolean discardExcess) throws InvalidArgumentException {
         try {
-            IrSignal irSignal = Pronto.parse(getSource());
+            IrSignal irSignal = Pronto.parse(getSource(), discardExcess);
             // If Pronto.NonProntoFormatException is not thrown, the signal is probably
             // an erroneous Pronto wannabe, do not catch other exceptions than Pronto.NonProntoFormatException
             if (fallbackFrequency != null)
@@ -66,6 +69,19 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
             logger.log(Level.FINER, "Tried as Pronto, gave up ({0})", ex.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Tries to interpret the string argument as Pronto.
+     *
+     * @param fallbackFrequency Modulation frequency to use, if it cannot be
+     * inferred from the first parameter.
+     * @param dummyGap
+     * @return IrSignal, or null on failure.
+     * @throws org.harctoolbox.ircore.InvalidArgumentException If the signal looks like a Pronto, but is not correctly parseable.
+     */
+    public IrSignal toIrSignalDiscardingExcess(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
+        return toIrSignal(fallbackFrequency, dummyGap, true);
     }
 
     @Override

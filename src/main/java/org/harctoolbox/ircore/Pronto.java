@@ -148,8 +148,12 @@ public abstract class Pronto {
      * @return  IrSignal
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IrSignal parse(int[] ccf) throws OddSequenceLengthException, InvalidArgumentException {
+        return parse(ccf, false);
+    }
+
+    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
+    private static IrSignal parse(int[] ccf, boolean discardExcess) throws OddSequenceLengthException, InvalidArgumentException {
         if (ccf.length < 6)
             throw new InvalidArgumentException("Pronto Hex is invalid since it is just " + ccf.length + " < 6 numbers long.");
         if (ccf.length % 2 != 0)
@@ -161,16 +165,22 @@ public abstract class Pronto {
         int frequencyCode = ccf[index++];
         int introLength = ccf[index++];
         int repeatLength = ccf[index++];
-        if (index + 2*(introLength+repeatLength) != ccf.length)
-            throw new InvalidArgumentException("Inconsistent length in Pronto Hex (claimed "
-                    + (introLength + repeatLength) + " pairs, was " + (ccf.length - 4)/2 + " pairs).");
+        if (index + 2 * (introLength + repeatLength) != ccf.length) {
+            if (discardExcess) {
+                if (index + 2 * (introLength + repeatLength) > ccf.length)
+                    throw new InvalidArgumentException("Too few data pairs,  (need "
+                            + (introLength + repeatLength) + " pairs, have " + (ccf.length - 4) / 2 + " pairs).");
+            } else
+                throw new InvalidArgumentException("Inconsistent length in Pronto Hex (claimed "
+                        + (introLength + repeatLength) + " pairs, was " + (ccf.length - 4) / 2 + " pairs).");
+        }
         IrSignal irSignal = null;
 
         switch (type) {
             case LEARNED_CODE: // 0x0000
             case LEARNED_UNMODULATED_CODE: // 0x0100
                 double[] intro = usArray(frequencyCode, ccf, index, index + 2*introLength);
-                double[] repeat = usArray(frequencyCode, ccf, index + 2*introLength, ccf.length);
+                double[] repeat = usArray(frequencyCode, ccf, index + 2*introLength, index + 2*(introLength + repeatLength));
                 IrSequence introSequence = new IrSequence(intro);
                 IrSequence repeatSequence = new IrSequence(repeat);
                 irSignal = new IrSignal(introSequence, repeatSequence, null,
@@ -193,8 +203,16 @@ public abstract class Pronto {
      * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
     public static IrSignal parse(String ccfString) throws NonProntoFormatException, InvalidArgumentException {
+        return parse(ccfString, false);
+    }
+
+    public static IrSignal parseDiscardingExcess(String ccfString) throws NonProntoFormatException, InvalidArgumentException {
+        return parse(ccfString, true);
+    }
+
+    static IrSignal parse(String ccfString, boolean discardExcess) throws NonProntoFormatException, InvalidArgumentException {
         int[] ccf = parseAsInts(ccfString);
-        return parse(ccf);
+        return parse(ccf, discardExcess);
     }
 
     /**
@@ -218,6 +236,17 @@ public abstract class Pronto {
      * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
     public static IrSignal parse(String[] array) throws InvalidArgumentException, NonProntoFormatException {
+        return parse(array, 0);
+    }
+
+    /**
+     * Creates a new IrSignals by interpreting its argument as CCF string.
+     * @param array Strings representing hexadecimal numbers
+     * @return IrSignal
+     * @throws InvalidArgumentException
+     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
+     */
+    public static IrSignal parseDiscardingExccess(String[] array) throws InvalidArgumentException, NonProntoFormatException {
         return parse(array, 0);
     }
 

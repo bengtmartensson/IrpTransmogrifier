@@ -33,6 +33,9 @@ import org.harctoolbox.ircore.IrCoreUtils;
  */
 public final class IrpUtils {
 
+    // The symbolic names for exit statii now in org.harctoolbox.cmdline.ExitStatus.
+    // For backwards compability, keep them here. For now...
+
     // Symbolic names for exit statii
     public final static int EXIT_SUCCESS               = 0;
     public final static int EXIT_USAGE_ERROR           = 1;

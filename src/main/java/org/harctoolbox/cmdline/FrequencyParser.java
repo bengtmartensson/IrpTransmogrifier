@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,16 +13,19 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
-
-package org.harctoolbox.analyze;
-
-/**
- * Thrown if no decoder name match.
  */
-final public class NoDecoderMatchException extends Exception {
+package org.harctoolbox.cmdline;
 
-    NoDecoderMatchException(String name, boolean isRegexp) {
-        super(name + (isRegexp ? " (regular expression)" : ""));
+import com.beust.jcommander.IStringConverter;
+import java.util.Locale;
+import org.harctoolbox.ircore.IrCoreUtils;
+
+public class FrequencyParser implements IStringConverter<Double> {
+
+    @Override
+    public Double convert(String value) {
+        return value.toLowerCase(Locale.US).endsWith("k")
+                ? IrCoreUtils.khz2Hz(Double.parseDouble(value.substring(0, value.length() - 1)))
+                : Double.parseDouble(value);
     }
 }

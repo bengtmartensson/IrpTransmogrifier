@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.harctoolbox.cmdline.FrequencyParser;
+import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -45,7 +47,7 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testFrequencyParser() {
         System.out.println("FrequencyParser");
-        IrpTransmogrifier.FrequencyParser frequencyParser = new IrpTransmogrifier.FrequencyParser();
+        FrequencyParser frequencyParser = new FrequencyParser();
         assertEquals(frequencyParser.convert("38123"), 38123.0);
         assertEquals(frequencyParser.convert("38.1k"), 38100.0);
     }
@@ -381,7 +383,7 @@ public class IrpTransmogrifierNGTest {
     public void testRenderSilly() {
         System.out.println("renderSilly");
         IrpTransmogrifier instance = new IrpTransmogrifier();
-        IrpTransmogrifier.ProgramExitStatus status = instance.run("-i silly render -p");
+        ProgramExitStatus status = instance.run("-i silly render -p".split(" "));
         String expResult = "Parse error in \"silly\": `{' not found.";
         assertEquals(status.getMessage(), expResult);
     }
@@ -391,6 +393,9 @@ public class IrpTransmogrifierNGTest {
         System.out.println("renderI");
         String result = IrpTransmogrifier.execute("--irp {38.4k,564}<1,-1|1,-5>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255] render -n D=12,F=34 -p");
         String expResult = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 006C 0016 006C 0016 0016 0016 0016 0016 0016 0016 0016 0016 006C 0016 006C 0016 0016 0016 0016 0016 006C 0016 006C 0016 006C 0016 006C 0016 0016 0016 006C 0016 0016 0016 0016 0016 0016 0016 006C 0016 0016 0016 0016 0016 006C 0016 0016 0016 006C 0016 006C 0016 006C 0016 0016 0016 006C 0016 006C 0016 0342 015B 0057 0016 0E6C";
+        assertEquals(result, expResult);
+        result = IrpTransmogrifier.execute("render -n D=12,F=34 -p nec1");
+        expResult = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0041 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C";
         assertEquals(result, expResult);
     }
 
@@ -473,5 +478,68 @@ public class IrpTransmogrifierNGTest {
             assertTrue(result != null);
             //System.out.println(result);
         }
+    }
+
+    @Test(enabled = true)
+    public void testNoCommand() {
+        System.out.println("testNoCommand");
+        String result = IrpTransmogrifier.execute("");
+        assertTrue(result == null);
+    }
+
+    @Test(enabled = true)
+    public void testSillyCommand() {
+        System.out.println("testSillyCommand");
+        String result = IrpTransmogrifier.execute("covfefe");
+        assertTrue(result == null);
+    }
+
+    @Test(enabled = true)
+    public void testHelp() {
+        System.out.println("testHelp");
+        String result = IrpTransmogrifier.execute("help");
+        assertEquals(result.substring(0, 73), "Usage: IrpTransmogrifier [options] [command] [command options]\n  Options:");
+    }
+
+    @Test(enabled = true)
+    public void testDashHelp() {
+        System.out.println("testDashHelp");
+        String result = IrpTransmogrifier.execute("--help");
+        assertEquals(result.substring(0, 73), "Usage: IrpTransmogrifier [options] [command] [command options]\n  Options:");
+    }
+
+    @Test(enabled = true)
+    public void testHelpShort() {
+        System.out.println("testHelpShort");
+        String result = IrpTransmogrifier.execute("help --short");
+        assertEquals(result.substring(0, 72), "Usage: IrpTransmogrifier [options] [command] [command options]\nCommands:");
+    }
+
+    @Test(enabled = true)
+    public void testHelpDashHelp() {
+        System.out.println("testHelpDashHelp");
+        String result = IrpTransmogrifier.execute("help --help");
+        assertEquals(result.substring(0, 72), "Describe the syntax of program and commands.\nUsage: help [options] comma");
+    }
+
+    @Test(enabled = true)
+    public void testHelpDescribe() {
+        System.out.println("testHelpDescribe");
+        String result = IrpTransmogrifier.execute("help --describe");
+        assertEquals(result.substring(0, 72), "This command list the syntax for the command(s) given as argument,\ndefau");
+    }
+
+    @Test(enabled = true)
+    public void testHelpList() {
+        System.out.println("testHelpList");
+        String result = IrpTransmogrifier.execute("help list");
+        assertEquals(result.substring(0, 72), "List protocols and their properites.\nUsage: list [options] List of proto");
+    }
+
+    @Test(enabled = true)
+    public void testListHelp() {
+        System.out.println("testListHelp");
+        String result = IrpTransmogrifier.execute("list --help");
+        assertEquals(result.substring(0, 72), "List protocols and their properites.\nUsage: list [options] List of proto");
     }
 }

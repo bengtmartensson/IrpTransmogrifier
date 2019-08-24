@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,16 +13,23 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
-
-package org.harctoolbox.analyze;
-
-/**
- * Thrown if no decoder name match.
  */
-final public class NoDecoderMatchException extends Exception {
 
-    NoDecoderMatchException(String name, boolean isRegexp) {
-        super(name + (isRegexp ? " (regular expression)" : ""));
+package org.harctoolbox.cmdline;
+
+import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
+import java.util.Locale;
+import java.util.logging.Level;
+
+public class LevelParser implements IStringConverter<Level> {
+
+    @Override
+    public Level convert(String value) {
+        try {
+            return Level.parse(value.toUpperCase(Locale.US));
+        } catch (IllegalArgumentException ex) {
+            throw new ParameterException(ex);
+        }
     }
 }

@@ -190,7 +190,7 @@ public final class Analyzer extends Cleaner {
     private List<Class<?>> selectDecoderClasses(String decoderPattern, boolean regexp) throws NoDecoderMatchException {
         List<Class<?>> decoders = regexp ? selectDecoderClassesRegexp(decoderPattern) : selectDecoderClassesSubstring(decoderPattern);
         if (decoders.isEmpty())
-            throw new NoDecoderMatchException();
+            throw new NoDecoderMatchException(decoderPattern, regexp);
         return decoders;
     }
 

@@ -124,6 +124,19 @@ public final class ModulatedIrSequence extends IrSequence {
         return demodulate(irSequence, DEFAULT_DEMODULATE_THRESHOLD);
     }
 
+    public static Double frequencyAverage(Iterable<ModulatedIrSequence> seqs) {
+        double sum = 0;
+        int index = 0;
+        for (ModulatedIrSequence seq : seqs) {
+            Double freq = seq.getFrequency();
+            if (freq == null)
+                return null;
+            sum += freq;
+            index++;
+        }
+        return index > 0 ? sum / index : null;
+    }
+
     /**
      * Modulation frequency in Hz. Use 0 for no modulation. Use
      * null for no information.

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,16 +13,16 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
-*/
+ */
 
-package org.harctoolbox.analyze;
+package org.harctoolbox.cmdline;
 
 /**
- * Thrown if no decoder name match.
+ * Thrown when user has input silly parameters to a program.
  */
-final public class NoDecoderMatchException extends Exception {
+public class UsageException extends Exception {
 
-    NoDecoderMatchException(String name, boolean isRegexp) {
-        super(name + (isRegexp ? " (regular expression)" : ""));
+    public UsageException(String message) {
+        super(message);
     }
 }

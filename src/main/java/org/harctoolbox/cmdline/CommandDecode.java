@@ -168,20 +168,19 @@ public class CommandDecode extends AbstractCommand {
 
         private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws InvalidArgumentException {
             Objects.requireNonNull(irSignal, "irSignal must be non-null");
-            if (!strict && (irSignal.introOnly() || irSignal.repeatOnly())) {
+            if (repeatFinder) {
                 ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
-                if (repeatFinder) {
-                    RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+                RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
 
-                    IrSignal fixedIrSignal = repeatFinder.toIrSignalClean(sequence);
-                    if (dumpRepeatfinder) {
-                        out.println("RepeatReduced: " + irSignal);
-                        out.println("RepeatData: " + repeatFinder.getRepeatFinderData());
-                    }
-                    decodeIrSignal(decoder, fixedIrSignal, name, maxNameLength);
-                } else {
-                    decodeIrSequence(decoder, sequence, name, maxNameLength);
+                IrSignal fixedIrSignal = repeatFinder.toIrSignalClean(sequence);
+                if (dumpRepeatfinder) {
+                    out.println("RepeatReduced: " + fixedIrSignal);
+                    out.println("RepeatData: " + repeatFinder.getRepeatFinderData());
                 }
+                decodeIrSignal(decoder, fixedIrSignal, name, maxNameLength);
+            } else if (!strict && (irSignal.introOnly() || irSignal.repeatOnly())) {
+                ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
+                decodeIrSequence(decoder, sequence, name, maxNameLength);
             } else {
                 decodeIrSignal(decoder, irSignal, name, maxNameLength);
             }

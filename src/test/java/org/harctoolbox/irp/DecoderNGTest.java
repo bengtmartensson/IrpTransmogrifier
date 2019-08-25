@@ -39,6 +39,7 @@ public class DecoderNGTest {
     private final NameEngine rc5NameEngineWithDefault;
     private final IrSequence nec1Intro;
     private final IrSequence nec1Repeat;
+    private final IrSignal giCable;
 
     public DecoderNGTest() throws Exception {
         nrc17Intro  = new IrSequence(new int[]{500, 2500, 500, 1000, 1000, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 14500, 500, 2500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 1000, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 500, 110000});
@@ -50,6 +51,8 @@ public class DecoderNGTest {
         rc5Seq = new IrSequence(new int[]{889, 889, 1778, 889, 889, 1778, 889, 889, 1778, 889, 889, 1778, 889, 889, 889, 889, 1778, 889, 889, 889, 889, 90886});
         rc5NameEngine = new NameEngine("{D=12,F=56}");
         rc5NameEngineWithDefault = new NameEngine("{D=12,F=56,T=0}");
+        giCable = Pronto.parse("0000 006D 001A 0000 0157 00AC 0013 0055 0013 00AC 0013 0055 0013 00AC 0013 00AC 0013 0055 0013 0055 0013 0055 0013 0055 0013 0055 0013 0055 0013 0055 0013 00AC 0013 0055 0013 00AC 0013 0055 0013 0498 0157 0055 0013 0D24 0157 0055 0013 0D24 0157 0055 0013 0D24 0157 0055 0013 1365");
+
         decoder = new Decoder();
     }
 
@@ -115,6 +118,18 @@ public class DecoderNGTest {
         params.setAllDecodes(true);
         result = decoder.decodeIrSignal(irSignal, params);
         assertEquals(result.size(), 3);
+    }
+
+    @Test(enabled = true)
+    public void testDecodeGICable() {
+        System.out.println("decodeGICable");
+        Decoder.setDebugProtocolRegExp("g.i.cable");
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        Map<String, Decode> result = decoder.decodeIrSignal(giCable, params);
+        assertEquals(result.size(), 0);
+        ModulatedIrSequence seq = giCable.toModulatedIrSequence();
+        Decoder.DecodeTree decodes = decoder.decode(seq, params);
+        assertEquals(decodes.size(), 1);
     }
 
     /**

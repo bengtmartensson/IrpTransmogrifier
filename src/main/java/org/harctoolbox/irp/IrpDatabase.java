@@ -426,6 +426,11 @@ public final class IrpDatabase {
         return prot == null ? null : prot.getFirstProperty(key);
     }
 
+    public List<String> getProperties(String name, String key) {
+        UnparsedProtocol prot = getUnparsedProtocol(name);
+        return prot == null ? null : prot.getProperties(key);
+    }
+
     public NamedProtocol getNamedProtocol(String name) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         if (prot == null)

@@ -132,14 +132,12 @@ public class ProntoParserNGTest {
             assertEquals(ex.getMessage(), "Inconsistent length in Pronto Hex (claimed 37 pairs, was 36 pairs).");
         }
 
-        try {
-            result = ProntoParser.parseDiscardingExcess(NEC1_12_34_56_WRONG_COUNT);
-            fail();
-        } catch (InvalidArgumentException ex) {
-            assertEquals(ex.getMessage(), "Too few data pairs,  (need 37 pairs, have 36 pairs).");
-        }
+        result = ProntoParser.parseLoose(NEC1_12_34_56_WRONG_COUNT);
+        assertEquals(result.getIntroLength(), 72);
+        assertEquals(result.getRepeatLength(), 0);
 
-        result = ProntoParser.parseDiscardingExcess(NEC1_12_34_56_JUNK);
+
+        result = ProntoParser.parseLoose(NEC1_12_34_56_JUNK);
         assertEquals(result.getRepeatLength(), 4);
 
         result = ProntoParser.parse(NEC1_12_34_56_SILLY_NUMBER);

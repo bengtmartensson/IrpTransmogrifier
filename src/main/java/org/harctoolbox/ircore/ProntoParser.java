@@ -29,7 +29,7 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
         return instance.toIrSignal();
     }
 
-    public static IrSignal parseDiscardingExcess(String str) throws InvalidArgumentException {
+    public static IrSignal parseLoose(String str) throws InvalidArgumentException {
         ProntoParser instance = new ProntoParser(str);
         return instance.toIrSignal(null, null, true);
     }
@@ -56,9 +56,9 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
         return toIrSignal(fallbackFrequency, dummyGap, false);
     }
 
-    private IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap, boolean discardExcess) throws InvalidArgumentException {
+    private IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap, boolean loose) throws InvalidArgumentException {
         try {
-            IrSignal irSignal = Pronto.parse(getSource(), discardExcess);
+            IrSignal irSignal = Pronto.parse(getSource(), loose);
             // If Pronto.NonProntoFormatException is not thrown, the signal is probably
             // an erroneous Pronto wannabe, do not catch other exceptions than Pronto.NonProntoFormatException
             if (fallbackFrequency != null)

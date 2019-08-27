@@ -59,6 +59,13 @@ public abstract class Pronto {
      */
     protected final static int LEARNED_UNMODULATED_CODE = 0x0100;
 
+    private final static int TYPE_INDEX = 0;
+    private final static int FREQUENCY_INDEX = 1;
+    private final static int INTRO_LENGTH_INDEX = 2;
+    private final static int REPEAT_LENGTH_INDEX = 3;
+    private final static int NUMBER_METADATA = 4;
+    private final static int MIN_CCF_LENGTH = NUMBER_METADATA + 2;
+
     private static final Logger logger = Logger.getLogger(Pronto.class.getName());
 
     /**
@@ -152,35 +159,35 @@ public abstract class Pronto {
         return parse(ccf, false);
     }
 
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
-    private static IrSignal parse(int[] ccf, boolean discardExcess) throws OddSequenceLengthException, InvalidArgumentException {
-        if (ccf.length < 6)
-            throw new InvalidArgumentException("Pronto Hex is invalid since it is just " + ccf.length + " < 6 numbers long.");
+    private static IrSignal parse(int[] ccf, boolean loose) throws OddSequenceLengthException, InvalidArgumentException {
+        if (ccf.length < MIN_CCF_LENGTH)
+            throw new InvalidArgumentException("Pronto Hex is invalid since it is just " + ccf.length + " < " + MIN_CCF_LENGTH + " numbers long.");
         if (ccf.length % 2 != 0)
             throw new OddSequenceLengthException("Pronto Hex is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
-        int index = 0;
 
-        int type = ccf[index++];
-        int frequencyCode = ccf[index++];
-        int introLength = ccf[index++];
-        int repeatLength = ccf[index++];
-        if (index + 2 * (introLength + repeatLength) != ccf.length) {
-            if (discardExcess) {
-                if (index + 2 * (introLength + repeatLength) > ccf.length)
-                    throw new InvalidArgumentException("Too few data pairs,  (need "
-                            + (introLength + repeatLength) + " pairs, have " + (ccf.length - 4) / 2 + " pairs).");
+        int type = ccf[TYPE_INDEX];
+        int frequencyCode = ccf[FREQUENCY_INDEX];
+        int introLength = ccf[INTRO_LENGTH_INDEX];
+        int repeatLength = ccf[REPEAT_LENGTH_INDEX];
+        int expectedLength = NUMBER_METADATA + 2 * (introLength + repeatLength);
+        if (expectedLength != ccf.length) {
+            if (loose) {
+                if (expectedLength > ccf.length) {
+                    introLength = (ccf.length - NUMBER_METADATA) / 2;
+                    repeatLength = 0;
+                }
             } else
                 throw new InvalidArgumentException("Inconsistent length in Pronto Hex (claimed "
-                        + (introLength + repeatLength) + " pairs, was " + (ccf.length - 4) / 2 + " pairs).");
+                        + (introLength + repeatLength) + " pairs, was " + (ccf.length - NUMBER_METADATA) / 2 + " pairs).");
         }
         IrSignal irSignal = null;
 
         switch (type) {
             case LEARNED_CODE: // 0x0000
             case LEARNED_UNMODULATED_CODE: // 0x0100
-                double[] intro = usArray(frequencyCode, ccf, index, index + 2*introLength);
-                double[] repeat = usArray(frequencyCode, ccf, index + 2*introLength, index + 2*(introLength + repeatLength));
+                double[] intro = usArray(frequencyCode, ccf, NUMBER_METADATA, NUMBER_METADATA + 2*introLength);
+                double[] repeat = usArray(frequencyCode, ccf, NUMBER_METADATA + 2*introLength, NUMBER_METADATA + 2*(introLength + repeatLength));
                 IrSequence introSequence = new IrSequence(intro);
                 IrSequence repeatSequence = new IrSequence(repeat);
                 irSignal = new IrSignal(introSequence, repeatSequence, null,
@@ -210,9 +217,9 @@ public abstract class Pronto {
         return parse(ccfString, true);
     }
 
-    static IrSignal parse(String ccfString, boolean discardExcess) throws NonProntoFormatException, InvalidArgumentException {
+    static IrSignal parse(String ccfString, boolean loose) throws NonProntoFormatException, InvalidArgumentException {
         int[] ccf = parseAsInts(ccfString);
-        return parse(ccf, discardExcess);
+        return parse(ccf, loose);
     }
 
     /**

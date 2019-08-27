@@ -241,6 +241,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
+        logger.log(recognizeData.logRecordEnter(this));
         try {
             BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
             int chunkSize = bitSpec.getChunkSize();
@@ -260,6 +261,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                 int bareIrStreamNo;
                 for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
                     inData = recognizeData.clone();
+                    inData.setLevel(recognizeData.getLevel() + 1);
                     List<BitSpec> poppedStack = new ArrayList<>(bitSpecStack);
                     poppedStack.remove(poppedStack.size()-1);
 
@@ -332,6 +334,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         } catch (NameUnassignedException ex) {
             throw new SignalRecognitionException(ex);
         }
+        logger.log(recognizeData.logRecordExit(this));
     }
 
     @Override

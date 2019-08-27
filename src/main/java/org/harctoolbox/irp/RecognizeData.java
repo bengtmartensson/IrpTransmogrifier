@@ -17,6 +17,9 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
@@ -27,17 +30,18 @@ public final class RecognizeData extends Traverser implements Cloneable {
     private ParameterCollector parameterCollector;
     private final IrSequence irSequence;
     private int extentStart;
-    private boolean interleaving;
+    private final boolean interleaving;
     private ParameterCollector needsChecking;
     private final double absoluteTolerance;
     private final double relativeTolerance;
     private BitwiseParameter danglingBitFieldData;
     private final double minimumLeadout;
+    private int level;
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
-            double absoulteTolerance, double relativeTolerance, double minimumLeadout) {
-        this(generalSpec, definitions, irSequence, 0, interleaving, nameMap, absoulteTolerance, relativeTolerance, minimumLeadout);
-    }
+//    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
+//            double absoulteTolerance, double relativeTolerance, double minimumLeadout) {
+//        this(generalSpec, definitions, irSequence, 0, interleaving, nameMap, absoulteTolerance, relativeTolerance, minimumLeadout);
+//    }
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position,
             boolean interleaving, ParameterCollector parameterCollector, double absoluteTolerance, double relativeTolerance, double minimumLeadout) {
@@ -53,6 +57,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.absoluteTolerance = absoluteTolerance;
         this.relativeTolerance = relativeTolerance;
         this.minimumLeadout = minimumLeadout;
+        this.level = 0;
     }
 
     /**
@@ -267,5 +272,45 @@ public final class RecognizeData extends Traverser implements Cloneable {
             position++;
             hasConsumed = 0;
         }
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public Level getLogLevel() {
+        return level <= 2 ? Level.FINE
+                : level == 3 ? Level.FINER
+                : Level.FINEST;
+    }
+
+    LogRecord logRecordEnter(IrStreamItem item) {
+        return logRecord(item, true);
+    }
+
+    LogRecord logRecordExit(IrStreamItem item) {
+        return logRecord(item, false);
+    }
+
+    private LogRecord logRecord(IrStreamItem item, boolean enter) {
+        LogRecord logRecord;
+        if (item instanceof Numerical && !enter) {
+            try {
+                long value = ((Numerical) item).toLong(this.getParameterCollector().toNameEngine());
+                logRecord = new LogRecord(getLogLevel(), "{0}Level {1}: \"{2}\", result: {3}");
+                logRecord.setParameters(new Object[]{enter ? ">" : "<", level, item.toString(), value});
+                return logRecord;
+            } catch (NameUnassignedException ex) {
+            }
+        }
+
+        logRecord = new LogRecord(getLogLevel(), "{0}Level {1}: \"{2}\"");
+        logRecord.setParameters(new Object[]{enter ? ">" : "<", level, item.toString()});
+
+        return logRecord;
     }
 }

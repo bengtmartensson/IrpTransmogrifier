@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
@@ -146,9 +147,9 @@ public final class NamedProtocol extends Protocol {
             Double userMinimumLeadout, boolean override)
             throws SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
-            //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             throw new ProtocolNotDecodableException(name);
 
+        logger.log(Level.FINE, "Protocol: {0}: \"{1}\"", new Object[]{getName(), getIrp()});
         Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), strict,
                 getFrequencyTolerance(userFrequencyTolerance, override), getAbsoluteTolerance(userAbsoluteTolerance, override),
                 getRelativeTolerance(userRelativeTolerance, override), getMinimumLeadout(userMinimumLeadout, override));

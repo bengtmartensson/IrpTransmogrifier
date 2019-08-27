@@ -76,8 +76,6 @@ final class BitStream extends IrpObject implements Evaluatable {
     }
 
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine, BitSpec bitSpec) throws NameUnassignedException {
-        IrpUtils.entering(logger, "evaluate", this);
-
         EvaluatedIrStream list = new EvaluatedIrStream(nameEngine, generalSpec, pass);
 
         if (bitSpec == null || length % bitSpec.getChunkSize() != 0) {
@@ -91,7 +89,6 @@ final class BitStream extends IrpObject implements Evaluatable {
                 list.add(evaluatedIrStream);
             }
         }
-        IrpUtils.exiting(logger, "evaluate", list);
         return list;
     }
 

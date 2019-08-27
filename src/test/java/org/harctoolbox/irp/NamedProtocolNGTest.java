@@ -40,7 +40,7 @@ public class NamedProtocolNGTest {
     public void tearDownMethod() throws Exception {
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void testDecode_XMP() {
         System.out.println("decode_XMP");
         Decoder.setDebugProtocolRegExp("xmp-1");

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.antlr.v4.gui.TreeViewer;
@@ -121,42 +120,6 @@ public final class IrpUtils {
         panel.add(tv);
 
         JOptionPane.showMessageDialog(null, panel, title, JOptionPane.PLAIN_MESSAGE);
-    }
-
-    public static void entering(Logger logger, Level level, String member, Object arg) {
-        logger.logp(level, logger.getName(), member, String.format("-> %0$s", arg.toString()));
-    }
-
-    public static void entering(Logger logger, String member, Object arg) {
-        entering(logger, enteringExitingLevel, member, arg);
-    }
-
-    public static void entering(Logger logger, String member) {
-        entering(logger, member, "->");
-    }
-
-    public static void exiting(Logger logger, Level level, String member, String message) {
-        logger.logp(level, logger.getName(), member, message);
-    }
-
-    public static void exiting(Logger logger, Level level, String member, Object arg) {
-        logger.logp(level, logger.getName(), member, String.format("<- %0$s", arg.toString()));
-    }
-
-    public static void exiting(Logger logger, String member, Object arg) {
-        exiting(logger, enteringExitingLevel, member, arg);
-    }
-
-    public static void exiting(Logger logger, String member, String format, Object... args) {
-        exiting(logger, enteringExitingLevel, member, String.format(format, args));
-    }
-
-    public static void exiting(Logger logger, Level level, String member, String format, Object... args) {
-        exiting(logger, level, member, String.format(format, args));
-    }
-
-    public static void exiting(Logger logger, String member) {
-        exiting(logger, member, "<-");
     }
 
     static List<IrStreamItem> mkIrStreamItemList(IrStreamItem irStreamItem) {

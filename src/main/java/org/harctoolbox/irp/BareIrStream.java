@@ -244,11 +244,16 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
+        logger.log(recognizeData.logRecordEnter(this));
+        int currentLevel = recognizeData.getLevel();
+        recognizeData.setLevel(currentLevel + 1);
         IrSignal.Pass pass = null;
         for (Iterator<IrStreamItem> it = irStreamItems.iterator(); it.hasNext();) {
             IrStreamItem irStreamItem = it.next();
             irStreamItem.decode(recognizeData, bitSpecStack, isLast && !it.hasNext());
         }
+        recognizeData.setLevel(currentLevel);
+        logger.log(recognizeData.logRecordExit(this));
     }
 
     @Override
@@ -266,10 +271,8 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     @SuppressWarnings("AssignmentToMethodParameter")
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
         List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());
-        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat()) {
-            IrpUtils.exiting(logger, "traverse " + pass, "pass (since variation with intro equals repeat)");
+        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat())
             return list;
-        }
 
         for (IrStreamItem irStreamItem : irStreamItems) {
             IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);

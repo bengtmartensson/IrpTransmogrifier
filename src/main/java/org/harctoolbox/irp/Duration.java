@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -220,10 +219,10 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
-        if (!recognizeData.check(isOn())) {
-            IrpUtils.exiting(logger, Level.FINEST, "recognize", "wrong parity");
-            throw new SignalRecognitionException("Ether end if sequence, or found flash when gap expected, or vice versa");
-        }
+        logger.log(recognizeData.logRecordEnter(this));
+        if (!recognizeData.check(isOn()))
+            throw new SignalRecognitionException("Ether end of sequence, or found flash when gap expected, or vice versa");
+
         double actual = recognizeData.get();
         double wanted;
         try {
@@ -232,6 +231,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             throw new SignalRecognitionException(ex);
         }
         recognize(recognizeData, actual, wanted, isLast);
+        logger.log(recognizeData.logRecordExit(this));
     }
 
     @Override

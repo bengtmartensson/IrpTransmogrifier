@@ -281,7 +281,6 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws DomainViolationException
      */
     public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException {
-        IrpUtils.entering(logger, "toIrSignal");
         initializeDefinitions();
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
@@ -291,7 +290,6 @@ public class Protocol extends IrpObject implements AggregateLister {
         IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
         IrSequence ending = toIrSequence(nameEngine, Pass.ending);
         saveMemoryVariables(nameEngine);
-        IrpUtils.entering(logger, "toIrSignal");
         return new IrSignal(intro, repeat, ending, getFrequencyWithDefault(), getDutyCycle());
     }
 
@@ -348,12 +346,10 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws org.harctoolbox.irp.DomainViolationException
      */
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException {
-        IrpUtils.entering(logger, "toIrSequence", pass);
         RenderData renderData = new RenderData(generalSpec, nameEngine);
         Protocol reducedProtocol = normalForm(pass);
         reducedProtocol.bitspecIrstream.render(renderData, new ArrayList<>(0));
         IrSequence irSequence = renderData.toIrSequence();
-        IrpUtils.exiting(logger, "toIrSequence", pass);
         return irSequence;
     }
 
@@ -665,9 +661,10 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     private void checkFrequency(Double frequency, double frequencyTolerance) throws SignalRecognitionException {
+        logger.log(Level.FINER, "Expected frequency {0}, actual {1}, tolerance {2}", new Object[]{ (int) getFrequencyWithDefault(), frequency.intValue(), (int) frequencyTolerance});
         boolean success = frequencyTolerance < 0
-                || (frequency != null && IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0));
-        logger.log(Level.FINEST, "Frequency was checked, {0}OK.", success ? "" : "NOT ");
+                || IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0);
+        logger.log(Level.FINER, "Frequency was checked, {0}OK.", success ? "" : "NOT ");
         if (!success)
             throw new SignalRecognitionException("Frequency does not match");
     }

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
@@ -33,9 +34,11 @@ import org.w3c.dom.Element;
  */
 public final class Assignment extends IrpObject implements IrStreamItem, Numerical {
 
+    private static final Logger logger = Logger.getLogger(Assignment.class.getName());
+
     public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         Assignment assignment = new Assignment(str);
-        return assignment.toLong(nameEngine);
+        return assignment.value.toLong(nameEngine);
     }
 
     private Name name;
@@ -153,6 +156,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
+        logger.log(recognizeData.logRecordEnter(this));
         try {
             NameEngine nameEngine = recognizeData.getNameEngine();
             String nameString = name.toString();
@@ -164,6 +168,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
         } catch (NameUnassignedException | InvalidNameException ex) {
             throw new SignalRecognitionException(ex);
         }
+        logger.log(recognizeData.logRecordExit(this));
     }
 
     @Override

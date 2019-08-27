@@ -142,10 +142,15 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> inheritedBitSpecs, boolean isLast) throws SignalRecognitionException {
+        logger.log(recognizeData.logRecordEnter(this));
         List<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         IrSignal.Pass pass = null;
+        int currentLevel = recognizeData.getLevel();
+        recognizeData.setLevel(currentLevel + 1);
         irStream.decode(recognizeData, stack, isLast);
+        recognizeData.setLevel(currentLevel);
+        logger.log(recognizeData.logRecordExit(this));
     }
 
     @Override

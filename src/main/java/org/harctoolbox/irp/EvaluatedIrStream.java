@@ -72,7 +72,6 @@ final class EvaluatedIrStream {
 
 
     IrSequence toIrSequence() throws NameUnassignedException, IrpInvalidArgumentException {
-        IrpUtils.entering(logger, "toIrSequence", this);
         List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
         for (Evaluatable element : elements) {
@@ -91,7 +90,6 @@ final class EvaluatedIrStream {
             }
         }
         IrSequence result = mkIrSequence(times);
-        IrpUtils.exiting(logger, "toIrSequence", result);
         return result;
     }
 
@@ -169,11 +167,9 @@ final class EvaluatedIrStream {
     }
 
     private void squeezeBitStreams(BitStream bitStream) {
-        IrpUtils.entering(logger, "squeezeBitStreams", this.toString() + "+" + bitStream);
         int lastIndex = elements.size() - 1;
         BitStream old = (BitStream) elements.get(lastIndex);
         old.add(bitStream, generalSpec, nameEngine);
-        IrpUtils.exiting(logger, "squeezeBitStreams", this);
     }
 
     /**

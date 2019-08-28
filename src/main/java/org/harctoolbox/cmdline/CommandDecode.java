@@ -53,6 +53,9 @@ public class CommandDecode extends AbstractCommand {
     @Parameter(names = {"-c", "--clean"}, description = "Invoke cleaner on signal") // ignored with --repeat-finder
     private boolean cleaner = false;
 
+    @Parameter(names = { "--debugpattern"}, description = "Stop pattern for decoding", hidden = true)
+    private String debugPattern = null;
+
     @Parameter(names = {"-f", "--frequency"}, converter = FrequencyParser.class, description = "Set modulation frequency.")
     private Double frequency = null;
 
@@ -134,8 +137,7 @@ public class CommandDecode extends AbstractCommand {
             if (IrCoreUtils.numberTrue(input != null, namedInput != null, args != null) != 1)
                 throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
-            //setupDatabase();
-            //irpDatabase.expand();
+            Decoder.setDebugProtocolRegExp(debugPattern);
             List<String> protocolNamePatterns = protocol == null ? null : Arrays.asList(protocol.split(","));
             List<String> protocolsNames = irpDatabase.evaluateProtocols(protocolNamePatterns, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
             if (protocolsNames.isEmpty())

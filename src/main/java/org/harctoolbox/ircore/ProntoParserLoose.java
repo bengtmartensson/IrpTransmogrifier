@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2018 Bengt Martensson.
+Copyright (C) 2019 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,23 +17,20 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.ircore;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+public class ProntoParserLoose extends ProntoParser {
 
-public class ProntoParser extends AbstractIrParser implements IrSignalParser {
-
-    private final static Logger logger = Logger.getLogger(ProntoParser.class.getName());
+    //private final static Logger logger = Logger.getLogger(ProntoParserLoose.class.getName());
 
     public static IrSignal parse(String str) throws InvalidArgumentException {
-        ProntoParser instance = new ProntoParser(str);
+        ProntoParserLoose instance = new ProntoParserLoose(str);
         return instance.toIrSignal();
     }
 
-    public ProntoParser(String source) {
+    public ProntoParserLoose(String source) {
         super(source);
     }
 
-    public ProntoParser(Iterable<? extends CharSequence> args) {
+    public ProntoParserLoose(Iterable<? extends CharSequence> args) {
         super(args);
     }
 
@@ -48,26 +45,11 @@ public class ProntoParser extends AbstractIrParser implements IrSignalParser {
      */
     @Override
     public IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap) throws InvalidArgumentException {
-        return toIrSignal(fallbackFrequency, dummyGap, false);
-    }
-
-    protected IrSignal toIrSignal(Double fallbackFrequency, Double dummyGap, boolean loose) throws InvalidArgumentException {
-        try {
-            IrSignal irSignal = Pronto.parse(getSource(), loose);
-            // If Pronto.NonProntoFormatException is not thrown, the signal is probably
-            // an erroneous Pronto wannabe, do not catch other exceptions than Pronto.NonProntoFormatException
-            if (fallbackFrequency != null)
-                logger.log(Level.FINE, "Explicit frequency with a Pronto type signal meaningless, thus ignored.");
-            return irSignal;
-        } catch (Pronto.NonProntoFormatException ex) {
-            // Signal does not look like Pronto, give up
-            logger.log(Level.FINER, "Tried as Pronto, gave up ({0})", ex.getMessage());
-            return null;
-        }
+        return toIrSignal(fallbackFrequency, dummyGap, true);
     }
 
     @Override
     public String getName() {
-        return "Pronto Hex";
+        return "Pronto Hex (Loose)";
     }
 }

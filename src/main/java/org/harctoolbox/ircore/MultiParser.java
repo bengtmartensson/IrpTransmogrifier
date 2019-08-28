@@ -24,7 +24,7 @@ public class MultiParser extends AbstractIrParser {
 
     public static List<IrSignalParser> ircoreParsersList(String source) {
         List<IrSignalParser> parsersList = new ArrayList<>(4);
-        parsersList.add(new ProntoParser(source));
+        parsersList.add(new ProntoParserLoose(source));
         parsersList.add(new BracketedIrSignalParser(source));
         parsersList.add(new MultilineIrSignalParser(source));
         return parsersList;

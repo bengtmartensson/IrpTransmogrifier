@@ -173,10 +173,11 @@ public abstract class Pronto {
         int expectedLength = NUMBER_METADATA + 2 * (introLength + repeatLength);
         if (expectedLength != ccf.length) {
             if (loose) {
-                if (expectedLength > ccf.length) {
-                    introLength = (ccf.length - NUMBER_METADATA) / 2;
-                    repeatLength = 0;
-                }
+                logger.log(Level.WARNING, "Inconsistent length in Pronto Hex (claimed {0} pairs, was {1} pairs). "
+                        + "Intro length set to {1} pairs; repeat length set to 0.",
+                        new Object[]{introLength + repeatLength, (ccf.length - NUMBER_METADATA) / 2});
+                introLength = (ccf.length - NUMBER_METADATA) / 2;
+                repeatLength = 0;
             } else
                 throw new InvalidArgumentException("Inconsistent length in Pronto Hex (claimed "
                         + (introLength + repeatLength) + " pairs, was " + (ccf.length - NUMBER_METADATA) / 2 + " pairs).");
@@ -213,7 +214,7 @@ public abstract class Pronto {
         return parse(ccfString, false);
     }
 
-    public static IrSignal parseDiscardingExcess(String ccfString) throws NonProntoFormatException, InvalidArgumentException {
+    public static IrSignal parseLoose(String ccfString) throws NonProntoFormatException, InvalidArgumentException {
         return parse(ccfString, true);
     }
 
@@ -243,17 +244,6 @@ public abstract class Pronto {
      * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
      */
     public static IrSignal parse(String[] array) throws InvalidArgumentException, NonProntoFormatException {
-        return parse(array, 0);
-    }
-
-    /**
-     * Creates a new IrSignals by interpreting its argument as CCF string.
-     * @param array Strings representing hexadecimal numbers
-     * @return IrSignal
-     * @throws InvalidArgumentException
-     * @throws org.harctoolbox.ircore.Pronto.NonProntoFormatException
-     */
-    public static IrSignal parseDiscardingExccess(String[] array) throws InvalidArgumentException, NonProntoFormatException {
         return parse(array, 0);
     }
 

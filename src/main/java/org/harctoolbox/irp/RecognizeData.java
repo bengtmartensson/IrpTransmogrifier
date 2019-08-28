@@ -19,8 +19,8 @@ package org.harctoolbox.irp;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSequence;
+import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public final class RecognizeData extends Traverser implements Cloneable {
@@ -37,14 +37,11 @@ public final class RecognizeData extends Traverser implements Cloneable {
     private BitwiseParameter danglingBitFieldData;
     private final double minimumLeadout;
     private int level;
-
-//    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, boolean interleaving, ParameterCollector nameMap,
-//            double absoulteTolerance, double relativeTolerance, double minimumLeadout) {
-//        this(generalSpec, definitions, irSequence, 0, interleaving, nameMap, absoulteTolerance, relativeTolerance, minimumLeadout);
-//    }
+    private final IrSignal.Pass pass;
 
     public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position,
-            boolean interleaving, ParameterCollector parameterCollector, double absoluteTolerance, double relativeTolerance, double minimumLeadout) {
+            boolean interleaving, ParameterCollector parameterCollector, double absoluteTolerance, double relativeTolerance,
+            double minimumLeadout, IrSignal.Pass pass) {
         super(generalSpec, definitions);
         danglingBitFieldData = new BitwiseParameter();
         this.position = position;
@@ -57,6 +54,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.absoluteTolerance = absoluteTolerance;
         this.relativeTolerance = relativeTolerance;
         this.minimumLeadout = minimumLeadout;
+        this.pass = pass;
         this.level = 0;
     }
 
@@ -288,6 +286,10 @@ public final class RecognizeData extends Traverser implements Cloneable {
                 : Level.FINEST;
     }
 
+    public IrSignal.Pass getPass() {
+        return pass;
+    }
+
     LogRecord logRecordEnter(IrStreamItem item) {
         return logRecord(item, true);
     }
@@ -310,6 +312,13 @@ public final class RecognizeData extends Traverser implements Cloneable {
 
         logRecord = new LogRecord(getLogLevel(), "{0}Level {1}: \"{2}\"");
         logRecord.setParameters(new Object[]{enter ? ">" : "<", level, item.toString()});
+
+        return logRecord;
+    }
+
+    public LogRecord logRecordEnterWithIrStream(IrStreamItem item) {
+        LogRecord logRecord= new LogRecord(getLogLevel(), "{0} {1}Level {2}: \"{3}\", IrSequence: {4}");
+        logRecord.setParameters(new Object[]{this.getPass().toString(), ">", level, item.toString(), this.irSequence});
 
         return logRecord;
     }

@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * base <code>IrpProtocols.xml</code>.
  */
 public final class NamedProtocol extends Protocol {
-    private final static Logger logger = Logger.getLogger(Protocol.class.getName());
+    private final static Logger logger = Logger.getLogger(NamedProtocol.class.getName());
 
     public static Document toDocument(Iterable<NamedProtocol> protocols) {
         Document document = XmlUtils.newDocument();
@@ -120,6 +120,7 @@ public final class NamedProtocol extends Protocol {
         if (!isDecodeable())
             //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             throw new ProtocolNotDecodableException(name);
+        logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSignal.toString(true)});
 
         Map<String, Long> params = super.recognize(irSignal, strict || isRejectRepeats(),
                 getFrequencyTolerance(userFrequencyTolerance, override), getAbsoluteTolerance(userAbsoluteTolerance, override),
@@ -149,7 +150,7 @@ public final class NamedProtocol extends Protocol {
         if (!isDecodeable())
             throw new ProtocolNotDecodableException(name);
 
-        logger.log(Level.FINE, "Protocol: {0}: \"{1}\"", new Object[]{getName(), getIrp()});
+        logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSequence.toString(true)});
         Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), strict,
                 getFrequencyTolerance(userFrequencyTolerance, override), getAbsoluteTolerance(userAbsoluteTolerance, override),
                 getRelativeTolerance(userRelativeTolerance, override), getMinimumLeadout(userMinimumLeadout, override));

@@ -677,7 +677,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private int decode(ParameterCollector names, IrSequence irSequence, int beginPos, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
             throws SignalRecognitionException {
         RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, beginPos, interleavingOk(), names,
-                absoluteTolerance, relativeTolerance, minimumLeadout);
+                absoluteTolerance, relativeTolerance, minimumLeadout, pass);
         Protocol reducedProtocol = normalForm(pass);
         //traverse(recognizeData, pass);
         reducedProtocol.decode(recognizeData);

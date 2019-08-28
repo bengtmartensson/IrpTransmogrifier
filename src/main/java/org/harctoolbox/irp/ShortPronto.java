@@ -77,8 +77,8 @@ public final class ShortPronto extends Pronto {
      */
     @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     public static IrSignal parse(int[] ccf) throws InvalidArgumentException {
-        if (ccf.length < 4)
-            throw new InvalidArgumentException("CCF is invalid since less than 4 numbers long.");
+        if (ccf.length < MIN_CCF_LENGTH)
+            throw new InvalidArgumentException("CCF is invalid since less than " + MIN_CCF_LENGTH + " numbers long.");
         if (ccf.length % 2 != 0)
             throw new OddSequenceLengthException("CCF is invalid since it has an odd number ("
                     + ccf.length + ") of durations.");
@@ -87,17 +87,15 @@ public final class ShortPronto extends Pronto {
         Integer S = null;
         Integer F = null;
 
-        int index = 0;
-        int type = ccf[index++];
-        //int frequencyCode = ccf[index++];
-        index++;
-        int introLength = ccf[index++];
-        int repeatLength = ccf[index++];
-        if (index + 2*(introLength+repeatLength) != ccf.length)
+        int type = ccf[TYPE_INDEX];
+        int introLength = ccf[INTRO_LENGTH_INDEX];
+        int repeatLength = ccf[REPEAT_LENGTH_INDEX];
+        if (NUMBER_METADATA + 2*(introLength+repeatLength) != ccf.length)
             throw new InvalidArgumentException("Inconsistent length in CCF (claimed "
-                    + (introLength + repeatLength) + " pairs, was " + (ccf.length - 4)/2 + " pairs).");
+                    + (introLength + repeatLength) + " pairs, was " + (ccf.length - NUMBER_METADATA)/2 + " pairs).");
         IrSignal irSignal = null;
 
+        int index = NUMBER_METADATA;
         switch (type) {
             case LEARNED_CODE: // 0x0000
             case LEARNED_UNMODULATED_CODE: // 0x0100

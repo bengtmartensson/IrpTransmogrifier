@@ -59,12 +59,12 @@ public abstract class Pronto {
      */
     protected final static int LEARNED_UNMODULATED_CODE = 0x0100;
 
-    private final static int TYPE_INDEX = 0;
-    private final static int FREQUENCY_INDEX = 1;
-    private final static int INTRO_LENGTH_INDEX = 2;
-    private final static int REPEAT_LENGTH_INDEX = 3;
-    private final static int NUMBER_METADATA = 4;
-    private final static int MIN_CCF_LENGTH = NUMBER_METADATA + 2;
+    protected final static int TYPE_INDEX = 0;
+    protected final static int FREQUENCY_INDEX = 1;
+    protected final static int INTRO_LENGTH_INDEX = 2;
+    protected final static int REPEAT_LENGTH_INDEX = 3;
+    protected final static int NUMBER_METADATA = 4;
+    protected final static int MIN_CCF_LENGTH = NUMBER_METADATA + 2;
 
     private static final Logger logger = Logger.getLogger(Pronto.class.getName());
 

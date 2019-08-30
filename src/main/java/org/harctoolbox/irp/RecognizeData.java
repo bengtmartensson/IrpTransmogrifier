@@ -58,6 +58,12 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.level = 0;
     }
 
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int beginPos, boolean interleavingOk,
+            ParameterCollector names, Decoder.DecoderParameters params, IrSignal.Pass pass) {
+        this(generalSpec, definitions, irSequence, beginPos, interleavingOk, names,
+                params.getAbsoluteTolerance(), params.getRelativeTolerance(), params.getMinimumLeadout(), pass);
+    }
+
     /**
      * Returns a shallow copy, except for the NameEngine, which is copied with NameEngine.clone().
      * @return
@@ -74,13 +80,6 @@ public final class RecognizeData extends Traverser implements Cloneable {
         result.setParameterCollector(getParameterCollector().clone());
         result.nameEngine = this.nameEngine.clone();
         return result;
-    }
-
-    /**
-     * @return the irSequence
-     */
-    public IrSequence getIrSequence() {
-        return irSequence;
     }
 
     /**
@@ -139,10 +138,6 @@ public final class RecognizeData extends Traverser implements Cloneable {
         add(name, new BitwiseParameter(value));
     }
 
-    void incrementPosition(int i) {
-        position += i;
-    }
-
     public boolean isOn() {
         return Duration.isOn(position);
     }
@@ -164,23 +159,9 @@ public final class RecognizeData extends Traverser implements Cloneable {
     }
 
     /**
-     * @return the extentStart
-     */
-    public int getExtentStart() {
-        return extentStart;
-    }
-
-    /**
      */
     public void markExtentStart() {
         extentStart = position + 1;
-    }
-
-    /**
-     * @return the interleaving
-     */
-    public boolean isInterleaving() {
-        return interleaving;
     }
 
     /**
@@ -258,11 +239,6 @@ public final class RecognizeData extends Traverser implements Cloneable {
 
     void setDanglingBitFieldData() {
         danglingBitFieldData = new BitwiseParameter();
-    }
-
-    @Override
-    public boolean isFinished() {
-        return position == irSequence.getLength();
     }
 
     void finish() {

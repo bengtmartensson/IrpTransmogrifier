@@ -172,7 +172,7 @@ public class CommandDecode extends AbstractCommand {
             Objects.requireNonNull(irSignal, "irSignal must be non-null");
             if (repeatFinder) {
                 ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
-                RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+                RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minRepeatGap);
 
                 IrSignal fixedIrSignal = repeatFinder.toIrSignalClean(sequence);
                 if (dumpRepeatfinder) {

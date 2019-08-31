@@ -1,5 +1,29 @@
-Release Notes for IrpTransmogrifier 1.0.0.
+Release Notes for IrpTransmogrifier 1.1.0.
 
+The notation #n refers to issues number n at
+https://github.com/bengtmartensson/IrpTransmogrifier/issues
+
+===============================================================================
+2019-08-31: Version 1.1.0
+
+* API example code added in directory contributed.
+* Code generation code are now in a separate project IrProtocolCodeGeneration #108
+* Pronto signals are per default loosely parsed #118, #117
+* Bugfixes/improvements in Analyzer/Biphase* #116
+* IrSignal.toString produces silly result in the presence of ModulatedIrSequence #115
+* Refacturing of main class IrpTransmogrifier #114
+* XML basedir problem fixed. (IrScrutinizer #314)
+* Logging for debugging of (non-) decodes vastly improved #93
+* Removed (non-owned) schemas and entitys files, #101.
+* Fixes for non-recognized options in decode and analyze. #110.
+* analyze now has --girr option #103
+* New protocol classification (list --classify), constant intro/repeat #102
+* Modulation/demodulation support: new command demodulate, command render has new
+  option --modulate; #100
+* Remove support for the old ini file format, including convertconfig. #107
+* Remove IctImporter #109
+
+===============================================================================
 2019-08-11: Version 1.0.1
 
 * Allow for decode parameter not to override protocol specific values (API only).

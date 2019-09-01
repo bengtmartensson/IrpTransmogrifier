@@ -59,6 +59,9 @@ public class CommandDecode extends AbstractCommand {
     @Parameter(names = {"-f", "--frequency"}, converter = FrequencyParser.class, description = "Set modulation frequency.")
     private Double frequency = null;
 
+    @Parameter(names = {"-l", "--ignoreleadinggarbage"}, description = "Accept decodes starting with undecodable pairs.")
+    private boolean ignoreLeadingGarbage = false;
+
     @Parameter(names = {"-i", "--input"}, description = "File/URL from which to take inputs, one per line.")
     private String input = null;
 
@@ -206,7 +209,7 @@ public class CommandDecode extends AbstractCommand {
         private Decoder.DecoderParameters newDecoderParameters() {
             return new Decoder.DecoderParameters(strict, noPreferOver,
                     !keepDefaultedParameters, recursive, commandLineArgs.frequencyTolerance,
-                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout, override);
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout, override, ignoreLeadingGarbage);
         }
 
         @SuppressWarnings("AssignmentToMethodParameter")

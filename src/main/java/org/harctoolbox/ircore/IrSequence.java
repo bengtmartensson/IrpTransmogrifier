@@ -702,6 +702,13 @@ public class IrSequence implements Cloneable {
         return IrCoreUtils.l1Norm(data, begin, length);
     }
 
+    public int firstBigGap(int start, double limit) {
+        for (int i = start + start%2; i < this.data.length - 2; i += 2)
+            if (data[i+1] >= limit)
+                return i+1;
+        return -1;
+    }
+
     /**
      * Generates a pretty string representing the object.
      * @return nice string.

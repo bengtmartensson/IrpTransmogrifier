@@ -475,6 +475,15 @@ public class IrpTransmogrifierNGTest {
         }
     }
 
+    @Test
+    public void testIgnoreLeadingGarbage() {
+        System.out.println("testIgnoreLeadingGarbage");
+        String result = IrpTransmogrifier.execute("--blacklist gwts decode " + GRAHAM_PANASONIC);
+        assertEquals(result, "");
+        result = IrpTransmogrifier.execute("--blacklist gwts,nec-shirriff decode --ignoreleadinggarbage " + GRAHAM_PANASONIC);
+        assertEquals(result, "Panasonic: {D=176,F=17,S=16}, beg=16, end=115, reps=1 {UNDECODED. length=24}");
+    }
+
     @Test(enabled = true)
     public void testOverride() {
         System.out.println("decodeRc5x");

@@ -137,7 +137,12 @@ public final class Decoder {
      */
     public DecodeTree decode(ModulatedIrSequence irSequence, DecoderParameters params) {
         Map<Integer, Map<String, TrunkDecodeTree>> map = new ConcurrentHashMap<>(16);
-        return decode(irSequence, 0, params, 0, map);
+        DecodeTree decodes = decode(irSequence, 0, params, 0, map);
+        if (!decodes.isEmpty() || !params.isIgnoreLeadingGarbage())
+            return decodes;
+
+        int newStart = irSequence.firstBigGap(0, params.minimumLeadout) + 1;
+        return newStart > 0 ? decode(irSequence, newStart, params, 0, map) : decodes;
     }
 
     private DecodeTree decode(ModulatedIrSequence irSequence, int position, DecoderParameters params, int level, Map<Integer, Map<String, TrunkDecodeTree>>map) {
@@ -273,6 +278,7 @@ public final class Decoder {
         private Double relativeTolerance;
         private Double minimumLeadout;
         private boolean override;
+        private boolean ignoreLeadingGarbage;
         /**
          *
          * @param strict If true, intro-, repeat-, and ending sequences are
@@ -287,9 +293,11 @@ public final class Decoder {
          * @param relativeTolerance
          * @param minimumLeadout
          * @param override If true, the given parameters override parameter specific parameter values.
+         * @param ignoreLeadingGarbage
          */
         public DecoderParameters(boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive,
-                Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout, boolean override) {
+                Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout,
+                boolean override, boolean ignoreLeadingGarbage) {
             this.strict = strict;
             this.allDecodes = allDecodes;
             this.removeDefaultedParameters = removeDefaultedParameters;
@@ -299,6 +307,7 @@ public final class Decoder {
             this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
             this.minimumLeadout = IrCoreUtils.getMinimumLeadout(minimumLeadout);
             this.override = override;
+            this.ignoreLeadingGarbage = ignoreLeadingGarbage;
         }
 
         public DecoderParameters() {
@@ -306,11 +315,11 @@ public final class Decoder {
         }
 
         public DecoderParameters(boolean strict) {
-            this(strict, false, true, false, null, null, null, null, false);
+            this(strict, false, true, false, null, null, null, null, false, false);
         }
 
         public DecoderParameters(boolean strict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
-            this(strict, false, true, false, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false);
+            this(strict, false, true, false, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false, false);
         }
 
         public DecoderParameters adjust(boolean newStrict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
@@ -319,7 +328,7 @@ public final class Decoder {
                     pick(absoluteTolerance, this.absoluteTolerance, override),
                     pick(relativeTolerance, this.relativeTolerance, override),
                     pick(minimumLeadout, this.minimumLeadout, override),
-                    override);
+                    override, ignoreLeadingGarbage);
 
             return copy;
         }
@@ -449,6 +458,14 @@ public final class Decoder {
 
         public void setOverride(boolean override) {
             this.override = override;
+        }
+
+        private void setIgnoreLeadingGarbage(boolean ignoreLeadingGarbage) {
+            this.ignoreLeadingGarbage = ignoreLeadingGarbage;
+        }
+
+        private boolean isIgnoreLeadingGarbage() {
+            return ignoreLeadingGarbage;
         }
     }
 

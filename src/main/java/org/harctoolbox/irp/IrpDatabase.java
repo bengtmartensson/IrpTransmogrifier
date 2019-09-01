@@ -481,6 +481,21 @@ public final class IrpDatabase {
         }
     }
 
+    public void remove(List<String> blackList) throws UnknownProtocolException {
+        if (blackList == null)
+            return;
+
+        for (String protocol : blackList)
+            remove(protocol);
+    }
+
+    public void remove(String protocol) throws UnknownProtocolException {
+        if (!protocols.containsKey(protocol))
+            throw new UnknownProtocolException(protocol);
+
+        protocols.remove(protocol);
+    }
+
     private void addProtocol(Element current) {
         addProtocol(new UnparsedProtocol(current));
     }

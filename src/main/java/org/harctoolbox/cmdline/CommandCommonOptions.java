@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.cmdline;
 
 import com.beust.jcommander.Parameter;
+import java.util.List;
 import java.util.logging.Level;
 import org.harctoolbox.ircore.IrCoreUtils;
 
@@ -27,8 +28,10 @@ public class CommandCommonOptions {
     // JCommander does not know about our defaults being null, so handle this explicitly-
     @Parameter(names = {"-a", "--absolutetolerance"},
             description = "Absolute tolerance in microseconds, used when comparing durations. Default: " + IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE + ".")
-
     public Double absoluteTolerance = null;
+
+    @Parameter(names = {"-b", "--blacklist"}, description = "List of protocols to be removed from the data base")
+    public List<String> blackList = null;
 
     @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
     public String configFile = null;

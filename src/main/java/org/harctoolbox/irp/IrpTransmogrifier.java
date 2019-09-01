@@ -35,7 +35,6 @@ import java.util.logging.SimpleFormatter;
 import java.util.logging.XMLFormatter;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.analyze.NoDecoderMatchException;
-import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.cmdline.AbstractCommand;
 import org.harctoolbox.cmdline.CmdLineProgram;
 import org.harctoolbox.cmdline.CmdUtils;
@@ -169,11 +168,11 @@ public final class IrpTransmogrifier implements CmdLineProgram {
                     commandBitField.bitfield(out, commandLineArgs);
                     break;
                 case "code":
-                    setupDatabase();
+                    setupDatabase(commandLineArgs.blackList);
                     commandCode.code(out, commandLineArgs, irpDatabase, originalArguments);
                     break;
                 case "decode":
-                    setupDatabase();
+                    setupDatabase(commandLineArgs.blackList);
                     commandDecode.decode(out, commandLineArgs, irpDatabase);
                     break;
                 case "demodulate":
@@ -189,15 +188,15 @@ public final class IrpTransmogrifier implements CmdLineProgram {
                     commandLirc.lirc(out, commandLineArgs.encoding);
                     break;
                 case "list":
-                    setupDatabase();
+                    setupDatabase(commandLineArgs.blackList);
                     commandList.list(out, commandLineArgs, irpDatabase);
                     break;
                 case "render":
-                    setupDatabase();
+                    setupDatabase(commandLineArgs.blackList);
                     commandRender.render(out, irpDatabase, commandLineArgs);
                     break;
                 case "version":
-                    setupDatabase();
+                    setupDatabase(commandLineArgs.blackList);
                     commandVersion.version(out, commandLineArgs, irpDatabase);
                     break;
                 default:
@@ -239,13 +238,14 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         return CommandHelp.usageString(command, argumentParser);
     }
 
-    private void setupDatabase() throws IOException, UsageException, IrpParseException {
+    private void setupDatabase(List<String> blackList) throws IOException, UsageException, IrpParseException, UnknownProtocolException {
         if (commandLineArgs.configFile != null && commandLineArgs.irp != null)
             throw new UsageException("At most one of configfile and irp can be specified");
 
         irpDatabase = commandLineArgs.irp != null ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
                 : new IrpDatabase(commandLineArgs.configFile);
         irpDatabase.expand();
+        irpDatabase.remove(blackList);
     }
 
     @Override

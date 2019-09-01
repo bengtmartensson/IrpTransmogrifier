@@ -147,8 +147,6 @@ public final class IrpTransmogrifier implements CmdLineProgram {
             if (commandLineArgs.output != null)
                 out = IrCoreUtils.getPrintSteam(commandLineArgs.output);
 
-            RepeatFinder.setDefaultMinRepeatLastGap(commandLineArgs.minRepeatGap); // Parallelization problem
-
             // Since we have help and version as subcommands, --help and --version
             // are a little off. Keep them for compatibility, and
             // map --help and --version to the subcommands

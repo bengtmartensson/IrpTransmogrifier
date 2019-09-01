@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -29,10 +30,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
@@ -133,22 +136,33 @@ public final class Decoder {
      * @return List of decodes.
      */
     public DecodeTree decode(ModulatedIrSequence irSequence, DecoderParameters params) {
-        return decode(irSequence, 0, params, 0);
+        Map<Integer, Map<String, TrunkDecodeTree>> map = new ConcurrentHashMap<>(16);
+        return decode(irSequence, 0, params, 0, map);
     }
 
-    private DecodeTree /*List<Map<String, Decode>>*/ decode(ModulatedIrSequence irSequence, int position, DecoderParameters params, int level) {
+    private DecodeTree decode(ModulatedIrSequence irSequence, int position, DecoderParameters params, int level, Map<Integer, Map<String, TrunkDecodeTree>>map) {
         logger.log(Level.FINE, String.format("level = %1$d position = %2$d", level, position));
         DecodeTree list = new DecodeTree(irSequence.getLength() - position);
         if (list.length == 0)
             return list;
 
-        parsedProtocols.values().forEach((namedProtocol) -> {
+        parsedProtocols.values().parallelStream().forEach((namedProtocol) -> {
             try {
                 if (debugProtocolNamePattern != null)
                     if (debugProtocolNamePattern.matcher(namedProtocol.getName().toLowerCase(Locale.US)).matches())
                         // This is intended to put a debugger breakpoint here
                         logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
-                TrunkDecodeTree decode = tryNamedProtocol(namedProtocol, irSequence, position, params, level);
+                TrunkDecodeTree decode;
+                Map<String, TrunkDecodeTree> p = map.get(position);
+                if (p != null && p.containsKey(namedProtocol.getName())) {
+                    decode = p.get(namedProtocol.getName());
+                } else {
+                    decode = tryNamedProtocol(namedProtocol, irSequence, position, params, level, map);
+                    if (!map.containsKey(position)) {
+                        map.put(position, new ConcurrentHashMap<>(4));
+                    }
+                    map.get(position).put(namedProtocol.getName(), decode);
+                }
                 list.add(decode);
             } catch (SignalRecognitionException ex) {
                 logger.log(Level.FINER, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
@@ -161,21 +175,19 @@ public final class Decoder {
             if (list.isComplete())
                 list.removeIncompletes();
         }
-
+        list.sort();
         return list;
     }
 
-    private TrunkDecodeTree tryNamedProtocol(NamedProtocol namedProtocol, ModulatedIrSequence irSequence, int position, DecoderParameters params, int level)
+    private TrunkDecodeTree tryNamedProtocol(NamedProtocol namedProtocol, ModulatedIrSequence irSequence, int position, DecoderParameters params, int level, Map<Integer, Map<String, TrunkDecodeTree>>map)
             throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
-        Decode decode = namedProtocol.recognize(irSequence, position, params.isStrict(),
-                params.getFrequencyTolerance(), params.getAbsoluteTolerance(), params.getRelativeTolerance(),
-                params.getMinimumLeadout(), params.isOverride());
+        Decode decode = namedProtocol.recognize(irSequence, position, params);
         if (params.isRemoveDefaultedParameters())
             decode.removeDefaulteds();
         if (!params.recursive || decode.endPos == irSequence.getLength() - 1)
             return new TrunkDecodeTree(decode, irSequence.getLength());
 
-        DecodeTree rest = decode(irSequence, decode.getEndPos() + 1, params, level + 1);
+        DecodeTree rest = decode(irSequence, decode.getEndPos() + 1, params, level + 1, map);
         return new TrunkDecodeTree(decode, rest);
     }
 
@@ -203,16 +215,15 @@ public final class Decoder {
                     if (debugProtocolNamePattern.matcher(namedProtocol.getName().toLowerCase(Locale.US)).matches())
                         // This is intended to put a debugger breakpoint here
                         logger.log(Level.FINEST, "Trying protocol {0}", namedProtocol.getName());
-                Map<String, Long> params = namedProtocol.recognize(irSignal, parameters.isStrict(),
-                        parameters.getFrequencyTolerance(), parameters.getAbsoluteTolerance(), parameters.getRelativeTolerance(),
-                        parameters.getMinimumLeadout(), parameters.isOverride());
+                Map<String, Long> params = namedProtocol.recognize(irSignal, parameters);
                 if (parameters.isRemoveDefaultedParameters())
                     namedProtocol.removeDefaulteds(params);
                 Decode decode = new Decode(namedProtocol, params);
                 decodes.put(namedProtocol.getName(), decode);
-            } catch (DomainViolationException | SignalRecognitionException ex) {
+            } catch (/*DomainViolationException |*/ SignalRecognitionException ex) {
                 logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
             } catch (NamedProtocol.ProtocolNotDecodableException ex) {
+                throw new ThisCannotHappenException();
             }
         });
 
@@ -250,6 +261,7 @@ public final class Decoder {
     Collection<NamedProtocol> getParsedProtocols() {
         return parsedProtocols.values();
     }
+
     public static class DecoderParameters {
 
         private boolean strict;
@@ -282,20 +294,44 @@ public final class Decoder {
             this.allDecodes = allDecodes;
             this.removeDefaultedParameters = removeDefaultedParameters;
             this.recursive = recursive;
-            this.frequencyTolerance = frequencyTolerance;
-            this.absoluteTolerance = absoluteTolerance;
-            this.relativeTolerance = relativeTolerance;
-            this.minimumLeadout = minimumLeadout;
+            this.frequencyTolerance = IrCoreUtils.getFrequencyTolerance(frequencyTolerance);
+            this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
+            this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
+            this.minimumLeadout = IrCoreUtils.getMinimumLeadout(minimumLeadout);
             this.override = override;
         }
 
         public DecoderParameters() {
-            this(false, false, true, false, null, null, null, null, true);
+            this(false/*, false, true, false, null, null, null, null, true*/);
         }
 
         public DecoderParameters(boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive,
                 Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
-            this(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, true);
+            this(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout,
+                    frequencyTolerance != null || absoluteTolerance != null || relativeTolerance != null || minimumLeadout != null);
+        }
+
+        public DecoderParameters(boolean strict) {
+            this(strict, false, true, false, null, null, null, null, false);
+        }
+
+        public DecoderParameters(boolean strict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
+            this(strict, false, true, false, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        }
+
+        public DecoderParameters adjust(boolean newStrict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
+            DecoderParameters copy = new DecoderParameters(strict || newStrict, allDecodes, removeDefaultedParameters, recursive,
+                    pick(frequencyTolerance, this.frequencyTolerance, override),
+                    pick(absoluteTolerance, this.absoluteTolerance, override),
+                    pick(relativeTolerance, this.relativeTolerance, override),
+                    pick(minimumLeadout, this.minimumLeadout, override),
+                    override);
+
+            return copy;
+        }
+
+        private Double pick(Double standard, Double user, boolean override) {
+            return (override && user != null) ? user : standard;
         }
 
         /**
@@ -422,13 +458,14 @@ public final class Decoder {
         }
     }
 
-    public static class DecodeTree implements Iterable<TrunkDecodeTree> {
-        private ArrayList<TrunkDecodeTree> decodes;
+    // "Note: this class has a natural ordering that is inconsistent with equals."
+    public static class DecodeTree implements Iterable<TrunkDecodeTree>, Comparable<DecodeTree> {
+        private final List<TrunkDecodeTree> decodes;
         private int length;
 
         private DecodeTree(int length) {
             this.length = length;
-            decodes = new ArrayList<>(4);
+            decodes = Collections.synchronizedList(new ArrayList<>(4));
         }
 
         public String toString(int radix, String separator) {
@@ -437,9 +474,11 @@ public final class Decoder {
             StringJoiner stringJoiner = new StringJoiner(separator, "{", "}");
             if (decodes.isEmpty())
                 stringJoiner.add("UNDECODED. length=" + Integer.toString(length, 10));
+            synchronized(decodes) {
             decodes.forEach((decode) -> {
                 stringJoiner.add(decode.toString(radix, separator));
             });
+            }
 
             return stringJoiner.toString();
         }
@@ -461,7 +500,11 @@ public final class Decoder {
             return decodes.isEmpty() && length == 0;
         }
 
-        private void reduce() {
+        public synchronized void sort() {
+            Collections.sort(decodes);
+        }
+
+        private synchronized void reduce() {
             List<TrunkDecodeTree> decs = new ArrayList<>(decodes);
             decs.forEach((TrunkDecodeTree decode) -> {
                 if (decode != null) {
@@ -478,7 +521,7 @@ public final class Decoder {
             });
         }
 
-        private void removeIncompletes() {
+        private synchronized void removeIncompletes() {
             List<TrunkDecodeTree> decs = new ArrayList<>(decodes);
             decs.forEach((TrunkDecodeTree decode) -> {
                 if (decode != null && !decode.isComplete())
@@ -486,7 +529,7 @@ public final class Decoder {
             });
         }
 
-        private TrunkDecodeTree findName(String protocol) {
+        private synchronized TrunkDecodeTree findName(String protocol) {
             for (TrunkDecodeTree decode : decodes)
                 if (decode.getNamedProtocol().getName().equals(protocol))
                     return decode;
@@ -494,7 +537,7 @@ public final class Decoder {
             return null;
         }
 
-        private void remove(String protName) {
+        private synchronized void remove(String protName) {
             TrunkDecodeTree decode = findName(protName);
             if (decode != null)
                 decodes.remove(decode);
@@ -504,7 +547,7 @@ public final class Decoder {
             return decodes.size();
         }
 
-        TrunkDecodeTree getAlternative(String protocolName) {
+        synchronized TrunkDecodeTree getAlternative(String protocolName) {
             for (TrunkDecodeTree decode : decodes)
                 if (decode.trunk.getName().equals(protocolName))
                     return decode;
@@ -535,9 +578,21 @@ public final class Decoder {
 
             return decodes.stream().anyMatch((d) -> (d.isComplete()));
         }
+
+        @Override
+        public int compareTo(DecodeTree o) {
+            int min = Math.min(decodes.size(), o.decodes.size());
+            for (int i = 0; i < min; i++) {
+                int c = decodes.get(i).compareTo(o.decodes.get(i));
+                if (c != 0)
+                    return c;
+            }
+            return decodes.size() - o.decodes.size();
+        }
     }
 
-    public static class TrunkDecodeTree {
+    // "Note: this class has a natural ordering that is inconsistent with equals."
+    public static class TrunkDecodeTree implements Comparable<TrunkDecodeTree> {
         private Decode trunk;
         private DecodeTree rest;
 
@@ -586,9 +641,16 @@ public final class Decoder {
         private boolean isComplete() {
             return rest.isComplete();
         }
+
+        @Override
+        public int compareTo(TrunkDecodeTree trunkDecodeTree) {
+            int c = trunk.compareTo(trunkDecodeTree.trunk);
+            return c != 0 ? c : rest.compareTo(trunkDecodeTree.rest);
+        }
     }
 
-    public static class Decode {
+    // "Note: this class has a natural ordering that is inconsistent with equals."
+    public static class Decode implements Comparable<Decode> {
         private final NamedProtocol namedProtocol;
         //private final NameEngine nameEngine;
         private final Map<String, Long> map;
@@ -683,6 +745,11 @@ public final class Decoder {
                 stringJoiner.add(key + "=" + Long.toString(map.get(key), radix));
             });
             return stringJoiner.toString();
+        }
+
+        @Override
+        public int compareTo(Decode o) {
+            return namedProtocol.compareTo(o.namedProtocol);
         }
     }
 }

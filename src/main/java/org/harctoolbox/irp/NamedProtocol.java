@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * properties, in particular a name. It corresponds to an entry in the protocol data
  * base <code>IrpProtocols.xml</code>.
  */
-public final class NamedProtocol extends Protocol {
+public final class NamedProtocol extends Protocol implements Comparable<NamedProtocol> {
     private final static Logger logger = Logger.getLogger(NamedProtocol.class.getName());
 
     public static Document toDocument(Iterable<NamedProtocol> protocols) {
@@ -106,26 +106,26 @@ public final class NamedProtocol extends Protocol {
      * @param strict
      * @return
      * @throws SignalRecognitionException
+     * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
      */
     @Override
-    public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException {
-        return recognize(irSignal, strict, IrCoreUtils.getFrequencyTolerance(frequencyTolerance),
-                IrCoreUtils.getAbsoluteTolerance(absoluteTolerance), IrCoreUtils.getRelativeTolerance(relativeTolerance),
-                IrCoreUtils.getMinimumLeadout(minimumLeadout));
+    public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException, ProtocolNotDecodableException {
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        return recognize(irSignal, params);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean strict,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout, boolean override)
-            throws DomainViolationException, SignalRecognitionException, ProtocolNotDecodableException {
+    @Override
+    public Map<String, Long> recognize(IrSignal irSignal, Decoder.DecoderParameters params/*boolean strict,
+            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance, Double userMinimumLeadout, boolean override*/)
+            throws ProtocolNotDecodableException, SignalRecognitionException
+    {
         if (!isDecodeable())
-            //logger.log(Level.FINE, "Protocol {0} is not decodeable, skipped", getName());
             throw new ProtocolNotDecodableException(name);
         logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSignal.toString(true)});
 
-        Map<String, Long> params = super.recognize(irSignal, strict || isRejectRepeats(),
-                getFrequencyTolerance(userFrequencyTolerance, override), getAbsoluteTolerance(userAbsoluteTolerance, override),
-                getRelativeTolerance(userRelativeTolerance, override), getMinimumLeadout(userMinimumLeadout, override));
-        return params;
+        Decoder.DecoderParameters fixedParams = params.adjust(isRejectRepeats(), frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Map<String, Long> parameters = super.recognize(irSignal, fixedParams);
+        return parameters;
     }
 
     /**
@@ -133,27 +133,18 @@ public final class NamedProtocol extends Protocol {
      * The ModulatedIrSequence should contain intro or (one or many) repeat sequences, and possibly an ending sequence.
      * @param irSequence ModulatedIrSequence to be matched
      * @param beginPos Where the match is effectively started, normally 0.
-     * @param strict If true, sequences must match fully; no unmatched "junk" at the end permitted.
-     * @param userFrequencyTolerance
-     * @param userAbsoluteTolerance
-     * @param userRelativeTolerance
-     * @param userMinimumLeadout
-     * @param override If true, the parameter values in the call overwrite protocol specific values.
+     * @param params
      * @return Decoder.Decode object, containing matching data.
      * @throws SignalRecognitionException
      * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
      */
-    public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, boolean strict,
-            Double userFrequencyTolerance, Double userAbsoluteTolerance, Double userRelativeTolerance,
-            Double userMinimumLeadout, boolean override)
+    public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, Decoder.DecoderParameters params)
             throws SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             throw new ProtocolNotDecodableException(name);
 
         logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSequence.toString(true)});
-        Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), strict,
-                getFrequencyTolerance(userFrequencyTolerance, override), getAbsoluteTolerance(userAbsoluteTolerance, override),
-                getRelativeTolerance(userRelativeTolerance, override), getMinimumLeadout(userMinimumLeadout, override));
+        Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), params);
         return new Decoder.Decode(this, decode);
     }
 
@@ -332,6 +323,12 @@ public final class NamedProtocol extends Protocol {
         putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);
         map.putAll(parameters);
         return map;
+    }
+
+    @Override
+    public int compareTo(NamedProtocol namedProtocol) {
+        int c = this.name.compareTo(namedProtocol.name);
+        return c != 0 ? c : this.toIrpString().compareTo(namedProtocol.toIrpString());
     }
 
     /**

@@ -172,7 +172,7 @@ public class CommandDecode extends AbstractCommand {
             Objects.requireNonNull(irSignal, "irSignal must be non-null");
             if (repeatFinder) {
                 ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
-                RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+                RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minRepeatGap);
 
                 IrSignal fixedIrSignal = repeatFinder.toIrSignalClean(sequence);
                 if (dumpRepeatfinder) {
@@ -237,20 +237,9 @@ public class CommandDecode extends AbstractCommand {
 
             if (decodes == null || decodes.isEmpty())
                 out.println();
-            else {
-                boolean first = true;
-                for (Decoder.TrunkDecodeTree decode : decodes) {
-                    printDecodes(decode, first ? 0 : maxNameLength + 2);
-                    first = false;
-                }
-            }
-        }
-
-        private void printDecodes(Decoder.TrunkDecodeTree decode, int indent) {
-            if (commandLineArgs.tsvOptimize)
-                out.println((indent > 0 ? "\t" : "") + decode.toString(radix, "\t"));
             else
-                out.println(IrCoreUtils.spaces(indent) + decode.toString(radix, " "));
+                for (Decoder.TrunkDecodeTree decode : decodes)
+                    out.println(decode.toString(radix, commandLineArgs.tsvOptimize ? "\t" : " "));
         }
     }
 }

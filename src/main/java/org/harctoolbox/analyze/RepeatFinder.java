@@ -93,12 +93,12 @@ public final class RepeatFinder {
     private IrSequence irSequence;
     private RepeatFinderData repeatFinderData;
 
-    public RepeatFinder(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance, double minRepeatLastGap) {
+    public RepeatFinder(IrSequence irSequence, Double absoluteTolerance, Double relativeTolerance, Double minRepeatLastGap) {
         if (irSequence == null)
             throw new NullPointerException("IrSequence must be non-null.");
         this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
-        this.minRepeatLastGap = minRepeatLastGap;
+        this.minRepeatLastGap = IrCoreUtils.getMinRepeatLastGap(minRepeatLastGap);
         this.irSequence = irSequence;
         try {
             analyze();

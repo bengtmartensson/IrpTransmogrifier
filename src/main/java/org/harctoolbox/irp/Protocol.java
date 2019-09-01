@@ -534,13 +534,13 @@ public class Protocol extends IrpObject implements AggregateLister {
         return parameterSpecs.random(random);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException {
+    public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
         return recognize(irSignal, true);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException {
-        return recognize(irSignal, strict, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE,
-                IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
+    public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict);
+        return recognize(irSignal, params);
     }
 
     /**
@@ -557,35 +557,42 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @param minimumLeadout
      * @return Directory of identified parameters. Never null.
      * @throws SignalRecognitionException if the IrSignal did not match the present protocol.
+     * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
      */
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
-            throws SignalRecognitionException {
+            throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        return recognize(irSignal, params);
+    }
+
+    public Map<String, Long> recognize(IrSignal irSignal, Decoder.DecoderParameters parameters) throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
+
         //IrpUtils.entering(logger, Level.FINE, "recognize", this);
-        checkFrequency(irSignal.getFrequencyWithDefault(), frequencyTolerance);
+        checkFrequency(irSignal.getFrequencyWithDefault(), parameters);
         initializeDefinitions();
         ParameterCollector names = new ParameterCollector();
 
-        int pos = decode(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
+        int pos = decode(names, irSignal.getIntroSequence(), IrSignal.Pass.intro, parameters);
         if (pos == 0 && irSignal.getIntroLength() > 0) {
-            if (strict)
+            if (parameters.isStrict())
                 throw new SignalRecognitionException("Intro sequence was not matched");
             else {
-                pos = decode(names, irSignal.getIntroSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
+                pos = decode(names, irSignal.getIntroSequence(), IrSignal.Pass.repeat, parameters);
                 if (pos < irSignal.getIntroLength())
                     throw new SignalRecognitionException("Intre sequence was not matched, also not as repeat");
             }
         } else {
-            pos = decode(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
+            pos = decode(names, irSignal.getRepeatSequence(), IrSignal.Pass.repeat, parameters);
             if (pos < irSignal.getRepeatLength())
                 throw new SignalRecognitionException("Repeat sequence was not fully matched");
         }
         try {
-            pos = decode(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
+            pos = decode(names, irSignal.getEndingSequence(), IrSignal.Pass.ending, parameters);
             if (pos < irSignal.getEndingLength())
                 throw new SignalRecognitionException("Ending sequence was not fully matched");
         } catch (SignalRecognitionException ex) {
-            if (strict)
+            if (parameters.isStrict())
                 throw ex;
         }
 
@@ -597,40 +604,34 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public Decoder.Decode recognize(ModulatedIrSequence irSequence, boolean rejectNoRepeats, boolean strict)
             throws SignalRecognitionException {
-        return recognize(irSequence, 0, rejectNoRepeats, strict,
+        return recognize(irSequence, 0, rejectNoRepeats, new Decoder.DecoderParameters(strict)/*,
                 IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE,
-                IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
+                IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT*/);
     }
 
     /**
      * Tries to match the ModulatedIrSequence in the argument, if match, return the matching parameters. If no match, throws exception.
      * The ModulatedIrSequence should contain intro or (one or many) repeat sequences, and possibly an ending sequence.
      * @param irSequence ModulatedIrSequence to be matched
-     * @param beginPos Where the match is efectively started, normally 0.
+     * @param beginPos Where the match is supposed to start, normally 0.
      * @param rejectNoRepeats If true, at least one repeat sequence must be matched in the sequence given.
-     * @param strict If true, sequences must match fully; no unmatched "junk" at the end permitted.
-     * @param frequencyTolerance
-     * @param absoluteTolerance
-     * @param relativeTolerance
-     * @param minimumLeadout
+     * @param params
      * @return Decoder.Decode object, containing matching data.
      * @throws SignalRecognitionException
      */
-    public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, boolean rejectNoRepeats, boolean strict,
-            double frequencyTolerance, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
+    public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, boolean rejectNoRepeats, Decoder.DecoderParameters params)
             throws SignalRecognitionException {
 
-        //IrpUtils.entering(logger, Level.FINE, "recognize", this);
-        checkFrequency(irSequence.getFrequencyWithDefault(), frequencyTolerance);
+        checkFrequency(irSequence.getFrequencyWithDefault(), params);
         initializeDefinitions();
         ParameterCollector names = new ParameterCollector();
-        int pos = decode(names, irSequence, beginPos, IrSignal.Pass.intro, absoluteTolerance, relativeTolerance, minimumLeadout);
+        int pos = decode(names, irSequence, beginPos, IrSignal.Pass.intro, params);
         int noRepeatsMatched = 0;
         int oldPos;
         while (true) {
             oldPos = pos;
             try {
-                pos = decode(names, irSequence, oldPos, IrSignal.Pass.repeat, absoluteTolerance, relativeTolerance, minimumLeadout);
+                pos = decode(names, irSequence, oldPos, IrSignal.Pass.repeat, params);
                 if (pos == oldPos)
                     break;
                 noRepeatsMatched++;
@@ -646,11 +647,11 @@ public class Protocol extends IrpObject implements AggregateLister {
             throw new SignalRecognitionException("Neither intro- nor repeat sequence was matched");
 
         try {
-            pos = decode(names, irSequence, pos, IrSignal.Pass.ending, absoluteTolerance, relativeTolerance, minimumLeadout);
-            if (strict && pos < irSequence.getLength() - 1)
+            pos = decode(names, irSequence, pos, IrSignal.Pass.ending, params);
+            if (params.isStrict() && pos < irSequence.getLength() - 1)
                 throw new SignalRecognitionException("Sequence was not fully matched");
         } catch (SignalRecognitionException ex) {
-            if (strict)
+            if (params.isStrict())
                 throw ex;
             logger.log(Level.WARNING, "Ending sequence not matched.");
         }
@@ -660,24 +661,23 @@ public class Protocol extends IrpObject implements AggregateLister {
         return new Decoder.Decode(null, parameters, beginPos, pos - 1, noRepeatsMatched);
     }
 
-    private void checkFrequency(Double frequency, double frequencyTolerance) throws SignalRecognitionException {
-        logger.log(Level.FINER, "Expected frequency {0}, actual {1}, tolerance {2}", new Object[]{ (int) getFrequencyWithDefault(), frequency.intValue(), (int) frequencyTolerance});
-        boolean success = frequencyTolerance < 0
-                || IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, frequencyTolerance, 0.0);
+    private void checkFrequency(Double frequency, Decoder.DecoderParameters params) throws SignalRecognitionException {
+        logger.log(Level.FINER, "Expected frequency {0}, actual {1}, tolerance {2}", new Object[]{(int) getFrequencyWithDefault(), frequency.intValue(), params.getFrequencyTolerance().intValue()});
+        boolean success = params.getFrequencyTolerance() < 0
+                || IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, params.getFrequencyTolerance(), 0.0);
         logger.log(Level.FINER, "Frequency was checked, {0}OK.", success ? "" : "NOT ");
         if (!success)
             throw new SignalRecognitionException("Frequency does not match");
     }
 
-    private int decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
+    private int decode(ParameterCollector names, IrSequence irSequence, IrSignal.Pass pass, Decoder.DecoderParameters params)
             throws SignalRecognitionException {
-        return decode(names, irSequence, 0, pass, absoluteTolerance, relativeTolerance, minimumLeadout);
+        return decode(names, irSequence, 0, pass, params);
     }
 
-    private int decode(ParameterCollector names, IrSequence irSequence, int beginPos, IrSignal.Pass pass, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
+    private int decode(ParameterCollector names, IrSequence irSequence, int beginPos, IrSignal.Pass pass, Decoder.DecoderParameters params)
             throws SignalRecognitionException {
-        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, beginPos, interleavingOk(), names,
-                absoluteTolerance, relativeTolerance, minimumLeadout, pass);
+        RecognizeData recognizeData = new RecognizeData(generalSpec, definitions, irSequence, beginPos, interleavingOk(), names, params, pass);
         Protocol reducedProtocol = normalForm(pass);
         //traverse(recognizeData, pass);
         reducedProtocol.decode(recognizeData);

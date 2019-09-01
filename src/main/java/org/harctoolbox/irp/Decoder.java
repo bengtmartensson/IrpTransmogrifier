@@ -305,18 +305,12 @@ public final class Decoder {
             this(false/*, false, true, false, null, null, null, null, true*/);
         }
 
-        public DecoderParameters(boolean strict, boolean allDecodes, boolean removeDefaultedParameters, boolean recursive,
-                Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
-            this(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout,
-                    frequencyTolerance != null || absoluteTolerance != null || relativeTolerance != null || minimumLeadout != null);
-        }
-
         public DecoderParameters(boolean strict) {
             this(strict, false, true, false, null, null, null, null, false);
         }
 
         public DecoderParameters(boolean strict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
-            this(strict, false, true, false, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+            this(strict, false, true, false, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false);
         }
 
         public DecoderParameters adjust(boolean newStrict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {

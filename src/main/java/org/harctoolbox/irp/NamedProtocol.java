@@ -193,6 +193,14 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
                 && auxParameters.equals(other.auxParameters);
     }
 
+    public IrSignal render(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException, ProtocolNotRenderableException {
+        List<String> list = auxParameters.get("decode-only");
+        if (list != null)
+            if (Boolean.parseBoolean(list.get(0)))
+                throw new ProtocolNotRenderableException(name);
+        return super.toIrSignal(nameEngine);
+    }
+
     @Override
     public String toString() {
         return name + ": " + super.toString();
@@ -337,7 +345,17 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
     public static class ProtocolNotDecodableException extends IrpException {
 
         ProtocolNotDecodableException(String name) {
-            super("Protocol " + name + " not decodable");
+            super("Protocol " + name + " not decodable.");
+        }
+    }
+
+    /**
+     * This exception is thrown when trying to render with a NamedProtocol having the {@code decode-only} property {@code true}.
+     */
+    public static class ProtocolNotRenderableException extends IrpException {
+
+        ProtocolNotRenderableException(String protocolName) {
+            super("Protocol " + protocolName + " not renderable.");
         }
     }
 }

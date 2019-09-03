@@ -95,7 +95,7 @@ public class CommandRender extends AbstractCommand {
                 + "it may need to be enclosed within single or double quotes.";
     }
 
-    public void render(PrintStream printStream, IrpDatabase irpDatabase, CommandCommonOptions commonOptions) throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
+    public void render(PrintStream printStream, IrpDatabase irpDatabase, CommandCommonOptions commonOptions) throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, NamedProtocol.ProtocolNotRenderableException {
         Renderer renderer = new Renderer(printStream, irpDatabase, commonOptions);
         renderer.render();
     }
@@ -112,7 +112,7 @@ public class CommandRender extends AbstractCommand {
             this.out = printStream;
         }
 
-        private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
+        private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, NamedProtocol.ProtocolNotRenderableException {
             if (commandLineArgs.irp == null && (random != nameEngine.isEmpty()))
                 throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
@@ -132,7 +132,7 @@ public class CommandRender extends AbstractCommand {
             }
         }
 
-        private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException {
+        private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException, NamedProtocol.ProtocolNotRenderableException {
 //            NameEngine nameEngine = !nameEngine.isEmpty() ? nameEngine
 //                    : random ? new NameEngine(protocol.randomParameters())
 //                            : new NameEngine();
@@ -147,7 +147,7 @@ public class CommandRender extends AbstractCommand {
 
             if (!pronto && !raw && !rawWithoutSigns && !modulate && !printParameters)
                 logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, --modulate, or --printparameters to get output.");
-            IrSignal irSignal = protocol.toIrSignal(nameEngine);
+            IrSignal irSignal = protocol.render(nameEngine);
 
             if (count != null) {
                 if (numberRepeats != null)

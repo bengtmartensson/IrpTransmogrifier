@@ -9,6 +9,7 @@ import org.harctoolbox.cmdline.FrequencyParser;
 import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.ircore.IrCoreUtils;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -512,6 +513,13 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testNoCommand");
         String result = IrpTransmogrifier.execute("");
         assertTrue(result == null);
+    }
+
+    @Test
+    public void testDecodeOnly() {
+        System.out.println("testDecodeOnly");
+        String result = IrpTransmogrifier.execute("render --random nec -p");
+        assertNull(result);
     }
 
     @Test(enabled = true)

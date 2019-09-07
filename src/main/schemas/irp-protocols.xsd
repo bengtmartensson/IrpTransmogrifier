@@ -87,13 +87,23 @@
 
     <xs:element name="parameter">
         <xs:annotation>
-            <xs:documentation>A parameter has a name, given as attribute, and a value, CDATA content of the element.
-The semantic interpretation is determined by the reading program.</xs:documentation>
+            <xs:documentation>A parameter has a name, given as attribute, and a type, which is either xml or text (default). If xml, arbitrary well-formed XML content can be contained. If text, the value is the CDATA content of the element. The semantic interpretation is determined by the reading program.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+            </xs:sequence>
             <xs:attribute name="name" type="xs:string"/>
+            <xs:attribute name="type" type="parameterType" default="text"/>
         </xs:complexType>
     </xs:element>
+
+    <xs:simpleType name="parameterType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="text"/>
+            <xs:enumeration value="xml"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:attributeGroup name="version">
         <xs:annotation>

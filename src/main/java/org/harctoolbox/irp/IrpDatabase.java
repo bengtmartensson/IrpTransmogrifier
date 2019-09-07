@@ -43,6 +43,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -431,6 +432,11 @@ public final class IrpDatabase {
         return prot == null ? null : prot.getProperties(key);
     }
 
+    public List<DocumentFragment> getXmlProperties(String name, String key) {
+        UnparsedProtocol prot = getUnparsedProtocol(name);
+        return prot == null ? null : prot.getXmlProperties(key);
+    }
+
     public NamedProtocol getNamedProtocol(String name) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         if (prot == null)
@@ -544,10 +550,22 @@ public final class IrpDatabase {
     private static class UnparsedProtocol {
         public static final int APRIORI_SIZE = 4;
 
+        private static DocumentFragment nodeListToDocumentFragment(NodeList childNodes) {
+            Document doc = XmlUtils.newDocument();
+            DocumentFragment fragment = doc.createDocumentFragment();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node node = childNodes.item(i);
+                fragment.appendChild(doc.importNode(node, true));
+            }
+            return fragment;
+        }
+
         private Map<String, List<String>> map;
+        private Map<String, List<DocumentFragment>> xmlMap;
 
         UnparsedProtocol() {
             map = new LinkedHashMap<>(APRIORI_SIZE); // want to preserve order
+            xmlMap = new HashMap<>(APRIORI_SIZE);
         }
 
         UnparsedProtocol(String irp) {
@@ -571,6 +589,13 @@ public final class IrpDatabase {
         UnparsedProtocol(Element element) {
             this();
             parseElement(element);
+        }
+
+        private void addXmlProperty(String key, DocumentFragment fragment) {
+            if (!xmlMap.containsKey(key))
+                xmlMap.put(key, new ArrayList<>(1));
+            List<DocumentFragment> list = xmlMap.get(key);
+            list.add(fragment);
         }
 
         private void addProperty(String key, String value) {
@@ -613,12 +638,20 @@ public final class IrpDatabase {
                         addProperty(DOCUMENTATION_NAME, e.getTextContent().trim().replaceAll("\\s+", " "));
                         break;
                     case PARAMETER_NAME:
-                        addProperty(e.getAttribute("name"), e.getTextContent());
+                        boolean isXml = e.getAttribute("type").equals("xml");
+                        if (isXml)
+                            addXmlProperty(e.getAttribute("name"), nodeListToDocumentFragment(e.getChildNodes()));
+                        else
+                            addProperty(e.getAttribute("name"), e.getTextContent());
                         break;
                     default:
                         throw new ThisCannotHappenException("unknown tag: " + e.getTagName());
                 }
             }
+        }
+
+        List<DocumentFragment> getXmlProperties(String key) {
+            return xmlMap != null ? xmlMap.get(key) : null;
         }
 
         List<String> getProperties(String key) {
@@ -698,5 +731,6 @@ public final class IrpDatabase {
             }
             return element;
         }
+
     }
 }

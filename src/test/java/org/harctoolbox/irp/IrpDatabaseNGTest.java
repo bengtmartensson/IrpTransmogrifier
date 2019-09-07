@@ -179,6 +179,7 @@ public class IrpDatabaseNGTest {
         assertEquals(result, expResult);
         assertEquals(instance.getDocumentation("GI Cable"), null);
         assertEquals(instance.getDocumentationExpandAlias("GI Cable"), "This protocol signals repeats by the use of dittos.");
+        assertEquals(instance.getDocumentation("adnotam"), "Very similar to RC5, except AdNotam uses two start bits, and no toggle bit.");
     }
 
     /**

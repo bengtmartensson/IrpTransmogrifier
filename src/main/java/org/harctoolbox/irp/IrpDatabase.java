@@ -414,8 +414,13 @@ public final class IrpDatabase {
     }
 
     public String getDocumentation(String name) {
+        DocumentFragment fragment = getHtmlDocumentation(name);
+        return fragment == null ? null : XmlUtils.dumbHtmlRender(fragment);
+    }
+
+    public DocumentFragment getHtmlDocumentation(String name) {
         UnparsedProtocol prot = getUnparsedProtocol(name);
-        return prot == null ? null : prot.getDocumentation();
+        return prot == null ? null : prot.getHtmlDocumentation();
     }
 
     public String getDocumentationExpandAlias(String name) {
@@ -635,7 +640,7 @@ public final class IrpDatabase {
                         addProperty(IRP_NAME, e.getTextContent().replaceAll("\\s+", ""));
                         break;
                     case DOCUMENTATION_NAME:
-                        addProperty(DOCUMENTATION_NAME, e.getTextContent().trim().replaceAll("\\s+", " "));
+                        addXmlProperty(DOCUMENTATION_NAME, nodeListToDocumentFragment(e.getChildNodes()));
                         break;
                     case PARAMETER_NAME:
                         boolean isXml = e.getAttribute("type").equals("xml");
@@ -670,8 +675,9 @@ public final class IrpDatabase {
             return getFirstProperty(IRP_NAME);
         }
 
-        String getDocumentation() {
-            return getFirstProperty(DOCUMENTATION_NAME);
+        DocumentFragment getHtmlDocumentation() {
+            List<DocumentFragment> list = getXmlProperties(DOCUMENTATION_NAME);
+            return list != null ? list.get(0) : null;
         }
 
         boolean isUsable() {
@@ -680,7 +686,7 @@ public final class IrpDatabase {
         }
 
         NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
-            return new NamedProtocol(getName(), getCName(), getIrp(), getDocumentation(),
+            return new NamedProtocol(getName(), getCName(), getIrp(), getHtmlDocumentation(),
                     getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
                     getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getFirstProperty(REJECT_REPEATLESS_NAME), getProperties(PREFER_OVER_NAME), map);
         }

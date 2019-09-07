@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
@@ -33,6 +34,8 @@ import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.NamedProtocol;
 import org.harctoolbox.irp.UnknownProtocolException;
 import org.harctoolbox.irp.UnsupportedRepeatException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 
 @SuppressWarnings("FieldMayBeFinal")
 
@@ -53,11 +56,14 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"--cname"}, description = "List C name of the protocol(s).")
     private boolean cName = false;
 
-    @Parameter(names = {"--documentation"}, description = "Print (possible longer) documentation.")
+    @Parameter(names = {"--documentation"}, description = "Print (possible longer) documentation, as a dumb rendering of the HTML documenation.")
     private boolean documentation = false;
 
     @Parameter(names = {"--gui", "--display"}, description = "Display parse diagram.")
     private boolean gui = false;
+
+    @Parameter(names = {"--html"}, description = "Print (possible longer) documentation as HTML.")
+    private boolean html = false;
 
     @Parameter(names = {"-i", "--irp"}, description = "List IRP form.")
     private boolean irp = false;
@@ -148,6 +154,9 @@ public class CommandList extends AbstractCommand {
             if (documentation)
                 listProperty(out, "documentation", irpDatabase.getDocumentation(protocolName), commandLineArgs.quiet);
 
+            if (html)
+                listDocumentFragment(out, protocol.getHtmlDocumentation(), commandLineArgs.quiet, commandLineArgs.encoding);
+
             if (stringTree)
                 listProperty(out, "stringTree", protocol.toStringTree(), commandLineArgs.quiet);
 
@@ -187,5 +196,13 @@ public class CommandList extends AbstractCommand {
 
     private void listProperty(PrintStream out, String propertyName, long value, boolean quiet) {
         listProperty(out, propertyName, Long.toString(value), quiet);
+    }
+
+    private void listDocumentFragment(PrintStream out, DocumentFragment fragment, boolean quiet, String encoding) {
+        Document document = XmlUtils.wrapDocumentFragment(fragment, "http://www.w3.org/1999/xhtml", "div", "class", "protocol-decumentation");
+        if (!/*commandLineArgs.*/quiet && fragment != null)
+            out.print("html=");
+        XmlUtils.printHtmlDOM(out, document, encoding);
+        out.println();
     }
 }

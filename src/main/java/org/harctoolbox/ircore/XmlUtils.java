@@ -43,6 +43,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -185,6 +186,20 @@ public final class XmlUtils {
                 index.put(key, el);
         }
         return index;
+    }
+
+    public static void printHtmlDOM(OutputStream ostr, Document doc, String encoding) {
+        try {
+            Transformer tr = TransformerFactory.newInstance().newTransformer();
+            if (encoding != null)
+                tr.setOutputProperty(OutputKeys.ENCODING, encoding);
+            tr.setOutputProperty(OutputKeys.INDENT, "no");
+            tr.setOutputProperty(OutputKeys.METHOD, "html");
+            tr.transform(new DOMSource(doc), new StreamResult(ostr));
+        } catch (TransformerException ex) {
+            logger.log(Level.SEVERE, "{0}", ex.getMessage());
+            throw new ThisCannotHappenException(ex);
+        }
     }
 
     public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements, String doctypeSystemid) {
@@ -338,6 +353,26 @@ public final class XmlUtils {
 
     public static void addDoubleAttributeAsInteger(Element element, String attName, double value) {
         element.setAttribute(attName, Long.toString(Math.round(value)));
+    }
+
+    public static String dumbHtmlRender(DocumentFragment fragment) {
+        if (fragment == null)
+            return null;
+
+        NodeList nodeList = fragment.getChildNodes();
+        StringBuilder sb = new StringBuilder(1024);
+        for (int i = 0; i < nodeList.getLength(); i++)
+            sb.append(nodeList.item(i).getTextContent());
+        return sb.toString().trim();
+    }
+
+    public static Document wrapDocumentFragment(DocumentFragment fragment, String namespaceURI, String tagName, String attName, String attValue) {
+        Document doc = XmlUtils.newDocument(true);
+        Element root = doc.createElementNS(namespaceURI, tagName);
+        root.setAttribute(attName, attValue);
+        doc.appendChild(root);
+        root.appendChild(doc.importNode(fragment, true));
+        return doc;
     }
 
     public static void main(String[] args) {

@@ -29,6 +29,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 /**
@@ -62,7 +63,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
     private final String irp; // original one on input, not canonicalized
     private final String name;
     private final String cName;
-    private final String documentation;
+    private final DocumentFragment htmlDocumentation;
     private final Double absoluteTolerance;
     private final Double relativeTolerance;
     private final Double frequencyTolerance;
@@ -72,7 +73,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
     private final Map<String, List<String>> auxParameters;
     private final boolean rejectRepeatless;
 
-    public NamedProtocol(String name, String cName, String irp, String documentation, String frequencyTolerance,
+    public NamedProtocol(String name, String cName, String irp, DocumentFragment htmlDocumentation, String frequencyTolerance,
             String absoluteTolerance, String relativeTolerance, String minimumLeadout, String decodable, String rejectRepeatless,
             List<String> preferOver, Map<String, List<String>> map)
             throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
@@ -80,7 +81,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
         this.irp = irp;
         this.name = name;
         this.cName = cName;
-        this.documentation = documentation;
+        this.htmlDocumentation = htmlDocumentation;
         this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : null;
         this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : null;
         this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : null;
@@ -94,7 +95,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
         });
     }
 
-    public NamedProtocol(String name, String irp, String documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
+    public NamedProtocol(String name, String irp, DocumentFragment documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, null, new HashMap<>(0));
     }
 
@@ -162,7 +163,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
         hash = 41 * hash + Objects.hashCode(this.irp);
         hash = 41 * hash + Objects.hashCode(this.name);
         hash = 41 * hash + Objects.hashCode(this.cName);
-        hash = 41 * hash + Objects.hashCode(this.documentation);
+        hash = 41 * hash + Objects.hashCode(this.htmlDocumentation);
         hash = 41 * hash + Objects.hashCode(this.absoluteTolerance);
         hash = 41 * hash + Objects.hashCode(this.relativeTolerance);
         hash = 41 * hash + Objects.hashCode(this.frequencyTolerance);
@@ -183,7 +184,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
                 && irp.equals(other.irp)
                 && name.equals(other.name)
                 && cName.equals(other.cName)
-                && documentation.equals(other.documentation)
+                && htmlDocumentation.equals(other.htmlDocumentation)
                 && Double.compare(absoluteTolerance, other.absoluteTolerance) == 0
                 && Double.compare(relativeTolerance, other.relativeTolerance) == 0
                 && Double.compare(frequencyTolerance, other.frequencyTolerance) == 0
@@ -220,8 +221,12 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
     /**
      * @return the documentation
      */
+    public DocumentFragment getHtmlDocumentation() {
+        return htmlDocumentation;
+    }
+
     public String getDocumentation() {
-        return documentation != null ? documentation : "";
+        return XmlUtils.dumbHtmlRender(getHtmlDocumentation());
     }
 
     public String getIrp() {

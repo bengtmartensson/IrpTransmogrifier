@@ -22,12 +22,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
+import org.harctoolbox.irp.Decoder;
 import org.harctoolbox.irp.DomainViolationException;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpDatabase;
@@ -49,8 +51,9 @@ public class CommandRender extends AbstractCommand {
     @Parameter(names = {"-#", "--count"}, description = "Generate am IR sequence with count number of transmissions")
     private Integer count = null;
 
-    //@Parameter(names = { "-i", "--irp" }, description = "Explicit IRP string to use as protocol definition.")
-    //private String irp = null;
+    @Parameter(names = {"-d", "--decode"}, description = "Send the rendered signal to the decoder (for debugging/development).")
+    private boolean decode = false;
+
     @Parameter(names = {"-m", "--modulate"}, description = "Generate modulated form (EXPERIMENTAL)")
     private boolean modulate = false;
 
@@ -120,8 +123,6 @@ public class CommandRender extends AbstractCommand {
                 if (!protocols.isEmpty())
                     throw new UsageException("Cannot not use --irp together with named protocols");
             }
-//        setupDatabase();
-//        irpDatabase.expand();
             List<String> list = irpDatabase.evaluateProtocols(protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
             if (list.isEmpty())
                 throw new UsageException("No protocol matched.");
@@ -132,11 +133,7 @@ public class CommandRender extends AbstractCommand {
             }
         }
 
-        private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException, NamedProtocol.ProtocolNotRenderableException {
-//            NameEngine nameEngine = !nameEngine.isEmpty() ? nameEngine
-//                    : random ? new NameEngine(protocol.randomParameters())
-//                            : new NameEngine();
-
+        private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException, NamedProtocol.ProtocolNotRenderableException, IrpParseException {
             if (nameEngine.isEmpty() && random) {
                 nameEngine = new NameEngine(protocol.randomParameters());
                 logger.log(Level.INFO, nameEngine.toString());
@@ -160,6 +157,8 @@ public class CommandRender extends AbstractCommand {
                     throw new UsageException("--modulate is only supported together with --number-repeats or --count.");
                 renderPrint(irSignal);
             }
+            if (decode)
+                decode(irSignal, protocol.getName());
         }
 
         private void renderPrint(IrSignal irSignal) {
@@ -180,6 +179,23 @@ public class CommandRender extends AbstractCommand {
                 out.println(Pronto.toString(new IrSignal(irSequence)));
             if (modulate)
                 out.println(irSequence.modulate().toString(true));
+        }
+
+        private void decode(IrSignal irSignal, String name) throws IrpParseException {
+            Decoder decoder = new Decoder(irpDatabase);
+            Decoder.DecoderParameters decoderParams = new Decoder.DecoderParameters();
+            decoderParams.setAllDecodes(true);
+            decoderParams.setRemoveDefaultedParameters(false);
+            Map<String, Decoder.Decode> decodes = decoder.decodeIrSignal(irSignal, decoderParams);
+            Decoder.Decode dec = decodes.get(name);
+            if (dec != null && nameEngine.numericallyEquals(dec.getMap()))
+                System.err.println("Decode succeeded!");
+            else {
+                System.err.println("Decode failed. Actual decodes:");
+                decodes.values().forEach((decode) -> {
+                    out.println(decode);
+                });
+            }
         }
     }
 }

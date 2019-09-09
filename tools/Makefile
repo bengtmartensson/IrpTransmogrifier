@@ -23,7 +23,6 @@ GH_PAGES := $(TOP)/gh-pages
 ORIGINURL := $(shell git remote get-url origin)
 
 default: $(IRP_TRANSMOGRIFIER_JAR)
-	$(IRPTRANSMOGRIFIER) --help
 
 $(IRP_TRANSMOGRIFIER_JAR) $(IRP_TRANSMOGRIFIER_BIN):
 	mvn install -Dmaven.test.skip=true

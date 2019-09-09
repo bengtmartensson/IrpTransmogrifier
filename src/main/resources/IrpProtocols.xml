@@ -5,6 +5,81 @@
      notice and this notice are preserved.  This file is offered as-is,
      without any warranty.
 -->
+
+<!--
+Notes for those modifying this file:
+
+Syntax of the XML file is defined in the W3C Schema http://www.harctoolbox.org/schemas/irp-protocols.xsd
+(although possibly easier to digest for machines than for humans).
+This defines the XML name space irp=http://www.harctoolbox.org/irp-protocols,
+using the prefix irp.
+
+Semantics is/should be documented in the main IrpTransmogrifier documentation.
+
+These notes are therefore to be seen as informal help to people modifying, not
+as a defining document.
+
+
+This document is read by IrpTransmogrifier with XInclude processing enabled, so
+it is possible to use include documents according to the XInclude standard.
+
+Semantics of some of the elements:
+
+irp:parameter: The irp:parameter can be used to define all sort of information associated with
+a particular protocol. IrpTransmogrifier ignores the ones with names it does not
+use, except that it can be inquired about the values from the API. Of course, using
+another program to read the file and extract the value as an XPath expression is also possible.
+(For example: /irp:protocols/irp:protocol[@name="Denon"]/irp:parameter[@name="uei-executor"]/text()
+extracts the text of the uei-executor for the Denon protocol).
+Such a parameter contains of an arbitrary string content, or, by setting the attribute type to "xml",
+an arbitrary well-formed XML fragment. For a certain name (value of the name attribute), the
+element can occur multiple times.  It will be available to a reading program as a List
+in Java, one list element per occurrence on the parameter with the particular name.
+
+irp:documentation: Arbitrary documentation of the present protocol. Can contain (X)HTML markup.
+More formally: it is considered as an XML document fragment. A reading user or program
+can request it either as XHTML (an XML document fragment), or as text (which is
+nothing but a dumb rendering of the HTML content).
+
+irp:irp: A text string, possibly spanning several lines, containing the IRP representation
+of the present protocol. Use of CDATA sections is recommended, however not required.
+
+List of parameters recognized by IrpTransmogrifier:
+
+prefer-over
+    If a signal has multiple decodes, the present protocol is preferred over the one mentioned as prefer-over.
+May be given several times. (Normally, a specialized protocol should be preferred over a more general one.)
+
+alt_name
+    Alternative name, ("alias", "synonym") for the present protocol.
+
+reject-repeatless
+    When decoding, normally the repeat sequence may match 0 times, i.e. not at all.
+If this parameter is true at least one repeat must be present for a match to be recognized.
+(Strictly speaking, this would have been possible to achieve by using "+" instead of "*"
+for the repeat indicator, but this would have other disadvantages.)
+
+decodable
+    Setting this to false prohibits the program from trying to use this protocol for decoding.
+Normally, this is only used when the IRP form makes protocol decoding impossible or not feasible.
+
+decode-only
+    Setting this to true makes the program refuse to render the protocol.
+Should be used only for "protocols" that denote incomplete or otherwise flawed decodes,
+for example with missing parts or non-matching checksums.
+
+The following define protocol-private values of otherwise global parameters:
+
+absolutetolerance
+    See Numerical equality between durations. Current default: 100.0.
+relativetolerance
+    See Numerical equality between durations. Current default: 0.3.
+frequency-tolerance
+    Tolerance in Hz for frequency comparisons. Set to -1 to disable frequency check. Current default: 2000.0.
+minimum-leadout
+    Minimal duration in micro seconds that is accepted as final duration. Current default: 20000.0.
+
+-->
 <irp:protocols xmlns="http://www.w3.org/1999/xhtml"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -362,14 +437,60 @@ This version is a re-parametrization of 3FG&apos;s version, allowing for decodin
         <irp:documentation>Protocol for Fujitsu inverter air conditioning. <a href="http://www.remotecentral.com/cgi-bin/mboard/rc-discrete/thread.cgi?4894">Reference</a>.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="GI4DTV" name="G.I.4DTV">
-        <irp:parameter name="uei-executor">00A4</irp:parameter>
-        <irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*{C= ((#(F&25) + #(D&5))&1) + 2*((#(F&43) + #(D&7))&1) + 4*((#(F&22) + #(D&7))&1) + 8*((#(F&44) + #(D&6))&1)}[D:0..3, F:0..63]]]></irp:irp>
-        <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible. Unit (device) numbers from 0 to 7 are supported.  The check sum C is a Hamming Code, which can correct single bit errors. D:1:2 is encoded in the check sum. See <a href="http://www.hifi-remote.com/forums/viewtopic.php?p=103934#103934">forum thread</a>.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTV</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTVnoCheck</irp:parameter>
+        <!--irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*{C= ((#(F&25) + #(D&5))&1) + 2*((#(F&43) + #(D&7))&1) + 4*((#(F&22) + #(D&7))&1) + 8*((#(F&44) + #(D&6))&1)}[D:0..3, F:0..63]]]></irp:irp-->
+        <irp:irp><![CDATA[
+{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C0:1,C1:1,C2:1,C3:1,1,-60)*
+{
+C0=D:1:2 + #(F&25) + #(D&1),
+C1=D:1:2 + #(F&43) + #(D&3),
+C2=D:1:2 + #(F&22) + #(D&3),
+C3=D:1:2 + #(F&44) + #(D&2)
+}[D:0..7, F:0..63]
+       ]]></irp:irp>
+    </irp:protocol>
+    <irp:protocol c-name="GI4DTV0123" name="G.I.4DTV0123">
+        <irp:parameter name="decodable">true</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTVold</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTVnoCheck</irp:parameter>
+        <!--irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*{C= ((#(F&25) + #(D&5))&1) + 2*((#(F&43) + #(D&7))&1) + 4*((#(F&22) + #(D&7))&1) + 8*((#(F&44) + #(D&6))&1)}[D:0..3, F:0..63]]]></irp:irp-->
+        <irp:irp><![CDATA[
+{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C0:1,C1:1,C2:1,C3:1,1,-60)*
+{
+C0=D:1:2 + #(F&25) + #(D&1),
+C1=D:1:2 + #(F&43) + #(D&3),
+C2=D:1:2 + #(F&22) + #(D&3),
+C3=D:1:2 + #(F&44) + #(D&2)
+}[D:0..3, F:0..63]
+       ]]></irp:irp>
+    </irp:protocol>
+    <irp:protocol c-name="GI4DTV4567" name="G.I.4DTV4567">
+        <irp:parameter name="decodable">true</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTVold</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTVnoCheck</irp:parameter>
+        <!--irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*{C= ((#(F&25) + #(D&5))&1) + 2*((#(F&43) + #(D&7))&1) + 4*((#(F&22) + #(D&7))&1) + 8*((#(F&44) + #(D&6))&1)}[D:0..3, F:0..63]]]></irp:irp-->
+        <irp:irp><![CDATA[
+{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C0:1,C1:1,C2:1,C3:1,1,-60)*
+{
+C0=1 + #(F&25) + #(D&1),
+C1=1 + #(F&43) + #(D&3),
+C2=1 + #(F&22) + #(D&3),
+C3=1 + #(F&44) + #(D&2)
+}[D:0..3, F:0..63]
+       ]]></irp:irp>
     </irp:protocol>
     <irp:protocol c-name="GI4DTVnoCheck" name="G.I.4DTVnoCheck">
         <irp:parameter name="uei-executor">00A4</irp:parameter>
         <irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*[D:0..3, F:0..63, C:0..15]]]></irp:irp>
         <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible. Unit (device) numbers from 0 to 7 are supported. See <a href="http://www.hifi-remote.com/forums/viewtopic.php?p=103934#103934">forum thread</a>.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="GI4DTVold" name="G.I.4DTVold">
+        <irp:parameter name="uei-executor">00A4</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTVnoCheck</irp:parameter>
+        <irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*{C= ((#(F&25) + #(D&5))&1) + 2*((#(F&43) + #(D&7))&1) + 4*((#(F&22) + #(D&7))&1) + 8*((#(F&44) + #(D&6))&1)}[D:0..3, F:0..63]]]></irp:irp>
+        <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible. Unit (device) numbers from 0 to 7 are supported.  The check sum C is a Hamming Code, which can correct single bit errors. D:1:2 is encoded in the check sum. See <a href="http://www.hifi-remote.com/forums/viewtopic.php?p=103934#103934">forum thread</a>.</irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="GICable" name="G.I.Cable">
         <irp:parameter name="alt_name">GI Cable</irp:parameter>

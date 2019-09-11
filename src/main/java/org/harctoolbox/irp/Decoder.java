@@ -53,6 +53,7 @@ public final class Decoder {
     private static final Logger logger = Logger.getLogger(Decoder.class.getName());
 
     private static Pattern debugProtocolNamePattern= null;
+    private final static int MAX_PREFER_OVER_NESTING = 10;
 
     /**
      * For debugging only.
@@ -247,15 +248,26 @@ public final class Decoder {
         decs.forEach((Decode decode) -> {
             if (decode != null) {
                 NamedProtocol prot = decode.getNamedProtocol();
-                if (prot != null) {
-                    List<String> preferOvers = prot.getPreferOver();
-                    if (preferOvers != null) {
-                        preferOvers.forEach((protName) -> {
-                            decodes.remove(protName);
-                        });
-                    }
-                }
+                if (prot != null) // can it happen that prot == null?
+                    reduce(decodes, prot.getPreferOver(), 0);
             }
+        });
+    }
+
+    private void reduce(Map<String, Decode> decodes, List<String> toBeRemoved, int level) {
+        if (level > MAX_PREFER_OVER_NESTING) {
+            logger.severe("Max prefer-over depth reached, cycle likely. Please report.");
+            return;
+        }
+        if (toBeRemoved == null)
+            return;
+
+        toBeRemoved.forEach((protName) -> {
+            NamedProtocol p = parsedProtocols.get(protName.toLowerCase(Locale.US));
+            if (p != null)
+                reduce(decodes, p.getPreferOver(), level+1);
+
+            decodes.remove(protName);
         });
     }
 
@@ -460,7 +472,7 @@ public final class Decoder {
             this.override = override;
         }
 
-        private void setIgnoreLeadingGarbage(boolean ignoreLeadingGarbage) {
+        public void setIgnoreLeadingGarbage(boolean ignoreLeadingGarbage) {
             this.ignoreLeadingGarbage = ignoreLeadingGarbage;
         }
 
@@ -515,6 +527,8 @@ public final class Decoder {
             Collections.sort(decodes);
         }
 
+        // Presently, this does not remove protocols transitively,
+        // like in the IrRemote case
         private synchronized void reduce() {
             List<TrunkDecodeTree> decs = new ArrayList<>(decodes);
             decs.forEach((TrunkDecodeTree decode) -> {
@@ -675,7 +689,7 @@ public final class Decoder {
             this.begPos = begPos;
             this.endPos = endPos;
             this.numberOfRepetitions = numberOfRepetitions;
-        }
+}
 
         Decode(NamedProtocol namedProtocol, Map<String, Long> params) {
             this(namedProtocol, params, -1, -1, 0);

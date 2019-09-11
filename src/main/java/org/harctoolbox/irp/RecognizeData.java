@@ -178,8 +178,8 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.hasConsumed = hasConsumed;
     }
 
-    public boolean leadoutOk(boolean isLast) throws SignalRecognitionException {
-        return isLast && (get() >= minimumLeadout);
+    public boolean leadoutOk() throws SignalRecognitionException {
+        return get() >= minimumLeadout;
     }
 
     public boolean check(boolean on) {

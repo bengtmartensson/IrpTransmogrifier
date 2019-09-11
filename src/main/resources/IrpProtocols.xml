@@ -767,7 +767,6 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <!--irp:parameter name="prefer-over">NEC1</irp:parameter-->
         <irp:parameter name="prefer-over">NEC-f16</irp:parameter>
-        <irp:parameter name="prefer-over">NEC2</irp:parameter>
         <irp:parameter name="prefer-over">NEC1-f16</irp:parameter>
         <irp:parameter name="prefer-over">NEC2-f16</irp:parameter>
         <irp:parameter name="prefer-over">NEC1-rnc</irp:parameter>
@@ -808,6 +807,7 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:documentation/>
     </irp:protocol>
     <irp:protocol c-name="NEC2" name="NEC2">
+        <irp:parameter name="prefer-over">NEC</irp:parameter>
         <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <irp:parameter name="prefer-over">NEC2-f16</irp:parameter>
         <irp:parameter name="prefer-over">Pioneer</irp:parameter>

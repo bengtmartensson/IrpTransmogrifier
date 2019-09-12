@@ -249,25 +249,29 @@ public final class Decoder {
             if (decode != null) {
                 NamedProtocol prot = decode.getNamedProtocol();
                 if (prot != null) // can it happen that prot == null?
-                    reduce(decodes, prot.getPreferOver(), 0);
+                    reduce(decodes, prot, 0);
             }
         });
     }
 
-    private void reduce(Map<String, Decode> decodes, List<String> toBeRemoved, int level) {
+    private void reduce(Map<String, Decode> decodes, NamedProtocol preferred, int level) {
         if (level > MAX_PREFER_OVER_NESTING) {
-            logger.severe("Max prefer-over depth reached, cycle likely. Please report.");
+            logger.log(Level.SEVERE, "Max prefer-over depth reached using protocol {0}, cycle likely. Please report.", preferred);
             return;
         }
+        List<String> toBeRemoved = preferred.getPreferOver();
         if (toBeRemoved == null)
             return;
 
-        toBeRemoved.forEach((protName) -> {
+        toBeRemoved.forEach((String protName) -> {
             NamedProtocol p = parsedProtocols.get(protName.toLowerCase(Locale.US));
             if (p != null)
-                reduce(decodes, p.getPreferOver(), level+1);
+                reduce(decodes, p, level+1);
 
-            decodes.remove(protName);
+            if (decodes.containsKey(protName)) {
+                decodes.remove(protName);
+                logger.log(Level.FINE, "Protocol {0} removed by prefer-over from {1}.", new Object[]{protName, preferred.getName()});
+            }
         });
     }
 
@@ -538,7 +542,7 @@ public final class Decoder {
                         List<String> preferOvers = prot.getPreferOver();
                         if (preferOvers != null) {
                             preferOvers.forEach((protName) -> {
-                                remove(protName);
+                                remove(prot, protName);
                             });
                         }
                     }
@@ -562,10 +566,13 @@ public final class Decoder {
             return null;
         }
 
-        private synchronized void remove(String protName) {
+        private synchronized void remove(NamedProtocol prot, String protName) {
             TrunkDecodeTree decode = findName(protName);
             if (decode != null)
-                decodes.remove(decode);
+                if (decodes.contains(decode)) {
+                    decodes.remove(decode);
+                    logger.log(Level.FINE, "Protocol {0} removed by prefer-over from {1}.", new Object[]{decode.getName(), prot.getName()});
+                }
         }
 
         int size() {

@@ -132,6 +132,22 @@ public class DecoderNGTest {
         assertEquals(decodes.size(), 1);
     }
 
+    @Test(enabled = true)
+    public void testDecodePioneer() throws Pronto.NonProntoFormatException, InvalidArgumentException {
+        System.out.println("decodePioneer");
+        IrSignal irSignal = Pronto.parse("0000 0068 0000 0022 0169 00B4 0017 0017 0017 0044 0017 0017 0017 0044 0017 0044 0017 0017 0017 0044 0017 0017 0017 0044 0017 0017 0017 0044 0017 0017 0017 0017 0017 0044 0017 0017 0017 0044 0017 0017 0017 0044 0017 0044 0017 0017 0017 0017 0017 0044 0017 0017 0017 0017 0017 0044 0017 0017 0017 0017 0017 0044 0017 0044 0017 0017 0017 0044 0017 0044 0017 0636");
+        Decoder.setDebugProtocolRegExp("Pioneer");
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        params.setFrequencyTolerance(2000.0);
+        Map<String, Decode> result = decoder.decodeIrSignal(irSignal, params);
+        assertFalse(result.keySet().contains("Pioneer"));
+        assertTrue(result.keySet().contains("NEC2"));
+        params.setFrequencyTolerance(1000.0);
+        result = decoder.decodeIrSignal(irSignal, params);
+        assertTrue(result.keySet().contains("Pioneer"));
+        assertFalse(result.keySet().contains("NEC2"));
+    }
+
     /**
      * Test of decode method, of class Decoder.
      */

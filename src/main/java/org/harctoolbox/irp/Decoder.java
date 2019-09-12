@@ -346,7 +346,7 @@ public final class Decoder {
         }
 
         private Double pick(Double standard, Double user, boolean override) {
-            return (override && user != null) ? user : standard;
+            return ((override && user != null) || standard == null) ? user : standard;
         }
 
         /**

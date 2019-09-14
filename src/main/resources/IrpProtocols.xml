@@ -787,6 +787,7 @@ Note (BM): These two entries was one in the original document; I split it into t
     </irp:protocol>
     <irp:protocol c-name="NEC1" name="NEC1">
         <irp:parameter name="prefer-over">NEC1-f16</irp:parameter>
+        <irp:parameter name="prefer-over">NEC1-rnc</irp:parameter>
         <irp:parameter name="prefer-over">Pioneer</irp:parameter>
         <irp:parameter name="reject-repeatless">true</irp:parameter>
         <!--irp:parameter name="frequencyTolerance">100</irp:parameter>

@@ -26,6 +26,7 @@ public class IrpTransmogrifierNGTest {
     private static final String NEC1INTRO = "+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293";
     private static final String NEC1DITTO = "+9041 -2267 +626 -96193";
     private static final String GRAHAM_PANASONIC = "0000 0071 0008 0032 0010 0010 0010 0010 0010 0010 0010 0030 0010 0030 0010 0010 0010 0030 0010 0AA3 0080 0040 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0030 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0030 0010 0030 0010 0010 0010 0030 0010 0AA3 0080 0040 0010 0010 0010 0030 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0AA3";
+    private static final String GRAHAM_SONY15 = "0000 0067 000B 0010 0015 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 02D5 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 02D5";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -491,6 +492,16 @@ public class IrpTransmogrifierNGTest {
         assertEquals(result, "");
         result = IrpTransmogrifier.execute("--blacklist gwts,nec-shirriff decode --ignoreleadinggarbage " + GRAHAM_PANASONIC);
         assertEquals(result, "Panasonic: {D=176,F=17,S=16}, beg=16, end=115, reps=1 {UNDECODED. length=24}");
+    }
+
+    @Test
+    public void testIgnoreLeadingGarbageSony15() {
+        System.out.println("testIgnoreLeadingGarbageSony15");
+        String result;
+        result = IrpTransmogrifier.execute("--blacklist gwts --min-leadout 10000 decode " + GRAHAM_SONY15);
+        assertEquals(result, "");
+        result = IrpTransmogrifier.execute("--blacklist gwts,nec-shirriff --min-leadout 10000 decode --ignoreleadinggarbage -p sony15 " + GRAHAM_SONY15);
+        assertEquals(result, "Sony15: {D=151,F=61}, beg=22, end=53, reps=1");
     }
 
     @Test(enabled = true)

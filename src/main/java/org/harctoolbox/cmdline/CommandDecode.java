@@ -142,6 +142,8 @@ public class CommandDecode extends AbstractCommand {
 
             if (IrCoreUtils.numberTrue(input != null, namedInput != null, args != null) != 1)
                 throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
+            if (ignoreLeadingGarbage && strict)
+                throw new UsageException("--strict and --ignoreleadinggarbage may not be used together.");
 
             Decoder.setDebugProtocolRegExp(debugPattern);
             List<String> protocolNamePatterns = protocol == null ? null : Arrays.asList(protocol.split(","));
@@ -186,7 +188,7 @@ public class CommandDecode extends AbstractCommand {
                     out.println("RepeatData: " + repeatFinder.getRepeatFinderData());
                 }
                 decodeIrSignal(decoder, fixedIrSignal, name, maxNameLength);
-            } else if (!strict && (irSignal.introOnly() || irSignal.repeatOnly())) {
+            } else if (ignoreLeadingGarbage || (!strict && (irSignal.introOnly() || irSignal.repeatOnly()))) {
                 ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
                 decodeIrSequence(decoder, sequence, name, maxNameLength);
             } else {

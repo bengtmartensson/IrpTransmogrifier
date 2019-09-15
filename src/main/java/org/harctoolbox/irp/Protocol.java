@@ -640,7 +640,7 @@ public class Protocol extends IrpObject implements AggregateLister {
             }
         }
 
-        if (rejectNoRepeats && noRepeatsMatched == 0)
+        if (rejectNoRepeats && noRepeatsMatched <= (isEmpty(Pass.intro) ? 1 : 0))
             throw new SignalRecognitionException("No repeat sequence matched; this was required through rejectNoRepeats");
 
         if (pos == beginPos)
@@ -648,7 +648,7 @@ public class Protocol extends IrpObject implements AggregateLister {
 
         try {
             pos = decode(names, irSequence, pos, IrSignal.Pass.ending, params);
-            if (params.isStrict() && pos < irSequence.getLength() - 1)
+            if (!isEmpty(Pass.ending) && params.isStrict() && pos < irSequence.getLength() - 1)
                 throw new SignalRecognitionException("Sequence was not fully matched");
         } catch (SignalRecognitionException ex) {
             if (params.isStrict())

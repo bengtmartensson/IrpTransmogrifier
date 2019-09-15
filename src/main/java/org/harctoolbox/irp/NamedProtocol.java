@@ -145,7 +145,8 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
             throw new ProtocolNotDecodableException(name);
 
         logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSequence.toString(true)});
-        Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), params);
+        Decoder.DecoderParameters fixedParams = params.adjust(isRejectRepeats(), frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), fixedParams);
         return new Decoder.Decode(this, decode);
     }
 

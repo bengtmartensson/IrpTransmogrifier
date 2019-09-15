@@ -281,7 +281,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         else if (recognizeData.leadoutOk() && isLast)
             recognizeData.consume();
         else
-            throw new SignalRecognitionException("Duration does not parse");
+            throw new SignalRecognitionException("Duration does not parse, wanted " + wanted + ", was " + actual + ", position = " + recognizeData.getPosition());
     }
 
 

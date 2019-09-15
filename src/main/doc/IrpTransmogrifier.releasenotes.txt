@@ -1,7 +1,27 @@
-Release Notes for IrpTransmogrifier 1.1.0.
+Release Notes for IrpTransmogrifier 1.1.1.
 
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
+
+===============================================================================
+2019-09-15: Version 1.1.1
+
+Open issue: Protocol G.I.4DTV partially broken, see #126.
+
+* --ignoreLeadingGarbage now forces IrSequence decoding.
+* Improved logging of prefer-over removal of decodes (loglevel FINE).
+* Bugfix: User parameters sometimes did not take effect (after #121). #131.
+* IrpProtocols.xml: Prefer NEC2 over NEC, and prefer NEC1 over NEC1-rnc.
+* For decoding of IrSignals, remove prefer-overs transitively. #130.
+* Fixed definition of F12. Resolves #129.
+* New render option --decode.
+* Handle XHTML in element irp:documentation sensibly. Resolves #125.
+* Allow XML in irp:parameter element. Resolves #124.
+* Refusal to render decode-only protocols implemented. Resolves #123.
+* New decode option --ignoreLeadingGarbage. #122.
+* New decode option --override. #121.
+* New common option --blacklist. #120.
+* Refactoring some decoding stuff. Dramatic speedup on --recursive.
 
 ===============================================================================
 2019-08-31: Version 1.1.0

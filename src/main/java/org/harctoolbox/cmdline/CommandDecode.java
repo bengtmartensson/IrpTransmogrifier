@@ -245,9 +245,15 @@ public class CommandDecode extends AbstractCommand {
 
             if (decodes == null || decodes.isEmpty())
                 out.println();
-            else
-                for (Decoder.TrunkDecodeTree decode : decodes)
+            else {
+                boolean first = true;
+                for (Decoder.TrunkDecodeTree decode : decodes) {
+                    if (!first && name != null)
+                        out.print("\t");
                     out.println(decode.toString(radix, commandLineArgs.tsvOptimize ? "\t" : " "));
+                    first = false;
+                }
+            }
         }
     }
 }

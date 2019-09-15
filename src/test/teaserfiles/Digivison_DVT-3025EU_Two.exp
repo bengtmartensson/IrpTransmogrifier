@@ -1,8 +1,24 @@
 Page+:	Digivision: {D=79,Dev2=67,Dev3=78,F=28},	beg=0, end=109, reps=6
-Page-:	
+Page+$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=28},	beg=0, end=109, reps=6
+Page+$2:	Digivision: {D=79,Dev2=67,Dev3=78,F=28},	beg=0, end=109, reps=6
+Page-:	Digivision: {D=79,Dev2=67,Dev3=78,F=38},	beg=0, end=109, reps=6
+Page-$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=38},	beg=0, end=109, reps=6
+Page-$2:	
 0:	Digivision: {D=79,Dev2=67,Dev3=78,F=19},	beg=0, end=109, reps=6
+0$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=19},	beg=0, end=109, reps=6
+0$2:	Digivision: {D=79,Dev2=67,Dev3=78,F=19},	beg=0, end=109, reps=6
 3:	Digivision: {D=79,Dev2=67,Dev3=78,F=34},	beg=0, end=109, reps=6
+3$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=34},	beg=0, end=109, reps=6
+3$2:	Digivision: {D=79,Dev2=67,Dev3=78,F=34},	beg=0, end=109, reps=6
 6:	Digivision: {D=79,Dev2=67,Dev3=78,F=18},	beg=0, end=109, reps=6
+6$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=18},	beg=0, end=109, reps=6
+6$2:	Digivision: {D=79,Dev2=67,Dev3=78,F=18},	beg=0, end=109, reps=6
 Ch+:	Digivision: {D=79,Dev2=67,Dev3=78,F=46},	beg=0, end=109, reps=6
-Exit:	Digivision: {D=79,Dev2=67,Dev3=78,F=14},	beg=0, end=109, reps=6
-Up:	Digivision: {D=79,Dev2=67,Dev3=78,F=43},	beg=0, end=109, reps=6
+Ch+$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=46},	beg=0, end=109, reps=6
+Ch+$2:	Digivision: {D=79,Dev2=67,Dev3=78,F=46},	beg=0, end=109, reps=6
+Exit:	
+Exit$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=14},	beg=0, end=109, reps=6
+Exit$2:	Digivision: {D=79,Dev2=67,Dev3=78,F=14},	beg=0, end=109, reps=6
+Up:	
+Up$1:	Digivision: {D=79,Dev2=67,Dev3=78,F=43},	beg=0, end=109, reps=6
+Up$2:	Digivision: {D=79,Dev2=67,Dev3=78,F=43},	beg=0, end=109, reps=6

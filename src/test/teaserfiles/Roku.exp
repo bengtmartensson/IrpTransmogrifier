@@ -1,7 +1,7 @@
-Menu:	NEC: {D=234,F=3,S=194},	beg=0, end=67	{NEC: {D=234,F=131,S=194},	beg=68, end=135	{NEC: {D=234,F=131,S=194},	beg=136, end=203	{NEC: {D=234,F=131,S=194},	beg=204, end=271	{NEC: {D=234,F=131,S=194},	beg=272, end=339}}}}
-Play:	NEC: {D=234,F=76,S=194},	beg=0, end=67	{NEC: {D=234,F=204,S=194},	beg=68, end=135	{NEC: {D=234,F=204,S=194},	beg=136, end=203	{NEC: {D=234,F=204,S=194},	beg=204, end=271}}}
-Pause:	NEC: {D=234,F=76,S=194},	beg=0, end=67	{NEC: {D=234,F=204,S=194},	beg=68, end=135	{NEC: {D=234,F=204,S=194},	beg=136, end=203	{NEC: {D=234,F=204,S=194},	beg=204, end=271}}}
-Rwd:	NEC: {D=234,F=52,S=194},	beg=0, end=67	{NEC: {D=234,F=180,S=194},	beg=68, end=135	{NEC: {D=234,F=180,S=194},	beg=136, end=203}}
-FFWD:	NEC: {D=234,F=85,S=194},	beg=0, end=67	{NEC: {D=234,F=213,S=194},	beg=68, end=135	{NEC: {D=234,F=213,S=194},	beg=136, end=203	{NEC: {D=234,F=213,S=194},	beg=204, end=271}}}
-Skip Back:	NEC: {D=234,F=120,S=194},	beg=0, end=67	{NEC: {D=234,F=248,S=194},	beg=68, end=135	{NEC: {D=234,F=248,S=194},	beg=136, end=203	{NEC: {D=234,F=248,S=194},	beg=204, end=271}}}
-OK:	NEC: {D=234,F=42,S=194},	beg=0, end=67	{NEC: {D=234,F=170,S=194},	beg=68, end=135	{NEC: {D=234,F=170,S=194},	beg=136, end=203	{NEC: {D=234,F=170,S=194},	beg=204, end=271}}}
+Menu:	NEC: {D=234,F=3,S=194},	beg=0, end=67	{NEC2: {D=234,F=131,S=194},	beg=68, end=339, reps=4}
+Play:	NEC: {D=234,F=76,S=194},	beg=0, end=67	{NEC2: {D=234,F=204,S=194},	beg=68, end=271, reps=3}
+Pause:	NEC: {D=234,F=76,S=194},	beg=0, end=67	{NEC2: {D=234,F=204,S=194},	beg=68, end=271, reps=3}
+Rwd:	NEC: {D=234,F=52,S=194},	beg=0, end=67	{NEC2: {D=234,F=180,S=194},	beg=68, end=203, reps=2}
+FFWD:	NEC: {D=234,F=85,S=194},	beg=0, end=67	{NEC2: {D=234,F=213,S=194},	beg=68, end=271, reps=3}
+Skip Back:	NEC: {D=234,F=120,S=194},	beg=0, end=67	{NEC2: {D=234,F=248,S=194},	beg=68, end=271, reps=3}
+OK:	NEC: {D=234,F=42,S=194},	beg=0, end=67	{NEC2: {D=234,F=170,S=194},	beg=68, end=271, reps=3}

@@ -1,4 +1,8 @@
 Power:	Dish_Network: {D=0,F=2,S=0},	beg=0, end=69, reps=1
 OK:	Dish_Network: {D=0,F=16,S=0},	beg=0, end=409, reps=11
-Info (Short):	Dish_Network: {D=0,F=0,S=0},	beg=0, end=103, reps=2	{UNDECODED. length=12}
+Info (Short):	Dish_Network: {D=0,F=0,S=0},	beg=0, end=137, reps=3	{UNDECODED. length=12}
 Info (Long):	Dish_Network: {D=0,F=0,S=0},	beg=0, end=375, reps=10	{UNDECODED. length=32}
+Info (Short)$1:	Dish_Network: {D=0,F=0,S=0},	beg=0, end=69, reps=1	{UNDECODED. length=12}
+Info (Long)$1:	Dish_Network: {D=0,F=0,S=0},	beg=0, end=375, reps=10	{UNDECODED. length=32}
+Info (Short)$2:	Dish_Network: {D=0,F=0,S=0},	beg=0, end=103, reps=2	{UNDECODED. length=12}
+Info (Long)$2:	Dish_Network: {D=0,F=0,S=0},	beg=0, end=375, reps=10	{UNDECODED. length=32}

@@ -6,6 +6,8 @@
 5:	ScAtl-6: {D=26,F=61},	beg=0, end=311, reps=6
 6:	ScAtl-6: {D=58,F=60},	beg=0, end=259, reps=5
 7:	ScAtl-6: {D=26,F=60},	beg=0, end=103, reps=2
+7$1:	ScAtl-6: {D=26,F=60},	beg=0, end=103, reps=2
+7$2:	ScAtl-6: {D=26,F=60},	beg=0, end=103, reps=2
 8:	ScAtl-6: {D=58,F=59},	beg=0, end=155, reps=3
 9:	ScAtl-6: {D=26,F=59},	beg=0, end=103, reps=2
 Vol+:	

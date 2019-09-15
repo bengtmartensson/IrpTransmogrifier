@@ -1,12 +1,6 @@
 FM:	NEC1-f16: {D=127,F=10072,S=1},	beg=0, end=67
-	NEC2-f16: {D=127,F=10072,S=1},	beg=0, end=67, reps=1
 AM:	NEC1-f16: {D=127,F=10837,S=1},	beg=0, end=67
-	NEC2-f16: {D=127,F=10837,S=1},	beg=0, end=67, reps=1
 Preset up:	NEC1-f16: {D=127,F=9307,S=1},	beg=0, end=67
-	NEC2-f16: {D=127,F=9307,S=1},	beg=0, end=67, reps=1
 Preset down:	NEC1-f16: {D=127,F=8542,S=1},	beg=0, end=67
-	NEC2-f16: {D=127,F=8542,S=1},	beg=0, end=67, reps=1
 Tuning up:	NEC1-f16: {D=127,F=7777,S=1},	beg=0, end=67
-	NEC2-f16: {D=127,F=7777,S=1},	beg=0, end=67, reps=1
 Tuning down:	NEC1-f16: {D=127,F=7012,S=1},	beg=0, end=67
-	NEC2-f16: {D=127,F=7012,S=1},	beg=0, end=67, reps=1

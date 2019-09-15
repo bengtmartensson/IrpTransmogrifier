@@ -1,5 +1,3 @@
 vol+:	Apple: {F=5,PairID=0},	beg=0, end=67
-Play:	NEC1-f16: {D=238,F=95,S=135},	beg=0, end=67	{NEC1-f16: {D=238,F=5,S=135},	beg=68, end=135	NEC2-f16: {D=238,F=5,S=135},	beg=68, end=135, reps=1}
-	NEC2-f16: {D=238,F=95,S=135},	beg=0, end=67, reps=1	{NEC1-f16: {D=238,F=5,S=135},	beg=68, end=135	NEC2-f16: {D=238,F=5,S=135},	beg=68, end=135, reps=1}
+Play:	NEC1-f16: {D=238,F=95,S=135},	beg=0, end=67	{NEC1-f16: {D=238,F=5,S=135},	beg=68, end=135}
 Pause:	NEC1-f16: {D=238,F=95,S=135},	beg=0, end=67	{NEC1-f16: {D=238,F=5,S=135},	beg=68, end=143, reps=2}
-	NEC2-f16: {D=238,F=95,S=135},	beg=0, end=67, reps=1	{NEC1-f16: {D=238,F=5,S=135},	beg=68, end=143, reps=2}

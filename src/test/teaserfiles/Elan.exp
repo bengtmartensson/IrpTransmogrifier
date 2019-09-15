@@ -1,43 +1,43 @@
-Ch1 Mute:	Elan: {D=18,F=9},	beg=0, end=69, reps=1
-Ch1 Unmute:	Elan: {D=18,F=8},	beg=0, end=69, reps=1
-Ch1 Vol -:	Elan: {D=18,F=6},	beg=0, end=69, reps=1
-Ch 1 Vol+:	Elan: {D=18,F=7},	beg=0, end=69, reps=1
-Ch1 Power Off:	Elan: {D=18,F=11},	beg=0, end=69, reps=1
-Ch1 Power On:	Elan: {D=18,F=12},	beg=0, end=69, reps=1
-Ch2 Mute:	Elan: {D=18,F=9},	beg=0, end=69, reps=1
-Ch2 Unmute:	Elan: {D=18,F=8},	beg=0, end=69, reps=1
-Ch2 Vol-:	Elan: {D=18,F=22},	beg=0, end=69, reps=1
-Ch2 Vol+:	Elan: {D=18,F=23},	beg=0, end=69, reps=1
-Ch2 Power Off:	Elan: {D=18,F=27},	beg=0, end=69, reps=1
-Ch2 Power On:	Elan: {D=18,F=28},	beg=0, end=69, reps=1
-Ch3 Mute:	Elan: {D=18,F=41},	beg=0, end=69, reps=1
-Ch3 Unmute:	Elan: {D=18,F=40},	beg=0, end=69, reps=1
-Ch3 Vol-:	Elan: {D=18,F=38},	beg=0, end=69, reps=1
-Ch3 Vol+:	Elan: {D=18,F=39},	beg=0, end=69, reps=1
-Ch3 Power Off:	Elan: {D=18,F=43},	beg=0, end=69, reps=1
-Ch3 Power On:	Elan: {D=18,F=44},	beg=0, end=69, reps=1
-Ch4 Mute:	Elan: {D=18,F=57},	beg=0, end=69, reps=1
-Ch4 Unmute:	Elan: {D=18,F=56},	beg=0, end=69, reps=1
-Ch4 Vol-:	Elan: {D=18,F=54},	beg=0, end=69, reps=1
-Ch4 Vol+:	Elan: {D=18,F=55},	beg=0, end=69, reps=1
-Ch4 Power Off:	Elan: {D=18,F=59},	beg=0, end=69, reps=1
-Ch4 Power On:	Elan: {D=18,F=60},	beg=0, end=69, reps=1
-Ch5 Mute:	Elan: {D=18,F=73},	beg=0, end=69, reps=1
-Ch5 Unmute:	Elan: {D=18,F=72},	beg=0, end=69, reps=1
-Ch6 Mute:	Elan: {D=18,F=89},	beg=0, end=69, reps=1
-Ch7 Mute:	Elan: {D=18,F=105},	beg=0, end=69, reps=1
-Ch8 Mute:	Elan: {D=18,F=121},	beg=0, end=69, reps=1
-Ch9 Mute:	Elan: {D=18,F=137},	beg=0, end=69, reps=1
-Ch10 Mute:	Elan: {D=18,F=153},	beg=0, end=69, reps=1
-Ch11 Mute:	Elan: {D=18,F=169},	beg=0, end=69, reps=1
-Ch 12 Mute:	Elan: {D=18,F=185},	beg=0, end=69, reps=1
-Ch 12 Unmute:	Elan: {D=18,F=184},	beg=0, end=69, reps=1
-Ch 12 Vol-:	Elan: {D=18,F=182},	beg=0, end=69, reps=1
-Ch12 Vol+:	Elan: {D=18,F=183},	beg=0, end=69, reps=1
-Ch12 Power Off:	Elan: {D=18,F=187},	beg=0, end=69, reps=1
-Ch 12 Power On:	Elan: {D=18,F=188},	beg=0, end=69, reps=1
-Ch 13 Mute:	Elan: {D=18,F=201},	beg=0, end=69, reps=1
-Ch 14 Mute:	Elan: {D=18,F=217},	beg=0, end=69, reps=1
-Ch 15 Mute:	Elan: {D=18,F=233},	beg=0, end=69, reps=1
-Ch 16 Mute:	Elan: {D=18,F=249},	beg=0, end=69, reps=1
-try CH2 unmute:	Elan: {D=12,F=24},	beg=0, end=69, reps=1
+Ch1 Mute:	
+Ch1 Unmute:	
+Ch1 Vol -:	
+Ch 1 Vol+:	
+Ch1 Power Off:	
+Ch1 Power On:	
+Ch2 Mute:	
+Ch2 Unmute:	
+Ch2 Vol-:	
+Ch2 Vol+:	
+Ch2 Power Off:	
+Ch2 Power On:	
+Ch3 Mute:	
+Ch3 Unmute:	
+Ch3 Vol-:	
+Ch3 Vol+:	
+Ch3 Power Off:	
+Ch3 Power On:	
+Ch4 Mute:	
+Ch4 Unmute:	
+Ch4 Vol-:	
+Ch4 Vol+:	
+Ch4 Power Off:	
+Ch4 Power On:	
+Ch5 Mute:	
+Ch5 Unmute:	
+Ch6 Mute:	
+Ch7 Mute:	
+Ch8 Mute:	
+Ch9 Mute:	
+Ch10 Mute:	
+Ch11 Mute:	
+Ch 12 Mute:	
+Ch 12 Unmute:	
+Ch 12 Vol-:	
+Ch12 Vol+:	
+Ch12 Power Off:	
+Ch 12 Power On:	
+Ch 13 Mute:	
+Ch 14 Mute:	
+Ch 15 Mute:	
+Ch 16 Mute:	
+try CH2 unmute:	

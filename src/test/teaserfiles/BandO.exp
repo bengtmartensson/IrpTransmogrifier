@@ -1,5 +1,6 @@
 TV:	B&O: {D=0,F=128},	beg=0, end=43
-TV_Power:	B&O: {D=15,F=12},	beg=0, end=43
+TV_Power:	B&O: {D=0,F=12},	beg=0, end=43
+TV_Power$1:	B&O: {D=15,F=12},	beg=0, end=43
 TV_Vol_Up:	B&O: {D=0,F=96},	beg=0, end=43	{B&O repeat: {D=0,F=96},	beg=44, end=85	{B&O repeat: {D=0,F=96},	beg=86, end=127	{B&O repeat: {D=0,F=96},	beg=128, end=169	{UNDECODED. length=6}}}}
 	B&O repeat: {D=0,F=96},	beg=0, end=41	{UNDECODED. length=134}
 TV_Up_Arrow:	B&O: {D=0,F=30},	beg=0, end=43	{B&O repeat: {D=0,F=114},	beg=44, end=85	{B&O repeat: {D=0,F=114},	beg=86, end=127	{B&O repeat: {D=0,F=114},	beg=128, end=169	{UNDECODED. length=6}}}}
@@ -10,7 +11,8 @@ TV_0:	B&O: {D=0,F=0},	beg=0, end=43
 TV_1:	B&O: {D=0,F=1},	beg=0, end=43
 TV_2:	B&O: {D=0,F=2},	beg=0, end=43
 RADIO:	B&O: {D=1,F=129},	beg=0, end=43
-RADIO_Power:	B&O: {D=15,F=12},	beg=0, end=43
+RADIO_Power:	B&O: {D=1,F=12},	beg=0, end=43
+RADIO_Power$1:	B&O: {D=15,F=12},	beg=0, end=43
 RADIO_Vol_Up:	B&O: {D=1,F=96},	beg=0, end=43	{B&O repeat: {D=1,F=96},	beg=44, end=85	{B&O repeat: {D=1,F=96},	beg=86, end=127	{B&O repeat: {D=1,F=96},	beg=128, end=169	{UNDECODED. length=6}}}}
 	B&O repeat: {D=1,F=96},	beg=0, end=41	{UNDECODED. length=134}
 RADIO_Up_Arrow:	B&O: {D=1,F=30},	beg=0, end=43	{B&O repeat: {D=1,F=114},	beg=44, end=85	{B&O repeat: {D=1,F=114},	beg=86, end=127	{B&O repeat: {D=1,F=114},	beg=128, end=169	{UNDECODED. length=6}}}}

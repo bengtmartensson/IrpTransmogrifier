@@ -2,12 +2,6 @@ IRPTRANSMOGRIFIER := ../../../tools/irptransmogrifier
 ICTPARSE := ../../../contributed/input-filters/ict.sh
 DIFF := diff -w
 
-#TRANSMOGRIFY=generate
-TRANSMOGRIFY=decodeNamed
-
-# No decodes. This file is serial date
-#$TRANSMOGRIFY Airboard.ict
-
 NORMAL_TESTS := \
 Aiwa2_Aiwa \
 Aiwa_left \
@@ -181,30 +175,12 @@ mitsubishi \
 unknownA \
 velodyne
 
-
 TARGETS := $(foreach f,$(NORMAL_TESTS),$(f).diff)
 
 default: $(TARGETS)
 
-# function generate {
-#     $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --recursive --namedinput "$1" > "$1".exp
-# }
-
-# function decodeNamed {
-#     echo $1
-#     $ICTPARSE "$1" | $IRPTRANSMOGRIFIER --tsv $2 $3 $4 $5 decode --recursive --namedinput - | tee "$1.log" | diff -w - "$1".exp
-# }
-
-#%.diff: %.out %.ict.exp
-#	$(DIFF) $*.out $*.ict.exp
-
 %.diff: %.out | %.exp
 	-$(DIFF) "$*.out" "$*.exp" > "$@"
-
-
-#	if $(DIFF) "$*.out" "$*.exp" > "$@" ; then \
-#		rm -f "$@" ; \
-#	fi
 
 CanalSat-%.out: CanalSat-%.txt
 	$(IRPTRANSMOGRIFIER) --frequencytolerance -1 --out "$@" --tsv decode --recursive  --namedinput "$<"

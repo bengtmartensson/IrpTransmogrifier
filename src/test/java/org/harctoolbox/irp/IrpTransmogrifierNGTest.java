@@ -1,10 +1,12 @@
 package org.harctoolbox.irp;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.harctoolbox.cmdline.CmdUtils;
 import org.harctoolbox.cmdline.FrequencyParser;
 import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -539,6 +541,15 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testDecodeOnly");
         String result = IrpTransmogrifier.execute("render --random nec -p");
         assertNull(result);
+    }
+
+    @Test
+    public void testRenderWithDecode() {
+        System.out.println("testRenderWithDecode");
+        ByteArrayOutputStream errBytes = CmdUtils.storeStdErr();
+        IrpTransmogrifier.execute("render -n D=12,F=34 -r --decode  OrtekMCE");
+        String stderr = CmdUtils.restoreStdErr(errBytes);
+        assertEquals(stderr.trim(), "Decode succeeded!");
     }
 
     @Test(enabled = true)

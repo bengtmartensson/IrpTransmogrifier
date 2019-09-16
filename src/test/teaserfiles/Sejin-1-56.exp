@@ -32,6 +32,7 @@ Space:	Sejin-1-56: {D=0,F=0,S=5},	beg=0, end=237, reps=7
 9:	Sejin-1-56: {D=0,F=0,S=105},	beg=0, end=237, reps=7
 0 (Part 1):	Sejin-1-56: {D=0,F=0,S=107},	beg=0, end=255, reps=8
 0 (Part 3):	Sejin-1-56: {D=0,F=0,S=107},	beg=0, end=31, reps=1
+0 (Part 3)$1:	Sejin-1-56: {D=0,F=0,S=107},	beg=0, end=31, reps=1
 *:	Sejin-1-56: {D=0,F=0,S=66},	beg=0, end=237, reps=7
 #:	Sejin-1-56: {D=0,F=0,S=84},	beg=0, end=237, reps=7
 LEO-NET:	Sejin-1-56: {D=0,F=2,S=82},	beg=0, end=237, reps=7

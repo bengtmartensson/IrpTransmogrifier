@@ -18,6 +18,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.cmdline;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
@@ -54,6 +56,30 @@ public class CmdUtils {
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | UnsupportedEncodingException ex) {
             // Get here only by programming errors, no need to confuse the use
             throw new ThisCannotHappenException(ex);
+        }
+    }
+
+    public static ByteArrayOutputStream storeStdErr() {
+        ByteArrayOutputStream errBytes = new ByteArrayOutputStream();
+        PrintStream errStream;
+        try {
+            errStream = new PrintStream(errBytes, false, DEFAULT_CHARSET_NAME);
+            System.setErr(errStream);
+        } catch (UnsupportedEncodingException ex) {
+            throw new ThisCannotHappenException();
+        }
+        return errBytes;
+    }
+
+    public static String restoreStdErr(ByteArrayOutputStream errBytes) {
+        System.err.flush();
+        System.err.close();
+        try {
+            String stderr = errBytes.toString(DEFAULT_CHARSET_NAME);
+            System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err), true, DEFAULT_CHARSET_NAME));
+            return stderr;
+        } catch (UnsupportedEncodingException ex) {
+            throw new ThisCannotHappenException();
         }
     }
 

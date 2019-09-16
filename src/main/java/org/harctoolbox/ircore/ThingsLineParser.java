@@ -38,11 +38,12 @@ import java.util.logging.Logger;
 public class ThingsLineParser<T> {
 
     private final static Logger logger = Logger.getLogger(ThingsLineParser.class.getName());
-    private final static String COMMENT_PREFIX = "#";
+    private final String commentPrefix;
     private final ThingParser parser;
 
-    public ThingsLineParser(ThingParser thingParser) {
+    public ThingsLineParser(ThingParser thingParser, String commentPrefix) {
         this.parser = thingParser;
+        this.commentPrefix = commentPrefix;
     }
 
     /**
@@ -128,7 +129,7 @@ public class ThingsLineParser<T> {
             if (line == null)
                 break;
             line = line.trim();
-            if (line.isEmpty() || line.startsWith(COMMENT_PREFIX))
+            if (line.isEmpty() || (commentPrefix != null && line.startsWith(commentPrefix)))
                 continue;
             String name = line;
             try {

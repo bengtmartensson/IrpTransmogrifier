@@ -228,7 +228,7 @@ public class CommandAnalyze extends AbstractCommand {
                 ThingsLineParser<ModulatedIrSequence> irSignalParser = new ThingsLineParser<>(
                         (List<String> line) -> {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
-                        }
+                        }, commandLineArgs.commentStart
                 );
                 List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(input, commandLineArgs.encoding, false);
                 analyze(modSeqs, ModulatedIrSequence.frequencyAverage(modSeqs));
@@ -236,7 +236,7 @@ public class CommandAnalyze extends AbstractCommand {
                 ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
                         (List<String> line) -> {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
-                        }
+                        }, commandLineArgs.commentStart
                 );
                 Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(namedInput, commandLineArgs.encoding);
                 if (signals.isEmpty())

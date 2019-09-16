@@ -155,14 +155,14 @@ public class CommandDecode extends AbstractCommand {
             if (input != null) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
-                });
+                }, commandLineArgs.commentStart);
                 List<IrSignal> signals = irSignalParser.readThings(input, commandLineArgs.encoding, false);
                 for (IrSignal irSignal : signals)
                     decode(decoder, irSignal.setFrequency(frequency), null, 0);
             } else if (namedInput != null) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
-                });
+                }, commandLineArgs.commentStart);
                 Map<String, IrSignal> signals = irSignalParser.readNamedThings(namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
                 for (Map.Entry<String, IrSignal> kvp : signals.entrySet())

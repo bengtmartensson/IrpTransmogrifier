@@ -36,6 +36,11 @@ public class CommandCommonOptions {
     @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
     public String configFile = null;
 
+    @Parameter(names = { "-C", "--commentStart"}, description = "Character(s) to be considered starting a line comment in input and namedInput files.")
+    public String commentStart = null;
+
+    // Some day there will possibly be a commentEnd?
+
     @Parameter(names = {"-e", "--encoding"}, description = "Encoding used in generated output.")
     public String encoding = "UTF-8";
 

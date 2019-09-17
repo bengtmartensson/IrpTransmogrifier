@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -54,7 +55,7 @@ import org.xml.sax.SAXException;
  * This class is a data bases manager for the data base of IRP protocols.
  * It reads a configuration file containing definitions for IR format in the IRP-Notation.
  */
-public final class IrpDatabase {
+public final class IrpDatabase implements Iterable<NamedProtocol> {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
 
     public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml";
@@ -550,6 +551,39 @@ public final class IrpDatabase {
     public IrSignal render(String protocolName, Map<String, Long> params) throws IrpException {
         Protocol protocol = getProtocolExpandAlias(protocolName);
         return protocol.toIrSignal(params);
+    }
+
+    /**
+     * This is a comparatively expensive operation, while its next()
+     * performs actual parsing of the IRP string.
+     * @return
+     */
+    @Override
+    public Iterator<NamedProtocol> iterator() {
+        return new NamedProtocolIterator(protocols);
+    }
+
+    private static class NamedProtocolIterator implements Iterator<NamedProtocol> {
+        private Iterator<UnparsedProtocol> unparsedIterator;
+
+        private NamedProtocolIterator(Map<String, UnparsedProtocol> map) {
+            unparsedIterator = map.values().iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return unparsedIterator.hasNext();
+        }
+
+        @Override
+        public NamedProtocol next() {
+            try {
+                UnparsedProtocol unparsed = unparsedIterator.next();
+                return unparsed.toNamedProtocol();
+            } catch (IrpException ex) {
+                throw new ThisCannotHappenException(ex);
+            }
+        }
     }
 
     private static class UnparsedProtocol {

@@ -28,8 +28,9 @@ public class IrpDatabaseNGTest {
 
     private final IrpDatabase instance;
 
-    public IrpDatabaseNGTest() throws IOException {
+    public IrpDatabaseNGTest() throws IOException, IrpParseException {
         instance = new IrpDatabase(CONFIGFILE);
+        instance.expand();
     }
 
     @BeforeMethod
@@ -223,5 +224,15 @@ public class IrpDatabaseNGTest {
         String expResult = "{55.5k,250,msb}<-1,1|1,-1>([T=0,1,-1,D:7,S:6,T:1,0:1,F:7,-89m,T=1][1,-1,D:7,S:6,T:1,0:1,F:7,-89m,T=1])*[D:0..127,S:0..63,F:0..127]";
         String result = instance.getNormalFormIrp(protocolName, radix);
         assertEquals(result, expResult);
+    }
+
+    @Test
+    public void testIterator() {
+        System.out.println("testIterator");
+        String candidate = "";
+        for (NamedProtocol namedProtocol : instance)
+            if (namedProtocol.getName().length() > candidate.length())
+                candidate = namedProtocol.getName();
+        assertEquals(candidate, "Fujitsu_Aircon_old");
     }
 }

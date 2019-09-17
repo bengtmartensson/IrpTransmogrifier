@@ -186,10 +186,19 @@ public class CommandRender extends AbstractCommand {
             Decoder decoder = new Decoder(irpDatabase);
             Decoder.DecoderParameters decoderParams = new Decoder.DecoderParameters();
             decoderParams.setAllDecodes(true);
-            decoderParams.setRemoveDefaultedParameters(false);
+            // Remove defaulted parameters both from decode ...
+            decoderParams.setRemoveDefaultedParameters(true);
             Map<String, Decoder.Decode> decodes = decoder.decodeIrSignal(irSignal, decoderParams);
             Decoder.Decode dec = decodes.get(name);
-            if (dec != null && nameEngine.numericallyEquals(dec.getMap()))
+            if (dec == null) {
+                System.err.println("Decode failed.");
+                return;
+            }
+            // ... and the NameEngine used for rendering (to be uniform)
+            Map<String, Long> map = nameEngine.toMap();
+            dec.getNamedProtocol().removeDefaulteds(map);
+            NameEngine reducedNameEngine = new NameEngine(map);
+            if (reducedNameEngine.numericallyEquals(dec.getMap()))
                 System.err.println("Decode succeeded!");
             else {
                 System.err.println("Decode failed. Actual decodes:");

@@ -46,10 +46,10 @@ public class IrpDatabaseNGTest {
      * This guarantees that the data base will be, and stay, sorted.
      */
     @Test
-    public void testCheckSorted() {
+    public void testCheckSorted() throws IOException {
         System.out.println("checkSorted");
-        boolean expResult = false;
-        boolean result = instance.checkSorted();
+        IrpDatabase db = new IrpDatabase(CONFIGFILE);
+        boolean result = db.checkSorted();
         assertTrue(result);
     }
 

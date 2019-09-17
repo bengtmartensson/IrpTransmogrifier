@@ -130,7 +130,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return new IrpDatabase(protocols, new HashMap<>(0), "");
     }
 
-    private static void addProtocol(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, UnparsedProtocol proto) {
+    private static void addToProtocols(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, UnparsedProtocol proto) {
         if (!proto.isUsable() || proto.getName() == null || proto.getIrp() == null)
             return;
 
@@ -239,15 +239,15 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     private void addProtocol(UnparsedProtocol proto) {
-        addProtocol(protocols, aliases, proto);
+        addToProtocols(protocols, aliases, proto);
     }
 
     public void addProtocol(String protocolName, String irp) {
-        new UnparsedProtocol(protocolName, irp, null);
+        addProtocol(protocolName, irp, null);
     }
 
     public void addProtocol(String protocolName, String irp, DocumentFragment doc) {
-        new UnparsedProtocol(protocolName, irp, doc);
+        addProtocol(new UnparsedProtocol(protocolName, irp, doc));
     }
 
     private Document emptyDocument() {
@@ -544,10 +544,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     public void remove(String protocolName) throws UnknownProtocolException {
-        if (!protocols.containsKey(protocolName))
+        if (!isKnown(protocolName))
             throw new UnknownProtocolException(protocolName);
 
-        protocols.remove(protocolName);
+        protocols.remove(protocolName.toLowerCase(Locale.US));
     }
 
     private void addProtocol(Element current) {

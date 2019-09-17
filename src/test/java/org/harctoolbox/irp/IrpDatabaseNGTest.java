@@ -235,4 +235,28 @@ public class IrpDatabaseNGTest {
                 candidate = namedProtocol.getName();
         assertEquals(candidate, "Fujitsu_Aircon_old");
     }
+
+    @Test
+    public void testProperties() throws UnknownProtocolException {
+        System.out.println("testProperties");
+        List<String> props = instance.getProperties("nec1", "prefer-over");
+        assertEquals(props.size(), 3);
+        instance.addProperty("nec1", "prefer-over", "halleluja");
+        props = instance.getProperties("nec1", "prefer-over");
+        assertEquals(props.size(), 4);
+        instance.removeProperties("nec1", "prefer-over");
+        props = instance.getProperties("nec1", "prefer-over");
+        assertNull(props);
+    }
+
+    @Test
+    public void testAddProtocol() throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+        System.out.println("testAddProtocol");
+        String name = "OrtekMCE{2}";
+        instance.addProtocol(name,
+                "{38.6k,480}<1,-1|-1,1>([][P=1][P=2],4,-1,D:5,P:2,F:6,C:4,-48m)+{C=3+#D+#P+#F}[D:0..31,F:0..63]");
+        instance.addProperty(name, "monster", "godzilla");
+        NamedProtocol namedProtocol = instance.getNamedProtocol(name);
+        assertEquals(namedProtocol.getName(), name);
+    }
 }

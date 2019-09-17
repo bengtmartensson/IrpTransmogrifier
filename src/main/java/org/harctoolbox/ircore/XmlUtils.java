@@ -47,6 +47,7 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -373,6 +374,19 @@ public final class XmlUtils {
         doc.appendChild(root);
         root.appendChild(doc.importNode(fragment, true));
         return doc;
+    }
+
+    /**
+     * Expensive to use many times.
+     * @param str
+     * @return
+     */
+    public static DocumentFragment stringToDocumentFragment(String str) {
+        Document document = newDocument();
+        Text textNode = document.createTextNode(str);
+        DocumentFragment fragment = document.createDocumentFragment();
+        fragment.appendChild(textNode);
+        return fragment;
     }
 
     public static void main(String[] args) {

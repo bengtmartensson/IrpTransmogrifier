@@ -120,10 +120,14 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     public static IrpDatabase parseIrp(String protocolName, String irp, String documentation) {
+        return parseIrp(protocolName, irp, XmlUtils.stringToDocumentFragment(documentation));
+    }
+
+    public static IrpDatabase parseIrp(String protocolName, String irp, DocumentFragment documentation) {
         Map<String, UnparsedProtocol> protocols = new HashMap<>(1);
         UnparsedProtocol protocol = new UnparsedProtocol(protocolName, irp, documentation);
         protocols.put(protocolName, protocol);
-        return new IrpDatabase(protocols, new HashMap<>(0), "-");
+        return new IrpDatabase(protocols, new HashMap<>(0), "");
     }
 
     private static void addProtocol(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, UnparsedProtocol proto) {
@@ -238,6 +242,14 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         addProtocol(protocols, aliases, proto);
     }
 
+    public void addProtocol(String protocolName, String irp) {
+        new UnparsedProtocol(protocolName, irp, null);
+    }
+
+    public void addProtocol(String protocolName, String irp, DocumentFragment doc) {
+        new UnparsedProtocol(protocolName, irp, doc);
+    }
+
     private Document emptyDocument() {
         Document doc = XmlUtils.newDocument(true);
         ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
@@ -339,6 +351,13 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return protocols.get(name.toLowerCase(Locale.US));
     }
 
+    private UnparsedProtocol getUnparsedProtocolNonNull(String protocolName) throws UnknownProtocolException {
+        UnparsedProtocol unparsedProtocol = protocols.get(protocolName.toLowerCase(Locale.US));
+        if (unparsedProtocol == null)
+            throw new UnknownProtocolException(protocolName);
+        return unparsedProtocol;
+    }
+
     /**
      * Returns the keys of the protocol data base, which happens to be the protocol names converted to lower case.
      * @return
@@ -414,44 +433,67 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return result;
     }
 
-    public String getDocumentation(String name) {
-        DocumentFragment fragment = getHtmlDocumentation(name);
+    public String getDocumentation(String protocolName) {
+        DocumentFragment fragment = getHtmlDocumentation(protocolName);
         return fragment == null ? null : XmlUtils.dumbHtmlRender(fragment);
     }
 
-    public DocumentFragment getHtmlDocumentation(String name) {
-        UnparsedProtocol prot = getUnparsedProtocol(name);
+    public DocumentFragment getHtmlDocumentation(String protocolName) {
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         return prot == null ? null : prot.getHtmlDocumentation();
     }
 
-    public String getDocumentationExpandAlias(String name) {
-        return getDocumentation(expandAlias(name));
+    public String getDocumentationExpandAlias(String protocolName) {
+        return getDocumentation(expandAlias(protocolName));
     }
 
-    public String getFirstProperty(String name, String key) {
-        UnparsedProtocol prot = getUnparsedProtocol(name);
+    public String getFirstProperty(String protocolName, String key) {
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         return prot == null ? null : prot.getFirstProperty(key);
     }
 
-    public List<String> getProperties(String name, String key) {
-        UnparsedProtocol prot = getUnparsedProtocol(name);
+    public List<String> getProperties(String protocolName, String key) {
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         return prot == null ? null : prot.getProperties(key);
     }
 
-    public List<DocumentFragment> getXmlProperties(String name, String key) {
-        UnparsedProtocol prot = getUnparsedProtocol(name);
+    public void addProperty(String protocolName, String key, String value) throws UnknownProtocolException {
+        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        prot.addProperty(key, value);
+    }
+
+    public void setProperties(String protocolName, String key, List<String> properties) throws UnknownProtocolException {
+        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        prot.setProperties(key, properties);
+    }
+
+    public void removeProperties(String protocolName, String key) throws UnknownProtocolException {
+        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        prot.removeProperties(key);
+    }
+
+    public List<DocumentFragment> getXmlProperties(String protocolName, String key) {
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         return prot == null ? null : prot.getXmlProperties(key);
     }
 
-    public NamedProtocol getNamedProtocol(String name) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
-        UnparsedProtocol prot = getUnparsedProtocol(name);
-        if (prot == null)
-            throw new UnknownProtocolException(name);
+    public void setXmlProperties(String protocolName, String key, List<DocumentFragment> properties) throws UnknownProtocolException {
+        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        prot.setXmlProperties(key, properties);
+    }
+
+    public void removeXmlProperties(String protocolName, String key) throws UnknownProtocolException {
+        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        prot.removeProperties(key);
+    }
+
+    public NamedProtocol getNamedProtocol(String protocolName) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
         return prot.toNamedProtocol();
     }
 
-    public NamedProtocol getNamedProtocolExpandAlias(String name) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
-        return getNamedProtocol(expandAlias(name));
+    public NamedProtocol getNamedProtocolExpandAlias(String protocolName) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+        return getNamedProtocol(expandAlias(protocolName));
     }
 
     public List<NamedProtocol> getNamedProtocol(Collection<String> protocolNames) {
@@ -501,11 +543,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             remove(protocol);
     }
 
-    public void remove(String protocol) throws UnknownProtocolException {
-        if (!protocols.containsKey(protocol))
-            throw new UnknownProtocolException(protocol);
+    public void remove(String protocolName) throws UnknownProtocolException {
+        if (!protocols.containsKey(protocolName))
+            throw new UnknownProtocolException(protocolName);
 
-        protocols.remove(protocol);
+        protocols.remove(protocolName);
     }
 
     private void addProtocol(Element current) {
@@ -611,11 +653,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             this(UNNAMED, irp, null);
         }
 
-        UnparsedProtocol(String name, String irp, String documentation) {
+        UnparsedProtocol(String name, String irp, DocumentFragment documentation) {
             this();
             addProperty(NAME_NAME, name);
             addProperty(IRP_NAME, irp);
-            addProperty(DOCUMENTATION_NAME, documentation);
+            addXmlProperty(DOCUMENTATION_NAME, documentation);
         }
 
         UnparsedProtocol(Map<String, String> map) {
@@ -693,8 +735,24 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             return xmlMap != null ? xmlMap.get(key) : null;
         }
 
+        void setXmlProperties(String key, List<DocumentFragment> list) {
+            xmlMap.put(key, list);
+        }
+
+        void removeXmlProperties(String key) {
+            xmlMap.remove(key);
+        }
+
         List<String> getProperties(String key) {
             return map.get(key);
+        }
+
+        void setProperties(String key, List<String> list) {
+            map.put(key, list);
+        }
+
+        void removeProperties(String key) {
+            map.remove(key);
         }
 
         String getName() {
@@ -771,6 +829,5 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             }
             return element;
         }
-
     }
 }

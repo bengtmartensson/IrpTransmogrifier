@@ -202,10 +202,8 @@ public final class IrpTransmogrifier implements CmdLineProgram {
                 default:
                     return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Unknown command: " + command);
             }
-        } catch (UsageException | NameUnassignedException | UnknownProtocolException| FileNotFoundException | DomainViolationException ex) {
+        } catch (NamedProtocol.ProtocolNotRenderableException | UsageException | NameUnassignedException | UnknownProtocolException| FileNotFoundException | DomainViolationException ex) {
             // Exceptions likely from silly user input, just print the exception
-            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (NamedProtocol.ProtocolNotRenderableException ex) {
             return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (OddSequenceLengthException ex) {
             return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR,

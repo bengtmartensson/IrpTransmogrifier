@@ -117,4 +117,29 @@ public class ExpressionNGTest {
         String result = instance.toIrpString();
         assertEquals("42", result);
     }
+
+    @Test
+    public void testShortCircuiting() throws InvalidNameException, NameUnassignedException {
+        System.out.println("testShortCircuiting");
+        NameEngine nameEngine = new NameEngine("{A=1,B=0}");
+        Expression exp = Expression.newExpression("A || C");
+        exp.toLong(nameEngine);
+        try {
+            exp = Expression.newExpression("A && C");
+            exp.toLong(nameEngine);
+            fail();
+        } catch (NameUnassignedException ex) {
+        }
+        exp = Expression.newExpression("A ? B : C");
+        exp.toLong(nameEngine);
+
+        try {
+            exp = Expression.newExpression("!A ? B : C");
+            exp.toLong(nameEngine);
+            fail();
+        } catch (NameUnassignedException ex) {
+        }
+        exp = Expression.newExpression("!A ? C : B");
+        exp.toLong(nameEngine);
+    }
 }

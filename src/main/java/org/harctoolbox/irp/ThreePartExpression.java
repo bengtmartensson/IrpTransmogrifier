@@ -131,8 +131,9 @@ final class ThreePartExpression extends Expression {
 
     @Override
     public long toLong(NameEngine nameEngine) throws NameUnassignedException {
+        boolean shortCircuiting = operator.equals("&&") || operator.equals("||");
         long left = op1.toLong(nameEngine);
-        long right = op2.toLong(nameEngine);
+        long right = shortCircuiting ? 0 : op2.toLong(nameEngine);
 
         switch (operator) {
 
@@ -171,9 +172,9 @@ final class ThreePartExpression extends Expression {
             case "|":
                 return left | right;
             case "&&":
-                return (left != 0 ? right : 0L);
+                return (left == 0L) ? 0L   : op2.toLong(nameEngine);
             case "||":
-                return (left != 0 ? left : right);
+                return (left != 0L) ? left : op2.toLong(nameEngine);
             default:
                 throw new ThisCannotHappenException("Unknown operator: " + operator);
         }

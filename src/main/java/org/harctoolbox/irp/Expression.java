@@ -112,6 +112,9 @@ public abstract class Expression extends PrimaryItem {
         return x ? 1L : 0L;
     }
 
+    public static final Expression TRUE = newExpression(1L);
+    public static final Expression FALSE = newExpression(0L);
+
     private ParserDriver parserDriver = null;
 
     protected Expression(ParseTree ctx) {

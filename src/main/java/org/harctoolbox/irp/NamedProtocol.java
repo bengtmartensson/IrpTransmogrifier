@@ -107,7 +107,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
      * @param strict
      * @return
      * @throws SignalRecognitionException
-     * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
+     * @throws org.harctoolbox.irp.Protocol.ProtocolNotDecodableException
      */
     @Override
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException, ProtocolNotDecodableException {
@@ -137,8 +137,8 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
      * @param params
      * @return Decoder.Decode object, containing matching data.
      * @throws SignalRecognitionException
-     * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
-     */
+     * @throws org.harctoolbox.irp.Protocol.ProtocolNotDecodableException
+      */
     public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, Decoder.DecoderParameters params)
             throws SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
@@ -343,25 +343,5 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
     public int compareTo(NamedProtocol namedProtocol) {
         int c = this.name.compareTo(namedProtocol.name);
         return c != 0 ? c : this.toIrpString().compareTo(namedProtocol.toIrpString());
-    }
-
-    /**
-     * This exception is thrown when trying to decode with a NamedProtocol having the {@code decodable} property {@code false}.
-     */
-    public static class ProtocolNotDecodableException extends IrpException {
-
-        ProtocolNotDecodableException(String name) {
-            super("Protocol " + name + " not decodable.");
-        }
-    }
-
-    /**
-     * This exception is thrown when trying to render with a NamedProtocol having the {@code decode-only} property {@code true}.
-     */
-    public static class ProtocolNotRenderableException extends IrpException {
-
-        ProtocolNotRenderableException(String protocolName) {
-            super("Protocol " + protocolName + " not renderable.");
-        }
     }
 }

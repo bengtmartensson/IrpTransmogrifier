@@ -534,11 +534,11 @@ public class Protocol extends IrpObject implements AggregateLister {
         return parameterSpecs.random(random);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
+    public Map<String, Long> recognize(IrSignal irSignal) throws SignalRecognitionException, ProtocolNotDecodableException {
         return recognize(irSignal, true);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
+    public Map<String, Long> recognize(IrSignal irSignal, boolean strict) throws SignalRecognitionException, ProtocolNotDecodableException {
         Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict);
         return recognize(irSignal, params);
     }
@@ -557,16 +557,16 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @param minimumLeadout
      * @return Directory of identified parameters. Never null.
      * @throws SignalRecognitionException if the IrSignal did not match the present protocol.
-     * @throws org.harctoolbox.irp.NamedProtocol.ProtocolNotDecodableException
+     * @throws org.harctoolbox.irp.Protocol.ProtocolNotDecodableException
      */
     public Map<String, Long> recognize(IrSignal irSignal, boolean strict,
             double frequencyTolerance, double absoluteTolerance, double relativeTolerance, double minimumLeadout)
-            throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
+            throws SignalRecognitionException, ProtocolNotDecodableException {
         Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         return recognize(irSignal, params);
     }
 
-    public Map<String, Long> recognize(IrSignal irSignal, Decoder.DecoderParameters parameters) throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
+    public Map<String, Long> recognize(IrSignal irSignal, Decoder.DecoderParameters parameters) throws SignalRecognitionException, ProtocolNotDecodableException {
 
         //IrpUtils.entering(logger, Level.FINE, "recognize", this);
         checkFrequency(irSignal.getFrequencyWithDefault(), parameters);
@@ -882,5 +882,25 @@ public class Protocol extends IrpObject implements AggregateLister {
 
     public boolean hasNonStandardParameters() {
         return getParameterSpecs().hasNonStandardParameters();
+    }
+
+    /**
+     * This exception is thrown when trying to decode with a Protocol that is not decodeable.
+     */
+    public static class ProtocolNotDecodableException extends IrpException {
+
+        ProtocolNotDecodableException(String name) {
+            super("Protocol " + name + " not decodable.");
+        }
+    }
+
+    /**
+     * This exception is thrown when trying to render with a Protocol that is not renderable.
+     */
+    public static class ProtocolNotRenderableException extends IrpException {
+
+        ProtocolNotRenderableException(String protocolName) {
+            super("Protocol " + protocolName + " not renderable.");
+        }
     }
 }

@@ -75,6 +75,10 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         this(irStreamItems, new RepeatMarker());
     }
 
+    public IrStream() {
+        this(new ArrayList<IrStreamItem>(0));
+    }
+
     @Override
     public IrStream substituteConstantVariables(Map<String, Long> constantVariables) {
         return new IrStream(bareIrStream.substituteConstantVariables(constantVariables), this.repeatMarker);

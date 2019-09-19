@@ -79,6 +79,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private Boolean interleavingGap = null;
     private ParserDriver parserDriver = null;
     private final Class<? extends AbstractDecoder> decoderClass;
+    private String irp;
 
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs) {
         this(generalSpec, bitspecIrstream, definitions, parameterSpecs, null);
@@ -100,18 +101,11 @@ public class Protocol extends IrpObject implements AggregateLister {
         initializeDefinitions();
         this.parameterSpecs = parameterSpecs != null ? parameterSpecs : new ParameterSpecs();
         computeNormalForm();
-    }
-
-    /**
-     *
-     * @param generalSpec
-     */
-    public Protocol(GeneralSpec generalSpec) {
-        this(generalSpec, null, null, null, null);
+        irp = computeIrp(10);
     }
 
     public Protocol() {
-        this(new GeneralSpec());
+        this(new GeneralSpec(), new BitspecIrstream(), new NameEngine(), new ParameterSpecs());
     }
 
     /**
@@ -123,9 +117,10 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws org.harctoolbox.irp.UnsupportedRepeatException
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      */
-    // TODO: should throw a "real" esxception if antlr parsing fails, now ParseCancellationException
+    // TODO: should throw a "real" exception if antlr parsing fails, now ParseCancellationException
     public Protocol(String irpString) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         this(new ParserDriver(irpString));
+        this.irp = irpString;
     }
 
     private Protocol(ParserDriver parserDriver) throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
@@ -149,6 +144,11 @@ public class Protocol extends IrpObject implements AggregateLister {
         }
 
         checkSanity();
+    }
+
+    private String computeIrp(int radix) {
+        return generalSpec.toIrpString(radix) + bitspecIrstream.toIrpString(radix) + initialDefinitions.toIrpString(radix)
+                + parameterSpecs.toIrpString(radix);
     }
 
     public String getDecoderName() {
@@ -356,6 +356,10 @@ public class Protocol extends IrpObject implements AggregateLister {
     @Override
     public int numberOfInfiniteRepeats() {
         return bitspecIrstream.numberOfInfiniteRepeats();
+    }
+
+    public String getIrp() {
+        return irp;
     }
 
     public BitDirection getBitDirection() {

@@ -61,6 +61,10 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         this(parserDriver.getParser().bitspec_irstream());
     }
 
+    public BitspecIrstream() {
+        this(new BitSpec(), new IrStream());
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof BitspecIrstream))

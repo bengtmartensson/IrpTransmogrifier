@@ -126,6 +126,23 @@ public class ProtocolNGTest {
     public void tearDownMethod() throws Exception {
     }
 
+    @Test
+    public void testNewProtocol() {
+        System.out.println("testNewProtocol");
+        Protocol protocol = new Protocol();
+        String irp = protocol.getIrp();
+        assertEquals(irp, "{1,lsb}<>()");
+    }
+
+    @Test
+    public void testNewProtocolString() throws UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
+        System.out.println("testNewProtocolString");
+        Protocol protocol = new Protocol("{1,lsb}<>(/* halleluja */)");
+        String irp = protocol.getIrp();
+        assertEquals(irp, "{1,lsb}<>(/* halleluja */)");
+        assertEquals(protocol.toIrpString(), "{1,lsb}<>()");
+    }
+
     /**
      * Test of getFrequency method, of class Protocol.
      */

@@ -60,7 +60,6 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
             ;
     }
 
-    private final String irp; // original one on input, not canonicalized
     private final String name;
     private final String cName;
     private final DocumentFragment htmlDocumentation;
@@ -78,7 +77,6 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
             List<String> preferOver, Map<String, List<String>> map)
             throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         super(irp);
-        this.irp = irp;
         this.name = name;
         this.cName = cName;
         this.htmlDocumentation = htmlDocumentation;
@@ -160,8 +158,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 41 * hash + Objects.hashCode(this.irp);
+        int hash = super.hashCode();
         hash = 41 * hash + Objects.hashCode(this.name);
         hash = 41 * hash + Objects.hashCode(this.cName);
         hash = 41 * hash + Objects.hashCode(this.htmlDocumentation);
@@ -182,7 +179,6 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
 
         NamedProtocol other = (NamedProtocol) obj;
         return super.equals(obj)
-                && irp.equals(other.irp)
                 && name.equals(other.name)
                 && cName.equals(other.cName)
                 && htmlDocumentation.equals(other.htmlDocumentation)
@@ -228,10 +224,6 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
 
     public String getDocumentation() {
         return XmlUtils.dumbHtmlRender(getHtmlDocumentation());
-    }
-
-    public String getIrp() {
-        return irp;
     }
 
     public boolean isDecodeable() {

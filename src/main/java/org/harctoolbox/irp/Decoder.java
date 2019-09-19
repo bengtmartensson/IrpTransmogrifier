@@ -116,7 +116,6 @@ public final class Decoder {
      * @throws org.harctoolbox.irp.IrpParseException
      */
     public Decoder(IrpDatabase irpDatabase, List<String> names) throws IrpParseException {
-        irpDatabase.expand();
         parsedProtocols = new LinkedHashMap<>(irpDatabase.size());
         Collection<String> list = names != null ? names : irpDatabase.getKeys();
         list.forEach((protocolName) -> {

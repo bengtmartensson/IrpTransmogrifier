@@ -30,7 +30,6 @@ public class IrpDatabaseNGTest {
 
     public IrpDatabaseNGTest() throws IOException, IrpParseException {
         instance = new IrpDatabase(CONFIGFILE);
-        instance.expand();
     }
 
     @BeforeMethod
@@ -44,9 +43,11 @@ public class IrpDatabaseNGTest {
     /**
      * Test of checkSorted method, of class IrpDatabase.
      * This guarantees that the data base will be, and stay, sorted.
+     * @throws java.io.IOException
+     * @throws org.harctoolbox.irp.IrpParseException
      */
     @Test
-    public void testCheckSorted() throws IOException {
+    public void testCheckSorted() throws IOException, IrpParseException {
         System.out.println("checkSorted");
         IrpDatabase db = new IrpDatabase(CONFIGFILE);
         boolean result = db.checkSorted();
@@ -56,9 +57,10 @@ public class IrpDatabaseNGTest {
     /**
      * Test of isKnown method, of class IrpDatabase.
      * @throws java.io.IOException
+     * @throws org.harctoolbox.irp.IrpParseException
      */
     @Test(enabled = false)
-    public void testIsKnown_String_String() throws IOException {
+    public void testIsKnown_String_String() throws IOException, IrpParseException {
         System.out.println("isKnown");
         String protocolsPath = CONFIGFILE;
         assertFalse(IrpDatabase.isKnown(protocolsPath, "covfefe"));
@@ -250,7 +252,7 @@ public class IrpDatabaseNGTest {
     }
 
     @Test
-    public void testAddProtocol() throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+    public void testAddProtocol() throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
         System.out.println("testAddProtocol");
         String name = "OrtekMCE{2}";
         instance.addProtocol(name,
@@ -258,5 +260,15 @@ public class IrpDatabaseNGTest {
         instance.addProperty(name, "monster", "godzilla");
         NamedProtocol namedProtocol = instance.getNamedProtocol(name);
         assertEquals(namedProtocol.getName(), name);
+    }
+
+    @Test
+    public void testAddProtocolExpand() throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException {
+        System.out.println("testAddProtocolExpand");
+        String name = "junk";
+        instance.addProtocol(name, "NEC1{D=F,S=F}[F:0..255]");
+        NamedProtocol p = instance.getNamedProtocol(name);
+        String irp = instance.getIrp(name);
+        assertEquals(irp, "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*){D=F,S=F}[F:0..255]");
     }
 }

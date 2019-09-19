@@ -244,7 +244,6 @@ public final class IrpTransmogrifier implements CmdLineProgram {
 
         irpDatabase = commandLineArgs.irp != null ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
                 : new IrpDatabase(commandLineArgs.configFile);
-        irpDatabase.expand();
         irpDatabase.remove(blackList);
     }
 

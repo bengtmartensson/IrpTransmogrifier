@@ -98,7 +98,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                 || key.equals(ALT_NAME_NAME);
     }
 
-    public static boolean isKnown(String protocolsPath, String protocol) throws IOException {
+    public static boolean isKnown(String protocolsPath, String protocol) throws IOException, IrpParseException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
 
@@ -108,8 +108,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
      * @param configFilename
      * @param protocolName
      * @return String with IRP representation
+     * @throws org.harctoolbox.irp.IrpParseException
      */
-    public static String getIrp(String configFilename, String protocolName) {
+    public static String getIrp(String configFilename, String protocolName) throws IrpParseException {
         try {
             IrpDatabase irpMaster = new IrpDatabase(configFilename);
             return irpMaster.getIrp(protocolName);
@@ -119,11 +120,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         }
     }
 
-    public static IrpDatabase parseIrp(String protocolName, String irp, String documentation) {
+    public static IrpDatabase parseIrp(String protocolName, String irp, String documentation) throws IrpParseException {
         return parseIrp(protocolName, irp, XmlUtils.stringToDocumentFragment(documentation));
     }
 
-    public static IrpDatabase parseIrp(String protocolName, String irp, DocumentFragment documentation) {
+    public static IrpDatabase parseIrp(String protocolName, String irp, DocumentFragment documentation) throws IrpParseException {
         Map<String, UnparsedProtocol> protocols = new HashMap<>(1);
         UnparsedProtocol protocol = new UnparsedProtocol(protocolName, irp, documentation);
         protocols.put(protocolName, protocol);
@@ -194,35 +195,36 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     private Map<String, String> aliases;
 
-    public IrpDatabase(Reader reader) throws IOException {
+    public IrpDatabase(Reader reader) throws IOException, IrpParseException {
         this(openXmlReader(reader));
     }
 
-    public IrpDatabase(InputStream inputStream) throws IOException {
+    public IrpDatabase(InputStream inputStream) throws IOException, IrpParseException {
         this(openXmlStream(inputStream));
     }
 
-    public IrpDatabase(File file) throws IOException {
+    public IrpDatabase(File file) throws IOException, IrpParseException {
         this(openXmlFile(file));
     }
 
-    public IrpDatabase(String file) throws IOException {
+    public IrpDatabase(String file) throws IOException, IrpParseException {
         this(mkStream(file));
     }
 
-    public IrpDatabase() throws IOException {
+    public IrpDatabase() throws IOException, IrpParseException {
         this(new HashMap<String, UnparsedProtocol>(4), new HashMap<String, String>(0), "null");
     }
 
-    public IrpDatabase(Map<String, String> protocols) {
+    public IrpDatabase(Map<String, String> protocols) throws IrpParseException {
         this(toUnparsedProtocols(protocols), new HashMap<String, String>(0), "null");
     }
 
     /**
      *
      * @param doc
+     * @throws org.harctoolbox.irp.IrpParseException
      */
-    public IrpDatabase(Document doc) {
+    public IrpDatabase(Document doc) throws IrpParseException {
         Element root = doc.getDocumentElement();
         configFileVersion = root.getAttribute("version");
         NodeList nodes = root.getElementsByTagNameNS(IRP_PROTOCOL_NS, "protocol");
@@ -230,24 +232,27 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         aliases = new LinkedHashMap<>(16);
         for (int i = 0; i < nodes.getLength(); i++)
             addProtocol((Element)nodes.item(i));
+        expand();
     }
 
-    private IrpDatabase(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, String version) {
+    private IrpDatabase(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, String version) throws IrpParseException {
         this.configFileVersion = version;
         this.protocols = protocols;
         this.aliases = aliases;
+        expand();
     }
 
     private void addProtocol(UnparsedProtocol proto) {
         addToProtocols(protocols, aliases, proto);
     }
 
-    public void addProtocol(String protocolName, String irp) {
+    public void addProtocol(String protocolName, String irp) throws IrpParseException {
         addProtocol(protocolName, irp, null);
     }
 
-    public void addProtocol(String protocolName, String irp, DocumentFragment doc) {
+    public void addProtocol(String protocolName, String irp, DocumentFragment doc) throws IrpParseException {
         addProtocol(new UnparsedProtocol(protocolName, irp, doc));
+        this.expand(protocolName);
     }
 
     private Document emptyDocument() {
@@ -508,9 +513,13 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return list;
     }
 
-    public void expand() throws IrpParseException {
+    private void expand() throws IrpParseException {
         for (String protocol : protocols.keySet())
-            expand(0, protocol);
+            expand(protocol);
+    }
+
+    private void expand(String name) throws IrpParseException {
+        expand(0, name);
     }
 
     private void expand(int depth, String name) throws IrpParseException {

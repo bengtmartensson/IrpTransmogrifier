@@ -373,6 +373,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="F12" name="F12">
+        <irp:parameter name="prefer-over">F12_relaxed</irp:parameter>
         <irp:parameter name="uei-executor">001A</irp:parameter>
         <irp:irp><![CDATA[{37.9k,422}<1,-3|3,-1>((D:3,S:1,F:8,-80)2)*  [D:0..7,S:0..1,F:0..255]]]></irp:irp>
         <irp:documentation>Old version of the F12 specification.
@@ -390,6 +391,13 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
 {37.9k,422}<1,-3|3,-1>(D:3,H:1,F:8,-34,D:3,H:1,F:8,-88,D:3,H:1,F:8,-34,D:3,H:1,F:8)* {H=1} [D:0..7,F:0..0xFF]
 ]]></irp:irp>
         <irp:documentation>Taken from <a href="http://www.hifi-remote.com/wiki/index.php?title=DecodeIR#F12">DecodeIR</a>, case H=1.
+        </irp:documentation>
+    </irp:protocol>
+    <irp:protocol c-name="F12_relaxed" name="F12_relaxed">
+        <irp:parameter name="uei-executor">001A</irp:parameter>
+        <irp:parameter name="minimum-leadout">6000</irp:parameter>
+        <irp:irp><![CDATA[{37.9k,422}<1,-3|3,-1>(D:3,S:1,F:8,-80)*  [D:0..7,S:0..1,F:0..255]]]></irp:irp>
+        <irp:documentation>Relaxed version of the F12 specification.
         </irp:documentation>
     </irp:protocol>
     <irp:protocol c-name="F32" name="F32">

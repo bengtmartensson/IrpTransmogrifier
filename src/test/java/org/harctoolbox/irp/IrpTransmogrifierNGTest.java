@@ -515,7 +515,7 @@ public class IrpTransmogrifierNGTest {
         args = "--relativetolerance 0.3 decode --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
         result = IrpTransmogrifier.execute(args);
         assertEquals(result, "RC5x: {D=5,F=32,S=108,T=1}");
-        args = "--relativetolerance 0.3 decode --override --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
+        args = "--relativetolerance 0.3 --override decode --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
         result = IrpTransmogrifier.execute(args);
         assertEquals(result, "");
     }

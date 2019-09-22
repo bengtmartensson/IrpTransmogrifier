@@ -73,9 +73,6 @@ public class CommandDecode extends AbstractCommand {
     @Parameter(names = {"-n", "--namedinput"}, description = "File/URL from which to take inputs, one line name, data one line.")
     private String namedInput = null;
 
-    @Parameter(names = {"-o", "--override"}, description = "Let given parameters override the protocol parameters in IrpProtoocols.xml")
-    private boolean override = false;
-
     @Parameter(names = {"-p", "--protocol"}, description = "Comma separated list of protocols to try match (default all).")
     private String protocol = null;
 
@@ -211,7 +208,7 @@ public class CommandDecode extends AbstractCommand {
         private Decoder.DecoderParameters newDecoderParameters() {
             return new Decoder.DecoderParameters(strict, noPreferOver,
                     !keepDefaultedParameters, recursive, commandLineArgs.frequencyTolerance,
-                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout, override, ignoreLeadingGarbage);
+                    commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout, commandLineArgs.override, ignoreLeadingGarbage);
         }
 
         @SuppressWarnings("AssignmentToMethodParameter")

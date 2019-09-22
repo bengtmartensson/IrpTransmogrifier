@@ -77,6 +77,9 @@ public class CommandCommonOptions {
     @Parameter(names = {"-o", "--output"}, description = "Name of output file. Default: stdout.")
     public String output = null;
 
+    @Parameter(names = {"-O", "--override"}, description = "Let given command line parameters override the protocol parameters in IrpProtoocols.xml")
+    public boolean override = false;
+
     @Parameter(names = {"-q", "--quiet"}, description = "Quitest possible operation, typically to be used from scripts.")
     public boolean quiet = false;
 

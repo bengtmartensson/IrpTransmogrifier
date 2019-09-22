@@ -640,6 +640,7 @@ public class Protocol extends IrpObject implements AggregateLister {
                     break;
                 noRepeatsMatched++;
             } catch (SignalRecognitionException ex) {
+                logger.log(Level.FINE, "Protocol did not parse: {0}", ex.getMessage());
                 break;
             }
         }

@@ -50,8 +50,8 @@ public class IrpDatabaseNGTest {
     public void testCheckSorted() throws IOException, IrpParseException {
         System.out.println("checkSorted");
         IrpDatabase db = new IrpDatabase(CONFIGFILE);
-        boolean result = db.checkSorted();
-        assertTrue(result);
+        String result = db.checkSorted();
+        assertNull(result);
     }
 
     /**

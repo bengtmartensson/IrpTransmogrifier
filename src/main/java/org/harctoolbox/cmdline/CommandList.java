@@ -47,7 +47,7 @@ public class CommandList extends AbstractCommand {
     // not yet implemented
     //@Parameter(names = { "-b", "--browse" }, description = "Open the protoocol data base file in the browser")
     //private boolean browse = false;
-    @Parameter(names = {"--checksorted"}, description = "Check if the protocol are alphabetically.")
+    @Parameter(names = {"--check-sorted"}, description = "Check if the protocol are alphabetically.")
     private boolean checkSorted = false;
 
     @Parameter(names = {"-c", "--classify"}, description = "Classify the protocol(s).")
@@ -78,6 +78,9 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"-n", "--normalform"}, description = "List the normal form.")
     private boolean normalForm = false;
 
+    @Parameter(names = {"--prefer-overs"}, description = "List all protocol's prefer-overs, recursively")
+    private boolean preferOvers = false;
+
     @Parameter(names = {"--name"}, description = "List protocol name, also if --quiet is given.")
     private boolean name = false;
 
@@ -102,12 +105,14 @@ public class CommandList extends AbstractCommand {
     }
 
     public void list(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
-        //setupDatabase();
+        CmdUtils.checkForOption("list", protocols);
         if (checkSorted) {
-            if (irpDatabase.checkSorted())
-                out.println("Protol data base is sorted.");
+            String offender = irpDatabase.checkSorted();
+            if (offender == null)
+                out.println("Protocol data base is sorted.");
             else
-                out.println("Protol data base is NOT sorted.");
+                out.println("Protocol data base is NOT sorted, first offending protocol: " + offender + ".");
+            return;
         }
 
         if (!commandLineArgs.quiet) {
@@ -177,6 +182,10 @@ public class CommandList extends AbstractCommand {
 
             if (warnings)
                 listProperty(out, "warnings", protocol.warningsString(), commandLineArgs.quiet);
+
+            if (preferOvers)
+                //if (protocolName.equalsIgnoreCase("Pioneer"))
+                    protocol.dumpPreferOvers(out, irpDatabase);
         }
     }
 

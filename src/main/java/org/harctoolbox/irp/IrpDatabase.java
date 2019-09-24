@@ -586,17 +586,19 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return protocol.normalFormIrpString(radix);
     }
 
-    public boolean checkSorted() {
-        boolean result = true;
+    /**
+     * Checks if the data base is sorted with respect to the protocol name's.
+     * @return First offending protocol, or null if the database is sorted.
+     */
+    public String checkSorted() {
         String last = " ";
         for (String protocol : protocols.keySet()) {
-            if (protocol.compareTo(last) < 0) {
-                result = false;
-                logger.log(Level.WARNING, "Protocol {0} violates ordering", protocol);
-            }
+            if (protocol.compareTo(last) < 0)
+                return protocol;
+
             last = protocol;
         }
-        return result;
+        return null;
     }
 
     public IrSignal render(String protocolName, Map<String, Long> params) throws IrpException {

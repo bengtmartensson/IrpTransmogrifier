@@ -325,7 +325,7 @@ public class IrpTransmogrifierNGTest {
         String sony15 = "0000 0068 0010 0000 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0018";
         String result = IrpTransmogrifier.execute("decode -p sony15 " + sony15);
         System.out.println(result);
-        assertEquals(result, "");
+        assertEquals(result, "No decodes.");
     }
 
     @Test(enabled = true)
@@ -491,7 +491,7 @@ public class IrpTransmogrifierNGTest {
     public void testIgnoreLeadingGarbage() {
         System.out.println("testIgnoreLeadingGarbage");
         String result = IrpTransmogrifier.execute("--blacklist gwts decode " + GRAHAM_PANASONIC);
-        assertEquals(result, "");
+        assertEquals(result, "No decodes.");
         result = IrpTransmogrifier.execute("--blacklist gwts,nec-shirriff decode --ignoreleadinggarbage " + GRAHAM_PANASONIC);
         assertEquals(result, "Panasonic: {D=176,F=17,S=16}, beg=16, end=115, reps=1 {UNDECODED. length=24}");
     }
@@ -526,7 +526,7 @@ public class IrpTransmogrifierNGTest {
         String result = IrpTransmogrifier.execute("decode " + GRAHAM_PANASONIC);
         assertEquals(result, "GwtS: {CRC=255,D=213,F=215}, beg=0, end=15 {UNDECODED. length=124}");
         result = IrpTransmogrifier.execute("--blacklist gwts,nec-shirriff decode " + GRAHAM_PANASONIC);
-        assertEquals(result, "");
+        assertEquals(result, "No decodes.");
     }
 
     @Test(enabled = true)

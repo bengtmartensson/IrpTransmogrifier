@@ -240,8 +240,8 @@ public class CommandDecode extends AbstractCommand {
             if (name != null)
                 out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
 
-            if (decodes == null || decodes.isEmpty())
-                out.println();
+            if (!commandLineArgs.quiet && (decodes == null || decodes.isEmpty()))
+                out.println("No decodes.");
             else {
                 boolean first = true;
                 for (Decoder.TrunkDecodeTree decode : decodes) {

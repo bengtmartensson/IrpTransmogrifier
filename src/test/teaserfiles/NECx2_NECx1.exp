@@ -1,6 +1,8 @@
 Vol+ NEC2:	NEC2: {D=31,F=223},	beg=0, end=271, reps=4
+	Pioneer: {D=31,F=223},	beg=0, end=271, reps=4
 	Pioneer-Mix: {D0=31,F0=223},	beg=0, end=271, reps=2
 Vol- NEC2:	NEC2: {D=31,F=95},	beg=0, end=203, reps=3
+	Pioneer: {D=31,F=95},	beg=0, end=203, reps=3
 	Pioneer-Mix: {D0=31,F0=95},	beg=0, end=203, reps=1
 Mute:	NECx2: {D=67,F=57,S=83},	beg=0, end=203, reps=3
 Up:	NECx2: {D=67,F=13,S=83},	beg=0, end=271, reps=4

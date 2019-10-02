@@ -188,7 +188,7 @@ public class CommandRender extends AbstractCommand {
             decoderParams.setAllDecodes(true);
             // Remove defaulted parameters both from decode ...
             decoderParams.setRemoveDefaultedParameters(true);
-            Map<String, Decoder.Decode> decodes = decoder.decodeIrSignal(irSignal, decoderParams);
+            Decoder.SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal, decoderParams);
             Decoder.Decode dec = decodes.get(name);
             if (dec == null) {
                 System.err.println("Decode failed.");
@@ -202,7 +202,7 @@ public class CommandRender extends AbstractCommand {
                 System.err.println("Decode succeeded!");
             else {
                 System.err.println("Decode failed. Actual decodes:");
-                decodes.values().forEach((decode) -> {
+                decodes.forEach((decode) -> {
                     out.println(decode);
                 });
             }

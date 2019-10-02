@@ -1,4 +1,4 @@
-IRPTRANSMOGRIFIER := ../../../tools/irptransmogrifier
+IRPTRANSMOGRIFIER := ../../../tools/irptransmogrifier --quiet
 ICTPARSE := ../../../contributed/input-filters/ict.sh
 DIFF := diff -w
 

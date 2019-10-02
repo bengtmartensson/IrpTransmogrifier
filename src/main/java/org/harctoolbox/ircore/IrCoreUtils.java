@@ -616,6 +616,18 @@ public final class IrCoreUtils {
         return d == null ? 0 : d.hashCode();
     }
 
+    /**
+     * Support function for lexicographic compareTos
+     * @param compare
+     * @return
+     */
+    public static int lexicalCompare(int... compare) {
+        for (int c : compare)
+            if (c != 0)
+                return c;
+        return 0;
+    }
+
     private IrCoreUtils() {
     }
 }

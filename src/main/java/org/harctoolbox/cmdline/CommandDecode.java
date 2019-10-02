@@ -218,11 +218,11 @@ public class CommandDecode extends AbstractCommand {
                 logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
             }
             Decoder.DecoderParameters params = newDecoderParameters();
-            Map<String, Decoder.Decode> decodes = decoder.decodeIrSignal(irSignal, params);
+            Decoder.SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal, params);
             printDecodes(decodes, name, maxNameLength);
         }
 
-        private void printDecodes(Map<String, Decoder.Decode> decodes, String name, int maxNameLength) {
+        private void printDecodes(Decoder.SimpleDecodesSet decodes, String name, int maxNameLength) {
             if (name != null)
                 out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
 
@@ -231,7 +231,7 @@ public class CommandDecode extends AbstractCommand {
                 return;
             }
 
-            decodes.values().forEach((kvp) -> {
+            decodes.forEach((kvp) -> {
                 out.println("\t" + kvp.toString(radix, commandLineArgs.tsvOptimize ? "\t" : " "));
             });
         }
@@ -240,8 +240,8 @@ public class CommandDecode extends AbstractCommand {
             if (name != null)
                 out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
 
-            if (!commandLineArgs.quiet && (decodes == null || decodes.isEmpty()))
-                out.println("No decodes.");
+            if (decodes == null || decodes.isEmpty())
+                out.println(commandLineArgs.quiet ? "" : "No decodes.");
             else {
                 boolean first = true;
                 for (Decoder.TrunkDecodeTree decode : decodes) {

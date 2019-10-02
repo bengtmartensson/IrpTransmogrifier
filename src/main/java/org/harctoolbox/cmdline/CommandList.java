@@ -183,9 +183,11 @@ public class CommandList extends AbstractCommand {
             if (warnings)
                 listProperty(out, "warnings", protocol.warningsString(), commandLineArgs.quiet);
 
-            if (preferOvers)
-                //if (protocolName.equalsIgnoreCase("Pioneer"))
-                    protocol.dumpPreferOvers(out, irpDatabase);
+            if (preferOvers) {
+                if (commandLineArgs.quiet && ! this.name && protocol.preferredOvers().size() > 0)
+                    out.println(irpDatabase.getName(protocolName) + ":");
+                protocol.dumpPreferOvers(out, irpDatabase);
+            }
         }
     }
 

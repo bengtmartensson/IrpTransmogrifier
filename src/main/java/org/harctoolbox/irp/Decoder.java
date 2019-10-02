@@ -24,13 +24,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -75,10 +77,9 @@ public final class Decoder {
         try {
             Decoder decoder = new Decoder();
             IrSignal irSignal = Pronto.parse(args);
-            Map<String, Decode> decodes = decoder.decodeIrSignal(irSignal);
-            decodes.values().forEach((kvp) -> {
-                System.out.println(kvp);
-            });
+            SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal);
+            for (Decode decode : decodes)
+                System.out.println(decode);
         } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | IrpParseException ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
@@ -87,7 +88,7 @@ public final class Decoder {
 
     private final Map<String, NamedProtocol> parsedProtocols;
 
-    public Decoder(File irpDatabasePath) throws IOException, IrpParseException {
+    private Decoder(File irpDatabasePath) throws IOException, IrpParseException {
         this(new IrpDatabase(irpDatabasePath), null);
     }
 
@@ -95,7 +96,7 @@ public final class Decoder {
         this(irpDatabase, null);
     }
 
-    Decoder() throws IrpParseException, IOException {
+    public Decoder() throws IrpParseException, IOException {
         this(new IrpDatabase((String) null));
     }
 
@@ -105,7 +106,7 @@ public final class Decoder {
      * @throws java.io.IOException
      * @throws org.harctoolbox.irp.IrpParseException
      */
-    Decoder(String... names) throws IOException, IrpParseException {
+    public Decoder(String... names) throws IOException, IrpParseException {
         this(new IrpDatabase((String) null), Arrays.asList(names));
     }
 
@@ -136,22 +137,22 @@ public final class Decoder {
      * @return List of decodes.
      */
     public DecodeTree decode(ModulatedIrSequence irSequence, DecoderParameters params) {
-        Map<Integer, Map<String, TrunkDecodeTree>> map = new ConcurrentHashMap<>(16);
+        Map<Integer, Map<String, TrunkDecodeTree>> map = new HashMap<>(16);
         DecodeTree decodes = decode(irSequence, 0, params, 0, map);
-        if (!decodes.isEmpty() || !params.isIgnoreLeadingGarbage())
+        if (decodes.isEmpty() && params.isIgnoreLeadingGarbage()) {
+            int newStart = irSequence.firstBigGap(0, params.minimumLeadout) + 1;
+            return newStart > 0 ? decode(irSequence, newStart, params, 0, map) : decodes;
+        } else
             return decodes;
-
-        int newStart = irSequence.firstBigGap(0, params.minimumLeadout) + 1;
-        return newStart > 0 ? decode(irSequence, newStart, params, 0, map) : decodes;
     }
 
     private DecodeTree decode(ModulatedIrSequence irSequence, int position, DecoderParameters params, int level, Map<Integer, Map<String, TrunkDecodeTree>>map) {
         logger.log(Level.FINE, String.format("level = %1$d position = %2$d", level, position));
-        DecodeTree list = new DecodeTree(irSequence.getLength() - position);
-        if (list.length == 0)
-            return list;
+        DecodeTree decodeTree = new DecodeTree(irSequence.getLength() - position);
+        if (decodeTree.length == 0)
+            return decodeTree;
 
-        parsedProtocols.values().parallelStream().forEach((namedProtocol) -> {
+        parsedProtocols.values().forEach((namedProtocol) -> {
             try {
                 if (debugProtocolNamePattern != null)
                     if (debugProtocolNamePattern.matcher(namedProtocol.getName().toLowerCase(Locale.US)).matches())
@@ -164,11 +165,11 @@ public final class Decoder {
                 } else {
                     decode = tryNamedProtocol(namedProtocol, irSequence, position, params, level, map);
                     if (!map.containsKey(position)) {
-                        map.put(position, new ConcurrentHashMap<>(4));
+                        map.put(position, new HashMap<>(4));
                     }
                     map.get(position).put(namedProtocol.getName(), decode);
                 }
-                list.add(decode);
+                decodeTree.add(decode);
             } catch (SignalRecognitionException ex) {
                 logger.log(Level.FINER, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
             } catch (NamedProtocol.ProtocolNotDecodableException ex) {
@@ -176,12 +177,12 @@ public final class Decoder {
         });
 
         if (!params.isAllDecodes()) {
-            list.reduce();
-            if (list.isComplete())
-                list.removeIncompletes();
+            decodeTree.reduce(parsedProtocols);
+            if (decodeTree.isComplete())
+                decodeTree.removeIncompletes();
         }
-        list.sort();
-        return list;
+        decodeTree.sort();
+        return decodeTree;
     }
 
     private TrunkDecodeTree tryNamedProtocol(NamedProtocol namedProtocol, ModulatedIrSequence irSequence, int position, DecoderParameters params, int level, Map<Integer, Map<String, TrunkDecodeTree>>map)
@@ -212,8 +213,8 @@ public final class Decoder {
      * @param parameters
      * @return Map of decodes with protocol name as key.
      */
-    public Map<String, Decode> decodeIrSignal(IrSignal irSignal, DecoderParameters parameters) {
-        Map<String, Decode> decodes = new HashMap<>(8);
+    public SimpleDecodesSet decodeIrSignal(IrSignal irSignal, DecoderParameters parameters) {
+        List<Decode> decodes = new ArrayList<>(8);
         parsedProtocols.values().forEach((NamedProtocol namedProtocol) -> {
             try {
                 if (debugProtocolNamePattern != null)
@@ -224,54 +225,24 @@ public final class Decoder {
                 if (parameters.isRemoveDefaultedParameters())
                     namedProtocol.removeDefaulteds(params);
                 Decode decode = new Decode(namedProtocol, params);
-                decodes.put(namedProtocol.getName(), decode);
+                decodes.add(decode);
             } catch (/*DomainViolationException |*/ SignalRecognitionException ex) {
                 logger.log(Level.FINE, String.format("Protocol %1$s did not decode: %2$s", namedProtocol.getName(), ex.getMessage()));
             } catch (NamedProtocol.ProtocolNotDecodableException ex) {
                 throw new ThisCannotHappenException();
             }
         });
+        SimpleDecodesSet simpleDecodesSet = new SimpleDecodesSet(decodes);
 
 
         if (!parameters.isAllDecodes())
-            reduce(decodes);
-        return decodes;
+            simpleDecodesSet.reduce(parsedProtocols);
+        simpleDecodesSet.sort();
+        return simpleDecodesSet;
     }
 
-    public Map<String, Decode> decodeIrSignal(IrSignal irSignal) {
+    public SimpleDecodesSet decodeIrSignal(IrSignal irSignal) {
         return decodeIrSignal(irSignal, new DecoderParameters());
-    }
-
-    private void reduce(Map<String, Decode> decodes) {
-        List<Decode> decs = new ArrayList<>(decodes.values());
-        decs.forEach((Decode decode) -> {
-            if (decode != null) {
-                NamedProtocol prot = decode.getNamedProtocol();
-                if (prot != null) // can it happen that prot == null?
-                    reduce(decodes, prot, 0);
-            }
-        });
-    }
-
-    private void reduce(Map<String, Decode> decodes, NamedProtocol preferred, int level) {
-        if (level > MAX_PREFER_OVER_NESTING) {
-            logger.log(Level.SEVERE, "Max prefer-over depth reached using protocol {0}, cycle likely. Please report.", preferred);
-            return;
-        }
-        List<String> toBeRemoved = preferred.getPreferOver();
-        if (toBeRemoved == null)
-            return;
-
-        toBeRemoved.forEach((String protName) -> {
-            NamedProtocol p = parsedProtocols.get(protName.toLowerCase(Locale.US));
-            if (p != null)
-                reduce(decodes, p, level+1);
-
-            if (decodes.containsKey(protName)) {
-                decodes.remove(protName);
-                logger.log(Level.FINE, "Protocol {0} removed by prefer-over from {1}.", new Object[]{protName, preferred.getName()});
-            }
-        });
     }
 
     /**
@@ -282,7 +253,7 @@ public final class Decoder {
         return parsedProtocols.values();
     }
 
-    public static class DecoderParameters {
+    public static final class DecoderParameters {
 
         private boolean strict;
         private boolean allDecodes;
@@ -484,27 +455,167 @@ public final class Decoder {
         }
     }
 
-    // "Note: this class has a natural ordering that is inconsistent with equals."
-    public static class DecodeTree implements Iterable<TrunkDecodeTree>, Comparable<DecodeTree> {
-        private final List<TrunkDecodeTree> decodes;
+    private static abstract class AbstractDecodesCollection<T extends HasPreferOvers> implements Iterable<T> {
+
+        protected Map<String, T> map;
+
+        AbstractDecodesCollection(Iterable<T> iterable, int size) {
+            map = new LinkedHashMap<>(size);
+            iterable.forEach((e) -> {
+                add(e);
+            });
+        }
+
+        AbstractDecodesCollection(List<T> list) {
+            this(list, list.size());
+        }
+
+        AbstractDecodesCollection(Map<String, T>map) {
+            this.map = new HashMap<>(map);
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            return map.values().iterator();
+        }
+
+        /**
+         * Manipulates its argument, removing some decodes.
+         *
+         * @param decodes
+         */
+        void reduce(Map<String, NamedProtocol> parsedProtocols) {
+
+            Map<String, T> old = new HashMap<>(map);
+            for (Map.Entry<String, T> kvp : old.entrySet())
+                if (toBeRemoved(kvp.getValue(), parsedProtocols))
+                    map.remove(kvp.getKey());
+        }
+
+        /**
+         * Returns true if any of the NamedProtocols in the second argument is prefered-over the first.
+         * @param removeCandidate
+         * @param parsedProtocols
+         * @return
+         */
+        private boolean toBeRemoved(T removeCandidate, Map<String, NamedProtocol> parsedProtocols) {
+            for (T remover : map.values()) {
+                if (!remover.equals(removeCandidate))
+                    if (toBeRemoved(removeCandidate, remover, parsedProtocols, 0))
+                        return true;
+            }
+            return false;
+        }
+
+        private boolean toBeRemoved(T removeCandidate, HasPreferOvers remover, Map<String, NamedProtocol> parsedProtocols, int level) {
+            if (level > MAX_PREFER_OVER_NESTING) {
+                logger.log(Level.SEVERE, "Max prefer-over depth reached using protocol {0}, cycle likely. Please report.", remover.getName());
+                return false;
+            }
+
+            logger.log(Level.FINEST, "Is {0} to be removed from {1}, level {2}", new Object[]{removeCandidate.getName(), remover.getName(), level});
+            Set<String> preferOvers = remover.getPreferOverNames();
+            boolean remove = preferOvers.contains(removeCandidate.getName());
+            if (remove) {
+                logger.log(Level.FINE, "Decode {0} removed by {1}",
+                        new Object[]{removeCandidate.getName(), remover.getName()});
+                return true;
+            } else {
+                for (String preferOver : preferOvers) {
+                    T t = this.map.get(preferOver);
+                    HasPreferOvers hpo = t != null ? t.getDecode() : parsedProtocols.get(preferOver.toLowerCase(Locale.US));
+                    boolean success = toBeRemoved(removeCandidate, hpo, parsedProtocols, level + 1);
+                    if (success)
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        public void add(T decode) {
+            map.put(decode.getName(), decode);
+        }
+
+        public boolean isEmpty() {
+            return map.isEmpty();
+        }
+
+        public T get(String name) {
+            return map.get(name);
+        }
+
+        public boolean contains(String name) {
+            return map.containsKey(name);
+        }
+
+        public void remove(String protName) {
+            if (protName != null && map.containsKey(protName)) {
+                map.remove(protName);
+                //logger.log(Level.FINE, "Protocol {0} removed by prefer-over from {1}.", new Object[]{decode.getName(), prot.getName()});
+            }
+        }
+
+        public void remove(T decode) {
+            remove(decode.getName());
+        }
+
+        public int size() {
+            return map.size();
+        }
+
+        public final void sort() {
+            List<T> list = sortedValues();
+            map.clear();
+            list.forEach((d) -> {
+                add(d);
+            });
+        }
+
+        abstract List<T> sortedValues();
+
+        public T first() {
+            Iterator<T> it = iterator();
+            return it.hasNext() ? it.next() : null;
+        }
+    }
+
+    public static final class SimpleDecodesSet extends AbstractDecodesCollection<Decode> {
+
+        public SimpleDecodesSet(List<Decode> list) {
+            super(list);
+        }
+
+        @Override
+        List<Decode> sortedValues() {
+            List<Decode> list = new ArrayList<>(map.values());
+            Collections.sort(list);
+            return list;
+        }
+    }
+
+    public static final class DecodeTree extends AbstractDecodesCollection<TrunkDecodeTree> implements Comparable<DecodeTree> {
         private int length;
 
         private DecodeTree(int length) {
+            super(new ArrayList<TrunkDecodeTree>(8));
             this.length = length;
-            decodes = Collections.synchronizedList(new ArrayList<>(4));
+        }
+
+        private DecodeTree(DecodeTree old) {
+            super(old.map);
+            this.length = old.length;
         }
 
         public String toString(int radix, String separator) {
             if (isVoid())
                 return "";
             StringJoiner stringJoiner = new StringJoiner(separator, "{", "}");
-            if (decodes.isEmpty())
+            if (map.isEmpty())
                 stringJoiner.add("UNDECODED. length=" + Integer.toString(length, 10));
-            synchronized(decodes) {
-            decodes.forEach((decode) -> {
+
+            map.values().forEach((decode) -> {
                 stringJoiner.add(decode.toString(radix, separator));
             });
-            }
 
             return stringJoiner.toString();
         }
@@ -514,116 +625,70 @@ public final class Decoder {
             return toString(10, ", ");
         }
 
-        private void add(TrunkDecodeTree decode) {
-            decodes.add(decode);
-        }
-
-        public boolean isEmpty() {
-            return decodes.isEmpty();
+        private void removeIncompletes() {
+            DecodeTree old = new DecodeTree(this);
+            for (TrunkDecodeTree decode : old) {
+                 if (!decode.isComplete())
+                    remove(decode);
+            }
         }
 
         boolean isVoid() {
-            return decodes.isEmpty() && length == 0;
+            return isEmpty() && length == 0;
         }
 
-        public synchronized void sort() {
-            Collections.sort(decodes);
-        }
-
-        // Presently, this does not remove protocols transitively,
-        // like in the IrRemote case
-        private synchronized void reduce() {
-            List<TrunkDecodeTree> decs = new ArrayList<>(decodes);
-            decs.forEach((TrunkDecodeTree decode) -> {
-                if (decode != null) {
-                    NamedProtocol prot = decode.getNamedProtocol();
-                    if (prot != null) {
-                        List<String> preferOvers = prot.getPreferOver();
-                        if (preferOvers != null) {
-                            preferOvers.forEach((protName) -> {
-                                remove(prot, protName);
-                            });
-                        }
-                    }
-                }
-            });
-        }
-
-        private synchronized void removeIncompletes() {
-            List<TrunkDecodeTree> decs = new ArrayList<>(decodes);
-            decs.forEach((TrunkDecodeTree decode) -> {
-                if (decode != null && !decode.isComplete())
-                    decodes.remove(decode);
-            });
-        }
-
-        private synchronized TrunkDecodeTree findName(String protocol) {
-            for (TrunkDecodeTree decode : decodes)
-                if (decode.getNamedProtocol().getName().equals(protocol))
-                    return decode;
-
-            return null;
-        }
-
-        private synchronized void remove(NamedProtocol prot, String protName) {
-            TrunkDecodeTree decode = findName(protName);
-            if (decode != null)
-                if (decodes.contains(decode)) {
-                    decodes.remove(decode);
-                    logger.log(Level.FINE, "Protocol {0} removed by prefer-over from {1}.", new Object[]{decode.getName(), prot.getName()});
-                }
-        }
-
-        int size() {
-            return decodes.size();
-        }
-
-        synchronized TrunkDecodeTree getAlternative(String protocolName) {
-            for (TrunkDecodeTree decode : decodes)
-                if (decode.trunk.getName().equals(protocolName))
-                    return decode;
-
-            return null;
-        }
-
-        Decode getDecode(int i) {
-            return decodes.get(i).trunk;
-        }
-
-        DecodeTree getRest(int i) {
-            return decodes.get(i).rest;
-        }
-
-        TrunkDecodeTree getAlternative(int i) {
-            return decodes.get(i);
-        }
-
-        @Override
-        public Iterator<TrunkDecodeTree> iterator() {
-            return decodes.iterator();
+        TrunkDecodeTree getAlternative(String protocolName) {
+            return get(protocolName);
         }
 
         private boolean isComplete() {
             if (length == 0)
                 return true;
 
-            return decodes.stream().anyMatch((d) -> (d.isComplete()));
+            return map.values().stream().anyMatch((d) -> (d.isComplete()));
         }
 
         @Override
         public int compareTo(DecodeTree o) {
-            int min = Math.min(decodes.size(), o.decodes.size());
-            for (int i = 0; i < min; i++) {
-                int c = decodes.get(i).compareTo(o.decodes.get(i));
+            Iterator<TrunkDecodeTree> it = this.iterator();
+            Iterator<TrunkDecodeTree> jt = o.iterator();
+            for (;it.hasNext() && jt.hasNext();) {
+                TrunkDecodeTree d = it.next();
+                TrunkDecodeTree od = jt.next();
+                int c = d.compareTo(od);
                 if (c != 0)
                     return c;
             }
-            return decodes.size() - o.decodes.size();
+            return size() - o.size();
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5 + super.hashCode();
+            hash = 83 * hash + this.length;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            return compareTo((DecodeTree) obj) == 0;
+        }
+
+        @Override
+        List<TrunkDecodeTree> sortedValues() {
+            ArrayList<TrunkDecodeTree> list = new ArrayList<>(map.values());
+            Collections.sort(list);
+            return list;
         }
     }
 
-    // "Note: this class has a natural ordering that is inconsistent with equals."
-    public static class TrunkDecodeTree implements Comparable<TrunkDecodeTree> {
+    public static final class TrunkDecodeTree implements HasPreferOvers, Comparable<TrunkDecodeTree> {
         private Decode trunk;
         private DecodeTree rest;
 
@@ -649,10 +714,7 @@ public final class Decoder {
             return stringJoiner.toString();
         }
 
-        private NamedProtocol getNamedProtocol() {
-            return trunk.getNamedProtocol();
-        }
-
+        @Override
         public String getName() {
             return trunk.getName();
         }
@@ -678,10 +740,38 @@ public final class Decoder {
             int c = trunk.compareTo(trunkDecodeTree.trunk);
             return c != 0 ? c : rest.compareTo(trunkDecodeTree.rest);
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            return compareTo((TrunkDecodeTree) obj) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 47 * hash + Objects.hashCode(this.trunk);
+            hash = 47 * hash + Objects.hashCode(this.rest);
+            return hash;
+        }
+
+        @Override
+        public Set<String> getPreferOverNames() {
+            return trunk.getPreferOverNames();
+        }
+
+        @Override
+        public HasPreferOvers getDecode() {
+            return trunk;
+        }
     }
 
-    // "Note: this class has a natural ordering that is inconsistent with equals."
-    public static class Decode implements Comparable<Decode> {
+    public static final class Decode implements HasPreferOvers, Comparable<Decode> {
         private final NamedProtocol namedProtocol;
         //private final NameEngine nameEngine;
         private final Map<String, Long> map;
@@ -695,7 +785,7 @@ public final class Decoder {
             this.begPos = begPos;
             this.endPos = endPos;
             this.numberOfRepetitions = numberOfRepetitions;
-}
+        }
 
         Decode(NamedProtocol namedProtocol, Map<String, Long> params) {
             this(namedProtocol, params, -1, -1, 0);
@@ -727,6 +817,19 @@ public final class Decoder {
                     + (numberOfRepetitions != 0 ? (", reps=" + numberOfRepetitions) : "");
         }
 
+        @Override
+        public Set<String> getPreferOverNames() {
+            List<PreferOver> preferOvers = namedProtocol.getPreferOver();
+            Set<String> result = new HashSet<>(preferOvers.size());
+
+            for (PreferOver preferOver : preferOvers) {
+                String removee = preferOver.toBeRemoved(map);
+                if (removee != null)
+                    result.add(removee);
+            }
+            return result;
+        }
+
         /**
          * @return the namedProtocol
          */
@@ -734,6 +837,7 @@ public final class Decoder {
             return namedProtocol;
         }
 
+        @Override
         public String getName() {
             return namedProtocol.getName();
         }
@@ -779,8 +883,38 @@ public final class Decoder {
         }
 
         @Override
-        public int compareTo(Decode o) {
-            return namedProtocol.compareTo(o.namedProtocol);
+        public int compareTo(Decode other) {
+            return IrCoreUtils.lexicalCompare(namedProtocol.compareTo(other.namedProtocol),
+                    this.begPos - other.begPos,
+                    this.endPos - other.endPos,
+                    this.numberOfRepetitions - other.numberOfRepetitions);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            return compareTo((Decode) obj) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 19 * hash + Objects.hashCode(this.namedProtocol);
+            hash = 19 * hash + Objects.hashCode(this.map);
+            hash = 19 * hash + this.begPos;
+            hash = 19 * hash + this.endPos;
+            hash = 19 * hash + this.numberOfRepetitions;
+            return hash;
+        }
+
+        @Override
+        public HasPreferOvers getDecode() {
+            return this;
         }
     }
 }

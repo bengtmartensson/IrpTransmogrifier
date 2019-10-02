@@ -1,7 +1,6 @@
 package org.harctoolbox.irp;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Random;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
@@ -76,9 +75,9 @@ public class DecoderNGTest {
             for (NamedProtocol protocol : decoder.getParsedProtocols()) {
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);
-                Map<String, Decode> decodes = decoder.decodeIrSignal(irSignal, params);
+                Decoder.SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal, params);
                 boolean success = false;
-                for (Decode decode : decodes.values()) {
+                for (Decode decode : decodes) {
                     System.out.println(decode);
                     if (decode.same(protocol.getName(), nameEngine)) {
                         success = true;
@@ -87,7 +86,7 @@ public class DecoderNGTest {
                 }
                 if (!success) {
                     System.out.println(">>>>>>>>> " + protocol.getName() + "\t" + nameEngine.toString());
-                    decodes.values().forEach((decode) -> {
+                    decodes.forEach((decode) -> {
                         System.out.println("----------------> " + decode.toString());
                     });
 
@@ -107,7 +106,7 @@ public class DecoderNGTest {
         IrSignal irSignal = Pronto.parse("0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041 0016 05F7 015B 0057 0016 0E6C");
         Decoder.DecoderParameters params = new Decoder.DecoderParameters();
         params.setRemoveDefaultedParameters(false);
-        Map<String, Decode> result = decoder.decodeIrSignal(irSignal, params);
+        Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);
         assertEquals(result.size(), 1);
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35,S=243}");
         Decoder.setDebugProtocolRegExp(null);
@@ -125,7 +124,7 @@ public class DecoderNGTest {
         System.out.println("decodeGICable");
         Decoder.setDebugProtocolRegExp("g.i.cable");
         Decoder.DecoderParameters params = new Decoder.DecoderParameters();
-        Map<String, Decode> result = decoder.decodeIrSignal(giCable, params);
+        Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(giCable, params);
         assertEquals(result.size(), 0);
         ModulatedIrSequence seq = giCable.toModulatedIrSequence();
         Decoder.DecodeTree decodes = decoder.decode(seq, params);
@@ -139,13 +138,13 @@ public class DecoderNGTest {
         Decoder.setDebugProtocolRegExp("Pioneer");
         Decoder.DecoderParameters params = new Decoder.DecoderParameters();
         params.setFrequencyTolerance(2000.0);
-        Map<String, Decode> result = decoder.decodeIrSignal(irSignal, params);
-        assertFalse(result.keySet().contains("Pioneer"));
-        assertTrue(result.keySet().contains("NEC2"));
+        Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);
+        assertTrue(result.contains("Pioneer"));
+        assertTrue(result.contains("NEC2"));
         params.setFrequencyTolerance(1000.0);
         result = decoder.decodeIrSignal(irSignal, params);
-        assertTrue(result.keySet().contains("Pioneer"));
-        assertFalse(result.keySet().contains("NEC2"));
+        assertTrue(result.contains("Pioneer"));
+        assertFalse(result.contains("NEC2"));
     }
 
     /**
@@ -176,7 +175,7 @@ public class DecoderNGTest {
         Decoder instance = new Decoder("NRC17");
         Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false, false);
         Decoder.DecodeTree result = instance.decode(irSequence, params);
-        Decode first = result.getDecode(0);
+        Decode first = result.iterator().next().getTrunk();
         assertTrue(nrc17NameEngine.numericallyEquals(first));
         assertEquals(first.getBegPos(), 0);
         assertEquals(first.getEndPos(), 163);
@@ -190,7 +189,7 @@ public class DecoderNGTest {
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false, false);
         result = instance.decode(irSequence, params);
         assertEquals(result.size(), 1);
-        first = result.getDecode(0);
+        first = result.iterator().next().getTrunk();
         assertTrue(nrc17NameEngine.numericallyEquals(first));
     }
 
@@ -220,7 +219,7 @@ public class DecoderNGTest {
         Decoder.setDebugProtocolRegExp("nec1");
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false, false);
         result = instance.decode(irSequence, params);
-        assertEquals(result.size(),7);
+        assertEquals(result.size(),8);
         Decoder.TrunkDecodeTree first = result.getAlternative("NEC1");
         assertEquals(first.getName(), "NEC1");
         Decoder.TrunkDecodeTree second = first.getRest().getAlternative("RC5");
@@ -228,7 +227,7 @@ public class DecoderNGTest {
 
         irSequence = new ModulatedIrSequence(IrSequence.concatenate(nec1Intro, rc5Seq), 37000d);
         result = instance.decode(irSequence, params);
-        assertEquals(result.size(), 6);
+        assertEquals(result.size(), 7);
 
         allDecodes = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false, false);
@@ -256,7 +255,7 @@ public class DecoderNGTest {
         IrSignal irSignal = new IrSignal(nrc17Intro, nrc17Repeat, nrc17Ending, NRC17_FREQUENCY);
         boolean strict = true;
         Decoder.DecoderParameters params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false, false);
-        Map<String, Decode> result = dec.decodeIrSignal(irSignal, params);
+        Decoder.SimpleDecodesSet result = dec.decodeIrSignal(irSignal, params);
         assertTrue(nrc17NameEngine.numericallyEquals(result.get("NRC17")));
 
         irSignal = new IrSignal(nrc17Intro, nrc17Repeat, null, NRC17_FREQUENCY);

@@ -17,16 +17,20 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -37,8 +41,9 @@ import org.w3c.dom.Element;
  * properties, in particular a name. It corresponds to an entry in the protocol data
  * base <code>IrpProtocols.xml</code>.
  */
-public final class NamedProtocol extends Protocol implements Comparable<NamedProtocol> {
+public final class NamedProtocol extends Protocol implements HasPreferOvers,Comparable<NamedProtocol> {
     private final static Logger logger = Logger.getLogger(NamedProtocol.class.getName());
+    private final static int MAXLEVEL = 10;
 
     public static Document toDocument(Iterable<NamedProtocol> protocols) {
         Document document = XmlUtils.newDocument();
@@ -67,8 +72,8 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
     private final Double relativeTolerance;
     private final Double frequencyTolerance;
     private final Double minimumLeadout;
-    private final boolean decodable; // If true, the parameter values overwrite protocol specific values.
-    private final List<String> preferOver;
+    private final boolean decodable;
+    private final List<PreferOver> preferOver; // If true, the parameter values overwrite protocol specific values.
     private final Map<String, List<String>> auxParameters;
     private final boolean rejectRepeatless;
 
@@ -86,7 +91,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
         this.minimumLeadout = minimumLeadout != null ? Double.parseDouble(minimumLeadout) : null;
         this.decodable = decodable == null || Boolean.parseBoolean(decodable);
         this.rejectRepeatless = rejectRepeatless != null && Boolean.parseBoolean(rejectRepeatless);
-        this.preferOver = preferOver;
+        this.preferOver = PreferOver.parse(preferOver);
         this.auxParameters = new HashMap<>(map.size());
         map.entrySet().stream().filter((kvp) -> (!IrpDatabase.isKnownKeyword(kvp.getKey()))).forEach((kvp) -> {
             this.auxParameters.put(kvp.getKey(), kvp.getValue());
@@ -95,6 +100,82 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
 
     public NamedProtocol(String name, String irp, DocumentFragment documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, null, new HashMap<>(0));
+    }
+
+    public Set<String> preferredOvers() {
+        HashSet<String> result = new HashSet<>(16);
+        for (PreferOver prefOver : preferOver) {
+            String remove = prefOver.toBeRemoved();
+            if (remove != null)
+                result.add(remove);
+        }
+        return result;
+    }
+
+    public Set<String> preferredOvers(Map<String, Long>params) {
+        HashSet<String> result = new HashSet<>(16);
+        for (PreferOver prefOver : preferOver) {
+            String remove = prefOver.toBeRemoved(params);
+            if (remove != null)
+                result.add(remove);
+        }
+        return result;
+    }
+
+    public Set<String> preferredOvers(IrpDatabase irpDatabase) throws InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+        return preferredOvers(irpDatabase, 0);
+    }
+
+    public Set<String> preferredOvers(IrpDatabase irpDatabase, int level) throws UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+        if (level >= MAXLEVEL)
+            throw new ThisCannotHappenException("MAXLEVEL reached, probably circular prefer-overs");
+
+        HashSet<String> result = new HashSet<>(16);
+        for (PreferOver prefOver : preferOver) {
+            String remove = prefOver.toBeRemoved();
+            if (remove == null)
+                continue;
+
+            result.add(remove);
+            try {
+                NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(remove);
+                Set<String> secondary = namedProtocol.preferredOvers(irpDatabase);
+                result.addAll(secondary);
+            } catch (UnknownProtocolException | InvalidNameException ex) {
+                logger.log(Level.SEVERE, "{0}", ex.getMessage());
+            }
+        }
+        return result;
+    }
+
+    public void dumpPreferOvers(PrintStream out) {
+        out.println(name + ":");
+        for (PreferOver prefOver : preferOver) {
+            out.println("\t" + prefOver);
+        }
+    }
+
+    public void dumpPreferOvers(PrintStream out, IrpDatabase irpDatabase) {
+        dumpPreferOvers(out, irpDatabase, 0);
+    }
+
+    public void dumpPreferOvers(PrintStream out, IrpDatabase irpDatabase, int level) {
+        if (level >= MAXLEVEL)
+            throw new ThisCannotHappenException("MAXLEVEL (= " + MAXLEVEL + ") reached, probably circular prefer-overs");
+
+        //out.println(IrCoreUtils.tabs(level) + this.name + ":");
+        for (PreferOver prefOver : preferOver) {
+            String r = prefOver.toBeRemoved();
+            try {
+                out.println(IrCoreUtils.tabs(level+1) + prefOver);
+                NamedProtocol namedProtocol = irpDatabase.getNamedProtocol(r);
+                namedProtocol.dumpPreferOvers(out, irpDatabase, level+1);
+            } catch (UnknownProtocolException ex) {
+                logger.log(Level.WARNING, "{0}", ex.getMessage());
+            } catch (InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException | NameUnassignedException ex) {
+                Logger.getLogger(NamedProtocol.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /**
@@ -207,6 +288,7 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
     /**
      * @return the name
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -266,8 +348,17 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
         return getDoubleWithSubstitute(userValue, minimumLeadout, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT, override);
     }
 
-    List<String> getPreferOver() {
-        return preferOver == null ? null : Collections.unmodifiableList(preferOver);
+    List<PreferOver> getPreferOver() {
+        return Collections.unmodifiableList(preferOver);
+    }
+
+    @Override
+    public Set<String> getPreferOverNames() {
+        HashSet<String> result = new HashSet<>(preferOver.size());
+        preferOver.forEach((po) -> {
+            result.add(po.toBeRemoved());
+        });
+        return result;
     }
 
     @Override
@@ -333,7 +424,11 @@ public final class NamedProtocol extends Protocol implements Comparable<NamedPro
 
     @Override
     public int compareTo(NamedProtocol namedProtocol) {
-        int c = this.name.compareTo(namedProtocol.name);
-        return c != 0 ? c : this.toIrpString().compareTo(namedProtocol.toIrpString());
+        return IrCoreUtils.lexicalCompare(this.name.compareTo(namedProtocol.name), this.toIrpString().compareTo(namedProtocol.toIrpString()));
+    }
+
+    @Override
+    public HasPreferOvers getDecode() {
+        return this;
     }
 }

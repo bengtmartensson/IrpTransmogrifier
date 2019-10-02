@@ -165,7 +165,7 @@ public class IrpDatabaseNGTest {
         System.out.println("getMatchingNamesRegexp");
         String regexp = "NEC.*";
         List result = instance.getMatchingNamesRegexp(regexp);
-        assertEquals(result.size(), 10);
+        assertEquals(result.size(), 11);
         result = instance.getMatchingNamesRegexp("RC6.*");
         assertTrue(result.contains("rc6-6-32"));
     }
@@ -242,10 +242,10 @@ public class IrpDatabaseNGTest {
     public void testProperties() throws UnknownProtocolException {
         System.out.println("testProperties");
         List<String> props = instance.getProperties("nec1", "prefer-over");
-        assertEquals(props.size(), 3);
+        int n = props.size();
         instance.addProperty("nec1", "prefer-over", "halleluja");
         props = instance.getProperties("nec1", "prefer-over");
-        assertEquals(props.size(), 4);
+        assertEquals(props.size(), n+1);
         instance.removeProperties("nec1", "prefer-over");
         props = instance.getProperties("nec1", "prefer-over");
         assertNull(props);

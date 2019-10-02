@@ -218,10 +218,10 @@ public final class ShortPronto extends Pronto {
      * @return CCF as string, or null on failure.
      */
     public static String toString(IrSignal irSignal, boolean fallback) {
-        Map<String, Decoder.Decode> decodes = decoder.decodeIrSignal(irSignal);
+        Decoder.SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal);
         if (decodes.isEmpty())
             return fallback ? Pronto.toString(irSignal) : null;
-        Decoder.Decode decode = decodes.values().iterator().next();
+        Decoder.Decode decode = decodes.first();
         return toString(decode);
     }
 

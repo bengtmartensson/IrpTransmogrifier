@@ -206,6 +206,7 @@ public final class IrSignal implements Cloneable {
         return frequency;
     }
 
+    @SuppressWarnings("null")
     public Double getFrequencyWithDefault() {
         return frequency != null ? frequency : ModulatedIrSequence.DEFAULT_FREQUENCY;
     }

@@ -17,12 +17,15 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 abstract class OnePartExpression extends Expression {
 
+    @SuppressWarnings("null")
     public static Expression newExpression(ParseTree ctx, ParseTree child) {
+        Objects.requireNonNull(child);
         if (child instanceof IrpParser.Primary_itemContext)
             return PrimaryItemExpression.newExpression(ctx, (IrpParser.Primary_itemContext) child);
         else if (child instanceof IrpParser.BitfieldContext)

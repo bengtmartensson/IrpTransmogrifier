@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -338,7 +339,9 @@ public final class Analyzer extends Cleaner {
         return repeatFinderData[i];
     }
 
+    @SuppressWarnings("null")
     double getTimeBaseFromData(AnalyzerParams params) {
+        Objects.requireNonNull(params);
         return params.getTimebase() != null
                 ? params.getTimebase()
                 : getTimeBaseFromData(params.getBurstPrefs().getMaxRoundingError());
@@ -390,6 +393,7 @@ public final class Analyzer extends Cleaner {
             return burstPrefs;
         }
 
+        @SuppressWarnings("null")
         public int getNoBitsLimit(int noPayload) {
             int tableLimit = (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
             return Math.min(maxParameterWidth, tableLimit);

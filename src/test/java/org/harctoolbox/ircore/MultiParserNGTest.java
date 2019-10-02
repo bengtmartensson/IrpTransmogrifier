@@ -118,8 +118,7 @@ public class MultiParserNGTest {
 
         instance = MultiParser.newIrCoreParser(listOfFourErroneous);
         try {
-            //List expResult = null;
-            result = instance.toList();
+            instance.toList();
             fail();
         } catch (OddSequenceLengthException ex) {
         }
@@ -132,10 +131,9 @@ public class MultiParserNGTest {
     @Test
     public void testToModulatedIrSequence_Double_double() throws InvalidArgumentException {
         System.out.println("toModulatedIrSequence");
-        Double fallbackFrequency = null;
         double dummyGap = 3333.0;
         MultiParser instance = MultiParser.newIrCoreParser(nec1capturedOdd);
-        ModulatedIrSequence result = instance.toModulatedIrSequence(fallbackFrequency, dummyGap);
+        ModulatedIrSequence result = instance.toModulatedIrSequence(null, dummyGap);
         assertEquals(result.get(result.getLength()-1), dummyGap, 0.00001);
     }
 
@@ -147,17 +145,15 @@ public class MultiParserNGTest {
     @SuppressWarnings("UnusedAssignment")
     public void testToModulatedIrSequence_Double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toModulatedIrSequence");
-        Double fallbackFrequency = null;
         MultiParser instance = MultiParser.newIrCoreParser(nec1captured);
         //ModulatedIrSequence expResult = null;
-        ModulatedIrSequence result = instance.toModulatedIrSequence(fallbackFrequency);
+        ModulatedIrSequence result = instance.toModulatedIrSequence(null);
         assertEquals(result.getFrequency(), 38461, 0.001);
         assertEquals(result.getLength(), 72);
 
         instance = MultiParser.newIrCoreParser(nec1capturedOdd);
         try {
-            //ModulatedIrSequence expResult = null;
-            result = instance.toModulatedIrSequence(fallbackFrequency);
+            instance.toModulatedIrSequence(null);
             fail();
         } catch (OddSequenceLengthException ex) {
         }
@@ -236,7 +232,7 @@ public class MultiParserNGTest {
 
         instance = MultiParser.newIrCoreParser(nec1Odd);
         try {
-            result = instance.toIrSequence();
+            instance.toIrSequence();
             fail();
         } catch (OddSequenceLengthException ex) {
         }
@@ -251,7 +247,7 @@ public class MultiParserNGTest {
         System.out.println("toIrSequence");
         double dummyGap = 1234.0;
         MultiParser instance = MultiParser.newIrCoreParser(nec1Odd);
-        IrSequence result = instance.toIrSequence(dummyGap);
+        instance.toIrSequence(dummyGap);
     }
 
     /**
@@ -261,14 +257,13 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignalAsMultiLine() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignalAsMultiLine");
-        Double frequency = null;
         MultiParser instance = MultiParser.newIrCoreParser(ortekmceMultiline);
         @SuppressWarnings("UnusedAssignment")
-        IrSignal result = instance.toIrSignal(frequency);
+        IrSignal result = instance.toIrSignal(null);
         assertNotNull(result);
 
         instance = MultiParser.newIrCoreParser(ortekmceBracketed);
-        result = instance.toIrSignal(frequency);
+        result = instance.toIrSignal(null);
         assertNotNull(result);
     }
 
@@ -279,13 +274,12 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignalAsBracketedString() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignalAsBracketedString");
-        Double frequency = null;
         MultiParser instance = MultiParser.newIrCoreParser(ortekmceBracketed);
         @SuppressWarnings("UnusedAssignment")
-        IrSignal result = instance.toIrSignal(frequency);
+        IrSignal result = instance.toIrSignal(null);
         assertEquals(result.getEndingLength(), 32);
         instance = MultiParser.newIrCoreParser(ortekmceMultiline);
-        result = instance.toIrSignal(frequency);
+        result = instance.toIrSignal(null);
         assertEquals(result.getEndingLength(), 32);
     }
 
@@ -311,11 +305,10 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignal_Double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignal");
-        Double frequency = null;
         MultiParser instance = MultiParser.newIrCoreParser(ortekmceBracketed);
-        IrSignal result = instance.toIrSignal(frequency);
+        IrSignal result = instance.toIrSignal(null);
         assertNull(result.getFrequency());
-        frequency = 12345.0;
+        double frequency = 12345.0;
         result = instance.toIrSignal(frequency);
         assertEquals(result.getFrequency(), frequency, 00001);
     }
@@ -327,12 +320,11 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignal_Double_double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignal_Double_double");
-        Double fallbackFrequency = null;
         double threshold = 30000.0;
         MultiParser instance = MultiParser.newIrCoreParser(nec1Repeat);
-        IrSignal result = instance.toIrSignal(fallbackFrequency, threshold);
+        IrSignal result = instance.toIrSignal(null, threshold);
         assertNull(result.getFrequency());
-        fallbackFrequency = 12345.0;
+        double fallbackFrequency = 12345.0;
         result = instance.toIrSignal(fallbackFrequency, threshold);
         assertEquals(result.getFrequency(), fallbackFrequency, 0.000001);
     }
@@ -344,10 +336,9 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignal_Double_double_silly() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignal_Double_double_silly");
-        Double fallbackFrequency = null;
         double threshold = 30000.0;
         MultiParser instance = MultiParser.newIrCoreParser("blah blah");
-        IrSignal result = instance.toIrSignal(fallbackFrequency, threshold);
+        IrSignal result = instance.toIrSignal(null, threshold);
         assertNull(result);
     }
 }

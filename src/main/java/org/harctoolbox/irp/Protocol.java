@@ -724,6 +724,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return definitions;
     }
 
+    @SuppressWarnings("null")
     public String classificationString() {
         StringBuilder str = new StringBuilder(128);
         str.append((int) minDurationDiff());

@@ -94,11 +94,13 @@ public final class BitwiseParameter implements Cloneable {
     }
 
     public boolean isConsistent(BitwiseParameter parameter) {
+        Objects.requireNonNull(parameter);
         return parameter.expected != null ? isConsistent(parameter.expected)
                 : expected != null ? parameter.isConsistent(this)
                 : isConsistent(value, parameter.value, bitmask & parameter.bitmask);
     }
 
+    @SuppressWarnings("null")
     public boolean isConsistent(long val) {
         return isConsistent(expected != null ? expected : value, val, bitmask);
     }
@@ -187,6 +189,7 @@ public final class BitwiseParameter implements Cloneable {
         expected = null;
     }
 
+    @SuppressWarnings("null")
     public long getValuePreferExpected() {
         return expected != null ? expected : getValue();
     }

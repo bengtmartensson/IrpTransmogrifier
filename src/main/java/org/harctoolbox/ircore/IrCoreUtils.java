@@ -536,6 +536,7 @@ public final class IrCoreUtils {
     private static int approximateGreatestCommonDivider(Integer num, List<Integer> args, double relTolerance) {
         if (args.isEmpty())
             return num;
+        @SuppressWarnings("null")
         int newNum = num == null ? args.get(0) : approximateGreatestCommonDivider(num, args.get(0), relTolerance);
         ArrayList<Integer> list = new ArrayList<>(args);
         list.remove(0);

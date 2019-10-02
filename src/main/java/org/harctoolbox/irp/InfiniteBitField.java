@@ -18,6 +18,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Map;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -96,10 +97,14 @@ public final class InfiniteBitField extends BitField {
         Element dataElement = document.createElement("Data");
         dataElement.appendChild(data.toElement(document));
         element.appendChild(dataElement);
-        if (!(chop instanceof Number && ((Number) chop).toLong() == 0)) {
-            Element chopElement = document.createElement("Chop");
-            chopElement.appendChild(chop.toElement(document));
-            element.appendChild(chopElement);
+        try {
+            if (!(chop instanceof Number && chop.toLong() == 0)) {
+                Element chopElement = document.createElement("Chop");
+                chopElement.appendChild(chop.toElement(document));
+                element.appendChild(chopElement);
+            }
+        } catch (NameUnassignedException ex) {
+            throw new ThisCannotHappenException();
         }
         return element;
     }

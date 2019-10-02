@@ -188,6 +188,7 @@ public abstract class AbstractDecoder {
 
     protected abstract List<IrStreamItem> parse(int beginStart, int beginLength) throws DecodeException;
 
+    @SuppressWarnings("null")
     protected int getNoBitsLimit(List<Integer> parameterWidths) {
         return (parameterWidths == null || noPayload >= parameterWidths.size()) ? Integer.MAX_VALUE : parameterWidths.get(noPayload);
     }

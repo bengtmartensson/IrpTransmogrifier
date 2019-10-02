@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
@@ -57,7 +58,9 @@ public final class IrpUtils {
 
     private final static Level enteringExitingLevel = Level.FINER;
 
+    @SuppressWarnings("null")
     public static long variableGet(Map<String, Long> map, String name) {
+        Objects.requireNonNull(map);
         return map.containsKey(name) ? map.get(name) :  IrCoreUtils.INVALID;
     }
 

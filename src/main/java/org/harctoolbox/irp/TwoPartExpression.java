@@ -27,7 +27,11 @@ import org.w3c.dom.Element;
 final class TwoPartExpression extends Expression {
 
     public static Expression newExpression(IrpParser.ExpressionContext ctx) {
-        return newExpression(ctx, ctx.getChild(0), ctx.getChild(1));
+        return newExpression(ctx, ctx.getChild(0).getText().charAt(0), ctx.expression(0));
+    }
+
+    public static Expression newExpression(ParseTree ctx, char operator, IrpParser.ExpressionContext expression) {
+        return new TwoPartExpression(ctx, operator, expression);
     }
 
     public static Expression newExpression(ParseTree ctx, ParseTree first, ParseTree second) {
@@ -36,6 +40,10 @@ final class TwoPartExpression extends Expression {
 
     private final char operator;
     private final Expression operand;
+
+    private TwoPartExpression(ParseTree ctx, char operator, IrpParser.ExpressionContext operand) {
+        this(ctx, operator, Expression.newExpression(operand));
+    }
 
     private TwoPartExpression(ParseTree ctx, ParseTree first, ParseTree second) {
         this(ctx, first.getText().charAt(0), Expression.newExpression((IrpParser.ExpressionContext) second));

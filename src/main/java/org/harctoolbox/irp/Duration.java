@@ -153,7 +153,9 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         }
     }
 
+    @SuppressWarnings("null")
     private double multiplicator(GeneralSpec generalSpec) {
+        Objects.requireNonNull(time_units);
         return unit.equals("p") ? IrCoreUtils.seconds2microseconds(1/generalSpec.getFrequencyWitDefault())
                 : unit.equals("m") ? 1000
                 : unit.equals("u") ? 1

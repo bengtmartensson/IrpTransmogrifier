@@ -33,6 +33,8 @@ import org.w3c.dom.Element;
 public abstract class Expression extends PrimaryItem {
 
     private static final Logger logger = Logger.getLogger(Expression.class.getName());
+    public static final Expression TRUE = newExpression(1L);
+    public static final Expression FALSE = newExpression(0L);
 
     public static Expression newExpression(long value) {
         return new NumberExpression(value);
@@ -98,11 +100,11 @@ public abstract class Expression extends PrimaryItem {
             case 1:
                 return OnePartExpression.newExpression(original, ctx.getChild(0));
             case 2:
-                return TwoPartExpression.newExpression(original, ctx.getChild(0), ctx.getChild(1));
+                return TwoPartExpression.newExpression(original, ctx.getChild(0).getText().charAt(0), ctx.expression(0));
             case 3:
-                return ThreePartExpression.newExpression(original, ctx.getChild(0), ctx.getChild(1), ctx.getChild(2));
+                return ThreePartExpression.newExpression(original, ctx.expression(0), ctx.getChild(1).getText(), ctx.expression(1));
             case 5:
-                return FivePartExpression.newExpression(original, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
+                return FivePartExpression.newExpression(original, ctx.expression(0), ctx.expression(1), ctx.expression(2));
             default:
                 throw new ThisCannotHappenException("Unknown expression type");
         }
@@ -112,8 +114,6 @@ public abstract class Expression extends PrimaryItem {
         return x ? 1L : 0L;
     }
 
-    public static final Expression TRUE = newExpression(1L);
-    public static final Expression FALSE = newExpression(0L);
 
     private ParserDriver parserDriver = null;
 

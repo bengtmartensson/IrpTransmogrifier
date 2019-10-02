@@ -53,10 +53,9 @@ public abstract class BitField extends IrpObject implements Numerical {
     }
 
     public static BitField newBitField(IrpParser.BitfieldContext ctx) {
-        BitField instance = (ctx instanceof IrpParser.Finite_bitfieldContext)
-                ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
-                : new InfiniteBitField((IrpParser.Infinite_bitfieldContext) ctx);
-        return instance;
+        return    (ctx instanceof IrpParser.Finite_bitfieldContext)   ? new FiniteBitField((IrpParser.Finite_bitfieldContext) ctx)
+                : (ctx instanceof IrpParser.Infinite_bitfieldContext) ? new InfiniteBitField((IrpParser.Infinite_bitfieldContext) ctx)
+                : null; // cannot happen, placifying findbugs...
     }
 
     public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
@@ -67,7 +66,7 @@ public abstract class BitField extends IrpObject implements Numerical {
     static Expression newExpression(IrpParser.BitfieldContext ctx) {
         if (ctx instanceof IrpParser.Infinite_bitfieldContext)
             throw new ThisCannotHappenException("Cannot use an infinite bitfield as expression");
-        return FiniteBitField.newExpression((IrpParser.Finite_bitfieldContext) ctx);
+        return FiniteBitField.newExpression(ctx);
     }
 
     protected boolean complement;

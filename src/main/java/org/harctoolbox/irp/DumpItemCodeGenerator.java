@@ -20,6 +20,7 @@ package org.harctoolbox.irp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 
@@ -34,8 +35,9 @@ public final class DumpItemCodeGenerator extends ItemCodeGenerator {
         return s.toString();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "null"})
     private static String render(Object object, int level) {
+        Objects.requireNonNull(object);
         if (object instanceof List<?>)
             return render((List<?>) object, level);
         else if (object instanceof Map<?, ?>)

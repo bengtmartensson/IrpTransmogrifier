@@ -150,9 +150,9 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
 
     public void dumpPreferOvers(PrintStream out) {
         out.println(name + ":");
-        for (PreferOver prefOver : preferOver) {
+        preferOver.forEach((prefOver) -> {
             out.println("\t" + prefOver);
-        }
+        });
     }
 
     public void dumpPreferOvers(PrintStream out, IrpDatabase irpDatabase) {
@@ -164,7 +164,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
             throw new ThisCannotHappenException("MAXLEVEL (= " + MAXLEVEL + ") reached, probably circular prefer-overs");
 
         //out.println(IrCoreUtils.tabs(level) + this.name + ":");
-        for (PreferOver prefOver : preferOver) {
+        preferOver.forEach((prefOver) -> {
             String r = prefOver.toBeRemoved();
             try {
                 out.println(IrCoreUtils.tabs(level+1) + prefOver);
@@ -175,7 +175,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
             } catch (InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException | NameUnassignedException ex) {
                 Logger.getLogger(NamedProtocol.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        });
     }
 
     /**

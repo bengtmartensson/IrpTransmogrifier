@@ -104,7 +104,6 @@ public class ThingsLineParser<T> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<T> readThings(Reader reader, boolean multiLines) throws IOException {
         BufferedReader in = new BufferedReader(reader);
         List<T> list = new ArrayList<>(4);

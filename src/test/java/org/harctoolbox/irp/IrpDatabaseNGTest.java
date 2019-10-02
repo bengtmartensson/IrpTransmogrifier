@@ -267,7 +267,7 @@ public class IrpDatabaseNGTest {
         System.out.println("testAddProtocolExpand");
         String name = "junk";
         instance.addProtocol(name, "NEC1{D=F,S=F}[F:0..255]");
-        NamedProtocol p = instance.getNamedProtocol(name);
+        instance.getNamedProtocol(name);
         String irp = instance.getIrp(name);
         assertEquals(irp, "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*){D=F,S=F}[F:0..255]");
     }

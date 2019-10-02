@@ -109,6 +109,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
      * @param ctx
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      */
+    @SuppressWarnings("null")
     public GeneralSpec(IrpParser.Generalspec_listContext ctx) throws IrpInvalidArgumentException {
         super(ctx);
         Double unitInPeriods = null;
@@ -168,6 +169,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
         return frequency;
     }
 
+    @SuppressWarnings("null")
     public double getFrequencyWitDefault() {
         return frequency != null ? frequency : DEFAULT_FREQUENCY;
     }

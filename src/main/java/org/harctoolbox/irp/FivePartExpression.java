@@ -24,11 +24,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 final class FivePartExpression extends Expression {
 
     public static FivePartExpression newExpression(IrpParser.ExpressionContext ctx) {
-        return newExpression(ctx, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
+        return newExpression(ctx, ctx.expression(0), ctx.expression(1), ctx.expression(2));
     }
 
-    public static FivePartExpression newExpression(ParseTree ctx, ParseTree cond, ParseTree trueExpression, ParseTree falseExpression) {
-        return new FivePartExpression(ctx, (IrpParser.ExpressionContext) cond, (IrpParser.ExpressionContext) trueExpression, (IrpParser.ExpressionContext) falseExpression);
+    public static FivePartExpression newExpression(ParseTree ctx, IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
+        return new FivePartExpression(ctx, cond, trueExpression, falseExpression);
     }
 
     private final Expression conditional;

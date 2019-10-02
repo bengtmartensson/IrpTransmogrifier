@@ -28,27 +28,26 @@ import org.w3c.dom.Element;
 final class ThreePartExpression extends Expression {
 
     public static Expression newExpression(IrpParser.ExpressionContext ctx) {
-        return new ThreePartExpression(ctx, ctx.getChild(0), ctx.getChild(1), ctx.getChild(2));
+        return new ThreePartExpression(ctx, ctx.expression(0), ctx.getChild(1).getText(), ctx.expression(1));
     }
 
-    public static Expression newExpression(ParseTree ctx, ParseTree first, ParseTree second, ParseTree third) {
-        return new ThreePartExpression(ctx, first, second, third);
+    public static Expression newExpression(ParseTree ctx, IrpParser.ExpressionContext left, String operator, IrpParser.ExpressionContext right) {
+        return new ThreePartExpression(ctx, left, operator, right);
     }
 
     private final String operator;
     private final Expression op1;
     private final Expression op2;
 
-    private ThreePartExpression(ParseTree ctx, Expression first, String second, Expression third) {
-        super(ctx);
-        op1 = first;
-        operator = second;
-        op2 = third;
+    private ThreePartExpression(ParseTree ctx, IrpParser.ExpressionContext left, String op, IrpParser.ExpressionContext right) {
+        this(ctx, Expression.newExpression(left), op, Expression.newExpression(right));
     }
 
-    private ThreePartExpression(ParseTree ctx, ParseTree first, ParseTree second, ParseTree third) {
-        this(ctx, Expression.newExpression((IrpParser.ExpressionContext) first),
-                second.getText(), Expression.newExpression((IrpParser.ExpressionContext) third));
+    private ThreePartExpression(ParseTree ctx, Expression first, String operator, Expression third) {
+        super(ctx);
+        op1 = first;
+        this.operator = operator;
+        op2 = third;
     }
 
     private ThreePartExpression(PrimaryItem pi1, String operator, PrimaryItem pi2) {

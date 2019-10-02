@@ -256,6 +256,7 @@ public final class ModulatedIrSequence extends IrSequence {
         return dutyCycle;
     }
 
+    @SuppressWarnings("null")
     public double getDutyCycleWithDefault() {
         return dutyCycle != null ? dutyCycle : DEFAULT_DUTYCYCLE;
     }

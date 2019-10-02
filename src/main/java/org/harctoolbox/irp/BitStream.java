@@ -40,8 +40,10 @@ final class BitStream extends IrpObject implements Evaluatable {
         length = 0;
     }
 
+    @SuppressWarnings("null")
     BitStream(BitField bitField, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
         super(null);
+        Objects.requireNonNull(bitField);
         if (bitField instanceof InfiniteBitField)
             throw new ThisCannotHappenException("Infinite bitfields cannot be converted to BitStreams.");
 

@@ -139,7 +139,7 @@ public class IrpDatabaseNGTest {
     public void testGetCName() {
         System.out.println("getCName");
         String name = "48-nec1";
-        String expResult = "X48NEC1";
+        String expResult = "x48_NEC1";
         String result = instance.getCName(name);
         assertEquals(result, expResult);
     }

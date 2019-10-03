@@ -175,6 +175,19 @@ mitsubishi \
 unknownA \
 velodyne
 
+FREQTOLERANCE_CanalSatLD          := --frequencytolerance -1
+FREQTOLERANCE_CanalSat_38         := --frequencytolerance -1
+FREQTOLERANCE_CanalSat_38_3       := --frequencytolerance -1
+FREQTOLERANCE_Elan                := --frequencytolerance -1
+FREQTOLERANCE_Mitsubishi_K.pronto := --frequencytolerance -1
+FREQTOLERANCE_Denon_short         := --frequencytolerance 4000
+FREQTOLERANCE_Humax4Phase         := --frequencytolerance 6000
+FREQTOLERANCE_RC6_6_56            := --frequencytolerance 6000
+FREQTOLERANCE_Xiaomi_MDZ_16_AA    := --frequencytolerance 2500
+FREQTOLERANCE_ZenithAll           := --frequencytolerance 2500
+FREQTOLERANCE_Zenith_6_0_1        := --frequencytolerance 2500
+FREQTOLERANCE_Zenith_7_0_10       := --frequencytolerance 2500
+
 TARGETS := $(foreach f,$(NORMAL_TESTS),$(f).diff)
 
 default: $(TARGETS)
@@ -182,41 +195,8 @@ default: $(TARGETS)
 %.diff: %.out | %.exp
 	-$(DIFF) "$*.out" "$*.exp" > "$@"
 
-CanalSat-%.out: CanalSat-%.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance -1 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-CanalSatLD.out: CanalSatLD.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance -1 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-Elan.out: Elan.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance -1 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-Mitsubishi-K.pronto.out: Mitsubishi-K.pronto.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance -1 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-Denon_short.out: Denon_short.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance 4000 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-Humax4Phase.out: Humax4Phase.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance 6000 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-RC6-6-56.out: RC6-6-56.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance 6000 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-Xiaomi_MDZ-16-AA.out: Xiaomi_MDZ-16-AA.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance 2500 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-ZenithAll.out: ZenithAll.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance 2500 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-Zenith_6_0_1.out: Zenith_6_0_1.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance 2500 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-Zenith_7_0_10.out: Zenith_7_0_10.txt
-	$(IRPTRANSMOGRIFIER) --frequencytolerance 2500 --out "$@" --tsv decode --recursive  --namedinput "$<"
-
-%.out %.exp: %.txt
-	$(IRPTRANSMOGRIFIER) --out "$@" --tsv decode --recursive  --namedinput "$<"
+%.out: %.txt
+	$(IRPTRANSMOGRIFIER) $(FREQTOLERANCE_$(subst -,_,$(basename $@))) --out "$@" --tsv decode --recursive  --namedinput "$<"
 
 %.txt: %.ict
 	$(ICTPARSE) "$<" > "$@"

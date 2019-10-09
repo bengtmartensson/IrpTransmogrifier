@@ -317,8 +317,8 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
             if (bareIrStreamNo == bitSpec.size())
                 throw new SignalRecognitionException("FiniteBitField did not parse");
-//            if (recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb) // <---
-//                bareIrStreamNo = IrCoreUtils.reverse(bareIrStreamNo, chunkSize);
+            if (recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb) // <---
+                bareIrStreamNo = IrCoreUtils.reverse(bareIrStreamNo, chunkSize);
 
             recognizeData.setPosition(inData.getPosition());
             recognizeData.setHasConsumed(inData.getHasConsumed());

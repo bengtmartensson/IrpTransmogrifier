@@ -80,7 +80,9 @@ final class BitStream extends IrpObject implements Evaluatable {
             int noChunks = ((int) length) / bitSpec.getChunkSize();
             for (int n = 0; n < noChunks; n++) {
                 int chunkNo = noChunks - n - 1;
-                BareIrStream irs = bitSpec.get(getChunkNo(chunkNo, bitSpec.getChunkSize()));
+                int msbindex = getChunkNo(chunkNo, bitSpec.getChunkSize());
+                int index = generalSpec.getBitDirection() == BitDirection.msb ? msbindex : IrCoreUtils.reverse(msbindex, bitSpec.getChunkSize());
+                BareIrStream irs = bitSpec.get(index);
                 EvaluatedIrStream evaluatedIrStream = irs.evaluate(state, pass, generalSpec, nameEngine);
                 list.add(evaluatedIrStream);
             }

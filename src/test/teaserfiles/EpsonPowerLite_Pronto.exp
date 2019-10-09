@@ -1,29 +1,29 @@
-s-vid:	Epson: {D=9,F1=3,F2=2,OBC=4,S=5,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
-Power:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
-search:	Epson: {D=9,F1=2,F2=2,OBC=7,S=5,T1=0,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
-1:	Epson: {D=9,F1=2,F2=2,OBC=0,S=5,T1=0,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-2:	Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-3:	Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-4:	Epson: {D=9,F1=2,F2=2,OBC=3,S=5,T1=0,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-5:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-6:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-7:	Epson: {D=9,F1=3,F2=2,OBC=3,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-8:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-9:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=149, reps=5	{UNDECODED. length=30}
-video:	Epson: {D=9,F1=3,F2=2,OBC=4,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-EZ-MP:	Epson: {D=9,F1=2,F2=2,OBC=5,S=5,T1=0,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-comp1:	Epson: {D=9,F1=3,F2=2,OBC=5,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-comp2:	Epson: {D=9,F1=2,F2=2,OBC=5,S=5,T1=0,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
-MENU:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-HELP:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
-PG`Down_Arrow:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-E-ZOOM-:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-FREEZE:	Epson: {D=9,F1=3,F2=2,OBC=0,S=5,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
-PG`Up_Arrow:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-E-ZOOM+:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
-RESIZE:	Epson: {D=9,F1=2,F2=2,OBC=0,S=5,T1=0,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
-A/VMUTE:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+s-vid:	Epson: {D=98,F1=1,F2=0,OBC=18,S=170,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+Power:	Epson: {D=98,F1=1,F2=2,OBC=42,S=170,T1=1,T2=2},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+search:	Epson: {D=98,F1=2,F2=0,OBC=63,S=170,T1=2,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+1:	Epson: {D=98,F1=2,F2=2,OBC=2,S=170,T1=2,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+2:	Epson: {D=98,F1=1,F2=2,OBC=11,S=170,T1=1,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+3:	Epson: {D=98,F1=1,F2=2,OBC=1,S=170,T1=1,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+4:	Epson: {D=98,F1=2,F2=2,OBC=38,S=170,T1=2,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+5:	Epson: {D=98,F1=2,F2=0,OBC=42,S=168,T1=2,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+6:	Epson: {D=98,F1=1,F2=0,OBC=41,S=168,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+7:	Epson: {D=98,F1=1,F2=2,OBC=44,S=170,T1=1,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+8:	Epson: {D=98,F1=1,F2=0,OBC=32,S=168,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+9:	Epson: {D=98,F1=2,F2=0,OBC=35,S=168,T1=2,T2=0},	beg=0, end=149, reps=5	{UNDECODED. length=30}
+video:	Epson: {D=98,F1=1,F2=0,OBC=24,S=170,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+EZ-MP:	Epson: {D=98,F1=2,F2=0,OBC=20,S=170,T1=2,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+comp1:	Epson: {D=98,F1=1,F2=2,OBC=22,S=170,T1=1,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+comp2:	Epson: {D=98,F1=2,F2=2,OBC=28,S=170,T1=2,T2=2},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+MENU:	Epson: {D=98,F1=2,F2=2,OBC=32,S=170,T1=2,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+HELP:	Epson: {D=98,F1=2,F2=2,OBC=41,S=170,T1=2,T2=2},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+PG`Down_Arrow:	Epson: {D=98,F1=1,F2=2,OBC=33,S=168,T1=1,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+E-ZOOM-:	Epson: {D=98,F1=2,F2=2,OBC=34,S=168,T1=2,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+FREEZE:	Epson: {D=98,F1=1,F2=0,OBC=0,S=170,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+PG`Up_Arrow:	Epson: {D=98,F1=1,F2=2,OBC=43,S=168,T1=1,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+E-ZOOM+:	Epson: {D=98,F1=2,F2=2,OBC=40,S=168,T1=2,T2=2},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+RESIZE:	Epson: {D=98,F1=2,F2=0,OBC=10,S=170,T1=2,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+A/VMUTE:	Epson: {D=98,F1=1,F2=0,OBC=33,S=170,T1=1,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
 ENTER:	
-PnP:	Epson: {D=9,F1=2,F2=2,OBC=2,S=5,T1=0,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
+PnP:	Epson: {D=98,F1=2,F2=0,OBC=34,S=170,T1=2,T2=0},	beg=0, end=119, reps=4	{UNDECODED. length=30}
 ESC:	
-COLOR MOD:	Epson: {D=9,F1=3,F2=2,OBC=2,S=5,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}
+COLOR MOD:	Epson: {D=98,F1=1,F2=0,OBC=43,S=170,T1=1,T2=0},	beg=0, end=89, reps=3	{UNDECODED. length=30}

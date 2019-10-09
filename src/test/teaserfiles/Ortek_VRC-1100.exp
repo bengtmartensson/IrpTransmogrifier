@@ -1,49 +1,49 @@
-Power:	OrtekMCE: {D=21,F=3,P=2},	beg=0, end=261, reps=8
-IE:	OrtekMCE: {D=21,F=5,P=2},	beg=0, end=217, reps=7
-Recordings (Yellow):	OrtekMCE: {D=21,F=6,P=2},	beg=0, end=181, reps=5
-Music (Blue):	OrtekMCE: {D=21,F=7,P=2},	beg=0, end=259, reps=8
-Pictures (Green):	OrtekMCE: {D=21,F=4,P=2},	beg=0, end=247, reps=7
-Videos (Red):	OrtekMCE: {D=21,F=2,P=2},	beg=0, end=219, reps=6
-Recordings:	OrtekMCE: {D=21,F=14,P=2},	beg=0, end=231, reps=7
-Guide:	OrtekMCE: {D=21,F=15,P=2},	beg=0, end=233, reps=7
-Live TV:	OrtekMCE: {D=21,F=12,P=2},	beg=0, end=259, reps=8
-Movies:	OrtekMCE: {D=21,F=10,P=2},	beg=0, end=215, reps=7
-Rew:	OrtekMCE: {D=21,F=13,P=2},	beg=0, end=215, reps=7
-FFW:	OrtekMCE: {D=21,F=9,P=2},	beg=0, end=145, reps=4
-Skip Back:	OrtekMCE: {D=21,F=8,P=2},	beg=0, end=191, reps=5
+Power:	OrtekMCE: {D=21,F=3},	beg=0, end=261, reps=8
+IE:	OrtekMCE: {D=21,F=5},	beg=0, end=217, reps=7
+Recordings (Yellow):	OrtekMCE: {D=21,F=6},	beg=0, end=181, reps=5
+Music (Blue):	OrtekMCE: {D=21,F=7},	beg=0, end=259, reps=8
+Pictures (Green):	OrtekMCE: {D=21,F=4},	beg=0, end=247, reps=7
+Videos (Red):	OrtekMCE: {D=21,F=2},	beg=0, end=219, reps=6
+Recordings:	OrtekMCE: {D=21,F=14},	beg=0, end=231, reps=7
+Guide:	OrtekMCE: {D=21,F=15},	beg=0, end=233, reps=7
+Live TV:	OrtekMCE: {D=21,F=12},	beg=0, end=259, reps=8
+Movies:	OrtekMCE: {D=21,F=10},	beg=0, end=215, reps=7
+Rew:	OrtekMCE: {D=21,F=13},	beg=0, end=215, reps=7
+FFW:	OrtekMCE: {D=21,F=9},	beg=0, end=145, reps=4
+Skip Back:	OrtekMCE: {D=21,F=8},	beg=0, end=191, reps=5
 Skip Fwd:	
-Stop:	OrtekMCE: {D=21,F=16,P=2},	beg=0, end=247, reps=7
-Pause:	OrtekMCE: {D=21,F=20,P=2},	beg=0, end=215, reps=7
-Rec:	OrtekMCE: {D=21,F=19,P=2},	beg=0, end=239, reps=8
-Play:	OrtekMCE: {D=21,F=11,P=2},	beg=0, end=239, reps=8
-Back:	OrtekMCE: {D=21,F=22,P=2},	beg=0, end=237, reps=8
-Info:	OrtekMCE: {D=21,F=18,P=1},	beg=0, end=241, reps=9
-Up:	OrtekMCE: {D=21,F=21,P=2},	beg=0, end=175, reps=6
-Down:	OrtekMCE: {D=21,F=32,P=2},	beg=0, end=249, reps=7
-Left:	OrtekMCE: {D=21,F=23,P=2},	beg=0, end=215, reps=7
-Right:	OrtekMCE: {D=21,F=33,P=1},	beg=0, end=259, reps=9
-OK:	OrtekMCE: {D=21,F=34,P=1},	beg=0, end=207, reps=7
-Vol+:	OrtekMCE: {D=21,F=50,P=2},	beg=0, end=239, reps=8
-Vol-:	OrtekMCE: {D=21,F=51,P=2},	beg=0, end=257, reps=8
-Mute:	OrtekMCE: {D=21,F=48,P=2},	beg=0, end=249, reps=7
+Stop:	OrtekMCE: {D=21,F=16},	beg=0, end=247, reps=7
+Pause:	OrtekMCE: {D=21,F=20},	beg=0, end=215, reps=7
+Rec:	OrtekMCE: {D=21,F=19},	beg=0, end=239, reps=8
+Play:	OrtekMCE: {D=21,F=11},	beg=0, end=239, reps=8
+Back:	OrtekMCE: {D=21,F=22},	beg=0, end=237, reps=8
+Info:	OrtekMCE: {D=21,F=18},	beg=0, end=241, reps=9
+Up:	OrtekMCE: {D=21,F=21},	beg=0, end=175, reps=6
+Down:	OrtekMCE: {D=21,F=32},	beg=0, end=249, reps=7
+Left:	OrtekMCE: {D=21,F=23},	beg=0, end=215, reps=7
+Right:	OrtekMCE: {D=21,F=33},	beg=0, end=259, reps=9
+OK:	OrtekMCE: {D=21,F=34},	beg=0, end=207, reps=7
+Vol+:	OrtekMCE: {D=21,F=50},	beg=0, end=239, reps=8
+Vol-:	OrtekMCE: {D=21,F=51},	beg=0, end=257, reps=8
+Mute:	OrtekMCE: {D=21,F=48},	beg=0, end=249, reps=7
 Ch+:	
-Ch-:	OrtekMCE: {D=21,F=49,P=2},	beg=0, end=193, reps=6
-Start (Green Button):	OrtekMCE: {D=21,F=46,P=2},	beg=0, end=203, reps=6
+Ch-:	OrtekMCE: {D=21,F=49},	beg=0, end=193, reps=6
+Start (Green Button):	OrtekMCE: {D=21,F=46},	beg=0, end=203, reps=6
 0:	
-1:	OrtekMCE: {D=21,F=52,P=2},	beg=0, end=239, reps=8
-2:	OrtekMCE: {D=21,F=36,P=2},	beg=0, end=231, reps=7
-3:	OrtekMCE: {D=21,F=31,P=2},	beg=0, end=221, reps=6
-4:	OrtekMCE: {D=21,F=53,P=1},	beg=0, end=45, reps=1
-5:	OrtekMCE: {D=21,F=35,P=2},	beg=0, end=241, reps=8
-6:	OrtekMCE: {D=21,F=30,P=2},	beg=0, end=257, reps=8
-7:	OrtekMCE: {D=21,F=45,P=1},	beg=0, end=189, reps=7
-8:	OrtekMCE: {D=21,F=37,P=2},	beg=0, end=221, reps=8
-9:	OrtekMCE: {D=21,F=38,P=1},	beg=0, end=241, reps=9
-*:	OrtekMCE: {D=21,F=43,P=1},	beg=0, end=237, reps=9
-#:	OrtekMCE: {D=21,F=40,P=1},	beg=0, end=259, reps=9
-Close:	OrtekMCE: {D=21,F=44,P=1},	beg=0, end=241, reps=9
-Clear:	OrtekMCE: {D=21,F=41,P=2},	beg=0, end=221, reps=8
-Enter:	OrtekMCE: {D=21,F=39,P=1},	beg=0, end=257, reps=9
+1:	OrtekMCE: {D=21,F=52},	beg=0, end=239, reps=8
+2:	OrtekMCE: {D=21,F=36},	beg=0, end=231, reps=7
+3:	OrtekMCE: {D=21,F=31},	beg=0, end=221, reps=6
+4:	OrtekMCE: {D=21,F=53},	beg=0, end=45, reps=1
+5:	OrtekMCE: {D=21,F=35},	beg=0, end=241, reps=8
+6:	OrtekMCE: {D=21,F=30},	beg=0, end=257, reps=8
+7:	OrtekMCE: {D=21,F=45},	beg=0, end=189, reps=7
+8:	OrtekMCE: {D=21,F=37},	beg=0, end=221, reps=8
+9:	OrtekMCE: {D=21,F=38},	beg=0, end=241, reps=9
+*:	OrtekMCE: {D=21,F=43},	beg=0, end=237, reps=9
+#:	OrtekMCE: {D=21,F=40},	beg=0, end=259, reps=9
+Close:	OrtekMCE: {D=21,F=44},	beg=0, end=241, reps=9
+Clear:	OrtekMCE: {D=21,F=41},	beg=0, end=221, reps=8
+Enter:	OrtekMCE: {D=21,F=39},	beg=0, end=257, reps=9
 Mouse Up:	
 Mouse Down:	
 Mouse Right:	

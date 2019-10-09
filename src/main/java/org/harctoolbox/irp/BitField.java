@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 /**
@@ -29,7 +30,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
  *
  * @see BitStream
  */
-public abstract class BitField extends IrpObject implements Numerical {
+public abstract class BitField extends IrpObject implements Numerical, EquationSolving {
 
     /**
      * Max length of a BitField in this implementation.
@@ -43,13 +44,6 @@ public abstract class BitField extends IrpObject implements Numerical {
 
     public static BitField newBitField(ParserDriver parserDriver) {
         return newBitField(parserDriver.getParser().bitfield());
-//        int last = parser.bitfield().getStop().getStopIndex();
-//        if (last != str.length() - 1)
-//            logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
-//    }
-//
-//    private static BitField newBitField(IrpParser parser) {
-//        return newBitField(parser.bitfield());
     }
 
     public static BitField newBitField(IrpParser.BitfieldContext ctx) {
@@ -61,6 +55,18 @@ public abstract class BitField extends IrpObject implements Numerical {
     public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         BitField bitField = newBitField(str);
         return bitField.toLong(nameEngine);
+    }
+
+    public static long toLong(long data, long width, long chop, boolean complement, boolean reverse) {
+        long x = data >> chop;
+        if (complement)
+            x = ~x;
+        if (width < MAXWIDTH)
+            x &= IrCoreUtils.ones(width);
+        if (reverse)
+            x = IrCoreUtils.reverse(x, (int) width);
+
+        return x;
     }
 
     static Expression newExpression(IrpParser.BitfieldContext ctx) {
@@ -99,12 +105,26 @@ public abstract class BitField extends IrpObject implements Numerical {
 
     @Override
     public long toLong() throws NameUnassignedException {
-        return toLong(NameEngine.empty);
+        return toLong(NameEngine.EMPTY);
     }
 
     public abstract String toString(NameEngine nameEngine);
 
     public abstract long getWidth(NameEngine nameEngine) throws NameUnassignedException;
+
+    protected abstract BitwiseParameter getWidth(RecognizeData nameResolver) throws NameUnassignedException;
+
+    public long getChop(NameEngine nameResolver) throws NameUnassignedException {
+        return chop.toLong(nameResolver);
+    }
+
+    protected long getChop() throws NameUnassignedException {
+        return chop.toLong();
+    }
+
+    public BitwiseParameter getChop(RecognizeData recognizeData) {
+        return chop.toBitwiseParameter(recognizeData);
+    }
 
     public boolean isEmpty(NameEngine nameEngine) throws NameUnassignedException {
         return getWidth(nameEngine) == 0;
@@ -130,9 +150,8 @@ public abstract class BitField extends IrpObject implements Numerical {
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
         Map<String, Object> map = IrpUtils.propertiesMap(6, this);
         map.put("data", data.propertiesMap(eval, generalSpec, nameEngine));
-        //map.put("width", width.propertiesMap(true, generalSpec));
         try {
-            long num = chop.toLong(null);
+            long num = chop.toLong();
             if (num != 0)
                 map.put("chop", chop.propertiesMap(true, generalSpec, nameEngine));
         } catch (NameUnassignedException ex) {
@@ -154,5 +173,13 @@ public abstract class BitField extends IrpObject implements Numerical {
 
     public boolean constant(NameEngine nameEngine) {
         return data.constant(nameEngine) && chop.constant(nameEngine);
+    }
+
+    @Override
+    public abstract BitwiseParameter invert(BitwiseParameter rhs, RecognizeData nameResolver/*, long oldBitmask*/) throws NameUnassignedException;
+
+    @Override
+    public final PrimaryItem leftHandSide() {
+        return data;
     }
 }

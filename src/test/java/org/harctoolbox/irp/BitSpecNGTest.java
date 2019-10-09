@@ -88,10 +88,10 @@ public class BitSpecNGTest {
             BitSpec rc5 = new BitSpec(RC5_BITSPEC);
             BitSpec rc6 = new BitSpec(RC6_BITSPEC);
             //BitSpec empty = new BitSpec();
-            assertFalse(nec1.isStandardBiPhase(generalSpec, NameEngine.empty));
-            assertFalse(nokia32.isStandardBiPhase(generalSpec, NameEngine.empty));
-            assertTrue(rc5.isStandardBiPhase(generalSpec, NameEngine.empty));
-            assertTrue(rc6.isStandardBiPhase(generalSpec, NameEngine.empty));
+            assertFalse(nec1.isStandardBiPhase(generalSpec, NameEngine.EMPTY));
+            assertFalse(nokia32.isStandardBiPhase(generalSpec, NameEngine.EMPTY));
+            assertTrue(rc5.isStandardBiPhase(generalSpec, NameEngine.EMPTY));
+            assertTrue(rc6.isStandardBiPhase(generalSpec, NameEngine.EMPTY));
         } catch (IrpInvalidArgumentException ex) {
             fail();
         }

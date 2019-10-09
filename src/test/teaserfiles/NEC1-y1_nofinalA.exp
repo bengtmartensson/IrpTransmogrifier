@@ -1,6 +1,6 @@
-FM:	NEC1-f16: {D=127,F=10072,S=1},	beg=0, end=67
-AM:	NEC1-f16: {D=127,F=10837,S=1},	beg=0, end=67
-Preset up:	NEC1-f16: {D=127,F=9307,S=1},	beg=0, end=67
-Preset down:	NEC1-f16: {D=127,F=8542,S=1},	beg=0, end=67
-Tuning up:	NEC1-f16: {D=127,F=7777,S=1},	beg=0, end=67
-Tuning down:	NEC1-f16: {D=127,F=7012,S=1},	beg=0, end=67
+FM:	NEC-f16: {D=127,F=10072,S=1},	beg=0, end=67
+AM:	NEC-f16: {D=127,F=10837,S=1},	beg=0, end=67
+Preset up:	NEC-f16: {D=127,F=9307,S=1},	beg=0, end=67
+Preset down:	NEC-f16: {D=127,F=8542,S=1},	beg=0, end=67
+Tuning up:	NEC-f16: {D=127,F=7777,S=1},	beg=0, end=67
+Tuning down:	NEC-f16: {D=127,F=7012,S=1},	beg=0, end=67

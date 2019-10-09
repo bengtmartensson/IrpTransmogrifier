@@ -24,11 +24,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 final class FivePartExpression extends Expression {
 
     public static FivePartExpression newExpression(IrpParser.ExpressionContext ctx) {
-        return newExpression(ctx, ctx.expression(0), ctx.expression(1), ctx.expression(2));
+        return newExpression(ctx, ctx.getChild(0), ctx.getChild(2), ctx.getChild(4));
     }
 
-    public static FivePartExpression newExpression(ParseTree ctx, IrpParser.ExpressionContext cond, IrpParser.ExpressionContext trueExpression, IrpParser.ExpressionContext falseExpression) {
-        return new FivePartExpression(ctx, cond, trueExpression, falseExpression);
+    public static FivePartExpression newExpression(ParseTree ctx, ParseTree cond, ParseTree trueExpression, ParseTree falseExpression) {
+        return new FivePartExpression(ctx, (IrpParser.ExpressionContext) cond, (IrpParser.ExpressionContext) trueExpression, (IrpParser.ExpressionContext) falseExpression);
     }
 
     private final Expression conditional;
@@ -114,7 +114,18 @@ final class FivePartExpression extends Expression {
     }
 
     @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        BitwiseParameter ctrl = conditional.toBitwiseParameter(recognizeData);
+        return ctrl.isTrue() ? trueExp.toBitwiseParameter(recognizeData) : falseExp.toBitwiseParameter(recognizeData);
+    }
+
+    @Override
     public boolean constant(NameEngine nameEngine) {
         return trueExp.constant(nameEngine) && falseExp.constant(nameEngine);
+    }
+
+    @Override
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData recognizeData) throws NameUnassignedException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

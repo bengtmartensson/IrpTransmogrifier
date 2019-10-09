@@ -86,6 +86,11 @@ final class NameExpression extends PrimaryItemExpression {
     }
 
     @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        return name.toBitwiseParameter(recognizeData);
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element el = super.toElement(document);
         el.appendChild(name.toElement(document));
@@ -93,7 +98,7 @@ final class NameExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData nameEngine) {
         return rhs;
     }
 

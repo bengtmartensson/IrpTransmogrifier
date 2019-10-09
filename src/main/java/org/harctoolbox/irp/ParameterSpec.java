@@ -93,7 +93,7 @@ public final class ParameterSpec extends IrpObject {
     }
 
     public void check(NameEngine nameEngine) throws InvalidNameException, DomainViolationException, NameUnassignedException {
-        if (!nameEngine.containsKey(name.getName())) {
+        if (!nameEngine.containsKey(name.toString())) {
             if (this.hasMemory())
                 return;
 
@@ -103,7 +103,7 @@ public final class ParameterSpec extends IrpObject {
                 throw new NameUnassignedException(name, true);
         }
 
-        Long value = nameEngine.get(name.getName()).toLong(nameEngine);
+        Long value = nameEngine.get(name).toLong(nameEngine);
         checkDomain(value);
     }
 
@@ -129,6 +129,15 @@ public final class ParameterSpec extends IrpObject {
             def.appendChild(deflt.toElement(document));
         }
         return el;
+    }
+
+    /**
+     * Heuristic bitmask required.
+     * @return
+     */
+    long bitmask() {
+        long n = max.toLong() - min.toLong();
+        return (Long.highestOneBit(n) << 1L) - 1L;
     }
 
     public String domainAsString() {
@@ -216,5 +225,12 @@ public final class ParameterSpec extends IrpObject {
         template.addAttribute("deflt", deflt);
         template.addAttribute("memory", memory);
         return template.render();
+    }
+
+    long fixValue(long x, long modulus) {
+        if (this.isWithinDomain(x))
+            return x;
+        long n = (long) Math.ceil(((double) (getMin() - x))/modulus);
+        return x + n*modulus;
     }
 }

@@ -1,10 +1,10 @@
-unnamed_0:	CanalSat: {D=1,F=0,S=37,T=1},	beg=0, end=199, reps=4
-unnamed_1:	CanalSat: {D=1,F=1,S=37,T=1},	beg=0, end=113, reps=2
-unnamed_2:	CanalSat: {D=1,F=2,S=37,T=1},	beg=0, end=75, reps=1
-unnamed_3:	CanalSat: {D=1,F=3,S=37,T=0},	beg=0, end=37
-unnamed_4:	CanalSat: {D=1,F=4,S=37,T=1},	beg=0, end=189, reps=4
+unnamed_0:	CanalSat: {D=1,F=0,S=37},	beg=0, end=199, reps=4
+unnamed_1:	CanalSat: {D=1,F=1,S=37},	beg=0, end=113, reps=2
+unnamed_2:	CanalSat: {D=1,F=2,S=37},	beg=0, end=75, reps=1
+unnamed_3:	CanalSat: {D=1,F=3,S=37},	beg=0, end=37
+unnamed_4:	CanalSat: {D=1,F=4,S=37},	beg=0, end=189, reps=4
 unnamed_5:	
-unnamed_6:	CanalSat: {D=1,F=6,S=37,T=1},	beg=0, end=265, reps=6
-unnamed_7:	CanalSat: {D=1,F=20,S=37,T=1},	beg=0, end=107, reps=2
+unnamed_6:	CanalSat: {D=1,F=6,S=37},	beg=0, end=265, reps=6
+unnamed_7:	CanalSat: {D=1,F=20,S=37},	beg=0, end=107, reps=2
 unnamed_8:	
 unnamed_9:	

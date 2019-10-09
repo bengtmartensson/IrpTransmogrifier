@@ -36,13 +36,13 @@ import org.w3c.dom.Element;
  *
  */
 
-public final class NameEngine extends IrpObject implements Cloneable, AggregateLister, Iterable<Map.Entry<String, Expression>> {
+public final class NameEngine extends IrpObject implements AggregateLister, Iterable<Map.Entry<String, Expression>> {
     private final static int WEIGHT = 0;
 
     private final static Logger logger = Logger.getLogger(NameEngine.class.getName());
 
     @SuppressWarnings("PackageVisibleField")
-    public static final NameEngine empty = new NameEngine();
+    public static final NameEngine EMPTY = new NameEngine();
 
     public static NameEngine parseLoose(String str) {
         if (str == null || str.trim().isEmpty())
@@ -73,22 +73,38 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         return element;
     }
 
+    private static HashMap<String, Expression> mapConvert(Map<String, Long> numericalParameters) {
+        HashMap<String, Expression> result = new HashMap<>(numericalParameters.size());
+        numericalParameters.entrySet().forEach((kvp) -> {
+            result.put(kvp.getKey(), new NumberExpression(kvp.getValue()));
+        });
+        return result;
+    }
+
     private Map<String, Expression> map;
+
+    public NameEngine(Map<String, Long> numericalParameters) {
+        this(null, mapConvert(numericalParameters));
+    }
 
     public NameEngine() {
         this(0);
     }
 
     public NameEngine(int initialCapacity) {
-        this(null, initialCapacity);
+        this(null, new HashMap<String, Expression>(initialCapacity));
     }
 
-    public NameEngine(IrpParser.DefinitionsContext ctx, int initialCapacity) {
+    private NameEngine(IrpParser.DefinitionsContext ctx, Map<String, Expression> map) {
         super(ctx);
-        map = new LinkedHashMap<>(initialCapacity);
+        this.map = map;
     }
 
-    public NameEngine(IrpParser.DefinitionsContext ctx) {
+    private NameEngine(IrpParser.DefinitionsContext ctx, int initialCapacity) {
+        this(ctx, new LinkedHashMap<>(initialCapacity));
+    }
+
+    private NameEngine(IrpParser.DefinitionsContext ctx) {
         this(ctx, 4);
         parseDefinitions(ctx.definitions_list());
     }
@@ -97,15 +113,12 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         this(new ParserDriver(str));
     }
 
-    public NameEngine(ParserDriver parserDriver) throws InvalidNameException {
+    private NameEngine(ParserDriver parserDriver) throws InvalidNameException {
         this(parserDriver.getParser().definitions());
     }
 
-    public NameEngine(Map<String, Long> numericalParameters) {
-        this(null, numericalParameters.size());
-        numericalParameters.entrySet().stream().forEach((entry) -> {
-            map.put(entry.getKey(), new NumberExpression(entry.getValue()));
-        });
+    public NameEngine(NameEngine orig) {
+        this(null, new HashMap<String, Expression>(orig.map));
     }
 
     @Override
@@ -194,24 +207,6 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         }
     }
 
-    /**
-     * Creates a copy of the NameEngine. The bindings are copied, the expressions not.
-     * @return Shallow copy.
-     */
-    @Override
-    @SuppressWarnings("CloneDeclaresCloneNotSupported")
-    public NameEngine clone() {
-        NameEngine result = null;
-        try {
-            result = (NameEngine) super.clone();
-        } catch (CloneNotSupportedException ex) {
-            throw new InternalError(ex);
-        }
-        result.map = new LinkedHashMap<>(map.size());
-        result.map.putAll(map);
-        return result;
-    }
-
     @Override
     public Iterator<Map.Entry<String, Expression>> iterator() {
         return map.entrySet().iterator();
@@ -274,6 +269,14 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
         if (expression == null)
             throw new NameUnassignedException(name);
         return expression;
+    }
+
+    public Expression get(Name name) throws NameUnassignedException {
+        return get(name.toString());
+    }
+
+    public Expression getPossiblyNull(String name) {
+        return map.get(name);
     }
 
     public long toLong(String name) throws NameUnassignedException {
@@ -387,7 +390,7 @@ public final class NameEngine extends IrpObject implements Cloneable, AggregateL
     }
 
     NameEngine remove(Iterable<String> names) {
-        NameEngine result = this.clone();
+        NameEngine result = new NameEngine(this);
         names.forEach((key) -> result.map.remove(key));
         return result;
     }

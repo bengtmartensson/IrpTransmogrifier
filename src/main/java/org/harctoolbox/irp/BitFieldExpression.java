@@ -50,8 +50,8 @@ final class BitFieldExpression extends PrimaryItemExpression {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
-        return rhs & bitmask;
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData nameEngine) throws NameUnassignedException {
+        return bitField.invert(rhs, nameEngine);
     }
 
     @Override
@@ -105,5 +105,10 @@ final class BitFieldExpression extends PrimaryItemExpression {
     @Override
     public boolean constant(NameEngine nameEngine) {
         return bitField.constant(nameEngine);
+    }
+
+    @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        return bitField.toBitwiseParameter(recognizeData);
     }
 }

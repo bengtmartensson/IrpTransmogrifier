@@ -52,8 +52,6 @@ public abstract class PrimaryItem extends IrpObject implements Numerical, Equati
     @Override
     public abstract String toIrpString(int radix);
 
-//    public abstract boolean isUnary();
-
     /**
      * Generate a map of the properties in the very object.
      * @param eval If true, evaluate names.
@@ -67,22 +65,21 @@ public abstract class PrimaryItem extends IrpObject implements Numerical, Equati
      * Default implementation, for non-invertible expressions.
      * @param rhs
      * @param nameEngine
-     * @param bitmask
      * @return null
      * @throws org.harctoolbox.irp.NameUnassignedException
      */
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws NameUnassignedException {
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData nameEngine) throws NameUnassignedException {
         return null;
     }
 
     /**
-     * Default implementation, for non-invertible expressions.
-     * @return null
+     * Default implementation.
+     * @return this
      */
     @Override
     public PrimaryItem leftHandSide() {
-        return null;
+        return this;
     }
 
     /**

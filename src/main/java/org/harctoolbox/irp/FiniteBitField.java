@@ -38,13 +38,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     public static FiniteBitField newFiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
         return new FiniteBitField(ctx);
-        //instance.parseTree = ctx;
-        //return instance;
     }
-
-//    public static Expression newExpression(IrpParser.Finite_bitfieldContext ctx) throws IrpSemanticException {
-//        return FiniteBitFieldExpression.newExpression(newFiniteBitField(ctx));
-//    }
 
     private PrimaryItem width;
     private boolean reverse;
@@ -55,10 +49,6 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     private FiniteBitField(ParserDriver parserDriver) {
         this((IrpParser.Finite_bitfieldContext) parserDriver.getParser().bitfield());
-//        this.parser = new ParserDriver(str).getParser();
-//        int last = parseTree.getStop().getStopIndex();
-//            if (last != str.length() - 1)
-//                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
     }
 
     public FiniteBitField(String name, long width) throws InvalidNameException {
@@ -67,6 +57,10 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     public FiniteBitField(String name, long width, boolean complement) throws InvalidNameException {
         this(new Name(name), new Number(width), new Number(0), complement, false);
+    }
+
+    private FiniteBitField(long data, long width, long chop, boolean complement, boolean reverse) throws InvalidNameException {
+        this(new Number(data), new Number(width), new Number(chop), complement, reverse);
     }
 
     private FiniteBitField(PrimaryItem data, PrimaryItem width, PrimaryItem chop, boolean complement, boolean reverse) throws InvalidNameException {
@@ -120,15 +114,20 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
-    public long toLong(NameEngine nameEngine) throws NameUnassignedException {
-        long x = data.toLong(nameEngine) >> chop.toLong(nameEngine);
-        if (complement)
-            x = ~x;
-        x &= ((1L << width.toLong(nameEngine)) - 1L);
-        if (reverse)
-            x = IrCoreUtils.reverse(x, (int) width.toLong(nameEngine));
+    public long toLong(NameEngine nameResolver) throws NameUnassignedException {
+        return toLong(data.toLong(nameResolver), width.toLong(nameResolver), chop.toLong(nameResolver), complement, reverse);
+    }
 
-        return x;
+    @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData nameResolver) {
+        BitwiseParameter payload = this.data.toBitwiseParameter(nameResolver);
+        if (payload == null)
+            return BitwiseParameter.NULL;
+        long wid = width.toBitwiseParameter(nameResolver).longValueExact();
+        long ch = chop.toBitwiseParameter(nameResolver).longValueExact();
+        long value = toLong(payload.getValue(), wid, ch, complement, reverse);
+        long bitmap = IrCoreUtils.ones(wid) & (payload.getBitmask() >> ch);
+        return new BitwiseParameter(value, bitmap);
     }
 
     public String toBinaryString(NameEngine nameEngine, boolean reverse) throws NameUnassignedException {
@@ -159,6 +158,11 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public long getWidth(NameEngine nameEngine) throws NameUnassignedException {
         return width.toLong(nameEngine);
+    }
+
+    @Override
+    public BitwiseParameter getWidth(RecognizeData recognizeData) {
+        return width.toBitwiseParameter(recognizeData);
     }
 
     @Override
@@ -233,7 +237,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public Integer numberOfBits() {
         try {
-            return (int) getWidth(NameEngine.empty);
+            return (int) getWidth(NameEngine.EMPTY);
         } catch (NameUnassignedException ex) {
             return null;
         }
@@ -243,98 +247,109 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         logger.log(recognizeData.logRecordEnter(this));
         try {
-            BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
-            int chunkSize = bitSpec.getChunkSize();
-            long payload = 0L;
-            int numWidth = (int) width.toLong(recognizeData.toNameEngine());
-            BitwiseParameter danglingData = recognizeData.getDanglingBitFieldData();
-            if (!danglingData.isEmpty()) {
-                payload = danglingData.getValue();
-                numWidth -= Long.bitCount(danglingData.getBitmask());
-                recognizeData.setDanglingBitFieldData();
-            }
-            int rest = numWidth % chunkSize;
-            int noChunks = rest == 0 ? numWidth / chunkSize : numWidth / chunkSize + 1;
+            long payload = collectData(recognizeData, bitSpecStack);
 
-            for (int chunk = 0; chunk < noChunks; chunk++) {
-                RecognizeData inData = null;
-                int bareIrStreamNo;
-                for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
-                    inData = recognizeData.clone();
-                    inData.setLevel(recognizeData.getLevel() + 1);
-                    List<BitSpec> poppedStack = new ArrayList<>(bitSpecStack);
-                    poppedStack.remove(poppedStack.size()-1);
-
-                    try {
-                        bitSpec.get(bareIrStreamNo).decode(inData, poppedStack, false);
-                        // match!
-                        break;
-                    } catch (SignalRecognitionException ex) {
-                        // No match, just try the next one
-                    }
-                }
-                assert(inData != null);
-
-                if (bareIrStreamNo == bitSpec.size())
-                    throw new SignalRecognitionException("FiniteBitField did not parse");
-
-                recognizeData.setPosition(inData.getPosition());
-                recognizeData.setHasConsumed(inData.getHasConsumed());
-                payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
-                recognizeData.getNameEngine().add(inData.getNameEngine());
+            // Can the data be computed with already present data?
+            boolean success = isChecksum(recognizeData, payload);
+            if (success) {
+                logger.log(recognizeData.logRecordExit(this));
+                return;
             }
 
-            if (rest != 0) {
-                // this has been tested only with bitorder = msb.
-                int bitsToStore = chunkSize - rest;
-                long bitmask = IrCoreUtils.ones(bitsToStore);
-                recognizeData.setDanglingBitFieldData(payload, bitmask);
-                payload >>= bitsToStore;
-            }
-            if (this.reverse ^ recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
-                payload = IrCoreUtils.reverse(payload, noChunks);
-            if (this.complement)
-                payload = ~payload;
-            payload <<= (int) chop.toLong(recognizeData.toNameEngine());
-            long bitmask = IrCoreUtils.ones((int) width.toLong(recognizeData.toNameEngine())) << chop.toLong(recognizeData.toNameEngine());
-            payload &= bitmask;
-
+            // no, it is a parameter assignment,
             // We now have the "equation" data == payload, we are turning that into an assignment
-            PrimaryItem expression = data;
-            Long rhs = payload;
+            //PrimaryItem expression = data;
+            //Long rhs = payload;
 
-            NameEngine nameEngine = recognizeData.toNameEngine();
-            while (expression != null && rhs != null && !((expression instanceof Name) || (expression instanceof Number))) {
-                rhs = expression.invert(rhs, nameEngine, bitmask);
-                //rhs &= bitmask;
-                expression = expression.leftHandSide();
+            Equation equation = new Equation(this, payload, width.toLong(recognizeData.getNameEngine()), recognizeData);
+            String origEquation = equation.toString();
+            boolean solved = equation.solve();
+            if (!solved) {
+                throw new SignalRecognitionException("Could not solve equation: " + origEquation);
             }
+            recognizeData.add(equation.getName(), equation.getValue());
 
-            if (expression != null && rhs != null) {
-                // equation solving succeeded!
-                if (expression instanceof Name) {
-                    // perform assignment
-
-                    Name name = (Name) expression;
-                    logger.log(Level.FINER, "Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(10), payload, bitmask});
-                    if (data instanceof Name)
-                        recognizeData.add(name.toString(), rhs, bitmask);
-                    else
-                        recognizeData.add(name.toString(), rhs);
-                } else if (expression instanceof Number) {
-                    // check, barf if not OK
-                    long expected = this.toLong(recognizeData.getParameterCollector().toNameEngine());
-                    if (expected != rhs)
-                        throw new SignalRecognitionException("Constant FiniteBitField did not evaluated to expected value");
-                } else
-                    throw new ThisCannotHappenException();
-            } else {
-                logger.log(Level.WARNING, "Unsolvable equation Assignment: {0}={1}&{2}", new Object[]{data.toIrpString(10), payload, bitmask});
-            }
+            solved = equation.expandLhsSolve();
+            if (solved)
+                recognizeData.add(equation.getName(), equation.getValue());
         } catch (NameUnassignedException ex) {
             throw new SignalRecognitionException(ex);
         }
-        logger.log(recognizeData.logRecordExit(this));
+    }
+
+    private boolean isChecksum(RecognizeData recognizeData, long payload) throws SignalRecognitionException {
+        BitwiseParameter expected = this.toBitwiseParameter(recognizeData);
+        return expected.check(payload, assignmentNeededBitmask(recognizeData));
+    }
+
+    private long collectData(RecognizeData recognizeData, List<BitSpec> bitSpecStack) throws SignalRecognitionException, NameUnassignedException {
+        BitSpec bitSpec = bitSpecStack.get(bitSpecStack.size() - 1);
+        int chunkSize = bitSpec.getChunkSize();
+        long payload = 0L;
+        int numWidth = (int) width.toBitwiseParameter(recognizeData).longValueExact();
+        BitwiseParameter danglingData = recognizeData.getDanglingBitFieldData();
+        if (!danglingData.isEmpty()) {
+            payload = danglingData.getValue();
+            numWidth -= Long.bitCount(danglingData.getBitmask());
+            recognizeData.setDanglingBitFieldData();
+        }
+        int rest = numWidth % chunkSize;
+        int noChunks = rest == 0 ? numWidth / chunkSize : numWidth / chunkSize + 1;
+
+        for (int chunk = 0; chunk < noChunks; chunk++) {
+            RecognizeData inData = null;
+            int bareIrStreamNo;
+            for (bareIrStreamNo = 0; bareIrStreamNo < bitSpec.size(); bareIrStreamNo++) {
+                inData = recognizeData.clone();
+                inData.setLevel(recognizeData.getLevel() + 1);
+                List<BitSpec> poppedStack = new ArrayList<>(bitSpecStack);
+                poppedStack.remove(poppedStack.size() - 1);
+
+                try {
+                    bitSpec.get(bareIrStreamNo).decode(inData, poppedStack, false);
+                    // match!
+                    break;
+                } catch (SignalRecognitionException ex) {
+                    // No match, just try the next one
+                }
+            }
+            assert (inData != null);
+
+            if (bareIrStreamNo == bitSpec.size())
+                throw new SignalRecognitionException("FiniteBitField did not parse");
+//            if (recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb) // <---
+//                bareIrStreamNo = IrCoreUtils.reverse(bareIrStreamNo, chunkSize);
+
+            recognizeData.setPosition(inData.getPosition());
+            recognizeData.setHasConsumed(inData.getHasConsumed());
+            payload = ((payload << (long) chunkSize)) | (long) bareIrStreamNo;
+            recognizeData.getNameEngine().add(inData.getNameEngine());
+        }
+
+        if (rest != 0) {
+            // this has been tested only with bitorder = msb.
+            int bitsToStore = chunkSize - rest;
+            long bitmask = IrCoreUtils.ones(bitsToStore);
+            recognizeData.setDanglingBitFieldData(payload, bitmask);
+            payload >>= bitsToStore;
+        }
+        if (recognizeData.getGeneralSpec().getBitDirection() == BitDirection.lsb)
+            payload = IrCoreUtils.reverse(payload, numWidth);
+        return payload;
+    }
+
+    @Override
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData recognizeData/*, long oldBitmask*/) throws NameUnassignedException {
+        long ch = getChop(recognizeData.getNameEngine());
+        long wid = getWidth(recognizeData.getNameEngine());
+        long payload = rhs.getValue();
+        if (complement)
+            payload = ~payload;
+        if (reverse)
+            payload = IrCoreUtils.reverse(payload, (int) wid);
+        long bitmask = (rhs.getBitmask() & IrCoreUtils.ones(wid)) << ch;
+        payload <<= ch;
+        return new BitwiseParameter(payload, bitmask);
     }
 
     @Override
@@ -425,5 +440,9 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public boolean constant(NameEngine nameEngine) {
         return super.constant(nameEngine) && width.constant(nameEngine);
+    }
+
+    private long assignmentNeededBitmask(RecognizeData recognizeData) {
+        return getWidth(recognizeData).longValueExact() << getChop(recognizeData).longValueExact();
     }
 }

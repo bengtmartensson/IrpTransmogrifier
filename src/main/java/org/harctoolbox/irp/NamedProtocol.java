@@ -224,7 +224,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
             throw new ProtocolNotDecodableException(name);
 
         logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSequence.toString(true)});
-        Decoder.DecoderParameters fixedParams = params.adjust(isRejectRepeats(), frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Decoder.DecoderParameters fixedParams = params.adjust(false/*isRejectRepeats()*/, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), fixedParams);
         return new Decoder.Decode(this, decode);
     }

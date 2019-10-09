@@ -55,7 +55,6 @@ final class BitStream extends IrpObject implements Evaluatable {
     }
     @Override
     public String toIrpString(int radix) {
-        //return "BitStream(" + data + "=0x" + data.toString(16) + "=0b" + data.toString(2) + ":" + length + ")";
         return "BitStream(" + data.toString(radix) + ":" + length + ")";
     }
 
@@ -68,12 +67,7 @@ final class BitStream extends IrpObject implements Evaluatable {
     private int getChunkNo(int n, int chunksize) {
         if (n < 0 || (length > 0 && (n+1)*chunksize-1 >= length))
             throw new IndexOutOfBoundsException("Illegal bit " + n + " in getChunkNo");
-        // If a chunk goes over the data[] limits, this has to be implemented extra.
-        // I have more interesting thing to do :-)
-        //if (((n+1)*chunksize-1)/Long.SIZE != (n*chunksize)/Long.SIZE)
-        //    throw new RuntimeException("Case not implemented");
-        //int chunk = (int)(data[n*chunksize/Long.SIZE] >> n*chunksize) & ((1 << chunksize)- 1);
-        long mask = (1L << chunksize) - 1L;
+        long mask = IrCoreUtils.ones(chunksize);
         return data.shiftRight(n*chunksize).and(BigInteger.valueOf(mask)).intValueExact();
     }
 
@@ -94,55 +88,10 @@ final class BitStream extends IrpObject implements Evaluatable {
         return list;
     }
 
-//    @Override
-//    public boolean isEmpty(NameEngine nameEngine) {
-//        return length == 0;
-//    }
-
     @Override
     public Element toElement(Document document) {
         throw new UnsupportedOperationException("Not supported.");
     }
-
-//    @Override
-//    public Integer numberOfBareDurations(boolean recursive) {
-//        return (int) length;
-//    }
-//
-//    @Override
-//    public ParserRuleContext getParseTree() {
-//        return null;
-//    }
-
-//    @Override
-//    public void recognize(RecognizeData recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-//        throw new UnsupportedOperationException("Not supported yet.");
-//    }
-//
-//    @Override
-//    public void traverse(Traverser recognizeData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
-//        throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    @Override
-//    public boolean interleavingOk(GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean interleavingOk(DurationType toCheck, GeneralSpec generalSpec, NameEngine nameEngine, DurationType last, boolean gapFlashBitSpecs) {
-//        return true;
-//    }
-//
-//    @Override
-//    public DurationType endingDurationType(DurationType last, boolean gapFlashBitSpecs) {
-//        return DurationType.newDurationType(gapFlashBitSpecs);
-//    }
-//
-//    @Override
-//    public DurationType startingDuratingType(DurationType last, boolean gapFlashBitSpecs) {
-//        return DurationType.newDurationType(!gapFlashBitSpecs);
-//    }
 
     @Override
     public int weight() {
@@ -165,29 +114,4 @@ final class BitStream extends IrpObject implements Evaluatable {
         hash = 53 * hash + Objects.hashCode(this.data);
         return hash;
     }
-
-//    @Override
-//    public boolean hasExtent() {
-//        return false;
-//    }
-//
-//    @Override
-//    public Set<String> assignmentVariables() {
-//        return new HashSet<>(0);
-//    }
-//
-//    @Override
-//    public Map<String, Object> propertiesMap(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    @Override
-//    public void render(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) throws UnassignedException, InvalidNameException {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    @Override
-//    public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine) {
-//        return null;
-//    }
 }

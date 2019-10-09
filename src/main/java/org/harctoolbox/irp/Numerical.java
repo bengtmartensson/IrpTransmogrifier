@@ -30,4 +30,6 @@ public interface Numerical {
     public long toLong(NameEngine nameEngine) throws NameUnassignedException;
 
     public long toLong() throws NameUnassignedException;
+
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData);
 }

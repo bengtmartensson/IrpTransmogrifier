@@ -19,6 +19,7 @@ import org.testng.annotations.Test;
 public class DecoderNGTest {
     private final static double NRC17_FREQUENCY = 38000d;
     private final static double RC5_FREQUENCY = 36000d;
+    private final static String protocolName = "Humax 4Phase";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -39,9 +40,11 @@ public class DecoderNGTest {
     private final IrSequence nec1Intro;
     private final IrSequence nec1Repeat;
     private final IrSignal giCable;
+    private final IrSignal gi4dtv_2_42;
+    private final IrSignal gi4dtv_6_42;
 
     public DecoderNGTest() throws Exception {
-        nrc17Intro  = new IrSequence(new int[]{500, 2500, 500, 1000, 1000, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 14500, 500, 2500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 1000, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 500, 110000});
+        nrc17Intro = new IrSequence(new int[]{500, 2500, 500, 1000, 1000, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 14500, 500, 2500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 1000, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 500, 110000});
         nrc17Repeat = new IrSequence(new int[]{500, 2500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 1000, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 500, 110000});
         nrc17Ending = new IrSequence(new int[]{500, 2500, 500, 1000, 1000, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 100500});
         nrc17NameEngine = new NameEngine("{D=12,F=56}");
@@ -51,6 +54,9 @@ public class DecoderNGTest {
         rc5NameEngine = new NameEngine("{D=12,F=56}");
         rc5NameEngineWithDefault = new NameEngine("{D=12,F=56,T=0}");
         giCable = Pronto.parse("0000 006D 001A 0000 0157 00AC 0013 0055 0013 00AC 0013 0055 0013 00AC 0013 00AC 0013 0055 0013 0055 0013 0055 0013 0055 0013 0055 0013 0055 0013 0055 0013 00AC 0013 0055 0013 00AC 0013 0055 0013 0498 0157 0055 0013 0D24 0157 0055 0013 0D24 0157 0055 0013 0D24 0157 0055 0013 1365");
+        gi4dtv_2_42 = Pronto.parse("0000 006F 0000 000E 00B9 004A 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 006F 0025 0025 0025 0025 0025 006F 0025 08AC");
+        gi4dtv_6_42 = Pronto.parse("0000 006F 0000 000E 00B9 004A 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 006F 0025 0025 0025 08AC");
+//                                    0000 006F 0000 000E 00B9 004A 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 006F 0025 0025 0025 08AC
 
         decoder = new Decoder();
     }
@@ -73,6 +79,11 @@ public class DecoderNGTest {
         params.setAllDecodes(true);
         try {
             for (NamedProtocol protocol : decoder.getParsedProtocols()) {
+                System.out.println(protocol.getName());
+                if (protocol.getName().equals(protocolName)) {
+                    System.out.println("$$$$ " + protocolName);
+                    Decoder.setDebugProtocolRegExp(protocolName);
+                }
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);
                 Decoder.SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal, params);
@@ -129,6 +140,17 @@ public class DecoderNGTest {
         ModulatedIrSequence seq = giCable.toModulatedIrSequence();
         Decoder.DecodeTree decodes = decoder.decode(seq, params);
         assertEquals(decodes.size(), 1);
+    }
+
+    @Test(enabled = true)
+    public void testDecodeGI4DTV() {
+        System.out.println("decodeG.I.4DTV");
+        Decoder.setDebugProtocolRegExp("^G.I.4DTV$");
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(gi4dtv_2_42, params);
+        assertEquals(result.get("G.I.4DTV").toString(), "G.I.4DTV: {D=2,F=42}");
+        result = decoder.decodeIrSignal(gi4dtv_6_42, params);
+        assertEquals(result.get("G.I.4DTV").toString(), "G.I.4DTV: {D=6,F=42}");
     }
 
     @Test(enabled = true)
@@ -219,7 +241,7 @@ public class DecoderNGTest {
 
         irSequence = new ModulatedIrSequence(IrSequence.concatenate(nec1Intro, rc5Seq), 37000d);
         result = instance.decode(irSequence, params);
-        assertEquals(result.size(), 7);
+        assertEquals(result.size(), 6);
 
         allDecodes = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, null, null, null, null, false, false);

@@ -231,6 +231,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testDecodeNoRepeatedNec() {
+        System.out.println("decodeNoRepeatedNec");
+        String args = "decode --debug nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result.split("\r?\n")[0].substring(0,21), "NEC: {D=12,F=56,S=34}");
+    }
+
+    @Test(enabled = true)
     public void testDecodeRepeatedNec1() {
         System.out.println("decodeRepeatedNec1");
         String args = "decode -p nec1 -r  +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193";
@@ -297,6 +305,15 @@ public class IrpTransmogrifierNGTest {
         String result = IrpTransmogrifier.execute("-f -1 decode " + akaiMitsubishi);
         System.out.println(result);
         assertEquals(result,"Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
+    }
+
+    @Test(enabled = true)
+    public void testDecodeGI4DTV() {
+        System.out.println("testDecodeGI4DTV");
+        String gi4dtv = "0000 006F 0000 000E 00B9 004A 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 006F 0025 0025 0025 08AC";
+        String result = IrpTransmogrifier.execute("decode --debug ^G.I.4DTV$   -p g.i.4dtv " + gi4dtv);
+        System.out.println(result);
+        assertEquals(result, "G.I.4DTV: {D=6,F=42}, beg=0, end=27, reps=1");
     }
 
     @Test(enabled = true)

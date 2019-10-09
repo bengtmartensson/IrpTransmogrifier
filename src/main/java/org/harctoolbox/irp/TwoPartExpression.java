@@ -129,6 +129,26 @@ final class TwoPartExpression extends Expression {
     }
 
     @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        BitwiseParameter op = operand.toBitwiseParameter(recognizeData);
+        if (op == null)
+            return BitwiseParameter.NULL;
+
+        switch (operator) {
+            case '!':
+                return op.negation();
+            case '#':
+                return op.bitCount();
+            case '-':
+                return op.minus();
+            case '~':
+                return op.bitInvert();
+            default:
+                throw new ThisCannotHappenException("Unknown operator: " + operator);
+        }
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element el = super.toElement(document);
         Element e = document.createElement("UnaryOperator");
@@ -139,12 +159,12 @@ final class TwoPartExpression extends Expression {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData nameEngine) {
         switch (operator) {
             case '~':
-                return (~rhs) & bitmask;
+                return rhs.bitInvert();
             case '-':
-                return (-rhs) & bitmask;
+                return rhs.minus();
             default:
                 return null;
         }

@@ -62,11 +62,6 @@ public abstract class Expression extends PrimaryItem {
             return new NumberExpression(number);
         } catch (NumberFormatException ex) {
             return newExpression(new ParserDriver(str));
-            //Expression exp = newExpression(parseDriver);
-//            int last = exp.parseTree.getStop().getStopIndex();
-//            if (last != str.length() - 1)
-//                logger.log(Level.WARNING, "Did not match all input, just \"{0}\"", str.substring(0, last + 1));
-            //return exp;
         }
     }
 
@@ -137,7 +132,7 @@ public abstract class Expression extends PrimaryItem {
 
     @Override
     public long toLong() throws NameUnassignedException {
-        return toLong(NameEngine.empty);
+        return toLong(NameEngine.EMPTY);
     }
 
     // presently implemented only in NumberExpression

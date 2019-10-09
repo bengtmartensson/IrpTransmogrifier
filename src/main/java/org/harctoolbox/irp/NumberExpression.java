@@ -102,7 +102,6 @@ final class NumberExpression extends PrimaryItemExpression {
         return map;
     }
 
-    @Override
     public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
         return rhs & bitmask;
     }
@@ -125,5 +124,10 @@ final class NumberExpression extends PrimaryItemExpression {
     @Override
     public boolean constant(NameEngine nameEngine) {
         return true;
+    }
+
+    @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        return new BitwiseParameter(toLong());
     }
 }

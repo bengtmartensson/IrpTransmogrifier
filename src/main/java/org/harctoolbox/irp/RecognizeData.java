@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public final class RecognizeData extends Traverser implements Cloneable {
 
@@ -39,7 +38,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
     private int level;
     private final IrSignal.Pass pass;
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int position,
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, ParameterSpecs parameterSpecs, IrSequence irSequence, int position,
             boolean interleaving, ParameterCollector parameterCollector, double absoluteTolerance, double relativeTolerance,
             double minimumLeadout, IrSignal.Pass pass) {
         super(generalSpec, definitions);
@@ -50,7 +49,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.parameterCollector = parameterCollector;
         this.extentStart = 0;
         this.interleaving = interleaving;
-        this.needsChecking = new ParameterCollector();
+        this.needsChecking = new ParameterCollector(parameterSpecs);
         this.absoluteTolerance = absoluteTolerance;
         this.relativeTolerance = relativeTolerance;
         this.minimumLeadout = minimumLeadout;
@@ -58,10 +57,21 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.level = 0;
     }
 
-    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, IrSequence irSequence, int beginPos, boolean interleavingOk,
+    public RecognizeData(GeneralSpec generalSpec, NameEngine definitions, ParameterSpecs parameterSpecs,
+            IrSequence irSequence, int beginPos, boolean interleavingOk,
             ParameterCollector names, Decoder.DecoderParameters params, IrSignal.Pass pass) {
-        this(generalSpec, definitions, irSequence, beginPos, interleavingOk, names,
+        this(generalSpec, definitions, parameterSpecs, irSequence, beginPos, interleavingOk, names,
                 params.getAbsoluteTolerance(), params.getRelativeTolerance(), params.getMinimumLeadout(), pass);
+    }
+
+    // Just for testing, do not use for anything else
+    RecognizeData() {
+        this(new NameEngine());
+    }
+
+    // Just for testing, do not use for anything else
+    RecognizeData(NameEngine nameEngine) {
+        this(new GeneralSpec(), nameEngine, new ParameterSpecs(), new IrSequence(), 0, false, new ParameterCollector(), new Decoder.DecoderParameters(), IrSignal.Pass.intro);
     }
 
     /**
@@ -78,7 +88,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
             throw new InternalError(ex);
         }
         result.setParameterCollector(getParameterCollector().clone());
-        result.nameEngine = this.nameEngine.clone();
+        result.nameEngine = new NameEngine(this.nameEngine);
         return result;
     }
 
@@ -111,27 +121,27 @@ public final class RecognizeData extends Traverser implements Cloneable {
     }
 
     void add(String name, BitwiseParameter parameter) throws ParameterInconsistencyException {
-        if (getNameEngine().containsKey(name)) {
-            Expression expression;
-            try {
-                expression = getNameEngine().get(name);
-            } catch (NameUnassignedException ex) {
-                throw new ThisCannotHappenException();
-            }
-            try {
-                long expected = expression.toLong(parameterCollector.toNameEngine());
-                parameter.checkConsistency(name, expected);
-            } catch (NameUnassignedException ex) {
-                // It has an expression, but is not presently checkable.
-                // mark for later checking.
-                needsChecking.add(name, parameter);
-            }
-        } else
+        Expression expression = getNameEngine().getPossiblyNull(name);
+        if (expression == null) {
             parameterCollector.add(name, parameter);
+        } else {
+            BitwiseParameter expected = expression.toBitwiseParameter(this);
+            boolean consistent = expected.isConsistent(parameter);
+            if (!consistent)
+                throw new ParameterInconsistencyException(name, expected, parameter);
+            parameterCollector.add(name, parameter);
+
+            // It has an expression, but is not presently checkable.
+            // mark for later checking.
+            Long bitmask = parameterCollector.getBitmask(name);
+            if (bitmask == null || !parameter.isFinished(bitmask))
+                needsChecking.add(name, parameter);
+        }
     }
 
-    void add(String name, long value, long bitmask) throws ParameterInconsistencyException {
-        add(name, new BitwiseParameter(value, bitmask));
+
+    void add(Name name, BitwiseParameter value) throws ParameterInconsistencyException {
+        add(name.toString(), value);
     }
 
     void add(String name, long value) throws ParameterInconsistencyException {
@@ -178,13 +188,12 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.hasConsumed = hasConsumed;
     }
 
-    public boolean leadoutOk() throws SignalRecognitionException {
-        return get() >= minimumLeadout;
+    public boolean leadoutOk(boolean isLast) throws SignalRecognitionException {
+        return isLast && (get() >= minimumLeadout);
     }
 
     public boolean check(boolean on) {
-        return isOn() == on
-                && position < irSequence.getLength();
+        return isOn() == on && position < irSequence.getLength();
     }
 
     public double getExtentDuration() {
@@ -197,8 +206,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
     }
 
     void checkConsistency() throws NameUnassignedException, ParameterInconsistencyException {
-        NameEngine nameEngine = this.toNameEngine();
-        needsChecking.checkConsistency(nameEngine, getNameEngine());
+        needsChecking.checkConsistency(this);
         needsChecking = new ParameterCollector();
     }
 
@@ -214,12 +222,6 @@ public final class RecognizeData extends Traverser implements Cloneable {
      */
     public double getRelativeTolerance() {
         return relativeTolerance;
-    }
-
-    NameEngine toNameEngine() {
-        NameEngine nameEngine = getNameEngine().clone();
-        nameEngine.add(parameterCollector.toNameEngine());
-        return nameEngine;
     }
 
     /**
@@ -277,13 +279,10 @@ public final class RecognizeData extends Traverser implements Cloneable {
     private LogRecord logRecord(IrStreamItem item, boolean enter) {
         LogRecord logRecord;
         if (item instanceof Numerical && !enter) {
-            try {
-                long value = ((Numerical) item).toLong(this.getParameterCollector().toNameEngine());
-                logRecord = new LogRecord(getLogLevel(), "{0}Level {1}: \"{2}\", result: {3}");
-                logRecord.setParameters(new Object[]{enter ? ">" : "<", level, item.toString(), value});
-                return logRecord;
-            } catch (NameUnassignedException ex) {
-            }
+            BitwiseParameter value = ((Numerical) item).toBitwiseParameter(this);
+            logRecord = new LogRecord(getLogLevel(), "{0}Level {1}: \"{2}\", result: {3}");
+            logRecord.setParameters(new Object[]{enter ? ">" : "<", level, item.toString(), value});
+            return logRecord;
         }
 
         logRecord = new LogRecord(getLogLevel(), "{0}Level {1}: \"{2}\"");
@@ -297,5 +296,14 @@ public final class RecognizeData extends Traverser implements Cloneable {
         logRecord.setParameters(new Object[]{this.getPass().toString(), ">", level, item.toString(), this.irSequence});
 
         return logRecord;
+    }
+
+    public void assignment(String nameString, long val) throws InvalidNameException {
+        nameEngine.define(nameString, val);
+    }
+
+    public BitwiseParameter toBitwiseParameter(String name) {
+        Expression expression = nameEngine.getPossiblyNull(name);
+        return expression != null ? expression.toBitwiseParameter(this) : parameterCollector.get(name);
     }
 }

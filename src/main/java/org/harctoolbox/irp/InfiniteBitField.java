@@ -18,11 +18,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Map;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public final class InfiniteBitField extends BitField {
+
+    public static long toLong(long data, long chop, boolean complement) {
+        return toLong(data, MAXWIDTH, chop, complement, false);
+    }
 
     public InfiniteBitField(String str) {
         this(new ParserDriver(str));
@@ -54,16 +57,27 @@ public final class InfiniteBitField extends BitField {
 
     @Override
     public long toLong(NameEngine nameEngine) throws NameUnassignedException {
-        long x = data.toLong(nameEngine) >>> chop.toLong(nameEngine);
-        if (complement)
-            x = ~x;
+        return toLong(data.toLong(nameEngine), chop.toLong(nameEngine), complement);
+    }
 
-        return x;
+    @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        BitwiseParameter payload = this.data.toBitwiseParameter(recognizeData);
+        if (payload == null)
+            return new BitwiseParameter();
+        long ch = chop.toBitwiseParameter(recognizeData).longValueExact();
+        long value = toLong(payload.getValue(), ch, complement);
+        return new BitwiseParameter(value, payload.getBitmask() >> ch);
     }
 
     @Override
     public long getWidth(NameEngine nameEngine) {
         return MAXWIDTH;
+    }
+
+    @Override
+    protected BitwiseParameter getWidth(RecognizeData nameResolver) throws NameUnassignedException {
+        return new BitwiseParameter(MAXWIDTH);
     }
 
     @Override
@@ -97,14 +111,10 @@ public final class InfiniteBitField extends BitField {
         Element dataElement = document.createElement("Data");
         dataElement.appendChild(data.toElement(document));
         element.appendChild(dataElement);
-        try {
-            if (!(chop instanceof Number && chop.toLong() == 0)) {
-                Element chopElement = document.createElement("Chop");
-                chopElement.appendChild(chop.toElement(document));
-                element.appendChild(chopElement);
-            }
-        } catch (NameUnassignedException ex) {
-            throw new ThisCannotHappenException();
+        if (!(chop instanceof Number && ((Number) chop).toLong() == 0)) {
+            Element chopElement = document.createElement("Chop");
+            chopElement.appendChild(chop.toElement(document));
+            element.appendChild(chopElement);
         }
         return element;
     }
@@ -120,5 +130,16 @@ public final class InfiniteBitField extends BitField {
     @Override
     public Integer numberOfBits() {
         return 0;
+    }
+
+    @Override
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData recognizeData/*, long oldBitmask*/) throws NameUnassignedException {
+        long ch = getChop(recognizeData.getNameEngine());
+        long payload = rhs.getValue();
+        if (complement)
+            payload = ~payload;
+        long bitmask = rhs.getBitmask() << ch;
+        payload <<= ch;
+        return new BitwiseParameter(payload, bitmask);
     }
 }

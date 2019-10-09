@@ -323,6 +323,22 @@ public final class Decoder {
             return ((override && user != null) || standard == null) ? user : standard;
         }
 
+        @Override
+        public String toString() {
+            StringJoiner sj = new StringJoiner(",", "{", "}");
+            sj.add(Boolean.toString(strict));
+            sj.add(Boolean.toString(allDecodes));
+            sj.add(Boolean.toString(removeDefaultedParameters));
+            sj.add(Boolean.toString(recursive));
+            sj.add(Double.toString(frequencyTolerance));
+            sj.add(Double.toString(absoluteTolerance));
+            sj.add(Double.toString(relativeTolerance));
+            sj.add(Double.toString(minimumLeadout));
+            sj.add(Boolean.toString(override));
+            sj.add(Boolean.toString(ignoreLeadingGarbage));
+            return sj.toString();
+        }
+
         /**
          * @return the strict
          */

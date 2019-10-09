@@ -222,13 +222,13 @@ public final class IrCoreUtils {
     }
 
     public static long ones(Number numOnes) {
+        if (numOnes == null)
+            return -1L;
+
         long n = numOnes.longValue();
         if (n < 0 || n > Long.SIZE)
             throw new IllegalArgumentException("Argument must be non-negative and <= " + Long.SIZE);
-        long result = 0L;
-        for (int i = 0; i < n; i++)
-            result = (result << 1) | 1L;
-        return result;
+        return n == Long.SIZE ? -1L : (1L << n) - 1;
     }
 
     public static String toCName(String name) {
@@ -362,12 +362,9 @@ public final class IrCoreUtils {
     public static long log2(long x) {
         if (x <= 0)
             throw new IllegalArgumentException("argument must be positive");
-        long pow = 1;
-        for (long n = 0; ; n++) {
-            if (pow >= x)
-                return n;
-            pow *= 2;
-        }
+
+        int d = Long.SIZE - Long.numberOfLeadingZeros(x);
+        return Long.bitCount(x) > 1 ? d : d - 1;
     }
 
     public static String radixPrefix(int radix) {
@@ -432,6 +429,20 @@ public final class IrCoreUtils {
         long y = Long.reverse(x);
         if (width > 0)
             y >>>= Long.SIZE - width;
+        return y;
+    }
+
+    /**
+     * Reverses the bits, living in a width-bit wide world.
+     *
+     * @param x data
+     * @param width width in bits
+     * @return bitreversed
+     */
+    public static int reverse(int x, int width) {
+        int y = Integer.reverse(x);
+        if (width > 0)
+            y >>>= Integer.SIZE - width;
         return y;
     }
 

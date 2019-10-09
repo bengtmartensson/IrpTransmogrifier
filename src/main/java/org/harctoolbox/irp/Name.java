@@ -30,30 +30,6 @@ public final class Name extends PrimaryItem implements Floatable {
     private static final int WEIGHT = 1;
     private static Pattern namePattern = Pattern.compile(IrpUtils.C_IDENTIFIER_REGEXP);
 
-//    /**
-//     * Check the syntactical correctness of the name.
-//     *
-//     * This invokes a newly constructed parser, i.e. is comparatively expensive.
-//     *
-//     * @param name Name to be checked
-//     * @return true if the name is syntactically valid.
-//     * @throws org.harctoolbox.irp.InvalidNameException
-//     */
-//    //  Alternatively, could check agains a regexp. But this keeps the grammar in one place.
-//    public static String parse(String name) {
-////        try {
-//            ParserDriver parserDriver = new ParserDriver(name);
-//            IrpParser.NameContext nam = parserDriver.getParser().name();
-//            return nam.getText();
-////        } catch (ParseCancellationException ex) {
-////            throw new InvalidNameException(name);
-////        }
-//    }
-
-//    public static String parse(IrpParser.NameContext ctx) {
-//        return ctx.getText();
-//    }
-
     /**
      * Check the syntactical correctness of the name.
      *
@@ -129,7 +105,7 @@ public final class Name extends PrimaryItem implements Floatable {
 
     @Override
     public long toLong(NameEngine nameEngine) throws NameUnassignedException {
-        Expression expression = nameEngine.get(getName());
+        Expression expression = nameEngine.get(this);
         return expression.toLong(nameEngine);
     }
 
@@ -153,17 +129,15 @@ public final class Name extends PrimaryItem implements Floatable {
     @Override
     public boolean constant(NameEngine nameEngine) {
         try {
-            Expression expression = nameEngine.get(getName());
+            Expression expression = nameEngine.get(this);
             return expression.constant(nameEngine);
         } catch (NameUnassignedException ex) {
             return false;
         }
     }
 
-    /**
-     * @return the name
-     */
-    public String getName() {
+    @Override
+    public String toString() {
         return name;
     }
 
@@ -183,12 +157,17 @@ public final class Name extends PrimaryItem implements Floatable {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData nameEngine) {
         return rhs;
     }
 
     @Override
     public PrimaryItem leftHandSide() {
         return this;
+    }
+
+    @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        return recognizeData.toBitwiseParameter(toString());
     }
 }

@@ -163,7 +163,12 @@ public final class Number extends PrimaryItem {
 
     @Override
     public long toLong(NameEngine nameEngine) throws ArithmeticException {
-        return longValueExact();
+        return toLong();
+    }
+
+    @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        return new BitwiseParameter(toLong());
     }
 
     @Override
@@ -196,7 +201,7 @@ public final class Number extends PrimaryItem {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) {
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData nameEngine) {
         return rhs;
     }
 

@@ -41,7 +41,8 @@ public class NamedProtocolNGTest {
     @Test(enabled = true)
     public void testDecode_XMP() {
         System.out.println("decode_XMP");
-        Decoder.setDebugProtocolRegExp("xmp-1");
+        Decoder.setDebugProtocolRegExp("xmp");
+        //Decoder.setDebugProtocolRegExp("xmp-1");
         Decoder.DecoderParameters params = new Decoder.DecoderParameters();
         params.setRemoveDefaultedParameters(true);
         Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);

@@ -228,7 +228,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
         double actual = recognizeData.get();
         double wanted;
         try {
-            wanted = toFloat(recognizeData.getGeneralSpec(), recognizeData.toNameEngine());
+            wanted = toFloat(recognizeData.getGeneralSpec(), recognizeData.getNameEngine());
         } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
             throw new SignalRecognitionException(ex);
         }
@@ -280,7 +280,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
             recognizeData.consume();
         else if (actual > wanted && recognizeData.allowChopping())
             recognizeData.consume(wanted);
-        else if (recognizeData.leadoutOk() && isLast)
+        else if (recognizeData.leadoutOk(isLast))
             recognizeData.consume();
         else
             throw new SignalRecognitionException("Duration does not parse, wanted " + wanted + ", was " + actual + ", position = " + recognizeData.getPosition());

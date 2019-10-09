@@ -35,6 +35,10 @@ final class ThreePartExpression extends Expression {
         return new ThreePartExpression(ctx, left, operator, right);
     }
 
+    private static BitwiseParameter wrap(BitwiseParameter param) {
+        return param != null ? param : BitwiseParameter.ZERO;
+    }
+
     private final String operator;
     private final Expression op1;
     private final Expression op2;
@@ -180,6 +184,63 @@ final class ThreePartExpression extends Expression {
     }
 
     @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        BitwiseParameter left = op1.toBitwiseParameter(recognizeData);
+        if (left == null)
+            return BitwiseParameter.NULL;
+        boolean shortCircuiting = operator.equals("&&") || operator.equals("||");
+        BitwiseParameter right = null;
+        if (!shortCircuiting) {
+            right = op2.toBitwiseParameter(recognizeData);
+            if (right == null)
+                return BitwiseParameter.NULL;
+        }
+
+        switch (operator) {
+            case "**":
+                return left.power(right);
+            case "*":
+                return left.mul(right);
+            case "/":
+                return left.div(right);
+            case "%":
+                return left.mod(right);
+            case "+":
+                return left.plus(right);
+            case "-":
+                return left.minus(right);
+            case "<<":
+                return left.leftShift(right);
+            case ">>":
+                return left.rightShift(right);
+            case "<=":
+                return left.le(right);
+            case ">=":
+                return left.ge(right);
+            case "<":
+                return left.lt(right);
+            case ">":
+                return left.gt(right);
+            case "==":
+                return left.eq(right);
+            case "!=":
+                return left.ne(right);
+            case "&":
+                return left.and(right);
+            case "^":
+                return left.xor(right);
+            case "|":
+                return left.or(right);
+            case "&&":
+                return left.isFalse() ? left : wrap(op2.toBitwiseParameter(recognizeData));
+            case "||":
+                return left.isTrue() ? left : wrap(op2.toBitwiseParameter(recognizeData));
+            default:
+                throw new ThisCannotHappenException("Unknown operator: " + operator);
+        }
+    }
+
+    @Override
     public Element toElement(Document document) {
         Element el = super.toElement(document);
         Element e = document.createElement("BinaryOperator");
@@ -191,18 +252,22 @@ final class ThreePartExpression extends Expression {
     }
 
     @Override
-    public Long invert(long rhs, NameEngine nameEngine, long bitmask) throws NameUnassignedException {
+    public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData recognizeData) throws NameUnassignedException {
+        BitwiseParameter right = op2.toBitwiseParameter(recognizeData);
+        if (right == null)
+            return BitwiseParameter.NULL;
+
         switch (operator) {
             case "+":
-                return rhs - op2.toLong(nameEngine);
+                return rhs.minus(right);
             case "-":
-                return rhs + op2.toLong(nameEngine);
+                return rhs.plus(right);
             case "*":
-                return (rhs / op2.toLong(nameEngine)) & bitmask;
+                return rhs.div(right);
             case "/":
-                return (rhs * op2.toLong(nameEngine)) & bitmask;
+                return rhs.mul(right);
             case "^":
-                return (rhs ^ op2.toLong(nameEngine)) & bitmask;
+                return rhs.xor(right);
             default:
                 return null;
         }

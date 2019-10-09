@@ -198,6 +198,11 @@ default: $(TARGETS)
 %.out: %.txt
 	$(IRPTRANSMOGRIFIER) $(FREQTOLERANCE_$(subst -,_,$(basename $@))) --out "$@" --tsv decode --recursive  --namedinput "$<"
 
+ifneq ($(MAKE_EXP),)
+%.exp: %.txt
+	$(IRPTRANSMOGRIFIER) $(FREQTOLERANCE_$(subst -,_,$(basename $@))) --out "$@" --tsv decode --recursive  --namedinput "$<"
+endif
+
 %.txt: %.ict
 	$(ICTPARSE) "$<" > "$@"
 

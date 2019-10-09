@@ -102,8 +102,13 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
+    public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
+        return value.toBitwiseParameter(recognizeData);
+    }
+
+    @Override
     public long toLong() throws NameUnassignedException {
-        return toLong(NameEngine.empty);
+        return toLong(NameEngine.EMPTY);
     }
 
     public String getName() {
@@ -158,14 +163,10 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         logger.log(recognizeData.logRecordEnter(this));
         try {
-            NameEngine nameEngine = recognizeData.getNameEngine();
             String nameString = name.toString();
-            long val = value.toLong(recognizeData.toNameEngine());
-            if (nameEngine.containsKey(nameString))
-                nameEngine.define(nameString, val);
-            else
-                recognizeData.getParameterCollector().setExpected(nameString, val);
-        } catch (NameUnassignedException | InvalidNameException ex) {
+            BitwiseParameter val = value.toBitwiseParameter(recognizeData);
+            recognizeData.assignment(nameString, val.getValue());
+        } catch (InvalidNameException ex) {
             throw new SignalRecognitionException(ex);
         }
         logger.log(recognizeData.logRecordExit(this));

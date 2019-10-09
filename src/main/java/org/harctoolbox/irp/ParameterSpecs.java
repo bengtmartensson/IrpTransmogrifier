@@ -92,14 +92,30 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
     public boolean isEmpty() {
         return map.isEmpty();
     }
+
     public Set<String> getNames() {
         return map.keySet();
     }
+
     public Collection<ParameterSpec> getParams() {
         return map.values();
     }
+
     public ParameterSpec getParameterSpec(String name) {
         return map.get(name);
+    }
+
+    public Long bitmask(String name) {
+        ParameterSpec parameterSpec = map.get(name);
+        return parameterSpec != null ? parameterSpec.bitmask() : null;
+    }
+
+    public Map<String, Long> bitmasks() {
+        Map<String, Long> result = new HashMap<>(size());
+        map.entrySet().forEach((name) -> {
+            result.put(name.getKey(), name.getValue().bitmask());
+        });
+        return result;
     }
 
     @Override
@@ -275,5 +291,16 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
 
     public boolean hasNonStandardParameters() {
         return map.keySet().stream().anyMatch((name) -> (!ParameterSpec.isStandardName(name)));
+    }
+
+    long fixValue(String name, long value, long modulo) {
+        ParameterSpec parameterSpec = map.get(name);
+        if (parameterSpec == null)
+            return value;
+        return parameterSpec.fixValue(value, modulo);
+    }
+
+    public int size() {
+        return map.size();
     }
 }

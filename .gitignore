@@ -19,3 +19,5 @@ src/test/decoderfiles-
 gh-pages
 2sort
 attic
+/contributed/build/
+/contributed/dist/

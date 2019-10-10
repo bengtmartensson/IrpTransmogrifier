@@ -1,4 +1,4 @@
-package apiexample;
+package org.harctoolbox.example;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,6 +17,13 @@ import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpParseException;
 import org.harctoolbox.irp.NameEngine;
 import org.harctoolbox.irp.NameUnassignedException;
+
+// This example demonstrates several concepts.
+// It first sets up a decoder from the Irp Database.
+// It shows how to get information from the extra parameters in IrpProtocols.xml.
+// and how to compute extra values give as Irp Expressions.
+
+// See http://www.hifi-remote.com/forums/viewtopic.php?t=101943&start=11
 
 public class DecoderAPIExample {
 
@@ -76,8 +83,8 @@ public class DecoderAPIExample {
 
     public void decode(IrSignal irSignal) throws NameUnassignedException {
         // First try to decode as a signal,...
-        Map<String, Decode> sigDecodes = decoder.decodeIrSignal(irSignal, decoderParams);
-        for (Decode decode : sigDecodes.values()) {
+        Decoder.SimpleDecodesSet sigDecodes = decoder.decodeIrSignal(irSignal, decoderParams);
+        for (Decode decode : sigDecodes) {
             extendParameters(decode);
             System.out.println(decode);
         }

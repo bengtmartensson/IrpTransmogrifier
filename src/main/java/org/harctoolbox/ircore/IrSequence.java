@@ -564,11 +564,12 @@ public class IrSequence implements Cloneable {
 
     /**
      * Compares two IrSequences for equality.
-     * @param irSequence to be compared against this.
+     * @param irSequence to be compared against this. Default tolerances essentially
+     * allows for numerical rounding errors, not much more.
      * @return equality
      */
     public boolean approximatelyEquals(IrSequence irSequence) {
-        return approximatelyEquals(irSequence, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
+        return approximatelyEquals(irSequence, 1.0, 0.001);
     }
 
     /**

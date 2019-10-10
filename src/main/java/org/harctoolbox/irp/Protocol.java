@@ -347,10 +347,16 @@ public class Protocol extends IrpObject implements AggregateLister {
      */
     private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException {
         RenderData renderData = new RenderData(generalSpec, nameEngine);
-        Protocol reducedProtocol = normalForm(pass);
-        reducedProtocol.bitspecIrstream.render(renderData, new ArrayList<>(0));
+        BitspecIrstream stream = extractBitspecIrstream(pass);
+        stream.render(renderData, new ArrayList<>(0));
         IrSequence irSequence = renderData.toIrSequence();
         return irSequence;
+    }
+
+    private BitspecIrstream extractBitspecIrstream(Pass pass) {
+        BitSpec bitSpec = bitspecIrstream.getBitSpec();
+        BareIrStream irStream = normalFormVariation.select(pass);
+        return new BitspecIrstream(bitSpec, new IrStream(irStream));
     }
 
     @Override

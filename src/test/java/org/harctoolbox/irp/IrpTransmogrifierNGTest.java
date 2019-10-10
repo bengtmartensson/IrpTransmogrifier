@@ -430,6 +430,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test
+    public void testRenderHumax4() {
+        System.out.println("renderHumax4");
+        String result = IrpTransmogrifier.execute("--url render -n D=13,S=7,F=112 Humax%204Phase -p");
+        String expResult = "0000 004A 0009 0009 000C 0018 0018 001D 0006 000C 000C 0012 0012 0018 0018 000C 0006 001D 000C 0012 0006 13AE 000C 0018 0018 001D 0006 000C 000C 0012 0012 001D 0012 000C 0006 001D 000C 0012 0006 13AE";
+        assertEquals(result, expResult);
+    }
+
+    @Test
     public void testExpression() {
         System.out.println("Expression");
         String result = IrpTransmogrifier.execute("expression -n a=1,b=11 -- -1?a+b:9");

@@ -156,9 +156,10 @@ public final class Number extends PrimaryItem {
     }
 
     public String toString(int radix) {
-        return IrCoreUtils.radixPrefix(radix) + (data instanceof Long
-                ? Long.toUnsignedString((Long)data, radix)
-                : ((BigInteger) data).toString(radix));
+        return IrCoreUtils.radixPrefix(radix)
+                + (data instanceof BigInteger
+                        ? ((BigInteger) data).toString(radix)
+                        : Long.toUnsignedString(data.longValue(), radix));
     }
 
     @Override

@@ -99,7 +99,7 @@ final class EvaluatedIrStream {
         elements.stream().forEach((element) -> {
             joiner.add(element.toString());
         });
-        return joiner.toString();
+        return joiner.toString() + " " + nameEngine.toString();
     }
 
     void add(EvaluatedIrStream evaluatedIrStream) {

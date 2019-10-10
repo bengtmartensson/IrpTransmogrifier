@@ -350,6 +350,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         BitspecIrstream stream = extractBitspecIrstream(pass);
         stream.render(renderData, new ArrayList<>(0));
         IrSequence irSequence = renderData.toIrSequence();
+        logger.log(Level.FINE, "{0} {1}", new Object[]{pass, irSequence});
         return irSequence;
     }
 

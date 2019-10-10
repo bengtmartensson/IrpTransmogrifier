@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
@@ -163,7 +164,9 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         stack.add(bitSpec);
         renderData.push();
         irStream.render(renderData, stack);
+        logger.log(Level.FINE, "renderdata (unreduced): {0}", renderData.getEvaluatedIrStream().toString());
         renderData.reduce(bitSpec);
+        logger.log(Level.FINE, "renderdata (reduced): {0}", renderData.getEvaluatedIrStream().toString());
         renderData.pop();
     }
 

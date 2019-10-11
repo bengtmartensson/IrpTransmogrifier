@@ -26,7 +26,7 @@ public interface HasPreferOvers {
 
     /**
      * Returns the prefer-overs.
-     * @return Set&lt;String> of the names of protocols that are prefer-overs.
+     * @return Set&lt;String&gt; of the names of protocols that are prefer-overs.
      */
     public Set<String> getPreferOverNames();
 

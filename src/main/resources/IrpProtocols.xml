@@ -82,6 +82,10 @@ relativetolerance
     See Numerical equality between durations. Current default: 0.3.
 frequency-tolerance
     Tolerance in Hz for frequency comparisons. Set to -1 to disable frequency check. Current default: 2000.0.
+frequency-low
+frequency-high
+    If present, replaces the frequency-tolerance parameter.
+    In this case, frequencies between frequency-low and frequency-high (inclusive) will be accepted.
 minimum-leadout
     Minimal duration in micro seconds that is accepted as final duration. Current default: 20000.0.
 
@@ -89,7 +93,7 @@ minimum-leadout
 <irp:protocols xmlns="http://www.w3.org/1999/xhtml"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2019-09-11"
+               version="2019-10-11"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
     <irp:protocol name="48-NEC">

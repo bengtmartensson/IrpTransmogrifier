@@ -279,17 +279,22 @@ Reports version number and license.
 Usage: IrpTransmogrifier [options] [command] [command options]
   Options:
     -a, --absolutetolerance
-      Absolute tolerance in microseconds, used when comparing durations.
+      Absolute tolerance in microseconds, used when comparing durations. 
       Default: 100.0.
+    -b, --blacklist
+      List of protocols to be removed from the data base
+    -C, --commentStart
+      Character(s) to be considered starting a line comment in input and 
+      namedInput files.
     -c, --configfile
-      Pathname of IRP database file in XML format. Default is the one in the
+      Pathname of IRP database file in XML format. Default is the one in the 
       jar file.
     -e, --encoding
       Encoding used in generated output.
       Default: UTF-8
     -f, --frequencytolerance
-      Frequency tolerance in Hz. Negative disables frequency check. Default:
-      2000.0.
+      Frequency tolerance in Hz. Negative disables frequency check. Default: 
+      2000.0. 
     -h, --help, -?
       Display help message. Deprecated; use the command "help" instead.
     -i, --irp
@@ -303,8 +308,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       Log format, as in class java.util.logging.SimpleFormatter.
       Default: [%2$s] %4$s: %5$s%n
     -l, --loglevel
-      Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING
-      }
+      Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING 
+      } 
       Default: WARNING
     --min-leadout
       Threshold for leadout when decoding. Default: 20000.0.
@@ -313,6 +318,10 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       Default: 5000.0
     -o, --output
       Name of output file. Default: stdout.
+    -O, --override
+      Let given command line parameters override the protocol parameters in 
+      IrpProtoocols.xml 
+      Default: false
     -q, --quiet
       Quitest possible operation, typically to be used from scripts.
       Default: false
@@ -322,14 +331,14 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     -r, --relativetolerance
       Relative tolerance as a number < 1. Default: 0.3.
     --seed
-      Set seed for the pseudo random number generation. If not specified, will
+      Set seed for the pseudo random number generation. If not specified, will 
       be random, different between program invocations.
     -s, --sort
       Sort the protocols alphabetically on output.
       Default: false
     -t, --tsv, --csv
-      Use tabs in output to optimize for the import in spreadsheet programs as
-      cvs.
+      Use tabs in output to optimize for the import in spreadsheet programs as 
+      cvs. 
       Default: false
     -u, --url-decode
       URL-decode protocol names, (understanding %20 for example).
@@ -355,7 +364,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Produce a short usage message.
             Default: false
 
-    version      Report version
+    version      Report version and license.
       Usage: version [options]
         Options:
           --describe
@@ -363,13 +372,13 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -h, -?, --help
             Print help for this command.
           -s, --short
-            Issue only the version number of the program proper
+            Issue only the version number of the program proper.
             Default: false
 
-    list      List protocols and their properites
+    list      List protocols and their properites.
       Usage: list [options] List of protocols (default all)
         Options:
-          --checksorted
+          --check-sorted
             Check if the protocol are alphabetically.
             Default: false
           -c, --classify
@@ -384,10 +393,14 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Display parse diagram.
             Default: false
           --documentation
-            Print (possible longer) documentation.
+            Print (possible longer) documentation, as a dumb rendering of the 
+            HTML documenation.
             Default: false
           -h, -?, --help
             Print help for this command.
+          --html
+            Print (possible longer) documentation as HTML.
+            Default: false
           -i, --irp
             List IRP form.
             Default: false
@@ -399,6 +412,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -n, --normalform
             List the normal form.
+            Default: false
+          --prefer-overs
+            List all protocol's prefer-overs, recursively
             Default: false
           -r, --radix
             Radix of parameter output.
@@ -418,10 +434,17 @@ Usage: IrpTransmogrifier [options] [command] [command options]
         Options:
           -#, --count
             Generate am IR sequence with count number of transmissions
+          -d, --decode
+            Send the rendered signal to the decoder (for 
+            debugging/development). 
+            Default: false
           --describe
             Print a possibly longer documentation for the present command.
           -h, -?, --help
             Print help for this command.
+          -m, --modulate
+            Generate modulated form (EXPERIMENTAL)
+            Default: false
           -n, --nameengine
             Name Engine to use
             Default: <empty string>
@@ -444,8 +467,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
 
     decode      Decode IR signal given as argument
-      Usage: decode [options] durations in micro seconds, alternatively pronto
-            hex
+      Usage: decode [options] durations in micro seconds, alternatively pronto 
+            hex 
         Options:
           -c, --clean
             Invoke cleaner on signal
@@ -459,11 +482,14 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Set modulation frequency.
           -h, -?, --help
             Print help for this command.
+          -l, --ignoreleadinggarbage
+            Accept decodes starting with undecodable pairs.
+            Default: false
           -i, --input
             File/URL from which to take inputs, one per line.
           -k, --keep-defaulted
-            In output, do not remove parameters that are equal to their
-            defaults.
+            In output, do not remove parameters that are equal to their 
+            defaults. 
             Default: false
           -n, --namedinput
             File/URL from which to take inputs, one line name, data one line.
@@ -487,24 +513,36 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -T, --trailinggap
             Trailing gap (in micro seconds) added to sequences of odd length.
 
-    analyze      Analyze signal: tries to find an IRP form with parameters
+    demodulate      Demodulate IrSequence given as argument (EXPERIMENTAL).
+      Usage: demodulate [options] durations in micro seconds, alternatively 
+            pronto hex
+        Options:
+          --describe
+            Print a possibly longer documentation for the present command.
+          -h, -?, --help
+            Print help for this command.
+          -t, --threshold
+            Threshold used for demodulating, in micro seconds.
+            Default: 35.0
+
+    analyze      Analyze signal: tries to find an IRP form with parameters.
       Usage: analyze [options] durations in microseconds, or pronto hex.
         Options:
           -a, --all
-            List all decoder outcomes, instead of only the one with lowest
-            weight.
+            List all decoder outcomes, instead of only the one with lowest 
+            weight. 
             Default: false
           -b, --bit-usage
             Create bit usage report. (Not with --all)
             Default: false
           -c, --chop
-            Chop input sequence into several using threshold (in milliseconds)
+            Chop input sequence into several using threshold (in milliseconds) 
             given as argument.
           -C, --clean
             Output the cleaned sequence(s).
             Default: false
           -d, --decoder
-            Use only the decoders matching argument (regular expression, or
+            Use only the decoders matching argument (regular expression, or 
             prefix). Use the argument "list" to list the available decoders.
           --describe
             Print a possibly longer documentation for the present command.
@@ -519,6 +557,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -f, --frequency
             Modulation frequency of raw signal.
+          -g, --girr
+            Generate Girr file (EXPERIMENTAL).
+            Default: false
           -h, -?, --help
             Print help for this command.
           -i, --input
@@ -562,14 +603,14 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print some statistics.
             Default: false
           -t, --timebase
-            Force time unit , in microseconds (no suffix), or in periods (with
+            Force time unit , in microseconds (no suffix), or in periods (with 
             suffix "p").
           --timings
             Print the total timings of the compute IRP form.
             Default: false
           -T, --trailinggap
-            Dummy trailing gap (in micro seconds) added to sequences of odd
-            length.
+            Dummy trailing gap (in micro seconds) added to sequences of odd 
+            length. 
 
     code      Generate code for the given target(s)
       Usage: code [options] protocols
@@ -577,7 +618,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           --describe
             Print a possibly longer documentation for the present command.
           -d, --directory
-            Directory in whicht the generate output files will be written, if
+            Directory in whicht the generate output files will be written, if 
             not using the --output option.
           -h, -?, --help
             Print help for this command.
@@ -588,9 +629,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Specify target dependent parameters to the code generators.
             Default: []
           -s, --stdirectory
-            Directory containing st (string template) files for code
-            generation.
-            Default: /home/bengt/harctoolbox/IrpTransmogrifier/tools/../src/main/st
+            Directory containing st (string template) files for code 
+            generation. 
+            Default: /home/bengt/harctoolbox/IrpTransmogrifier/src/main/st
         * -t, --target
             Target(s) for code generation. Use ? for a list.
             Default: []
@@ -634,8 +675,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Generate XML and write to file argument.
 
     lirc      Convert Lirc configuration files to IRP form.
-      Usage: lirc [options] Lirc config files/directories/URLs; empty for
-            <stdin>.
+      Usage: lirc [options] Lirc config files/directories/URLs; empty for 
+            <stdin>. 
         Options:
           -c, --commands
             Also list the commands if the remotes.

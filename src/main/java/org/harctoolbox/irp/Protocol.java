@@ -377,7 +377,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return generalSpec.getFrequency();
     }
 
-    private double getFrequencyWithDefault() {
+    protected double getFrequencyWithDefault() {
         return generalSpec.getFrequencyWitDefault();
     }
 
@@ -687,7 +687,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return new Decoder.Decode(null, parameters, beginPos, pos - 1, noRepeatsMatched);
     }
 
-    private void checkFrequency(Double frequency, Decoder.DecoderParameters params) throws SignalRecognitionException {
+    protected void checkFrequency(Double frequency, Decoder.DecoderParameters params) throws SignalRecognitionException {
         logger.log(Level.FINER, "Expected frequency {0}, actual {1}, tolerance {2}", new Object[]{(int) getFrequencyWithDefault(), frequency.intValue(), params.getFrequencyTolerance().intValue()});
         boolean success = params.getFrequencyTolerance() < 0
                 || IrCoreUtils.approximatelyEquals(getFrequencyWithDefault(), frequency, params.getFrequencyTolerance(), 0.0);

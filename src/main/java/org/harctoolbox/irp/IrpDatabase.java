@@ -74,6 +74,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String PARAMETER_NAME = "parameter";
     public static final String DECODABLE_NAME = "decodable";
     public static final String FREQUENCY_TOLERANCE_NAME = "frequency-tolerance";
+    public static final String FREQUENCY_LOWER_NAME = "frequency-lower";
+    public static final String FREQUENCY_UPPER_NAME = "frequency-upper";
     public static final String RELATIVE_TOLERANCE_NAME = "relative-tolerance";
     public static final String ABSOLUTE_TOLERANCE_NAME = "absolute-tolerance";
     public static final String MINIMUM_LEADOUT_NAME = "minimum-leadout";
@@ -91,6 +93,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                 || key.equals(PARAMETER_NAME)
                 || key.equals(DECODABLE_NAME)
                 || key.equals(FREQUENCY_TOLERANCE_NAME)
+                || key.equals(FREQUENCY_LOWER_NAME)
+                || key.equals(FREQUENCY_UPPER_NAME)
                 || key.equals(RELATIVE_TOLERANCE_NAME)
                 || key.equals(ABSOLUTE_TOLERANCE_NAME)
                 || key.equals(MINIMUM_LEADOUT_NAME)
@@ -788,9 +792,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             return str == null || Boolean.parseBoolean(str) || str.equalsIgnoreCase("yes");
         }
 
-        NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
+        private NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
             return new NamedProtocol(getName(), getCName(), getIrp(), getHtmlDocumentation(),
-                    getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
+                    getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(FREQUENCY_LOWER_NAME), getFirstProperty(FREQUENCY_UPPER_NAME),
+                    getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
                     getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getFirstProperty(REJECT_REPEATLESS_NAME), getProperties(PREFER_OVER_NAME), map);
         }
 

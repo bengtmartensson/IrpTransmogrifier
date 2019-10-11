@@ -127,7 +127,7 @@ public class DecoderNGTest {
         assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35}");
         params.setAllDecodes(true);
         result = decoder.decodeIrSignal(irSignal, params);
-        assertEquals(result.size(), 3);
+        assertEquals(result.size(), 2);
     }
 
     @Test(enabled = true)
@@ -163,10 +163,31 @@ public class DecoderNGTest {
         Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);
         assertTrue(result.contains("Pioneer"));
         assertTrue(result.contains("NEC2"));
+
         params.setFrequencyTolerance(1000.0);
         result = decoder.decodeIrSignal(irSignal, params);
         assertTrue(result.contains("Pioneer"));
         assertFalse(result.contains("NEC2"));
+
+        irSignal = new IrSignal(irSignal, 39699.0);
+        result = decoder.decodeIrSignal(irSignal, params);
+        assertFalse(result.contains("Pioneer"));
+
+        irSignal = new IrSignal(irSignal, 39700.0);
+        result = decoder.decodeIrSignal(irSignal, params);
+        assertTrue(result.contains("Pioneer"));
+
+        irSignal = new IrSignal(irSignal, 41000.0);
+        result = decoder.decodeIrSignal(irSignal, params);
+        assertTrue(result.contains("Pioneer"));
+
+        irSignal = new IrSignal(irSignal, 41001.0);
+        result = decoder.decodeIrSignal(irSignal, params);
+        assertFalse(result.contains("Pioneer"));
+
+        params.setFrequencyTolerance(-1d);
+        result = decoder.decodeIrSignal(irSignal, params);
+        assertTrue(result.contains("Pioneer"));
     }
 
     /**

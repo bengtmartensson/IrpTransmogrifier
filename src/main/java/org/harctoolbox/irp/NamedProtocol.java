@@ -65,12 +65,18 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
             ;
     }
 
+    private static boolean inInterval(double x, double lower, double upper) {
+        return lower <= x && x <= upper;
+    }
+
     private final String name;
     private final String cName;
     private final DocumentFragment htmlDocumentation;
     private final Double absoluteTolerance;
     private final Double relativeTolerance;
     private final Double frequencyTolerance;
+    private final Double frequencyLower;
+    private final Double frequencyUpper;
     private final Double minimumLeadout;
     private final boolean decodable;
     private final List<PreferOver> preferOver; // If true, the parameter values overwrite protocol specific values.
@@ -78,6 +84,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     private final boolean rejectRepeatless;
 
     public NamedProtocol(String name, String cName, String irp, DocumentFragment htmlDocumentation, String frequencyTolerance,
+            String frequencyLower, String frequencyUpper,
             String absoluteTolerance, String relativeTolerance, String minimumLeadout, String decodable, String rejectRepeatless,
             List<String> preferOver, Map<String, List<String>> map)
             throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
@@ -86,6 +93,8 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         this.cName = cName;
         this.htmlDocumentation = htmlDocumentation;
         this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : null;
+        this.frequencyLower = frequencyLower != null ? Double.parseDouble(frequencyLower) : null;
+        this.frequencyUpper = frequencyUpper != null ? Double.parseDouble(frequencyUpper) : null;
         this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : null;
         this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : null;
         this.minimumLeadout = minimumLeadout != null ? Double.parseDouble(minimumLeadout) : null;
@@ -99,7 +108,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     }
 
     public NamedProtocol(String name, String irp, DocumentFragment documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
-        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, null, new HashMap<>(0));
+        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, null, null, null, new HashMap<>(0));
     }
 
     public Set<String> preferredOvers() {
@@ -227,6 +236,22 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         Decoder.DecoderParameters fixedParams = params.adjust(false/*isRejectRepeats()*/, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), fixedParams);
         return new Decoder.Decode(this, decode);
+    }
+
+    @SuppressWarnings("null")
+    @Override
+    protected void checkFrequency(Double frequency, Decoder.DecoderParameters params) throws SignalRecognitionException {
+        if (params.getFrequencyTolerance() < 0) {
+            logger.log(Level.FINER, "Frequency not checked since frequencyTolerance < 0");
+            return;
+        }
+
+        double lower = frequencyLower != null ? frequencyLower : getFrequencyWithDefault() - params.getFrequencyTolerance();
+        double upper = frequencyUpper != null ? frequencyUpper : getFrequencyWithDefault() + params.getFrequencyTolerance();
+        boolean success = inInterval(frequency, lower, upper);
+        logger.log(Level.FINER, "Frequency was checked, {0}OK.", success ? "" : "NOT ");
+        if (!success)
+            throw new SignalRecognitionException("Frequency does not match");
     }
 
     @Override

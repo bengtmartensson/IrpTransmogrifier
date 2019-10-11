@@ -183,6 +183,10 @@ public final class IrSignal implements Cloneable {
         this(new int[0], 0, 0, ModulatedIrSequence.DEFAULT_FREQUENCY, null);
     }
 
+    public IrSignal(IrSignal irSignal, Double newFrequency) {
+        this(irSignal.introSequence, irSignal.repeatSequence, irSignal.endingSequence, newFrequency, irSignal.dutyCycle);
+    }
+
     private void setup(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, Double frequency, Double dutyCycle) {
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
@@ -196,10 +200,6 @@ public final class IrSignal implements Cloneable {
         map.put(Pass.intro, this.introSequence);
         map.put(Pass.repeat, this.repeatSequence);
         map.put(Pass.ending, this.endingSequence);
-    }
-
-    public IrSignal setFrequency(Double newFrequency) {
-        return new IrSignal(introSequence, repeatSequence, endingSequence, newFrequency != null ? newFrequency : frequency);
     }
 
     public Double getFrequency() {

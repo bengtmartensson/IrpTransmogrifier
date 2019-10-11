@@ -273,8 +273,10 @@ public class CommandAnalyze extends AbstractCommand {
             if (repeatFinder || dumpRepeatfinder) {
                 IrSequence irSequence = irSignal.toModulatedIrSequence();
                 analyzer = new Analyzer(irSequence, freq, true, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            } else
-                analyzer = new Analyzer(irSignal.setFrequency(freq), commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            } else {
+                IrSignal fixedSignal = frequency != null ? new IrSignal(irSignal, frequency) : irSignal;
+                analyzer = new Analyzer(fixedSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+            }
             analyze(analyzer, null);
         }
 

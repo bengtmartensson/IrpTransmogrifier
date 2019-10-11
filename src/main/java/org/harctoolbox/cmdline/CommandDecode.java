@@ -155,7 +155,7 @@ public class CommandDecode extends AbstractCommand {
                 }, commandLineArgs.commentStart);
                 List<IrSignal> signals = irSignalParser.readThings(input, commandLineArgs.encoding, false);
                 for (IrSignal irSignal : signals)
-                    decode(decoder, irSignal.setFrequency(frequency), null, 0);
+                    decode(decoder, irSignal, null, 0);
             } else if (namedInput != null) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
@@ -163,18 +163,19 @@ public class CommandDecode extends AbstractCommand {
                 Map<String, IrSignal> signals = irSignalParser.readNamedThings(namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
                 for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
-                    decode(decoder, kvp.getValue().setFrequency(frequency), kvp.getKey(), maxNameLength);
+                    decode(decoder, kvp.getValue(), kvp.getKey(), maxNameLength);
             } else {
                 MultiParser prontoRawParser = MultiParser.newIrCoreParser(args);
                 IrSignal irSignal = prontoRawParser.toIrSignal(frequency, trailingGap);
                 if (irSignal == null)
                     throw new UsageException("Could not parse as IrSignal: " + String.join(" ", args));
-                decode(decoder, irSignal.setFrequency(frequency), null, 0);
+                decode(decoder, irSignal, null, 0);
             }
         }
 
-        private void decode(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws InvalidArgumentException {
-            Objects.requireNonNull(irSignal, "irSignal must be non-null");
+        private void decode(Decoder decoder, IrSignal irSig, String name, int maxNameLength) throws InvalidArgumentException {
+            Objects.requireNonNull(irSig, "irSignal must be non-null");
+            IrSignal irSignal = frequency != null ? new IrSignal(irSig, frequency) : irSig;
             if (repeatFinder) {
                 ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
                 RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minRepeatGap);

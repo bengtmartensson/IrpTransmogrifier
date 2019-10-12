@@ -1,4 +1,4 @@
-Release Notes for IrpTransmogrifier 1.1.1.
+Release Notes for IrpTransmogrifier 1.2.0.
 
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues

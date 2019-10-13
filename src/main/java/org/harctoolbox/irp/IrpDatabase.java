@@ -285,7 +285,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return doc;
     }
 
-    public Document toDocument(List<String> protocolNames) {
+    public Document toXml(List<String> protocolNames) {
         Document document = XmlUtils.newDocument();
         Element root = document.createElement("NamedProtocols");
         document.appendChild(root);

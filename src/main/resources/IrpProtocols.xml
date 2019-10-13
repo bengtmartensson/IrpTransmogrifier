@@ -93,7 +93,7 @@ minimum-leadout
 <irp:protocols xmlns="http://www.w3.org/1999/xhtml"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2019-10-11"
+               version="2019-10-13"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
     <irp:protocol name="48-NEC">
@@ -277,7 +277,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:irp><![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,0:2,1,-165,D:5,~F:8,3:2,1,-165)* [D:0..31,F:0..255]]]></irp:irp>
         <irp:documentation>A Denon signal has two halves, either one of which is enough to fully decode the information. A significant fraction of Denon learned signals contain just one half or have the halves separated so that DecodeIr can't process them together. When one half is seen separate from the other, DecodeIr will name the protocol Denon{1} or Denon{2} depending on which half is decoded. Denon, Denon{1} and Denon{2} all represent the same protocol when they are correct. But only Denon is robust. A Denon{1} or Denon{2} decode might be <A href="#spurious">spurious</A>.</irp:documentation>
     </irp:protocol>
-    <irp:protocol name="Denon-K" usable="true">
+    <irp:protocol name="Denon-K">
         <irp:parameter name="uei-executor">00CD</irp:parameter>
         <irp:parameter name="prefer-over">Kaseikyo</irp:parameter>
         <irp:irp><![CDATA[{37k,432}<1,-1|1,-3>(8,-4,84:8,50:8,0:4,D:4,S:4,F:12,((D*16)^S^(F*16)^(F:8:4)):8,1,-173)* [D:0..15,S:0..15,F:0..4095]]]></irp:irp>
@@ -455,7 +455,7 @@ This version is a re-parametrization of 3FG&apos;s version, allowing for decodin
         <irp:documentation>Protocol for Fujitsu inverter air conditioning. <a href="http://www.remotecentral.com/cgi-bin/mboard/rc-discrete/thread.cgi?4894">Reference</a>.</irp:documentation>
     </irp:protocol>
     <irp:protocol name="G.I.4DTV">
-        <irp:parameter name="prefer-over">G.I.4DTVnoCheck</irp:parameter>
+        <irp:parameter name="prefer-over">G.I.4DTV_relaxed</irp:parameter>
         <!--irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*{C= ((#(F&25) + #(D&5))&1) + 2*((#(F&43) + #(D&7))&1) + 4*((#(F&22) + #(D&7))&1) + 8*((#(F&44) + #(D&6))&1)}[D:0..3, F:0..63]]]></irp:irp-->
         <irp:irp><![CDATA[
 {37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C0:1,C1:1,C2:1,C3:1,1,-60)*
@@ -466,17 +466,12 @@ C2=D:1:2 + #(F&22) + #(D&3),
 C3=D:1:2 + #(F&44) + #(D&2)
 }[D:0..7, F:0..63]
        ]]></irp:irp>
+       <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible. Unit (device) numbers from 0 to 7 are supported.  The check sum C is a Hamming Code, which can correct single bit errors. D:1:2 is encoded in the check sum. See <a href="http://www.hifi-remote.com/forums/viewtopic.php?p=103934#103934">forum thread</a>.</irp:documentation>
     </irp:protocol>
-    <irp:protocol name="G.I.4DTVnoCheck">
+    <irp:protocol name="G.I.4DTV_relaxed">
         <irp:parameter name="uei-executor">00A4</irp:parameter>
         <irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*[D:0..3, F:0..63, C:0..15]]]></irp:irp>
-        <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible. Unit (device) numbers from 0 to 7 are supported. See <a href="http://www.hifi-remote.com/forums/viewtopic.php?p=103934#103934">forum thread</a>.</irp:documentation>
-    </irp:protocol>
-    <irp:protocol name="G.I.4DTVold">
-        <irp:parameter name="uei-executor">00A4</irp:parameter>
-        <irp:parameter name="prefer-over">G.I.4DTVnoCheck</irp:parameter>
-        <irp:irp><![CDATA[{37.3k,992}<1,-1|1,-3>(5,-2,F:6,D:2,C:4,1,-60)*{C= ((#(F&25) + #(D&5))&1) + 2*((#(F&43) + #(D&7))&1) + 4*((#(F&22) + #(D&7))&1) + 8*((#(F&44) + #(D&6))&1)}[D:0..3, F:0..63]]]></irp:irp>
-        <irp:documentation>This is a moderately robust protocol, but <A href="#spurious">spurious decodes</A> are still possible. Unit (device) numbers from 0 to 7 are supported.  The check sum C is a Hamming Code, which can correct single bit errors. D:1:2 is encoded in the check sum. See <a href="http://www.hifi-remote.com/forums/viewtopic.php?p=103934#103934">forum thread</a>.</irp:documentation>
+        <irp:documentation>Relaxed version of <a href="#G.I.4DTV">G.I.4DTV</a> &#x2014; the checksum is not checked but considered a parameter.</irp:documentation>
     </irp:protocol>
     <irp:protocol name="G.I.Cable">
         <irp:parameter name="alt_name">GI Cable</irp:parameter>
@@ -676,7 +671,7 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:irp><![CDATA[{38k,127}<3,-4|3,-8>(31,-36,D:4,~D:4,F:8,~F:8,3,-50m)*[D:0..15,F:0..255]]]></irp:irp>
         <irp:documentation>Logitech is used with their PS3 adapter.  The IR signal is similar to <a href="#Kathrein">Kathrein</a>.  If a Logitech signal is decoded as Kathrein, the device number and OBC are still correct.</irp:documentation>
     </irp:protocol>
-    <irp:protocol name="Lumagen" usable="true">
+    <irp:protocol name="Lumagen">
         <irp:irp><![CDATA[{38.4k,416,msb}<1,-6|1,-12>(D:4,C:1,F:7,1,-26)* {C = (#F+1)&1} [D:0..15,F:0..127]]]></irp:irp>
         <irp:documentation/>
     </irp:protocol>
@@ -701,7 +696,7 @@ Note (BM): These two entries was one in the original document; I split it into t
         <irp:irp><![CDATA[{38k,525}<1,-1|1,-3>(D:3,F:7,1,^30.5m)* [D:0..7,F:0..127]]]></irp:irp>
         <irp:documentation>This is not a robust protocol, so <A href="#spurious">spurious decodes</A> are likely.</irp:documentation>
     </irp:protocol>
-    <irp:protocol name="MCE" usable="true">
+    <irp:protocol name="MCE">
         <irp:parameter name="prefer-over">RC6-M-32</irp:parameter>
         <irp:parameter name="alt_name">RC6-6-32</irp:parameter>
         <irp:irp><![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T) {OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]]]></irp:irp>
@@ -1012,7 +1007,7 @@ which is displayed as simply "RC6", RC6-6-24 which is displayed as
             <a href="#Replay">Replay</a> and some RC6-6-32 which is displayed as <a href="#MCE">MCE</a>.
         </irp:documentation>
     </irp:protocol>
-    <irp:protocol name="RC6-M-56" usable="true">
+    <irp:protocol name="RC6-M-56">
         <irp:parameter name="absolute-tolerance">300</irp:parameter>
         <irp:irp><![CDATA[{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,M:3,<-2,2|2,-2>(T:1),C:56,-131.0m)*[M:0..7,T@:0..1=0,C:0..72057594037927935]]]></irp:irp>
         <irp:documentation>This is the "RC6-?-?? protocol" made usable for the case of ??=56.</irp:documentation>
@@ -1190,7 +1185,7 @@ In ProntoEdit, DecodeIr's "Device" is called "Customer Code"; DecodeIr's "Subdev
 Here we follow the Pronto form, which is also consistent with DecodeIR.
         </irp:documentation>
     </irp:protocol>
-    <irp:protocol name="Solidtek16" usable="true">
+    <irp:protocol name="Solidtek16">
         <irp:irp><![CDATA[{38k}<-624,468|468,-624>(S=0,(1820,-590,0:1,D:4,F:7,S:1,C:4,1:1,-143m,S=1)3) {C= F:4:0 + F:3:4 + 8*S } [D:0..15, F:0..127]]]></irp:irp>
         <irp:documentation>This is a keyboard protocol.  The make/break bit is decoded into the subdevice field.</irp:documentation>
     </irp:protocol>

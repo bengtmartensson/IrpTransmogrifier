@@ -59,6 +59,9 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"--documentation"}, description = "Print (possible longer) documentation, as a dumb rendering of the HTML documenation.")
     private boolean documentation = false;
 
+    @Parameter(names = {"-d", "--dump"}, description = "Print the IRP data base as DOC tree stringified.")
+    private boolean dump = false;
+
     @Parameter(names = {"--gui", "--display"}, description = "Display parse diagram.")
     private boolean gui = false;
 
@@ -123,6 +126,12 @@ public class CommandList extends AbstractCommand {
         List<String> list = irpDatabase.evaluateProtocols(protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
         if (list.isEmpty())
             throw new UsageException("No protocol matched.");
+
+        if (dump) {
+            Document document = irpDatabase.toDocument(list);
+            XmlUtils.printDOM(out, document, commandLineArgs.encoding, "Irp Documentation");
+            return;
+        }
 
         for (String name : list) {
             String protocolName = irpDatabase.expandAlias(name);

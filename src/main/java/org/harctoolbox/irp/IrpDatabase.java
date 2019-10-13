@@ -276,11 +276,14 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     public Document toDocument() {
+        return toDocument(protocols.keySet());
+    }
+
+    public Document toDocument(Iterable<String> list) {
         Document doc = emptyDocument();
         Element root = doc.getDocumentElement();
-        protocols.values().forEach((protocol) -> {
-            root.appendChild(protocol.toElement(doc));
-        });
+        for (String protocolName : list)
+            root.appendChild(protocols.get(protocolName.toLowerCase(Locale.US)).toElement(doc));
 
         return doc;
     }
@@ -846,6 +849,19 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                     }
                 }
             }
+
+            xmlMap.entrySet().forEach((kvp) -> {
+                List<DocumentFragment> list = kvp.getValue();
+                list.forEach((documentFragment) -> {
+                    Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
+                    element.appendChild(param);
+                    param.setAttribute(NAME_NAME, kvp.getKey());
+                    param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.XML_PRESERVE_NAME); // to prevent extra white space from being inserted
+                    doc.adoptNode(documentFragment);
+                    param.appendChild(documentFragment);
+                });
+            });
+
             return element;
         }
     }

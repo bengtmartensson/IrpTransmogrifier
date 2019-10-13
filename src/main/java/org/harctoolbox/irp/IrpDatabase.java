@@ -394,7 +394,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     public String getCName(String name) {
         UnparsedProtocol prot = getUnparsedProtocol(name);
-        return prot == null ? null : prot.getCName();
+        if (prot == null)
+            return null;
+        String storedCName = prot.getCName();
+        return storedCName != null ? storedCName : IrpUtils.toCIdentifier(prot.getName());
     }
 
     public String getNameExpandAlias(String name) {
@@ -719,7 +722,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             String name = element.getAttribute(NAME_NAME);
             addProperty(NAME_NAME, name);
             String cName = element.getAttribute(CNAME_NAME);
-            addProperty(CNAME_NAME, cName.isEmpty() ? IrpUtils.toCIdentifier(name) : cName);
+            if (!cName.isEmpty())
+                addProperty(CNAME_NAME, cName);
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -810,7 +814,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                 switch (kvp.getKey()) {
                     case NAME_NAME:
                         element.setAttribute(NAME_NAME, kvp.getValue().get(0));
-                        element.setAttribute(CNAME_NAME, IrCoreUtils.toCName(kvp.getValue().get(0)));
                         break;
                     case USABLE_NAME:
                         element.setAttribute(USABLE_NAME, Boolean.toString(!kvp.getValue().get(0).equals("no")));

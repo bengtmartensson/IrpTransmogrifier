@@ -239,11 +239,12 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     private void setupDatabase(List<String> blackList) throws IOException, UsageException, IrpParseException, UnknownProtocolException {
-        if (commandLineArgs.configFile != null && commandLineArgs.irp != null)
+        if (commandLineArgs.configFiles != null && commandLineArgs.irp != null)
             throw new UsageException("At most one of configfile and irp can be specified");
 
         irpDatabase = commandLineArgs.irp != null ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
-                : new IrpDatabase(commandLineArgs.configFile);
+                : commandLineArgs.configFiles != null ? new IrpDatabase(commandLineArgs.configFiles)
+                : new IrpDatabase((String) null);
         irpDatabase.remove(blackList);
     }
 

@@ -1,5 +1,6 @@
 package org.harctoolbox.irp;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -270,5 +271,44 @@ public class IrpDatabaseNGTest {
         instance.getNamedProtocol(name);
         String irp = instance.getIrp(name);
         assertEquals(irp, "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*){D=F,S=F}[F:0..255]");
+    }
+
+
+    @Test
+    public void testRemove() throws IOException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, UnknownProtocolException {
+        System.out.println("testRemove");
+        IrpDatabase irpDatabase = new IrpDatabase((String) null);
+        irpDatabase.getNamedProtocolExpandAlias("RC6-6-32");
+        irpDatabase.remove("mce");
+        try {
+            irpDatabase.getNamedProtocolExpandAlias("RC6-6-32");
+            fail();
+        } catch (UnknownProtocolException ex) {
+        }
+    }
+
+    @Test
+    public void testPatchFile() throws IOException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException, IrpParseException {
+        System.out.println("testPatchFile");
+        IrpDatabase irpDatabase = new IrpDatabase((String) null);
+        irpDatabase.patch(new File("src/test/resources/IrpProtocols-test.xml"));
+        try {
+            irpDatabase.getNamedProtocol("nec2");
+            fail();
+        } catch (UnknownProtocolException ex) {
+        }
+
+        List<String> list = irpDatabase.getProperties("nec1", "foo");
+        assertEquals(list.size(), 1);
+        assertTrue(list.contains("bar"));
+        NamedProtocol nec1 = irpDatabase.getNamedProtocol("nec1");
+        assertEquals(nec1.getDocumentation(), "Nec1 new doc");
+        List<String> po = irpDatabase.getProperties("nec1", "prefer-over");
+        assertTrue(po.contains("foobar"));
+
+        NamedProtocol foobar = irpDatabase.getNamedProtocol("foobar");
+        assertEquals(foobar.getDocumentation(), "Lorem Ipsum");
+
+        irpDatabase.getNamedProtocolExpandAlias("necropHile");
     }
 }

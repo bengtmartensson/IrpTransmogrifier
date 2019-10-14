@@ -61,7 +61,7 @@ public final class ShortPronto extends Pronto {
         map.put(RC6_NAME, RC6_IRP);
         map.put(NEC1_NAME, NEC1_IRP);
         try {
-            IrpDatabase irpDatabase = new IrpDatabase(map);
+            IrpDatabase irpDatabase = IrpDatabase.parseIrp(map);
             return new Decoder(irpDatabase);
         } catch (IrpParseException ex) {
             //throw new ThisCannotHappenException();

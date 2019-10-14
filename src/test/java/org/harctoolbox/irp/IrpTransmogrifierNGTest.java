@@ -577,6 +577,13 @@ public class IrpTransmogrifierNGTest {
         assertEquals(stderr.trim(), "Decode succeeded!");
     }
 
+    @Test
+    public void testTwoConfigFiles() {
+        System.out.println("testTwoConfigFiles");
+        String result = IrpTransmogrifier.execute("--configfile  src/main/resources/IrpProtocols.xml,src/test/resources/IrpProtocols-test.xml --quiet list --docu nec1");
+        assertEquals(result, "Nec1 new doc");
+    }
+
     @Test(enabled = true)
     public void testSillyCommand() {
         System.out.println("testSillyCommand");

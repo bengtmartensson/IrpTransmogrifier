@@ -80,6 +80,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String CNAME_NAME = "c-name";
     public static final String IRP_NAME = "irp";
     public static final String USABLE_NAME = "usable";
+    public static final String VERSION_NAME = "version";
     public static final String DOCUMENTATION_NAME = "documentation";
     public static final String PARAMETER_NAME = "parameter";
     public static final String DECODABLE_NAME = "decodable";
@@ -92,6 +93,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String PREFER_OVER_NAME = "prefer-over";
     public static final String ALT_NAME_NAME = "alt_name";
     public static final String REJECT_REPEATLESS_NAME = "reject-repeatless";
+    public static final String TYPE_NAME = "type";
+    public static final String XML_NAME = "XML";
 
     static boolean isKnownKeyword(String key) {
         return key.equals(PROTOCOL_NAME)
@@ -142,29 +145,13 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         Map<String, UnparsedProtocol> protocols = new HashMap<>(1);
         UnparsedProtocol protocol = new UnparsedProtocol(protocolName, irp, documentation);
         protocols.put(protocolName, protocol);
-        return new IrpDatabase(protocols, new HashMap<>(0), "");
+        return new IrpDatabase(protocols);
     }
 
-    private static void addToProtocols(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, UnparsedProtocol proto) {
-        if (!proto.isUsable() || proto.getName() == null || proto.getIrp() == null)
-            return;
-
-        String nameLower = proto.getName().toLowerCase(Locale.US);
-        if (protocols.containsKey(nameLower))
-            logger.log(Level.WARNING, "Multiple definitions of protocol `{0}''. Keeping the last.", nameLower);
-        protocols.put(nameLower, proto);
-        List<String> altNameList = proto.getProperties(ALT_NAME_NAME);
-        if (altNameList != null) {
-            altNameList.stream().map((name) -> {
-                String n = name.toLowerCase(Locale.US);
-                if (aliases.containsKey(n))
-                    logger.log(Level.WARNING, "alt_name \"{0}\" defined more than once.", name);
-                return n;
-            }).forEachOrdered((n) -> {
-                aliases.put(n, proto.getName());
-            });
-        }
+    public static IrpDatabase parseIrp(Map<String, String> map) throws IrpParseException {
+        return new IrpDatabase(toUnparsedProtocols(map));
     }
+
     private static Document openXmlStream(InputStream inputStream) throws IOException {
         try {
             return XmlUtils.openXmlStream(inputStream, null, true, true);
@@ -202,7 +189,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return (file == null || file.isEmpty()) ? IrpDatabase.class.getResourceAsStream(DEFAULT_CONFIG_FILE) : IrCoreUtils.getInputSteam(file);
     }
 
-    private String configFileVersion;
+    private final StringBuilder version;
 
     // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
     private Map<String, UnparsedProtocol> protocols;
@@ -225,39 +212,80 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         this(mkStream(file));
     }
 
-    public IrpDatabase() throws IOException, IrpParseException {
-        this(new HashMap<String, UnparsedProtocol>(4), new HashMap<String, String>(0), "null");
-    }
+    public IrpDatabase(String[] files) throws IrpParseException, IOException {
+        this();
+        for (String file : files)
+            patch(file);
 
-    public IrpDatabase(Map<String, String> protocols) throws IrpParseException {
-        this(toUnparsedProtocols(protocols), new HashMap<String, String>(0), "null");
-    }
-
-    /**
-     *
-     * @param doc
-     * @throws org.harctoolbox.irp.IrpParseException
-     */
-    public IrpDatabase(Document doc) throws IrpParseException {
-        Element root = doc.getDocumentElement();
-        configFileVersion = root.getAttribute("version");
-        NodeList nodes = root.getElementsByTagNameNS(IRP_PROTOCOL_NS, "protocol");
-        protocols = new LinkedHashMap<>(nodes.getLength()); // to preserve order
-        aliases = new LinkedHashMap<>(16);
-        for (int i = 0; i < nodes.getLength(); i++)
-            addProtocol((Element)nodes.item(i));
         expand();
+        rebuildAliases();
     }
 
-    private IrpDatabase(Map<String, UnparsedProtocol> protocols, Map<String, String> aliases, String version) throws IrpParseException {
-        this.configFileVersion = version;
+    public IrpDatabase(Iterable<File> files) throws IrpParseException, IOException {
+        this();
+        for (File file : files)
+            patch(file);
+
+        expand();
+        rebuildAliases();
+    }
+
+    private IrpDatabase() throws IrpParseException {
+        this(new LinkedHashMap<>(16));
+    }
+
+    private IrpDatabase(Map<String, UnparsedProtocol> protocols) throws IrpParseException {
+        this.version = new StringBuilder(64);
         this.protocols = protocols;
-        this.aliases = aliases;
+        this.aliases = new LinkedHashMap<>(8);
         expand();
+        rebuildAliases();
     }
 
-    private void addProtocol(UnparsedProtocol proto) {
-        addToProtocols(protocols, aliases, proto);
+    public IrpDatabase(Document doc) throws IrpParseException {
+        this();
+        patch(doc);
+        expand();
+        rebuildAliases();
+    }
+
+    public void patch(Reader reader) throws IOException {
+        patch(openXmlReader(reader));
+    }
+
+    public void patch(File file) throws IOException {
+        patch(openXmlFile(file));
+    }
+
+    public void patch(String file) throws IOException {
+        patch(new File(file));
+    }
+
+    public void patch(Document document) {
+        Element root = document.getDocumentElement();
+        appendToVersion(root.getAttribute("version"));
+        NodeList nodes = root.getElementsByTagNameNS(IRP_PROTOCOL_NS, PROTOCOL_NAME);
+        for (int i = 0; i < nodes.getLength(); i++)
+            patchProtocol((Element) nodes.item(i));
+    }
+
+    private void patchProtocol(Element current) {
+        patchProtocol(new UnparsedProtocol(current));
+    }
+
+    private void patchProtocol(UnparsedProtocol proto) {
+        String nameLower = proto.getName().toLowerCase(Locale.US);
+        UnparsedProtocol existing = protocols.get(nameLower);
+        if (existing != null) {
+            if (proto.isEmpty())
+                protocols.remove(nameLower);
+            else
+                existing.patch(proto);
+        } else {
+            protocols.put(nameLower, proto);
+        }
+
+        buildAliases(proto);
     }
 
     public void addProtocol(String protocolName, String irp) throws IrpParseException {
@@ -265,9 +293,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     public void addProtocol(String protocolName, String irp, DocumentFragment doc) throws IrpParseException {
-        addProtocol(new UnparsedProtocol(protocolName, irp, doc));
-        this.expand(protocolName);
+        patchProtocol(new UnparsedProtocol(protocolName, irp, doc));
+        expand(protocolName);
     }
+
 
     private Document emptyDocument() {
         Document doc = XmlUtils.newDocument(true);
@@ -280,7 +309,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         root.setAttribute(XML_NAMESPACE_ATTRIBUTE_NAME, XML_NS_URI);
         root.setAttribute(XMLNS_ATTRIBUTE, HTML_NAMESPACE_URI);
         root.setAttribute(SCHEMA_LOCATION_ATTRIBUTE_NAME, IRP_PROTOCOL_NS + " " + IRP_PROTOCOL_SCHEMA_LOCATION);
-        root.setAttribute("version", configFileVersion);
+        root.setAttribute(VERSION_NAME, version.toString());
         doc.appendChild(root);
         return doc;
     }
@@ -323,7 +352,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
      * @return the configFileVersion
      */
     public String getConfigFileVersion() {
-        return configFileVersion;
+        return version.toString();
     }
 
     private void dump(PrintStream ps, String name) {
@@ -577,10 +606,17 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             throw new UnknownProtocolException(protocolName);
 
         protocols.remove(protocolName.toLowerCase(Locale.US));
+        removeAliases(protocolName);
     }
 
-    private void addProtocol(Element current) {
-        addProtocol(new UnparsedProtocol(current));
+    private void removeAliases(String protocolName) {
+        ArrayList<String> result = new ArrayList<>(4);
+        aliases.entrySet().stream().filter((kvp) -> (kvp.getValue().equals(protocolName))).forEachOrdered((kvp) -> {
+            result.add(kvp.getKey());
+        });
+        result.forEach((s) -> {
+            aliases.remove(s);
+        });
     }
 
     public List<String> evaluateProtocols(List<String> protocols, boolean sort, boolean regexp, boolean urlDecode) {
@@ -636,6 +672,37 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return new NamedProtocolIterator(protocols);
     }
 
+    private void appendToVersion(String version) {
+        if (version.isEmpty())
+            return;
+
+        if (this.version.length() > 0)
+            this.version.append("+");
+        this.version.append(version);
+    }
+
+    private void buildAliases(UnparsedProtocol proto) {
+        List<String> altNameList = proto.getProperties(ALT_NAME_NAME);
+        if (altNameList == null)
+            return;
+        String nameLower = proto.getName().toLowerCase(Locale.US);
+        altNameList.stream().map((altName) -> {
+            String old = aliases.get(altName.toLowerCase(Locale.US));
+            if (old != null && !old.equals(nameLower))
+                logger.log(Level.WARNING, "alt_name \"{0}\" defined more than once, to different targets. Keeping the last.", altName);
+            return altName;
+        }).forEachOrdered((altName) -> {
+            aliases.put(altName.toLowerCase(Locale.US), proto.getName().toLowerCase(Locale.US));
+        });
+    }
+
+    private void rebuildAliases() {
+        aliases.clear();
+        this.protocols.values().forEach((protocol) -> {
+            buildAliases(protocol);
+        });
+    }
+
     private static class NamedProtocolIterator implements Iterator<NamedProtocol> {
         private Iterator<UnparsedProtocol> unparsedIterator;
 
@@ -672,6 +739,25 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             return fragment;
         }
 
+        private static <T> void patchMap(Map<String, List<T>> existingMap, Map<String, List<T>> patchMap) {
+            patchMap.entrySet().forEach((kvp) -> {
+                String name = kvp.getKey();
+                List<T> newList = kvp.getValue();
+                if (existingMap.containsKey(name)) {
+                    if (newList.isEmpty())
+                        existingMap.remove(name);
+                    else {
+                        List<T> oldList = existingMap.get(name);
+                        if (name.equals(DOCUMENTATION_NAME))
+                            oldList.clear();
+                        oldList.addAll(newList);
+                    }
+                } else {
+                    existingMap.put(name, kvp.getValue());
+                }
+            });
+        }
+
         private Map<String, List<String>> map;
         private Map<String, List<DocumentFragment>> xmlMap;
 
@@ -688,7 +774,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             this();
             addProperty(NAME_NAME, name);
             addProperty(IRP_NAME, irp);
-            addXmlProperty(DOCUMENTATION_NAME, documentation);
+            if (documentation != null)
+                addXmlProperty(DOCUMENTATION_NAME, documentation);
         }
 
         UnparsedProtocol(Map<String, String> map) {
@@ -701,6 +788,15 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         UnparsedProtocol(Element element) {
             this();
             parseElement(element);
+        }
+
+        UnparsedProtocol(String key, String irp) {
+            this(key, irp, null);
+        }
+
+        private void patch(UnparsedProtocol patchProtocol) {
+            patchMap(map, patchProtocol.map);
+            patchMap(xmlMap, patchProtocol.xmlMap);
         }
 
         private void addXmlProperty(String key, DocumentFragment fragment) {
@@ -751,11 +847,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                         addXmlProperty(DOCUMENTATION_NAME, nodeListToDocumentFragment(e.getChildNodes()));
                         break;
                     case PARAMETER_NAME:
-                        boolean isXml = e.getAttribute("type").equals("xml");
+                        boolean isXml = e.getAttribute(TYPE_NAME).equals(XML_NAME);
                         if (isXml)
-                            addXmlProperty(e.getAttribute("name"), nodeListToDocumentFragment(e.getChildNodes()));
+                            addXmlProperty(e.getAttribute(NAME_NAME), nodeListToDocumentFragment(e.getChildNodes()));
                         else
-                            addProperty(e.getAttribute("name"), e.getTextContent());
+                            addProperty(e.getAttribute(NAME_NAME), e.getTextContent());
                         break;
                     default:
                         throw new ThisCannotHappenException("unknown tag: " + e.getTagName());
@@ -873,6 +969,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             });
 
             return element;
+        }
+
+        private boolean isEmpty() {
+            // There is always the name
+            return map.size() <= 1 && xmlMap.isEmpty();
         }
     }
 }

@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.cmdline;
 
 import com.beust.jcommander.Parameter;
+import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -33,8 +34,9 @@ public class CommandCommonOptions {
     @Parameter(names = {"-b", "--blacklist"}, description = "List of protocols to be removed from the data base")
     public List<String> blackList = null;
 
-    @Parameter(names = {"-c", "--configfile"}, description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
-    public String configFile = null;
+    @Parameter(names = {"-c", "--configfile"}, listConverter = FileListParser.class,
+            description = "Pathname of IRP database file in XML format. Default is the one in the jar file.")
+    public List<File> configFiles = null;
 
     @Parameter(names = { "-C", "--commentStart"}, description = "Character(s) to be considered starting a line comment in input and namedInput files.")
     public String commentStart = null;

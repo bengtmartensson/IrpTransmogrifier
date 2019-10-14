@@ -38,11 +38,20 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static javax.xml.XMLConstants.XML_NS_URI;
 import javax.xml.validation.Schema;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
+import static org.harctoolbox.ircore.XmlUtils.HTML_NAMESPACE_URI;
+import static org.harctoolbox.ircore.XmlUtils.SCHEMA_LOCATION_ATTRIBUTE_NAME;
+import static org.harctoolbox.ircore.XmlUtils.W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME;
+import static org.harctoolbox.ircore.XmlUtils.XINCLUDE_NAMESPACE_ATTRIBUTE_NAME;
+import static org.harctoolbox.ircore.XmlUtils.XINCLUDE_NAMESPACE_URI;
+import static org.harctoolbox.ircore.XmlUtils.XML_NAMESPACE_ATTRIBUTE_NAME;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -66,6 +75,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     public static final String UNNAMED = "unnamed_protocol";
     public static final String PROTOCOL_NAME = "protocol";
+    public static final String PROTOCOLS_NAME = "protocols";
     public static final String NAME_NAME = "name";
     public static final String CNAME_NAME = "c-name";
     public static final String IRP_NAME = "irp";
@@ -264,12 +274,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
                 "type=\"text/xsl\" href=\"IrpProtocols2html.xsl\"");
         doc.appendChild(pi);
-        Element root = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":protocols");
-        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        root.setAttribute("xmlns:xi", "http://www.w3.org/2001/XInclude");
-        root.setAttribute("xmlns:xml", "http://www.w3.org/XML/1998/namespace");
-        root.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-        root.setAttribute("xsi:schemaLocation", IRP_PROTOCOL_NS + " " + IRP_PROTOCOL_SCHEMA_LOCATION);
+        Element root = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PROTOCOLS_NAME);
+        root.setAttribute(W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME, W3C_XML_SCHEMA_INSTANCE_NS_URI);
+        root.setAttribute(XINCLUDE_NAMESPACE_ATTRIBUTE_NAME, XINCLUDE_NAMESPACE_URI);
+        root.setAttribute(XML_NAMESPACE_ATTRIBUTE_NAME, XML_NS_URI);
+        root.setAttribute(XMLNS_ATTRIBUTE, HTML_NAMESPACE_URI);
+        root.setAttribute(SCHEMA_LOCATION_ATTRIBUTE_NAME, IRP_PROTOCOL_NS + " " + IRP_PROTOCOL_SCHEMA_LOCATION);
         root.setAttribute("version", configFileVersion);
         doc.appendChild(root);
         return doc;

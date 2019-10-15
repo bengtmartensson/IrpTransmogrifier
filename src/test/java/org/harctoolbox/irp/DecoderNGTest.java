@@ -160,6 +160,7 @@ public class DecoderNGTest {
         Decoder.setDebugProtocolRegExp("Pioneer");
         Decoder.DecoderParameters params = new Decoder.DecoderParameters();
         params.setFrequencyTolerance(2000.0);
+        params.setAllDecodes(true);
         Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);
         assertTrue(result.contains("Pioneer"));
         assertTrue(result.contains("NEC2"));

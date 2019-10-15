@@ -11,7 +11,7 @@ Movies:	OrtekMCE: {D=21,F=10},	beg=0, end=215, reps=7
 Rew:	OrtekMCE: {D=21,F=13},	beg=0, end=215, reps=7
 FFW:	OrtekMCE: {D=21,F=9},	beg=0, end=145, reps=4
 Skip Back:	OrtekMCE: {D=21,F=8},	beg=0, end=191, reps=5
-Skip Fwd:	
+Skip Fwd:	OrtekMCE_relaxed: {D=21,F=17},	beg=0, end=167, reps=6
 Stop:	OrtekMCE: {D=21,F=16},	beg=0, end=247, reps=7
 Pause:	OrtekMCE: {D=21,F=20},	beg=0, end=215, reps=7
 Rec:	OrtekMCE: {D=21,F=19},	beg=0, end=239, reps=8
@@ -26,10 +26,10 @@ OK:	OrtekMCE: {D=21,F=34},	beg=0, end=207, reps=7
 Vol+:	OrtekMCE: {D=21,F=50},	beg=0, end=239, reps=8
 Vol-:	OrtekMCE: {D=21,F=51},	beg=0, end=257, reps=8
 Mute:	OrtekMCE: {D=21,F=48},	beg=0, end=249, reps=7
-Ch+:	
+Ch+:	OrtekMCE_relaxed: {D=21,F=47},	beg=0, end=155, reps=5
 Ch-:	OrtekMCE: {D=21,F=49},	beg=0, end=193, reps=6
 Start (Green Button):	OrtekMCE: {D=21,F=46},	beg=0, end=203, reps=6
-0:	
+0:	OrtekMCE_relaxed: {D=21,F=42},	beg=0, end=129, reps=5
 1:	OrtekMCE: {D=21,F=52},	beg=0, end=239, reps=8
 2:	OrtekMCE: {D=21,F=36},	beg=0, end=231, reps=7
 3:	OrtekMCE: {D=21,F=31},	beg=0, end=221, reps=6

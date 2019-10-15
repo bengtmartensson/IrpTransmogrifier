@@ -187,6 +187,7 @@ FREQTOLERANCE_Xiaomi_MDZ_16_AA    := --frequencytolerance 2500
 FREQTOLERANCE_ZenithAll           := --frequencytolerance 2500
 FREQTOLERANCE_Zenith_6_0_1        := --frequencytolerance 2500
 FREQTOLERANCE_Zenith_7_0_10       := --frequencytolerance 2500
+#FREQTOLERANCE_PioneerMix	  := --frequencytolerance -1
 
 TARGETS := $(foreach f,$(NORMAL_TESTS),$(f).diff)
 
@@ -211,7 +212,7 @@ endif
 
 nukeempty:
 	find . -name \*.diff -size 0 -exec rm \{\} \;
-	ls -l *.diff
+	-ls -l *.diff
 
 clean:
 	rm -f *.diff *.out

@@ -1,25 +1,15 @@
 Power:	NEC-f16: {D=248,F=1848,S=199},	beg=0, end=67	{NEC-f16: {D=248,F=1848,S=199},	beg=68, end=135	{NEC-f16: {D=248,F=1848,S=199},	beg=136, end=203}	NEC2-f16: {D=248,F=1848,S=199},	beg=68, end=203, reps=2}
 	NEC2-f16: {D=248,F=1848,S=199},	beg=0, end=203, reps=3
 0:	NEC2: {D=248,F=240},	beg=0, end=271, reps=4
-	Pioneer-Mix: {D0=248,F0=240},	beg=0, end=271, reps=2
 1:	NEC2: {D=248,F=248},	beg=0, end=271, reps=4
-	Pioneer-Mix: {D0=248,F0=248},	beg=0, end=271, reps=2
 2:	NEC2: {D=248,F=244},	beg=0, end=407, reps=6
-	Pioneer-Mix: {D0=248,F0=244},	beg=0, end=407, reps=4
 3:	NEC2: {D=248,F=252},	beg=0, end=475, reps=7
-	Pioneer-Mix: {D0=248,F0=252},	beg=0, end=475, reps=5
 4:	NEC2: {D=248,F=242},	beg=0, end=475, reps=7
-	Pioneer-Mix: {D0=248,F0=242},	beg=0, end=475, reps=5
 5:	NEC2: {D=248,F=250},	beg=0, end=475, reps=7
-	Pioneer-Mix: {D0=248,F0=250},	beg=0, end=475, reps=5
 6:	NEC2: {D=248,F=246},	beg=0, end=475, reps=7
-	Pioneer-Mix: {D0=248,F0=246},	beg=0, end=475, reps=5
 7:	NEC2: {D=248,F=254},	beg=0, end=475, reps=7
-	Pioneer-Mix: {D0=248,F0=254},	beg=0, end=475, reps=5
 8:	NEC2: {D=248,F=241},	beg=0, end=475, reps=7
-	Pioneer-Mix: {D0=248,F0=241},	beg=0, end=475, reps=5
 9:	NEC2: {D=248,F=249},	beg=0, end=407, reps=6
-	Pioneer-Mix: {D0=248,F0=249},	beg=0, end=407, reps=4
 Up:	NEC-f16: {D=248,F=2358,S=199},	beg=0, end=67	{NEC-f16: {D=248,F=2358,S=199},	beg=68, end=135	{NEC-f16: {D=248,F=2358,S=199},	beg=136, end=203	{NEC-f16: {D=248,F=2358,S=199},	beg=204, end=271	{NEC-f16: {D=248,F=2358,S=199},	beg=272, end=339}	NEC2-f16: {D=248,F=2358,S=199},	beg=204, end=339, reps=2}	NEC2-f16: {D=248,F=2358,S=199},	beg=136, end=339, reps=3}	NEC2-f16: {D=248,F=2358,S=199},	beg=68, end=339, reps=4}
 	NEC2-f16: {D=248,F=2358,S=199},	beg=0, end=339, reps=5
 Down:	NEC-f16: {D=248,F=3123,S=199},	beg=0, end=67	{NEC-f16: {D=248,F=3123,S=199},	beg=68, end=135	{NEC-f16: {D=248,F=3123,S=199},	beg=136, end=203	{NEC-f16: {D=248,F=3123,S=199},	beg=204, end=271	{NEC-f16: {D=248,F=3123,S=199},	beg=272, end=339	{NEC-f16: {D=248,F=3123,S=199},	beg=340, end=407	{NEC-f16: {D=248,F=3123,S=199},	beg=408, end=475}	NEC2-f16: {D=248,F=3123,S=199},	beg=340, end=475, reps=2}	NEC2-f16: {D=248,F=3123,S=199},	beg=272, end=475, reps=3}	NEC2-f16: {D=248,F=3123,S=199},	beg=204, end=475, reps=4}	NEC2-f16: {D=248,F=3123,S=199},	beg=136, end=475, reps=5}	NEC2-f16: {D=248,F=3123,S=199},	beg=68, end=475, reps=6}

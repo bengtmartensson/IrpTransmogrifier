@@ -4,6 +4,19 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
+2019-10-16: Version 1.2.1
+
+* Merge Graham Dixon's fixes http://www.hifi-remote.com/forums/viewtopic.php?t=101943&start=63
+  in particular in <irp:parameter name="uei-executor">.
+* Updated protocol documentation etc in IrpProtocols.xml. Resolves #146.
+* Implemented IrpDatabase.patch(File) etc, allowing for patching IrpDatabases.
+  From command line, allow several arguments to --config. Resolves #68.
+* New option list --dump. Resolves #144.
+* Rename IrpDatabase.toDocument to IrpDatabase.toXml
+* Protocols: G.I.44DTVold removed; G.I.4DTVnoCheck -> G.I.4DTV_relaxed.
+  Remove all usable="true". Reordering.
+
+===============================================================================
 2019-10-11: Version 1.2.0
 
 * New parameters in IrpProtocols.xml: frequency-low & frequency-high. #132.

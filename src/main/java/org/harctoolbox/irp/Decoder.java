@@ -601,6 +601,14 @@ public final class Decoder {
             super(list);
         }
 
+        /**
+         * Creates a SimpleDecodeSet from a DecodeTree.  Note: This often throws away a lot of information.
+         * @param decodeTree
+         */
+        public SimpleDecodesSet(DecodeTree decodeTree) {
+            this(decodeTree.toList());
+        }
+
         @Override
         List<Decode> sortedValues() {
             List<Decode> list = new ArrayList<>(map.values());
@@ -634,6 +642,18 @@ public final class Decoder {
             });
 
             return stringJoiner.toString();
+        }
+
+        /**
+         * Creates a List of the Trunks of a DecodeTree. Note: This often throws away a lot of information.
+         * @return
+         */
+        public List<Decode> toList() {
+            List<Decode> result = new ArrayList<>(size());
+            map.values().forEach((TrunkDecodeTree tdt) -> {
+                result.add(tdt.getTrunk());
+            });
+            return result;
         }
 
         @Override

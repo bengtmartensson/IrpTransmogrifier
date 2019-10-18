@@ -94,7 +94,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String ALT_NAME_NAME = "alt_name";
     public static final String REJECT_REPEATLESS_NAME = "reject-repeatless";
     public static final String TYPE_NAME = "type";
-    public static final String XML_NAME = "XML";
+    public static final String XML_NAME = "xml";
 
     static boolean isKnownKeyword(String key) {
         return key.equals(PROTOCOL_NAME)
@@ -852,7 +852,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                         addXmlProperty(DOCUMENTATION_NAME, nodeListToDocumentFragment(e.getChildNodes()));
                         break;
                     case PARAMETER_NAME:
-                        boolean isXml = e.getAttribute(TYPE_NAME).equals(XML_NAME);
+                        boolean isXml = e.getAttribute(TYPE_NAME).toLowerCase(Locale.US).equals(XML_NAME);
                         if (isXml)
                             addXmlProperty(e.getAttribute(NAME_NAME), nodeListToDocumentFragment(e.getChildNodes()));
                         else

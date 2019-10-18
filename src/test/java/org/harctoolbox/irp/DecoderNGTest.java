@@ -143,6 +143,16 @@ public class DecoderNGTest {
     }
 
     @Test(enabled = true)
+    public void testDecodeEmpty() {
+        System.out.println("decodeEmpty");
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(IrSignal.EMPTY, params);
+        assertTrue(result.isEmpty());
+        Decoder.DecodeTree decodes = decoder.decode(ModulatedIrSequence.EMPTY, params);
+        assertTrue(decodes.isEmpty());
+    }
+
+    @Test(enabled = true)
     public void testDecodeGI4DTV() {
         System.out.println("decodeG.I.4DTV");
         Decoder.setDebugProtocolRegExp("^G.I.4DTV$");

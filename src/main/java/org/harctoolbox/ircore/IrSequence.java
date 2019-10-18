@@ -43,6 +43,7 @@ public class IrSequence implements Cloneable {
 
     private static final double EPSILON = 0.001;
     public static final double DUMMYGAPDURATION = 50000d; // should not translate to 0000 in Pronto
+    public static final IrSequence EMPTY = new IrSequence();
     private static Random random = null;
 
     /**

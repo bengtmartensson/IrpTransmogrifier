@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 
 public final class IrSignal implements Cloneable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
+    public static final IrSignal EMPTY = new IrSignal();
 
     /** Intro sequence, always sent once. Can be empty, but not null. */
     private IrSequence introSequence;
@@ -176,11 +177,9 @@ public final class IrSignal implements Cloneable {
 
     /**
      * Constructs an IrSignal of zero length.
-     * @throws org.harctoolbox.ircore.InvalidArgumentException
-     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public IrSignal() throws InvalidArgumentException {
-        this(new int[0], 0, 0, ModulatedIrSequence.DEFAULT_FREQUENCY, null);
+    public IrSignal() {
+        this(IrSequence.EMPTY, IrSequence.EMPTY, IrSequence.EMPTY, ModulatedIrSequence.DEFAULT_FREQUENCY, null);
     }
 
     public IrSignal(IrSignal irSignal, Double newFrequency) {

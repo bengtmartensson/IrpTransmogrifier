@@ -32,6 +32,9 @@ public final class ModulatedIrSequence extends IrSequence {
     public static final double DEFAULT_DUTYCYCLE = 0.4;
     public static final double DEFAULT_DEMODULATE_THRESHOLD = 35.0;
 
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
+    public static final ModulatedIrSequence EMPTY = new ModulatedIrSequence();
+
     public static ModulatedIrSequence concatenate(Collection<IrSequence> sequences, double frequency, double dutyCycle) {
         return new ModulatedIrSequence(IrSequence.concatenate(sequences), frequency, dutyCycle);
     }

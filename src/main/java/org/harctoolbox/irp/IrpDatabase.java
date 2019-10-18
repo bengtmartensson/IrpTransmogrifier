@@ -274,7 +274,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     private void patchProtocol(UnparsedProtocol proto) {
-        String nameLower = proto.getName().toLowerCase(Locale.US);
+        String name = proto.getName();
+        if (name == null) // likely usable = "false"
+            return;
+
+        String nameLower = name.toLowerCase(Locale.US);
         UnparsedProtocol existing = protocols.get(nameLower);
         if (existing != null) {
             if (proto.isEmpty())
@@ -826,8 +830,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
         private void parseElement(Element element) {
             String usable = element.getAttribute(USABLE_NAME);
-            if (!usable.isEmpty())
-                addProperty(USABLE_NAME, usable);
+            if (usable.equalsIgnoreCase("false"))
+                return;
+
             String name = element.getAttribute(NAME_NAME);
             addProperty(NAME_NAME, name);
             String cName = element.getAttribute(CNAME_NAME);

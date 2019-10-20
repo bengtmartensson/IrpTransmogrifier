@@ -44,6 +44,9 @@ public final class Version {
     /** Project home page. */
     public final static String homepageUrl = "<xsl:value-of select='$url'/>";
 
+    /** Documentation URL. */
+    public final static String documentationUrl = "<xsl:value-of select='$url'/>" + "/" + appName + ".html";
+
     /** URL containing current official version. */
     public final static String currentVersionUrl = homepageUrl + "/downloads/" + appName + ".version";
 

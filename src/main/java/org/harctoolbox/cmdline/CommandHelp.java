@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import org.harctoolbox.irp.Version;
 
 @SuppressWarnings("FieldMayBeFinal")
-
 @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
 public class CommandHelp extends AbstractCommand {
 
@@ -59,69 +59,91 @@ public class CommandHelp extends AbstractCommand {
     @Parameter(description = "commands")
     private List<String> commands = null;
 
+    public void help(PrintStream out, JCommander argumentParser) {
+        Help instance = new Help(out, argumentParser);
+        instance.help();
+    }
+
     @Override
     public String description() {
         return "This command list the syntax for the command(s) given as argument, default all. "
                 + "Also see the option \"--describe\".";
     }
 
-    public void help(PrintStream out, JCommander argumentParser) {
-        if (shortForm) {
-            shortUsage(out, argumentParser);
-            return;
+    private class Help {
+
+        private final PrintStream out;
+        private final JCommander argumentParser;
+
+        private Help(PrintStream out, JCommander argumentParser) {
+            this.out = out;
+            this.argumentParser = argumentParser;
         }
 
-        if (commonOptions) {
-            commonOptions(out);
-            return;
+        private void help() {
+            if (shortForm) {
+                shortUsage(out, argumentParser);
+                return;
+            }
+
+            if (commonOptions) {
+                commonOptions(out);
+                return;
+            }
+
+            String cmd = argumentParser.getParsedCommand();
+            if (commands != null)
+                commands.forEach((command) -> {
+                    try {
+                        out.println(usageString(command, argumentParser));
+                    } catch (ParameterException ex) {
+                        out.println("No such command: " + command);
+                    }
+                });
+            else if (cmd == null || cmd.equals("help")) {
+                out.println(usageString(null, argumentParser));
+                printDocumentationUrl();
+            } else
+                out.println(usageString(cmd, argumentParser));
         }
 
-        String cmd = argumentParser.getParsedCommand();
-        if (commands != null)
-            commands.forEach((command) -> {
-                try {
-                    out.println(usageString(command, argumentParser));
-                } catch (ParameterException ex) {
-                    out.println("No such command: " + command);
-                }
+        /**
+         * Print just the common options. JCommander does not support this case,
+         * so this implementation is pretty gross.
+         */
+        private void commonOptions(PrintStream out) {
+            CommandCommonOptions cla = new CommandCommonOptions();
+            JCommander parser = new JCommander(cla);
+            StringBuilder str = new StringBuilder(2500);
+            parser.usage(str);
+            str.replace(0, 41, "Common options:\n"); // barf!
+            out.println(str.toString().trim()); // str ends with line feed.
+        }
+
+        private void shortUsage(PrintStream out, JCommander argumentParser) {
+            String PROGRAMNAME = argumentParser.getProgramName();
+            out.println("Usage: " + PROGRAMNAME + " [options] [command] [command options]");
+            out.println("Commands:");
+
+            List<String> cmds = new ArrayList<>(argumentParser.getCommands().keySet());
+            Collections.sort(cmds);
+            cmds.forEach((cmd) -> {
+                out.println("   " + padString(cmd, 16) + argumentParser.getCommandDescription(cmd));
             });
-        else if (cmd == null || cmd.equals("help"))
-            out.println(usageString(null, argumentParser));
-        else
-            out.println(usageString(cmd, argumentParser));
+
+            out.println();
+            out.println("Use");
+            out.println("    \"" + PROGRAMNAME + " help\" for the full syntax,");
+            out.println("    \"" + PROGRAMNAME + " help <command>\" for a particular command,");
+            out.println("    \"" + PROGRAMNAME + " <command> --describe\" for a description,");
+            out.println("    \"" + PROGRAMNAME + " help --common\" for the common options.");
+
+            printDocumentationUrl();
+        }
+
+        private void printDocumentationUrl() {
+            out.println();
+            out.println("For documentation, see " + Version.documentationUrl);
+        }
     }
-
-    /**
-     * Print just the common options.
-     * JCommander does not support this case,
-     * so this implementation is pretty gross.
-     */
-    private void commonOptions(PrintStream out) {
-        CommandCommonOptions cla = new CommandCommonOptions();
-        JCommander parser = new JCommander(cla);
-        StringBuilder str = new StringBuilder(2500);
-        parser.usage(str);
-        str.replace(0, 41, "Common options:\n"); // barf!
-        out.println(str.toString().trim()); // str ends with line feed.
-    }
-
-    private void shortUsage(PrintStream out, JCommander argumentParser) {
-        String PROGRAMNAME = argumentParser.getProgramName();
-        out.println("Usage: " + PROGRAMNAME + " [options] [command] [command options]");
-        out.println("Commands:");
-
-        List<String> commands = new ArrayList<>(argumentParser.getCommands().keySet());
-        Collections.sort(commands);
-        commands.forEach((cmd) -> {
-            out.println("   " + padString(cmd, 16) + argumentParser.getCommandDescription(cmd));
-        });
-
-        out.println();
-        out.println("Use");
-        out.println("    \"" + PROGRAMNAME + " help\" for the full syntax,");
-        out.println("    \"" + PROGRAMNAME + " help <command>\" for a particular command,");
-        out.println("    \"" + PROGRAMNAME + " <command> --describe\" for a description,");
-        out.println("    \"" + PROGRAMNAME + " help --common\" for the common options.");
-    }
-
 }

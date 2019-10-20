@@ -10,6 +10,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.w3c.dom.DocumentFragment;
 
 /**
  *
@@ -291,6 +292,10 @@ public class IrpDatabaseNGTest {
     public void testPatchFile() throws IOException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException, IrpParseException {
         System.out.println("testPatchFile");
         IrpDatabase irpDatabase = new IrpDatabase((String) null);
+        List<String> necExecutors = irpDatabase.getProperties("nec1", "uei-executor");
+        assertFalse(necExecutors.isEmpty());
+        List<DocumentFragment> aminoExecutors = irpDatabase.getXmlProperties("amino", "uei-executor");
+        assertFalse(aminoExecutors.isEmpty());
         irpDatabase.patch(new File("src/test/resources/IrpProtocols-test.xml"));
         try {
             irpDatabase.getNamedProtocol("nec2");
@@ -309,6 +314,19 @@ public class IrpDatabaseNGTest {
         NamedProtocol foobar = irpDatabase.getNamedProtocol("foobar");
         assertEquals(foobar.getDocumentation(), "Lorem Ipsum");
 
+        List<String> necExecutorsx = irpDatabase.getProperties("nec1", "uei-executofdsfggsfsr");
+        List<DocumentFragment> aminoExecutorsx = irpDatabase.getXmlProperties("amino", "uei-sdfsfdfsexecutor");
+
         irpDatabase.getNamedProtocolExpandAlias("necropHile");
+        necExecutors = irpDatabase.getProperties("nec1", "uei-executor");
+        assertNull(necExecutors);
+        aminoExecutors = irpDatabase.getXmlProperties("amino", "uei-executor");
+        assertNull(aminoExecutors);
+
+        NamedProtocol amino = irpDatabase.getNamedProtocol("amino");
+        String doc = amino.getDocumentation();
+        assertNull(doc);
+
+        assertFalse(irpDatabase.isKnown("covfefe"));
     }
 }

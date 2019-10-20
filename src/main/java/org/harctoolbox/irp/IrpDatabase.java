@@ -95,6 +95,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String REJECT_REPEATLESS_NAME = "reject-repeatless";
     public static final String TYPE_NAME = "type";
     public static final String XML_NAME = "xml";
+    private static final String FALSE_NAME = "false";
 
     static boolean isKnownKeyword(String key) {
         return key.equals(PROTOCOL_NAME)
@@ -746,18 +747,18 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         private static <T> void patchMap(Map<String, List<T>> existingMap, Map<String, List<T>> patchMap) {
             patchMap.entrySet().forEach((kvp) -> {
                 String name = kvp.getKey();
-                List<T> newList = kvp.getValue();
-                if (existingMap.containsKey(name)) {
-                    if (newList.isEmpty())
+                if (!(name.equals(NAME_NAME))) {
+                    List<T> newList = kvp.getValue();
+                    if (newList == null)
                         existingMap.remove(name);
-                    else {
+                    else if (existingMap.containsKey(name)) {
                         List<T> oldList = existingMap.get(name);
                         if (name.equals(DOCUMENTATION_NAME))
                             oldList.clear();
                         oldList.addAll(newList);
+                    } else {
+                        existingMap.put(name, newList);
                     }
-                } else {
-                    existingMap.put(name, kvp.getValue());
                 }
             });
         }
@@ -804,17 +805,25 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         }
 
         private void addXmlProperty(String key, DocumentFragment fragment) {
-            if (!xmlMap.containsKey(key))
-                xmlMap.put(key, new ArrayList<>(1));
-            List<DocumentFragment> list = xmlMap.get(key);
-            list.add(fragment);
+            if (!fragment.hasChildNodes())
+                xmlMap.put(key, null);
+            else {
+                if (!xmlMap.containsKey(key))
+                    xmlMap.put(key, new ArrayList<>(1));
+                List<DocumentFragment> list = xmlMap.get(key);
+                list.add(fragment);
+            }
         }
 
         private void addProperty(String key, String value) {
-            if (!map.containsKey(key))
-                map.put(key, new ArrayList<>(1));
-            List<String> list = map.get(key);
-            list.add(value);
+            if (value.isEmpty())
+                map.put(key, null);
+            else {
+                if (!map.containsKey(key))
+                    map.put(key, new ArrayList<>(1));
+                List<String> list = map.get(key);
+                list.add(value);
+            }
         }
 
         private void setUniqueProperty(String key, String value) {
@@ -830,7 +839,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
         private void parseElement(Element element) {
             String usable = element.getAttribute(USABLE_NAME);
-            if (usable.equalsIgnoreCase("false"))
+            if (usable.equalsIgnoreCase(FALSE_NAME))
                 return;
 
             String name = element.getAttribute(NAME_NAME);

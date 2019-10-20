@@ -1,7 +1,16 @@
-Release Notes for IrpTransmogrifier 1.2.0.
+Release Notes for IrpTransmogrifier.
 
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
+
+===============================================================================
+2019-10-20: Version 1.2.2
+
+* Bugfix: Fix implementation of IrpDatabase patchfile nuking by empty entries.
+* Bugfix #148.
+* Bugfix #147.
+* IrpProtocols.xml: deleted unusable  protocols.
+* New constructor Decoder.SimpleDecodesSet(DecodeTree), new function Decoder.DecodeTree.toList().
 
 ===============================================================================
 2019-10-16: Version 1.2.1

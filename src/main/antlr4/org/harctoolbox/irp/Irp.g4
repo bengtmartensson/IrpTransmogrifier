@@ -93,7 +93,7 @@ name_or_number:
 
 // 4.2
 // class extent (extends Duration)
-// Semantics: An extent is a gap, with all preceeding durations in the
+// Semantics: An extent is a gap, with all preceding durations in the
 // containing bare_irstream subtracted. More than one extent in one
 // bare_irstream are thus allowed. The "counting" starts anew after each extent.
 extent:
@@ -147,7 +147,7 @@ bitspec:
 
 // 8.2
 // class RepeatMarker
-// NOTE: Semantically, at most infinite repeat in a protocol makes sense.
+// NOTE: Semantically, at most one infinite repeat in a protocol makes sense.
 repeat_marker:
     '*'
     | '+'
@@ -161,7 +161,7 @@ bitspec_irstream:
 
 // 9.2
 // class Expression
-// para_expression is called expression in spec
+// called expression in spec
 para_expression:
     '(' expression ')'
 ;

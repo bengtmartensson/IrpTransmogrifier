@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import org.harctoolbox.ircore.DumbHtmlRenderer;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -172,19 +173,24 @@ public class IrpDatabaseNGTest {
         assertTrue(result.contains("rc6-6-32"));
     }
 
+    // FIXME
     /**
      * Test of getDocumentation method, of class IrpDatabase.
+     * @throws org.harctoolbox.irp.UnknownProtocolException
      */
     @Test
-    public void testGetDocumentation() {
+    public void testGetDocumentation() throws UnknownProtocolException {
         System.out.println("getDocumentation");
         String name = "Anthem_relaxed";
         String expResult = "Relaxed version of the Anthem protocol.";
         String result = instance.getDocumentation(name);
         assertEquals(result, expResult);
-        assertEquals(instance.getDocumentation("GI Cable"), null);
-        assertEquals(instance.getDocumentationExpandAlias("ruwido r-step").substring(0, 40), "The repeat frames are not all identical.");
-        assertEquals(instance.getDocumentation("adnotam"), "Very similar to RC5, except AdNotam uses two start bits, and no toggle bit.");
+        String txt = instance.getDocumentationExpandAlias("GI Cable");
+        assertNull(txt);
+        //assertTrue(instance.getDocumentation("GI Cable").isEmpty());
+        txt = instance.getDocumentationExpandAlias("ruwido r-step");
+        assertEquals(txt.substring(0, 40), "The repeat frames are not all identical.");
+        assertEquals(DumbHtmlRenderer.render(instance.getHtmlDocumentation("adnotam")), "Very similar to RC5, except AdNotam uses two start bits, and no toggle bit.");
     }
 
     /**
@@ -307,12 +313,12 @@ public class IrpDatabaseNGTest {
         assertEquals(list.size(), 1);
         assertTrue(list.contains("bar"));
         NamedProtocol nec1 = irpDatabase.getNamedProtocol("nec1");
-        assertEquals(nec1.getDocumentation(), "Nec1 new doc");
+        assertEquals(DumbHtmlRenderer.render(nec1.getDocumentation()), "Nec1 new doc");
         List<String> po = irpDatabase.getProperties("nec1", "prefer-over");
         assertTrue(po.contains("foobar"));
 
         NamedProtocol foobar = irpDatabase.getNamedProtocol("foobar");
-        assertEquals(foobar.getDocumentation(), "Lorem Ipsum");
+        assertEquals(DumbHtmlRenderer.render(foobar.getDocumentation()), "Lorem Ipsum");
 
         List<String> necExecutorsx = irpDatabase.getProperties("nec1", "uei-executofdsfggsfsr");
         List<DocumentFragment> aminoExecutorsx = irpDatabase.getXmlProperties("amino", "uei-sdfsfdfsexecutor");
@@ -324,7 +330,7 @@ public class IrpDatabaseNGTest {
         assertNull(aminoExecutors);
 
         NamedProtocol amino = irpDatabase.getNamedProtocol("amino");
-        String doc = amino.getDocumentation();
+        DocumentFragment doc = amino.getDocumentation();
         assertNull(doc);
 
         assertFalse(irpDatabase.isKnown("covfefe"));

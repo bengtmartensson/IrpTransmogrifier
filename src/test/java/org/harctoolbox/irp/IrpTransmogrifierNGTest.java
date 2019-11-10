@@ -395,7 +395,7 @@ public class IrpTransmogrifierNGTest {
     public void testGetHtmlDocumentation() {
         System.out.println("getHtmlDocumentation");
         String result = IrpTransmogrifier.execute("--quiet list --html adnotam");
-        String expResult = "<div class=\"protocol-decumentation\" xmlns=\"http://www.w3.org/1999/xhtml\">Very similar to <a href=\"#RC5\">RC5</a>, except AdNotam uses two start bits, and no toggle bit.</div>";
+        String expResult = "<div class=\"protocol-documentation\" xmlns=\"http://www.w3.org/1999/xhtml\">Very similar to <a href=\"#RC5\">RC5</a>, except AdNotam uses two start bits, and no toggle bit.</div>";
         assertEquals(result, expResult);
     }
 

@@ -42,6 +42,7 @@ import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XML_NS_URI;
 import javax.xml.validation.Schema;
+import org.harctoolbox.ircore.DumbHtmlRenderer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -188,6 +189,18 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     private static InputStream mkStream(String file) throws FileNotFoundException {
         return (file == null || file.isEmpty()) ? IrpDatabase.class.getResourceAsStream(DEFAULT_CONFIG_FILE) : IrCoreUtils.getInputSteam(file);
+    }
+
+    public static IrpDatabase newDefaultIrpDatabase() {
+        try {
+            return new IrpDatabase((String) null);
+        } catch (IOException | IrpParseException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
+    }
+
+    private static String getDocumentation(DocumentFragment frag) {
+        return DumbHtmlRenderer.render(frag);
     }
 
     private final StringBuilder version;
@@ -492,18 +505,19 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return result;
     }
 
-    // FIXME
-    public String getDocumentation(String protocolName) {
-        //DocumentFragment fragment = getHtmlDocumentation(protocolName);
-        return "Teomprarily broken in this version";//fragment == null ? null : XmlUtils.dumbHtmlRender(fragment);
+    public String getDocumentation(String protocolName) throws UnknownProtocolException {
+        DocumentFragment fragment = getHtmlDocumentation(protocolName);
+        return fragment == null ? null : getDocumentation(fragment);
     }
 
-    public DocumentFragment getHtmlDocumentation(String protocolName) {
+    public DocumentFragment getHtmlDocumentation(String protocolName) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(protocolName);
-        return prot == null ? null : prot.getHtmlDocumentation();
+        if (prot == null)
+            throw new UnknownProtocolException(protocolName);
+        return prot.getHtmlDocumentation();
     }
 
-    public String getDocumentationExpandAlias(String protocolName) {
+    public String getDocumentationExpandAlias(String protocolName) throws UnknownProtocolException {
         return getDocumentation(expandAlias(protocolName));
     }
 
@@ -737,7 +751,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     private static class UnparsedProtocol {
-        public static final int APRIORI_SIZE = 4;
+        private static final int APRIORI_SIZE = 4;
 
         private static DocumentFragment nodeListToDocumentFragment(NodeList childNodes) {
             Document doc = XmlUtils.newDocument();
@@ -977,14 +991,15 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
             xmlMap.entrySet().forEach((kvp) -> {
                 List<DocumentFragment> list = kvp.getValue();
-                list.forEach((documentFragment) -> {
-                    Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
-                    element.appendChild(param);
-                    param.setAttribute(NAME_NAME, kvp.getKey());
-                    param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.XML_PRESERVE_NAME); // to prevent extra white space from being inserted
-                    doc.adoptNode(documentFragment);
-                    param.appendChild(documentFragment);
-                });
+                if (list != null)
+                    list.forEach((documentFragment) -> {
+                        Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
+                        element.appendChild(param);
+                        param.setAttribute(NAME_NAME, kvp.getKey());
+                        param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.XML_PRESERVE_NAME); // to prevent extra white space from being inserted
+                        doc.adoptNode(documentFragment);
+                        param.appendChild(documentFragment);
+                    });
             });
 
             return element;

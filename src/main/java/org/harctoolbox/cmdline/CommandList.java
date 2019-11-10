@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.DumbHtmlRenderer;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.irp.InvalidNameException;
@@ -107,7 +108,7 @@ public class CommandList extends AbstractCommand {
         return "This command list miscellaneous properties of the protocol(s) given as arguments.";
     }
 
-    public void list(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+    public void list(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException {
         CmdUtils.checkForOption("list", protocols);
         if (checkSorted) {
             String offender = irpDatabase.checkSorted();
@@ -169,7 +170,7 @@ public class CommandList extends AbstractCommand {
                 listProperty(out, "documentation", irpDatabase.getDocumentation(protocolName), commandLineArgs.quiet);
 
             if (html)
-                listDocumentFragment(out, protocol.getHtmlDocumentation(), commandLineArgs.quiet, commandLineArgs.encoding);
+                listDocumentFragment(out, protocol.getDocumentation(), commandLineArgs.quiet, commandLineArgs.encoding);
 
             if (stringTree)
                 listProperty(out, "stringTree", protocol.toStringTree(), commandLineArgs.quiet);
@@ -200,6 +201,12 @@ public class CommandList extends AbstractCommand {
         }
     }
 
+    private void listProperty(PrintStream out, String propertyName, DocumentFragment documentFragment, boolean quiet) {
+        if (quiet && propertyName != null)
+            out.print(propertyName + "=");
+        out.println(DumbHtmlRenderer.render(documentFragment));
+    }
+
     private void listProperty(PrintStream out, String propertyName, String propertyValue, boolean quiet) {
         if (!/*commandLineArgs.*/quiet && propertyName != null)
             out.print(propertyName + "=");
@@ -219,7 +226,7 @@ public class CommandList extends AbstractCommand {
     }
 
     private void listDocumentFragment(PrintStream out, DocumentFragment fragment, boolean quiet, String encoding) {
-        Document document = XmlUtils.wrapDocumentFragment(fragment, "http://www.w3.org/1999/xhtml", "div", "class", "protocol-decumentation");
+        Document document = XmlUtils.wrapDocumentFragment(fragment, "http://www.w3.org/1999/xhtml", "div", "class", "protocol-documentation");
         if (!/*commandLineArgs.*/quiet && fragment != null)
             out.print("html=");
         XmlUtils.printHtmlDOM(out, document, encoding);

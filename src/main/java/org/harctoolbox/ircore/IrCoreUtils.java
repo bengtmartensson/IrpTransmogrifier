@@ -193,13 +193,16 @@ public final class IrCoreUtils {
         return l1Norm(sequence, 0, sequence.length);
     }
 
-    private static String chars(int length, byte value) {
+    public static String chars(int length, char ch) {
+        return chars(length, (byte) ch);
+    }
+
+    public static String chars(int length, byte value) {
         if (length <= 0)
             return "";
 
         byte[] buf = new byte[length];
-        for (int i = 0; i < length; i++)
-            buf[i] = value;
+        Arrays.fill(buf, value);
         return new String(buf, DEFAULT_CHARSET);
     }
 
@@ -334,6 +337,10 @@ public final class IrCoreUtils {
         while (str.length() < effectiveLength)
             str.insert(0, '0');
         return str.toString();
+    }
+
+    public static String padString(String s, int length) {
+        return s + spaces(length - s.length());
     }
 
     /**

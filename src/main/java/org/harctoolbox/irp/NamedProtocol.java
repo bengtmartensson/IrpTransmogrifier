@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.DumbHtmlRenderer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -319,18 +320,11 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     }
 
     public String getCName() {
-        return cName;
+        return cName != null ? cName : IrCoreUtils.toCName(name);
     }
 
-    /**
-     * @return the documentation
-     */
-    public DocumentFragment getHtmlDocumentation() {
+    public DocumentFragment getDocumentation() {
         return htmlDocumentation;
-    }
-
-    public String getDocumentation() {
-        return XmlUtils.dumbHtmlRender(getHtmlDocumentation());
     }
 
     public boolean isDecodeable() {
@@ -373,6 +367,22 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return getDoubleWithSubstitute(userValue, minimumLeadout, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT, override);
     }
 
+    public double getRelativeTolerance() {
+        return getRelativeTolerance(null, false);
+    }
+
+    public double getAbsoluteTolerance() {
+        return getAbsoluteTolerance(null, false);
+    }
+
+    public double getFrequencyTolerance() {
+        return getFrequencyTolerance(null, false);
+    }
+
+    public double getMinimumLeadout() {
+        return getMinimumLeadout(null, false);
+    }
+
     List<PreferOver> getPreferOver() {
         return Collections.unmodifiableList(preferOver);
     }
@@ -397,10 +407,29 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     public Element toElement(Document document) {
         Element root = super.toElement(document);
         root.setAttribute("name", getName());
+        root.setAttribute("c-name", getCName());
+        root.setAttribute("absolute-tolerance", Double.toString(getAbsoluteTolerance()));
+        root.setAttribute("relative-tolerance", Double.toString(getRelativeTolerance()));
+        root.setAttribute("frequency-tolerance", Double.toString(getFrequencyTolerance()));
+        if (frequencyLower != null)
+            root.setAttribute("frequency-lower", Double.toString(frequencyLower));
+        if (frequencyUpper != null)
+            root.setAttribute("frequency-upper", Double.toString(frequencyUpper));
+        root.setAttribute("minimum-leadout", Double.toString(getMinimumLeadout()));
+        XmlUtils.addBooleanAttributeIfTrue(root, "decodable", decodable);
+        XmlUtils.addBooleanAttributeIfTrue(root, "reject-repeatless", rejectRepeatless);
 
-        Element docu = document.createElement("Documentation");
-        docu.appendChild(document.createTextNode(getDocumentation()));
-        root.appendChild(docu);
+        DocumentFragment html = getDocumentation();
+        if (html != null) {
+            Element docu = document.createElement("Html");
+            docu.appendChild(document.adoptNode(html.cloneNode(true)));
+            root.appendChild(docu);
+
+            Element textDocu = document.createElement("Documentation");
+            String textdoc = DumbHtmlRenderer.render(getDocumentation());
+            textDocu.setTextContent(textdoc);
+            root.appendChild(textDocu);
+        }
 
         Element irpElement = document.createElement("Irp");
         irpElement.appendChild(document.createTextNode(getIrp()));
@@ -439,7 +468,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         map.put("protocolName", getName());
         map.put("cProtocolName", getCName());
         map.put("irp", getIrp());
-        map.put("documentation", IrCoreUtils.javaifyString(getDocumentation()));
+        map.put("documentation", IrCoreUtils.javaifyString(DumbHtmlRenderer.render(getDocumentation())));
         putParameter(map, "relativeTolerance", userRelativeTolerance, relativeTolerance);
         putParameter(map, "absoluteTolerance", userAbsoluteTolerance, absoluteTolerance);
         putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);

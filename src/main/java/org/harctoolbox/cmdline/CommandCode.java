@@ -160,7 +160,7 @@ public class CommandCode extends AbstractCommand {
 
         private void createXmlProtocols(List<String> protocolNames) {
             Document document = irpDatabase.toXml(protocolNames);
-            XmlUtils.printDOM(out, document, encoding, "Irp Documentation");
+            XmlUtils.printDOM(out, document, encoding, "Irp");
         }
 
         // TODO: nuke

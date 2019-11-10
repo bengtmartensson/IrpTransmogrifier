@@ -360,17 +360,6 @@ public final class XmlUtils {
         element.setAttribute(attName, Long.toString(Math.round(value)));
     }
 
-    public static String dumbHtmlRender(DocumentFragment fragment) {
-        if (fragment == null)
-            return null;
-
-        NodeList nodeList = fragment.getChildNodes();
-        StringBuilder sb = new StringBuilder(1024);
-        for (int i = 0; i < nodeList.getLength(); i++)
-            sb.append(nodeList.item(i).getTextContent());
-        return sb.toString().trim();
-    }
-
     public static Document wrapDocumentFragment(DocumentFragment fragment, String namespaceURI, String tagName, String attName, String attValue) {
         Document doc = XmlUtils.newDocument(true);
         Element root = doc.createElementNS(namespaceURI, tagName);

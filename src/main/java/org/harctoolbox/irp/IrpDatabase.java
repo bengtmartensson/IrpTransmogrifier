@@ -492,9 +492,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return result;
     }
 
+    // FIXME
     public String getDocumentation(String protocolName) {
-        DocumentFragment fragment = getHtmlDocumentation(protocolName);
-        return fragment == null ? null : XmlUtils.dumbHtmlRender(fragment);
+        //DocumentFragment fragment = getHtmlDocumentation(protocolName);
+        return "Teomprarily broken in this version";//fragment == null ? null : XmlUtils.dumbHtmlRender(fragment);
     }
 
     public DocumentFragment getHtmlDocumentation(String protocolName) {
@@ -706,6 +707,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         this.protocols.values().forEach((protocol) -> {
             buildAliases(protocol);
         });
+    }
+
+    public String getVersion() {
+        return version.toString();
     }
 
     private static class NamedProtocolIterator implements Iterator<NamedProtocol> {

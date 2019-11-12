@@ -30,6 +30,18 @@ $(IRP_TRANSMOGRIFIER_JAR) $(IRP_TRANSMOGRIFIER_BIN):
 $(IRP_TRANSMOGRIFIER_JAR)-test:
 	mvn install -Dmaven.test.skip=false
 
+release: setversion push gh-pages tag deploy
+
+setversion:
+ifeq ($(VERSION),)
+$(error VERSION must not be empty)
+endif
+	mvn versions:set -DnewVersion=$(VERSION)
+	git commit -S -m "Set version to $(VERSION)" pom.xml
+
+deploy:
+	mvn deploy -P release
+
 apidoc: target/site/apidocs
 	$(BROWSE) target/site/apidocs/index.html
 
@@ -37,6 +49,9 @@ javadoc: target/site/apidocs
 
 target/site/apidocs:
 	mvn javadoc:javadoc
+
+push:
+	git push
 
 gh-pages: target/site/apidocs
 	rm -rf $(GH_PAGES)
@@ -53,7 +68,7 @@ $(INSTALLDIR):
 tag:
 	git checkout master
 	git status
-	git tag -a Version-$(VERSION) -m "Tagging Version-$(VERSION)"
+	git tag -s -a Version-$(VERSION) -m "Tagging Version-$(VERSION)"
 	git push origin Version-$(VERSION)
 
 # Only for Unix-like systems
@@ -75,4 +90,4 @@ clean:
 	rm -rf $(JAVA_PROTOCOL_TEST)
 	rm -rf $(GH_PAGES)
 
-.PHONY: clean $(IRP_TRANSMOGRIFIER_JAR)-test
+.PHONY: clean $(IRP_TRANSMOGRIFIER_JAR)-test release

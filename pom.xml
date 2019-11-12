@@ -451,7 +451,7 @@
             <id>buildSetup.exe</id>
             <activation>
                 <file>
-                    <exists>/usr/bin/chmodx</exists> <!-- good enough for now :-) -->
+                    <exists>/usr/bin/chmod</exists> <!-- good enough for now :-) -->
                 </file>
             </activation>
             <build>

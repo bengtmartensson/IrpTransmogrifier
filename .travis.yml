@@ -9,7 +9,7 @@ language: java
 #- sudo apt-get update -qq
 script:
 - mvn install -DskipTests=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -B -V
-- tools/upload.sh target/*.zip
+- tools/upload.sh target/*.zip target/*.zip.md5 target/*.zip.sha1
 branches:
   except:
     - # Do not build tags that we create when we upload to GitHub Releases

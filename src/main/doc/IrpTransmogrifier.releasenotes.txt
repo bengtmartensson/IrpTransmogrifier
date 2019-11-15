@@ -4,6 +4,12 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
+2019-11-12: Version 1.2.3
+
+* Deploy releases to Maven Central repository, #149.
+* Improvements to protocol documentation and HtmlDocumentation.
+
+===============================================================================
 2019-10-20: Version 1.2.2
 
 * Bugfix: Fix implementation of IrpDatabase patchfile nuking by empty entries.

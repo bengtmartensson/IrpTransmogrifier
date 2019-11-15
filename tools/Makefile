@@ -7,27 +7,29 @@ TOP := $(realpath $(MYDIR)..)
 
 include $(MYDIR)/paths.mk
 
+PROJECT_NAME := IrpTransmogrifier
+PROJECT_NAME_LOWERCASE := $(shell echo $(PROJECT_NAME) | tr A-Z a-z)
 EXTRACT_VERSION := $(TOP)/tools/extract_project_version.xsl
 VERSION := $(shell $(XSLTPROC) $(EXTRACT_VERSION) pom.xml)
 IRPHOME := $(TOP)/target
 IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
 XSLT_DIR := $(IRPHOME)/xslt
 LIRC_TRANSFORM=$(XSLT_DIR)/lirc.xsl
-IRP_TRANSMOGRIFIER_JAR := $(IRPHOME)/IrpTransmogrifier-$(VERSION)-jar-with-dependencies.jar
-IRP_TRANSMOGRIFIER_BIN := $(IRPHOME)/IrpTransmogrifier-$(VERSION)-bin.zip
-IRPTRANSMOGRIFIER := $(JAVA) -jar $(IRP_TRANSMOGRIFIER_JAR) --loglevel warning --url-decode
+PROJECT_JAR := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-jar-with-dependencies.jar
+PROJECT_BIN := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-bin.zip
+#IRPTRANSMOGRIFIER := $(JAVA) -jar $(PROJECT_JAR) --loglevel warning --url-decode
 
 IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml
 
 GH_PAGES := $(TOP)/gh-pages
 ORIGINURL := $(shell git remote get-url origin)
 
-default: $(IRP_TRANSMOGRIFIER_JAR)
+default: $(PROJECT_JAR)
 
-$(IRP_TRANSMOGRIFIER_JAR) $(IRP_TRANSMOGRIFIER_BIN):
+$(PROJECT_JAR) $(PROJECT_BIN):
 	mvn install -Dmaven.test.skip=true
 
-$(IRP_TRANSMOGRIFIER_JAR)-test:
+$(PROJECT_JAR)-test:
 	mvn install -Dmaven.test.skip=false
 
 release: setversion push gh-pages tag deploy
@@ -37,7 +39,7 @@ ifeq ($(VERSION),)
 $(error VERSION must not be empty)
 endif
 	mvn versions:set -DnewVersion=$(VERSION)
-	git commit -S -m "Set version to $(VERSION)" pom.xml
+	git commit -S -m "Set version to $(VERSION)" pom.xml src/main/doc/$(PROJECT_NAME).releasenotes.txt
 
 deploy:
 	mvn deploy -P release
@@ -72,13 +74,13 @@ tag:
 	git push origin Version-$(VERSION)
 
 # Only for Unix-like systems
-install: $(IRP_TRANSMOGRIFIER_BIN) | $(INSTALLDIR)
+install: $(PROJECT_BIN) | $(INSTALLDIR)
 	-rm -rf $(INSTALLDIR)/*
 	( cd $(INSTALLDIR); jar xf $< )
-	ln -sf $(INSTALLDIR)/irptransmogrifier.sh $(BINLINK)
+	ln -sf $(INSTALLDIR)/$(PROJECT_NAME_LOWERCASE).sh $(BINLINK)
 	echo \#!/bin/sh > $(BROWSELINK)
 	echo $(BROWSE) $(INSTALLDIR)/IrpProtocols.html >> $(BROWSELINK)
-	chmod +x $(BROWSELINK) $(INSTALLDIR)/irptransmogrifier.sh
+	chmod +x $(BROWSELINK) $(INSTALLDIR)/$(PROJECT_NAME_LOWERCASE).sh
 
 uninstall:
 	rm -rf $(INSTALLDIR)
@@ -87,7 +89,6 @@ uninstall:
 clean:
 	mvn clean
 	rm -f all-protocols.xml lirc.xml
-	rm -rf $(JAVA_PROTOCOL_TEST)
 	rm -rf $(GH_PAGES)
 
-.PHONY: clean $(IRP_TRANSMOGRIFIER_JAR)-test release
+.PHONY: clean $(PROJECT_JAR)-test release

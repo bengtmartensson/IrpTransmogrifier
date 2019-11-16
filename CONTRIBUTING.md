@@ -36,16 +36,6 @@ Normal builds must not require Internet access.
 All parameters (URLs, version numbers etc.) should be contained therein within /project/properties.
 (Other programs can then extract that information, see `tools/get-jdk-tar.sh` for an example.)
 
-## GUI files
-Most (but not all) Java classes with GUI content are maintained with
-[Netbeans](http://www.netbeans.org). This is indicated by a <code>.form</code> file
-in parallel to the <code>.java</code> file. Contributions that breaks Netbeans
-cannot be accepted -- as a rule of thumb, the parts of the code that
-belongs to Netbeans are clearly marked as such, and may not be hand
-edited. (Some GUI files has been initially created by Netbeans, but
-then "de-Netbeanized", identified by the lack of a .form file. The
-paragraph does not apply to these, of course.)
-
 ## Git branches
 
 (This section stolen from LIRC, with minor editing.)  We basically use the branching

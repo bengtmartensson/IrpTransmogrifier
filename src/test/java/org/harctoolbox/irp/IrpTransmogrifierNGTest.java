@@ -196,6 +196,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testAnalyzeParameterWidths() {
+        System.out.println("analyzeParameterWidths");
+        String args = "analyze  --parameterwidths D:8,S:8,F:8 +7668 -3969 +486 -459 +486 -459 +486 -459 +486 -459 +486 -999 +486 -459 +486 -459 +486 -459 +486 -999 +486 -999 +486 -999 +486 -999 +486 -459 +486 -999 +486 -999 +486 -999 +486 -459 +486 -999 +486 -459 +486 -459 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -39690";
+        String result = IrpTransmogrifier.execute(args);
+        assertEquals(result, "{477,msb}<1,-1|1,-2>(16,-3969u,D:8,S:8,F:8,A:8,1,-39.69m){A=0xb5,D=0x8,F=0x4a,S=0xf7}");
+    }
+
+    @Test(enabled = true)
     public void testDecodeRc5() {
         System.out.println("decodeRc5");
         String args = "decode --strict -p rc5 0000 0073 0000 000B 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";

@@ -293,6 +293,8 @@ public final class Analyzer extends Cleaner {
                 logger.log(Level.FINE, "{0}: {1} w = {2}", new Object[]{decoder.name(), protocol.toIrpString(10), protocol.weight()});
             } catch (DecodeException ex) {
                 logger.log(Level.FINE, "{0}: {1}", new Object[]{decoder.name(), ex.getMessage()});
+            } catch (AnalyzerParams.TooFewParameterNamesException ex) {
+                logger.log(Level.FINE, "{0}: Too few parameter names", new Object[]{decoder.name()});
             }
         });
         return protocols;
@@ -357,13 +359,26 @@ public final class Analyzer extends Cleaner {
         private final List<Integer> parameterWidths;
         private final int maxParameterWidth;
         private final Burst.Preferences burstPrefs;
+        private List<String> parameterNames;
 
         public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) {
-            this(frequency, timeBaseString, bitDirection, useExtents, parameterWidths, 32, invert, new Burst.Preferences());
+            this(frequency, timeBaseString, bitDirection, useExtents, parameterWidths, 32, invert, new Burst.Preferences(), new ArrayList<>(0));
         }
 
+        /**
+         *
+         * @param frequency
+         * @param timeBaseString
+         * @param bitDirection
+         * @param useExtents
+         * @param parameterWidths
+         * @param maxParameterWidth
+         * @param invert
+         * @param burstPrefs
+         * @param parameterNames List of narameter names to used; must consist of valid Name-s.
+         */
         public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents,
-                List<Integer> parameterWidths, int maxParameterWidth, boolean invert, Burst.Preferences burstPrefs) {
+                List<Integer> parameterWidths, int maxParameterWidth, boolean invert, Burst.Preferences burstPrefs, List<String> parameterNames) {
             this.frequency = frequency;
             this.bitDirection = bitDirection;
             this.useExtents = useExtents;
@@ -371,6 +386,7 @@ public final class Analyzer extends Cleaner {
             this.burstPrefs = burstPrefs;
             this.parameterWidths = parameterWidths == null ? new ArrayList<>(0) : parameterWidths;
             this.maxParameterWidth = maxParameterWidth;
+            this.parameterNames = parameterNames;
 
             if (timeBaseString == null || timeBaseString.isEmpty()) {
                 timebase = null;
@@ -455,6 +471,23 @@ public final class Analyzer extends Cleaner {
          */
         public boolean isInvert() {
             return invert;
+        }
+
+        String mkName(int n) {
+            if (n < parameterNames.size())
+                return parameterNames.get(n);
+
+            String name = Cleaner.mkName(n - parameterNames.size());
+            if (parameterNames.contains(name))
+                throw new TooFewParameterNamesException();
+            return name;
+        }
+
+        public static class TooFewParameterNamesException extends RuntimeException {
+
+            public TooFewParameterNamesException() {
+                super();
+            }
         }
     }
 }

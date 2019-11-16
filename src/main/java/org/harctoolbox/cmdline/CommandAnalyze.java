@@ -46,6 +46,7 @@ import org.harctoolbox.irp.DuplicateFinder;
 import org.harctoolbox.irp.Expression;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
+import org.harctoolbox.irp.Name;
 import org.harctoolbox.irp.NameEngine;
 import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.Number;
@@ -118,8 +119,8 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"-M", "--maxparameterwidth"}, description = "Maximal parameter width.")
     private int maxParameterWidth = 63;
 
-    @Parameter(names = {"-w", "--parameterwidths"}, description = "Comma separated list of parameter widths.")
-    private List<Integer> parameterWidths = new ArrayList<>(4);
+    @Parameter(names = {"-w", "--parameterwidths"}, description = "Comma separated list of either parameter widths or name:width pairs.")
+    private List<String> parameterNamedWidths = new ArrayList<>(4);
 
     @Parameter(names = {"-r", "--repeatfinder"}, description = "Invoke the repeatfinder.")
     private boolean repeatFinder = false;
@@ -195,7 +196,7 @@ public class CommandAnalyze extends AbstractCommand {
         return this.frequency != null ? this.frequency : frequency;
     }
 
-    public void analyze(PrintStream out, CommandCommonOptions commandLineArgs) throws UsageException, InvalidArgumentException, IOException, NoDecoderMatchException {
+    public void analyze(PrintStream out, CommandCommonOptions commandLineArgs) throws UsageException, InvalidArgumentException, IOException, NoDecoderMatchException, InvalidNameException {
         AnalyzeClass analyzeClass = new AnalyzeClass(out, commandLineArgs);
         analyzeClass.analyze();
     }
@@ -210,7 +211,7 @@ public class CommandAnalyze extends AbstractCommand {
             this.commandLineArgs = commandLineArgs;
         }
 
-        private void analyze() throws UsageException, InvalidArgumentException, IOException, NoDecoderMatchException {
+        private void analyze() throws UsageException, InvalidArgumentException, IOException, NoDecoderMatchException, InvalidNameException {
             CmdUtils.checkForOption("analyze", args);
             if (allDecodes && decoder != null)
                 throw new UsageException("Cannot use both --alldecodes and --decode.");
@@ -267,7 +268,7 @@ public class CommandAnalyze extends AbstractCommand {
             }
         }
 
-        private void analyze(IrSignal irSignal) throws InvalidArgumentException, NoDecoderMatchException {
+        private void analyze(IrSignal irSignal) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
             Analyzer analyzer;
             Double freq = possiblyOverrideWithAnalyzeFrequency(irSignal.getFrequency());
             if (repeatFinder || dumpRepeatfinder) {
@@ -280,37 +281,56 @@ public class CommandAnalyze extends AbstractCommand {
             analyze(analyzer, null);
         }
 
-        private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws InvalidArgumentException, NoDecoderMatchException {
+        private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
             Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
             irSequences.putAll(modulatedIrSequences);
             Double frequency = possiblyOverrideWithAnalyzeFrequency(ModulatedIrSequence.frequencyAverage(modulatedIrSequences.values()));
             analyze(irSequences, frequency);
         }
 
-        private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws InvalidArgumentException, NoDecoderMatchException {
+        private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences.values(), possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
         }
 
-        private void analyze(List<? extends IrSequence> irSequences) throws InvalidArgumentException, NoDecoderMatchException {
+        private void analyze(List<? extends IrSequence> irSequences) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
             analyze(irSequences, frequency);
         }
 
-        private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws InvalidArgumentException, NoDecoderMatchException {
+        private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences, possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             analyze(analyzer, null);
         }
 
-        private void analyze(Analyzer analyzer, String[] names) throws NoDecoderMatchException {
+        private void analyze(Analyzer analyzer, String[] names) throws NoDecoderMatchException, InvalidNameException, UsageException {
+            List<Integer> parameterWidths = new ArrayList<>(parameterNamedWidths.size());
+            List<String> parameterNames = new ArrayList<>(parameterNamedWidths.size());
+            if (!parameterNamedWidths.isEmpty() && parameterNamedWidths.get(0).contains(":")) {
+                for (String param : parameterNamedWidths) {
+                    String[] arr = param.split(":");
+                    if (arr.length != 2)
+                        throw new UsageException("Must use name:width form for all or none of parameterWidth values.");
+                    String name = arr[0];
+                    if (!Name.validName(name))
+                        throw new InvalidNameException(name);
+                    parameterNames.add(name);
+                    int width = Integer.parseInt(arr[1]);
+                    parameterWidths.add(width);
+                }
+            } else {
+                parameterNamedWidths.stream().map((param) -> Integer.parseInt(param)).forEachOrdered((width) -> {
+                    parameterWidths.add(width);
+                });
+            }
             Burst.Preferences burstPrefs = new Burst.Preferences(maxRoundingError, maxUnits, maxMicroSeconds);
             Analyzer.AnalyzerParams params = new Analyzer.AnalyzerParams(analyzer.getFrequency(), timeBase,
                     lsb ? BitDirection.lsb : BitDirection.msb,
                     extent, parameterWidths, maxParameterWidth, invert,
-                    burstPrefs);
+                    burstPrefs, parameterNames);
 
             if (statistics) {
                 analyzer.printStatistics(out, params);

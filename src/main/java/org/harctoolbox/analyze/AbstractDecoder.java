@@ -167,7 +167,7 @@ public abstract class AbstractDecoder {
         parameterData.fixBitDirection(bitDirection);
         if (complement)
             parameterData.invertData();
-        String name = Analyzer.mkName(noPayload);
+        String name = params.mkName(noPayload);
         noPayload++;
         try {
             nameEngine.define(name, parameterData.getData());

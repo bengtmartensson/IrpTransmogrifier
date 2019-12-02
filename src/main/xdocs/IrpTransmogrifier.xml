@@ -29,7 +29,7 @@
         </table>
 
         <section>
-            <title>Revision notes</title>
+            <title>Release notes</title>
             <p>
                 <a href="IrpTransmogrifier.releasenotes.txt">Release notes for the current version</a>
             </p>
@@ -355,7 +355,7 @@
                         approach:
                         The collected durations found in the sequence(s)
                         are bundled into "bins" (disjoint intervals), according to
-                        <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">this closeness concept</a>.
+                        <a href="#NumEqDurations">this closeness concept</a>.
                         Every duration belonging to a bin is "close" (determined by those parameters) to the bin
                         middle. All the durations within the bin are then replaced by the average of its
                         members. It is thus not guaranteed that the distance between a duration and its replacement
@@ -385,12 +385,12 @@
                         <dt>
                             <code>absolutetolerance</code>
                         </dt>
-                        <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
+                        <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
 
                         <dt>
                             <code>relativetolerance</code>
                         </dt>
-                        <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
+                        <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
                         <dt>
                             <code>minrepeatgap</code>
                         </dt>
@@ -441,12 +441,12 @@
                                 <dt id="absolutetolerance">
                                     <code>absolutetolerance</code>
                                 </dt>
-                                <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
+                                <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
 
                                 <dt id="relativetolerance">
                                     <code>relativetolerance</code>
                                 </dt>
-                                <dd>See <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
+                                <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
 
                                 <dt id="frequency-tolerance">
                                     <code>frequency-tolerance</code>
@@ -584,7 +584,7 @@
                     <section>
                         <title>Matching of durations, non-leadouts</title>
                         <p>Non-ending durations are matched according to
-                            <a href="http://localhost:8888/IrpTransmogrifier.html#NumEqDurations">this method</a>,
+                            <a href="#NumEqDurations">this method</a>,
                         using the parameters <code>absolutetolerance</code> and <code>relativetolerance</code>.</p>
                     </section>
 

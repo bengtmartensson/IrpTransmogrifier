@@ -302,6 +302,9 @@ public class IrpDatabaseNGTest {
         assertFalse(necExecutors.isEmpty());
         List<DocumentFragment> aminoExecutors = irpDatabase.getXmlProperties("amino", "uei-executor");
         assertFalse(aminoExecutors.isEmpty());
+        List<String> nec1PreferOvers = irpDatabase.getProperties("nec1", "prefer-over");
+        assertTrue(nec1PreferOvers.contains("Pioneer"));
+
         irpDatabase.patch(new File("src/test/resources/IrpProtocols-test.xml"));
         try {
             irpDatabase.getNamedProtocol("nec2");
@@ -316,6 +319,8 @@ public class IrpDatabaseNGTest {
         assertEquals(DumbHtmlRenderer.render(nec1.getDocumentation()), "Nec1 new doc");
         List<String> po = irpDatabase.getProperties("nec1", "prefer-over");
         assertTrue(po.contains("foobar"));
+        // Check that "Pioneer" was not added
+        assertTrue(po.lastIndexOf("Pioneer") < po.size() - 1);
 
         NamedProtocol foobar = irpDatabase.getNamedProtocol("foobar");
         assertEquals(DumbHtmlRenderer.render(foobar.getDocumentation()), "Lorem Ipsum");

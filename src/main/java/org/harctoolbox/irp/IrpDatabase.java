@@ -772,9 +772,13 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                         existingMap.remove(name);
                     else if (existingMap.containsKey(name)) {
                         List<T> oldList = existingMap.get(name);
-                        if (name.equals(DOCUMENTATION_NAME))
+                        if (name.equals(DOCUMENTATION_NAME) || name.equals(IRP_NAME))
                             oldList.clear();
-                        oldList.addAll(newList);
+
+                        for (T t : newList) {
+                            if (!oldList.contains(t))
+                                oldList.add(t);
+                        }
                     } else {
                         existingMap.put(name, newList);
                     }
@@ -827,9 +831,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             if (!fragment.hasChildNodes())
                 xmlMap.put(key, null);
             else {
-                if (!xmlMap.containsKey(key))
-                    xmlMap.put(key, new ArrayList<>(1));
                 List<DocumentFragment> list = xmlMap.get(key);
+                if (list == null) {
+                    list = new ArrayList<>(1);
+                    xmlMap.put(key,list);
+                }
                 list.add(fragment);
             }
         }
@@ -838,9 +844,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             if (value.isEmpty())
                 map.put(key, null);
             else {
-                if (!map.containsKey(key))
-                    map.put(key, new ArrayList<>(1));
                 List<String> list = map.get(key);
+                if (list == null) {
+                    list = new ArrayList<>(1);
+                    map.put(key,list);
+                }
                 list.add(value);
             }
         }

@@ -22,6 +22,10 @@
 
         <!-- add this -->
         <irp:parameter name="prefer-over">foobar</irp:parameter>
+
+        <!-- Should NOT be added, since already there -->
+        <irp:parameter name="prefer-over">Pioneer</irp:parameter>
+
     </irp:protocol>   <!-- modify the NEC1 protocol -->
 
     <irp:protocol name="NEC1-f16">

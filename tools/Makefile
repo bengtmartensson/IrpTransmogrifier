@@ -12,40 +12,45 @@ PROJECT_NAME_LOWERCASE := $(shell echo $(PROJECT_NAME) | tr A-Z a-z)
 EXTRACT_VERSION := $(TOP)/tools/extract_project_version.xsl
 VERSION := $(shell $(XSLTPROC) $(EXTRACT_VERSION) pom.xml)
 IRPHOME := $(TOP)/target
+PROJECT_JAR := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-jar-with-dependencies.jar
+PROJECT_BIN := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-bin.zip
+
 IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
 XSLT_DIR := $(IRPHOME)/xslt
 LIRC_TRANSFORM=$(XSLT_DIR)/lirc.xsl
-PROJECT_JAR := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-jar-with-dependencies.jar
-PROJECT_BIN := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-bin.zip
 #IRPTRANSMOGRIFIER := $(JAVA) -jar $(PROJECT_JAR) --loglevel warning --url-decode
 
 IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml
+UPLOADDIR_DIR := ftp://bengt-martensson.de/harctoolbox/downloads/
 
 GH_PAGES := $(TOP)/gh-pages
 ORIGINURL := $(shell git remote get-url origin)
+CHKSUMS := md5 sha1 sha512
+
+SUMS := $(foreach f,$(CHKSUMS),$(PROJECT_BIN).$f)
 
 default: $(PROJECT_JAR)
 
-$(PROJECT_JAR) $(PROJECT_BIN):
+$(PROJECT_JAR) $(PROJECT_BIN) $(SUMS):
 	mvn install -Dmaven.test.skip=true
 
 $(PROJECT_JAR)-test:
 	mvn install -Dmaven.test.skip=false
 
-release: setversion push gh-pages tag deploy
+release: push gh-pages tag deploy
+
+version:
+	@echo $(VERSION)
 
 setversion:
-ifeq ($(VERSION),)
-$(error VERSION must not be empty)
-endif
-	mvn versions:set -DnewVersion=$(VERSION)
-	git commit -S -m "Set version to $(VERSION)" pom.xml src/main/doc/$(PROJECT_NAME).releasenotes.txt
+	mvn versions:set -DnewVersion=$(NEWVERSION)
+	git commit -S -m "Set version to $(NEWVERSION)" pom.xml src/main/doc/$(PROJECT_NAME).releasenotes.txt
 
 deploy:
 	mvn deploy -P release
 
 apidoc: target/site/apidocs
-	$(BROWSE) target/site/apidocs/index.html
+	$(BROWSE) $</index.html
 
 javadoc: target/site/apidocs
 
@@ -72,6 +77,13 @@ tag:
 	git status
 	git tag -s -a Version-$(VERSION) -m "Tagging Version-$(VERSION)"
 	git push origin Version-$(VERSION)
+
+upload-sums: $(SUMS)
+	@(cd target ; \
+	for file in $(foreach f,$(CHKSUMS),*.$f) ; do \
+	echo Uploading $$file... ; \
+		curl --netrc --upload-file $$file $(UPLOADDIR_DIR)/$$file;\
+	done )
 
 # Only for Unix-like systems
 install: $(PROJECT_BIN) | $(INSTALLDIR)

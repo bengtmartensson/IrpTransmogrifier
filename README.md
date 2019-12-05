@@ -10,7 +10,8 @@ A GUI is possible, as well as the integration in GUI programs, like IrScrutinize
 ## Acknowledgement
 I would like to acknowledge the influence of the [JP1 forum](http://hifi-remote.com/forums/index.php), both the programs
 (in particular of course [DecodeIR](http://www.hifi-remote.com/wiki/index.php?title=DecodeIR), and the discussions
-(in particular with Dave Reed ("3FG")). This work surely would not exist without the JP1 forum.
+(in particular with Dave Reed ("3FG") and Graham Dixon ("mathdon")).
+This work surely would not exist without the JP1 forum.
 
 ## Background
 This program can be considered as a successor of [IrpMaster](http://www.harctoolbox.org/IrpMaster,html).

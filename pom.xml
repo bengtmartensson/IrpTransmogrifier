@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="US-ASCII"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -37,9 +37,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com:bengtmartensson/IrpTransmogrifier.git</connection>
-        <developerConnection>scm:git:ssh://github.com:bengtmartensson/IrpTransmogrifier.git</developerConnection>
-        <url>https://github.com/bengtmartensson/IrpTransmogrifier/tree/master</url>
+        <connection>scm:git:git://github.com:bengtmartensson/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:ssh://github.com:bengtmartensson/${project.artifactId}.git</developerConnection>
+        <url>https://github.com/bengtmartensson/${project.artifactId}/tree/master</url>
     </scm>
 
     <issueManagement>
@@ -70,7 +70,8 @@
                 <directory>src/main/schemas</directory>
             </resource>
         </resources>
-        <plugins><!-- Generate Version.java from Version.xml using mkVersion.xsl. -->
+        <plugins>
+            <!-- Generate Version.java from Version.xml using mkVersion.xsl. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xml-maven-plugin</artifactId>
@@ -196,11 +197,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.harctoolbox.irp.IrpTransmogrifier</mainClass>
+                            <mainClass>org.harctoolbox.irp.IrpTransmogrifier</mainClass> <!-- does not interpolate variables -->
                         </manifest>
                     </archive>
                     <!--finalName>${project.name}</finalName-->
@@ -317,7 +318,7 @@
                     <includes>
                         <include>IrpProtocols.xml</include>
                         <include>IrpProtocols2html.xsl</include>
-                        <include>IrpTransmogrifier.xml</include>
+                        <include>${project.artifactId}.xml</include>
                         <include>irp-protocols.xsd</include>
                     </includes>
                 </configuration>
@@ -369,11 +370,17 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <algorithms>
+                        <algorithm>MD5</algorithm>
+                        <algorithm>SHA-1</algorithm>
+                        <algorithm>SHA-512</algorithm>
+                    </algorithms>
                     <fileSets>
                         <fileSet>
                             <directory>${project.build.directory}</directory>
                             <includes>
                                 <include>*.zip</include>
+                                <!--include>*.jar</include-->
                             </includes>
                         </fileSet>
                     </fileSets>

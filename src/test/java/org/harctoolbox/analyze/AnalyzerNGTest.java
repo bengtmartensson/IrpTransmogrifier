@@ -1,8 +1,10 @@
 package org.harctoolbox.analyze;
 
+import java.util.List;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.irp.Protocol;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -47,5 +49,13 @@ public class AnalyzerNGTest {
         IrSignal expResult = new IrSignal(new IrSequence(INTRODATA), new IrSequence(REPEATDATA), new IrSequence(), 38400d);
         IrSignal result = instance.repeatReducedIrSignal(0);
         assertTrue(result.approximatelyEquals(expResult));
+    }
+    
+    @Test
+    public void testEmptySignal() throws InvalidArgumentException, NoDecoderMatchException {
+        Analyzer analyzer = new Analyzer(new IrSignal());
+        Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams();//irSignal.getFrequency(), timeBaseString, bitDirection, useExtents, parameterWidths, invert);
+        List<Protocol> list = analyzer.searchBestProtocol(analyzerParams);
+        assertEquals(list.size(), 0);
     }
 }

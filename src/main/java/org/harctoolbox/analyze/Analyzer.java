@@ -274,8 +274,11 @@ public final class Analyzer extends Cleaner {
     public List<Protocol> searchBestProtocol(AnalyzerParams params, String decoderPattern, boolean regexp) throws NoDecoderMatchException {
         List<AbstractDecoder> decoders = setupDecoders(params, decoderPattern, regexp);
         List<Protocol> result = new ArrayList<>(getNoSequences());
-        for (int i = 0; i < getNoSequences(); i++)
-            result.add(searchBestProtocol(decoders, i));
+        for (int i = 0; i < getNoSequences(); i++) {
+            Protocol best = searchBestProtocol(decoders, i);
+            if (best != null)
+                result.add(best);
+        }
 
         return result;
     }
@@ -363,6 +366,10 @@ public final class Analyzer extends Cleaner {
 
         public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) {
             this(frequency, timeBaseString, bitDirection, useExtents, parameterWidths, 32, invert, new Burst.Preferences(), new ArrayList<>(0));
+        }
+        
+        public AnalyzerParams() {
+            this(null, null, BitDirection.lsb, false, null, 32, false, new Burst.Preferences(), new ArrayList<>(0));
         }
 
         /**

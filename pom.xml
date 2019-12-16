@@ -493,7 +493,7 @@
     <dependencies>
         <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
+            <artifactId>antlr4</artifactId> <!-- invokes ST4 -->
             <version>4.7.2</version>
             <exclusions>
                 <exclusion>
@@ -511,12 +511,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>ST4</artifactId>
-            <version>4.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <scope>compile</scope>
@@ -525,7 +519,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.14.3</version>
+            <version>7.0.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

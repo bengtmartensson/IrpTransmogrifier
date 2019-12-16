@@ -23,7 +23,7 @@ public interface CmdLineProgram {
 
     public PrintStream getOutputStream();
 
-    public String usageString(String command);
+    public void usage(String command);
 
     public ProgramExitStatus run(String[] args);
 }

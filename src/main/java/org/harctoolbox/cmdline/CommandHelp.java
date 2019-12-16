@@ -17,10 +17,12 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.cmdline;
 
+import com.beust.jcommander.DefaultUsageFormatter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.internal.DefaultConsole;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,13 +43,14 @@ public class CommandHelp extends AbstractCommand {
         return stringBuilder.toString();
     }
 
-    public static String usageString(String command, JCommander argumentParser) {
-        StringBuilder stringBuilder = new StringBuilder(10000);
+    public static void usage(PrintStream printStream, String command, JCommander argumentParser) {
+        argumentParser.setConsole(new DefaultConsole(printStream));
         if (command == null)
-            argumentParser.usage(stringBuilder);
-        else
-            argumentParser.usage(command, stringBuilder);
-        return stringBuilder.toString().trim();
+            argumentParser.usage();
+        else {
+            DefaultUsageFormatter formatter = new DefaultUsageFormatter(argumentParser);
+            formatter.usage(command);
+        }
     }
 
     @Parameter(names = {"-c", "--common", "--options"}, description = "Describe the common options only.")
@@ -78,6 +81,7 @@ public class CommandHelp extends AbstractCommand {
         private Help(PrintStream out, JCommander argumentParser) {
             this.out = out;
             this.argumentParser = argumentParser;
+            argumentParser.setConsole(new DefaultConsole(out));
         }
 
         private void help() {
@@ -95,16 +99,16 @@ public class CommandHelp extends AbstractCommand {
             if (commands != null)
                 commands.forEach((command) -> {
                     try {
-                        out.println(usageString(command, argumentParser));
+                        usage(out, command, argumentParser);
                     } catch (ParameterException ex) {
                         out.println("No such command: " + command);
                     }
                 });
             else if (cmd == null || cmd.equals("help")) {
-                out.println(usageString(null, argumentParser));
+                usage(out, null, argumentParser);
                 printDocumentationUrl();
             } else
-                out.println(usageString(cmd, argumentParser));
+                usage(out, cmd, argumentParser);
         }
 
         /**
@@ -114,8 +118,10 @@ public class CommandHelp extends AbstractCommand {
         private void commonOptions(PrintStream out) {
             CommandCommonOptions cla = new CommandCommonOptions();
             JCommander parser = new JCommander(cla);
+            parser.setConsole(new DefaultConsole(out));
             StringBuilder str = new StringBuilder(2500);
-            parser.usage(str);
+            DefaultUsageFormatter formatter = new DefaultUsageFormatter(parser);
+            formatter.usage(str);
             str.replace(0, 41, "Common options:\n"); // barf!
             out.println(str.toString().trim()); // str ends with line feed.
         }
@@ -125,10 +131,11 @@ public class CommandHelp extends AbstractCommand {
             out.println("Usage: " + PROGRAMNAME + " [options] [command] [command options]");
             out.println("Commands:");
 
+            DefaultUsageFormatter formatter = new DefaultUsageFormatter(argumentParser);
             List<String> cmds = new ArrayList<>(argumentParser.getCommands().keySet());
             Collections.sort(cmds);
             cmds.forEach((cmd) -> {
-                out.println("   " + padString(cmd, 16) + argumentParser.getCommandDescription(cmd));
+                out.println("   " + padString(cmd, 16) + formatter.getCommandDescription(cmd));
             });
 
             out.println();

@@ -514,7 +514,7 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <scope>compile</scope>
-            <version>1.72</version>
+            <version>1.78</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>

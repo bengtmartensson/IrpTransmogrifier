@@ -234,8 +234,8 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     }
 
     @Override
-    public String usageString(String command) {
-        return CommandHelp.usageString(command, argumentParser);
+    public void usage(String command) {
+        CommandHelp.usage(out, command, argumentParser);
     }
 
     private void setupDatabase(List<String> blackList) throws IOException, UsageException, IrpParseException, UnknownProtocolException {

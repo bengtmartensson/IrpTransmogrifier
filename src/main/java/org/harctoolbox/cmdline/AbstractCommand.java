@@ -43,7 +43,7 @@ public abstract class AbstractCommand {
 
     public boolean process(CmdLineProgram instance) {
         if (help) {
-            instance.getOutputStream().println(instance.usageString(this.getClass().getSimpleName().substring(7).toLowerCase(Locale.US)));
+            instance.usage(this.getClass().getSimpleName().substring(7).toLowerCase(Locale.US));
             return true;
         }
         if (description) {

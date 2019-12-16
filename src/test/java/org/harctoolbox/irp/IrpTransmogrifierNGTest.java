@@ -53,8 +53,8 @@ public class IrpTransmogrifierNGTest {
     public void testFrequencyParser() {
         System.out.println("FrequencyParser");
         FrequencyParser frequencyParser = new FrequencyParser();
-        assertEquals(frequencyParser.convert("38123"), 38123.0);
-        assertEquals(frequencyParser.convert("38.1k"), 38100.0);
+        assertEquals(frequencyParser.convert("38123").doubleValue(), 38123.0);
+        assertEquals(frequencyParser.convert("38.1k").doubleValue(), 38100.0);
     }
 
     /**
@@ -618,6 +618,13 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testHelpShort");
         String result = IrpTransmogrifier.execute("help --short");
         assertEquals(result.substring(0, 72), "Usage: IrpTransmogrifier [options] [command] [command options]\nCommands:");
+    }
+
+    @Test(enabled = true)
+    public void testHelpCommon() {
+        System.out.println("testHelpCommon");
+        String result = IrpTransmogrifier.execute("help --common");
+        assertEquals(result.substring(0, 116), "Common options:\n    -a, --absolutetolerance\n      Absolute tolerance in microseconds, used when comparing durations.");
     }
 
     @Test(enabled = true)

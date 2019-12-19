@@ -311,6 +311,16 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return name + ": " + super.toString();
     }
 
+    @Override
+    public String toString(int radix) {
+        return name + ": " + super.toString(radix);
+    }
+
+    @Override
+    public String toString(int radix, String separator) {
+        return toString(radix);
+    }
+
     /**
      * @return the name
      */

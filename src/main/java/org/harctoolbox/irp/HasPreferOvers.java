@@ -33,4 +33,6 @@ public interface HasPreferOvers {
     public String getName();
 
     public HasPreferOvers getDecode();
+
+    public String toString(int radix, String separator);
 }

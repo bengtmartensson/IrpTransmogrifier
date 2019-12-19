@@ -35,6 +35,7 @@ import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.irp.Decoder;
+import org.harctoolbox.irp.HasPreferOvers;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpParseException;
 
@@ -127,14 +128,17 @@ public class CommandDecode extends AbstractCommand {
         private final PrintStream out;
         private final CommandCommonOptions commandLineArgs;
         private final IrpDatabase irpDatabase;
+        private final Decoder.DecoderParameters decoderParams;
+        private Decoder decoder;
 
         DecodeClass(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) {
             this.out = out;
             this.commandLineArgs = commandLineArgs;
             this.irpDatabase = irpDatabase;
+            this.decoderParams = newDecoderParameters();
         }
 
-        void decode() throws UsageException, IrpParseException, IOException, InvalidArgumentException {
+        private void decode() throws UsageException, IrpParseException, IOException, InvalidArgumentException {
             CmdUtils.checkForOption("decode", args);
 
             if (IrCoreUtils.numberTrue(input != null, namedInput != null, args != null) != 1)
@@ -148,14 +152,14 @@ public class CommandDecode extends AbstractCommand {
             if (protocolsNames.isEmpty())
                 throw new UsageException("No protocol given or matched.");
 
-            Decoder decoder = new Decoder(irpDatabase, protocolsNames);
+            decoder = new Decoder(irpDatabase, protocolsNames);
             if (input != null) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
                 }, commandLineArgs.commentStart);
                 List<IrSignal> signals = irSignalParser.readThings(input, commandLineArgs.encoding, false);
                 for (IrSignal irSignal : signals)
-                    decode(decoder, irSignal, null, 0);
+                    decode(irSignal, null, 0);
             } else if (namedInput != null) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
@@ -163,19 +167,26 @@ public class CommandDecode extends AbstractCommand {
                 Map<String, IrSignal> signals = irSignalParser.readNamedThings(namedInput, commandLineArgs.encoding);
                 int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
                 for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
-                    decode(decoder, kvp.getValue(), kvp.getKey(), maxNameLength);
+                    decode(kvp.getValue(), kvp.getKey(), maxNameLength);
             } else {
                 MultiParser prontoRawParser = MultiParser.newIrCoreParser(args);
                 IrSignal irSignal = prontoRawParser.toIrSignal(frequency, trailingGap);
                 if (irSignal == null)
                     throw new UsageException("Could not parse as IrSignal: " + String.join(" ", args));
-                decode(decoder, irSignal, null, 0);
+                decode(irSignal, null, 0);
             }
         }
 
-        private void decode(Decoder decoder, IrSignal irSig, String name, int maxNameLength) throws InvalidArgumentException {
+        private void decode(IrSignal irSig, String name, int maxNameLength) throws InvalidArgumentException {
             Objects.requireNonNull(irSig, "irSignal must be non-null");
             IrSignal irSignal = frequency != null ? new IrSignal(irSig, frequency) : irSig;
+            Decoder.AbstractDecodesCollection<? extends HasPreferOvers> decodes;
+
+            if (cleaner) {
+                irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
+                logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
+            }
+
             if (repeatFinder) {
                 ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
                 RepeatFinder repeatFinder = new RepeatFinder(sequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minRepeatGap);
@@ -185,24 +196,10 @@ public class CommandDecode extends AbstractCommand {
                     out.println("RepeatReduced: " + fixedIrSignal);
                     out.println("RepeatData: " + repeatFinder.getRepeatFinderData());
                 }
-                decodeIrSignal(decoder, fixedIrSignal, name, maxNameLength);
-            } else if (ignoreLeadingGarbage || (!strict && (irSignal.introOnly() || irSignal.repeatOnly()))) {
-                ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
-                decodeIrSequence(decoder, sequence, name, maxNameLength);
-            } else {
-                decodeIrSignal(decoder, irSignal, name, maxNameLength);
-            }
-        }
+                decodes = decoder.decodeIrSignal(fixedIrSignal, decoderParams);
+            } else
+                decodes = decoder.decodeLoose(irSignal, decoderParams);
 
-        @SuppressWarnings("AssignmentToMethodParameter")
-        private void decodeIrSequence(Decoder decoder, ModulatedIrSequence irSequence, String name, int maxNameLength) throws InvalidArgumentException {
-            if (cleaner) {
-                irSequence = Cleaner.clean(irSequence, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-                logger.log(Level.INFO, "Cleansed signal: {0}", irSequence.toString(true));
-            }
-
-            Decoder.DecoderParameters decoderParams = newDecoderParameters();
-            Decoder.DecodeTree decodes = decoder.decode(irSequence, decoderParams);
             printDecodes(decodes, name, maxNameLength);
         }
 
@@ -212,46 +209,10 @@ public class CommandDecode extends AbstractCommand {
                     commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout, commandLineArgs.override, ignoreLeadingGarbage);
         }
 
-        @SuppressWarnings("AssignmentToMethodParameter")
-        private void decodeIrSignal(Decoder decoder, IrSignal irSignal, String name, int maxNameLength) throws InvalidArgumentException {
-            if (cleaner) {
-                irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-                logger.log(Level.INFO, "Cleansed signal: {0}", irSignal.toString(true));
-            }
-            Decoder.DecoderParameters params = newDecoderParameters();
-            Decoder.SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal, params);
-            printDecodes(decodes, name, maxNameLength);
-        }
-
-        private void printDecodes(Decoder.SimpleDecodesSet decodes, String name, int maxNameLength) {
+        private void printDecodes(Decoder.AbstractDecodesCollection<? extends HasPreferOvers> decodes, String name, int maxNameLength) {
             if (name != null)
                 out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
-
-            if (decodes == null || decodes.isEmpty()) {
-                out.println();
-                return;
-            }
-
-            decodes.forEach((kvp) -> {
-                out.println("\t" + kvp.toString(radix, commandLineArgs.tsvOptimize ? "\t" : " "));
-            });
-        }
-
-        private void printDecodes(Decoder.DecodeTree decodes, String name, int maxNameLength) {
-            if (name != null)
-                out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
-
-            if (decodes == null || decodes.isEmpty())
-                out.println(commandLineArgs.quiet ? "" : "No decodes.");
-            else {
-                boolean first = true;
-                for (Decoder.TrunkDecodeTree decode : decodes) {
-                    if (!first && name != null)
-                        out.print("\t");
-                    out.println(decode.toString(radix, commandLineArgs.tsvOptimize ? "\t" : " "));
-                    first = false;
-                }
-            }
+            decodes.println(out, radix, commandLineArgs.tsvOptimize ? "\t" : " ", commandLineArgs.quiet);
         }
     }
 }

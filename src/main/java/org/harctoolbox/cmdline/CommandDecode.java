@@ -35,7 +35,7 @@ import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.irp.Decoder;
-import org.harctoolbox.irp.HasPreferOvers;
+import org.harctoolbox.irp.ElementaryDecode;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpParseException;
 
@@ -180,7 +180,7 @@ public class CommandDecode extends AbstractCommand {
         private void decode(IrSignal irSig, String name, int maxNameLength) throws InvalidArgumentException {
             Objects.requireNonNull(irSig, "irSignal must be non-null");
             IrSignal irSignal = frequency != null ? new IrSignal(irSig, frequency) : irSig;
-            Decoder.AbstractDecodesCollection<? extends HasPreferOvers> decodes;
+            Decoder.AbstractDecodesCollection<? extends ElementaryDecode> decodes;
 
             if (cleaner) {
                 irSignal = Cleaner.clean(irSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
@@ -209,7 +209,7 @@ public class CommandDecode extends AbstractCommand {
                     commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.minLeadout, commandLineArgs.override, ignoreLeadingGarbage);
         }
 
-        private void printDecodes(Decoder.AbstractDecodesCollection<? extends HasPreferOvers> decodes, String name, int maxNameLength) {
+        private void printDecodes(Decoder.AbstractDecodesCollection<? extends ElementaryDecode> decodes, String name, int maxNameLength) {
             if (name != null)
                 out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
             decodes.println(out, radix, commandLineArgs.tsvOptimize ? "\t" : " ", commandLineArgs.quiet);

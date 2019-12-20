@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Represents an object that has prefer-overs.
  */
-public interface HasPreferOvers {
+public interface ElementaryDecode {
 
     /**
      * Returns the prefer-overs.
@@ -32,5 +32,7 @@ public interface HasPreferOvers {
 
     public String getName();
 
-    public HasPreferOvers getDecode();
+    public ElementaryDecode getDecode();
+
+    public String toString(int radix, String separator);
 }

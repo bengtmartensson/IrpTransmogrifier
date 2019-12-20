@@ -155,6 +155,7 @@ public final class Number extends PrimaryItem {
                 : ((BigInteger) data).and(BigInteger.valueOf(mask)).longValueExact();
     }
 
+    @Override
     public String toString(int radix) {
         return IrCoreUtils.radixPrefix(radix)
                 + (data instanceof BigInteger

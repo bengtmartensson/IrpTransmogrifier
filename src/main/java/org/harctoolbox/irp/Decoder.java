@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -253,6 +254,14 @@ public final class Decoder {
         return parsedProtocols.values();
     }
 
+    public AbstractDecodesCollection<? extends ElementaryDecode> decodeLoose(IrSignal irSignal, DecoderParameters decoderParams) {
+        if (decoderParams.ignoreLeadingGarbage || (!decoderParams.strict && (irSignal.introOnly() || irSignal.repeatOnly()))) {
+            ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
+            return decode(sequence, decoderParams);
+        } else
+            return decodeIrSignal(irSignal, decoderParams);
+    }
+
     public static final class DecoderParameters {
 
         private boolean strict;
@@ -471,7 +480,7 @@ public final class Decoder {
         }
     }
 
-    private static abstract class AbstractDecodesCollection<T extends HasPreferOvers> implements Iterable<T> {
+    public static abstract class AbstractDecodesCollection<T extends ElementaryDecode> implements Iterable<T> {
 
         protected Map<String, T> map;
 
@@ -523,7 +532,7 @@ public final class Decoder {
             return false;
         }
 
-        private boolean toBeRemoved(T removeCandidate, HasPreferOvers remover, Map<String, NamedProtocol> parsedProtocols, int level) {
+        private boolean toBeRemoved(T removeCandidate, ElementaryDecode remover, Map<String, NamedProtocol> parsedProtocols, int level) {
             if (level > MAX_PREFER_OVER_NESTING) {
                 logger.log(Level.SEVERE, "Max prefer-over depth reached using protocol {0}, cycle likely. Please report.", remover.getName());
                 return false;
@@ -539,7 +548,7 @@ public final class Decoder {
             } else {
                 for (String preferOver : preferOvers) {
                     T t = this.map.get(preferOver);
-                    HasPreferOvers hpo = t != null ? t.getDecode() : parsedProtocols.get(preferOver.toLowerCase(Locale.US));
+                    ElementaryDecode hpo = t != null ? t.getDecode() : parsedProtocols.get(preferOver.toLowerCase(Locale.US));
                     boolean success = toBeRemoved(removeCandidate, hpo, parsedProtocols, level + 1);
                     if (success)
                         return true;
@@ -592,6 +601,18 @@ public final class Decoder {
         public T first() {
             Iterator<T> it = iterator();
             return it.hasNext() ? it.next() : null;
+        }
+
+        public void println(PrintStream out, int radix, String separator, boolean quiet) {
+            if (isEmpty())
+                printNoDecodes(out, quiet);
+            map.values().forEach((T decode) -> {
+                out.println("\t" + decode.toString(radix, separator));
+            });
+        }
+
+        protected void printNoDecodes(PrintStream out, boolean quiet) {
+            out.println();
         }
     }
 
@@ -722,9 +743,14 @@ public final class Decoder {
             Collections.sort(list);
             return list;
         }
+
+        @Override
+        protected void printNoDecodes(PrintStream out, boolean quiet) {
+            out.println(quiet ? "" : "No decodes.");
+        }
     }
 
-    public static final class TrunkDecodeTree implements HasPreferOvers, Comparable<TrunkDecodeTree> {
+    public static final class TrunkDecodeTree implements ElementaryDecode, Comparable<TrunkDecodeTree> {
         private Decode trunk;
         private DecodeTree rest;
 
@@ -742,6 +768,7 @@ public final class Decoder {
             return toString(10, " ");
         }
 
+        @Override
         public String toString(int radix, String separator) {
             StringJoiner stringJoiner = new StringJoiner(separator);
             stringJoiner.add(trunk.toString(radix, separator));
@@ -802,12 +829,12 @@ public final class Decoder {
         }
 
         @Override
-        public HasPreferOvers getDecode() {
+        public ElementaryDecode getDecode() {
             return trunk;
         }
     }
 
-    public static final class Decode implements HasPreferOvers, Comparable<Decode> {
+    public static final class Decode implements ElementaryDecode, Comparable<Decode> {
         private final NamedProtocol namedProtocol;
         //private final NameEngine nameEngine;
         private final Map<String, Long> map;
@@ -846,6 +873,7 @@ public final class Decoder {
             return toString(10, " ");
         }
 
+        @Override
         public String toString(int radix, String separator) {
             return namedProtocol.getName() + ": " + mapToString(radix)
                     + (begPos != -1 ? ("," + separator + "beg=" + begPos) : "")
@@ -949,7 +977,7 @@ public final class Decoder {
         }
 
         @Override
-        public HasPreferOvers getDecode() {
+        public ElementaryDecode getDecode() {
             return this;
         }
     }

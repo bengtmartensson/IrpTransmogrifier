@@ -332,7 +332,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println(result);
         assertEquals(result,
                 "Akai: {D=7,F=104}, beg=0, end=21, reps=1 {UNDECODED. length=12}" + IrCoreUtils.LINE_SEPARATOR
-                + "Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
+                + "\tMitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
     }
 
     @Test(enabled = true)

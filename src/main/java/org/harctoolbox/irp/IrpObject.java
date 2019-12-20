@@ -53,6 +53,10 @@ public abstract class IrpObject implements XmlExport {
         return toIrpString(10);
     }
 
+    public String toString(int radix) {
+        return toIrpString(radix);
+    }
+
     public final String toStringTree(IrpParser parser) {
         return parseTree != null ? parseTree.toStringTree(parser) : null;
     }

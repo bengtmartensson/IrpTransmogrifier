@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
  * properties, in particular a name. It corresponds to an entry in the protocol data
  * base <code>IrpProtocols.xml</code>.
  */
-public final class NamedProtocol extends Protocol implements HasPreferOvers,Comparable<NamedProtocol> {
+public final class NamedProtocol extends Protocol implements ElementaryDecode,Comparable<NamedProtocol> {
     private final static Logger logger = Logger.getLogger(NamedProtocol.class.getName());
     private final static int MAXLEVEL = 10;
 
@@ -311,6 +311,16 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return name + ": " + super.toString();
     }
 
+    @Override
+    public String toString(int radix) {
+        return name + ": " + super.toString(radix);
+    }
+
+    @Override
+    public String toString(int radix, String separator) {
+        return toString(radix);
+    }
+
     /**
      * @return the name
      */
@@ -482,7 +492,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     }
 
     @Override
-    public HasPreferOvers getDecode() {
+    public ElementaryDecode getDecode() {
         return this;
     }
 }

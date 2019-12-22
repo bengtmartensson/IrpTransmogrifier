@@ -57,7 +57,7 @@
                 <xs:choice>
                     <xs:element ref="irp"/>
                     <xs:element ref="documentation"/>
-                    <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="parameter"/>
                 </xs:choice>
             </xs:sequence>
             <xs:attributeGroup ref="name"/>
@@ -117,7 +117,7 @@
         <xs:annotation>
             <xs:documentation>Name of the protocol. May contain "funny" characters.</xs:documentation>
         </xs:annotation>
-        <xs:attribute name="name" type="xs:string">
+        <xs:attribute name="name" use="required" type="xs:string">
         </xs:attribute>
     </xs:attributeGroup>
 

@@ -102,11 +102,11 @@ public class IrpDatabaseNGTest {
     public void testGetIrp_String() {
         System.out.println("getIrp");
         String name = "NEC1";
-        String expResult = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255]";
+        String expResult = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
         String result = instance.getIrp(name);
         assertEquals(result, expResult);
         name = "RC6-6-32";
-        expResult = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T){OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]";
+        expResult = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T) {OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]";
         assertEquals(instance.getIrp(name), null);
         assertEquals(instance.getIrpExpandAlias(name), expResult);
     }
@@ -277,7 +277,7 @@ public class IrpDatabaseNGTest {
         instance.addProtocol(name, "NEC1{D=F,S=F}[F:0..255]");
         instance.getNamedProtocol(name);
         String irp = instance.getIrp(name);
-        assertEquals(irp, "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*){D=F,S=F}[F:0..255]");
+        assertEquals(irp, "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) {D=F,S=F}[F:0..255]");
     }
 
 

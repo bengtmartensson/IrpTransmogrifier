@@ -882,7 +882,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                 Element e = (Element) node;
                 switch (e.getLocalName()) {
                     case IRP_NAME:
-                        addProperty(IRP_NAME, e.getTextContent().replaceAll("\\s+", ""));
+                        addProperty(IRP_NAME, e.getTextContent());
                         break;
                     case DOCUMENTATION_NAME:
                         addXmlProperty(DOCUMENTATION_NAME, nodeListToDocumentFragment(e.getChildNodes()));

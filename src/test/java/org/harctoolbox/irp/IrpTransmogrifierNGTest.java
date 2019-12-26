@@ -387,7 +387,7 @@ public class IrpTransmogrifierNGTest {
         String result = IrpTransmogrifier.execute("list --irp nec1");
         String expResult = "name=NEC1"
                 + IrCoreUtils.LINE_SEPARATOR
-                + "irp={38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255]";
+                + "irp={38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
         assertEquals(result, expResult);
     }
 
@@ -395,7 +395,7 @@ public class IrpTransmogrifierNGTest {
     public void testListIrpQuiet() {
         System.out.println("listIrp");
         String result = IrpTransmogrifier.execute("--quiet list --irp nec1");
-        String expResult = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255]";
+        String expResult = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
         assertEquals(result, expResult);
     }
 

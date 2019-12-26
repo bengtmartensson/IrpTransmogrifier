@@ -69,7 +69,7 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"--html"}, description = "Print (possible longer) documentation as HTML.")
     private boolean html = false;
 
-    @Parameter(names = {"-i", "--irp"}, description = "List IRP form.")
+    @Parameter(names = {"-i", "--irp"}, description = "List IRP form, as given in the database (unparsed).")
     private boolean irp = false;
 
     // not really useful, therefore hidden
@@ -81,6 +81,9 @@ public class CommandList extends AbstractCommand {
 
     @Parameter(names = {"-n", "--normalform"}, description = "List the normal form.")
     private boolean normalForm = false;
+
+    @Parameter(names = {"-p", "--parsedirp"}, description = "List IRP form, as parsed.")
+    private boolean parsedIrp = false;
 
     @Parameter(names = {"--prefer-overs"}, description = "List all protocol's prefer-overs, recursively")
     private boolean preferOvers = false;
@@ -157,6 +160,9 @@ public class CommandList extends AbstractCommand {
 
             if (irp)
                 listProperty(out, "irp", irpDatabase.getIrp(protocolName), commandLineArgs.quiet);
+
+            if (parsedIrp)
+                listProperty(out, "parsedirp", protocol.toIrpString(radix), commandLineArgs.quiet);
 
             if (normalForm)
                 try {

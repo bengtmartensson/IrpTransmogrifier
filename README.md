@@ -312,7 +312,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     -i, --irp
       Explicit IRP string to use as protocol definition.
     --logclasses
-      List of (fully qualified) classes and their log levels.
+      List of (fully qualified) classes and their log levels, in the form
+      class1:level1|class2:level2|...
       Default: <empty string>
     -L, --logfile
       Log file. If empty, log to stderr.
@@ -320,7 +321,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
       Log format, as in class java.util.logging.SimpleFormatter.
       Default: [%2$s] %4$s: %5$s%n
     -l, --loglevel
-      Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING
+      Log level { OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL
       }
       Default: WARNING
     --min-leadout
@@ -369,6 +370,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print a possibly longer documentation for the present command.
           -h, -?, --help
             Print help for this command.
+          -l, --logging
+            Describe the logging related options only.
+            Default: false
           -c, --common, --options
             Describe the common options only.
             Default: false
@@ -417,7 +421,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print (possible longer) documentation as HTML.
             Default: false
           -i, --irp
-            List IRP form.
+            List IRP form, as given in the database (unparsed).
             Default: false
           -m, --mindiff
             Compute minimal difference between contained durations.
@@ -427,6 +431,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -n, --normalform
             List the normal form.
+            Default: false
+          -p, --parsedirp
+            List IRP form, as parsed.
             Default: false
           --prefer-overs
             List all protocol's prefer-overs, recursively
@@ -701,6 +708,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print a possibly longer documentation for the present command.
           -h, -?, --help
             Print help for this command.
+
+
 
 For documentation, see http://www.harctoolbox.org/IrpTransmogrifier.html
 ```

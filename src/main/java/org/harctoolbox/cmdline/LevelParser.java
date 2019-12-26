@@ -29,7 +29,7 @@ public class LevelParser implements IStringConverter<Level> {
         try {
             return Level.parse(value.toUpperCase(Locale.US));
         } catch (IllegalArgumentException ex) {
-            throw new ParameterException(ex);
+            throw new ParameterException(ex + ". Valid levels are: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL.");
         }
     }
 }

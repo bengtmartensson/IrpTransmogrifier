@@ -23,8 +23,8 @@ import java.util.logging.Level;
 import org.harctoolbox.ircore.IrCoreUtils;
 
 @SuppressWarnings("PublicField")
-
 public class CommandCommonOptions {
+    static final String[] loggingOptions = new String[] { "logclasses",  "logfile", "logformat", "logLevel", "xmlLog" };
 
     // JCommander does not know about our defaults being null, so handle this explicitly-
     @Parameter(names = {"-a", "--absolutetolerance"},
@@ -59,7 +59,7 @@ public class CommandCommonOptions {
     @Parameter(names = {"-i", "--irp"}, description = "Explicit IRP string to use as protocol definition.")
     public String irp = null;
 
-    @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels.")
+    @Parameter(names = {"--logclasses"}, description = "List of (fully qualified) classes and their log levels, in the form class1:level1|class2:level2|...")
     public String logclasses = "";
 
     @Parameter(names = {"-L", "--logfile"}, description = "Log file. If empty, log to stderr.")
@@ -69,7 +69,7 @@ public class CommandCommonOptions {
     public String logformat = "[%2$s] %4$s: %5$s%n";
 
     @Parameter(names = {"-l", "--loglevel"}, converter = LevelParser.class,
-            description = "Log level { ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE, WARNING }")
+            description = "Log level { OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL }")
     public Level logLevel = Level.WARNING;
 
     @Parameter(names = {"--min-leadout"},

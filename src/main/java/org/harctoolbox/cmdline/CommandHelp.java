@@ -20,13 +20,17 @@ package org.harctoolbox.cmdline;
 import com.beust.jcommander.DefaultUsageFormatter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.Parameterized;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.internal.DefaultConsole;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.harctoolbox.irp.Version;
 
@@ -55,6 +59,9 @@ public class CommandHelp extends AbstractCommand {
 
     @Parameter(names = {"-c", "--common", "--options"}, description = "Describe the common options only.")
     private boolean commonOptions = false;
+
+    @Parameter(names = {"-l", "--logging" }, description = "Describe the logging related options only.")
+    private boolean loggingOptions = false;
 
     @Parameter(names = {"-s", "--short"}, description = "Produce a short usage message.")
     private boolean shortForm = false;
@@ -95,6 +102,11 @@ public class CommandHelp extends AbstractCommand {
                 return;
             }
 
+            if (loggingOptions) {
+                loggingOptions(out);
+                return;
+            }
+
             String cmd = argumentParser.getParsedCommand();
             if (commands != null)
                 commands.forEach((command) -> {
@@ -118,12 +130,32 @@ public class CommandHelp extends AbstractCommand {
         private void commonOptions(PrintStream out) {
             CommandCommonOptions cla = new CommandCommonOptions();
             JCommander parser = new JCommander(cla);
+            options(out, parser, "Common options:\n");
+        }
+
+        private void options(PrintStream out, JCommander parser, String title) {
             parser.setConsole(new DefaultConsole(out));
             StringBuilder str = new StringBuilder(2500);
             DefaultUsageFormatter formatter = new DefaultUsageFormatter(parser);
             formatter.usage(str);
-            str.replace(0, 41, "Common options:\n"); // barf!
+            str.replace(0, 41, title); // barf!
             out.println(str.toString().trim()); // str ends with line feed.
+        }
+
+        /**
+         * Print just the common options. JCommander does not support this case,
+         * so this implementation is pretty gross.
+         */
+        private void loggingOptions(PrintStream out) {
+            List<String> loggingOpts = Arrays.asList(CommandCommonOptions.loggingOptions);
+            CommandCommonOptions cla = new CommandCommonOptions();
+            JCommander parser = new JCommander(cla);
+            Map<Parameterized, ParameterDescription> f = parser.getFields();
+            List<Parameterized> list = new ArrayList<>(f.keySet());
+            list.stream().filter((p) -> (!loggingOpts.contains(p.getName()))).forEachOrdered((p) -> {
+                f.remove(p);
+            });
+            options(out, parser, "Logging options:\n");
         }
 
         private void shortUsage(PrintStream out, JCommander argumentParser) {
@@ -144,6 +176,7 @@ public class CommandHelp extends AbstractCommand {
             out.println("    \"" + PROGRAMNAME + " help <command>\" for a particular command,");
             out.println("    \"" + PROGRAMNAME + " <command> --describe\" for a description,");
             out.println("    \"" + PROGRAMNAME + " help --common\" for the common options.");
+            out.println("    \"" + PROGRAMNAME + " help --logging\" for the logging related options.");
 
             printDocumentationUrl();
         }

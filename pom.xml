@@ -504,10 +504,6 @@
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.json</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.abego.treelayout</groupId>
-                    <artifactId>org.abego.treelayout.core</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

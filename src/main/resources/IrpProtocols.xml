@@ -130,7 +130,7 @@ as "Incomplete signal".
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
-               version="2019-10-15"
+               version="2019-12-22"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
     <irp:protocol name="48-NEC">

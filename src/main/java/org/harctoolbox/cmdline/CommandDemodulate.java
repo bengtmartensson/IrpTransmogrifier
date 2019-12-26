@@ -22,8 +22,10 @@ import com.beust.jcommander.Parameters;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 
 @Parameters(commandNames = {"demodulate"}, commandDescription = "Demodulate IrSequence given as argument (EXPERIMENTAL).")
@@ -46,8 +48,9 @@ public class CommandDemodulate extends AbstractCommand {
                 + "Typically the threshold is taken around the period of the expected modulation frequency.";
     }
 
-    public void demodulate(PrintStream out) throws OddSequenceLengthException {
-        IrSequence irSequence = new IrSequence(args.toArray(new String[args.size()]));
+    public void demodulate(PrintStream out, CommandCommonOptions commandLineArgs) throws OddSequenceLengthException, InvalidArgumentException {
+        MultiParser prontoRawParser = MultiParser.newIrCoreParser(args);
+        IrSequence irSequence = prontoRawParser.toIrSequence(commandLineArgs.minLeadout);
         ModulatedIrSequence demodulated = ModulatedIrSequence.demodulate(irSequence, threshold);
         out.println(demodulated.toString(true));
     }

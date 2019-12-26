@@ -176,7 +176,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
                     commandDecode.decode(out, commandLineArgs, irpDatabase);
                     break;
                 case "demodulate":
-                    commandDemodulate.demodulate(out);
+                    commandDemodulate.demodulate(out, commandLineArgs);
                     break;
                 case "expression":
                     commandExpression.expression(out, commandLineArgs);

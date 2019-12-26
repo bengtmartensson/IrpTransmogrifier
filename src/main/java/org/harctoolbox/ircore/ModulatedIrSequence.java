@@ -401,8 +401,15 @@ public final class ModulatedIrSequence extends IrSequence {
         for (int i = 0; i < getLength(); i += 2) {
             List<Double> pulse = flash(get(i));
             if (pulse.size() % 2 == 1) {
-                // ends with flash, slam the gap onto the end
-                pulse.add(get(i+1));
+                // ends with flash
+                int lastIndex = pulse.size() - 1;
+                Double lastOnDuration = pulse.get(lastIndex);
+                if (lastOnDuration <= 0.5d) {
+                    pulse.set(lastIndex - 1, pulse.get(lastIndex - 1) + lastOnDuration + get(i + 1));
+                    pulse.remove(lastIndex);
+                } else
+                    // slam the following gap onto the end
+                    pulse.add(get(i + 1));
             } else {
                 // ends with gap, extend that
                 double lastGap = pulse.get(pulse.size()-1);

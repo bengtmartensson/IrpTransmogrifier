@@ -296,7 +296,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         argumentParser.addCommand(commandLirc);
     }
 
-    private void setupLoggers() throws IOException {
+    private void setupLoggers() throws IOException, UsageException {
         if (commandLineArgs.logformat != null)
             System.getProperties().setProperty("java.util.logging.SimpleFormatter.format", commandLineArgs.logformat);
         Logger topLevelLogger = Logger.getLogger("");
@@ -315,7 +315,12 @@ public final class IrpTransmogrifier implements CmdLineProgram {
 
             Logger log = Logger.getLogger(classLevel[0].trim());
             loggers.add(log); // stop them from being garbage collected
-            Level level = Level.parse(classLevel[1].trim().toUpperCase(Locale.US));
+            Level level;
+            try {
+                level = Level.parse(classLevel[1].trim().toUpperCase(Locale.US));
+            } catch (IllegalArgumentException ex) {
+                throw new UsageException(ex + ". Valid levels are: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL.");
+            }
             log.setLevel(level);
             log.setUseParentHandlers(false);
             Handler handler = commandLineArgs.logfile != null ? new FileHandler(commandLineArgs.logfile) : new ConsoleHandler();

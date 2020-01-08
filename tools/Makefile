@@ -16,8 +16,6 @@ PROJECT_JAR := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-jar-with-dependencies.jar
 PROJECT_BIN := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-bin.zip
 
 IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
-XSLT_DIR := $(IRPHOME)/xslt
-LIRC_TRANSFORM=$(XSLT_DIR)/lirc.xsl
 #IRPTRANSMOGRIFIER := $(JAVA) -jar $(PROJECT_JAR) --loglevel warning --url-decode
 
 IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml

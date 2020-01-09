@@ -82,6 +82,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String IRP_NAME = "irp";
     public static final String USABLE_NAME = "usable";
     public static final String VERSION_NAME = "version";
+    public static final String PROG_VERSION_NAME = "program-version";
     public static final String DOCUMENTATION_NAME = "documentation";
     public static final String PARAMETER_NAME = "parameter";
     public static final String DECODABLE_NAME = "decodable";
@@ -348,6 +349,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public Document toXml(List<String> protocolNames) {
         Document document = XmlUtils.newDocument();
         Element root = document.createElement("NamedProtocols");
+        root.setAttribute(PROG_VERSION_NAME, Version.versionString);
+        root.setAttribute(VERSION_NAME, this.getConfigFileVersion());
         document.appendChild(root);
 
         protocolNames.forEach((String pname) -> {

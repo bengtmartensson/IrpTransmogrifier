@@ -840,7 +840,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             }
         }
 
-        private void addProperty(String key, String value) {
+        private void addProperty(String key, String val) {
+            String value = val.trim();
             if (value.isEmpty())
                 map.put(key, null);
             else {

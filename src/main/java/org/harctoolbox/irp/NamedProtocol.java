@@ -48,7 +48,7 @@ public final class NamedProtocol extends Protocol implements ElementaryDecode,Co
 
     public static Document toDocument(Iterable<NamedProtocol> protocols) {
         Document document = XmlUtils.newDocument();
-        Element root = document.createElement("NamedProtocols");
+        Element root = document.createElement(IrpDatabase.NAMED_PROTOCOLS_NAME);
         document.appendChild(root);
         for (NamedProtocol protocol : protocols) {
             Element el = protocol.toElement(document);
@@ -299,7 +299,7 @@ public final class NamedProtocol extends Protocol implements ElementaryDecode,Co
     }
 
     public IrSignal render(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException, ProtocolNotRenderableException {
-        List<String> list = auxParameters.get("decode-only");
+        List<String> list = auxParameters.get(IrpDatabase.DECODE_ONLY_NAME);
         if (list != null)
             if (Boolean.parseBoolean(list.get(0)))
                 throw new ProtocolNotRenderableException(name);
@@ -420,43 +420,43 @@ public final class NamedProtocol extends Protocol implements ElementaryDecode,Co
 
     public Element toElement(Document document, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
         Element root = super.toElement(document);
-        root.setAttribute("name", getName());
-        root.setAttribute("c-name", getCName());
-        root.setAttribute("absolute-tolerance", Double.toString(getAbsoluteTolerance(absoluteTolerance, override)));
-        root.setAttribute("relative-tolerance", Double.toString(getRelativeTolerance(relativeTolerance, override)));
-        root.setAttribute("frequency-tolerance", Double.toString(getFrequencyTolerance(frequencyTolerance, override)));
+        root.setAttribute(IrpDatabase.NAME_NAME, getName());
+        root.setAttribute(IrpDatabase.CNAME_NAME, getCName());
+        root.setAttribute(IrpDatabase.ABSOLUTE_TOLERANCE_NAME, Double.toString(getAbsoluteTolerance(absoluteTolerance, override)));
+        root.setAttribute(IrpDatabase.RELATIVE_TOLERANCE_NAME, Double.toString(getRelativeTolerance(relativeTolerance, override)));
+        root.setAttribute(IrpDatabase.FREQUENCY_TOLERANCE_NAME, Double.toString(getFrequencyTolerance(frequencyTolerance, override)));
         if (frequencyLower != null)
-            root.setAttribute("frequency-lower", Double.toString(frequencyLower));
+            root.setAttribute(IrpDatabase.FREQUENCY_LOWER_NAME, Double.toString(frequencyLower));
         if (frequencyUpper != null)
-            root.setAttribute("frequency-upper", Double.toString(frequencyUpper));
-        root.setAttribute("minimum-leadout", Double.toString(getMinimumLeadout()));
-        XmlUtils.addBooleanAttributeIfTrue(root, "decodable", decodable);
-        XmlUtils.addBooleanAttributeIfTrue(root, "reject-repeatless", rejectRepeatless);
+            root.setAttribute(IrpDatabase.FREQUENCY_UPPER_NAME, Double.toString(frequencyUpper));
+        root.setAttribute(IrpDatabase.MINIMUM_LEADOUT_NAME, Double.toString(getMinimumLeadout()));
+        XmlUtils.addBooleanAttributeIfTrue(root, IrpDatabase.DECODABLE_NAME, decodable);
+        XmlUtils.addBooleanAttributeIfTrue(root, IrpDatabase.REJECT_REPEATLESS_NAME, rejectRepeatless);
 
         DocumentFragment html = getDocumentation();
         if (html != null) {
-            Element docu = document.createElement("Html");
+            Element docu = document.createElement(IrpDatabase.HTML_NAME);
             docu.appendChild(document.adoptNode(html.cloneNode(true)));
             root.appendChild(docu);
 
-            Element textDocu = document.createElement("Documentation");
+            Element textDocu = document.createElement(IrpDatabase.DOCUMENTATION_ELEMENT_NAME);
             String textdoc = DumbHtmlRenderer.render(getDocumentation());
             textDocu.setTextContent(textdoc);
             root.appendChild(textDocu);
         }
 
-        Element irpElement = document.createElement("Irp");
+        Element irpElement = document.createElement(IrpDatabase.IRP_ELEMENT_NAME);
         irpElement.appendChild(document.createTextNode(getIrp()));
         root.appendChild(irpElement);
 
-        Element parameters = document.createElement("Parameters");
+        Element parameters = document.createElement(IrpDatabase.PARAMETERS_NAME);
         root.appendChild(parameters);
         for (Map.Entry<String, List<String>> param : auxParameters.entrySet()) {
-            Element parameter = document.createElement("Parameter");
+            Element parameter = document.createElement(IrpDatabase.PARAMETER_ELEMENT_NAME);
             parameters.appendChild(parameter);
-            parameter.setAttribute("name", param.getKey());
+            parameter.setAttribute(IrpDatabase.NAME_NAME, param.getKey());
             param.getValue().stream().map((val) -> {
-                Element value = document.createElement("Value");
+                Element value = document.createElement(IrpDatabase.VALUE_NAME);
                 value.setTextContent(val);
                 return value;
             }).forEachOrdered((value) -> {
@@ -469,8 +469,8 @@ public final class NamedProtocol extends Protocol implements ElementaryDecode,Co
 
     ItemCodeGenerator code(CodeGenerator codeGenerator, Map<String, String> parameters, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance) {
         ItemCodeGenerator template = codeGenerator.newItemCodeGenerator(this);
-        template.addAggregateList("metaData", metaDataPropertiesMap(parameters, absoluteTolerance, relativeTolerance, frequencyTolerance));
-        template.addAggregateList("protocol", this, getGeneralSpec(), getDefinitions());
+        template.addAggregateList(IrpDatabase.META_DATA_NAME, metaDataPropertiesMap(parameters, absoluteTolerance, relativeTolerance, frequencyTolerance));
+        template.addAggregateList(IrpDatabase.PROTOCOL_NAME, this, getGeneralSpec(), getDefinitions());
         return template;
     }
 
@@ -479,13 +479,13 @@ public final class NamedProtocol extends Protocol implements ElementaryDecode,Co
         auxParameters.entrySet().forEach((kvp) -> {
             map.put(kvp.getKey(), kvp.getValue());
         });
-        map.put("protocolName", getName());
-        map.put("cProtocolName", getCName());
-        map.put("irp", getIrp());
-        map.put("documentation", IrCoreUtils.javaifyString(DumbHtmlRenderer.render(getDocumentation())));
-        putParameter(map, "relativeTolerance", userRelativeTolerance, relativeTolerance);
-        putParameter(map, "absoluteTolerance", userAbsoluteTolerance, absoluteTolerance);
-        putParameter(map, "frequencyTolerance", userFrequencyTolerance, frequencyTolerance);
+        map.put(IrpDatabase.PROTOCOL_NAME_NAME, getName());
+        map.put(IrpDatabase.PROTOCOL_CNAME_NAME, getCName());
+        map.put(IrpDatabase.IRP_NAME, getIrp());
+        map.put(IrpDatabase.DOCUMENTATION_NAME, IrCoreUtils.javaifyString(DumbHtmlRenderer.render(getDocumentation())));
+        putParameter(map, IrpDatabase.RELATIVE_TOLERANCE_NAME, userRelativeTolerance, relativeTolerance);
+        putParameter(map, IrpDatabase.ABSOLUTE_TOLERANCE_NAME, userAbsoluteTolerance, absoluteTolerance);
+        putParameter(map, IrpDatabase.FREQUENCY_TOLERANCE_NAME, userFrequencyTolerance, frequencyTolerance);
         map.putAll(parameters);
         return map;
     }

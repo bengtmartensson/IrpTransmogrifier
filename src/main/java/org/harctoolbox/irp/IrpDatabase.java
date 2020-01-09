@@ -80,10 +80,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String NAME_NAME = "name";
     public static final String CNAME_NAME = "c-name";
     public static final String IRP_NAME = "irp";
+    public static final String IRP_ELEMENT_NAME = "Irp";
     public static final String USABLE_NAME = "usable";
     public static final String VERSION_NAME = "version";
     public static final String PROG_VERSION_NAME = "program-version";
     public static final String DOCUMENTATION_NAME = "documentation";
+    public static final String DOCUMENTATION_ELEMENT_NAME = "Documentation";
     public static final String PARAMETER_NAME = "parameter";
     public static final String DECODABLE_NAME = "decodable";
     public static final String FREQUENCY_TOLERANCE_NAME = "frequency-tolerance";
@@ -97,7 +99,16 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String REJECT_REPEATLESS_NAME = "reject-repeatless";
     public static final String TYPE_NAME = "type";
     public static final String XML_NAME = "xml";
-    private static final String FALSE_NAME = "false";
+    public static final String FALSE_NAME = "false";
+    public static final String HTML_NAME = "Html";
+    public static final String VALUE_NAME = "Value";
+    public static final String PARAMETERS_NAME = "Parameters";
+    public static final String PARAMETER_ELEMENT_NAME = "Parameter";
+    public static final String NAMED_PROTOCOLS_NAME = "named-protocols";
+    public static final String DECODE_ONLY_NAME = "decode-only";
+    public static final String PROTOCOL_NAME_NAME = "protocolName";
+    public static final String PROTOCOL_CNAME_NAME = "cProtocolName";
+    public static final String META_DATA_NAME = "metaData";
 
     static boolean isKnownKeyword(String key) {
         return key.equals(PROTOCOL_NAME)

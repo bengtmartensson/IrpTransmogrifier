@@ -346,7 +346,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return doc;
     }
 
-    public Document toXml(List<String> protocolNames) {
+    public Document toXml(List<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
         Document document = XmlUtils.newDocument();
         Element root = document.createElement("NamedProtocols");
         root.setAttribute(PROG_VERSION_NAME, Version.versionString);
@@ -357,7 +357,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             try {
                 logger.log(Level.FINE, "Processing {0} ...", pname);
                 NamedProtocol protocol = getNamedProtocol(pname);
-                Element element = protocol.toElement(document);
+                Element element = protocol.toElement(document, absoluteTolerance, relativeTolerance, frequencyTolerance, override);
                 root.appendChild(element);
             } catch (NameUnassignedException | ArithmeticException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}; protocol ignored", ex.getMessage());

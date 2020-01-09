@@ -415,12 +415,16 @@ public final class NamedProtocol extends Protocol implements ElementaryDecode,Co
 
     @Override
     public Element toElement(Document document) {
+        return toElement(document, null, null, null, false);
+    }
+
+    public Element toElement(Document document, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
         Element root = super.toElement(document);
         root.setAttribute("name", getName());
         root.setAttribute("c-name", getCName());
-        root.setAttribute("absolute-tolerance", Double.toString(getAbsoluteTolerance()));
-        root.setAttribute("relative-tolerance", Double.toString(getRelativeTolerance()));
-        root.setAttribute("frequency-tolerance", Double.toString(getFrequencyTolerance()));
+        root.setAttribute("absolute-tolerance", Double.toString(getAbsoluteTolerance(absoluteTolerance, override)));
+        root.setAttribute("relative-tolerance", Double.toString(getRelativeTolerance(relativeTolerance, override)));
+        root.setAttribute("frequency-tolerance", Double.toString(getFrequencyTolerance(frequencyTolerance, override)));
         if (frequencyLower != null)
             root.setAttribute("frequency-lower", Double.toString(frequencyLower));
         if (frequencyUpper != null)

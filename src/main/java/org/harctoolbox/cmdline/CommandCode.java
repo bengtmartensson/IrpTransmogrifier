@@ -79,12 +79,10 @@ public class CommandCode extends AbstractCommand {
         private final CommandCommonOptions commandLineArgs;
         private final IrpDatabase irpDatabase;
         private final String[] args;
-        private final String encoding;
 
         private CodeClass(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase, String[] args) {
             this.out = out;
             this.commandLineArgs = commandLineArgs;
-            this.encoding = commandLineArgs.encoding;
             this.irpDatabase = irpDatabase;
             this.args = args;
         }
@@ -93,8 +91,6 @@ public class CommandCode extends AbstractCommand {
             if (directory != null && commandLineArgs.output != null)
                 throw new UsageException("The --output and the --directory options are mutually exclusive.");
 
-            //setupDatabase();
-            //irpDatabase.expand();
             List<String> protocolNames = irpDatabase.evaluateProtocols(protocols, commandLineArgs.sort, commandLineArgs.regexp, commandLineArgs.urlDecode);
             if (protocolNames.isEmpty())
                 throw new UsageException("No protocols matched (forgot --regexp?)");
@@ -160,7 +156,7 @@ public class CommandCode extends AbstractCommand {
 
         private void createXmlProtocols(List<String> protocolNames) {
             Document document = irpDatabase.toXml(protocolNames);
-            XmlUtils.printDOM(out, document, encoding, "Irp");
+            XmlUtils.printDOM(out, document, commandLineArgs.encoding, "Irp");
         }
 
         // TODO: nuke

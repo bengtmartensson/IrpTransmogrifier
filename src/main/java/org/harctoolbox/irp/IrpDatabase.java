@@ -362,6 +362,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         Element root = document.createElement("NamedProtocols");
         root.setAttribute(PROG_VERSION_NAME, Version.versionString);
         root.setAttribute(VERSION_NAME, this.getConfigFileVersion());
+        root.setAttribute(ABSOLUTE_TOLERANCE_NAME, Double.toString(IrCoreUtils.getAbsoluteTolerance(absoluteTolerance)));
+        root.setAttribute(RELATIVE_TOLERANCE_NAME, Double.toString(IrCoreUtils.getRelativeTolerance(relativeTolerance)));
+        root.setAttribute(FREQUENCY_TOLERANCE_NAME, Double.toString(IrCoreUtils.getFrequencyTolerance(frequencyTolerance)));
         document.appendChild(root);
 
         protocolNames.forEach((String pname) -> {

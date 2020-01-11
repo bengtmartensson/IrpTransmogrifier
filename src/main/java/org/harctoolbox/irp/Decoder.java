@@ -532,7 +532,7 @@ public final class Decoder {
             return false;
         }
 
-        private boolean toBeRemoved(T removeCandidate, ElementaryDecode remover, Map<String, NamedProtocol> parsedProtocols, int level) {
+        private boolean toBeRemoved(T removeCandidate, HasPreferOvers remover, Map<String, NamedProtocol> parsedProtocols, int level) {
             if (level > MAX_PREFER_OVER_NESTING) {
                 logger.log(Level.SEVERE, "Max prefer-over depth reached using protocol {0}, cycle likely. Please report.", remover.getName());
                 return false;
@@ -548,7 +548,7 @@ public final class Decoder {
             } else {
                 for (String preferOver : preferOvers) {
                     T t = this.map.get(preferOver);
-                    ElementaryDecode hpo = t != null ? t.getDecode() : parsedProtocols.get(preferOver.toLowerCase(Locale.US));
+                    HasPreferOvers hpo = t != null ? t.getDecode() : parsedProtocols.get(preferOver.toLowerCase(Locale.US));
                     boolean success = toBeRemoved(removeCandidate, hpo, parsedProtocols, level + 1);
                     if (success)
                         return true;
@@ -782,6 +782,11 @@ public final class Decoder {
             return trunk.getName();
         }
 
+        @Override
+        public Map<String, Long> getMap() {
+            return trunk.map;
+        }
+
         public Decode getTrunk() {
             return trunk;
         }
@@ -928,6 +933,7 @@ public final class Decoder {
         }
 
         @SuppressWarnings("ReturnOfCollectionOrArrayField")
+        @Override
         public Map<String, Long> getMap() {
             return map;
         }

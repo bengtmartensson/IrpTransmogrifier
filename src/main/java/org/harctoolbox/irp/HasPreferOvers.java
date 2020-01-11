@@ -17,14 +17,20 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.util.Map;
+import java.util.Set;
 
 /**
- * Represents an object that represents a decode in some way.
+ * Represents an object that has prefer-overs.
  */
-public interface ElementaryDecode extends HasPreferOvers {
+public interface HasPreferOvers {
 
-    public ElementaryDecode getDecode();
+    /**
+     * Returns the prefer-overs.
+     * @return Set&lt;String&gt; of the names of protocols that are prefer-overs.
+     */
+    public Set<String> getPreferOverNames();
 
-    public Map<String, Long> getMap();
+    public String getName();
+
+    public String toString(int radix, String separator);
 }

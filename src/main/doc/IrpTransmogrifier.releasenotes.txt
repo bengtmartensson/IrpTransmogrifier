@@ -4,6 +4,28 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
+2020-01-14: Version 1.2.4
+
+* Code generation xml: Some fixes, more attributes, in particular tolerances.
+* Better error messages for --logclass.
+* New option list --parsedirp.
+* Don't nuke whitespace from IRP in database.
+* list --gui working again.
+* Improved command line documentation for logging commands.
+* Better command decoding for the demodulate command.
+* Fixed problem with 0 durations in render --modulate. #154.
+* Schema irp-protocols: Attribute protocol/@name now required.
+* Documentation update.
+* New protocol: Akord.
+* Analyzer: --parameterwidths now allows for optional parameter names. #150.
+* Several issues with patch files fixed.
+* Changes from Graham Dixon to uei-executor, several protocols.
+* Changed parameterization of NEC*-f16 protocols.
+* Added more test files and API examples.
+* Update JCommander to the current version 1.78. #153.
+* Refactoring of CommandDecode and Decode. #152.
+
+===============================================================================
 2019-11-12: Version 1.2.3
 
 * Deploy releases to Maven Central repository, #149.

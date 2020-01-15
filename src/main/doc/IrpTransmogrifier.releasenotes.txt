@@ -4,7 +4,7 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
-2020-01-14: Version 1.2.4
+2020-01-15: Version 1.2.4
 
 * Code generation xml: Some fixes, more attributes, in particular tolerances.
 * Better error messages for --logclass.

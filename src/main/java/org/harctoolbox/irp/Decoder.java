@@ -507,7 +507,7 @@ public final class Decoder {
         /**
          * Manipulates its argument, removing some decodes.
          *
-         * @param decodes
+         * @param parsedProtocols
          */
         void reduce(Map<String, NamedProtocol> parsedProtocols) {
 

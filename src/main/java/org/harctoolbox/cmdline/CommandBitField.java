@@ -37,7 +37,7 @@ public class CommandBitField extends AbstractCommand {
 
     private static final Logger logger = Logger.getLogger(CommandBitField.class.getName());
 
-    @Parameter(names = {"-n", "--nameengine"}, description = "Define a name engine for resolving the bitfield.", converter = NameEngineParser.class)
+    @Parameter(names = {"-n", "--nameengine", "--parameters"}, description = "Define a name engine for resolving the bitfield.", converter = NameEngineParser.class)
     private NameEngine nameEngine = new NameEngine();
 
     @Parameter(names = {"-l", "--lsb"}, description = "Output bitstream with least significant bit first.")

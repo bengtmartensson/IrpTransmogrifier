@@ -38,7 +38,7 @@ public class CommandExpression extends AbstractCommand {
 
     private static final Logger logger = Logger.getLogger(CommandExpression.class.getName());
 
-    @Parameter(names = {"-n", "--nameengine"}, description = "Define a name engine to use for evaluating.", converter = NameEngineParser.class)
+    @Parameter(names = {"-n", "--nameengine", "--parameters"}, description = "Define a name engine to use for evaluating.", converter = NameEngineParser.class)
     private NameEngine nameEngine = new NameEngine();
 
     @Parameter(names = {"-r", "--radix"}, description = "Radix for outputting result.")

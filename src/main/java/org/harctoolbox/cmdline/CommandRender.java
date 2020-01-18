@@ -57,14 +57,14 @@ public class CommandRender extends AbstractCommand {
     @Parameter(names = {"-m", "--modulate"}, description = "Generate modulated form (EXPERIMENTAL)")
     private boolean modulate = false;
 
-    @Parameter(names = {"-n", "--nameengine"}, description = "Name Engine to use", converter = NameEngineParser.class)
+    @Parameter(names = {"-n", "--nameengine", "--parameters"}, description = "Name Engine to use", converter = NameEngineParser.class)
     private NameEngine nameEngine = new NameEngine();
 
     @Parameter(names = {"-p", "--pronto", "--ccf", "--hex"}, description = "Generate Pronto hex.")
 
     private boolean pronto = false;
 
-    @Parameter(names = {"-P", "--printparameters", "--parameters"}, description = "Print used parameters values")
+    @Parameter(names = {"-P", "--printparameters"}, description = "Print actual parameters values, for example by --random")
     private boolean printParameters = false;
 
     @Parameter(names = {"-r", "--signed-raw"}, description = "Generate raw form.")

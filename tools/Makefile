@@ -64,7 +64,7 @@ gh-pages: target/site/apidocs
 	( cd ${GH_PAGES} ; \
 	cp -rf ../target/site/apidocs/* . ; \
 	git add * ; \
-	git commit -a -m "Update of API documentation" ; \
+	git commit -S -a -m "Update of API documentation" ; \
 	git push )
 
 $(INSTALLDIR):

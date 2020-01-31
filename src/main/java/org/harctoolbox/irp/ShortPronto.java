@@ -103,16 +103,16 @@ public final class ShortPronto extends Pronto {
                 break;
 
             case RC5_CODE: // 0x5000:
-                if (repeatLength != 1)
-                    throw new InvalidArgumentException("wrong repeat length");
+                if (introLength + repeatLength != 1)
+                    throw new InvalidArgumentException("Erroneous Pronto Hex lengths");
                 irp = RC5_IRP;
                 D = ccf[index++];
                 F = ccf[index++];
                 break;
 
             case RC5X_CODE: // 0x5001:
-                if (repeatLength != 2)
-                    throw new InvalidArgumentException("wrong repeat length");
+                if (introLength + repeatLength != 2)
+                    throw new InvalidArgumentException("Erroneous Pronto Hex lengths");
                 irp = RC5X_IRP;
                 D = ccf[index++];
                 S = ccf[index++];
@@ -120,16 +120,16 @@ public final class ShortPronto extends Pronto {
                 break;
 
             case RC6_CODE: // 0x6000:
-                if (repeatLength != 1)
-                    throw new InvalidArgumentException("wrong repeat length");
+                if (introLength + repeatLength != 1)
+                    throw new InvalidArgumentException("Erroneous Pronto Hex lengths");
                 irp = RC6_IRP;
                 D = ccf[index++];
                 F = ccf[index++];
                 break;
 
             case NEC1_CODE: // 0x900a:
-                if (repeatLength != 1)
-                    throw new InvalidArgumentException("wrong repeat length");
+                if (introLength + repeatLength != 1)
+                    throw new InvalidArgumentException("Erroneous Pronto Hex lengths");
                 irp = NEC1_IRP;
 		D = ccf[index] >> 8;
                 S = ccf[index++] & 0xff;

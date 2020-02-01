@@ -88,10 +88,11 @@ public final class Extent extends Duration {
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         logger.log(recognizeData.logRecordEnter(this));
-        double physical = recognizeData.getExtentDuration();
+        double elapsed = recognizeData.elapsed();
+        double physical = recognizeData.get();
         double theoretical;
         try {
-            theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null);
+            theoretical = toFloat(recognizeData.getGeneralSpec(), /*recognizeData.getNameEngine()*/null) - elapsed;
         } catch (IrpInvalidArgumentException | NameUnassignedException ex) {
             throw new SignalRecognitionException(ex);
         }

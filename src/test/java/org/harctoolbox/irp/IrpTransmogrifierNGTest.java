@@ -325,20 +325,19 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    // As the name indicates, in an earlier version this decoded as Akai + Mitsubishi. Clearl, the Akai decode is straightout wrong, see #156.
     public void testDecodeAkaiMitsubishiAll() {
         System.out.println("testDecodeAkaiMitsubishiAll");
         String akaiMitsubishi = "0000 006C 0000 0011 000A 0047 000A 0047 000A 0047 000A 001E 000A 001E 000A 001E 000A 0047 000A 001E 000A 0047 000A 0047 000A 0047 000A 001E 000A 0047 000A 001E 000A 001E 000A 001E 000A 031D";
         String result = IrpTransmogrifier.execute("-f -1 decode -a " + akaiMitsubishi);
         System.out.println(result);
-        assertEquals(result,
-                "Akai: {D=7,F=104}, beg=0, end=21, reps=1 {UNDECODED. length=12}" + IrCoreUtils.LINE_SEPARATOR
-                + "\tMitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
+        assertEquals(result, "Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
     }
 
     @Test(enabled = true)
     public void testDecodeSony15() {
         System.out.println("testDecodeSony15");
-        String sony15 = "0000 0068 0010 0000 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0100";
+        String sony15 = "0000 0068 0010 0000 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0300";
         String result = IrpTransmogrifier.execute("decode -p sony15 " + sony15);
         System.out.println(result);
         assertEquals(result, "Sony15: {D=164,F=61}, beg=0, end=31, reps=1");
@@ -533,8 +532,8 @@ public class IrpTransmogrifierNGTest {
     public void testIgnoreLeadingGarbageSony15() {
         System.out.println("testIgnoreLeadingGarbageSony15");
         String result;
-        result = IrpTransmogrifier.execute("--blacklist gwts --min-leadout 10000 decode " + GRAHAM_SONY15);
-        assertEquals(result, "");
+        //result = IrpTransmogrifier.execute("--blacklist gwts --min-leadout 10000 decode " + GRAHAM_SONY15);
+        //assertEquals(result, "");
         result = IrpTransmogrifier.execute("--blacklist gwts,nec-shirriff --min-leadout 10000 decode --ignoreleadinggarbage -p sony15 " + GRAHAM_SONY15);
         assertEquals(result, "Sony15: {D=151,F=61}, beg=22, end=53, reps=1");
     }

@@ -47,7 +47,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.hasConsumed = 0.0;
         this.irSequence = irSequence;
         this.parameterCollector = parameterCollector;
-        this.extentStart = 0;
+        this.extentStart = position;
         this.interleaving = interleaving;
         this.needsChecking = new ParameterCollector(parameterSpecs);
         this.absoluteTolerance = absoluteTolerance;
@@ -152,11 +152,10 @@ public final class RecognizeData extends Traverser implements Cloneable {
         return Duration.isOn(position);
     }
 
-    public double get() throws SignalRecognitionException {
-        if (position >= irSequence.getLength())
-            throw new SignalRecognitionException("IrSequence too short");
-
-        return  Math.abs(irSequence.get(position)) - getHasConsumed();
+    public double get() {
+        return position < irSequence.getLength()
+                ? Math.abs(irSequence.get(position)) - getHasConsumed()
+                : 0;
     }
 
     public void consume() {
@@ -194,6 +193,12 @@ public final class RecognizeData extends Traverser implements Cloneable {
 
     public boolean check(boolean on) {
         return isOn() == on && position < irSequence.getLength();
+    }
+
+    public double elapsed() {
+//        if (position >= irSequence.getLength())
+//            throw new ThisCannotHappenException("Internal error");
+        return irSequence.getTotalDuration(extentStart, position - extentStart);
     }
 
     public double getExtentDuration() {

@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.harctoolbox.ircore.AbstractIrParser;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
@@ -25,7 +27,7 @@ import org.harctoolbox.ircore.Pronto;
 
 public class ShortProntoParser extends AbstractIrParser implements IrSignalParser {
 
-    //private final static Logger logger = Logger.getLogger(ProntoParserLoose.class.getName());
+    private final static Logger logger = Logger.getLogger(ShortProntoParser.class.getName());
 
     public static IrSignal parse(String str) throws InvalidArgumentException {
         ShortProntoParser instance = new ShortProntoParser(str);
@@ -54,7 +56,9 @@ public class ShortProntoParser extends AbstractIrParser implements IrSignalParse
         try {
             return ShortPronto.parse(getSource());
         } catch (Pronto.NonProntoFormatException ex) {
-            throw new InvalidArgumentException(ex);
+            // Signal does not look like Pronto, give up
+            logger.log(Level.FINER, "Tried as Short Pronto, gave up ({0})", ex.getMessage());
+            return null;
         }
     }
 

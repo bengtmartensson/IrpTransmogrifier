@@ -20,6 +20,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,7 +59,7 @@ public class CommandBitField extends AbstractCommand {
                 + "However, a bitfield has a length, which an expression, evaluating to an integer value, does not.";
     }
 
-    public void bitfield(PrintStream out, CommandCommonOptions commandLineArgs) throws NameUnassignedException, FileNotFoundException {
+    public void bitfield(PrintStream out, CommandCommonOptions commandLineArgs) throws NameUnassignedException, FileNotFoundException, UnsupportedEncodingException {
         //NameEngine nameEngine = commandBitField.nameEngine;
         String text = String.join("", bitField).trim();
         BitField bitfield = BitField.newBitField(text);
@@ -71,7 +72,7 @@ public class CommandBitField extends AbstractCommand {
         }
 
         if (xml != null) {
-            XmlUtils.printDOM(IrCoreUtils.getPrintSteam(xml), bitfield.toDocument(), commandLineArgs.encoding, null);
+            XmlUtils.printDOM(IrCoreUtils.getPrintStream(xml, commandLineArgs.encoding), bitfield.toDocument(), commandLineArgs.encoding, null);
             logger.log(Level.INFO, "Wrote {0}", xml);
         }
     }

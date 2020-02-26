@@ -21,6 +21,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,7 +64,7 @@ public class CommandExpression extends AbstractCommand {
                 + "The --gui options presents a graphical representation of the parse tree.";
     }
 
-    public void expression(PrintStream out, CommandCommonOptions commandLineArgs) throws FileNotFoundException, NameUnassignedException, IrpParseException {
+    public void expression(PrintStream out, CommandCommonOptions commandLineArgs) throws FileNotFoundException, NameUnassignedException, IrpParseException, UnsupportedEncodingException {
         //NameEngine nameEngine = nameEngine;
         String text = String.join(" ", expressions).trim();
         Expression expression = Expression.newExpressionEOF(text);

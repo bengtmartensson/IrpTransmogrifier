@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -388,24 +387,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
      */
     public String getConfigFileVersion() {
         return version.toString();
-    }
-
-    private void dump(PrintStream ps, String name) {
-        ps.println(getUnparsedProtocol(name));
-    }
-
-    private void dump(PrintStream ps) {
-        protocols.keySet().stream().forEach((s) -> {
-            dump(ps, s);
-        });
-    }
-
-    public void dump(String filename) throws FileNotFoundException {
-        dump(IrCoreUtils.getPrintSteam(filename));
-    }
-
-    public void dump(String filename, String name) throws FileNotFoundException {
-        dump(IrCoreUtils.getPrintSteam(filename), name);
     }
 
     public boolean isAlias(String protocol) {

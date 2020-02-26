@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -252,20 +254,33 @@ public final class IrCoreUtils {
      * Either opens a file (optionally for appending (if beginning with +)) or returns stdout.
      *
      * @param filename Either - for stdout, or a file name, or null. If starting with +, the file is opened in append mode, after removing the +-character.
+     * @param encoding
      * @return Open PrintStream
      * @throws FileNotFoundException if FileOutputStream does
+     * @throws java.io.UnsupportedEncodingException
      */
-    public static PrintStream getPrintSteam(String filename) throws FileNotFoundException {
+    public static PrintStream getPrintStream(String filename, String encoding) throws FileNotFoundException, UnsupportedEncodingException {
         if (filename == null)
             return null;
 
         String realFilename = filename.startsWith("+") ? filename.substring(1) : filename;
+        return filename.equals("-")
+                ? System.out
+                : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, encoding);
+    }
+
+    /**
+     * Either opens a file (optionally for appending (if beginning with +)) or returns stdout.
+     *
+     * @param filename Either - for stdout, or a file name, or null. If starting with +, the file is opened in append mode, after removing the +-character.
+     * @return Open PrintStream
+     * @throws FileNotFoundException if FileOutputStream does
+     */
+    public static PrintStream getPrintStream(String filename) throws FileNotFoundException {
         try {
-            return filename.equals("-")
-                    ? System.out
-                    : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, DEFAULT_CHARSET_NAME);
+            return getPrintStream(filename, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            throw new ThisCannotHappenException();
+            throw new ThisCannotHappenException(ex);
         }
     }
 

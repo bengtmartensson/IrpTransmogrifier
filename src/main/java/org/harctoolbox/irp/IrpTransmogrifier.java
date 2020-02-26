@@ -144,7 +144,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
                 ParameterSpec.initRandom(commandLineArgs.seed);
 
             if (commandLineArgs.output != null)
-                out = IrCoreUtils.getPrintSteam(commandLineArgs.output);
+                out = IrCoreUtils.getPrintStream(commandLineArgs.output, commandLineArgs.encoding);
 
             // Since we have help and version as subcommands, --help and --version
             // are a little off. Keep them for compatibility, and

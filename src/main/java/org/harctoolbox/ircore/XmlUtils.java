@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -240,8 +241,8 @@ public final class XmlUtils {
         logger.log(Level.INFO, "File {0} written.", file);
     }
 
-    public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException {
-        PrintStream xmlStream = IrCoreUtils.getPrintSteam(xmlFileName);
+    public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException, UnsupportedEncodingException {
+        PrintStream xmlStream = IrCoreUtils.getPrintStream(xmlFileName, encoding);
         printDOM(xmlStream, doc, encoding, cdataElements);
     }
 

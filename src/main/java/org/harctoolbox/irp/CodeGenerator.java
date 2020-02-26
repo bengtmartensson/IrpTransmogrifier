@@ -65,7 +65,7 @@ public abstract class CodeGenerator {
             NamedProtocol protocol;
             protocol = irpDatabase.getNamedProtocol(protocolName);
             String filename = new File(directory + "/" + fileName(protocol.getCName())).getCanonicalPath();
-            try (PrintStream out = IrCoreUtils.getPrintSteam(filename)) {
+            try (PrintStream out = IrCoreUtils.getPrintStream(filename)) {
                 generate(protocol, out, true, inspect, parameters, absoluteTolerance, relativeTolerance, frequencyTolerance, tool, toolVersion, commandLine);
                 logger.log(Level.INFO, "Wrote {0}", filename);
             }

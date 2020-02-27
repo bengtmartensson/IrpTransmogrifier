@@ -400,12 +400,14 @@ public final class IrCoreUtils {
      * Parses integers of base 2 (prefix "0b"  or "%", 8 (leading 0), 10, or 16 (prefix "0x).
      * If argument special is true, allows intervals 123..456 or 123:456 by ignoring upper part.
      * and translates `*' to the constant "all" = (-2) and `#' to "some" (= -3).
+     * If no prefix, use the default given as second argument.
      *
      * @param str String to be parsed
      * @param special If the special stuff should be interpreted ('*', '+', intervals).
+     * @param defaultRadix
      * @return long integer.
      */
-    public static long parseLong(String str, boolean special) /*throws NumberFormatException*/ {
+    public static long parseLong(String str, boolean special, int defaultRadix) /*throws NumberFormatException*/ {
         if (special && (str.startsWith("#") || str.contains(",")))
             return SOME;
 
@@ -418,7 +420,32 @@ public final class IrCoreUtils {
                s.startsWith("%") ? Long.parseLong(s.substring(1), 2) :
                s.equals("0") ? 0L :
                s.startsWith("0") ? Long.parseLong(s.substring(1), 8) :
-               Long.parseLong(s);
+               Long.parseLong(s, defaultRadix);
+    }
+
+    /**
+     * Parses integers of base 2 (prefix "0b"  or "%", 8 (leading 0), 10, or 16 (prefix "0x).
+     * If argument special is true, allows intervals 123..456 or 123:456 by ignoring upper part.
+     * and translates `*' to the constant "all" = (-2) and `#' to "some" (= -3).
+     *
+     * @param str String to be parsed
+     * @param special If the special stuff should be interpreted ('*', '+', intervals).
+     * @return long integer.
+     */
+    public static long parseLong(String str, boolean special) /*throws NumberFormatException*/ {
+        return parseLong(str, special, 10);
+    }
+
+    /**
+     * Parses integers of base 2 (prefix "0b"  or "%", 8 (leading 0), 10, or 16 (prefix "0x).
+     * If no prefix, use the default given as second argument.
+     *
+     * @param str String to be parsed
+     * @param defaultRadix fallback radix
+     * @return long integer.
+     */
+    public static long parseLong(String str, int defaultRadix) /*throws NumberFormatException*/ {
+        return parseLong(str, false, defaultRadix);
     }
 
     /**

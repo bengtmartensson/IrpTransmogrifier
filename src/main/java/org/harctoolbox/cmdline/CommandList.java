@@ -48,13 +48,17 @@ public class CommandList extends AbstractCommand {
     // not yet implemented
     //@Parameter(names = { "-b", "--browse" }, description = "Open the protoocol data base file in the browser")
     //private boolean browse = false;
+    @Parameter(names = {"-a", "--all"}, description = "Implies (almost) all of the \"list xxx\"-options.")
+    private boolean all = false;
+
     @Parameter(names = {"--check-sorted"}, description = "Check if the protocol are alphabetically.")
     private boolean checkSorted = false;
 
     @Parameter(names = {"-c", "--classify"}, description = "Classify the protocol(s).")
     private boolean classify = false;
 
-    @Parameter(names = {"--cname"}, description = "List C name of the protocol(s).")
+    // Using c-names is deprecated, therefore hidden
+    @Parameter(names = {"--cname"}, hidden = true, description = "List C name of the protocol(s).")
     private boolean cName = false;
 
     @Parameter(names = {"--documentation"}, description = "Print (possible longer) documentation, as a dumb rendering of the HTML documenation.")
@@ -82,7 +86,8 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"-n", "--normalform"}, description = "List the normal form.")
     private boolean normalForm = false;
 
-    @Parameter(names = {"-p", "--parsedirp"}, description = "List IRP form, as parsed.")
+    // debugging feature, therefore hidden
+    @Parameter(names = {"-p", "--parsedirp"}, hidden = true, description = "List IRP form, as parsed.")
     private boolean parsedIrp = false;
 
     @Parameter(names = {"--prefer-overs"}, description = "List all protocol's prefer-overs, recursively")
@@ -151,14 +156,14 @@ public class CommandList extends AbstractCommand {
                 continue;
             }
 
-            if (!commandLineArgs.quiet || this.name)
+            if (!commandLineArgs.quiet || this.name || all)
                 // Use one line for the first, relatively short items
                 listProperty(out, "name", irpDatabase.getName(protocolName), commandLineArgs.quiet);
 
             if (cName)
                 listProperty(out, "cName", irpDatabase.getCName(protocolName), commandLineArgs.quiet);
 
-            if (irp)
+            if (irp || all)
                 listProperty(out, "irp", irpDatabase.getIrp(protocolName), commandLineArgs.quiet);
 
             if (parsedIrp)
@@ -172,7 +177,7 @@ public class CommandList extends AbstractCommand {
                     throw new ThisCannotHappenException(ex);
                 }
 
-            if (documentation)
+            if (documentation || all)
                 listProperty(out, "documentation", irpDatabase.getDocumentation(protocolName), commandLineArgs.quiet);
 
             if (html)
@@ -187,19 +192,20 @@ public class CommandList extends AbstractCommand {
             if (gui)
                 IrpUtils.showTreeViewer(protocol.toTreeViewer(), "Parse tree for " + protocolName);
 
-            if (weight)
+            if (weight || all)
                 listProperty(out, "Weight", protocol.weight(), commandLineArgs.quiet);
 
-            if (minDiff)
+            if (minDiff || all)
                 listProperty(out, "minDiff", protocol.minDurationDiff(), commandLineArgs.quiet);
 
-            if (classify)
+            if (classify || all)
                 listProperty(out, "classification", protocol.classificationString(), commandLineArgs.quiet);
 
-            if (warnings)
+            if (warnings || all)
                 listProperty(out, "warnings", protocol.warningsString(), commandLineArgs.quiet);
 
-            if (preferOvers) {
+            if (preferOvers || all) {
+                out.println("preferovers tree:");
                 if (commandLineArgs.quiet && ! this.name && protocol.preferredOvers().size() > 0)
                     out.println(irpDatabase.getName(protocolName) + ":");
                 protocol.dumpPreferOvers(out, irpDatabase);

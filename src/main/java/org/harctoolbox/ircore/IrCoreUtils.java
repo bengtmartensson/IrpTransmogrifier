@@ -419,7 +419,7 @@ public final class IrCoreUtils {
                s.startsWith("0b") ? Long.parseLong(s.substring(2), 2) :
                s.startsWith("%") ? Long.parseLong(s.substring(1), 2) :
                s.equals("0") ? 0L :
-               s.startsWith("0") ? Long.parseLong(s.substring(1), 8) :
+               (s.startsWith("0") && s.matches("[0-7]+") && defaultRadix == 10) ? Long.parseLong(s.substring(1), 8) :
                Long.parseLong(s, defaultRadix);
     }
 

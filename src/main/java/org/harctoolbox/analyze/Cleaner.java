@@ -151,7 +151,7 @@ public class Cleaner {
         int indexInSortedTimings = 0;
         for (int timingsIndex = 0; timingsIndex < dumbTimings.size(); timingsIndex++) {
             int dumbTiming = dumbTimings.get(timingsIndex);
-            int sum = 0;
+            long sum = 0;
             int terms = 0;
             int lastDuration = -1;
             while (indexInSortedTimings < sorted.length
@@ -161,8 +161,11 @@ public class Cleaner {
                 if (duration == lastDuration)
                     continue;
                 lastDuration = duration;
-                int noHits = rawHistogram.get(duration).total();
-                sum += noHits * duration;
+                long noHits = rawHistogram.get(duration).total();
+                long term = noHits * duration;
+                sum += term;
+                if (term < 0 || sum < 0)
+                    throw new ThisCannotHappenException("Internal overflow error!!! Please report.");
                 terms += noHits;
                 lookDownTable.put(duration, timingsIndex);
             }

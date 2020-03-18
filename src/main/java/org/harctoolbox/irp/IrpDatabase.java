@@ -44,6 +44,7 @@ import javax.xml.validation.Schema;
 import org.harctoolbox.ircore.DumbHtmlRenderer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
 import static org.harctoolbox.ircore.XmlUtils.HTML_NAMESPACE_URI;
@@ -667,7 +668,11 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     public IrSignal render(String protocolName, Map<String, Long> params) throws IrpException {
         Protocol protocol = getProtocolExpandAlias(protocolName);
-        return protocol.toIrSignal(params);
+        try {
+            return protocol.toIrSignal(params);
+        } catch (OddSequenceLengthException ex) {
+            throw new IrpException("IrSequence does not end with a gap,");
+        }
     }
 
     /**

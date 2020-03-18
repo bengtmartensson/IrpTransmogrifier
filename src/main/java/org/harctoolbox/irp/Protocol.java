@@ -34,6 +34,7 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
@@ -278,9 +279,10 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws org.harctoolbox.irp.NameUnassignedException
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      * @throws org.harctoolbox.irp.InvalidNameException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      * @throws DomainViolationException
      */
-    public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException {
+    public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException, OddSequenceLengthException {
         initializeDefinitions();
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
@@ -293,7 +295,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         return new IrSignal(intro, repeat, ending, getFrequencyWithDefault(), getDutyCycle());
     }
 
-    public IrSignal toIrSignal(Map<String, Long> params) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException {
+    public IrSignal toIrSignal(Map<String, Long> params) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException, OddSequenceLengthException {
         NameEngine nameEngine = new NameEngine(params);
         return toIrSignal(nameEngine);
     }
@@ -329,8 +331,9 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @return
      * @throws org.harctoolbox.irp.NameUnassignedException
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
      */
-    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException {
+    public ModulatedIrSequence toModulatedIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException, OddSequenceLengthException {
         return new ModulatedIrSequence(toIrSequence(nameEngine, pass), getFrequency(), getDutyCycle());
     }
 
@@ -345,7 +348,7 @@ public class Protocol extends IrpObject implements AggregateLister {
      * @throws org.harctoolbox.irp.IrpSyntaxException
      * @throws org.harctoolbox.irp.DomainViolationException
      */
-    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException {
+    private IrSequence toIrSequence(NameEngine nameEngine, Pass pass) throws NameUnassignedException, IrpInvalidArgumentException, OddSequenceLengthException {
         RenderData renderData = new RenderData(generalSpec, nameEngine);
         BitspecIrstream stream = extractBitspecIrstream(pass);
         stream.render(renderData, new ArrayList<>(0));

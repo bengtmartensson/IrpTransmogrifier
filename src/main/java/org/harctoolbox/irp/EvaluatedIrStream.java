@@ -41,14 +41,9 @@ final class EvaluatedIrStream {
      * @return
      * @throws OddSequenceLengthException
      */
-    private static IrSequence mkIrSequence(List<Double> durations) {
+    private static IrSequence mkIrSequence(List<Double> durations) throws OddSequenceLengthException {
         List<Double> interleaved = IrSequence.toInterleavingList(durations);
-        try {
-            //checkFixOddLength(interleaved, fixOdd);
-            return new IrSequence(interleaved);
-        } catch (OddSequenceLengthException ex) {
-            throw new ThisCannotHappenException();
-        }
+        return new IrSequence(interleaved);
     }
 
     private final List<Evaluatable> elements;
@@ -71,7 +66,7 @@ final class EvaluatedIrStream {
     }
 
 
-    IrSequence toIrSequence() throws NameUnassignedException, IrpInvalidArgumentException {
+    IrSequence toIrSequence() throws NameUnassignedException, IrpInvalidArgumentException, OddSequenceLengthException {
         List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
         for (Evaluatable element : elements) {

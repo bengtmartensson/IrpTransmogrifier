@@ -22,6 +22,7 @@ import com.beust.jcommander.ParameterException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -146,20 +147,28 @@ public final class IrpTransmogrifier implements CmdLineProgram {
             if (commandLineArgs.output != null)
                 out = IrCoreUtils.getPrintStream(commandLineArgs.output, commandLineArgs.encoding);
 
-            // Since we have help and version as subcommands, --help and --version
-            // are a little off. Keep them for compatibility, and
-            // map --help and --version to the subcommands
-            String command = commandLineArgs.helpRequested ? "help"
-                    : commandLineArgs.versionRequested ? "version"
-                    : argumentParser.getParsedCommand();
+        } catch (UnsupportedEncodingException | UsageException | FileNotFoundException ex) {
+            // Exceptions likely from silly user input, just print the exception
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+        } catch (IOException ex) {
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_FATAL_PROGRAM_FAILURE, ex.getLocalizedMessage());
+        }
 
-            if (command == null)
-                return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Command missing.");
+        // Since we have help and version as subcommands, --help and --version
+        // are a little off. Keep them for compatibility, and
+        // map --help and --version to the subcommands
+        String command = commandLineArgs.helpRequested ? "help"
+                : commandLineArgs.versionRequested ? "version"
+                : argumentParser.getParsedCommand();
 
-            boolean processed = processHelpAndDescription(command);
-            if (processed)
-                return new ProgramExitStatus();
+        if (command == null)
+            return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, "Command missing.");
 
+        boolean processed = processHelpAndDescription(command);
+        if (processed)
+            return new ProgramExitStatus();
+
+        try {
             switch (command) {
                 case "analyze":
                     commandAnalyze.analyze(out, commandLineArgs);
@@ -207,7 +216,8 @@ public final class IrpTransmogrifier implements CmdLineProgram {
             return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (OddSequenceLengthException ex) {
             return new ProgramExitStatus(PROGRAMNAME, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR,
-                    ex.getLocalizedMessage() + ". Consider using --trailinggap.");
+                    command.equals("render") ? "IrSequence does not end with a gap."
+                    : ex.getLocalizedMessage() + ". Consider using --trailinggap.");
         } catch (ParseCancellationException | InvalidArgumentException ex) {
             // When we get here,
             // Antlr has already written a somewhat sensible error message on

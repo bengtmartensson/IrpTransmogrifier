@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 
 public final class RenderData extends Traverser {
 
@@ -36,7 +37,7 @@ public final class RenderData extends Traverser {
         return evaluatedIrStreamList.get(evaluatedIrStreamList.size() - 1);
     }
 
-    IrSequence toIrSequence() throws NameUnassignedException, IrpInvalidArgumentException {
+    IrSequence toIrSequence() throws NameUnassignedException, IrpInvalidArgumentException, OddSequenceLengthException {
         return currentEvaluatedIrStream().toIrSequence();
     }
 

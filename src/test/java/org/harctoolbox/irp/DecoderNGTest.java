@@ -6,6 +6,7 @@ import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.Decoder.Decode;
@@ -105,7 +106,7 @@ public class DecoderNGTest {
                 }
             }
             return true;
-        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException ex) {
+        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException | OddSequenceLengthException ex) {
             throw new ThisCannotHappenException(ex);
         }
     }

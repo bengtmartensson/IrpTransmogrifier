@@ -36,6 +36,7 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.MultiParser;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
@@ -452,7 +453,7 @@ public class CommandAnalyze extends AbstractCommand {
                     int repeatDuration = (int) irSignal.getRepeatSequence().getTotalDuration();
                     int endingDuration = (int) irSignal.getEndingSequence().getTotalDuration();
                     out.println("timings = (" + introDuration + ", " + repeatDuration + ", " + endingDuration + ").");
-                } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException ex) {
+                } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException | OddSequenceLengthException ex) {
                     throw new ThisCannotHappenException(ex);
                 }
             }

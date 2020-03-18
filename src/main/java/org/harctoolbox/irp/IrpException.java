@@ -20,7 +20,7 @@ package org.harctoolbox.irp;
 /**
  * This class is a superclass of the exceptions thrown in the package.
  */
-public abstract class IrpException extends Exception {
+public class IrpException extends Exception {
 
     public IrpException(String message) {
         super(message);

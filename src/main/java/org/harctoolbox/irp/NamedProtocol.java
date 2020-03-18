@@ -31,6 +31,7 @@ import org.harctoolbox.ircore.DumbHtmlRenderer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.ircore.XmlUtils;
 import org.w3c.dom.Document;
@@ -298,7 +299,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
                 && auxParameters.equals(other.auxParameters);
     }
 
-    public IrSignal render(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException, ProtocolNotRenderableException {
+    public IrSignal render(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException, ProtocolNotRenderableException, OddSequenceLengthException {
         List<String> list = auxParameters.get(IrpDatabase.DECODE_ONLY_NAME);
         if (list != null)
             if (Boolean.parseBoolean(list.get(0)))

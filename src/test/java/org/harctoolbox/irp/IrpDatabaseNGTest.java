@@ -256,7 +256,7 @@ public class IrpDatabaseNGTest {
         assertEquals(props.size(), n+1);
         instance.removeProperties("nec1", "prefer-over");
         props = instance.getProperties("nec1", "prefer-over");
-        assertNull(props);
+        assertTrue(props.isEmpty());
     }
 
     @Test
@@ -330,9 +330,9 @@ public class IrpDatabaseNGTest {
 
         irpDatabase.getNamedProtocolExpandAlias("necropHile");
         necExecutors = irpDatabase.getProperties("nec1", "uei-executor");
-        assertNull(necExecutors);
+        assertTrue(necExecutors.isEmpty());
         aminoExecutors = irpDatabase.getXmlProperties("amino", "uei-executor");
-        assertNull(aminoExecutors);
+        assertTrue(aminoExecutors.isEmpty());
 
         NamedProtocol amino = irpDatabase.getNamedProtocol("amino");
         DocumentFragment doc = amino.getDocumentation();

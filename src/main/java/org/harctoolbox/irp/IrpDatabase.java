@@ -326,7 +326,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         expand(protocolName);
     }
 
-
     private Document emptyDocument() {
         Document doc = XmlUtils.newDocument(true);
         ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
@@ -524,9 +523,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return prot == null ? null : prot.getFirstProperty(key);
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> getProperties(String protocolName, String key) {
         UnparsedProtocol prot = getUnparsedProtocol(protocolName);
-        return prot == null ? null : prot.getProperties(key);
+        return prot == null ? Collections.EMPTY_LIST : prot.getProperties(key);
     }
 
     public void addProperty(String protocolName, String key, String value) throws UnknownProtocolException {
@@ -544,9 +544,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         prot.removeProperties(key);
     }
 
+    @SuppressWarnings("unchecked")
     public List<DocumentFragment> getXmlProperties(String protocolName, String key) {
         UnparsedProtocol prot = getUnparsedProtocol(protocolName);
-        return prot == null ? null : prot.getXmlProperties(key);
+        return prot == null ? Collections.EMPTY_LIST : prot.getXmlProperties(key);
     }
 
     public void setXmlProperties(String protocolName, String key, List<DocumentFragment> properties) throws UnknownProtocolException {
@@ -784,6 +785,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             });
         }
 
+        @SuppressWarnings("unchecked")
+        private static <T> List<T> getOrEmptyList(Map<String, List<T>> map, String key) {
+            List<T> list = map.get(key);
+            return list != null ? list : Collections.EMPTY_LIST;
+        }
+
         private Map<String, List<String>> map;
         private Map<String, List<DocumentFragment>> xmlMap;
 
@@ -899,8 +906,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             }
         }
 
-        List<DocumentFragment> getXmlProperties(String key) {
-            return xmlMap != null ? xmlMap.get(key) : null;
+        private List<DocumentFragment> getXmlProperties(String key) {
+            return getOrEmptyList(xmlMap, key);
         }
 
         void setXmlProperties(String key, List<DocumentFragment> list) {
@@ -911,8 +918,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             xmlMap.remove(key);
         }
 
-        List<String> getProperties(String key) {
-            return map.get(key);
+        private List<String> getProperties(String key) {
+            return getOrEmptyList(map, key);
         }
 
         void setProperties(String key, List<String> list) {
@@ -937,7 +944,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
         DocumentFragment getHtmlDocumentation() {
             List<DocumentFragment> list = getXmlProperties(DOCUMENTATION_NAME);
-            return list != null ? list.get(0) : null;
+            return list.isEmpty() ? null : list.get(0);
         }
 
         boolean isUsable() {

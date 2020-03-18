@@ -65,4 +65,11 @@
         <irp:documentation>Lorem Ipsum</irp:documentation>
     </irp:protocol>
 
+    <!-- Testing that both removal and addition of parameter values work together -->
+    <irp:protocol name="Aiwa">
+         <irp:parameter name="uei-executor">xxxxx</irp:parameter>
+        <irp:parameter name="uei-executor"/> <!-- nukes everything up until now -->
+        <irp:parameter name="uei-executor">9999[S;D,F]</irp:parameter>
+    </irp:protocol>
+
 </irp:protocols>

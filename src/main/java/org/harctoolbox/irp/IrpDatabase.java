@@ -752,7 +752,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         }
 
         private static <T> void patchMap(Map<String, List<T>> existingMap, Map<String, List<T>> patchMap) {
-            patchMap.entrySet().forEach((kvp) -> {
+            patchMap.entrySet().forEach((Map.Entry<String, List<T>> kvp) -> {
                 String name = kvp.getKey();
                 if (!(name.equals(NAME_NAME))) {
                     List<T> newList = kvp.getValue();
@@ -763,10 +763,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                         if (name.equals(DOCUMENTATION_NAME) || name.equals(IRP_NAME))
                             oldList.clear();
 
-                        for (T t : newList) {
-                            if (!oldList.contains(t))
+                        newList.forEach((t) -> {
+                            if (t == null)
+                                oldList.clear();
+                            else if (!oldList.contains(t))
                                 oldList.add(t);
-                        }
+                        });
                     } else {
                         existingMap.put(name, newList);
                     }
@@ -822,30 +824,22 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         }
 
         private void addXmlProperty(String key, DocumentFragment fragment) {
-            if (!fragment.hasChildNodes())
-                xmlMap.put(key, null);
-            else {
-                List<DocumentFragment> list = xmlMap.get(key);
-                if (list == null) {
-                    list = new ArrayList<>(1);
-                    xmlMap.put(key,list);
-                }
-                list.add(fragment);
+            List<DocumentFragment> list = xmlMap.get(key);
+            if (list == null) {
+                list = new ArrayList<>(1);
+                xmlMap.put(key, list);
             }
+            list.add(fragment.hasChildNodes() ? fragment : null);
         }
 
         private void addProperty(String key, String val) {
             String value = val.trim();
-            if (value.isEmpty())
-                map.put(key, null);
-            else {
-                List<String> list = map.get(key);
-                if (list == null) {
-                    list = new ArrayList<>(1);
-                    map.put(key,list);
-                }
-                list.add(value);
+            List<String> list = map.get(key);
+            if (list == null) {
+                list = new ArrayList<>(1);
+                map.put(key, list);
             }
+            list.add(value.isEmpty() ? null : value);
         }
 
         private void setUniqueProperty(String key, String value) {

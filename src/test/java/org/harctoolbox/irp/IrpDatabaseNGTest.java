@@ -345,6 +345,8 @@ public class IrpDatabaseNGTest {
         assertTrue(necExecutors.isEmpty());
         aminoExecutors = irpDatabase.getXmlProperties("amino", "uei-executor");
         assertTrue(aminoExecutors.isEmpty());
+        List<String> aiwaExecutors = irpDatabase.getProperties("aiwa", "uei-executor");
+        assertEquals(aiwaExecutors.size(), 1);
 
         NamedProtocol amino = irpDatabase.getNamedProtocol("amino");
         DocumentFragment doc = amino.getDocumentation();

@@ -97,9 +97,10 @@ public class IrpDatabaseNGTest {
 
     /**
      * Test of getIrp method, of class IrpDatabase.
+     * @throws org.harctoolbox.irp.UnknownProtocolException
      */
     @Test
-    public void testGetIrp_String() {
+    public void testGetIrp_String() throws UnknownProtocolException {
         System.out.println("getIrp");
         String name = "NEC1";
         String expResult = "{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]";
@@ -107,7 +108,11 @@ public class IrpDatabaseNGTest {
         assertEquals(result, expResult);
         name = "RC6-6-32";
         expResult = "{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T) {OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]";
-        assertEquals(instance.getIrp(name), null);
+        try {
+            instance.getIrp(name);
+            fail();
+        } catch (UnknownProtocolException ex) {
+        }
         assertEquals(instance.getIrpExpandAlias(name), expResult);
     }
 
@@ -123,23 +128,29 @@ public class IrpDatabaseNGTest {
 
     /**
      * Test of getName method, of class IrpDatabase.
+     * @throws org.harctoolbox.irp.UnknownProtocolException
      */
     @Test
-    public void testGetName() {
+    public void testGetName() throws UnknownProtocolException {
         System.out.println("getName");
         String name = "nec1";
         String expResult = "NEC1";
         String result = instance.getName(name);
         assertEquals(result, expResult);
-        assertEquals(instance.getName("rc6-6-32"), null);
+        try {
+            instance.getName("rc6-6-32");
+            fail();
+        } catch (UnknownProtocolException ex) {
+        }
         assertEquals(instance.getNameExpandAlias("rc6-6-32"), "MCE");
     }
 
     /**
      * Test of getCName method, of class IrpDatabase.
+     * @throws org.harctoolbox.irp.UnknownProtocolException
      */
     @Test
-    public void testGetCName() {
+    public void testGetCName() throws UnknownProtocolException {
         System.out.println("getCName");
         String name = "48-nec1";
         String expResult = "x48_NEC1";
@@ -149,9 +160,10 @@ public class IrpDatabaseNGTest {
 
     /**
      * Test of getCName method, of class IrpDatabase.
+     * @throws org.harctoolbox.irp.UnknownProtocolException
      */
     @Test
-    public void testGetCName1() {
+    public void testGetCName1() throws UnknownProtocolException {
         System.out.println("getCName1");
         String name = "Blaupunkt_relaxed";
         String expResult = "Blaupunkt_relaxed";
@@ -167,7 +179,7 @@ public class IrpDatabaseNGTest {
     public void testGetMatchingNamesRegexp() {
         System.out.println("getMatchingNamesRegexp");
         String regexp = "NEC.*";
-        List result = instance.getMatchingNamesRegexp(regexp);
+        List<String> result = instance.getMatchingNamesRegexp(regexp);
         assertEquals(result.size(), 11);
         result = instance.getMatchingNamesRegexp("RC6.*");
         assertTrue(result.contains("rc6-6-32"));

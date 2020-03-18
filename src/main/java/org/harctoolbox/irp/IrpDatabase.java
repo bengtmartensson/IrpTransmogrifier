@@ -139,15 +139,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
      * @param protocolName
      * @return String with IRP representation
      * @throws org.harctoolbox.irp.IrpParseException
+     * @throws org.harctoolbox.irp.UnknownProtocolException
+     * @throws java.io.IOException
      */
-    public static String getIrp(String configFilename, String protocolName) throws IrpParseException {
-        try {
-            IrpDatabase irpMaster = new IrpDatabase(configFilename);
-            return irpMaster.getIrp(protocolName);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            return null;
-        }
+    public static String getIrp(String configFilename, String protocolName) throws IrpParseException, UnknownProtocolException, IOException {
+        IrpDatabase irpMaster = new IrpDatabase(configFilename);
+        return irpMaster.getIrp(protocolName);
     }
 
     public static IrpDatabase parseIrp(String protocolName, String irp, String documentation) throws IrpParseException {
@@ -404,20 +401,16 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return isKnown(expandAlias(protocol));
     }
 
-    public String getIrp(String name) {
+    public String getIrp(String name) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(name);
-        return prot == null ? null : prot.getIrp();
+        return prot.getIrp();
     }
 
-    public String getIrpExpandAlias(String name) {
+    public String getIrpExpandAlias(String name) throws UnknownProtocolException {
         return getIrp(expandAlias(name));
     }
 
-    private UnparsedProtocol getUnparsedProtocol(String name) {
-        return protocols.get(name.toLowerCase(Locale.US));
-    }
-
-    private UnparsedProtocol getUnparsedProtocolNonNull(String protocolName) throws UnknownProtocolException {
+    private UnparsedProtocol getUnparsedProtocol(String protocolName) throws UnknownProtocolException {
         UnparsedProtocol unparsedProtocol = protocols.get(protocolName.toLowerCase(Locale.US));
         if (unparsedProtocol == null)
             throw new UnknownProtocolException(protocolName);
@@ -444,20 +437,18 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return aliases.keySet();
     }
 
-    public String getName(String name) {
+    public String getName(String name) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(name);
-        return prot == null ? null : prot.getName();
+        return prot.getName();
     }
 
-    public String getCName(String name) {
+    public String getCName(String name) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(name);
-        if (prot == null)
-            return null;
         String storedCName = prot.getCName();
         return storedCName != null ? storedCName : IrpUtils.toCIdentifier(prot.getName());
     }
 
-    public String getNameExpandAlias(String name) {
+    public String getNameExpandAlias(String name) throws UnknownProtocolException {
         return getName(expandAlias(name));
     }
 
@@ -509,8 +500,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     public DocumentFragment getHtmlDocumentation(String protocolName) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(protocolName);
-        if (prot == null)
-            throw new UnknownProtocolException(protocolName);
         return prot.getHtmlDocumentation();
     }
 
@@ -518,50 +507,50 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return getDocumentation(expandAlias(protocolName));
     }
 
-    public String getFirstProperty(String protocolName, String key) {
+    public String getFirstProperty(String protocolName, String key) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(protocolName);
-        return prot == null ? null : prot.getFirstProperty(key);
+        return prot.getFirstProperty(key);
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getProperties(String protocolName, String key) {
+    public List<String> getProperties(String protocolName, String key) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(protocolName);
-        return prot == null ? Collections.EMPTY_LIST : prot.getProperties(key);
+        return prot.getProperties(key);
     }
 
     public void addProperty(String protocolName, String key, String value) throws UnknownProtocolException {
-        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         prot.addProperty(key, value);
     }
 
     public void setProperties(String protocolName, String key, List<String> properties) throws UnknownProtocolException {
-        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         prot.setProperties(key, properties);
     }
 
     public void removeProperties(String protocolName, String key) throws UnknownProtocolException {
-        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         prot.removeProperties(key);
     }
 
     @SuppressWarnings("unchecked")
-    public List<DocumentFragment> getXmlProperties(String protocolName, String key) {
+    public List<DocumentFragment> getXmlProperties(String protocolName, String key) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(protocolName);
-        return prot == null ? Collections.EMPTY_LIST : prot.getXmlProperties(key);
+        return prot.getXmlProperties(key);
     }
 
     public void setXmlProperties(String protocolName, String key, List<DocumentFragment> properties) throws UnknownProtocolException {
-        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         prot.setXmlProperties(key, properties);
     }
 
     public void removeXmlProperties(String protocolName, String key) throws UnknownProtocolException {
-        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         prot.removeProperties(key);
     }
 
     public NamedProtocol getNamedProtocol(String protocolName) throws UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
-        UnparsedProtocol prot = getUnparsedProtocolNonNull(protocolName);
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
         return prot.toNamedProtocol();
     }
 
@@ -591,7 +580,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     private void expand(int depth, String name) throws IrpParseException {
-        UnparsedProtocol p = getUnparsedProtocol(name);
+        UnparsedProtocol p = protocols.get(name.toLowerCase(Locale.US));
         if (!p.getIrp().contains("{"))
             throw new IrpParseException(p.getIrp(), "`{' not found.");
 

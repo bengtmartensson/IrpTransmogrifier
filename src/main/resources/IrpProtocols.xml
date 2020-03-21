@@ -130,7 +130,7 @@ as "Incomplete signal".
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
-               version="2019-12-22"
+               version="2020-03-21"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
     <irp:protocol name="48-NEC">
@@ -368,9 +368,9 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         </irp:documentation>
     </irp:protocol>
     <irp:protocol name="Denon-K">
-        <irp:parameter name="uei-executor">00CD[D;S,F]</irp:parameter>
-	<irp:parameter name="uei-executor">01C8[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3,D?4,S?4,D?5,S?5;0,,,??,F]</irp:parameter>
-	<irp:parameter name="uei-executor">01AC[D,S;0,,,F]</irp:parameter>
+        <irp:parameter name="uei-executor">00CD:2[D;S,F]</irp:parameter>
+        <irp:parameter name="uei-executor">01C8[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3,D?4,S?4,D?5,S?5;0,,,??,F]</irp:parameter>
+        <irp:parameter name="uei-executor">01AC[D,S;0,,,F]</irp:parameter>
         <irp:parameter name="prefer-over">Kaseikyo</irp:parameter>
         <irp:irp><![CDATA[{37k,432}<1,-1|1,-3>(8,-4,84:8,50:8,0:4,D:4,S:4,F:12,((D*16)^S^(F*16)^(F:8:4)):8,1,-173)* [D:0..15,S:0..15,F:0..4095]]]></irp:irp>
         <irp:documentation>
@@ -420,10 +420,8 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     </irp:protocol>
     <irp:protocol name="DirecTV_P0">
         <irp:parameter name="uei-executor" type="xml">
-            <rm:deployment executor="0162[D,Parm;F]">
+            <rm:deployment executor="0162{Parm=0}[D,Parm;F]">
                 <rm:protocolName>DirecTV</rm:protocolName>
-                <rm:assignment target="Parm">0</rm:assignment>
-                <!--rm:assignment target="D">10*D+Parm</rm:assignment-->
             </rm:deployment>
         </irp:parameter>
         <irp:parameter name="min-leadout">7000</irp:parameter>
@@ -446,10 +444,8 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     </irp:protocol>
     <irp:protocol name="DirecTV_P1">
         <irp:parameter name="uei-executor" type="xml">
-            <rm:deployment executor="0162[D,Parm;F]">
+            <rm:deployment executor="0162{Parm=1}[D,Parm;F]">
                 <rm:protocolName>DirecTV</rm:protocolName>
-                <rm:assignment target="Parm">1</rm:assignment>
-                <!--rm:assignment target="D">10*D+Parm</rm:assignment-->
             </rm:deployment>
         </irp:parameter>
         <irp:parameter name="frequency-tolerance">1000</irp:parameter>
@@ -472,10 +468,8 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     </irp:protocol>
     <irp:protocol name="DirecTV_P2">
         <irp:parameter name="uei-executor" type="xml">
-            <rm:deployment executor="0162[D,Parm;F]">
+            <rm:deployment executor="0162{Parm=2}[D,Parm;F]">
                 <rm:protocolName>DirecTV</rm:protocolName>
-                <rm:assignment target="Parm">2</rm:assignment>
-                <!--rm:assignment target="D">10*D+Parm</rm:assignment-->
             </rm:deployment>
         </irp:parameter>
         <irp:parameter name="min-leadout">7000</irp:parameter>
@@ -501,10 +495,8 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:parameter name="frequency-tolerance">1000</irp:parameter>
         <irp:parameter name="prefer-over">DirecTV_P2</irp:parameter>
         <irp:parameter name="uei-executor" type="xml">
-            <rm:deployment executor="0162[D,Parm;F]">
+            <rm:deployment executor="0162{Parm=3}[D,Parm;F]">
                 <rm:protocolName>DirecTV</rm:protocolName>
-                <rm:assignment target="Parm">3</rm:assignment>
-                <!--rm:assignment target="D">10*D+Parm</rm:assignment-->
             </rm:deployment>
         </irp:parameter>
         <irp:irp><![CDATA[{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]></irp:irp>
@@ -525,7 +517,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     </irp:protocol>
     <irp:protocol name="DirecTV_P4">
         <irp:parameter name="uei-executor" type="xml">
-            <rm:deployment executor="0162[D,Parm;F]">
+            <rm:deployment executor="0162{Parm=4}[D,Parm;F]">
                 <rm:protocolName>DirecTV</rm:protocolName>
                 <rm:assignment target="Parm">4</rm:assignment>
                 <!--rm:assignment target="D">10*D+Parm</rm:assignment-->
@@ -551,10 +543,8 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     </irp:protocol>
     <irp:protocol name="DirecTV_P5">
         <irp:parameter name="uei-executor" type="xml">
-            <rm:deployment executor="0162[D,Parm;F]">
+            <rm:deployment executor="0162{Parm=5}[D,Parm;F]">
                 <rm:protocolName>DirecTV</rm:protocolName>
-                <rm:assignment target="Parm">5</rm:assignment>
-		<!--rm:assignment target="D">10*D+Parm</rm:assignment-->
             </rm:deployment>
         </irp:parameter>
 	<irp:parameter name="frequency-tolerance">1000</irp:parameter>
@@ -1089,6 +1079,9 @@ C3=D:1:2 + #(F&44) + #(D&2)
 	<irp:parameter name="uei-executor">005A(NEC1)</irp:parameter>
 	<irp:parameter name="uei-executor">005A(NEC2)</irp:parameter>
 	<irp:parameter name="uei-executor">01AD[;D,S,F:8,~F:8]</irp:parameter>
+        <irp:parameter name="uei-executor">011A:JP1[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,,0]</irp:parameter>
+        <irp:parameter name="uei-executor">01BA[D,S;F:8,~F:8]</irp:parameter>
+        <irp:parameter name="uei-executor">01EA(;S==~D:8)[F,~F:8;D]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m) [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
         <irp:documentation>
             Inspired by <a href="#DecodeIR">DecodeIR</a>, we call a NEC signal without <a href="#repeat">repeat</a> "NEC".
@@ -1097,6 +1090,22 @@ C3=D:1:2 + #(F&44) + #(D&2)
     </irp:protocol>
     <irp:protocol name="NEC-f16">
         <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="011A:JP1{X=F^E^129,Y=2*X:1+X:1:7,E=-1}(;X:6:1==63)[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,,Y]">
+                <rm:protocolName>NEC-Yamaha</rm:protocolName>
+                <rm:translator target="Y">YStyle=NEC|Y1|Y2|Y3</rm:translator>
+                <rm:assignment target="X">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01AD[;D,S,F,E]">
+                <rm:assignment target="OBC2">E</rm:assignment>
+                <rm:assignment target="E">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor">01BA[D,S;F,E]</irp:parameter>
+        <irp:parameter name="uei-executor">01FF:JP1f16[D,S,F;E]</irp:parameter>
+        <irp:parameter name="uei-executor">01EA(;S==~D:8)[F,E;D]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,E:8,1,^108m) [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
         <irp:documentation>
             A relaxed form (but used in some real devices) of the <a href="#NEC">NEC</a> protocol. Byte 3 and byte 4 are independent.
@@ -1130,6 +1139,9 @@ C3=D:1:2 + #(F&44) + #(D&2)
 	<irp:parameter name="uei-executor">00B6[D;S,F]</irp:parameter>
 	<irp:parameter name="uei-executor">00B6:JP1[D,0;S,F]</irp:parameter>
 	<irp:parameter name="uei-executor">01AD[;D,S,F:8,~F:8]</irp:parameter>
+        <irp:parameter name="uei-executor">011A:JP1[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,0,0]</irp:parameter>
+        <irp:parameter name="uei-executor">01BA[D,S;F:8,~F:8]</irp:parameter>
+        <irp:parameter name="uei-executor">01EA(;S==~D:8)[F,~F:8;D,0]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
         <irp:documentation>
             The most commonly used version of the NEC protocol, repeating with <a href="#dittos">dittos</a>.
@@ -1140,9 +1152,22 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <irp:parameter name="prefer-over">NEC-f16</irp:parameter>
         <irp:parameter name="reject-repeatless">true</irp:parameter>
-	<irp:parameter name="uei-executor">01AD[;D,S,F:8,E:8]</irp:parameter>
-	<irp:parameter name="uei-executor">01BA[D,S;F:8,E:8]</irp:parameter>
-	<irp:parameter name="uei-executor">01AD[;D,S,F:8,E:8]</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="011A:JP1{X=F^E^129,Y=2*X:1+X:1:7,E=-1}(;X:6:1==63)[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,0,Y]">
+                <rm:protocolName>NEC1-Yamaha</rm:protocolName>
+                <rm:translator target="Y">YStyle=NEC|Y1|Y2|Y3</rm:translator>
+                <rm:assignment target="X">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01AD[;D,S,F,E]">
+                <rm:assignment target="OBC2">E</rm:assignment>
+                <rm:assignment target="E">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor">01BA[D,S;F,E]</irp:parameter>
+        <irp:parameter name="uei-executor">01FF:JP1f16[D,S,F;E]</irp:parameter>
+        <irp:parameter name="uei-executor">01EA(;S==~D:8)[F,E;D,0]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,E:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
         <irp:documentation>
             A relaxed form (but used in some real devices) of the <a href="#NEC1">NEC1</a> protocol. Byte 3 and byte 4 are independent.
@@ -1152,6 +1177,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="prefer-over">NEC1-f16</irp:parameter>
         <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
 	<irp:parameter name="uei-executor">0206</irp:parameter>
+        <irp:parameter name="uei-executor"><![CDATA[01AD[;D,S,F,~(((F:4)<<4)|F:4:4):8]]]></irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:4:4,~F:4,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
         <irp:documentation>
             Variant of the <a href="#NEC1">NEC1</a> protocol with the checksum in byte 4 different.
@@ -1169,6 +1195,8 @@ C3=D:1:2 + #(F&44) + #(D&2)
 	<irp:parameter name="uei-executor">017E[D,S?0,S?1,S?2,S?3;??,,F,1]</irp:parameter>
 	<irp:parameter name="uei-executor">0246[D,S?0,S?1,S?2,S?3,S?4,S?5;??,,F,1]</irp:parameter>
 	<irp:parameter name="uei-executor">00B6:JP1[D,1;S,F]</irp:parameter>
+        <irp:parameter name="uei-executor">01EA(;S==~D:8)[F,~F:8;D,1]</irp:parameter>
+        <irp:parameter name="uei-executor">011A:JP1[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,1,0]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
         <irp:documentation>
             A variant of the NEC protocol, that repeats by repeating the whole intro sequence.
@@ -1179,24 +1207,72 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
         <!--irp:parameter name="prefer-over">Pioneer</irp:parameter-->
         <irp:parameter name="reject-repeatless">true</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="011A:JP1{X=F^E^129,Y=2*X:1+X:1:7,E=-1}(;X:6:1==63)[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,1,Y]">
+                <rm:protocolName>NEC2-Yamaha</rm:protocolName>
+                <rm:translator target="Y">YStyle=NEC|Y1|Y2|Y3</rm:translator>
+                <rm:assignment target="X">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01FF:JP1f16[D,S,F,1;E]">
+                <rm:assignment target="OBC2">E</rm:assignment>
+                <rm:assignment target="E">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor">01EA(;S==~D:8)[F,E;D,1]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,E:8,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
         <irp:documentation>
             A relaxed form (but used in some real devices) of the <a href="#NEC2">NEC2</a> protocol. Byte 3 and byte 4 are independent.
         </irp:documentation>
     </irp:protocol>
     <irp:protocol name="NECx1">
-        <!--irp:parameter name="reject-repeatless">true</irp:parameter-->
+        <irp:parameter name="reject-repeatless">true</irp:parameter>
+        <irp:parameter name="prefer-over">NECx1-f16</irp:parameter>
 	<irp:parameter name="uei-executor">005A</irp:parameter>
 	<irp:parameter name="uei-executor">011A[D?0,S?0,D?1,S?1;F,??,2]</irp:parameter>
 	<irp:parameter name="uei-executor">011A:2[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,2]</irp:parameter>
+        <irp:parameter name="uei-executor">011A:JP1[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,2,0]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(8,-8,D:8,S:8,F:8,~F:8,1,^108m,(8,-8,D:1,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
+    </irp:protocol>
+    <irp:protocol name="NECx1-f16">
+        <irp:parameter name="prefer-over">NECx-f16</irp:parameter>
+        <irp:parameter name="reject-repeatless">true</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="011A:JP1{X=F^E^129,Y=2*X:1+X:1:7,E=-1}(;X:6:1==63)[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,2,Y]">
+                <rm:protocolName>NECx1-Yamaha</rm:protocolName>
+                <rm:translator target="Y">YStyle=NEC|Y1|Y2|Y3</rm:translator>
+                <rm:assignment target="X">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(8,-8,D:8,S:8,F:8,E:8,1,^108m,(8,-8,D:1,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
+        <irp:documentation>
+            A relaxed form (but used in some real devices) of the <a href="#NECx1">NECx1</a> protocol. Byte 3 and byte 4 are independent.
+       </irp:documentation>
     </irp:protocol>
     <irp:protocol name="NECx2">
         <!--irp:parameter name="reject-repeatless">true</irp:parameter-->
+        <irp:parameter name="prefer-over">NECx2-f16</irp:parameter>
 	<irp:parameter name="uei-executor">005A</irp:parameter>
 	<irp:parameter name="uei-executor">011A[D?0,S?0,D?1,S?1;F,??,3]</irp:parameter>
 	<irp:parameter name="uei-executor">011A:2[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,3]</irp:parameter>
+        <irp:parameter name="uei-executor">011A:JP1[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,3,0]</irp:parameter>
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(8,-8,D:8,S:8,F:8,~F:8,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255]]]></irp:irp>
+    </irp:protocol>
+    <irp:protocol name="NECx2-f16">
+        <irp:parameter name="prefer-over">NECx-f16</irp:parameter>
+        <irp:parameter name="reject-repeatless">true</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="011A:JP1{X=F^E^129,Y=2*X:1+X:1:7,E=-1}(;X:6:1==63)[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,3,Y]">
+                <rm:protocolName>NECx2-Yamaha</rm:protocolName>
+                <rm:translator target="Y">YStyle=NEC|Y1|Y2|Y3</rm:translator>
+                <rm:assignment target="X">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(8,-8,D:8,S:8,F:8,E:8,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
+        <irp:documentation>
+            A relaxed form (but used in some real devices) of the <a href="#NECx2">NECx2</a> protocol. Byte 3 and byte 4 are independent.
+       </irp:documentation>
     </irp:protocol>
     <irp:protocol name="Nokia">
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>

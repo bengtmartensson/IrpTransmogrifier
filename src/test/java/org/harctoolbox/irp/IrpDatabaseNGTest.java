@@ -79,7 +79,7 @@ public class IrpDatabaseNGTest {
         System.out.println("getConfigFileVersion");
         String result = instance.getConfigFileVersion();
         // Don't want to update this file everytime the version number changes...
-        assertEquals(result.substring(0, 3), "201");
+        assertEquals(result.substring(0, 3), "202");
     }
 
     /**

@@ -1,4 +1,4 @@
-IRPTRANSMOGRIFIER := ../../../tools/irptransmogrifier --quiet --min-leadout 10000
+IRPTRANSMOGRIFIER := ../../../tools/irptransmogrifier --quiet --min-leadout 10000 --encoding us-ascii
 ICTPARSE := ../../../contributed/input-filters/ict.sh
 DIFF := diff -w
 

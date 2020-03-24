@@ -46,6 +46,7 @@ setversion:
 
 deploy:
 	mvn deploy -P release
+	@echo Possibly you need to update harctoolbox.org? At least IrpTransmogrifier.releasenotes.txt?
 
 apidoc: target/site/apidocs
 	$(BROWSE) $</index.html

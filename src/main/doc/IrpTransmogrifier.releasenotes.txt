@@ -4,6 +4,20 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
+2020-03-24: Version 1.2.5
+
+* IrpProtocols.xml: Merge protocol updates from RemoteMaster 2.10b2.
+* Better error messages for rendered IrSequences not ending with gap. #158.
+* Bugfix: IrpDatabase patch problems. #160.
+* API: IrpDatabase API fixes; avoid return null. #159.
+* Bugfix: overflow problem with very large data sets in --namedinput. #157.
+* IrCoreUtils.parseLong improvements.
+* list command: hide some ("expert") options. --all new option.
+* Improve decoding of short Pronto hex (slightly more forgiving).
+* Fixed decoder bug in Extent.decode. #156.
+* render, bitfield, expression: --parameters now synonym for --nameengine. #155.
+
+===============================================================================
 2020-01-15: Version 1.2.4
 
 * Code generation xml: Some fixes, more attributes, in particular tolerances.

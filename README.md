@@ -146,12 +146,12 @@ like
 
 ## Dependencies
 The program depends on [ANTLR4](https://www.antlr.org) ([license](https://github.com/antlr/antlr4/blob/master/LICENSE.txt)),
-[Stringtemplate](https://www.stringtemplate.org/), ([license](https://github.com/antlr/stringtemplate4/blob/master/LICENSE.txt),
+[Stringtemplate](https://www.stringtemplate.org/), ([license](https://github.com/antlr/stringtemplate4/blob/master/LICENSE.txt)),
 as well as the command line decoder [JCommander](http://jcommander.org/). (licensed under the [Apache 2 license](https://github.com/cbeust/jcommander/blob/master/license.txt)).
 When using Maven for building, these are automatically downloaded and installed.
 
 ## Usage
-Using from the command line, this is a command with subcommands. Before the sub command,
+Using from the command line, this is a command with sub commands. Before the sub command,
 common options can be given. After the command, command-specific options can be specified.
 Commands and option names can be abbreviated, as long as the abbreviation is unique.
 They are matched case sensitively, and can be abbreviated as long as the abbreviation is unambiguous.
@@ -394,14 +394,14 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     list      List protocols and their properites.
       Usage: list [options] List of protocols (default all)
         Options:
+          -a, --all
+            Implies (almost) all of the "list xxx"-options.
+            Default: false
           --check-sorted
             Check if the protocol are alphabetically.
             Default: false
           -c, --classify
             Classify the protocol(s).
-            Default: false
-          --cname
-            List C name of the protocol(s).
             Default: false
           --describe
             Print a possibly longer documentation for the present command.
@@ -431,9 +431,6 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -n, --normalform
             List the normal form.
-            Default: false
-          -p, --parsedirp
-            List IRP form, as parsed.
             Default: false
           --prefer-overs
             List all protocol's prefer-overs, recursively
@@ -467,13 +464,13 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -m, --modulate
             Generate modulated form (EXPERIMENTAL)
             Default: false
-          -n, --nameengine
+          -n, --nameengine, --parameters
             Name Engine to use
             Default: <empty string>
           --number-repeats
             Generate an IR sequence containing the given number of repeats
-          -P, --printparameters, --parameters
-            Print used parameters values
+          -P, --printparameters
+            Print actual parameters values, for example by --random
             Default: false
           -p, --pronto, --ccf, --hex
             Generate Pronto hex.
@@ -669,7 +666,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -l, --lsb
             Output bitstream with least significant bit first.
             Default: false
-          -n, --nameengine
+          -n, --nameengine, --parameters
             Define a name engine for resolving the bitfield.
             Default: <empty string>
           --xml
@@ -685,7 +682,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -h, -?, --help
             Print help for this command.
-          -n, --nameengine
+          -n, --nameengine, --parameters
             Define a name engine to use for evaluating.
             Default: <empty string>
           -r, --radix

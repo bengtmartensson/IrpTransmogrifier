@@ -44,7 +44,6 @@ import org.harctoolbox.irp.BitCounter;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.DomainViolationException;
 import org.harctoolbox.irp.DuplicateFinder;
-import org.harctoolbox.irp.Expression;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
 import org.harctoolbox.irp.Name;
@@ -416,24 +415,34 @@ public class CommandAnalyze extends AbstractCommand {
 
                 if (parameterTable) {
                     out.println();
-                    out.println("Parameter table:");
+                    out.print("Parametertable:\t");
+                    for (int i = 0; i < parameterNames.size(); i++)
+                        out.print("\t" + parameterNames.get(i) + ":" + parameterWidths.get(i));
+                    out.println();
                     for (int i = 0; i < protocols.size(); i++) {
                         if (protocols.size() > 1)
                             out.print(names != null
                                     ? (names[i] + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names[i].length() + 1)))
                                     : ("#" + i + "\t"));
                         Protocol protocol = protocols.get(i);
-                        NameEngine definitions = protocol.getDefinitions();
-                        for (Map.Entry<String, Expression> definition : definitions) {
-                            String name = definition.getKey();
-                            int length = protocol.guessParameterLength(name);
-                            Number num = definition.getValue().toNumber();
-                            out.print("\t" + num.formatIntegerWithLeadingZeros(radix, length));
-                        }
-                        out.println();
+                        Iterable<String> parameters = parameterNames.isEmpty() ? protocol.getDefinitions().toMap().keySet() : parameterNames;
+                        printParameters(parameters, protocol);
                     }
                 }
             }
+        }
+
+        private void printParameters(Iterable<String> parameterNames, Protocol protocol) {
+            for (String name : parameterNames) {
+                try {
+                    int length = protocol.guessParameterLength(name);
+                    Number num = protocol.getDefinitions().get(name).toNumber();
+                    out.print("\t" + num.formatIntegerWithLeadingZeros(radix, length));
+                } catch (NameUnassignedException ex) {
+                    throw new ThisCannotHappenException(ex);
+                }
+            }
+            out.println();
         }
 
         private void printAnalyzedProtocol(Protocol protocol, int radix, boolean usePeriods, boolean printWeight, boolean printTimings) {

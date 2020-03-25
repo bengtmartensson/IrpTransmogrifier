@@ -491,6 +491,7 @@ public class LircIrpNGTest {
      * Test of toProtocol method, of class LircIrp.
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testToProtocol() {
         System.out.println("toProtocol");
         Protocol result;

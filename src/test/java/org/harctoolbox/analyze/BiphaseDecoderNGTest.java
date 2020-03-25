@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 /**
  *
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class BiphaseDecoderNGTest {
 
     private static final int[] rc5_12_3_1 = new int[] {

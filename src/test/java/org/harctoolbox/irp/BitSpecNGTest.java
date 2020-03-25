@@ -10,6 +10,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class BitSpecNGTest {
 
     private static final String NEC1_BITSPEC = "<1,-1|1,-3>";

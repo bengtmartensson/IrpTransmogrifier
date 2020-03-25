@@ -71,6 +71,7 @@ public class CmdUtils {
         return errBytes;
     }
 
+   @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static String restoreStdErr(ByteArrayOutputStream errBytes) {
         System.err.flush();
         System.err.close();

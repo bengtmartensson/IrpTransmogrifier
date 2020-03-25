@@ -37,7 +37,10 @@ import static javax.xml.XMLConstants.XML_NS_PREFIX;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -231,6 +234,7 @@ public final class XmlUtils {
         printDOM(ostr, doc, encoding, cdataElements, null);
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void printDOM(File file, Document doc, String encoding, String cdataElements, String doctypeSystemid) throws FileNotFoundException {
         printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements, doctypeSystemid);
         logger.log(Level.INFO, "File {0} written.", file);
@@ -253,6 +257,7 @@ public final class XmlUtils {
         printDOM(file, doc, null, null, null);
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void printDOM(Document doc) {
         printDOM(System.out, doc, null, null);
     }
@@ -383,6 +388,7 @@ public final class XmlUtils {
         return fragment;
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         try {
             Schema schema = args.length > 1 ? readSchemaFromFile(new File(args[1])) : null;

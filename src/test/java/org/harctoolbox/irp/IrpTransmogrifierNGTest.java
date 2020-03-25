@@ -19,6 +19,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class IrpTransmogrifierNGTest {
 
     private static final String IRPPROTOCOLS_XML="src/main/resources/IrpProtocols.xml";

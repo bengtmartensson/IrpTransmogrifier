@@ -8,21 +8,21 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class MultiParserNGTest {
 
-
-    private static final String listOfFour = "[-3 -5][3. +55][-1212 234] [+434343 777]";
-    private static final String listOfFourErroneous = "[-3 -5][3. +55][-1212 234][+434343 777 333]";
-    private static final String nec1captured = "f=38461 +9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538 -65535";
-    private static final String nec1capturedOdd = "f=38461 +9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538";
-    private static final String nec1 = "+9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538 -65535";
-    private static final String nec1Odd = "+9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538";
-    private static final String nec1Repeat = "+9024 -4512 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -44268"
+    private static final String LIST_OF_FOUR = "[-3 -5][3. +55][-1212 234] [+434343 777]";
+    private static final String LIST_OF_FOUR_ERRONEOUS = "[-3 -5][3. +55][-1212 234][+434343 777 333]";
+    private static final String NEC1CAPTURED = "f=38461 +9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538 -65535";
+    private static final String NEC1_CAPTURED_ODD = "f=38461 +9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538";
+    private static final String NEC1 = "+9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538 -65535";
+    private static final String NEC1_ODD = "+9003 -4513 +566 -561 +564 -559 +564 -561 +564 -562 +564 -561 +564 -559 +566 -559 +564 -1687 +566 -1685 +566 -1687 +564 -1687 +564 -1687 +566 -1687 +564 -1687 +566 -1685 +566 -1686 +566 -1687 +566 -1685 +566 -1687 +564 -1688 +566 -1685 +566 -561 +564 -559 +564 -561 +564 -561 +564 -561 +564 -559 +566 -559 +564 -561 +564 -1687 +566 -1685 +566 -1688 +564 -38886 +9001 -2289 +538";
+    private static final String NEC1_REPEAT = "+9024 -4512 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -44268"
             + "+9024 -2256 +564 -96156";
-    private static final String ortekmceBracketed = "[+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +480 -480 +960 -480 +480 -48480]"
+    private static final String ORTEK_MCE_BRACKETED = "[+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +480 -480 +960 -480 +480 -48480]"
             + "[+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -48480]"
             + "[+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -48480]";
-    private static final String ortekmceMultiline = "+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +480 -480 +960 -480 +480 -48480\n"
+    private static final String ORTEK_MCE_MULTILINE = "+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +480 -480 +960 -480 +480 -48480\n"
             + "+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -48480\r\n"
             + "+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -48480";
 
@@ -98,7 +98,7 @@ public class MultiParserNGTest {
     public void testToList_double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toList");
         double chop = 30000.0;
-        MultiParser instance = MultiParser.newIrCoreParser(nec1Repeat);
+        MultiParser instance = MultiParser.newIrCoreParser(NEC1_REPEAT);
         List<IrSequence> result = instance.toListChop(chop);
         assertEquals(result.get(1).getLength(), 4);
      }
@@ -111,12 +111,12 @@ public class MultiParserNGTest {
     @SuppressWarnings("UnusedAssignment")
     public void testToList_0args() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toList");
-        MultiParser instance = MultiParser.newIrCoreParser(listOfFour);
+        MultiParser instance = MultiParser.newIrCoreParser(LIST_OF_FOUR);
         //List expResult = null;
         List<IrSequence> result = instance.toList();
         assertEquals(result.size(), 4);
 
-        instance = MultiParser.newIrCoreParser(listOfFourErroneous);
+        instance = MultiParser.newIrCoreParser(LIST_OF_FOUR_ERRONEOUS);
         try {
             instance.toList();
             fail();
@@ -132,7 +132,7 @@ public class MultiParserNGTest {
     public void testToModulatedIrSequence_Double_double() throws InvalidArgumentException {
         System.out.println("toModulatedIrSequence");
         double dummyGap = 3333.0;
-        MultiParser instance = MultiParser.newIrCoreParser(nec1capturedOdd);
+        MultiParser instance = MultiParser.newIrCoreParser(NEC1_CAPTURED_ODD);
         ModulatedIrSequence result = instance.toModulatedIrSequence(null, dummyGap);
         assertEquals(result.get(result.getLength()-1), dummyGap, 0.00001);
     }
@@ -145,13 +145,13 @@ public class MultiParserNGTest {
     @SuppressWarnings("UnusedAssignment")
     public void testToModulatedIrSequence_Double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toModulatedIrSequence");
-        MultiParser instance = MultiParser.newIrCoreParser(nec1captured);
+        MultiParser instance = MultiParser.newIrCoreParser(NEC1CAPTURED);
         //ModulatedIrSequence expResult = null;
         ModulatedIrSequence result = instance.toModulatedIrSequence(null);
         assertEquals(result.getFrequency(), 38461, 0.001);
         assertEquals(result.getLength(), 72);
 
-        instance = MultiParser.newIrCoreParser(nec1capturedOdd);
+        instance = MultiParser.newIrCoreParser(NEC1_CAPTURED_ODD);
         try {
             instance.toModulatedIrSequence(null);
             fail();
@@ -225,12 +225,12 @@ public class MultiParserNGTest {
     @SuppressWarnings("UnusedAssignment")
     public void testToIrSequence_0args() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSequence");
-        MultiParser instance = MultiParser.newIrCoreParser(nec1);
+        MultiParser instance = MultiParser.newIrCoreParser(NEC1);
         IrSequence result = instance.toIrSequence();
         System.out.println(result.toString(true, " "));
-        assertEquals(result.toString(true, " "), nec1);
+        assertEquals(result.toString(true, " "), NEC1);
 
-        instance = MultiParser.newIrCoreParser(nec1Odd);
+        instance = MultiParser.newIrCoreParser(NEC1_ODD);
         try {
             instance.toIrSequence();
             fail();
@@ -246,7 +246,7 @@ public class MultiParserNGTest {
     public void testToIrSequence_double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSequence");
         double dummyGap = 1234.0;
-        MultiParser instance = MultiParser.newIrCoreParser(nec1Odd);
+        MultiParser instance = MultiParser.newIrCoreParser(NEC1_ODD);
         instance.toIrSequence(dummyGap);
     }
 
@@ -257,12 +257,12 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignalAsMultiLine() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignalAsMultiLine");
-        MultiParser instance = MultiParser.newIrCoreParser(ortekmceMultiline);
+        MultiParser instance = MultiParser.newIrCoreParser(ORTEK_MCE_MULTILINE);
         @SuppressWarnings("UnusedAssignment")
         IrSignal result = instance.toIrSignal(null);
         assertNotNull(result);
 
-        instance = MultiParser.newIrCoreParser(ortekmceBracketed);
+        instance = MultiParser.newIrCoreParser(ORTEK_MCE_BRACKETED);
         result = instance.toIrSignal(null);
         assertNotNull(result);
     }
@@ -274,11 +274,11 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignalAsBracketedString() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignalAsBracketedString");
-        MultiParser instance = MultiParser.newIrCoreParser(ortekmceBracketed);
+        MultiParser instance = MultiParser.newIrCoreParser(ORTEK_MCE_BRACKETED);
         @SuppressWarnings("UnusedAssignment")
         IrSignal result = instance.toIrSignal(null);
         assertEquals(result.getEndingLength(), 32);
-        instance = MultiParser.newIrCoreParser(ortekmceMultiline);
+        instance = MultiParser.newIrCoreParser(ORTEK_MCE_MULTILINE);
         result = instance.toIrSignal(null);
         assertEquals(result.getEndingLength(), 32);
     }
@@ -290,10 +290,10 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignal_0args() throws InvalidArgumentException {
         System.out.println("toIrSignal");
-        MultiParser instance = MultiParser.newIrCoreParser(ortekmceBracketed);
+        MultiParser instance = MultiParser.newIrCoreParser(ORTEK_MCE_BRACKETED);
         IrSignal result = instance.toIrSignal();
         assertNotNull(result);
-        instance = MultiParser.newIrCoreParser(ortekmceMultiline);
+        instance = MultiParser.newIrCoreParser(ORTEK_MCE_MULTILINE);
         result = instance.toIrSignal();
         assertNotNull(result);
     }
@@ -305,7 +305,7 @@ public class MultiParserNGTest {
     @Test
     public void testToIrSignal_Double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignal");
-        MultiParser instance = MultiParser.newIrCoreParser(ortekmceBracketed);
+        MultiParser instance = MultiParser.newIrCoreParser(ORTEK_MCE_BRACKETED);
         IrSignal result = instance.toIrSignal(null);
         assertNull(result.getFrequency());
         double frequency = 12345.0;
@@ -321,7 +321,7 @@ public class MultiParserNGTest {
     public void testToIrSignal_Double_double() throws OddSequenceLengthException, InvalidArgumentException {
         System.out.println("toIrSignal_Double_double");
         double threshold = 30000.0;
-        MultiParser instance = MultiParser.newIrCoreParser(nec1Repeat);
+        MultiParser instance = MultiParser.newIrCoreParser(NEC1_REPEAT);
         IrSignal result = instance.toIrSignal(null, threshold);
         assertNull(result.getFrequency());
         double fallbackFrequency = 12345.0;

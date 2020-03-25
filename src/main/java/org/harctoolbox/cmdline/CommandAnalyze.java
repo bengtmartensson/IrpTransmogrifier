@@ -306,6 +306,7 @@ public class CommandAnalyze extends AbstractCommand {
             analyze(analyzer, null);
         }
 
+        @SuppressWarnings("UseOfSystemOutOrSystemErr")
         private void analyze(Analyzer analyzer, String[] names) throws NoDecoderMatchException, InvalidNameException, UsageException {
             List<Integer> parameterWidths = new ArrayList<>(parameterNamedWidths.size());
             List<String> parameterNames = new ArrayList<>(parameterNamedWidths.size());

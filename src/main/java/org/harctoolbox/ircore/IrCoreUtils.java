@@ -257,6 +257,7 @@ public final class IrCoreUtils {
      * @throws FileNotFoundException if FileOutputStream does
      * @throws java.io.UnsupportedEncodingException
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static PrintStream getPrintStream(String filename, String encoding) throws FileNotFoundException, UnsupportedEncodingException {
         if (filename == null)
             return null;
@@ -626,6 +627,7 @@ public final class IrCoreUtils {
         return strings != null ? maxLength(Arrays.asList(strings)) : 0;
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         boolean hasOption = args[0].equals("-r");
         double relTolerance = hasOption ? Double.parseDouble(args[1]) : 0.0;

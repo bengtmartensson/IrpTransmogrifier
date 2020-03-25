@@ -17,10 +17,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class DecoderNGTest {
     private final static double NRC17_FREQUENCY = 38000d;
     private final static double RC5_FREQUENCY = 36000d;
-    private final static String protocolName = "Humax 4Phase";
+    private final static String PROTOCOL_NAME = "Humax 4Phase";
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -81,9 +82,9 @@ public class DecoderNGTest {
         try {
             for (NamedProtocol protocol : decoder.getParsedProtocols()) {
                 System.out.println(protocol.getName());
-                if (protocol.getName().equals(protocolName)) {
-                    System.out.println("$$$$ " + protocolName);
-                    Decoder.setDebugProtocolRegExp(protocolName);
+                if (protocol.getName().equals(PROTOCOL_NAME)) {
+                    System.out.println("$$$$ " + PROTOCOL_NAME);
+                    Decoder.setDebugProtocolRegExp(PROTOCOL_NAME);
                 }
                 NameEngine nameEngine = new NameEngine(protocol.randomParameters(random));
                 IrSignal irSignal = protocol.toIrSignal(nameEngine);

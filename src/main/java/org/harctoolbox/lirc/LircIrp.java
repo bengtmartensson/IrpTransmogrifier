@@ -57,6 +57,7 @@ public final class LircIrp {
      * and dumps the outcome on stdout.
      * @param args
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         int radix = 16;
         try {
@@ -194,6 +195,7 @@ public final class LircIrp {
         return list;
     }
 
+    @SuppressWarnings("empty-statement")
     private void setupBody() {
         try {
             List<IrStreamItem> list = new ArrayList<>(8);

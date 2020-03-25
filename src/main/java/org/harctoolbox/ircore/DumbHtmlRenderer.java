@@ -30,7 +30,7 @@ public class DumbHtmlRenderer {
         if (fragment == null)
             return "";
 
-        String str = render((Node) fragment, true);
+        String str = render(fragment, true);
         return str.trim();
     }
 

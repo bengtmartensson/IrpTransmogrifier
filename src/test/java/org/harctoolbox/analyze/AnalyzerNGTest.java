@@ -42,6 +42,7 @@ public class AnalyzerNGTest {
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testRepeatReducedIrSignal() throws InvalidArgumentException {
         System.out.println("repeatReducedIrSignal");
         IrSequence irSequence = new IrSequence(ALLDATA);
@@ -50,7 +51,7 @@ public class AnalyzerNGTest {
         IrSignal result = instance.repeatReducedIrSignal(0);
         assertTrue(result.approximatelyEquals(expResult));
     }
-    
+
     @Test
     public void testEmptySignal() throws InvalidArgumentException, NoDecoderMatchException {
         Analyzer analyzer = new Analyzer(new IrSignal());

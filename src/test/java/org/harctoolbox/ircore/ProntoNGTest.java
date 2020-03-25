@@ -9,10 +9,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author bengt
- */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class ProntoNGTest {
 
     private static IrSignal nec1;

@@ -20,10 +20,11 @@ import org.testng.annotations.Test;
  *
  * @author bengt
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class BiphaseWithDoubleToggleDecoderNGTest {
 
-    private static final double absoluteTolerance = 100.0;
-    private static final double relativeTolerance = 0.1;
+    private static final double ABSOLUTE_TOLERANDE = 100.0;
+    private static final double RELATIVE_TOLERANCE = 0.1;
 
     private static final int[] rc6_255_0_0 = new int[]{
         2664, 888, 444, 888, 444, 444, 444, 444, 444, 888, 1332, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 888, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 83912
@@ -60,7 +61,7 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
     }
 
     private static Protocol parse(int[] data) throws OddSequenceLengthException, DecodeException, InvalidArgumentException {
-        Analyzer analyzer = new Analyzer(new IrSequence(data), ModulatedIrSequence.DEFAULT_FREQUENCY, false, absoluteTolerance, relativeTolerance);
+        Analyzer analyzer = new Analyzer(new IrSequence(data), ModulatedIrSequence.DEFAULT_FREQUENCY, false, ABSOLUTE_TOLERANDE, RELATIVE_TOLERANCE);
 
         List<Integer> widths = new ArrayList<>(8);
         widths.add(1);

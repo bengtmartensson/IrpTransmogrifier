@@ -18,12 +18,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-/**
- *
- * @author bengt
- */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class RepeatFinderParserNGTest {
-    public static final String nec = "0000 006C 0028 0000 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4"
+    public static final String NEC = "0000 006C 0028 0000 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4"
             + " 015B 0059 0016 0E6C"
             + " 015B 0055 0016 0E6C"
             + " 015B 0057 0016 0E6C";
@@ -55,8 +52,8 @@ public class RepeatFinderParserNGTest {
     public void testToIrSignal() throws InvalidArgumentException {
         System.out.println("toIrSignal");
         List<IrSignalParser> parsers = new ArrayList<>(1);
-        parsers.add(new ProntoParser(nec));
-        RepeatFinderParser instance = new RepeatFinderParser(parsers, nec);
+        parsers.add(new ProntoParser(NEC));
+        RepeatFinderParser instance = new RepeatFinderParser(parsers, NEC);
         IrSignal result = instance.toIrSignal();
         assertEquals(result.getRepeatLength(), 4);
     }
@@ -69,8 +66,8 @@ public class RepeatFinderParserNGTest {
     public void testToIrSignalClean() throws InvalidArgumentException {
         System.out.println("toIrSignalClean");
         List<IrSignalParser> parsers = new ArrayList<>(1);
-        parsers.add(new ProntoParser(nec));
-        RepeatFinderParser instance = new RepeatFinderParser(parsers, nec);
+        parsers.add(new ProntoParser(NEC));
+        RepeatFinderParser instance = new RepeatFinderParser(parsers, NEC);
         IrSignal result = instance.toIrSignalClean();
         assertEquals(result.getRepeatLength(), 4);
     }

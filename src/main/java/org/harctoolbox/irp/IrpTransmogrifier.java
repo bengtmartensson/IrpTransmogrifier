@@ -92,6 +92,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
         status.die();
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         main(args, System.out);
     }
@@ -113,6 +114,7 @@ public final class IrpTransmogrifier implements CmdLineProgram {
     private CommandLirc commandLirc;
     private String[] originalArguments; // Really necessary?
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public IrpTransmogrifier() {
         this(System.out);
     }

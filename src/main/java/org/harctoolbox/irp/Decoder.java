@@ -74,6 +74,7 @@ public final class Decoder {
      * Allows to invoke the decoding from the command line.
      * @param args Pronto hex type IR signal.
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         try {
             Decoder decoder = new Decoder();

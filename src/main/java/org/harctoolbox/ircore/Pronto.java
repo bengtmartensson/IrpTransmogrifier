@@ -364,6 +364,7 @@ public abstract class Pronto {
      *
      * @param args
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         try {
             IrSignal irSignal = args.length == 1 ? parse(args[0]) : parse(args);
@@ -376,6 +377,7 @@ public abstract class Pronto {
     protected Pronto() {
     }
 
+    @SuppressWarnings("serial")
     public static class NonProntoFormatException extends IrCoreException {
 
         public NonProntoFormatException(String string, int pos) {

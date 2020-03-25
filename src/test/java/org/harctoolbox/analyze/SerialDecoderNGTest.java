@@ -14,11 +14,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class SerialDecoderNGTest {
 
-    private static final double absoluteTolerance = 100.0;
-    private static final double relativeTolerance = 0.1;
+    private static final double ABSOLUTE_TOLERANCE = 100.0;
+    private static final double RELATIVE_TOLERANCE = 0.1;
 
     private static final int[] pctv_12_34 = new int[] {
         1664, 6656, 832, 1664, 1664, 4160, 832, 2496, 832, 1664, 1664, 100000
@@ -35,7 +35,7 @@ public class SerialDecoderNGTest {
     private final Analyzer pctv;
     private final Analyzer.AnalyzerParams paramsPctv;
     public SerialDecoderNGTest() throws InvalidArgumentException {
-        pctv = new Analyzer(new IrSequence(pctv_12_34), ModulatedIrSequence.DEFAULT_FREQUENCY, false, absoluteTolerance, relativeTolerance);
+        pctv = new Analyzer(new IrSequence(pctv_12_34), ModulatedIrSequence.DEFAULT_FREQUENCY, false, ABSOLUTE_TOLERANCE, RELATIVE_TOLERANCE);
         List<Integer> widths = new ArrayList<>(5);
         widths.add(2);
         widths.add(8);

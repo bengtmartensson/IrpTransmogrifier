@@ -13,10 +13,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.DocumentFragment;
 
-/**
- *
- * @author bengt
- */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class IrpDatabaseNGTest {
 
     private static final String CONFIGFILE = "src/main/resources/IrpProtocols.xml";

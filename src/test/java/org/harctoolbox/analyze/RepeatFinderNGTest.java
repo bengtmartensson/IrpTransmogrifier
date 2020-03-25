@@ -17,6 +17,7 @@ import org.testng.annotations.Test;
  *
  * @author bengt
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class RepeatFinderNGTest {
 
 

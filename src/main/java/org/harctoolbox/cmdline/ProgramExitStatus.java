@@ -75,6 +75,7 @@ public class ProgramExitStatus {
     }
 
     public void die() {
+        @SuppressWarnings("UseOfSystemOutOrSystemErr")
         PrintStream stream = exitStatus == EXIT_SUCCESS ? System.out : System.err;
         if (message != null && !message.isEmpty())
             stream.println(message);

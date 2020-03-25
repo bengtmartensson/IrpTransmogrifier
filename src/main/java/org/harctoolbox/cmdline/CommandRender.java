@@ -182,6 +182,7 @@ public class CommandRender extends AbstractCommand {
                 out.println(irSequence.modulate().toString(true));
         }
 
+        @SuppressWarnings("UseOfSystemOutOrSystemErr")
         private void decode(IrSignal irSignal, String name) throws IrpParseException {
             Decoder decoder = new Decoder(irpDatabase);
             Decoder.DecoderParameters decoderParams = new Decoder.DecoderParameters();

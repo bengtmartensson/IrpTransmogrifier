@@ -14,6 +14,7 @@ import org.testng.annotations.Test;
  *
  * @author bengt
  */
+@SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class Pwm2DecoderNGTest {
     private final static int[] nec12_34_56_durations
             = new int[]{9024, 4512, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 44268};

@@ -58,6 +58,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return document;
     }
 
+    @SuppressWarnings("empty-statement")
     private static void putParameter(Map<String, Object> map, String parameterName, Double userValue, Double databaseValue) {
         if (userValue != null)
             map.put(parameterName, userValue);

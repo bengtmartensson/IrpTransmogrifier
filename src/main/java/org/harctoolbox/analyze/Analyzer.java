@@ -367,7 +367,7 @@ public final class Analyzer extends Cleaner {
         public AnalyzerParams(Double frequency, String timeBaseString, BitDirection bitDirection, boolean useExtents, List<Integer> parameterWidths, boolean invert) {
             this(frequency, timeBaseString, bitDirection, useExtents, parameterWidths, 32, invert, new Burst.Preferences(), new ArrayList<>(0));
         }
-        
+
         public AnalyzerParams() {
             this(null, null, BitDirection.lsb, false, null, 32, false, new Burst.Preferences(), new ArrayList<>(0));
         }

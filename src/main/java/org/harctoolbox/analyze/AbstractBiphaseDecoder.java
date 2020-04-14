@@ -57,7 +57,6 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
 
     protected final int half;
     protected final int full;
-    protected ParameterData data;
     private final boolean invert;
 
     public AbstractBiphaseDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, int half, int full, boolean invert)  {
@@ -75,7 +74,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
     @Override
     protected List<IrStreamItem> parse(int beg, int length) throws DecodeException {
         List<IrStreamItem> items = new ArrayList<>(2*length);
-        data = new ParameterData();
+        ParameterData data = new ParameterData();
         int foundStartBits = 0;
         BiphaseState state = BiphaseState.start;
         for (int index = beg; index < beg + length; index++) {
@@ -168,6 +167,7 @@ public abstract class AbstractBiphaseDecoder extends AbstractDecoder {
                 data = new ParameterData();
             }
         }
+        saveParameter(data, items, params.getBitDirection());
         return items;
     }
 

@@ -41,7 +41,7 @@ public final class BiphaseWithDoubleToggleDecoder extends AbstractBiphaseDecoder
     @Override
     protected List<IrStreamItem> parse(int beg, int length) throws DecodeException {
         List<IrStreamItem> items = new ArrayList<>(2*length);
-        data = new ParameterData();
+        ParameterData data = new ParameterData();
         int foundStartBits = 0;
         BiphaseWithDoubleToggleState state = BiphaseWithDoubleToggleState.start;
         for (int index = beg; index < beg + length; index++) {
@@ -177,6 +177,7 @@ public final class BiphaseWithDoubleToggleDecoder extends AbstractBiphaseDecoder
                 data = new ParameterData();
             }
         }
+        saveParameter(data, items, params.getBitDirection());
         return items;
     }
 

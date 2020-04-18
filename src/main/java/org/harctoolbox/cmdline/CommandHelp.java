@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.harctoolbox.irp.Version;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
@@ -69,9 +68,9 @@ public class CommandHelp extends AbstractCommand {
     @Parameter(description = "commands")
     private List<String> commands = null;
 
-    public void help(PrintStream out, JCommander argumentParser) {
-        Help instance = new Help(out, argumentParser);
-        instance.help();
+    public void help(PrintStream out, AbstractCommand commonCommand, JCommander argumentParser, String url) {
+        Help instance = new Help(out, argumentParser, commonCommand);
+        instance.help(url);
     }
 
     @Override
@@ -84,16 +83,18 @@ public class CommandHelp extends AbstractCommand {
 
         private final PrintStream out;
         private final JCommander argumentParser;
+        private final AbstractCommand commonCommand;
 
-        private Help(PrintStream out, JCommander argumentParser) {
+        private Help(PrintStream out, JCommander argumentParser, AbstractCommand commonCommand) {
             this.out = out;
             this.argumentParser = argumentParser;
+            this.commonCommand = commonCommand;
             argumentParser.setConsole(new DefaultConsole(out));
         }
 
-        private void help() {
+        private void help(String url) {
             if (shortForm) {
-                shortUsage(out, argumentParser);
+                shortUsage(out, argumentParser, url);
                 return;
             }
 
@@ -118,7 +119,7 @@ public class CommandHelp extends AbstractCommand {
                 });
             else if (cmd == null || cmd.equals("help")) {
                 usage(out, null, argumentParser);
-                printDocumentationUrl();
+                printDocumentationUrl(url);
             } else
                 usage(out, cmd, argumentParser);
         }
@@ -128,8 +129,8 @@ public class CommandHelp extends AbstractCommand {
          * so this implementation is pretty gross.
          */
         private void commonOptions(PrintStream out) {
-            CommandCommonOptions cla = new CommandCommonOptions();
-            JCommander parser = new JCommander(cla);
+            //CommandCommonOptions commonOptions = new CommandCommonOptions();
+            JCommander parser = new JCommander(commonCommand);
             options(out, parser, "Common options:\n");
         }
 
@@ -147,7 +148,7 @@ public class CommandHelp extends AbstractCommand {
          * so this implementation is pretty gross.
          */
         private void loggingOptions(PrintStream out) {
-            List<String> loggingOpts = Arrays.asList(CommandCommonOptions.loggingOptions);
+            List<String> loggingOpts = Arrays.asList(CommandLogOptions.loggingOptions);
             CommandCommonOptions cla = new CommandCommonOptions();
             JCommander parser = new JCommander(cla);
             Map<Parameterized, ParameterDescription> f = parser.getFields();
@@ -158,7 +159,7 @@ public class CommandHelp extends AbstractCommand {
             options(out, parser, "Logging options:\n");
         }
 
-        private void shortUsage(PrintStream out, JCommander argumentParser) {
+        private void shortUsage(PrintStream out, JCommander argumentParser, String documentationUrl) {
             String PROGRAMNAME = argumentParser.getProgramName();
             out.println("Usage: " + PROGRAMNAME + " [options] [command] [command options]");
             out.println("Commands:");
@@ -178,12 +179,12 @@ public class CommandHelp extends AbstractCommand {
             out.println("    \"" + PROGRAMNAME + " help --common\" for the common options.");
             out.println("    \"" + PROGRAMNAME + " help --logging\" for the logging related options.");
 
-            printDocumentationUrl();
+            printDocumentationUrl(documentationUrl);
         }
 
-        private void printDocumentationUrl() {
+        private void printDocumentationUrl(String documentationUrl) {
             out.println();
-            out.println("For documentation, see " + Version.documentationUrl);
+            out.println("For documentation, see " + documentationUrl);
         }
     }
 }

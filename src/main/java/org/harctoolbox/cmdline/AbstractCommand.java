@@ -25,7 +25,7 @@ public abstract class AbstractCommand {
 
     @Parameter(names = {"-h", "-?", "--help"}, help = true, description = "Print help for this command.")
     @SuppressWarnings("FieldMayBeFinal")
-    private boolean help = false;
+    protected boolean helpRequested = false;
 
     @Parameter(names = {"--describe"}, help = true, description = "Print a possibly longer documentation for the present command.")
     @SuppressWarnings("FieldMayBeFinal")
@@ -42,7 +42,7 @@ public abstract class AbstractCommand {
     }
 
     public boolean process(CmdLineProgram instance) {
-        if (help) {
+        if (helpRequested) {
             instance.usage(this.getClass().getSimpleName().substring(7).toLowerCase(Locale.US));
             return true;
         }

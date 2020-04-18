@@ -50,7 +50,6 @@ public class CommandCode extends AbstractCommand {
     private static final Logger logger = Logger.getLogger(CommandCode.class.getName());
 
     @Parameter(names = {"-d", "--directory"}, description = "Directory in whicht the generate output files will be written, if not using the --output option.")
-
     private String directory = null;
 
     @Parameter(names = {"--inspect"}, description = "Fire up stringtemplate inspector on generated code (if sensible)")

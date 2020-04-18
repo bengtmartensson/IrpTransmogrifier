@@ -29,7 +29,7 @@ import org.harctoolbox.irp.Version;
 @Parameters(commandNames = {"version"}, commandDescription = "Report version and license.")
 public class CommandVersion extends AbstractCommand {
 
-    private static final Logger logger = Logger.getLogger(CommandCode.class.getName());
+    private static final Logger logger = Logger.getLogger(CommandVersion.class.getName());
 
     @Parameter(names = {"-s", "--short"}, description = "Issue only the version number of the program proper.")
     @SuppressWarnings("FieldMayBeFinal")
@@ -40,7 +40,7 @@ public class CommandVersion extends AbstractCommand {
         return "This command returns the version. and licensing information for the program.";
     }
 
-    public void version(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) {
+    public void version(PrintStream out, CommandIrpDatabaseOptions commandLineArgs, IrpDatabase irpDatabase) {
         if (shortForm || commandLineArgs.quiet)
             out.println(Version.version);
         else {

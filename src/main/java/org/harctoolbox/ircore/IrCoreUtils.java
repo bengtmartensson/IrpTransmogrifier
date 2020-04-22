@@ -28,8 +28,11 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -43,6 +46,9 @@ public final class IrCoreUtils {
     public final static long SOME = -3L;
 
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    private static Map<Integer, String> radixPrefixes;
+    private static Map<String, Integer> prefixToRadix;
 
     /**
      * Default absolute tolerance in micro seconds.
@@ -83,6 +89,24 @@ public final class IrCoreUtils {
      * "Dumb" Charset
      */
     public static final Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_NAME);
+
+    static {
+        Map<String, Integer> map = new LinkedHashMap<>(4);
+        map.put("0b", 2);
+        map.put("%", 2);
+        map.put("0", 8);
+        map.put("0x", 16);
+        setRadixPrefixes(map);
+    }
+
+    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
+    public static void setRadixPrefixes(Map<String, Integer> map) {
+        prefixToRadix = map;
+        radixPrefixes = new HashMap<>(map.size());
+        map.entrySet().forEach((kvp) -> {
+            radixPrefixes.putIfAbsent(kvp.getValue(), kvp.getKey());
+        });
+    }
 
     private static double getDoubleWithSubstitute(Double userValue, double fallback) {
         return userValue != null ? userValue : fallback;
@@ -389,10 +413,11 @@ public final class IrCoreUtils {
     }
 
     public static String radixPrefix(int radix) {
-        return radix == 2 ? "0b"
-                : radix == 8 ? "0"
-                : radix == 16 ? "0x"
-                : "";
+        return radixPrefixes.getOrDefault(radix, "");
+    }
+
+    public static int prefixRadix(String prefix) {
+        return prefixToRadix.getOrDefault(prefix, 10);
     }
 
     /**
@@ -414,12 +439,28 @@ public final class IrCoreUtils {
         if (special && (s.equals("*") || s.equals("'*'")))
             return ALL; // Just to help Windows' victims, who cannot otherwise pass a *.
         //s.equals("#") ? some :
-        return s.startsWith("0x") ? Long.parseLong(s.substring(2), 16) :
-               s.startsWith("0b") ? Long.parseLong(s.substring(2), 2) :
-               s.startsWith("%") ? Long.parseLong(s.substring(1), 2) :
-               s.equals("0") ? 0L :
-               (s.startsWith("0") && s.matches("[0-7]+") && defaultRadix == 10) ? Long.parseLong(s.substring(1), 8) :
-               Long.parseLong(s, defaultRadix);
+        return parseWithPrefix(str, defaultRadix);
+    }
+
+    public static long parseWithPrefix(String s, int defaultRadix) {
+        if (s.equals("0"))
+            return 0;
+
+        for (Map.Entry<String, Integer> kvp : prefixToRadix.entrySet()) {
+
+            String prefix = kvp.getKey();
+            if (s.startsWith(prefix)) {
+                // Have to treat (pseudo-) octal numbers with some care
+                if (prefix.equals("0"))
+                    if (!(s.matches("[0-7]+") && defaultRadix == 10))
+                        continue;
+                String payload = s.substring(prefix.length());
+                int radix = kvp.getValue();
+                return Long.parseLong(payload, radix);
+            }
+
+        }
+        return Long.parseLong(s, defaultRadix);
     }
 
     /**

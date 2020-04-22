@@ -2,7 +2,9 @@ package org.harctoolbox.ircore;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -664,5 +666,40 @@ public class IrCoreUtilsNGTest {
         expResult = "xxx.z";
         result = IrCoreUtils.addExtensionIfNotPresent(filename, extension);
         assertEquals(result, expResult);
+    }
+
+    /**
+     * Test of setRadixPrefixes.
+     * Silly name is to execute it last, since it has side effects.
+     */
+    @Test
+    public void ztestParseLong_String_WithSetRadixPrefixes() {
+        System.out.println("setRadixPrefixes");
+
+        // Set up a map of prefix -> radix mappings
+        Map<String, Integer> map = new LinkedHashMap<>(4);
+        map.put("0b", 2);
+        map.put("0x", 16);
+        map.put("0q", 4);
+        map.put("0cs", 11); // For Carl Sagan ;-)
+        IrCoreUtils.setRadixPrefixes(map);
+
+        assertEquals(IrCoreUtils.parseLong("0x12345"), 0x12345);
+        assertEquals(IrCoreUtils.parseLong("12345"), 12345);
+        assertEquals(IrCoreUtils.parseLong("0b100100"), 0b100100);
+        try {
+            IrCoreUtils.parseLong("%100100");
+            fail();
+        } catch (NumberFormatException ex) {
+        }
+        assertEquals(IrCoreUtils.parseLong("012345"), 12345);
+        assertEquals(IrCoreUtils.parseLong("0"), 0);
+        assertEquals(IrCoreUtils.parseLong("0cs1A"), 21);
+        assertEquals(IrCoreUtils.parseLong("0q12"), 6);
+
+        assertEquals(IrCoreUtils.radixPrefix(2), "0b");
+        assertEquals(IrCoreUtils.radixPrefix(4), "0q");
+        assertEquals(IrCoreUtils.radixPrefix(11), "0cs");
+        assertEquals(IrCoreUtils.radixPrefix(10), "");
     }
 }

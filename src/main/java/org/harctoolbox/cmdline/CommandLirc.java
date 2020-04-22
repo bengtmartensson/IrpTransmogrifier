@@ -42,7 +42,7 @@ public class CommandLirc extends AbstractCommand {
     @Parameter(names = {"-c", "--commands"}, description = "Also list the commands if the remotes.")
     private boolean commands = false;
 
-    @Parameter(names = {"-r", "--radix"}, hidden = true, description = "Radix for outputting result, default 16.") // Too much...?
+    @Parameter(names = {"-r", "--radix"}, hidden = true, description = "Radix for outputting result, default 16.", validateWith = Radix.class) // Too much...?
     private int radix = 16;
 
     @Parameter(description = "Lirc config files/directories/URLs; empty for <stdin>.", required = false)

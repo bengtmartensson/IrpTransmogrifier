@@ -96,7 +96,7 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"--name"}, description = "List protocol name, also if --quiet is given.")
     private boolean name = false;
 
-    @Parameter(names = {"-r", "--radix"}, description = "Radix of parameter output.")
+    @Parameter(names = {"-r", "--radix"}, description = "Radix of parameter output.", validateWith = Radix.class)
     private int radix = 16;
 
     @Parameter(names = {"--stringtree"}, description = "Produce stringtree.")

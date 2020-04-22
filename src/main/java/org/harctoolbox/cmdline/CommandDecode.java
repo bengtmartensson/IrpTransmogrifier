@@ -83,7 +83,7 @@ public class CommandDecode extends AbstractCommand {
     @Parameter(names = {"-R", "--dump-repeatfinder"}, description = "Print the result of the repeatfinder.")
     private boolean dumpRepeatfinder = false;
 
-    @Parameter(names = {"--radix"}, description = "Radix used for printing of output parameters.")
+    @Parameter(names = {"--radix"}, description = "Radix used for printing of output parameters.", validateWith = Radix.class)
     private int radix = 10;
 
     @Parameter(names = {"--recursive"}, description = "Apply decoder recursively, (for long signals).")

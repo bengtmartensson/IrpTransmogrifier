@@ -42,7 +42,7 @@ public class CommandExpression extends AbstractCommand {
     @Parameter(names = {"-n", "--nameengine", "--parameters"}, description = "Define a name engine to use for evaluating.", converter = NameEngineParser.class)
     private NameEngine nameEngine = new NameEngine();
 
-    @Parameter(names = {"-r", "--radix"}, description = "Radix for outputting result.")
+    @Parameter(names = {"-r", "--radix"}, description = "Radix for outputting result.", validateWith = Radix.class)
     private int radix = 10;
 
     @Parameter(names = {"--stringtree"}, description = "Output stringtree.")

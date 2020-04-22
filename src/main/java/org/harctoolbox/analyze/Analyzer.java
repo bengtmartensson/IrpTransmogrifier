@@ -451,7 +451,7 @@ public final class Analyzer extends Cleaner {
         /**
          * @return the frequency
          */
-        public double getFrequency() {
+        public Double getFrequency() {
             return frequency;
         }
 

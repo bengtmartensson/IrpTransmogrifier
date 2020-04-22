@@ -197,9 +197,13 @@ public abstract class AbstractDecoder {
         return getClass().getSimpleName();
     }
 
-    protected void dumpParameters(ParameterData data, List<IrStreamItem> items, int noBitsLimit) {
+    protected void dumpParameters(ParameterData data, List<IrStreamItem> items, int noBitsLimit, boolean invert) {
         ParameterData lowerParam = data.reduce(noBitsLimit);
-        saveParameter(lowerParam, items, params.getBitDirection(), params.isInvert());
+        saveParameter(lowerParam, items, params.getBitDirection(), invert);
+    }
+
+    protected void dumpParameters(ParameterData data, List<IrStreamItem> items, int noBitsLimit) {
+        dumpParameters(data, items, noBitsLimit, false);
     }
 
     protected static class ParameterData {

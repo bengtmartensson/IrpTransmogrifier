@@ -45,10 +45,12 @@ public abstract class PwmDecoder extends AbstractDecoder {
 
     public PwmDecoder(Analyzer analyzer, Analyzer.AnalyzerParams params, Burst[] bursts) throws NonUniqueBitCodeException {
         super(analyzer, params);
-        this.bursts = bursts.clone();
+        this.bursts = new Burst[bursts.length];
+        for (int i = 0; i < bursts.length; i++)
+            this.bursts[i] = bursts[params.isInvert() ? bursts.length - i - 1 : i];
         distinctFlashesInBursts = setupDistinctFlashesInBursts();
         chunksize = (int) IrCoreUtils.log2(bursts.length);
-        bitSpec = mkBitSpec(bursts, timebase, params.getBurstPrefs());
+        bitSpec = mkBitSpec(this.bursts, timebase, params.getBurstPrefs());
     }
 
     public boolean hasDistinctFlashesInBursts() {

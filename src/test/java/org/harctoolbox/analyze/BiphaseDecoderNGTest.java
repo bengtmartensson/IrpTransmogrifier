@@ -37,19 +37,16 @@ public class BiphaseDecoderNGTest {
 
     private final Analyzer rc5;
     private final Analyzer rc6;
-    private final Analyzer.AnalyzerParams paramsRc5;
-    private final Analyzer.AnalyzerParams paramsRc6;
+    private final List<Integer> widths;
 
     public BiphaseDecoderNGTest() throws OddSequenceLengthException, InvalidArgumentException {
         rc5 = new Analyzer(rc5_12_3_1);
         rc6 = new Analyzer(rc6_12_3_1);
-        List<Integer> widths = new ArrayList<>(4);
+        widths = new ArrayList<>(4);
         widths.add(1);
         widths.add(1);
         widths.add(1);
         widths.add(5);
-        paramsRc5 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, widths, true);
-        paramsRc6 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, null, false);
     }
 
     @BeforeMethod
@@ -67,6 +64,7 @@ public class BiphaseDecoderNGTest {
     @Test
     public void testParseRc5() throws Exception {
         System.out.println("processRc5");
+        Analyzer.AnalyzerParams paramsRc5 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, widths, true);
         BiphaseDecoder decoder = new BiphaseDecoder(rc5, paramsRc5);
         Protocol result = decoder.parse()[0];
         System.out.println("Expect warning for missing parameterspec");
@@ -74,13 +72,40 @@ public class BiphaseDecoderNGTest {
         assertEquals(result, expResult);
     }
 
+    /**
+     * Test of process method, of class BiphaseDecoder.
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testParseRc5Invert() throws Exception {
+        System.out.println("processRc5Invert");
+        Analyzer.AnalyzerParams paramsRc5 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, widths, false);
+        BiphaseDecoder decoder = new BiphaseDecoder(rc5, paramsRc5);
+        Protocol result = decoder.parse()[0];
+        System.out.println("Expect warning for missing parameterspec");
+        Protocol expResult = new Protocol("{36.0k,889,msb}<-1,1|1,-1>(A:1,B:1,2,-2,C:1,2,D:5,-2,E:2,^113m){A=1,B=1,C=1,D=0,E=3}");
+        assertEquals(result, expResult);
+    }
+
     @Test
     public void testParseRc6() throws Exception {
         System.out.println("processRc6");
+        Analyzer.AnalyzerParams paramsRc6 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, null, false);
         AbstractBiphaseDecoder decoder = new BiphaseDecoder(rc6, paramsRc6);
         Protocol result = decoder.parse()[0];
         System.out.println("Expect warning for missing parameterspec");
         Protocol expResult = new Protocol("{36.0k,444,msb}<-1,1|1,-1>(6,-2,A:4,-2,2,B:16,^107m){A=8,B=30723}");
+        assertEquals(result, expResult);
+    }
+
+    @Test
+    public void testParseRc6invert() throws Exception {
+        System.out.println("processRc6");
+        Analyzer.AnalyzerParams paramsRc6 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, null, true);
+        AbstractBiphaseDecoder decoder = new BiphaseDecoder(rc6, paramsRc6);
+        Protocol result = decoder.parse()[0];
+        System.out.println("Expect warning for missing parameterspec");
+        Protocol expResult = new Protocol("{36.0k,444,msb}<1,-1|-1,1>(6,-2,A:4,-2,2,B:16,^107m){A=7,B=34812}");
         assertEquals(result, expResult);
     }
 }

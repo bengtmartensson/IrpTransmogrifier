@@ -78,7 +78,7 @@ public final class SerialDecoder extends AbstractDecoder {
                 data.update(amount, noBits);
             } else {
                 while (!data.isEmpty())
-                    dumpParameters(data, items, noBitsLimit);
+                    dumpParameters(data, items, noBitsLimit, params.isInvert());
 
                 if (index == beg + length - 1 && params.isUseExtents())
                     items.add(newExtent(analyzer.getTotalDuration(beg, length)));
@@ -87,11 +87,11 @@ public final class SerialDecoder extends AbstractDecoder {
             }
 
             while (data.getNoBits() >= noBitsLimit)
-                dumpParameters(data, items, noBitsLimit);
+                dumpParameters(data, items, noBitsLimit, params.isInvert());
 
         }
         while (!data.isEmpty())
-            dumpParameters(data, items, noBitsLimit);
+            dumpParameters(data, items, noBitsLimit, params.isInvert());
 
         return items;
     }

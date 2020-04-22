@@ -27,17 +27,12 @@ public class Pwm2DecoderNGTest {
     public static void tearDownClass() throws Exception {
     }
 
-    private IrSequence irSequence;
-    private Analyzer analyzer;
-    private final Pwm2Decoder pwm;
+    private final IrSequence irSequence;
+    private final Analyzer analyzer;
 
     public Pwm2DecoderNGTest() throws Exception {
-        this.analyzer = null;
-        this.irSequence = null;
         irSequence = new IrSequence(nec12_34_56_durations);
-        Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400d, null, BitDirection.msb, true, null, false);
         analyzer = new Analyzer(irSequence);
-        pwm = new Pwm2Decoder(analyzer, analyzerParams);
     }
 
     @BeforeMethod
@@ -54,12 +49,25 @@ public class Pwm2DecoderNGTest {
      */
     @Test
     public void testParse() throws Exception {
-        System.out.println("process");
-        Protocol result;
-        result = pwm.parse()[0];
+        System.out.println("testParse");
+        Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400d, null, BitDirection.msb, true, null, false);
+        Pwm2Decoder pwm = new Pwm2Decoder(analyzer, analyzerParams);
+        Protocol result = pwm.parse()[0];
         System.out.println(result.toIrpString(16, false));
         System.out.println("Expect warnings for missing parameterspec");
         Protocol expResult = new Protocol("{38.4k,564,msb}<1,-1|1,-3>(16,-8,A:32,1,^108m){A=0x30441ce3}");
+        assertEquals(result, expResult);
+    }
+
+    @Test
+    public void testParseInvert() throws Exception {
+        System.out.println("testParseInvert");
+        Analyzer.AnalyzerParams analyzerParams = new Analyzer.AnalyzerParams(38400d, null, BitDirection.msb, true, null, true);
+        Pwm2Decoder pwm = new Pwm2Decoder(analyzer, analyzerParams);
+        Protocol result = pwm.parse()[0];
+        System.out.println(result.toIrpString(16, false));
+        System.out.println("Expect warnings for missing parameterspec");
+        Protocol expResult = new Protocol("{38.4k,564,msb}<1,-3|1,-1>(16,-8,A:32,1,^108m){A=0xcfbbe31c}");
         assertEquals(result, expResult);
     }
 }

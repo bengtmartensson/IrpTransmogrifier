@@ -213,6 +213,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test(enabled = true)
+    public void testAnalyze1Validate() {
+        System.out.println("analyze1");
+        String args = "-a 10 -r 0.01 analyze --validate --radix 16 -M 32 -t 1p 0000 0073 0000 0012 000F 000A 0006 000A 0006 000A 0006 001B 0006 000A 0006 000A 0006 001B 0006 0015 0006 000A 0006 001B 0006 000A 0006 0015 0006 0010 0006 000A 0006 0015 0006 000A 0006 0015 0006 0C90";
+        String result = execute(args);
+        assertEquals(result, "{36.0k,1p,msb}<6,-10|6,-16|6,-21|6,-27>(15,-10,A:32,6,-89m)*{A=0xc38c922}\nValidation succeeded!");
+    }
+
+    @Test(enabled = true)
     public void testDecodeRc5() {
         System.out.println("decodeRc5");
         String args = "decode --strict -p rc5 0000 0073 0000 000B 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";

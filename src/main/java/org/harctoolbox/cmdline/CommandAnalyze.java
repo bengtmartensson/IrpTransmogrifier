@@ -31,6 +31,7 @@ import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
 import org.harctoolbox.analyze.NoDecoderMatchException;
 import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrCoreException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
@@ -45,6 +46,7 @@ import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.DomainViolationException;
 import org.harctoolbox.irp.DuplicateFinder;
 import org.harctoolbox.irp.InvalidNameException;
+import org.harctoolbox.irp.IrpException;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
 import org.harctoolbox.irp.Name;
 import org.harctoolbox.irp.NameEngine;
@@ -143,6 +145,9 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"-T", "--trailinggap"}, description = "Dummy trailing gap (in micro seconds) added to sequences of odd length.")
     private Double trailingGap = null;
 
+    @Parameter(names = {"--validate"}, description = "Validate that the resulted protocol can be used for rendering and produces the same signal.")
+    private boolean validate = false;
+
     @Parameter(description = "durations in microseconds, or pronto hex.", required = false)
     private List<String> args = null;
 
@@ -196,7 +201,7 @@ public class CommandAnalyze extends AbstractCommand {
         return this.frequency != null ? this.frequency : frequency;
     }
 
-    public void analyze(PrintStream out, CommandCommonOptions commandLineArgs) throws UsageException, InvalidArgumentException, IOException, NoDecoderMatchException, InvalidNameException {
+    public void analyze(PrintStream out, CommandCommonOptions commandLineArgs) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, IOException {
         AnalyzeClass analyzeClass = new AnalyzeClass(out, commandLineArgs);
         analyzeClass.analyze();
     }
@@ -211,7 +216,7 @@ public class CommandAnalyze extends AbstractCommand {
             this.commandLineArgs = commandLineArgs;
         }
 
-        private void analyze() throws UsageException, InvalidArgumentException, IOException, NoDecoderMatchException, InvalidNameException {
+        private void analyze() throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, IOException {
             CmdUtils.checkForOption("analyze", args);
             if (allDecodes && decoder != null)
                 throw new UsageException("Cannot use both --alldecodes and --decode.");
@@ -226,6 +231,8 @@ public class CommandAnalyze extends AbstractCommand {
                 throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
 
             if (input != null) {
+                if (validate)
+                    throw new UsageException("Cannot use --validate with --input.");
                 ThingsLineParser<ModulatedIrSequence> irSignalParser = new ThingsLineParser<>(
                         (List<String> line) -> {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
@@ -234,6 +241,8 @@ public class CommandAnalyze extends AbstractCommand {
                 List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(input, commandLineArgs.encoding, false);
                 analyze(modSeqs, ModulatedIrSequence.frequencyAverage(modSeqs));
             } else if (namedInput != null) {
+                if (validate)
+                    throw new UsageException("Cannot use --validate with --namedinput.");
                 ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
                         (List<String> line) -> {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
@@ -268,7 +277,7 @@ public class CommandAnalyze extends AbstractCommand {
             }
         }
 
-        private void analyze(IrSignal irSignal) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
+        private void analyze(IrSignal irSignal) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
             Analyzer analyzer;
             Double freq = possiblyOverrideWithAnalyzeFrequency(irSignal.getFrequency());
             if (repeatFinder || dumpRepeatfinder) {
@@ -278,36 +287,36 @@ public class CommandAnalyze extends AbstractCommand {
                 IrSignal fixedSignal = frequency != null ? new IrSignal(irSignal, frequency) : irSignal;
                 analyzer = new Analyzer(fixedSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             }
-            analyze(analyzer, new ArrayList<>(0));
+            analyze(analyzer, new ArrayList<>(0), irSignal);
         }
 
-        private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
+        private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
             Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
             irSequences.putAll(modulatedIrSequences);
             Double frequency = possiblyOverrideWithAnalyzeFrequency(ModulatedIrSequence.frequencyAverage(modulatedIrSequences.values()));
             analyze(irSequences, frequency);
         }
 
-        private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
+        private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences.values(), possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            analyze(analyzer, new ArrayList<>(irSequences.keySet()));
+            analyze(analyzer, new ArrayList<>(irSequences.keySet()), null);
         }
 
-        private void analyze(List<? extends IrSequence> irSequences) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
+        private void analyze(List<? extends IrSequence> irSequences) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
             analyze(irSequences, frequency);
         }
 
-        private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
+        private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences, possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            analyze(analyzer, new ArrayList<>(0));
+            analyze(analyzer, new ArrayList<>(0), null);
         }
 
         @SuppressWarnings("UseOfSystemOutOrSystemErr")
-        private void analyze(Analyzer analyzer, List<String> names) throws NoDecoderMatchException, InvalidNameException, UsageException {
+        private void analyze(Analyzer analyzer, List<String> names, IrSignal inputSignal) throws IrpException, UsageException, IrCoreException, NoDecoderMatchException {
             List<Integer> parameterWidths = new ArrayList<>(parameterNamedWidths.size());
             List<String> parameterNames = new ArrayList<>(parameterNamedWidths.size());
             if (!parameterNamedWidths.isEmpty() && parameterNamedWidths.get(0).contains(":")) {
@@ -365,9 +374,15 @@ public class CommandAnalyze extends AbstractCommand {
                         out.print((names.isEmpty() ? "#" + noSignal : names.get(noSignal)) + ":\t");
                     if (statistics)
                         out.println(analyzer.toTimingsString(noSignal));
-                    protocolList.forEach((protocol) -> {
+                    for (Protocol protocol : protocolList) {
                         printAnalyzedProtocol(protocol, radix, params.isPreferPeriods(), true, true);
-                    });
+                        if (validate) {
+                            if (inputSignal != null)
+                                validate(protocol, inputSignal);
+                            else
+                                out.println("Validation for current case not implemented.");
+                        }
+                    }
                     noSignal++;
                 }
             } else {
@@ -389,6 +404,12 @@ public class CommandAnalyze extends AbstractCommand {
                     if (statistics)
                         out.println(analyzer.toTimingsString(i));
                     printAnalyzedProtocol(protocols.get(i), radix, params.isPreferPeriods(), statistics, timings);
+                    if (validate) {
+                        if (inputSignal != null)
+                            validate(protocols.get(i), inputSignal);
+                        else
+                            out.println("Validation for current case not implemented.");
+                    }
                 }
 
                 if (bitUsage) {
@@ -467,6 +488,15 @@ public class CommandAnalyze extends AbstractCommand {
                     throw new ThisCannotHappenException(ex);
                 }
             }
+        }
+
+        private boolean validate(Protocol protocol, IrSignal inputSignal) throws IrpException, IrCoreException {
+            IrSignal rendered = protocol.toIrSignal(new NameEngine());
+            boolean success = rendered.approximatelyEquals(inputSignal);
+            out.println(success
+                    ? "Validation succeeded!"
+                    : String.format("Validation failed: expected\n%s\ngot\n%s", inputSignal.toString(), rendered.toString()));
+            return success;
         }
     }
 }

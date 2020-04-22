@@ -39,6 +39,7 @@ import org.harctoolbox.cmdline.CommandVersion;
 import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.cmdline.UsageException;
 import org.harctoolbox.ircore.InvalidArgumentException;
+import org.harctoolbox.ircore.IrCoreException;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 
 /**
@@ -156,21 +157,21 @@ public final class IrpTransmogrifier extends CmdLineProgram {
                 default:
                     return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, "Unknown command: " + command);
             }
-        } catch (NamedProtocol.ProtocolNotRenderableException | UsageException | NameUnassignedException | UnknownProtocolException| FileNotFoundException | DomainViolationException ex) {
-            // Exceptions likely from silly user input, just print the exception
-            return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (OddSequenceLengthException ex) {
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR,
                     command.equals("render") ? "IrSequence does not end with a gap."
                     : ex.getLocalizedMessage() + ". Consider using --trailinggap.");
-        } catch (ParseCancellationException | InvalidArgumentException ex) {
+        } catch (IrpException | IrCoreException | UsageException | FileNotFoundException ex) {
+            // Exceptions likely from silly user input, just print the exception
+            return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+        } catch (ParseCancellationException ex) {
             // When we get here,
             // Antlr has already written a somewhat sensible error message on
             // stderr; that is good enough for now.
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | InvalidNameException | IrpInvalidArgumentException | UnsupportedRepeatException ex) {
+        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException ex) {
             //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
             // Likely a programming error or fatal error in the data base. Barf.
             ex.printStackTrace();

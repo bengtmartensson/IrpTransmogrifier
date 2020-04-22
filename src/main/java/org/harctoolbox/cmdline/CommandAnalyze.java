@@ -278,7 +278,7 @@ public class CommandAnalyze extends AbstractCommand {
                 IrSignal fixedSignal = frequency != null ? new IrSignal(irSignal, frequency) : irSignal;
                 analyzer = new Analyzer(fixedSignal, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             }
-            analyze(analyzer, null);
+            analyze(analyzer, new ArrayList<>(0));
         }
 
         private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
@@ -292,7 +292,7 @@ public class CommandAnalyze extends AbstractCommand {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences.values(), possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            analyze(analyzer, irSequences.keySet().toArray(new String[irSequences.size()]));
+            analyze(analyzer, new ArrayList<>(irSequences.keySet()));
         }
 
         private void analyze(List<? extends IrSequence> irSequences) throws InvalidArgumentException, NoDecoderMatchException, InvalidNameException, UsageException {
@@ -303,11 +303,11 @@ public class CommandAnalyze extends AbstractCommand {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences, possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
-            analyze(analyzer, null);
+            analyze(analyzer, new ArrayList<>(0));
         }
 
         @SuppressWarnings("UseOfSystemOutOrSystemErr")
-        private void analyze(Analyzer analyzer, String[] names) throws NoDecoderMatchException, InvalidNameException, UsageException {
+        private void analyze(Analyzer analyzer, List<String> names) throws NoDecoderMatchException, InvalidNameException, UsageException {
             List<Integer> parameterWidths = new ArrayList<>(parameterNamedWidths.size());
             List<String> parameterNames = new ArrayList<>(parameterNamedWidths.size());
             if (!parameterNamedWidths.isEmpty() && parameterNamedWidths.get(0).contains(":")) {
@@ -362,7 +362,7 @@ public class CommandAnalyze extends AbstractCommand {
                 int noSignal = 0;
                 for (List<Protocol> protocolList : protocols) {
                     if (protocols.size() > 1)
-                        out.print((names != null ? names[noSignal] : "#" + noSignal) + ":\t");
+                        out.print((names.isEmpty() ? "#" + noSignal : names.get(noSignal)) + ":\t");
                     if (statistics)
                         out.println(analyzer.toTimingsString(noSignal));
                     protocolList.forEach((protocol) -> {
@@ -383,9 +383,9 @@ public class CommandAnalyze extends AbstractCommand {
                 int maxNameLength = IrCoreUtils.maxLength(names);
                 for (int i = 0; i < protocols.size(); i++) {
                     if (protocols.size() > 1)
-                        out.print(names != null
-                                ? (names[i] + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names[i].length() + 1)))
-                                : ("#" + i + "\t"));
+                        out.print(names.isEmpty()
+                                ? ("#" + i + "\t")
+                                : (names.get(i) + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1))));
                     if (statistics)
                         out.println(analyzer.toTimingsString(i));
                     printAnalyzedProtocol(protocols.get(i), radix, params.isPreferPeriods(), statistics, timings);
@@ -423,7 +423,7 @@ public class CommandAnalyze extends AbstractCommand {
                     for (int i = 0; i < protocols.size(); i++) {
                         if (protocols.size() > 1)
                             out.print(names != null
-                                    ? (names[i] + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names[i].length() + 1)))
+                                    ? (names.get(i) + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1)))
                                     : ("#" + i + "\t"));
                         Protocol protocol = protocols.get(i);
                         Iterable<String> parameters = parameterNames.isEmpty() ? protocol.getDefinitions().toMap().keySet() : parameterNames;

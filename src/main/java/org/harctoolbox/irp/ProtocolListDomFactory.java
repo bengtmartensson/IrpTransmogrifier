@@ -31,20 +31,20 @@ import org.w3c.dom.Text;
 
 public class ProtocolListDomFactory {
 
-    public static Document protocolListToDom(Analyzer analyzer, List<Protocol> protocols, String[] names, int radix) {
+    public static Document protocolListToDom(Analyzer analyzer, List<Protocol> protocols, List<String> names, int radix) {
         ProtocolListDomFactory factory = new ProtocolListDomFactory(analyzer, protocols, names, radix);
         return factory.getDocument();
     }
 
     private Map<Integer, Protocol> protocolsWithoutDefs;
     private final Document doc;
-    private final String[] names;
+    private final List<String> names;
     private final int radix;
     private final Analyzer analyzer;
     private final List<Protocol> protocols;
     private int counter;
 
-    private ProtocolListDomFactory(Analyzer analyzer, List<Protocol> protocols, String[] names, int radix) {
+    private ProtocolListDomFactory(Analyzer analyzer, List<Protocol> protocols, List<String> names, int radix) {
 //        if (protocols.size() != names.length || analyzer.getNoSequences() != names.length)
 //            throw new IllegalArgumentException();
 
@@ -77,7 +77,7 @@ public class ProtocolListDomFactory {
         commandSet.setAttribute("name", "commandSet");
         remote.appendChild(commandSet);
         for (int i = 0; i< protocols.size(); i++)
-            commandSet.appendChild(commandToElement(protocols.get(i), names != null ? names[i] : null, analyzer.cleanedIrSequence(i)));
+            commandSet.appendChild(commandToElement(protocols.get(i), names != null ? names.get(i) : null, analyzer.cleanedIrSequence(i)));
 
         return remote;
     }

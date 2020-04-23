@@ -73,7 +73,7 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"--html"}, description = "Print (possible longer) documentation as HTML.")
     private boolean html = false;
 
-    @Parameter(names = {"-i", "--irp"}, description = "List IRP form, as given in the database (unparsed).")
+    @Parameter(names = {"-i", "--irp"}, description = "List IRP form, as given in the database (unparsed, i.e. preserving comments and whitespace, not taking --radix into account).")
     private boolean irp = false;
 
     // not really useful, therefore hidden
@@ -97,7 +97,7 @@ public class CommandList extends AbstractCommand {
     private boolean name = false;
 
     @Parameter(names = {"-r", "--radix"}, description = "Radix of parameter output.", validateWith = Radix.class)
-    private int radix = 16;
+    private int radix = 10;
 
     @Parameter(names = {"--stringtree"}, description = "Produce stringtree.")
     private boolean stringTree = false;

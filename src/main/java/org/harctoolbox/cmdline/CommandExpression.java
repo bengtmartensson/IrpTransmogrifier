@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.irp.Expression;
 import org.harctoolbox.irp.IrpParseException;
@@ -70,7 +71,7 @@ public class CommandExpression extends AbstractCommand {
         Expression expression = Expression.newExpressionEOF(text);
         long result = expression.toLong(nameEngine);
 
-        out.println(Long.toString(result, radix));
+        out.println(IrCoreUtils.radixPrefix(radix) + Long.toString(result, radix));
         if (stringTree)
             out.println(expression.toStringTree());
 

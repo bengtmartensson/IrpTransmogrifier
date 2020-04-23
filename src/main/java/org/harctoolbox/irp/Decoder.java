@@ -948,7 +948,7 @@ public final class Decoder {
                 return "";
             StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
             map.keySet().stream().sorted().forEach((key) -> {
-                stringJoiner.add(key + "=" + Long.toString(map.get(key), radix));
+                stringJoiner.add(key + "=" + IrCoreUtils.radixPrefix(radix) + Long.toString(map.get(key), radix));
             });
             return stringJoiner.toString();
         }

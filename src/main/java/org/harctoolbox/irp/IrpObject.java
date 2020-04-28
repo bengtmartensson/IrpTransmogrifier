@@ -42,8 +42,19 @@ public abstract class IrpObject implements XmlExport {
         return parseTree;
     }
 
+    /**
+     * Returns a computed IRP (-segment) string representation of current IrpObject.
+     * Numerical parameters, but not durations etc, will be printed using the
+     * radix in the argument.
+     * @param radix Radix for parameters.
+     * @return Formatted string.
+     */
     public abstract String toIrpString(int radix);
 
+    /**
+     * Defaulted version of toIrpString().
+     * @return
+     */
     public final String toIrpString() {
         return toIrpString(DEFAULT_RADIX);
     }
@@ -57,6 +68,12 @@ public abstract class IrpObject implements XmlExport {
         return toIrpString(radix);
     }
 
+    /**
+     * Return a LISP-like representation of the current object.
+     * Mainly for debugging.
+     * @param parser
+     * @return
+     */
     public final String toStringTree(IrpParser parser) {
         return parseTree != null ? parseTree.toStringTree(parser) : null;
     }

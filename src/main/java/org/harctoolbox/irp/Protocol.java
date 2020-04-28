@@ -44,10 +44,10 @@ import org.w3c.dom.Element;
  * This class implements the Protocol, per Chapter 1.6--1.7.
  * It essentially consists of the information in the IRP string.
  * Name and other properties is found in the derived class {@link org.harctoolbox.irp.NamedProtocol NamedProtocol}.
- *
- * <p>There are too many public functions in the API...
- *
  */
+
+// FIXME: There are too many public functions in the API...
+// FIXME: Throw out the DecoderClass, possibly to a derived class?
 public class Protocol extends IrpObject implements AggregateLister {
 
     private final static Logger logger = Logger.getLogger(Protocol.class.getName());
@@ -91,6 +91,15 @@ public class Protocol extends IrpObject implements AggregateLister {
         this(generalSpec, bitspecIrstream, definitions, parameterSpecs, parseTree, null);
     }
 
+    /**
+     * The general constructor for Protocol.
+     * @param generalSpec
+     * @param bitspecIrstream
+     * @param definitions
+     * @param parameterSpecs
+     * @param parseTree
+     * @param decoderClass
+     */
     public Protocol(GeneralSpec generalSpec, BitspecIrstream bitspecIrstream, NameEngine definitions, ParameterSpecs parameterSpecs,
             IrpParser.ProtocolContext parseTree, Class<? extends AbstractDecoder> decoderClass) {
         super(parseTree);
@@ -105,12 +114,15 @@ public class Protocol extends IrpObject implements AggregateLister {
         irp = computeIrp(10);
     }
 
+    /**
+     * Generates an empty protocol.
+     */
     public Protocol() {
         this(new GeneralSpec(), new BitspecIrstream(), new NameEngine(), new ParameterSpecs());
     }
 
     /**
-     * Main constructor.
+     * Parses the string given as argument and constructs a Protocol.
      *
      * @param irpString
      * @throws org.harctoolbox.irp.InvalidNameException
@@ -272,9 +284,9 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     /**
-     *
-     * @param nameEngine; may be changed
-     * @return
+     * Renders the protocol. Parameter values that are free in the protocol are taken from the NameEngine given as argument.
+     * @param nameEngine containing free names; may be changed in the call
+     * @return rendered signal
      * @throws ArithmeticException
      * @throws org.harctoolbox.irp.NameUnassignedException
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
@@ -325,10 +337,10 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     /**
-     *
+     * Renders the protocol, but only for the pass given as second argument.
      * @param nameEngine, NameEngine, may be altered.
-     * @param pass
-     * @return
+     * @param pass intro, repeat, or ending
+     * @return rendered ModulatedIrSequence
      * @throws org.harctoolbox.irp.NameUnassignedException
      * @throws org.harctoolbox.irp.IrpInvalidArgumentException
      * @throws org.harctoolbox.ircore.OddSequenceLengthException
@@ -338,10 +350,10 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     /**
-     *
+     * Renders the protocol, but only for the pass given as second argument.
      * @param nameEngine Name engine, may be altered
-     * @param pass
-     * @return
+     * @param pass intro, repeat, or ending
+     * @return rendered ModulatedIrSequence
      * @throws org.harctoolbox.ircore.InvalidArgumentException
      * @throws org.harctoolbox.irp.IrpSemanticException
      * @throws org.harctoolbox.irp.UnassignedException
@@ -368,6 +380,12 @@ public class Protocol extends IrpObject implements AggregateLister {
         return bitspecIrstream.numberOfInfiniteRepeats();
     }
 
+    /**
+     * Returns the IRP as found in the configuration file, including whitespace, comments, and the author's selection of radix.
+     * @see toIrpString()
+     *
+     * @return IRP string, as formatted iun the configuration file.
+     */
     public String getIrp() {
         return irp;
     }

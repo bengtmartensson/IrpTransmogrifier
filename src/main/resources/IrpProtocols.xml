@@ -174,7 +174,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
-               version="2020-03-22"
+               version="2020-04-30"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
     <irp:protocol name="48-NEC">
@@ -1213,6 +1213,14 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,E:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
         <irp:documentation>
             A relaxed form (but used in some real devices) of the <a href="#NEC1">NEC1</a> protocol. Byte 3 and byte 4 are independent.
+	    NEC1-Yamaha is a special case of this, in which bytes 3 and 4 are related but in a different manner than in a standard
+	    NEC1 signal.  The NEC1 standard is that byte 4 is the complement of byte 3.  The relationship in an NEC1-Yamaha signal
+	    is determined by a style parameter with values Y1, Y2 and Y3 as follows:
+            <ul>
+                <li>Y1: Only bits 0-6 are complemented.</li>
+                <li>Y2: Only bits 1-7 are complemented.</li>
+                <li>Y3: Only bits 1-6 are complemented.</li>
+            </ul>
        </irp:documentation>
     </irp:protocol>
     <irp:protocol name="NEC1-rnc">
@@ -1266,6 +1274,14 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,E:8,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
         <irp:documentation>
             A relaxed form (but used in some real devices) of the <a href="#NEC2">NEC2</a> protocol. Byte 3 and byte 4 are independent.
+	    NEC2-Yamaha is a special case of this, in which bytes 3 and 4 are related but in a different manner than in a standard
+	    NEC2 signal.  The NEC2 standard is that byte 4 is the complement of byte 3.  The relationship in an NEC2-Yamaha signal
+	    is determined by a style parameter with values Y1, Y2 and Y3 as follows:
+            <ul>
+                <li>Y1: Only bits 0-6 are complemented.</li>
+                <li>Y2: Only bits 1-7 are complemented.</li>
+                <li>Y3: Only bits 1-6 are complemented.</li>
+            </ul>
         </irp:documentation>
     </irp:protocol>
     <irp:protocol name="NECx1">
@@ -1290,6 +1306,14 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(8,-8,D:8,S:8,F:8,E:8,1,^108m,(8,-8,D:1,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
         <irp:documentation>
             A relaxed form (but used in some real devices) of the <a href="#NECx1">NECx1</a> protocol. Byte 3 and byte 4 are independent.
+	    NECx1-Yamaha is a special case of this, in which bytes 3 and 4 are related but in a different manner than in a standard
+	    NECx1 signal.  The NECx1 standard is that byte 4 is the complement of byte 3.  The relationship in an NECx1-Yamaha signal
+	    is determined by a style parameter with values Y1, Y2 and Y3 as follows:
+            <ul>
+                <li>Y1: Only bits 0-6 are complemented.</li>
+                <li>Y2: Only bits 1-7 are complemented.</li>
+                <li>Y3: Only bits 1-6 are complemented.</li>
+            </ul>
        </irp:documentation>
     </irp:protocol>
     <irp:protocol name="NECx2">
@@ -1314,6 +1338,14 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:irp><![CDATA[{38.4k,564}<1,-1|1,-3>(8,-8,D:8,S:8,F:8,E:8,1,^108m)* [D:0..255,S:0..255=255-D,F:0..255,E:0..255=255-F]]]></irp:irp>
         <irp:documentation>
             A relaxed form (but used in some real devices) of the <a href="#NECx2">NECx2</a> protocol. Byte 3 and byte 4 are independent.
+	    NECx2-Yamaha is a special case of this, in which bytes 3 and 4 are related but in a different manner than in a standard
+	    NECx2 signal.  The NECx2 standard is that byte 4 is the complement of byte 3.  The relationship in an NECx2-Yamaha signal
+            is determined by a style parameter with values Y1, Y2 and Y3 as follows:
+            <ul>
+                <li>Y1: Only bits 0-6 are complemented.</li>
+                <li>Y2: Only bits 1-7 are complemented.</li>
+                <li>Y3: Only bits 1-6 are complemented.</li>
+            </ul>
        </irp:documentation>
     </irp:protocol>
     <irp:protocol name="Nokia">

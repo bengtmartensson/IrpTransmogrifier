@@ -38,7 +38,6 @@ import org.harctoolbox.cmdline.CommandRender;
 import org.harctoolbox.cmdline.CommandVersion;
 import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.cmdline.UsageException;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreException;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 
@@ -188,14 +187,4 @@ public final class IrpTransmogrifier extends CmdLineProgram {
         }
         return new ProgramExitStatus();
     }
-
-//    private void setupDatabase(List<String> blackList) throws IOException, UsageException, IrpParseException, UnknownProtocolException {
-//        if (commandLineArgs.configFiles != null && commandLineArgs.irp != null)
-//            throw new UsageException("At most one of configfile and irp can be specified");
-//
-//        irpDatabase = commandLineArgs.irp != null ? IrpDatabase.parseIrp("user_protocol", commandLineArgs.irp, "Protocol entered on the command line")
-//                : commandLineArgs.configFiles != null ? new IrpDatabase(commandLineArgs.configFiles)
-//                : new IrpDatabase((String) null);
-//        irpDatabase.remove(blackList);
-//    }
 }

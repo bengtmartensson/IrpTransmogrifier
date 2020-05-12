@@ -14,7 +14,7 @@
                     <xsl:apply-templates select="/document/header"/>
                 </h1>
                 <ul>
-                    <xsl:apply-templates select="/document/body/section[position()>1]" mode="toc"/>
+                    <xsl:apply-templates select="/document/body/section" mode="toc"/>
                 </ul>
                 <xsl:apply-templates select="/document/body/*"/>
             </body>
@@ -45,23 +45,24 @@
             </em>
             </div>
    </xsl:template>
-
+<!--
     <xsl:template match="/document/body/section[position()=1]">
       <p>For the revision history of this document, see
       <a><xsl:attribute name="href">http://www.harctoolbox.org</xsl:attribute>the original document on the web site</a>.
     </p>
     </xsl:template>
-    
+-->
+    <xsl:template match="/document/body/table">
+      <p>For the revision history of this document, see
+      <a><xsl:attribute name="href">http://www.harctoolbox.org</xsl:attribute>the original document on the web site</a>.
+    </p>
+    </xsl:template>
+
     <!--xsl:template match="body/section[position()=1]/title" mode="toc">sfsfdfd</xsl:template-->
-    
+
     <!--xsl:template match="/document/body/section[position()>1]">
     <xsl:apply-templates/>
     </xsl:template-->
-
-    <xsl:template match="body/section[position()>1]/title">
-        <a><xsl:attribute name="name"><xsl:value-of select="translate(.,' ','+')"/></xsl:attribute></a>
-        <h2><xsl:value-of select="."/></h2>
-    </xsl:template>
 
     <xsl:template match="section" mode="toc">
         <li>
@@ -73,18 +74,40 @@
         </ul>
     </xsl:template>
 
+    <xsl:template match="body/section/title">
+        <h2>
+            <xsl:attribute name="id">
+                <xsl:value-of select="translate(.,' ','+')"/>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </h2>
+    </xsl:template>
+
     <xsl:template match="body/section/section/title">
-        <a><xsl:attribute name="name"><xsl:value-of select="translate(.,' ','+')"/></xsl:attribute></a>
-        <h3><xsl:value-of select="."/></h3>
+        <h3>
+            <xsl:attribute name="id">
+                <xsl:value-of select="translate(.,' ','+')"/>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </h3>
     </xsl:template>
 
     <xsl:template match="body/section/section/section/title">
-        <a><xsl:attribute name="name"><xsl:value-of select="translate(.,' ','+')"/></xsl:attribute></a>
-        <h4><xsl:value-of select="."/></h4>
+        <h4>
+            <xsl:attribute name="id">
+                <xsl:value-of select="translate(.,' ','+')"/>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </h4>
     </xsl:template>
 
     <xsl:template match="body/section/section/section/section/title">
-        <h5><xsl:value-of select="."/></h5>
+        <h5>
+            <xsl:attribute name="id">
+                <xsl:value-of select="translate(.,' ','+')"/>
+            </xsl:attribute>
+            <xsl:value-of select="."/>
+        </h5>
     </xsl:template>
 
     <xsl:template match="p">
@@ -132,6 +155,27 @@
 
     <xsl:template match="li">
         <li><xsl:apply-templates/></li>
+    </xsl:template>
+
+    <xsl:template match="dl">
+        <xsl:apply-templates select="dt|dd"/>
+    </xsl:template>
+
+    <xsl:template match="dt">
+        <dt>
+            <xsl:attribute name="id">
+                <xsl:value-of select="@id"/>
+            </xsl:attribute>
+            <b> <!-- I know, should be using CSS -->
+                <xsl:apply-templates/>
+            </b>
+        </dt>
+    </xsl:template>
+
+    <xsl:template match="dd">
+        <dd>
+            <xsl:apply-templates/>
+        </dd>
     </xsl:template>
 
 </xsl:stylesheet>

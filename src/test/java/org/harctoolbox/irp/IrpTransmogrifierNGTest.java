@@ -241,7 +241,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeRc5_1");
         String args = "decode -p rc5 0000 0073 000B 0000 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0020 0020 0020 0020 0040 0040 0040 0020 0CA8";
         String result = execute(args);
-        assertEquals(result, "RC5: {D=7,F=5}, beg=0, end=21, reps=1");
+        assertEquals(result, "RC5: {D=7,F=5}");
     }
 
     @Test(enabled = true)
@@ -305,7 +305,7 @@ public class IrpTransmogrifierNGTest {
         String recs80 = "+158 -7426 +158 -7426 +158 -7426 +158 -7426 +158 -4898 +158 -7426 +158 -7426 +158 -7426 +158 -4898 +158 -4898 +158 -4898 +158 -45000";
         String junk = " 1234 5678";
         String result = execute("decode " + recs80);
-        assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=23, reps=1");
+        assertEquals(result, "RECS80: {D=6,F=56,T=1}");
         result = execute("decode " + recs80 + junk);
         assertEquals(result, "RECS80: {D=6,F=56,T=1}, beg=0, end=23, reps=1 {UNDECODED. length=2}");
         result = execute("decode --strict " + recs80);
@@ -329,7 +329,7 @@ public class IrpTransmogrifierNGTest {
         String akaiMitsubishi = "0000 006C 0000 0011 000A 0047 000A 0047 000A 0047 000A 001E 000A 001E 000A 001E 000A 0047 000A 001E 000A 0047 000A 0047 000A 0047 000A 001E 000A 0047 000A 001E 000A 001E 000A 001E 000A 031D";
         String result = execute("-f -1 decode " + akaiMitsubishi);
         System.out.println(result);
-        assertEquals(result,"Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
+        assertEquals(result,"Mitsubishi: {D=71,F=23}");
     }
 
     @Test(enabled = true)
@@ -338,7 +338,7 @@ public class IrpTransmogrifierNGTest {
         String gi4dtv = "0000 006F 0000 000E 00B9 004A 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 006F 0025 0025 0025 08AC";
         String result = execute("decode --debug ^G.I.4DTV$   -p g.i.4dtv " + gi4dtv);
         System.out.println(result);
-        assertEquals(result, "G.I.4DTV: {D=6,F=42}, beg=0, end=27, reps=1");
+        assertEquals(result, "G.I.4DTV: {D=6,F=42}");
     }
 
     @Test(enabled = true)
@@ -348,7 +348,7 @@ public class IrpTransmogrifierNGTest {
         String akaiMitsubishi = "0000 006C 0000 0011 000A 0047 000A 0047 000A 0047 000A 001E 000A 001E 000A 001E 000A 0047 000A 001E 000A 0047 000A 0047 000A 0047 000A 001E 000A 0047 000A 001E 000A 001E 000A 001E 000A 031D";
         String result = execute("-f -1 decode -a " + akaiMitsubishi);
         System.out.println(result);
-        assertEquals(result, "Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
+        assertEquals(result, "Mitsubishi: {D=71,F=23}");
     }
 
     @Test(enabled = true)
@@ -357,7 +357,7 @@ public class IrpTransmogrifierNGTest {
         String sony15 = "0000 0068 0010 0000 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0018 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 0018 0018 0018 0030 0300";
         String result = execute("decode -p sony15 " + sony15);
         System.out.println(result);
-        assertEquals(result, "Sony15: {D=164,F=61}, beg=0, end=31, reps=1");
+        assertEquals(result, "Sony15: {D=164,F=61}");
     }
 
     @Test(enabled = true)
@@ -573,7 +573,7 @@ public class IrpTransmogrifierNGTest {
     public void testBlacklist() {
         System.out.println("testBlackList");
         String result = execute("decode " + GRAHAM_PANASONIC);
-        assertEquals(result, "GwtS: {CRC=255,D=213,F=215}, beg=0, end=15 {UNDECODED. length=124}");
+        assertEquals(result, "GwtS: {CRC=255,D=213,F=215}");
         result = execute("--blacklist gwts,nec-shirriff decode " + GRAHAM_PANASONIC);
         assertEquals(result, "No decodes.");
     }

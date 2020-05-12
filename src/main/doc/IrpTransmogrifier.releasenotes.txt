@@ -8,6 +8,7 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 * ...
 
+* Decoder.decodeLoose: Try decoding as IrSignal before as IrSequence. #168.
 * Merged in new documentation for NEC*-f16 protocols from RemoteMaster v2.10 build 8.
 * Rename protocol Dysan -> Dyson.
 * Fixed inconsequent working of --radix. #167.

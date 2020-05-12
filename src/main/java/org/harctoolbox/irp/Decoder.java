@@ -256,11 +256,12 @@ public final class Decoder {
     }
 
     public AbstractDecodesCollection<? extends ElementaryDecode> decodeLoose(IrSignal irSignal, DecoderParameters decoderParams) {
-        if (decoderParams.ignoreLeadingGarbage || (!decoderParams.strict && (irSignal.introOnly() || irSignal.repeatOnly()))) {
+        SimpleDecodesSet decodesAsIrSignal = decodeIrSignal(irSignal, decoderParams);
+        if (decodesAsIrSignal.isEmpty() && (decoderParams.ignoreLeadingGarbage || (!decoderParams.strict && (irSignal.introOnly() || irSignal.repeatOnly())))) {
             ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
             return decode(sequence, decoderParams);
         } else
-            return decodeIrSignal(irSignal, decoderParams);
+            return decodesAsIrSignal;
     }
 
     public static final class DecoderParameters {

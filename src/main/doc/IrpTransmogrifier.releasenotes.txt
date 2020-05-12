@@ -4,6 +4,22 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
+2020-05-??: Version 1.2.6
+
+* ...
+
+* Merged in new documentation for NEC*-f16 protocols from RemoteMaster v2.10 build 8.
+* Rename protocol Dysan -> Dyson.
+* Fixed inconsequent working of --radix. #167.
+* Fix bug in analyze --invert. #163.
+* New option --validate in analyze. Resolves #166.
+* Make the radix prefixes in IrCoreUtils configurable in API. #165.
+* Validate --radix command line option. #164.
+* Refactor commands. Resolves #162.
+* Fix bug in Biphase decoding. #161.
+* Improved analyzer command line output for named parameters.
+
+===============================================================================
 2020-03-24: Version 1.2.5
 
 * IrpProtocols.xml: Merge protocol updates from RemoteMaster 2.10b2.

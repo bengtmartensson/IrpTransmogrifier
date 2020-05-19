@@ -625,10 +625,27 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:documentation>This is not a robust protocol, so <A href="#spurious">spurious decodes</A> are likely.</irp:documentation>
     </irp:protocol>
     <irp:protocol name="Dyson">
-        <irp:irp><![CDATA[
-    {780,38k}<1,-1|1,-2>(3,-1,D:7,F:8,1,-104m)*
-            [D:0..127,F:0..255]
-            ]]></irp:irp>
+        <irp:parameter name="prefer-over">Dyson_relaxed</irp:parameter>
+        <irp:irp><![CDATA[{780,38k}<1,-1|1,-2>(3,-1,D:7,F:6,T:-2,1,-100m,3,-1,D:7,F:6,T:-2,1,-60m,(3,-1,1:1,1,-60m)*)[D:0..127,F:0..63,T:0..3=0]]]></irp:irp>
+        <irp:documentation>This protocol is used by Dyson fan heaters.  T is a toggle but its range of values may depend on the Dyson model.  For example,
+            the AM05 cycles T through 0,1,2 leaving the value 3 unused.  The Dyson2 protocol differs in having a longer lead-out between the two full frames.
+            It is used in the AM05 for the Power button.  For signals with no ditto repeat frames to be decoded by IrpTransmogrifier, Repeat Finder must be
+            turned off.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Dyson2">
+        <irp:parameter name="prefer-over">Dyson_relaxed</irp:parameter>
+        <irp:irp><![CDATA[{780,38k}<1,-1|1,-2>(3,-1,D:7,F:6,T:-2,1,-400m,3,-1,D:7,F:6,T:-2,1,-60m,(3,-1,1:1,1,-60m)*)[D:0..127,F:0..63,T:0..3=0]]]></irp:irp>
+        <irp:documentation>The Dyson protocol is used by Dyson fan heaters.  T is a toggle but its range of values may depend on the Dyson model.  For example,
+            the AM05 cycles T through 0,1,2 leaving the value 3 unused.  The Dyson2 protocol differs in having a longer lead-out between the two full frames.
+            It is used in the AM05 for the Power button.  For signals with no ditto repeat frames to be decoded by IrpTransmogrifier, Repeat Finder must be
+            turned off.</irp:documentation>
+    </irp:protocol>
+    <irp:protocol name="Dyson_relaxed">
+        <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:irp><![CDATA[{780,38k}<1,-1|1,-2>(3,-1,D:7,F:6,T:-2,1,-100m)*[D:0..127,F:0..63,T:0..3=0]]]></irp:irp>
+        <irp:documentation>Relaxed version of the Dyson and Dyson2 protocols, which tests only the first frame.  A signal may decode as Dyson_relaxed
+            because (a) the signal is incomplete, or (b) the capture hardware cannot report large lead-out values, or (c) the
+            signal has no ditto repeat frames and Repeat Finder has squashed it.</irp:documentation>
     </irp:protocol>
     <irp:protocol name="Elan">
         <irp:parameter name="uei-executor">01F8[D;F]</irp:parameter>

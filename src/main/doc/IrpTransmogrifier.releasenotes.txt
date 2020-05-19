@@ -6,8 +6,8 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 ===============================================================================
 2020-05-??: Version 1.2.6
 
-* ...
-
+* Changes to the Dyson protocol(s), as proposed by Graham Dixon.
+* Rename JVC_alt -> JVC_squashed.
 * Decoder.decodeLoose: Try decoding as IrSignal before as IrSequence. #168.
 * Merged in new documentation for NEC*-f16 protocols from RemoteMaster v2.10 build 8.
 * Rename protocol Dysan -> Dyson.

@@ -30,6 +30,11 @@
                 <td>2019-12-27</td>
                 <td>Update for version 1.2.4.</td>
             </tr>
+            <tr>
+                <td>2020-05-19</td>
+                <td>Update for version 1.2.6.
+                    More of an improvement and clarification than a description of new features.</td>
+            </tr>
         </table>
 
         <section>
@@ -234,7 +239,7 @@
                         IRP says otherwise, all others quantities are given
                         in (pure) SI units without prefix. So are duty cycle and relative tolerance both a real
                         number between 0 and 1, not a number of percents. Modulation frequency is given in Hz, not it kHz
-                        except for the <code>GeneralSpec</code>).
+                        (with the exception of the <code>GeneralSpec</code>).
                     </p>
                     <p>Integer literals can be given in base 16 (using prefix "0x"), base 8 (using prefix "0"),
                         base 2 (using prefix "0b"), as well as in base 10 (no prefix, omitting leading zeros).</p>
@@ -267,6 +272,11 @@
                         called "flashes" or sometimes "marks",
                         the other denote off-periods, "gaps" or "spaces". They always start with a flash, and end with a gap.
                     </p>
+                    <note>
+                        In some communities (Lirc and Linux, IRremote),
+                        the ending gap is not considered to be a part of the IrSequence/IrSignal.
+                        This must be taken into consideration if importing signals from these communities.
+                    </note>
                 </section>
 
                 <section>
@@ -406,6 +416,12 @@
                         </dt>
                         <dd>To be recognized as a repeat sequence, the final gap must be at least this long. Default: 5000.0.</dd>
                     </dl>
+                    <note>In some cases, the repeat finder is doing a "too good" job and
+                        may squash a signal so that the decoder does not produce the expected result.
+                        For example, a <code>JVC</code> signal is reduced beyond the <code>JVC</code> IRP.
+                        (To handle this case, the relaxed protocol <code>JVC_squashed</code> was entered into the IRP data base.)
+                    </note>
+
                 </section>
 
                 <section>
@@ -584,7 +600,9 @@
             <section>
                 <title>Rendering</title>
                 <p>
-                    Given a protocol name, present in the protocol data base, and a set of valid parameter values,
+                    Given a protocol name, present in the protocol data base
+                    (alternatively, an IRP protocol given explicitly with the <code>--irp</code> option),
+                    and a set of valid parameter values,
                     an IrSignal is computed. This use case corresponds to IrpMaster (or <a href="Glossary.html#MakeHex">MakeHex</a>).
                 </p>
                 <p>
@@ -661,7 +679,7 @@
                     <section>
                         <title>Matching of durations, non-leadouts</title>
                         <p>Non-ending durations are matched according to
-                            <a href="#NumEqDurations">this method</a>,
+                            <a href="#NumEqDurations">the numeric equality criterion</a>,
                         using the parameters <code>absolutetolerance</code> and <code>relativetolerance</code>.</p>
                     </section>
 
@@ -984,13 +1002,15 @@ parameter_spec:
                     (In the specifications, embedded comments in the IRP are not present.)
                 </p>
                 <p>The function <code>list --irp</code> lists the IRP as given in the data base (preserving comments and whitespace),
-                while <code>list --parsedirp</code> list the parsed version (with comments and whitespace removed).
+                while <code>list --parsedirp</code> list the parsed version.
+                The latter has comments and whitespace removed, and observes the <code>--radix</code> argument.
                 </p>
             </section>
             <section>
                 <title>Whitespace</title>
                 <p>
-                    All white space, including line breaks, are ignored when parsing. (In the original spec, the IRP form has to be on one line.)
+                    All white space, including line breaks, are ignored when parsing.
+                    (In the original spec, the IRP form had to be on one line.)
                     It is ignored by parsing.</p>
                 <p>The function <code>list --irp</code> lists the IRP as given in the data base (preserving comments and whitespace),
                     while <code>list --parsedirp</code> list the parsed version (with comments and whitespace removed).
@@ -1050,7 +1070,7 @@ parameter_spec:
                 <p>
                     Several extensions to the <a href="http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation#Expressions">expressions</a>
                     have been made. Note that, informally speaking,
-                    an expression is an integer, that, in different contexts are differently interpreted: as integer value,
+                    an expression is an integer, that, in different contexts is differently interpreted: as integer value,
                     (potentially infinite) bit pattern (using 2-complement representation),
                     and logical (0 is <code>false</code>, everything else is <code>true</code>).
                 </p>
@@ -1260,7 +1280,8 @@ parameter_spec:
                     <!--(However the st- and xslt-files, <!- - TODO Link - ->
                     are not included.)-->
                 </p>
-                <p>Also <a href="Glossary.html#RemoteMaster">RemoteMaster</a> comes with IrpTransmogrifier and a wrapper to start it as command line program.</p>
+                <p>Also <a href="Glossary.html#RemoteMaster">RemoteMaster</a> comes with IrpTransmogrifier and a wrapper
+                (<code>irptransmogrifier.bat</code>) to start it as command line program.</p>
                 <p>
                     If none of this is not possible or wanted, IrpTransmogrifier can of course be installed separately.
                     The latest released version can be found
@@ -1273,8 +1294,9 @@ parameter_spec:
                     Modify and/or relocate the wrapper(s) if desired or necessary.
                     Do not double click the wrappers, since this program runs only from the command line.
                 </p>
-                <p>The program requires Java 8 JRE or later to run. The Windows setup version of IrScrutinizer, as well as the 64-bit Linux AppImage,
-                    comes with its own Java, that can run IrpTransmogrifier.</p>
+                <p>The Macintosh app for IrScrutinizer presently does not come with support for running IrpTransmogrifier as command line program.</p>
+                <p>The program presently requires Java 8 JRE or later to run. Some distributions of IrScrutinizer
+                    come with their own Java installations, that can run IrpTransmogrifier.</p>
             </section>
 
             <section>
@@ -1609,8 +1631,8 @@ determine how the computed IRP is displayed.
                 available <a href="https://bengtmartensson.github.io/IrpTransmogrifier/">here</a>
                 current version only).</p>
 
-                <p>This project is avalable in the Maven central repository, and can easily be integrated
-                    into other projects using Maven. For this, include the lines</p>
+                <p>The released versions of project is available in the Maven central repository, and can easily be integrated
+                    into other Maven projects. For this, include the lines</p>
                     <source><![CDATA[
         <dependency>
             <groupId>org.harctoolbox</groupId>

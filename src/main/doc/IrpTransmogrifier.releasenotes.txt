@@ -6,6 +6,7 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 ===============================================================================
 2020-05-??: Version 1.2.6
 
+* Minor improvements in the main documentation.
 * Changes to the Dyson protocol(s), as proposed by Graham Dixon.
 * Rename JVC_alt -> JVC_squashed.
 * Decoder.decodeLoose: Try decoding as IrSignal before as IrSequence. #168.
@@ -13,7 +14,7 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 * Rename protocol Dysan -> Dyson.
 * Fixed inconsequent working of --radix. #167.
 * Fix bug in analyze --invert. #163.
-* New option --validate in analyze. Resolves #166.
+* New option --validate in analyze. #166.
 * Make the radix prefixes in IrCoreUtils configurable in API. #165.
 * Validate --radix command line option. #164.
 * Refactor commands. Resolves #162.

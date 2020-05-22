@@ -6,7 +6,8 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 ===============================================================================
 2020-05-??: Version 1.2.6
 
-* Minor improvements in the main documentation.
+* Checksums (signed in released versions) now reside in files checksums.*. #169.
+* Improvements in the main documentation.
 * Changes to the Dyson protocol(s), as proposed by Graham Dixon.
 * Rename JVC_alt -> JVC_squashed.
 * Decoder.decodeLoose: Try decoding as IrSignal before as IrSequence. #168.

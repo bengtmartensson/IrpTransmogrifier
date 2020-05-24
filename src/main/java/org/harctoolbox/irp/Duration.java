@@ -223,7 +223,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecStack, boolean isLast) throws SignalRecognitionException {
         logger.log(recognizeData.logRecordEnter(this));
         if (!recognizeData.check(isOn()))
-            throw new SignalRecognitionException("Ether end of sequence, or found flash when gap expected, or vice versa");
+            throw new SignalRecognitionException("Either end of sequence, or found flash when gap expected, or vice versa");
 
         double actual = recognizeData.get();
         double wanted;

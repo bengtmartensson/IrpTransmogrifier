@@ -177,7 +177,7 @@ public class IrpDatabaseNGTest {
         System.out.println("getMatchingNamesRegexp");
         String regexp = "NEC.*";
         List<String> result = instance.getMatchingNamesRegexp(regexp);
-        assertEquals(result.size(), 13);
+        assertEquals(result.size(), 14);
         result = instance.getMatchingNamesRegexp("RC6.*");
         assertTrue(result.contains("rc6-6-32"));
     }

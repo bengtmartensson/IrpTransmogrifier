@@ -1,28 +1,19 @@
-Volume-:	Pioneer: {D=173,F=11},	beg=0, end=135, reps=2
-	Pioneer-Mix: {D0=173,F0=11},	beg=0, end=135
-Volume+:	Pioneer: {D=173,F=10},	beg=0, end=135, reps=2
-	Pioneer-Mix: {D0=173,F0=10},	beg=0, end=135
-Mute1:	Pioneer: {D=173,F=25},	beg=0, end=67, reps=1
-Mute2:	Pioneer: {D=175,F=48},	beg=0, end=67, reps=1
-'Answer 1:	Pioneer: {D=173,F=151},	beg=0, end=67, reps=1
-Answer 2:	Pioneer: {D=175,F=50},	beg=0, end=67, reps=1
-Hangup 1:	Pioneer: {D=173,F=151},	beg=0, end=67, reps=1
-Hangup2:	Pioneer: {D=175,F=51},	beg=0, end=67, reps=1
-source:	Pioneer: {D=173,F=26},	beg=0, end=135, reps=2
-	Pioneer-Mix: {D0=173,F0=26},	beg=0, end=135
-Pause:	Pioneer: {D=173,F=88},	beg=0, end=407, reps=6
-	Pioneer-Mix: {D0=173,F0=88},	beg=0, end=407, reps=4
-display1:	Pioneer: {D=173,F=25},	beg=0, end=67, reps=1
-display2:	Pioneer: {D=175,F=109},	beg=0, end=67, reps=1
-left:	Pioneer: {D=173,F=66},	beg=0, end=271, reps=4
-	Pioneer-Mix: {D0=173,F0=66},	beg=0, end=271, reps=2
-List/enter1:	Pioneer: {D=173,F=25},	beg=0, end=67, reps=1
-List/Enter2:	Pioneer: {D=175,F=44},	beg=0, end=67, reps=1
-right:	Pioneer: {D=173,F=67},	beg=0, end=271, reps=4
-	Pioneer-Mix: {D0=173,F0=67},	beg=0, end=271, reps=2
-up:	Pioneer: {D=173,F=64},	beg=0, end=543, reps=8
-	Pioneer-Mix: {D0=173,F0=64},	beg=0, end=543, reps=6
-down:	Pioneer: {D=173,F=65},	beg=0, end=271, reps=4
-	Pioneer-Mix: {D0=173,F0=65},	beg=0, end=271, reps=2
-Band Esc:	Pioneer: {D=173,F=18},	beg=0, end=203, reps=3
-	Pioneer-Mix: {D0=173,F0=18},	beg=0, end=203, reps=1
+Volume-:		Pioneer: {D=173,F=11},	beg=0, end=135, reps=2
+Volume+:		Pioneer: {D=173,F=10},	beg=0, end=135, reps=2
+Mute1:		Pioneer: {D=173,F=25},	beg=0, end=67, reps=1
+Mute2:		Pioneer: {D=175,F=48},	beg=0, end=67, reps=1
+'Answer 1:		Pioneer: {D=173,F=151},	beg=0, end=67, reps=1
+Answer 2:		Pioneer: {D=175,F=50},	beg=0, end=67, reps=1
+Hangup 1:		Pioneer: {D=173,F=151},	beg=0, end=67, reps=1
+Hangup2:		Pioneer: {D=175,F=51},	beg=0, end=67, reps=1
+source:		Pioneer: {D=173,F=26},	beg=0, end=135, reps=2
+Pause:		Pioneer: {D=173,F=88},	beg=0, end=407, reps=6
+display1:		Pioneer: {D=173,F=25},	beg=0, end=67, reps=1
+display2:		Pioneer: {D=175,F=109},	beg=0, end=67, reps=1
+left:		Pioneer: {D=173,F=66},	beg=0, end=271, reps=4
+List/enter1:		Pioneer: {D=173,F=25},	beg=0, end=67, reps=1
+List/Enter2:		Pioneer: {D=175,F=44},	beg=0, end=67, reps=1
+right:		Pioneer: {D=173,F=67},	beg=0, end=271, reps=4
+up:		Pioneer: {D=173,F=64},	beg=0, end=543, reps=8
+down:		Pioneer: {D=173,F=65},	beg=0, end=271, reps=4
+Band Esc:		Pioneer: {D=173,F=18},	beg=0, end=203, reps=3

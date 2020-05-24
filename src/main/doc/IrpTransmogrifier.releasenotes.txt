@@ -4,7 +4,7 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
-2020-05-??: Version 1.2.6
+2020-05-24: Version 1.2.6
 
 * Checksums (signed in released versions) now reside in files checksums.*. #169.
 * Improvements in the main documentation.

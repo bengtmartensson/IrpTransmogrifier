@@ -19,16 +19,6 @@ tabs. Braces in _simple_ if-statements (etc) discouraged. No linefeed before ope
 should be minimal; C style declaration of local variables in the beginning
 of a block discouraged.
 
-## Text file format
-
-The format of text files follows the requirement of portability:
-
-* Text files that are only of interest for Windows (e.g.
-<code>IrScrutinizer_inno.iss</code>) should use CRLF,
-* Text files that a Windows user may open with Textedit
-(e.g. <code>IrpProtocols.ini</code>)  should use CRLF, unless this creates other problems,
-* Otherwise LF.
-
 ## Build process
 
 [Apache Maven](https://maven.apache.org] is used for builds.

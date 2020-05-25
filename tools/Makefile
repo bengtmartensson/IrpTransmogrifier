@@ -19,7 +19,7 @@ IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
 #IRPTRANSMOGRIFIER := $(JAVA) -jar $(PROJECT_JAR) --loglevel warning --url-decode
 
 IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml
-UPLOADDIR_DIR := ftp://bengt-martensson.de/harctoolbox/downloads/
+UPLOADDIR_DIR := ftp://bengt-martensson.de/harctoolbox/
 
 GH_PAGES := $(TOP)/gh-pages
 ORIGINURL := $(shell git remote get-url origin)
@@ -77,9 +77,12 @@ tag:
 	git tag -s -a Version-$(VERSION) -m "Tagging Version-$(VERSION)"
 	git push origin Version-$(VERSION)
 
-upload-sums: $(SUMS)
-	@(cd target ; \
-	for file in $(foreach f,$(CHKSUMS),*.$f) ; do \
+upload-harctoolbox:
+	@(cd $(TOP)/../www.harctoolbox.org ; \
+	make clean ; \
+	make site ; \
+	cd build/site/en ; \
+	for file in IrpTransmogrifier.html IrpTransmogrifier.pdf IrpTransmogrifier.releasenotes.txt wholesite.html wholesite.pdf ; do \
 	echo Uploading $$file... ; \
 		curl --netrc --upload-file $$file $(UPLOADDIR_DIR)/$$file;\
 	done )

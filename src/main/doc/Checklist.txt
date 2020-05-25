@@ -1,0 +1,18 @@
+Checklist for release.
+
+0. Check in good code ;-). Check that tests run ok, javadoc is ok.
+1. Update pom.xml and releasenotes, and checkin. For this, can use
+   make setversion NEWVERSION=1.x.y.
+2. push, make sure Travis build is ok.
+3. make tag.
+4. mvn install
+5. Create release on GitHub, using just created tag. Upload
+*.bin.zip. releasenotes, checksums.
+6. Delete CI build.
+7. make deploy. If error, try again. Can take a several hours until it
+shows up at https://mvnrepository.com/artifact/org.harctoolbox/IrpTransmogrifier
+8. make gh-pages.
+9. cd .../www.harctoolbox.org; make clean; make site.
+10 cd build/site/en/; make clean; make site
+11. Upload IrpTransmogrifier.html IrpTransmogrifier.pdf
+IrpTransmogrifier.releasenotes.txt wholesite.html wholesite.pdf to harctoolbox.org.

@@ -102,7 +102,7 @@ uninstall:
 
 clean:
 	mvn clean
-	rm -f all-protocols.xml lirc.xml
+	rm -f all-protocols.xml lirc.xml pom.xml.versionsBackup
 	rm -rf $(GH_PAGES)
 
 .PHONY: clean $(PROJECT_JAR)-test release

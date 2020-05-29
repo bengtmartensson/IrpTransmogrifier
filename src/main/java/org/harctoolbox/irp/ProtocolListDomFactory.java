@@ -77,7 +77,7 @@ public class ProtocolListDomFactory {
         commandSet.setAttribute("name", "commandSet");
         remote.appendChild(commandSet);
         for (int i = 0; i< protocols.size(); i++)
-            commandSet.appendChild(commandToElement(protocols.get(i), names != null ? names.get(i) : null, analyzer.cleanedIrSequence(i)));
+            commandSet.appendChild(commandToElement(protocols.get(i), (names != null && names.size() > i) ? names.get(i) : null, analyzer.cleanedIrSequence(i)));
 
         return remote;
     }

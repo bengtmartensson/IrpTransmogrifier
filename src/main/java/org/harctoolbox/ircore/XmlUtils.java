@@ -71,14 +71,25 @@ public final class XmlUtils {
     public static final String SCHEMA_LOCATION_ATTRIBUTE_NAME       = "xsi:schemaLocation";
     public static final String XML_LANG_ATTRIBUTE_NAME              = XML_NS_PREFIX + ":lang";
     public static final String XML_SPACE_ATTRIBUTE_NAME             = XML_NS_PREFIX + ":space";
-    public static final String XML_PRESERVE_NAME                    = "preserve";
+    public static final String ENCODING_ATTRIBUTE_NAME              = "encoding";
+    public static final String PRESERVE                             = "preserve";
     public static final String ENGLISH                              = "en";
-    public final static String GIRR_NAMESPACE_URI                   = "http://www.harctoolbox.org/Girr";
-    public final static String IRP_NAMESPACE_URI                    = "http://www.harctoolbox.org/irp-protocols";
-    public final static String XINCLUDE_NAMESPACE_URI               = "http://www.w3.org/2001/XInclude";
-    public final static String GIRR_COMMENT                         = "This file is in the Girr (General IR Remote) format, see http://www.harctoolbox.org/Girr.html";
-    public final static String GIRR_SCHEMA_LOCATION                 = "http://www.harctoolbox.org/Girr http://www.harctoolbox.org/schemas/girr_ns.xsd";
-    public final static String IRP_SCHEMA_LOCATION                  = "http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd";
+    public static final String YES                                  = "yes";
+    public static final String NO                                   = "no";
+    public static final String TRUE                                 = "true";
+    public static final String FALSE                                = "false";
+    public static final String XML                                  = "xml";
+    public static final String HTML                                 = "html";
+    public static final String GIRR_NAMESPACE_URI                   = "http://www.harctoolbox.org/Girr";
+    public static final String IRP_NAMESPACE_URI                    = "http://www.harctoolbox.org/irp-protocols";
+    public static final String XINCLUDE_NAMESPACE_URI               = "http://www.w3.org/2001/XInclude";
+    public static final String GIRR_COMMENT                         = "This file is in the Girr (General IR Remote) format, see http://www.harctoolbox.org/Girr.html";
+    public static final String GIRR_VERSION_NAME                    = "girrVersion";
+    public static final String GIRR_VERSION                         = "1.1";
+    public static final String GIRR_SCHEMA_LOCATION                 = "http://www.harctoolbox.org/Girr http://www.harctoolbox.org/schemas/girr_ns-" + GIRR_VERSION + ".xsd";
+    public static final String IRP_SCHEMA_LOCATION                  = "http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd";
+    public static final String IRP_PREFIX                           = "irp";
+    public static final String GIRR_PREFIX                          = "girr";
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 
@@ -90,7 +101,7 @@ public final class XmlUtils {
 
     public static Document parseStringToXmlDocument(String string, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {
         try {
-            InputStream stream = new ByteArrayInputStream(string.getBytes("UTF-8"));
+            InputStream stream = new ByteArrayInputStream(string.getBytes(DEFAULT_CHARSETNAME));
             return openXmlStream(stream, null, isNamespaceAware, isXIncludeAware);
         } catch (IOException ex) {
             throw new ThisCannotHappenException();
@@ -202,8 +213,8 @@ public final class XmlUtils {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             if (encoding != null)
                 tr.setOutputProperty(OutputKeys.ENCODING, encoding);
-            tr.setOutputProperty(OutputKeys.INDENT, "no");
-            tr.setOutputProperty(OutputKeys.METHOD, "html");
+            tr.setOutputProperty(OutputKeys.INDENT, NO);
+            tr.setOutputProperty(OutputKeys.METHOD, HTML);
             tr.transform(new DOMSource(doc), new StreamResult(ostr));
         } catch (TransformerException ex) {
             logger.log(Level.SEVERE, "{0}", ex.getMessage());
@@ -216,8 +227,8 @@ public final class XmlUtils {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             if (encoding != null)
                 tr.setOutputProperty(OutputKeys.ENCODING, encoding);
-            tr.setOutputProperty(OutputKeys.INDENT, "yes");
-            tr.setOutputProperty(OutputKeys.METHOD, "xml");
+            tr.setOutputProperty(OutputKeys.INDENT, YES);
+            tr.setOutputProperty(OutputKeys.METHOD, XML);
             if (cdataElements != null)
                 tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
             tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -292,7 +303,7 @@ public final class XmlUtils {
             if (xslt == null) {
                 tr = factory.newTransformer();
 
-                tr.setOutputProperty(OutputKeys.METHOD, "xml");
+                tr.setOutputProperty(OutputKeys.METHOD, XML);
                 tr.setOutputProperty(OutputKeys.ENCODING, encoding);
 
             } else {
@@ -308,13 +319,13 @@ public final class XmlUtils {
                 NodeList nodeList = xslt.getDocumentElement().getElementsByTagNameNS(XmlUtils.XSLT_NAMESPACE_URI, "output");
                 if (nodeList.getLength() > 0) {
                     Element e = (Element) nodeList.item(0);
-                    e.setAttribute("encoding", encoding);
+                    e.setAttribute(ENCODING_ATTRIBUTE_NAME, encoding);
                 }
                 if (debug)
                     XmlUtils.printDOM(new File("stylesheet-params.xsl"), xslt);
                 tr = factory.newTransformer(new DOMSource(xslt, xslt.getDocumentURI()));
             }
-            tr.setOutputProperty(OutputKeys.INDENT, "yes");
+            tr.setOutputProperty(OutputKeys.INDENT, YES);
             tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             if (binary) {
                 DOMResult domResult = new DOMResult();
@@ -359,7 +370,7 @@ public final class XmlUtils {
 
     public static void addBooleanAttributeIfTrue(Element element, String attName, boolean value) {
         if (value)
-            element.setAttribute(attName, "true");
+            element.setAttribute(attName, TRUE);
     }
 
     public static void addDoubleAttributeAsInteger(Element element, String attName, double value) {

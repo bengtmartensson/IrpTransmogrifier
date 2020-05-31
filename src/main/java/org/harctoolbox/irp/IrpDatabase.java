@@ -998,7 +998,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                         Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
                         element.appendChild(param);
                         param.setAttribute(NAME_NAME, kvp.getKey());
-                        param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.XML_PRESERVE_NAME); // to prevent extra white space from being inserted
+                        param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.PRESERVE); // to prevent extra white space from being inserted
                         doc.adoptNode(documentFragment);
                         param.appendChild(documentFragment);
                     });

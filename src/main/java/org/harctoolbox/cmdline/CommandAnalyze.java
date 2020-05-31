@@ -85,6 +85,9 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"--eliminate-vars"}, description = "Eliminate variables in output form")
     private boolean eliminateVars = false;
 
+    @Parameter(names = {"--fatgirr"}, description = "Generate Girr file in fat format (EXPERIMENTAL).")
+    private boolean fatgirr = false;
+
     @Parameter(names = {"-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
     private Double frequency = null;
 
@@ -388,10 +391,10 @@ public class CommandAnalyze extends AbstractCommand {
             } else {
                 List<Protocol> protocols = analyzer.searchBestProtocol(params, decoder, commandLineArgs.regexp);
 
-                if (girr) {
-                    System.err.println("NOTE: --girr supresses all other output!");
-                    Document doc = ProtocolListDomFactory.protocolListToDom(analyzer, protocols, names, radix);
+                if (girr || fatgirr) {
+                    Document doc = ProtocolListDomFactory.protocolListToDom(analyzer, protocols, names, radix, fatgirr);
                     XmlUtils.printDOM(out, doc, commandLineArgs.encoding, "");
+                    logger.warning("--girr and --fatgirr suppress all other output!");
                     return;
                 }
 

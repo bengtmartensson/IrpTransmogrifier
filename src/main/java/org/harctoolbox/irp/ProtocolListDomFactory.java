@@ -31,8 +31,8 @@ import org.w3c.dom.Text;
 
 public class ProtocolListDomFactory {
 
-    public static Document protocolListToDom(Analyzer analyzer, List<Protocol> protocols, List<String> names, int radix) {
-        ProtocolListDomFactory factory = new ProtocolListDomFactory(analyzer, protocols, names, radix);
+    public static Document protocolListToDom(Analyzer analyzer, List<Protocol> protocols, List<String> names, int radix, boolean fat) {
+        ProtocolListDomFactory factory = new ProtocolListDomFactory(analyzer, protocols, names, radix, fat);
         return factory.getDocument();
     }
 
@@ -44,7 +44,7 @@ public class ProtocolListDomFactory {
     private final List<Protocol> protocols;
     private int counter;
 
-    private ProtocolListDomFactory(Analyzer analyzer, List<Protocol> protocols, List<String> names, int radix) {
+    private ProtocolListDomFactory(Analyzer analyzer, List<Protocol> protocols, List<String> names, int radix, boolean fat) {
         this.protocolsWithoutDefs = new HashMap<>(8);
         this.analyzer = analyzer;
         this.protocols = protocols;
@@ -62,46 +62,68 @@ public class ProtocolListDomFactory {
         doc.appendChild(remotes);
         Element protocolsElement = mkProtocols();
         remotes.appendChild(protocolsElement);
-        Element remote = commandsToElement();
+        Element remote = commandsToElement(fat);
         remotes.appendChild(remote);
     }
 
 
-    private Element commandsToElement() {
+    private Element commandsToElement(boolean fat) {
         Element remote = doc.createElementNS(XmlUtils.GIRR_NAMESPACE_URI, "remote");
         remote.setAttribute("name", "remote");
         Element commandSet = doc.createElementNS(XmlUtils.GIRR_NAMESPACE_URI, "commandSet");
         commandSet.setAttribute("name", "commandSet");
         remote.appendChild(commandSet);
-        for (int i = 0; i< protocols.size(); i++)
-            commandSet.appendChild(commandToElement(protocols.get(i), (names != null && names.size() > i) ? names.get(i) : null, analyzer.cleanedIrSequence(i)));
+        if (analyzer.isSignalMode())
+            commandSet.appendChild(commandToElement(protocols.get(0), (names != null && names.size() > 0) ? names.get(0) : null,
+                    analyzer.cleanedIrSequence(0), analyzer.cleanedIrSequence(1), analyzer.cleanedIrSequence(2), fat));
+        else
+            for (int i = 0; i < protocols.size(); i++)
+                commandSet.appendChild(commandToElement(protocols.get(i), (names != null && names.size() > i) ? names.get(i) : null, analyzer.cleanedIrSequence(i), null, null, fat));
 
         return remote;
     }
 
-    private Element commandToElement(Protocol protocol, String name, IrSequence irSequence) {
+    private Element commandToElement(Protocol protocol, String name, IrSequence intro, IrSequence repeat, IrSequence ending, boolean fat) {
         Element command = doc.createElementNS(XmlUtils.GIRR_NAMESPACE_URI, "command");
         @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
         String commandName = name != null ? name : ("unnamed_" + Integer.toString(counter++));
         command.setAttribute("name", commandName);
         Element parameters = parametersToElement(protocol);
         command.appendChild(parameters);
-        Element raw = rawToElement(irSequence);
+        Element raw = rawToElement(intro, repeat, ending, fat);
         command.appendChild(raw);
         command.setAttribute("master", "raw");
         return command;
     }
 
-    private Element rawToElement(IrSequence irSequence) {
+    private Element rawToElement(IrSequence intro, IrSequence repeat, IrSequence ending, boolean fat) {
         Element raw = doc.createElementNS(XmlUtils.GIRR_NAMESPACE_URI, "raw");
         raw.setAttribute("frequency",
                 Integer.toString(analyzer.getFrequency() != null
                         ? analyzer.getFrequency().intValue() : (int) ModulatedIrSequence.DEFAULT_FREQUENCY));
-        Element intro = doc.createElementNS(XmlUtils.GIRR_NAMESPACE_URI, "intro");
-        raw.appendChild(intro);
-        Text content = doc.createTextNode(irSequence.toString(true, " ", "", ""));
-        intro.appendChild(content);
+        if (intro != null)
+            raw.appendChild(irSequenceToElement(intro, "intro", fat));
+        if (repeat != null)
+            raw.appendChild(irSequenceToElement(repeat, "repeat", fat));
+        if (ending != null)
+            raw.appendChild(irSequenceToElement(ending, "ending", fat));
         return raw;
+    }
+
+    private Element irSequenceToElement(IrSequence irSequence, String name, boolean fat) {
+        Element element = doc.createElementNS(XmlUtils.GIRR_NAMESPACE_URI, name);
+        if (fat) {
+            for (int i = 0; i < irSequence.getLength(); i++) {
+                Element el = doc.createElementNS(XmlUtils.GIRR_NAMESPACE_URI, ((i & 1) != 0 ? "gap" : "flash"));
+                Text text = doc.createTextNode(Long.toString(Math.round(irSequence.get(i))));
+                el.appendChild(text);
+                element.appendChild(el);
+            }
+        } else {
+            Text content = doc.createTextNode(irSequence.toString(true, " ", "", ""));
+            element.appendChild(content);
+        }
+        return element;
     }
 
     private Element parametersToElement(Protocol protocol) {

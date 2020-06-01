@@ -431,6 +431,18 @@ public class ProtocolNGTest {
     }
 
     /**
+     * Test of fillInDefaults, of class Protocol.
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testFillInDefaults() throws Exception {
+        System.out.println("FillInDefaults");
+        Map<String, Long> params = new NameEngine("{D=12,F=34}").toMap();
+        Map<String, Long> namesWithDefaults = nec1.fillInDefaults(params);
+        assertTrue(namesWithDefaults.get("S") == 243L);
+    }
+
+    /**
      * Test of getUnit method, of class Protocol.
      */
     @Test

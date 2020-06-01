@@ -934,6 +934,28 @@ public class Protocol extends IrpObject implements AggregateLister {
     }
 
     /**
+     * Add the missing (= defaulted) parameter in the argument Map.
+     * @param parameters
+     * @return Map with missing parameters filled in with their defaults.
+     * @throws NameUnassignedException if the defaults cannot be computed due to missing parameters (for example D in NEC1).
+     */
+    public Map<String, Long> fillInDefaults(Map<String, Long> parameters) throws NameUnassignedException {
+        HashMap<String, Long> result = new HashMap<>(parameters);
+        NameEngine nameEngine = new NameEngine(parameters);
+        for (ParameterSpec parameterSpec : parameterSpecs) {
+            String name = parameterSpec.getName();
+            if (! result.containsKey(name)) {
+                Expression deflt = parameterSpec.getDefault();
+                if (deflt == null)
+                    throw new NameUnassignedException(name);
+                long val = deflt.toLong(nameEngine); // NPE if non existent...
+                result.put(name, val);
+            }
+        }
+        return result;
+    }
+
+    /**
      * This exception is thrown when trying to decode with a Protocol that is not decodeable.
      */
     public static class ProtocolNotDecodableException extends IrpException {

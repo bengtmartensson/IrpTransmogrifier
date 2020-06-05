@@ -52,7 +52,6 @@ public final class IrpTransmogrifier extends CmdLineProgram {
     /**
      * Configuration file to use if none specified. Taken from main jar file.
      */
-    public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml"; // in jar-file
     private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
 
     /**

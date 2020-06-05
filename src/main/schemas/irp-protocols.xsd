@@ -93,7 +93,7 @@
             <xs:sequence>
                 <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
             </xs:sequence>
-            <xs:attribute name="name" type="xs:string"/>
+            <xs:attributeGroup ref="name"/>
             <xs:attribute name="type" type="parameterType" default="text"/>
         </xs:complexType>
     </xs:element>
@@ -115,7 +115,7 @@
 
     <xs:attributeGroup name="name">
         <xs:annotation>
-            <xs:documentation>Name of the protocol. May contain "funny" characters.</xs:documentation>
+            <xs:documentation>Name of a protocol or parameter. May contain "funny" characters.</xs:documentation>
         </xs:annotation>
         <xs:attribute name="name" use="required" type="xs:string">
         </xs:attribute>
@@ -123,7 +123,7 @@
 
     <xs:attributeGroup name="c-name">
         <xs:annotation>
-            <xs:documentation>Name of the protocol, as valid C identifier. For protocol names which are already valid C identifiers, this need not be given.</xs:documentation>
+            <xs:documentation>Name of the protocol, as valid C identifier. Since a default C name can be computed, usage is discouraged.</xs:documentation>
         </xs:annotation>
         <xs:attribute name="c-name" type="xs:string">
         </xs:attribute>

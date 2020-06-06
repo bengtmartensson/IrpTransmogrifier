@@ -71,7 +71,6 @@
             </resource>
         </resources>
         <plugins>
-            <!-- Generate Version.java from Version.xml using mkVersion.xsl. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xml-maven-plugin</artifactId>
@@ -80,19 +79,36 @@
                     <execution>
                         <phase>generate-sources</phase>
                         <goals>
+                            <goal>validate</goal>
                             <goal>transform</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <basedir>src/main/schemas</basedir>
+                    <catalogHandling>strict</catalogHandling>
+                    <catalogs>
+                        <catalog>catalog.xml</catalog>
+                    </catalogs>
+                    <validationSets>
+                        <validationSet>
+                            <dir>src/main/resources</dir>
+                            <includes>
+                                <include>IrpProtocols.xml</include>
+                            </includes>
+                            <xincludeAware>true</xincludeAware>
+                            <systemId>http://www.harctoolbox.org/schemas/irp-protocols.xsd</systemId>
+                        </validationSet>
+                    </validationSets>
                     <transformationSets>
                         <transformationSet>
+                            <!-- Generate Version.java from Version.xml using mkVersion.xsl. -->
                             <dir>src/main/xml</dir>
                             <outputDir>${project.build.directory}/generated-sources/xml/org/harctoolbox/irp</outputDir>
                             <includes>
                                 <include>Version.xml</include>
                             </includes>
-                            <stylesheet>${project.build.directory}/../tools/mkVersion.xsl</stylesheet>
+                            <stylesheet>${project.basedir}/tools/mkVersion.xsl</stylesheet>
                             <parameters>
                                 <parameter>
                                     <name>version</name>
@@ -119,7 +135,7 @@
                             <includes>
                                 <include>IrpProtocols.xml</include>
                             </includes>
-                            <stylesheet>src/main/resources/IrpProtocols2html.xsl</stylesheet>
+                            <stylesheet>${project.basedir}/src/main/resources/IrpProtocols2html.xsl</stylesheet>
                             <fileMappers>
                                 <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
                                     <targetExtension>.html</targetExtension>
@@ -132,7 +148,7 @@
                             <includes>
                                 <include>IrpProtocols.xml</include>
                             </includes>
-                            <stylesheet>src/main/resources/IrpProtocols2md.xsl</stylesheet>
+                            <stylesheet>${project.basedir}/src/main/resources/IrpProtocols2md.xsl</stylesheet>
                             <fileMappers>
                                 <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
                                     <targetExtension>.md</targetExtension>
@@ -146,7 +162,7 @@
                             <includes>
                                 <include>${project.name}.xml</include>
                             </includes>
-                            <stylesheet>tools/xdoc2html.xsl</stylesheet>
+                            <stylesheet>${project.basedir}/tools/xdoc2html.xsl</stylesheet>
                             <fileMappers>
                                 <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
                                     <targetExtension>.html</targetExtension>
@@ -154,11 +170,6 @@
                             </fileMappers>
                         </transformationSet>
                     </transformationSets>
-
-                    <!-- Uncomment to use local versions of the schemas/DTDs -->
-                    <!--catalogs>
-                        <catalog>../schemas/catalog.xml</catalog>
-                    </catalogs-->
                 </configuration>
 
                 <dependencies>

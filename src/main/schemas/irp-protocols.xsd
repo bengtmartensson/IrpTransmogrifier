@@ -53,7 +53,7 @@
             <xs:documentation>Describes one IR protocol in IRP form.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence maxOccurs="unbounded">
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
                 <xs:choice>
                     <xs:element ref="irp"/>
                     <xs:element ref="documentation"/>

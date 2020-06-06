@@ -27,6 +27,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,12 +40,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.w3c.dom.Document;
@@ -133,7 +137,12 @@ public final class XmlUtils {
     }
 
     public static Document openXmlFile(File file, File schemaFile, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
-        Schema schema = readSchemaFromFile(schemaFile);
+        Schema schema = readSchema(schemaFile);
+        return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
+    }
+    
+    public static Document openXmlFile(File file, String schemaString, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
+        Schema schema = readSchema(schemaString);
         return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
     }
 
@@ -273,12 +282,29 @@ public final class XmlUtils {
         printDOM(System.out, doc, null, null);
     }
 
-    private static Schema readSchemaFromFile(File schemaFile) {
+    public static Schema readSchema(Source source) throws SAXException {
+        return (SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)).newSchema(source);
+    }
+
+    public static Schema readSchema(File schemaFile) throws SAXException {
+        return readSchema(new StreamSource(schemaFile));
+    }
+
+    public static Schema readSchema(InputStream inputStream) throws SAXException {
+        return readSchema(new StreamSource(inputStream));
+    }
+
+    public static Schema readSchema(URL schemaUrl) throws SAXException {
+        return readSchema(new StreamSource(schemaUrl.toExternalForm()));
+    }
+
+    public static Schema readSchema(String schemaString) throws SAXException {
         try {
-            return (SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)).newSchema(schemaFile);
-        } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            throw new ThisCannotHappenException(ex);
+            URL url = new URL(schemaString);
+            return readSchema(url);
+        } catch (MalformedURLException ex) {
+            File file = new File(schemaString);
+            return readSchema(file);
         }
     }
 
@@ -402,7 +428,7 @@ public final class XmlUtils {
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void main(String[] args) {
         try {
-            Schema schema = args.length > 1 ? readSchemaFromFile(new File(args[1])) : null;
+            Schema schema = args.length > 1 ? readSchema(args[1]) : null;
             Document doc = openXmlFile(new File(args[0]), schema, true, true);
             System.out.println(doc);
         } catch (SAXException | IOException ex) {

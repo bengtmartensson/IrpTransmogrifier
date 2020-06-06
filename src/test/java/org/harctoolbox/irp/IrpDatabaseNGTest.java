@@ -28,7 +28,7 @@ public class IrpDatabaseNGTest {
 
     private final IrpDatabase instance;
 
-    public IrpDatabaseNGTest() throws IOException, IrpParseException {
+    public IrpDatabaseNGTest() throws Exception {
         instance = new IrpDatabase(CONFIGFILE);
     }
 
@@ -47,7 +47,7 @@ public class IrpDatabaseNGTest {
      * @throws org.harctoolbox.irp.IrpParseException
      */
     @Test
-    public void testCheckSorted() throws IOException, IrpParseException {
+    public void testCheckSorted() throws Exception {
         System.out.println("checkSorted");
         IrpDatabase db = new IrpDatabase(CONFIGFILE);
         String result = db.checkSorted();
@@ -60,7 +60,7 @@ public class IrpDatabaseNGTest {
      * @throws org.harctoolbox.irp.IrpParseException
      */
     @Test(enabled = false)
-    public void testIsKnown_String_String() throws IOException, IrpParseException {
+    public void testIsKnown_String_String() throws Exception {
         System.out.println("isKnown");
         String protocolsPath = CONFIGFILE;
         assertFalse(IrpDatabase.isKnown(protocolsPath, "covfefe"));
@@ -291,7 +291,7 @@ public class IrpDatabaseNGTest {
 
 
     @Test
-    public void testRemove() throws IOException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, UnknownProtocolException {
+    public void testRemove() throws Exception {
         System.out.println("testRemove");
         IrpDatabase irpDatabase = new IrpDatabase((String) null);
         irpDatabase.getNamedProtocolExpandAlias("RC6-6-32");
@@ -304,7 +304,7 @@ public class IrpDatabaseNGTest {
     }
 
     @Test
-    public void testPatchFile() throws IOException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException, IrpParseException {
+    public void testPatchFile() throws Exception {
         System.out.println("testPatchFile");
         IrpDatabase irpDatabase = new IrpDatabase((String) null);
         List<String> necExecutors = irpDatabase.getProperties("nec1", "uei-executor");

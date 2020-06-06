@@ -40,6 +40,7 @@ import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.cmdline.UsageException;
 import org.harctoolbox.ircore.IrCoreException;
 import org.harctoolbox.ircore.OddSequenceLengthException;
+import org.xml.sax.SAXException;
 
 /**
  * This class contains a command line main routine, allowing command line access to most things in the package.
@@ -183,6 +184,9 @@ public final class IrpTransmogrifier extends CmdLineProgram {
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR,
                     "No decoder matched \"" + ex.getMessage() +
                     "\". Use \"--decoder list\" to list the available decoders.");
+        } catch (SAXException ex) {
+            // This is a "report to developers"
+            return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_INTERNAL_FAILURE, ex.getLocalizedMessage());
         }
         return new ProgramExitStatus();
     }

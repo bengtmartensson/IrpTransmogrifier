@@ -43,6 +43,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
+import org.xml.sax.SAXException;
 
 /**
  * This class makes a decoder of an IrpDatabase, or optionally a subset thereof.
@@ -82,7 +83,7 @@ public final class Decoder {
             SimpleDecodesSet decodes = decoder.decodeIrSignal(irSignal);
             for (Decode decode : decodes)
                 System.out.println(decode);
-        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | IrpParseException ex) {
+        } catch (IOException | Pronto.NonProntoFormatException | InvalidArgumentException | IrpParseException | SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
         }
@@ -90,7 +91,7 @@ public final class Decoder {
 
     private final Map<String, NamedProtocol> parsedProtocols;
 
-    private Decoder(File irpDatabasePath) throws IOException, IrpParseException {
+    private Decoder(File irpDatabasePath) throws IOException, IrpParseException, SAXException {
         this(new IrpDatabase(irpDatabasePath), null);
     }
 
@@ -98,7 +99,7 @@ public final class Decoder {
         this(irpDatabase, null);
     }
 
-    public Decoder() throws IrpParseException, IOException {
+    public Decoder() throws IrpParseException, IOException, SAXException {
         this(new IrpDatabase((String) null));
     }
 
@@ -108,7 +109,7 @@ public final class Decoder {
      * @throws java.io.IOException
      * @throws org.harctoolbox.irp.IrpParseException
      */
-    public Decoder(String... names) throws IOException, IrpParseException {
+    public Decoder(String... names) throws IOException, IrpParseException, SAXException {
         this(new IrpDatabase((String) null), Arrays.asList(names));
     }
 

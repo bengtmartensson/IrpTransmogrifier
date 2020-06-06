@@ -65,11 +65,13 @@ import org.xml.sax.SAXException;
  * This class is a data bases manager for the data base of IRP protocols.
  * It reads a configuration file containing definitions for IR format in the IRP-Notation.
  */
+// NOTE: The program must work also if the schema cannot be retrieved.
 public final class IrpDatabase implements Iterable<NamedProtocol> {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
 
     public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml";
     public static final String IRP_PROTOCOL_NS = "http://www.harctoolbox.org/irp-protocols";
+    public static final String IRP_SCHEMA_FILE = "/irp-protocols.xsd";
     public static final String IRP_PROTOCOL_SCHEMA_LOCATION = "http://www.harctoolbox.org/schemas/irp-protocols.xsd";
     public static final String IRP_NAMESPACE_PREFIX = "irp";
     private static final int MAX_RECURSION_DEPTH = 5;
@@ -110,6 +112,26 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String PROTOCOL_CNAME_NAME = "cProtocolName";
     public static final String META_DATA_NAME = "metaData";
 
+    private static boolean validating = false;
+    private static Schema schema = null;
+
+    public static boolean isValidating() {
+        return validating;
+    }
+
+    public static void setValidating(boolean newValidating) throws SAXException {
+        validating = newValidating;
+        if (validating) {
+            if (schema == null)
+            schema = XmlUtils.readSchema(IrpDatabase.class.getResourceAsStream(IRP_SCHEMA_FILE));
+        } else
+            schema = null;
+    }
+
+    public static Schema getSchema() {
+        return schema;
+    }
+
     static boolean isKnownKeyword(String key) {
         return key.equals(PROTOCOL_NAME)
                 || key.equals(NAME_NAME)
@@ -129,7 +151,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                 || key.equals(ALT_NAME_NAME);
     }
 
-    public static boolean isKnown(String protocolsPath, String protocol) throws IOException, IrpParseException {
+    public static boolean isKnown(String protocolsPath, String protocol) throws IOException, IrpParseException, SAXException {
         return (new IrpDatabase(protocolsPath)).isKnown(protocol);
     }
 
@@ -142,8 +164,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
      * @throws org.harctoolbox.irp.IrpParseException
      * @throws org.harctoolbox.irp.UnknownProtocolException
      * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
      */
-    public static String getIrp(String configFilename, String protocolName) throws IrpParseException, UnknownProtocolException, IOException {
+    public static String getIrp(String configFilename, String protocolName) throws IrpParseException, UnknownProtocolException, IOException, SAXException {
         IrpDatabase irpMaster = new IrpDatabase(configFilename);
         return irpMaster.getIrp(protocolName);
     }
@@ -163,28 +186,16 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return new IrpDatabase(toUnparsedProtocols(map));
     }
 
-    private static Document openXmlStream(InputStream inputStream) throws IOException {
-        try {
-            return XmlUtils.openXmlStream(inputStream, null, true, true);
-        } catch (SAXException ex) {
-            throw new IOException(ex);
-        }
+    private static Document openXmlStream(InputStream inputStream) throws IOException, SAXException {
+        return XmlUtils.openXmlStream(inputStream, getSchema(), true, true);
     }
 
-    private static Document openXmlReader(Reader reader) throws IOException {
-        try {
-            return XmlUtils.openXmlReader(reader, null, true, true);
-        } catch (SAXException ex) {
-            throw new IOException(ex);
-        }
+    private static Document openXmlReader(Reader reader) throws IOException, SAXException {
+        return XmlUtils.openXmlReader(reader, getSchema(), true, true);
     }
 
-    private static Document openXmlFile(File file) throws IOException {
-        try {
-            return XmlUtils.openXmlFile(file, (Schema) null, true, true);
-        } catch (SAXException ex) {
-            throw new IOException(ex);
-        }
+    private static Document openXmlFile(File file) throws IOException, SAXException {
+        return XmlUtils.openXmlFile(file, getSchema(), true, true);
     }
 
     private static Map<String, UnparsedProtocol> toUnparsedProtocols(Map<String, String>protocols) {
@@ -203,7 +214,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static IrpDatabase newDefaultIrpDatabase() {
         try {
             return new IrpDatabase((String) null);
-        } catch (IOException | IrpParseException ex) {
+        } catch (IOException | IrpParseException | SAXException ex) {
             throw new ThisCannotHappenException(ex);
         }
     }
@@ -219,32 +230,23 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     private Map<String, String> aliases;
 
-    public IrpDatabase(Reader reader) throws IOException, IrpParseException {
+    public IrpDatabase(Reader reader) throws IOException, IrpParseException, SAXException {
         this(openXmlReader(reader));
     }
 
-    public IrpDatabase(InputStream inputStream) throws IOException, IrpParseException {
+    public IrpDatabase(InputStream inputStream) throws IOException, IrpParseException, SAXException {
         this(openXmlStream(inputStream));
     }
 
-    public IrpDatabase(File file) throws IOException, IrpParseException {
+    public IrpDatabase(File file) throws IOException, IrpParseException, SAXException {
         this(openXmlFile(file));
     }
 
-    public IrpDatabase(String file) throws IOException, IrpParseException {
+    public IrpDatabase(String file) throws IOException, IrpParseException, SAXException {
         this(mkStream(file));
     }
 
-    public IrpDatabase(String[] files) throws IrpParseException, IOException {
-        this();
-        for (String file : files)
-            patch(file);
-
-        expand();
-        rebuildAliases();
-    }
-
-    public IrpDatabase(Iterable<File> files) throws IrpParseException, IOException {
+    public IrpDatabase(Iterable<File> files) throws IrpParseException, IOException, SAXException {
         this();
         for (File file : files)
             patch(file);
@@ -272,15 +274,15 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         rebuildAliases();
     }
 
-    public void patch(Reader reader) throws IOException {
+    public void patch(Reader reader) throws IOException, SAXException {
         patch(openXmlReader(reader));
     }
 
-    public void patch(File file) throws IOException {
+    public void patch(File file) throws IOException, SAXException {
         patch(openXmlFile(file));
     }
 
-    public void patch(String file) throws IOException {
+    public void patch(String file) throws IOException, SAXException {
         patch(new File(file));
     }
 

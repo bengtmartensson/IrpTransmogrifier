@@ -1,7 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.io.IOException;
-import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.*;
@@ -26,7 +24,7 @@ public class NamedProtocolNGTest {
     private final IrSignal irSignal;
     private final Decoder decoder;
 
-    public NamedProtocolNGTest() throws Pronto.NonProntoFormatException, InvalidArgumentException, IrpParseException, IOException {
+    public NamedProtocolNGTest() throws Exception {
         irSignal = Pronto.parse("0000 006D 0012 0012 0008 0027 0008 003C 0008 0022 0008 006A 0008 0032 0008 0032 0008 001D 0008 001D 0008 020C 0008 0027 0008 0060 0008 001D 0008 0022 0008 001D 0008 001D 0008 001D 0008 001D 0008 0BEF 0008 0027 0008 003C 0008 0022 0008 006A 0008 0032 0008 0032 0008 001D 0008 001D 0008 020C 0008 0027 0008 0037 0008 0046 0008 0022 0008 001D 0008 001D 0008 001D 0008 001D 0008 0BEF");
         decoder = new Decoder();
     }

@@ -23,6 +23,7 @@ import java.util.List;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpParseException;
 import org.harctoolbox.irp.UnknownProtocolException;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("PublicField")
 public class CommandIrpDatabaseOptions extends CommandBasicOptions {
@@ -36,10 +37,15 @@ public class CommandIrpDatabaseOptions extends CommandBasicOptions {
 
     @Parameter(names = {"-i", "--irp"}, description = "Explicit IRP string to use as protocol definition.")
     public String irp = null;
+    
+    @Parameter(names = {"--validate"}, description = "Validate IRP database files against the schema, abort if not valid.")
+    public boolean validate = false;
 
-   public IrpDatabase setupDatabase() throws UsageException, IrpParseException, IOException, UnknownProtocolException {
+   public IrpDatabase setupDatabase() throws UsageException, IrpParseException, IOException, UnknownProtocolException, SAXException {
         if (configFiles != null && irp != null)
             throw new UsageException("At most one of configfile and irp can be specified");
+
+        IrpDatabase.setValidating(validate);
 
         IrpDatabase irpDatabase = irp != null ? IrpDatabase.parseIrp("user_protocol", irp, "Protocol entered on the command line")
                 : configFiles != null ? new IrpDatabase(configFiles)

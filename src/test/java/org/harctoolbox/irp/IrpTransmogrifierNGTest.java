@@ -670,4 +670,13 @@ public class IrpTransmogrifierNGTest {
         String result = execute("list --help");
         assertEquals(result.substring(0, 72), "List protocols and their properites.\nUsage: list [options] List of proto");
     }
+
+    @Test(enabled = true)
+    public void testValidate() {
+        System.out.println("testValidate");
+        String result = execute("-c src/main/resources/IrpProtocols.xml,src/test/resources/IrpProtocols-silly.xml list");
+        assertTrue(result.length() > 1000);
+        result = execute("--validate -c src/main/resources/IrpProtocols.xml,src/test/resources/IrpProtocols-silly.xml list");
+        assertNull(result);
+    }
 }

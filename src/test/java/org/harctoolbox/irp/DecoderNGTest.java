@@ -251,7 +251,7 @@ public class DecoderNGTest {
      * @throws java.io.IOException
      */
     @Test
-    public void testDecode_8args_ModulatedIrSequence() throws IrpParseException, IOException {
+    public void testDecode_8args_ModulatedIrSequence() throws Exception {
         System.out.println("decode_8args_ModulatedIrSequence");
         ModulatedIrSequence irSequence = new ModulatedIrSequence(IrSequence.concatenate(nec1Intro, nec1Repeat, nec1Repeat, rc5Seq), 37000d);
         boolean strict = true;

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
-import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.irp.CodeGenerator;
 import org.harctoolbox.irp.DumpCodeGenerator;
 import org.harctoolbox.irp.InvalidNameException;
@@ -40,6 +39,7 @@ import org.harctoolbox.irp.STCodeGenerator;
 import org.harctoolbox.irp.UnknownProtocolException;
 import org.harctoolbox.irp.UnsupportedRepeatException;
 import org.harctoolbox.irp.Version;
+import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
 
 @SuppressWarnings("FieldMayBeFinal")

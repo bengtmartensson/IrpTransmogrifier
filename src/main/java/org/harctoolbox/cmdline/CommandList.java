@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.harctoolbox.ircore.DumbHtmlRenderer;
 import org.harctoolbox.ircore.ThisCannotHappenException;
-import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
@@ -35,6 +33,8 @@ import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.NamedProtocol;
 import org.harctoolbox.irp.UnknownProtocolException;
 import org.harctoolbox.irp.UnsupportedRepeatException;
+import org.harctoolbox.xml.DumbHtmlRenderer;
+import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 

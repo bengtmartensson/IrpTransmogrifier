@@ -1,10 +1,9 @@
 package org.harctoolbox.irp;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import org.harctoolbox.ircore.DumbHtmlRenderer;
+import org.harctoolbox.xml.DumbHtmlRenderer;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;

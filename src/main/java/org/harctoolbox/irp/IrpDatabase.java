@@ -41,18 +41,18 @@ import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XML_NS_URI;
 import javax.xml.validation.Schema;
-import org.harctoolbox.ircore.DumbHtmlRenderer;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
-import org.harctoolbox.ircore.XmlUtils;
-import static org.harctoolbox.ircore.XmlUtils.HTML_NAMESPACE_URI;
-import static org.harctoolbox.ircore.XmlUtils.SCHEMA_LOCATION_ATTRIBUTE_NAME;
-import static org.harctoolbox.ircore.XmlUtils.W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME;
-import static org.harctoolbox.ircore.XmlUtils.XINCLUDE_NAMESPACE_ATTRIBUTE_NAME;
-import static org.harctoolbox.ircore.XmlUtils.XINCLUDE_NAMESPACE_URI;
-import static org.harctoolbox.ircore.XmlUtils.XML_NAMESPACE_ATTRIBUTE_NAME;
+import org.harctoolbox.xml.DumbHtmlRenderer;
+import org.harctoolbox.xml.XmlUtils;
+import static org.harctoolbox.xml.XmlUtils.HTML_NAMESPACE_URI;
+import static org.harctoolbox.xml.XmlUtils.SCHEMA_LOCATION_ATTRIBUTE_NAME;
+import static org.harctoolbox.xml.XmlUtils.W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME;
+import static org.harctoolbox.xml.XmlUtils.XINCLUDE_NAMESPACE_ATTRIBUTE_NAME;
+import static org.harctoolbox.xml.XmlUtils.XINCLUDE_NAMESPACE_URI;
+import static org.harctoolbox.xml.XmlUtils.XML_NAMESPACE_ATTRIBUTE_NAME;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -123,7 +123,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         validating = newValidating;
         if (validating) {
             if (schema == null)
-            schema = XmlUtils.readSchema(IrpDatabase.class.getResourceAsStream(IRP_SCHEMA_FILE));
+                schema = XmlUtils.readSchema(IrpDatabase.class.getResourceAsStream(IRP_SCHEMA_FILE));
         } else
             schema = null;
     }

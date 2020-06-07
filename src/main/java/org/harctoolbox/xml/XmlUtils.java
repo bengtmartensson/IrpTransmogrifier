@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 */
 
-package org.harctoolbox.ircore;
+package org.harctoolbox.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -50,6 +50,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -140,7 +142,7 @@ public final class XmlUtils {
         Schema schema = readSchema(schemaFile);
         return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
     }
-    
+
     public static Document openXmlFile(File file, String schemaString, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
         Schema schema = readSchema(schemaString);
         return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);

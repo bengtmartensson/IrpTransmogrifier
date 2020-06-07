@@ -40,7 +40,6 @@ import org.harctoolbox.ircore.MultiParser;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThingsLineParser;
 import org.harctoolbox.ircore.ThisCannotHappenException;
-import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.irp.BitCounter;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.DomainViolationException;
@@ -54,6 +53,7 @@ import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.Number;
 import org.harctoolbox.irp.Protocol;
 import org.harctoolbox.irp.ProtocolListDomFactory;
+import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
 
 @SuppressWarnings("FieldMayBeFinal")

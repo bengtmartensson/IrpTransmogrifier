@@ -36,7 +36,7 @@ import org.harctoolbox.ircore.IrSignal.Pass;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.ThisCannotHappenException;
-import org.harctoolbox.ircore.XmlUtils;
+import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -15,9 +15,11 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 */
 
-package org.harctoolbox.ircore;
+package org.harctoolbox.xml;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -50,12 +52,17 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.harctoolbox.ircore.IrCoreUtils;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -99,6 +106,13 @@ public final class XmlUtils {
 
     private static boolean debug = false;
 
+    private static final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+    static {
+        LSResourceResolver resourceResolver = new MyLSResourceResolver();
+        schemaFactory.setResourceResolver(resourceResolver);
+    }
+
     public static void setDebug(boolean dbg) {
         debug = dbg;
     }
@@ -115,24 +129,6 @@ public final class XmlUtils {
     public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
         final String fname = file.getCanonicalPath();
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
-
-        builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
-            @Override
-            public void error(SAXParseException exception) throws SAXParseException {
-                throw new SAXParseException("Parse Error in file " + fname + ", line " + exception.getLineNumber() + ": " + exception.getMessage(), "", fname, exception.getLineNumber(), 0);
-            }
-
-            @Override
-            public void fatalError(SAXParseException exception) throws SAXParseException {
-                throw new SAXParseException("Parse Error in file " + fname + ", line " + exception.getLineNumber() + ": " + exception.getMessage(), "", fname, exception.getLineNumber(), 0);
-            }
-
-            @Override
-            public void warning(SAXParseException exception) {
-                logger.log(Level.WARNING, "Parse Warning: {0}{1}", new Object[]{exception.getMessage(), exception.getLineNumber()});
-            }
-        });
-
         return builder.parse(file);
     }
 
@@ -140,7 +136,7 @@ public final class XmlUtils {
         Schema schema = readSchema(schemaFile);
         return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
     }
-    
+
     public static Document openXmlFile(File file, String schemaString, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
         Schema schema = readSchema(schemaString);
         return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
@@ -157,23 +153,6 @@ public final class XmlUtils {
 
     public static Document openXmlStream(InputStream stream, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
-
-        builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
-            @Override
-            public void error(SAXParseException exception) throws SAXParseException {
-                throw new SAXParseException("Parse Error in instream, line " + exception.getLineNumber() + ": " + exception.getMessage(), "", "instream", exception.getLineNumber(), 0);
-            }
-
-            @Override
-            public void fatalError(SAXParseException exception) throws SAXParseException {
-                throw new SAXParseException("Parse Error in instream, line " + exception.getLineNumber() + ": " + exception.getMessage(), "", "instream", exception.getLineNumber(), 0);
-            }
-
-            @Override
-            public void warning(SAXParseException exception) {
-                logger.log(Level.WARNING, "Parse Warning: {0}{1}", new Object[]{exception.getMessage(), exception.getLineNumber()});
-            }
-        });
         return builder.parse(stream);
     }
 
@@ -189,6 +168,8 @@ public final class XmlUtils {
         DocumentBuilder builder = null;
         try {
             builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new MyErrorHandler());
+            builder.setEntityResolver(new MyEntityResolver());
         } catch (ParserConfigurationException ex) {
             // there is something seriously wrong
             throw new ThisCannotHappenException(ex);
@@ -283,7 +264,7 @@ public final class XmlUtils {
     }
 
     public static Schema readSchema(Source source) throws SAXException {
-        return (SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)).newSchema(source);
+        return schemaFactory.newSchema(source);
     }
 
     public static Schema readSchema(File schemaFile) throws SAXException {
@@ -295,7 +276,7 @@ public final class XmlUtils {
     }
 
     public static Schema readSchema(URL schemaUrl) throws SAXException {
-        return readSchema(new StreamSource(schemaUrl.toExternalForm()));
+        return schemaFactory.newSchema(schemaUrl);
     }
 
     public static Schema readSchema(String schemaString) throws SAXException {
@@ -437,5 +418,138 @@ public final class XmlUtils {
     }
 
     private XmlUtils() {
+    }
+
+    private static class MyErrorHandler implements ErrorHandler {
+        @Override
+        public void error(SAXParseException exception) throws SAXParseException {
+            throw new SAXParseException("Parse Error in instream, line " + exception.getLineNumber() + ": " + exception.getMessage(), "", "instream", exception.getLineNumber(), 0);
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXParseException {
+            throw new SAXParseException("Parse Error in instream, line " + exception.getLineNumber() + ": " + exception.getMessage(), "", "instream", exception.getLineNumber(), 0);
+        }
+
+        @Override
+        public void warning(SAXParseException exception) {
+            logger.log(Level.WARNING, "Parse Warning: {0}{1}", new Object[]{exception.getMessage(), exception.getLineNumber()});
+        }
+    }
+
+    private static class MyLSResourceResolver implements LSResourceResolver {
+
+        MyLSResourceResolver() {
+        }
+
+        @Override
+        public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
+            try {
+                MyInput input = new MyInput(type, namespaceURI, publicId, systemId, baseURI);
+                return input;
+            } catch (IOException ex) {
+                throw new ThisCannotHappenException(ex);
+            }
+        }
+    }
+
+    private static class MyInput implements LSInput {
+
+        private String publicId;
+        private String systemId;
+        private final String stringData;
+        private String baseURI;
+
+        MyInput(String type, String namespaceURI, String publicId, String systemId, String baseURI) throws MalformedURLException, IOException {
+            this.publicId = publicId;
+            this.systemId = systemId;
+            this.baseURI = baseURI;
+
+            InputStream resourceAsStream = MyEntityResolver.getStream(systemId);
+            BufferedInputStream inputStream = new BufferedInputStream(resourceAsStream);
+            synchronized (inputStream) {
+                ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                while (true) {
+                    int result = inputStream.read();
+                    if (result == -1)
+                        break;
+                    buf.write((byte) result);
+                }
+                stringData = buf.toString();
+            }
+        }
+
+        @Override
+        public String getPublicId() {
+            return publicId;
+        }
+
+        @Override
+        public void setPublicId(String publicId) {
+        }
+
+        @Override
+        public String getBaseURI() {
+            return baseURI;
+        }
+
+        @Override
+        public InputStream getByteStream() {
+            return null;
+        }
+
+        @Override
+        public boolean getCertifiedText() {
+            return false;
+        }
+
+        @Override
+        public Reader getCharacterStream() {
+            return null;
+        }
+
+        @Override
+        public String getEncoding() {
+            return null;
+        }
+
+        @Override
+        public String getStringData() {
+            return stringData;
+        }
+
+        @Override
+        public void setBaseURI(String baseURI) {
+        }
+
+        @Override
+        public void setByteStream(InputStream byteStream) {
+        }
+
+        @Override
+        public void setCertifiedText(boolean certifiedText) {
+        }
+
+        @Override
+        public void setCharacterStream(Reader characterStream) {
+        }
+
+        @Override
+        public void setEncoding(String encoding) {
+        }
+
+        @Override
+        public void setStringData(String stringData) {
+        }
+
+        @Override
+        public String getSystemId() {
+            return systemId;
+        }
+
+        @Override
+        public void setSystemId(String systemId) {
+            this.systemId = systemId;
+        }
     }
 }

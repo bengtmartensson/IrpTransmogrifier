@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/.
 */
 
-package org.harctoolbox.ircore;
+package org.harctoolbox.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

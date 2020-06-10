@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
-import org.harctoolbox.ircore.XmlUtils;
 import org.harctoolbox.irp.BitField;
 import org.harctoolbox.irp.FiniteBitField;
 import org.harctoolbox.irp.NameEngine;
 import org.harctoolbox.irp.NameUnassignedException;
+import org.harctoolbox.xml.XmlUtils;
 
 @SuppressWarnings("FieldMayBeFinal")
 

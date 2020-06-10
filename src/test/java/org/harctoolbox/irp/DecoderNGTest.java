@@ -1,6 +1,5 @@
 package org.harctoolbox.irp;
 
-import java.io.IOException;
 import java.util.Random;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;

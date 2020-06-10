@@ -23,8 +23,8 @@ import java.util.Map;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrSignal;
-import org.harctoolbox.ircore.XmlExport;
-import org.harctoolbox.ircore.XmlUtils;
+import org.harctoolbox.xml.XmlExport;
+import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

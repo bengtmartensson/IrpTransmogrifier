@@ -440,14 +440,14 @@ public class CommandAnalyze extends AbstractCommand {
 
                 if (parameterTable) {
                     out.println();
-                    out.print("Parametertable:\t");
+                    out.print("Parameter table:\t");
                     for (int i = 0; i < parameterNames.size(); i++)
                         out.print("\t" + parameterNames.get(i) + ":" + parameterWidths.get(i));
                     out.println();
                     for (int i = 0; i < protocols.size(); i++) {
                         if (protocols.size() > 1)
                             out.print(names != null
-                                    ? (names.get(i) + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1)))
+                                    ? (names.get(i) + (commandLineArgs.tsvOptimize ? "" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1)))
                                     : ("#" + i + "\t"));
                         Protocol protocol = protocols.get(i);
                         Iterable<String> parameters = parameterNames.isEmpty() ? protocol.getDefinitions().toMap().keySet() : parameterNames;

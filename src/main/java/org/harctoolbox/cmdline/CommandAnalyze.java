@@ -440,7 +440,7 @@ public class CommandAnalyze extends AbstractCommand {
 
                 if (parameterTable) {
                     out.println();
-                    out.print("Parameter table:\t");
+                    out.print("Parameter table:");
                     for (int i = 0; i < parameterNames.size(); i++)
                         out.print("\t" + parameterNames.get(i) + ":" + parameterWidths.get(i));
                     out.println();

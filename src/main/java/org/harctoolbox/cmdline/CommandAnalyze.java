@@ -429,7 +429,7 @@ public class CommandAnalyze extends AbstractCommand {
                         Map<String, DuplicateFinder.DuplicateCollection> duplicates = duplicateFinder.getDuplicates();
                         duplicates.entrySet().forEach((kvp) -> {
                             out.println(kvp.getKey() + "\t" + kvp.getValue().toString()
-                                    + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
+                                    // wrong, and confusing...  + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
                                     + (lsb ? " (note: lsb-first)" : ""));
                         });
                     } catch (NameUnassignedException ex) {

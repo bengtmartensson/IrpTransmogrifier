@@ -3,6 +3,16 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
+Version 1.2.7(?, planned for 2020-12-31
+
+* Protocols: Kaseikyo family protocols now "prefer-over"-ed Kaseikyo. #177
+* anylyze with --tsv: layout fixes.
+* Implemented local XML Entity resolver (for accessing common Schemas locally, not over tne net).
+* New option --validate.
+* Fixes to the schema irp-protocols.xsd.
+* New option --fatgirr.
+* Bugfixes and improvements in analyze --girr.
+
 ===============================================================================
 2020-05-24: Version 1.2.6
 

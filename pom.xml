@@ -67,7 +67,7 @@
                 <directory>src/main/xdocs</directory>
             </resource>
             <resource>
-                <directory>common/schemas</directory>
+                <directory>src/main/schemas</directory>
                 <includes>
                     <include>irp-protocols.xsd</include>
                 </includes>

@@ -108,7 +108,7 @@
                             <includes>
                                 <include>Version.xml</include>
                             </includes>
-                            <stylesheet>${project.basedir}/tools/mkVersion.xsl</stylesheet>
+                            <stylesheet>${project.basedir}/common/xslt/mkVersion.xsl</stylesheet>
                             <parameters>
                                 <parameter>
                                     <name>version</name>
@@ -162,7 +162,7 @@
                             <includes>
                                 <include>${project.name}.xml</include>
                             </includes>
-                            <stylesheet>${project.basedir}/tools/xdoc2html.xsl</stylesheet>
+                            <stylesheet>${project.basedir}/common/xslt/xdoc2html.xsl</stylesheet>
                             <fileMappers>
                                 <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
                                     <targetExtension>.html</targetExtension>
@@ -383,7 +383,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${basedir}/tools/mkchecksums.sh</executable>
+                            <executable>${basedir}/common/scripts/mkchecksums.sh</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>
                             <arguments>
                                 <argument>${project.artifactId}-${project.version}-bin.zip</argument>

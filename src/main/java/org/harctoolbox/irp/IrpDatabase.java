@@ -486,7 +486,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         List<String> result = new ArrayList<>(10);
         for (String str : iterable) {
             try {
-                String s = urlDecode ? URLDecoder.decode(str, "US-ASCII") : str;
+                String s = urlDecode ? URLDecoder.decode(str, "UTF-8") : str; // See Javadoc for URLDecoder.decode
                 result.addAll(regexp ? getMatchingNamesRegexp(s) : getMatchingNamesExact(s));
             } catch (UnsupportedEncodingException ex) {
                 throw new ThisCannotHappenException();

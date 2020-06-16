@@ -83,12 +83,12 @@ public final class IrCoreUtils {
     /**
      * "Dumb" Charset name
      */
-    public static final String DEFAULT_CHARSET_NAME = "US-ASCII";
+    public static final String DUMB_CHARSET_NAME = "US-ASCII";
 
     /**
      * "Dumb" Charset
      */
-    public static final Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_NAME);
+    public static final Charset DUMB_CHARSET = Charset.forName(DUMB_CHARSET_NAME);
 
     static {
         Map<String, Integer> map = new LinkedHashMap<>(4);
@@ -227,7 +227,7 @@ public final class IrCoreUtils {
 
         byte[] buf = new byte[length];
         Arrays.fill(buf, value);
-        return new String(buf, DEFAULT_CHARSET);
+        return new String(buf, DUMB_CHARSET);
     }
 
     /**

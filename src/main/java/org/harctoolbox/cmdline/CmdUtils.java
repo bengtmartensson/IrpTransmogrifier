@@ -25,8 +25,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import static org.harctoolbox.ircore.IrCoreUtils.DEFAULT_CHARSET;
-import static org.harctoolbox.ircore.IrCoreUtils.DEFAULT_CHARSET_NAME;
+import static org.harctoolbox.ircore.IrCoreUtils.DUMB_CHARSET;
+import static org.harctoolbox.ircore.IrCoreUtils.DUMB_CHARSET_NAME;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class CmdUtils {
@@ -44,7 +44,7 @@ public class CmdUtils {
 
     public static String execute(Class<? extends CmdLineProgram> clazz, String[] args) {
         ByteArrayOutputStream outBytes = new ByteArrayOutputStream();
-        try (PrintStream outStream = new PrintStream(outBytes, false, DEFAULT_CHARSET_NAME)) {
+        try (PrintStream outStream = new PrintStream(outBytes, false, DUMB_CHARSET_NAME)) {
             Constructor<? extends CmdLineProgram> constructor = clazz.getConstructor(PrintStream.class);
             CmdLineProgram instance = constructor.newInstance(outStream);
             ProgramExitStatus status = instance.run(args);
@@ -52,7 +52,7 @@ public class CmdUtils {
                 return null;
 
             outStream.flush();
-            return new String(outBytes.toByteArray(), DEFAULT_CHARSET).trim();
+            return new String(outBytes.toByteArray(), DUMB_CHARSET).trim();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | UnsupportedEncodingException ex) {
             // Get here only by programming errors, no need to confuse the use
             throw new ThisCannotHappenException(ex);
@@ -63,7 +63,7 @@ public class CmdUtils {
         ByteArrayOutputStream errBytes = new ByteArrayOutputStream();
         PrintStream errStream;
         try {
-            errStream = new PrintStream(errBytes, false, DEFAULT_CHARSET_NAME);
+            errStream = new PrintStream(errBytes, false, DUMB_CHARSET_NAME);
             System.setErr(errStream);
         } catch (UnsupportedEncodingException ex) {
             throw new ThisCannotHappenException();
@@ -76,8 +76,8 @@ public class CmdUtils {
         System.err.flush();
         System.err.close();
         try {
-            String stderr = errBytes.toString(DEFAULT_CHARSET_NAME);
-            System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err), true, DEFAULT_CHARSET_NAME));
+            String stderr = errBytes.toString(DUMB_CHARSET_NAME);
+            System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err), true, DUMB_CHARSET_NAME));
             return stderr;
         } catch (UnsupportedEncodingException ex) {
             throw new ThisCannotHappenException();

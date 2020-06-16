@@ -17,12 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.cmdline;
 
 import com.beust.jcommander.Parameter;
+import org.harctoolbox.ircore.IrCoreUtils;
 
 @SuppressWarnings("PublicField")
 public class CommandBasicOptions extends CommandLogOptions {
 
     @Parameter(names = {"-e", "--encoding"}, description = "Encoding used in generated output.")
-    public String encoding = "UTF-8";
+    public String encoding = IrCoreUtils.UTF8;
 
     @Parameter(names = {"-o", "--output"}, description = "Name of output file. Default: stdout.")
     public String output = null;

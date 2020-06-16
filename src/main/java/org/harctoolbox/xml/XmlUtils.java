@@ -53,6 +53,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.harctoolbox.ircore.IrCoreUtils;
+import static org.harctoolbox.ircore.IrCoreUtils.UTF8;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -72,7 +73,6 @@ import org.xml.sax.SAXParseException;
  */
 public final class XmlUtils {
 
-    public static final String DEFAULT_CHARSETNAME                  = "UTF-8";
     public static final String W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME  = XMLNS_ATTRIBUTE + ":xsi";
     public static final String HTML_NAMESPACE_ATTRIBUTE_NAME        = XMLNS_ATTRIBUTE + ":html";
     public static final String XML_NAMESPACE_ATTRIBUTE_NAME         = XMLNS_ATTRIBUTE + ":xml";
@@ -119,7 +119,7 @@ public final class XmlUtils {
 
     public static Document parseStringToXmlDocument(String string, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {
         try {
-            InputStream stream = new ByteArrayInputStream(string.getBytes(DEFAULT_CHARSETNAME));
+            InputStream stream = new ByteArrayInputStream(string.getBytes(UTF8));
             return openXmlStream(stream, null, isNamespaceAware, isXIncludeAware);
         } catch (IOException ex) {
             throw new ThisCannotHappenException();

@@ -20,6 +20,7 @@ package org.harctoolbox.cmdline;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -116,7 +117,7 @@ public class CommandList extends AbstractCommand {
         return "This command list miscellaneous properties of the protocol(s) given as arguments.";
     }
 
-    public void list(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException {
+    public void list(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException, UnsupportedEncodingException {
         CmdUtils.checkForOption("list", protocols);
         if (checkSorted) {
             String offender = irpDatabase.checkSorted();
@@ -237,7 +238,7 @@ public class CommandList extends AbstractCommand {
         listProperty(out, propertyName, Long.toString(value), quiet);
     }
 
-    private void listDocumentFragment(PrintStream out, DocumentFragment fragment, boolean quiet, String encoding) {
+    private void listDocumentFragment(PrintStream out, DocumentFragment fragment, boolean quiet, String encoding) throws UnsupportedEncodingException {
         Document document = XmlUtils.wrapDocumentFragment(fragment, "http://www.w3.org/1999/xhtml", "div", "class", "protocol-documentation");
         if (!/*commandLineArgs.*/quiet && fragment != null)
             out.print("html=");

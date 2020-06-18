@@ -198,7 +198,8 @@ public final class XmlUtils {
         return index;
     }
 
-    public static void printHtmlDOM(OutputStream ostr, Document doc, String encoding) {
+    public static void printHtmlDOM(OutputStream ostr, Document doc, String encoding) throws UnsupportedEncodingException {
+        IrCoreUtils.checkEncoding(encoding);
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             if (encoding != null)
@@ -212,7 +213,8 @@ public final class XmlUtils {
         }
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements, String doctypeSystemid) {
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements, String doctypeSystemid) throws UnsupportedEncodingException {
+        IrCoreUtils.checkEncoding(encoding);
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             if (encoding != null)
@@ -231,19 +233,17 @@ public final class XmlUtils {
         }
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) {
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) throws UnsupportedEncodingException {
         printDOM(ostr, doc, encoding, cdataElements, null);
     }
 
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    public static void printDOM(File file, Document doc, String encoding, String cdataElements, String doctypeSystemid) throws FileNotFoundException {
+    public static void printDOM(File file, Document doc, String encoding, String cdataElements, String doctypeSystemid) throws FileNotFoundException, UnsupportedEncodingException {
         printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements, doctypeSystemid);
-        logger.log(Level.INFO, "File {0} written.", file);
     }
 
-    public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException {
+    public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException, UnsupportedEncodingException {
         printDOM(file, doc, encoding, cdataElements, null);
-        logger.log(Level.INFO, "File {0} written.", file);
     }
 
     public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException, UnsupportedEncodingException {
@@ -255,12 +255,17 @@ public final class XmlUtils {
     // since it would been too error prone.
 
     public static void printDOM(File file, Document doc) throws FileNotFoundException {
-        printDOM(file, doc, null, null, null);
+        try {
+            printDOM(file, doc, IrCoreUtils.UTF8, null, null);
+        } catch (UnsupportedEncodingException ex) {
+        }
     }
 
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void printDOM(Document doc) {
-        printDOM(System.out, doc, null, null);
+        try {
+            printDOM(System.out, doc, IrCoreUtils.UTF8, null, null);
+        } catch (UnsupportedEncodingException ex) {
+        }
     }
 
     public static Schema readSchema(Source source) throws SAXException {
@@ -298,9 +303,12 @@ public final class XmlUtils {
      * @param parameters
      * @param binary
      * @throws TransformerException
+     * @throws java.io.UnsupportedEncodingException
+     * @throws java.io.FileNotFoundException
      * @throws IOException
      */
-    public static void printDOM(OutputStream ostr, Document document, String encoding, Document xslt, Map<String, String> parameters, boolean binary) throws TransformerException, IOException {
+    public static void printDOM(OutputStream ostr, Document document, String encoding, Document xslt, Map<String, String> parameters, boolean binary) throws TransformerException, UnsupportedEncodingException, FileNotFoundException, IOException {
+        IrCoreUtils.checkEncoding(encoding);
         if (debug)
             XmlUtils.printDOM(new File("document.xml"), document);
 

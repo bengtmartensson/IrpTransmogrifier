@@ -21,6 +21,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -280,7 +281,7 @@ public class CommandAnalyze extends AbstractCommand {
             }
         }
 
-        private void analyze(IrSignal irSignal) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
+        private void analyze(IrSignal irSignal) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, UnsupportedEncodingException {
             Analyzer analyzer;
             Double freq = possiblyOverrideWithAnalyzeFrequency(irSignal.getFrequency());
             if (repeatFinder || dumpRepeatfinder) {
@@ -293,25 +294,25 @@ public class CommandAnalyze extends AbstractCommand {
             analyze(analyzer, new ArrayList<>(0), irSignal);
         }
 
-        private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
+        private void analyze(Map<String, ModulatedIrSequence> modulatedIrSequences) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, UnsupportedEncodingException {
             Map<String, IrSequence> irSequences = new LinkedHashMap<>(modulatedIrSequences.size());
             irSequences.putAll(modulatedIrSequences);
             Double frequency = possiblyOverrideWithAnalyzeFrequency(ModulatedIrSequence.frequencyAverage(modulatedIrSequences.values()));
             analyze(irSequences, frequency);
         }
 
-        private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
+        private void analyze(Map<String, IrSequence> irSequences, Double frequency) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, UnsupportedEncodingException {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences.values(), possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
             analyze(analyzer, new ArrayList<>(irSequences.keySet()), null);
         }
 
-        private void analyze(List<? extends IrSequence> irSequences) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
+        private void analyze(List<? extends IrSequence> irSequences) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, UnsupportedEncodingException {
             analyze(irSequences, frequency);
         }
 
-        private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException {
+        private void analyze(List<? extends IrSequence> irSequences, Double frequency) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, UnsupportedEncodingException {
             if (irSequences.isEmpty())
                 throw new InvalidArgumentException("No parseable sequences found.");
             Analyzer analyzer = new Analyzer(irSequences, possiblyOverrideWithAnalyzeFrequency(frequency), repeatFinder || dumpRepeatfinder, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance);
@@ -319,7 +320,7 @@ public class CommandAnalyze extends AbstractCommand {
         }
 
         @SuppressWarnings("UseOfSystemOutOrSystemErr")
-        private void analyze(Analyzer analyzer, List<String> names, IrSignal inputSignal) throws IrpException, UsageException, IrCoreException, NoDecoderMatchException {
+        private void analyze(Analyzer analyzer, List<String> names, IrSignal inputSignal) throws IrpException, UsageException, IrCoreException, NoDecoderMatchException, UnsupportedEncodingException {
             List<Integer> parameterWidths = new ArrayList<>(parameterNamedWidths.size());
             List<String> parameterNames = new ArrayList<>(parameterNamedWidths.size());
             if (!parameterNamedWidths.isEmpty() && parameterNamedWidths.get(0).contains(":")) {

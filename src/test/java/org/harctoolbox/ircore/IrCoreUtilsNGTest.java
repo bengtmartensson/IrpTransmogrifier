@@ -1,5 +1,6 @@
 package org.harctoolbox.ircore;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -701,5 +702,35 @@ public class IrCoreUtilsNGTest {
         assertEquals(IrCoreUtils.radixPrefix(4), "0q");
         assertEquals(IrCoreUtils.radixPrefix(11), "0cs");
         assertEquals(IrCoreUtils.radixPrefix(10), "");
+    }
+
+    /**
+     * Test of checkEncoding method, of class IrCoreUtils.
+     * @throws java.io.UnsupportedEncodingException
+     */
+    @Test
+    public void testCheckEncoding() throws UnsupportedEncodingException {
+        System.out.println("checkEncoding");
+        IrCoreUtils.checkEncoding("iso-8859-1");
+        try {
+            IrCoreUtils.checkEncoding("\niso-8859-1");
+            fail();
+        } catch (UnsupportedEncodingException ex) {
+        }
+        try {
+            IrCoreUtils.checkEncoding("covfefe");
+            fail();
+        } catch (UnsupportedEncodingException ex) {
+        }
+        try {
+            IrCoreUtils.checkEncoding(null);
+            fail();
+        } catch (UnsupportedEncodingException ex) {
+        }
+        try {
+            IrCoreUtils.checkEncoding("");
+            fail();
+        } catch (UnsupportedEncodingException ex) {
+        }
     }
 }

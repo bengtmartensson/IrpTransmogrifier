@@ -735,6 +735,15 @@ public final class IrCoreUtils {
         return 0;
     }
 
+    public static void checkEncoding(String encoding) throws UnsupportedEncodingException {
+        try {
+            if (! Charset.isSupported(encoding))
+                throw new UnsupportedEncodingException(encoding);
+        } catch (IllegalArgumentException unused) {
+            throw new UnsupportedEncodingException(encoding);
+        }
+    }
+
     private IrCoreUtils() {
     }
 }

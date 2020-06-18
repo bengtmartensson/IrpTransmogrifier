@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class CommandCode extends AbstractCommand {
     @Parameter(description = "protocols")
     private List<String> protocols;
 
-    public void code(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase, String[] args) throws IrpInvalidArgumentException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException {
+    public void code(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase, String[] args) throws IrpInvalidArgumentException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException, UnsupportedEncodingException, IOException {
         CodeClass codeClass = new CodeClass(out, commandLineArgs, irpDatabase, args);
         codeClass.code();
     }
@@ -86,7 +87,7 @@ public class CommandCode extends AbstractCommand {
             this.args = args;
         }
 
-        private void code() throws IrpInvalidArgumentException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException {
+        private void code() throws IrpInvalidArgumentException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException, UnsupportedEncodingException, IOException {
             if (directory != null && commandLineArgs.output != null)
                 throw new UsageException("The --output and the --directory options are mutually exclusive.");
 
@@ -113,7 +114,7 @@ public class CommandCode extends AbstractCommand {
                 }
         }
 
-        private void code(Collection<String> protocolNames, String pattern) throws IrpInvalidArgumentException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException {
+        private void code(Collection<String> protocolNames, String pattern) throws IrpInvalidArgumentException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException, IOException {
             File[] targets = IrCoreUtils.filesInDirMatchingRegExp(new File(stDir), pattern + STCodeGenerator.ST_GROUP_FILEEXTENSION);
             if (targets.length > 1 && directory == null)
                 logger.warning("Several targets will be concatenated in one file. Consider using --directory.");
@@ -128,7 +129,7 @@ public class CommandCode extends AbstractCommand {
             }
         }
 
-        private void code(Collection<String> protocolNames, CodeGenerator codeGenerator) throws IrpInvalidArgumentException, IOException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException {
+        private void code(Collection<String> protocolNames, CodeGenerator codeGenerator) throws IrpInvalidArgumentException, UnknownProtocolException, InvalidNameException, UnsupportedRepeatException, NameUnassignedException, UsageException, IOException {
             Map<String, String> params = assembleParameterMap(parameters);
             if (directory != null)
                 codeGenerator.generate(protocolNames, irpDatabase, new File(directory), inspect, params,
@@ -153,7 +154,7 @@ public class CommandCode extends AbstractCommand {
             stream.println(String.join(" ", listTargets()));
         }
 
-        private void createXmlProtocols(List<String> protocolNames) {
+        private void createXmlProtocols(List<String> protocolNames) throws UnsupportedEncodingException {
             Document document = irpDatabase.toXml(protocolNames, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance, commandLineArgs.override);
             XmlUtils.printDOM(out, document, commandLineArgs.outputEncoding, "Irp");
         }

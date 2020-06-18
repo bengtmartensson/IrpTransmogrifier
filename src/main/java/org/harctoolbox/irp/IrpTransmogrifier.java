@@ -139,7 +139,7 @@ public final class IrpTransmogrifier extends CmdLineProgram {
                     commandHelp.help(out, new CommandCommonOptions(), argumentParser, Version.documentationUrl);
                     break;
                 case "lirc":
-                    commandLirc.lirc(out, commandLineArgs.encoding);
+                    commandLirc.lirc(out, commandLineArgs.inputEncoding);
                     break;
                 case "list":
                     irpDatabase = commandLineArgs.setupDatabase();

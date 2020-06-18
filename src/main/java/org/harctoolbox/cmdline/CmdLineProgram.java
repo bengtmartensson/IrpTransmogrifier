@@ -107,7 +107,7 @@ public abstract class CmdLineProgram {
 
 
         if (commandBasicOptions.output != null)
-            out = IrCoreUtils.getPrintStream(commandBasicOptions.output, commandBasicOptions.encoding);
+            out = IrCoreUtils.getPrintStream(commandBasicOptions.output, commandBasicOptions.outputEncoding);
 
 
         // Since we have help and version as subcommands, --help and --version

@@ -155,7 +155,7 @@ public class CommandCode extends AbstractCommand {
 
         private void createXmlProtocols(List<String> protocolNames) {
             Document document = irpDatabase.toXml(protocolNames, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance, commandLineArgs.override);
-            XmlUtils.printDOM(out, document, commandLineArgs.encoding, "Irp");
+            XmlUtils.printDOM(out, document, commandLineArgs.outputEncoding, "Irp");
         }
 
         // TODO: nuke

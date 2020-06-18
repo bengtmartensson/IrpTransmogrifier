@@ -72,7 +72,7 @@ public class CommandBitField extends AbstractCommand {
         }
 
         if (xml != null) {
-            XmlUtils.printDOM(IrCoreUtils.getPrintStream(xml, commandLineArgs.encoding), bitfield.toDocument(), commandLineArgs.encoding, null);
+            XmlUtils.printDOM(IrCoreUtils.getPrintStream(xml, commandLineArgs.outputEncoding), bitfield.toDocument(), commandLineArgs.outputEncoding, null);
             logger.log(Level.INFO, "Wrote {0}", xml);
         }
     }

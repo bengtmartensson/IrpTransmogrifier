@@ -138,7 +138,7 @@ public class CommandList extends AbstractCommand {
 
         if (dump) {
             Document document = irpDatabase.toDocument(list);
-            XmlUtils.printDOM(out, document, commandLineArgs.encoding, "Irp Documentation");
+            XmlUtils.printDOM(out, document, commandLineArgs.outputEncoding, "Irp Documentation");
             return;
         }
 
@@ -181,7 +181,7 @@ public class CommandList extends AbstractCommand {
                 listProperty(out, "documentation", irpDatabase.getDocumentation(protocolName), commandLineArgs.quiet);
 
             if (html)
-                listDocumentFragment(out, protocol.getDocumentation(), commandLineArgs.quiet, commandLineArgs.encoding);
+                listDocumentFragment(out, protocol.getDocumentation(), commandLineArgs.quiet, commandLineArgs.outputEncoding);
 
             if (stringTree)
                 listProperty(out, "stringTree", protocol.toStringTree(), commandLineArgs.quiet);

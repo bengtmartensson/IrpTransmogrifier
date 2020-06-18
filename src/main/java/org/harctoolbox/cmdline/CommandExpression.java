@@ -76,7 +76,7 @@ public class CommandExpression extends AbstractCommand {
             out.println(expression.toStringTree());
 
         if (xml != null) {
-            XmlUtils.printDOM(xml, expression.toDocument(), commandLineArgs.encoding, null);
+            XmlUtils.printDOM(xml, expression.toDocument(), commandLineArgs.outputEncoding, null);
             logger.log(Level.INFO, "Wrote {0}", xml);
         }
 

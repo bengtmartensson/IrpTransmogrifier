@@ -241,7 +241,7 @@ public class CommandAnalyze extends AbstractCommand {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
                         }, commandLineArgs.commentStart
                 );
-                List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(input, commandLineArgs.encoding, false);
+                List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(input, commandLineArgs.inputEncoding, false);
                 analyze(modSeqs, ModulatedIrSequence.frequencyAverage(modSeqs));
             } else if (namedInput != null) {
                 if (validate)
@@ -251,7 +251,7 @@ public class CommandAnalyze extends AbstractCommand {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
                         }, commandLineArgs.commentStart
                 );
-                Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(namedInput, commandLineArgs.encoding);
+                Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(namedInput, commandLineArgs.inputEncoding);
                 if (signals.isEmpty())
                     throw new InvalidArgumentException("No parseable sequences found.");
                 analyze(signals);
@@ -393,7 +393,7 @@ public class CommandAnalyze extends AbstractCommand {
 
                 if (girr || fatgirr) {
                     Document doc = ProtocolListDomFactory.protocolListToDom(analyzer, protocols, names, radix, fatgirr);
-                    XmlUtils.printDOM(out, doc, commandLineArgs.encoding, "");
+                    XmlUtils.printDOM(out, doc, commandLineArgs.outputEncoding, "");
                     logger.warning("--girr and --fatgirr suppress all other output!");
                     return;
                 }

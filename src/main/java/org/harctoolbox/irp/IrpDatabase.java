@@ -18,7 +18,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -207,7 +206,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return map;
     }
 
-    private static InputStream mkStream(String file) throws FileNotFoundException {
+    private static InputStream mkStream(String file) throws IOException {
         return (file == null || file.isEmpty()) ? IrpDatabase.class.getResourceAsStream(DEFAULT_CONFIG_FILE) : IrCoreUtils.getInputSteam(file);
     }
 

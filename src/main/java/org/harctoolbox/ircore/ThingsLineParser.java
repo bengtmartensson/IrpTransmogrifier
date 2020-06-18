@@ -18,22 +18,20 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.ircore;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.transform.TransformerException;
+import org.harctoolbox.xml.XmlUtils;
+import org.xml.sax.SAXException;
 
 public class ThingsLineParser<T> {
 
@@ -55,52 +53,15 @@ public class ThingsLineParser<T> {
      * @throws IOException
      */
     public List<T> readThings(String urlOrFilename, String charSetName, boolean multiLines) throws IOException {
-        if (urlOrFilename.equals("-"))
-            return readThings(new InputStreamReader(System.in, charSetName), multiLines);
-        try {
-            return readThingsURL(urlOrFilename, charSetName, multiLines);
-        } catch (MalformedURLException ex) {
-            return readThingsFile(new File(urlOrFilename), charSetName, multiLines);
+        try (InputStreamReader reader = IrCoreUtils.getInputReader(urlOrFilename, charSetName)) {
+            return readThings(reader, multiLines);
         }
     }
 
-    public Map<String, T> readNamedThings(String urlOrFilename, String charSetName) throws IOException {
-        if (urlOrFilename.equals("-"))
-            return readNamedThings(new InputStreamReader(System.in, charSetName));
-        try {
-            return readNamedThingsURL(urlOrFilename, charSetName);
-        } catch (MalformedURLException ex) {
-            return readNamedThingsFile(new File(urlOrFilename), charSetName);
-        }
-    }
-
-    private List<T> readThingsURL(String urlOrFilename, String charsetName, boolean multiLines) throws MalformedURLException, IOException {
-        URL url = new URL(urlOrFilename);
-        URLConnection urlConnection = url.openConnection();
-        try (InputStream inputStream = urlConnection.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charsetName);
-            return readThings(inputStreamReader, multiLines);
-        }
-    }
-
-    private Map<String, T> readNamedThingsURL(String urlOrFilename, String charsetName) throws MalformedURLException, IOException {
-        URL url = new URL(urlOrFilename);
-        URLConnection urlConnection = url.openConnection();
-        try (InputStream inputStream = urlConnection.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charsetName);
-            return readNamedThings(inputStreamReader);
-        }
-    }
-
-    private List<T> readThingsFile(File file, String charSetName, boolean multiLines) throws FileNotFoundException, IOException {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            return readThings(new InputStreamReader(new FileInputStream(file), charSetName), multiLines);
-        }
-    }
-
-    private Map<String, T> readNamedThingsFile(File file, String charSetName) throws FileNotFoundException, IOException {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            return readNamedThings(new InputStreamReader(new FileInputStream(file), charSetName));
+    public List<T> readThings(String input, String xslt, String encoding, boolean multiLines) throws SAXException, IOException, UnsupportedEncodingException, TransformerException {
+        Objects.requireNonNull(xslt);
+        try (InputStreamReader reader = XmlUtils.mkReaderXml(input, xslt, encoding)) {
+            return readThings(reader, multiLines);
         }
     }
 
@@ -118,6 +79,19 @@ public class ThingsLineParser<T> {
             }
         }
         return list;
+    }
+
+    public Map<String, T> readNamedThings(String urlOrFilename, String charSetName) throws IOException {
+        try (InputStreamReader reader = IrCoreUtils.getInputReader(urlOrFilename, charSetName)) {
+            return readNamedThings(reader);
+        }
+    }
+
+    public Map<String, T> readNamedThings(String namedInput, String xslt, String encoding) throws SAXException, IOException, TransformerException {
+        Objects.requireNonNull(xslt);
+        try (InputStreamReader reader = XmlUtils.mkReaderXml(namedInput, xslt, encoding)) {
+            return readNamedThings(reader);
+        }
     }
 
     public Map<String, T> readNamedThings(Reader reader) throws IOException {

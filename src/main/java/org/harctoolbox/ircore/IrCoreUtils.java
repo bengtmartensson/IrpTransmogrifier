@@ -21,10 +21,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,6 +93,16 @@ public final class IrCoreUtils {
      * "Dumb" Charset
      */
     public static final Charset DUMB_CHARSET = Charset.forName(DUMB_CHARSET_NAME);
+
+    /**
+     * "Extended Latin 1" Encoding
+     */
+    public static final String EXTENDED_LATIN1_NAME = "WINDOWS-1252";
+
+    /**
+     * "Extended Latin 1" Charset
+     */
+    public static final Charset EXTENDED_LATIN1 = Charset.forName(EXTENDED_LATIN1_NAME);
 
     /**
      * UTF-8 encoding name
@@ -313,14 +327,27 @@ public final class IrCoreUtils {
     }
 
     /**
-     * Either opens an input file or returns stdin.
+     * Opens a Url, an input file, or returns stdin.
      *
      * @param filename
      * @return Open InputStream
      * @throws FileNotFoundException
+     * @throws IOException
      */
-    public static InputStream getInputSteam(String filename) throws FileNotFoundException {
-        return filename.equals("-") ? System.in : new FileInputStream(filename);
+    public static InputStream getInputSteam(String filename) throws FileNotFoundException, IOException {
+        if (filename == null || filename.isEmpty() || filename.equals("-"))
+            return System.in;
+        try {
+            URL url = new URL(filename);
+            return url.openStream();
+        } catch (MalformedURLException ex) {
+            return new FileInputStream(filename);
+        }
+    }
+
+    public static InputStreamReader getInputReader(String filename, String encoding) throws FileNotFoundException, IOException {
+        InputStream inputStream = getInputSteam(filename);
+        return new InputStreamReader(inputStream, encoding);
     }
 
     /**

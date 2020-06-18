@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
@@ -33,6 +34,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.XMLConstants;
@@ -72,7 +74,7 @@ import org.xml.sax.SAXParseException;
  * This class consists of a collection of useful static constants and functions.
  */
 public final class XmlUtils {
-
+    public static final String DEFAULT_CHARSETNAME                  = "UTF-8";
     public static final String W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME  = XMLNS_ATTRIBUTE + ":xsi";
     public static final String HTML_NAMESPACE_ATTRIBUTE_NAME        = XMLNS_ATTRIBUTE + ":html";
     public static final String XML_NAMESPACE_ATTRIBUTE_NAME         = XMLNS_ATTRIBUTE + ":xml";
@@ -90,6 +92,7 @@ public final class XmlUtils {
     public static final String TRUE                                 = "true";
     public static final String FALSE                                = "false";
     public static final String XML                                  = "xml";
+    public static final String TEXT                                 = "text";
     public static final String HTML                                 = "html";
     public static final String GIRR_NAMESPACE_URI                   = "http://www.harctoolbox.org/Girr";
     public static final String IRP_NAMESPACE_URI                    = "http://www.harctoolbox.org/irp-protocols";
@@ -127,7 +130,6 @@ public final class XmlUtils {
     }
 
     public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
-        final String fname = file.getCanonicalPath();
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
         return builder.parse(file);
     }
@@ -142,6 +144,12 @@ public final class XmlUtils {
         return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
     }
 
+    public static Document openXmlFile(String string, String schemaString, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
+        Schema schema = readSchema(schemaString);
+        InputStream inputStream = IrCoreUtils.getInputSteam(string);
+        return openXmlStream(inputStream, schema, isNamespaceAware, isXIncludeAware);
+    }
+
     public static Document openXmlFile(File file) throws IOException, SAXException {
         return openXmlFile(file, (Schema) null, true, true);
     }
@@ -154,6 +162,10 @@ public final class XmlUtils {
     public static Document openXmlStream(InputStream stream, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
         return builder.parse(stream);
+    }
+
+    public static Document openXmlThing(String thing, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
+        return openXmlStream(IrCoreUtils.getInputSteam(thing), schema, isNamespaceAware, isXIncludeAware);
     }
 
     private static DocumentBuilder newDocumentBuilder(Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) {
@@ -198,6 +210,21 @@ public final class XmlUtils {
         return index;
     }
 
+    public static ByteArrayInputStream renderDOM(Document document, Document xslt, String encoding) throws UnsupportedEncodingException, TransformerException, IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(65536);
+        XmlUtils.printDOM(out, document, encoding, xslt, new HashMap<>(0), false);
+        byte[] data = out.toByteArray();
+        ByteArrayInputStream inStream = new ByteArrayInputStream(data);
+        return inStream;
+    }
+
+    public static InputStreamReader mkReaderXml(String docu, String xslt, String encoding) throws SAXException, UnsupportedEncodingException, TransformerException, IOException {
+        Document document = XmlUtils.openXmlThing(docu, null, true, true);
+        Document stylesheet = XmlUtils.openXmlThing(xslt, null, true, true);
+        InputStream inputStream = XmlUtils.renderDOM(document, stylesheet, encoding);
+        return new InputStreamReader(inputStream, encoding);
+    }
+
     public static void printHtmlDOM(OutputStream ostr, Document doc, String encoding) throws UnsupportedEncodingException {
         IrCoreUtils.checkEncoding(encoding);
         try {
@@ -208,12 +235,11 @@ public final class XmlUtils {
             tr.setOutputProperty(OutputKeys.METHOD, HTML);
             tr.transform(new DOMSource(doc), new StreamResult(ostr));
         } catch (TransformerException ex) {
-            logger.log(Level.SEVERE, "{0}", ex.getMessage());
             throw new ThisCannotHappenException(ex);
         }
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements, String doctypeSystemid) throws UnsupportedEncodingException {
+    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) throws UnsupportedEncodingException {
         IrCoreUtils.checkEncoding(encoding);
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
@@ -224,26 +250,25 @@ public final class XmlUtils {
             if (cdataElements != null)
                 tr.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, cdataElements);
             tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            if (doctypeSystemid != null)
-                tr.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doctypeSystemid);
             tr.transform(new DOMSource(doc), new StreamResult(ostr));
         } catch (TransformerException ex) {
-            logger.log(Level.SEVERE, "{0}", ex.getMessage());
             throw new ThisCannotHappenException(ex);
         }
     }
 
-    public static void printDOM(OutputStream ostr, Document doc, String encoding, String cdataElements) throws UnsupportedEncodingException {
-        printDOM(ostr, doc, encoding, cdataElements, null);
+    public static void printDOM(OutputStream ostr, Document doc, String encoding) throws UnsupportedEncodingException {
+        printDOM(ostr, doc, encoding, null);
     }
 
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    public static void printDOM(File file, Document doc, String encoding, String cdataElements, String doctypeSystemid) throws FileNotFoundException, UnsupportedEncodingException {
-        printDOM(file != null ? new FileOutputStream(file) : System.out, doc, encoding, cdataElements, doctypeSystemid);
+    public static void printDOM(OutputStream ostr, Document doc) {
+        try {
+            printDOM(ostr, doc, DEFAULT_CHARSETNAME);
+        } catch (UnsupportedEncodingException ex) {
+        }
     }
 
     public static void printDOM(File file, Document doc, String encoding, String cdataElements) throws FileNotFoundException, UnsupportedEncodingException {
-        printDOM(file, doc, encoding, cdataElements, null);
+        printDOM(new FileOutputStream(file), doc, encoding, cdataElements);
     }
 
     public static void printDOM(String xmlFileName, Document doc, String encoding, String cdataElements) throws FileNotFoundException, UnsupportedEncodingException {
@@ -256,14 +281,14 @@ public final class XmlUtils {
 
     public static void printDOM(File file, Document doc) throws FileNotFoundException {
         try {
-            printDOM(file, doc, IrCoreUtils.UTF8, null, null);
+            printDOM(file, doc, IrCoreUtils.UTF8, null);
         } catch (UnsupportedEncodingException ex) {
         }
     }
 
     public static void printDOM(Document doc) {
         try {
-            printDOM(System.out, doc, IrCoreUtils.UTF8, null, null);
+            printDOM(System.out, doc, IrCoreUtils.UTF8, null);
         } catch (UnsupportedEncodingException ex) {
         }
     }
@@ -284,14 +309,11 @@ public final class XmlUtils {
         return schemaFactory.newSchema(schemaUrl);
     }
 
-    public static Schema readSchema(String schemaString) throws SAXException {
-        try {
-            URL url = new URL(schemaString);
-            return readSchema(url);
-        } catch (MalformedURLException ex) {
-            File file = new File(schemaString);
-            return readSchema(file);
-        }
+    public static Schema readSchema(String schemaString) throws SAXException, FileNotFoundException, IOException {
+        if (schemaString == null || schemaString.isEmpty())
+            return null;
+        InputStream inputStreanm = IrCoreUtils.getInputSteam(schemaString);
+        return readSchema(inputStreanm);
     }
 
     /**
@@ -307,39 +329,32 @@ public final class XmlUtils {
      * @throws java.io.FileNotFoundException
      * @throws IOException
      */
-    public static void printDOM(OutputStream ostr, Document document, String encoding, Document xslt, Map<String, String> parameters, boolean binary) throws TransformerException, UnsupportedEncodingException, FileNotFoundException, IOException {
+    public static void printDOM(OutputStream ostr, Document document, String encoding, Document xslt, Map<String, String> parameters, boolean binary) throws UnsupportedEncodingException, FileNotFoundException, IOException, TransformerException {
         IrCoreUtils.checkEncoding(encoding);
+        Objects.requireNonNull(xslt);
         if (debug)
             XmlUtils.printDOM(new File("document.xml"), document);
 
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer tr;
-            if (xslt == null) {
-                tr = factory.newTransformer();
-
-                tr.setOutputProperty(OutputKeys.METHOD, XML);
-                tr.setOutputProperty(OutputKeys.ENCODING, encoding);
-
-            } else {
-                if (parameters != null)
-                    parameters.entrySet().stream().map((kvp) -> {
-                        Element e = xslt.createElementNS(XmlUtils.XSLT_NAMESPACE_URI, "xsl:param");
-                        e.setAttribute("name", kvp.getKey());
-                        e.setAttribute("select", kvp.getValue());
-                        return e;
-                    }).forEachOrdered((e) -> {
-                        xslt.getDocumentElement().insertBefore(e, xslt.getDocumentElement().getFirstChild());
-                    });
-                NodeList nodeList = xslt.getDocumentElement().getElementsByTagNameNS(XmlUtils.XSLT_NAMESPACE_URI, "output");
-                if (nodeList.getLength() > 0) {
-                    Element e = (Element) nodeList.item(0);
-                    e.setAttribute(ENCODING_ATTRIBUTE_NAME, encoding);
-                }
-                if (debug)
-                    XmlUtils.printDOM(new File("stylesheet-params.xsl"), xslt);
-                tr = factory.newTransformer(new DOMSource(xslt, xslt.getDocumentURI()));
+            if (parameters != null)
+                parameters.entrySet().stream().map((kvp) -> {
+                    Element e = xslt.createElementNS(XmlUtils.XSLT_NAMESPACE_URI, "xsl:param");
+                    e.setAttribute("name", kvp.getKey());
+                    e.setAttribute("select", kvp.getValue());
+                    return e;
+                }).forEachOrdered((e) -> {
+                    xslt.getDocumentElement().insertBefore(e, xslt.getDocumentElement().getFirstChild());
+                });
+            NodeList nodeList = xslt.getDocumentElement().getElementsByTagNameNS(XmlUtils.XSLT_NAMESPACE_URI, "output");
+            if (nodeList.getLength() > 0) {
+                Element e = (Element) nodeList.item(0);
+                e.setAttribute(ENCODING_ATTRIBUTE_NAME, encoding);
             }
+            if (debug)
+                XmlUtils.printDOM(new File("stylesheet-params.xsl"), xslt);
+            tr = factory.newTransformer(new DOMSource(xslt, xslt.getDocumentURI()));
             tr.setOutputProperty(OutputKeys.INDENT, YES);
             tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             if (binary) {
@@ -356,7 +371,7 @@ public final class XmlUtils {
             } else
                 tr.transform(new DOMSource(document), new StreamResult(ostr));
         } finally {
-            if (parameters != null && xslt != null) {
+            if (parameters != null) {
                 NodeList nl = xslt.getDocumentElement().getChildNodes();
                 // Must remove children in backward order not to invalidate nl, #139.
                 for (int i = nl.getLength() - 1; i >= 0; i--) {
@@ -414,17 +429,6 @@ public final class XmlUtils {
         return fragment;
     }
 
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    public static void main(String[] args) {
-        try {
-            Schema schema = args.length > 1 ? readSchema(args[1]) : null;
-            Document doc = openXmlFile(new File(args[0]), schema, true, true);
-            System.out.println(doc);
-        } catch (SAXException | IOException ex) {
-            Logger.getLogger(XmlUtils.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     private XmlUtils() {
     }
 
@@ -474,16 +478,17 @@ public final class XmlUtils {
             this.baseURI = baseURI;
 
             InputStream resourceAsStream = MyEntityResolver.getStream(systemId);
-            BufferedInputStream inputStream = new BufferedInputStream(resourceAsStream);
-            synchronized (inputStream) {
-                ByteArrayOutputStream buf = new ByteArrayOutputStream();
-                while (true) {
-                    int result = inputStream.read();
-                    if (result == -1)
-                        break;
-                    buf.write((byte) result);
+            try (BufferedInputStream inputStream = new BufferedInputStream(resourceAsStream)) {
+                synchronized (inputStream) {
+                    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                    while (true) {
+                        int result = inputStream.read();
+                        if (result == -1)
+                            break;
+                        buf.write((byte) result);
+                    }
+                    stringData = buf.toString(DEFAULT_CHARSETNAME);
                 }
-                stringData = buf.toString();
             }
         }
 

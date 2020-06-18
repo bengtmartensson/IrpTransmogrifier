@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.transform.TransformerException;
 import org.harctoolbox.analyze.Cleaner;
 import org.harctoolbox.analyze.RepeatFinder;
 import org.harctoolbox.ircore.InvalidArgumentException;
@@ -38,6 +39,7 @@ import org.harctoolbox.irp.Decoder;
 import org.harctoolbox.irp.ElementaryDecode;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpParseException;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("FieldMayBeFinal")
 
@@ -95,6 +97,9 @@ public class CommandDecode extends AbstractCommand {
     @Parameter(names = {"-T", "--trailinggap"}, description = "Trailing gap (in micro seconds) added to sequences of odd length.")
     private Double trailingGap = null;
 
+    @Parameter(names = {"--xslt"}, description = "File/URL name of XSLT transformation that will be applied to --input or --namedinput argument")
+    private String xslt = null;
+
     @Parameter(description = "durations in micro seconds, alternatively pronto hex", required = false)
     private List<String> args;
 
@@ -118,7 +123,7 @@ public class CommandDecode extends AbstractCommand {
                 + "The common options --absolutetolerance --relativetolerance, --minrepeatgap determine how the repeat finder breaks the input data. ";
     }
 
-    public void decode(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, IrpParseException, IOException, InvalidArgumentException {
+    public void decode(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, IrpParseException, IOException, InvalidArgumentException, SAXException, TransformerException {
         DecodeClass decodeClass = new DecodeClass(out, commandLineArgs, irpDatabase);
         decodeClass.decode();
     }
@@ -138,7 +143,7 @@ public class CommandDecode extends AbstractCommand {
             this.decoderParams = newDecoderParameters();
         }
 
-        private void decode() throws UsageException, IrpParseException, IOException, InvalidArgumentException {
+        private void decode() throws UsageException, IrpParseException, IOException, InvalidArgumentException, SAXException, TransformerException {
             CmdUtils.checkForOption("decode", args);
 
             if (IrCoreUtils.numberTrue(input != null, namedInput != null, args != null) != 1)
@@ -157,14 +162,18 @@ public class CommandDecode extends AbstractCommand {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
                 }, commandLineArgs.commentStart);
-                List<IrSignal> signals = irSignalParser.readThings(input, commandLineArgs.inputEncoding, false);
+                List<IrSignal> signals = xslt == null
+                        ? irSignalParser.readThings(input, commandLineArgs.inputEncoding, false)
+                        : irSignalParser.readThings(input, xslt, commandLineArgs.inputEncoding, false);
                 for (IrSignal irSignal : signals)
                     decode(irSignal, null, 0);
             } else if (namedInput != null) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
                 }, commandLineArgs.commentStart);
-                Map<String, IrSignal> signals = irSignalParser.readNamedThings(namedInput, commandLineArgs.inputEncoding);
+                Map<String, IrSignal> signals = xslt == null
+                        ? irSignalParser.readNamedThings(namedInput, commandLineArgs.inputEncoding)
+                        : irSignalParser.readNamedThings(namedInput, xslt, commandLineArgs.inputEncoding);
                 int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
                 for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
                     decode(kvp.getValue(), kvp.getKey(), maxNameLength);

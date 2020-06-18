@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import javax.xml.transform.TransformerException;
 import org.harctoolbox.analyze.AbstractDecoder;
 import org.harctoolbox.analyze.Analyzer;
 import org.harctoolbox.analyze.Burst;
@@ -56,6 +57,7 @@ import org.harctoolbox.irp.Protocol;
 import org.harctoolbox.irp.ProtocolListDomFactory;
 import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("FieldMayBeFinal")
 
@@ -152,6 +154,9 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"--validate"}, description = "Validate that the resulted protocol can be used for rendering and produces the same signal.")
     private boolean validate = false;
 
+    @Parameter(names = {"--xslt"}, description = "File/URL name of XSLT transformation that will be applied to --input or --namedinput argument")
+    private String xslt = null;
+
     @Parameter(description = "durations in microseconds, or pronto hex.", required = false)
     private List<String> args = null;
 
@@ -205,7 +210,7 @@ public class CommandAnalyze extends AbstractCommand {
         return this.frequency != null ? this.frequency : frequency;
     }
 
-    public void analyze(PrintStream out, CommandCommonOptions commandLineArgs) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, IOException {
+    public void analyze(PrintStream out, CommandCommonOptions commandLineArgs) throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, IOException, SAXException, UnsupportedEncodingException, TransformerException {
         AnalyzeClass analyzeClass = new AnalyzeClass(out, commandLineArgs);
         analyzeClass.analyze();
     }
@@ -220,7 +225,7 @@ public class CommandAnalyze extends AbstractCommand {
             this.commandLineArgs = commandLineArgs;
         }
 
-        private void analyze() throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, IOException {
+        private void analyze() throws IrpException, IrCoreException, NoDecoderMatchException, UsageException, IOException, SAXException, UnsupportedEncodingException, TransformerException {
             CmdUtils.checkForOption("analyze", args);
             if (allDecodes && decoder != null)
                 throw new UsageException("Cannot use both --alldecodes and --decode.");
@@ -242,7 +247,9 @@ public class CommandAnalyze extends AbstractCommand {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
                         }, commandLineArgs.commentStart
                 );
-                List<ModulatedIrSequence> modSeqs = irSignalParser.readThings(input, commandLineArgs.inputEncoding, false);
+                List<ModulatedIrSequence> modSeqs = xslt == null
+                        ? irSignalParser.readThings(input, commandLineArgs.inputEncoding, false)
+                        : irSignalParser.readThings(input, xslt, commandLineArgs.inputEncoding, false);
                 analyze(modSeqs, ModulatedIrSequence.frequencyAverage(modSeqs));
             } else if (namedInput != null) {
                 if (validate)
@@ -252,8 +259,10 @@ public class CommandAnalyze extends AbstractCommand {
                             return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
                         }, commandLineArgs.commentStart
                 );
-                Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(namedInput, commandLineArgs.inputEncoding);
-                if (signals.isEmpty())
+                Map<String, ModulatedIrSequence> signals = xslt == null
+                        ? thingsLineParser.readNamedThings(namedInput, commandLineArgs.inputEncoding)
+                        : thingsLineParser.readNamedThings(namedInput, xslt, commandLineArgs.inputEncoding);
+               if (signals.isEmpty())
                     throw new InvalidArgumentException("No parseable sequences found.");
                 analyze(signals);
             } else {

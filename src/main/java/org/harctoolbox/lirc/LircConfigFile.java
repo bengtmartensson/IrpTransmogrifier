@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.harctoolbox.ircore.IrCoreUtils.EXTENDED_LATIN1_NAME;
 
 /**
  * This class parses the <a href="http://lirc.org/html/lircd.conf.html">Lircd configuration file(s)</a>.
@@ -64,7 +65,7 @@ public final class LircConfigFile {
     /**
      * Default character set for the input files.
      */
-    public final static String DEFAULT_CHARSET_NAME = "WINDOWS-1252";
+    public final static String DEFAULT_CHARSET_NAME = EXTENDED_LATIN1_NAME;
 
     /**
      * Reads the file given as second argument and updates the dictionary of {@link LircRemote}s given as first argument.

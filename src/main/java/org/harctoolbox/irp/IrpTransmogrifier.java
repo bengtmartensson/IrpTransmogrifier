@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.transform.TransformerException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.analyze.NoDecoderMatchException;
 import org.harctoolbox.cmdline.CmdLineProgram;
@@ -170,7 +171,7 @@ public final class IrpTransmogrifier extends CmdLineProgram {
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
-        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException ex) {
+        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | TransformerException ex) {
             //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
             // Likely a programming error or fatal error in the data base. Barf.
             ex.printStackTrace();

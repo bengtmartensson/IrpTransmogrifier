@@ -23,13 +23,13 @@ import org.harctoolbox.ircore.IrCoreUtils;
 public class CommandBasicOptions extends CommandLogOptions {
 
     @Parameter(names = {"-e", "--encoding", "--iencoding"}, description = "Encoding used to read input.")
-    public String inputEncoding = IrCoreUtils.UTF8;
+    public String inputEncoding = IrCoreUtils.UTF8_NAME;
 
     @Parameter(names = {"-o", "--output"}, description = "Name of output file. Default: stdout.")
     public String output = null;
 
     @Parameter(names = {      "--oencoding"}, description = "Encoding used in generated output.")
-    public String outputEncoding = IrCoreUtils.UTF8;
+    public String outputEncoding = IrCoreUtils.UTF8_NAME;
 
     @Parameter(names = {"-q", "--quiet"}, description = "Quitest possible operation, typically to be used from scripts.")
     public boolean quiet = false;

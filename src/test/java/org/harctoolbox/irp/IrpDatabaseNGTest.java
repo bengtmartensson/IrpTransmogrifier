@@ -333,8 +333,8 @@ public class IrpDatabaseNGTest {
         NamedProtocol foobar = irpDatabase.getNamedProtocol("foobar");
         assertEquals(DumbHtmlRenderer.render(foobar.getDocumentation()), "Lorem Ipsum");
 
-        List<String> necExecutorsx = irpDatabase.getProperties("nec1", "uei-executofdsfggsfsr");
-        List<DocumentFragment> aminoExecutorsx = irpDatabase.getXmlProperties("amino", "uei-sdfsfdfsexecutor");
+        //List<String> necExecutorsx = irpDatabase.getProperties("nec1", "uei-executofdsfggsfsr");
+        //List<DocumentFragment> aminoExecutorsx = irpDatabase.getXmlProperties("amino", "uei-sdfsfdfsexecutor");
 
         irpDatabase.getNamedProtocolExpandAlias("necropHile");
         necExecutors = irpDatabase.getProperties("nec1", "uei-executor");

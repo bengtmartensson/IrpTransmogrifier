@@ -107,7 +107,9 @@ public final class IrCoreUtils {
     /**
      * UTF-8 encoding name
      */
-    public static final String UTF8 = "UTF-8";
+    public static final String UTF8_NAME = "UTF-8";
+
+    public static final Charset UTF8 = Charset.forName(UTF8_NAME);
 
     static {
         Map<String, Integer> map = new LinkedHashMap<>(4);
@@ -320,7 +322,7 @@ public final class IrCoreUtils {
      */
     public static PrintStream getPrintStream(String filename) throws FileNotFoundException {
         try {
-            return getPrintStream(filename, UTF8);
+            return getPrintStream(filename, UTF8_NAME);
         } catch (UnsupportedEncodingException ex) {
             throw new ThisCannotHappenException(ex);
         }

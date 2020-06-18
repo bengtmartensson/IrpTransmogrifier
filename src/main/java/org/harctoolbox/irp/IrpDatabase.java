@@ -118,7 +118,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return validating;
     }
 
-    public static void setValidating(boolean newValidating) throws SAXException {
+    public static synchronized void setValidating(boolean newValidating) throws SAXException {
         validating = newValidating;
         if (validating) {
             if (schema == null)
@@ -485,7 +485,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         List<String> result = new ArrayList<>(10);
         for (String str : iterable) {
             try {
-                String s = urlDecode ? URLDecoder.decode(str, IrCoreUtils.UTF8) : str; // See Javadoc for URLDecoder.decode
+                String s = urlDecode ? URLDecoder.decode(str, IrCoreUtils.UTF8_NAME) : str; // See Javadoc for URLDecoder.decode
                 result.addAll(regexp ? getMatchingNamesRegexp(s) : getMatchingNamesExact(s));
             } catch (UnsupportedEncodingException ex) {
                 throw new ThisCannotHappenException();

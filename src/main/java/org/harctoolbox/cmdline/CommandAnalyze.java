@@ -508,7 +508,7 @@ public class CommandAnalyze extends AbstractCommand {
             boolean success = rendered.approximatelyEquals(inputSignal);
             out.println(success
                     ? "Validation succeeded!"
-                    : String.format("Validation failed: expected\n%s\ngot\n%s", inputSignal.toString(), rendered.toString()));
+                    : String.format("Validation failed: expected%n%s%ngot%n%s", inputSignal.toString(), rendered.toString()));
             return success;
         }
     }

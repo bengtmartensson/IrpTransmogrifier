@@ -108,6 +108,7 @@ public final class Decoder {
      * @param names
      * @throws java.io.IOException
      * @throws org.harctoolbox.irp.IrpParseException
+     * @throws org.xml.sax.SAXException
      */
     public Decoder(String... names) throws IOException, IrpParseException, SAXException {
         this(new IrpDatabase((String) null), Arrays.asList(names));

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.harctoolbox.ircore.IrCoreUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1467,7 +1468,7 @@ class MyEntityResolver implements EntityResolver {
     }
 
     private static InputStream mkInputStream(String str) {
-          return new ByteArrayInputStream(str.getBytes());
+        return new ByteArrayInputStream(str.getBytes(IrCoreUtils.UTF8));
     }
 
     @Override

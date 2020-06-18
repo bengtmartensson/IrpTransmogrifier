@@ -281,14 +281,14 @@ public final class XmlUtils {
 
     public static void printDOM(File file, Document doc) throws FileNotFoundException {
         try {
-            printDOM(file, doc, IrCoreUtils.UTF8, null);
+            printDOM(file, doc, IrCoreUtils.UTF8_NAME, null);
         } catch (UnsupportedEncodingException ex) {
         }
     }
 
     public static void printDOM(Document doc) {
         try {
-            printDOM(System.out, doc, IrCoreUtils.UTF8, null);
+            printDOM(System.out, doc, IrCoreUtils.UTF8_NAME, null);
         } catch (UnsupportedEncodingException ex) {
         }
     }

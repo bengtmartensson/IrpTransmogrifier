@@ -34,7 +34,6 @@ import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.NamedProtocol;
 import org.harctoolbox.irp.UnknownProtocolException;
 import org.harctoolbox.irp.UnsupportedRepeatException;
-import org.harctoolbox.xml.DumbHtmlRenderer;
 import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -214,11 +213,11 @@ public class CommandList extends AbstractCommand {
         }
     }
 
-    private void listProperty(PrintStream out, String propertyName, DocumentFragment documentFragment, boolean quiet) {
-        if (quiet && propertyName != null)
-            out.print(propertyName + "=");
-        out.println(DumbHtmlRenderer.render(documentFragment));
-    }
+//    private void listProperty(PrintStream out, String propertyName, DocumentFragment documentFragment, boolean quiet) {
+//        if (quiet && propertyName != null)
+//            out.print(propertyName + "=");
+//        out.println(DumbHtmlRenderer.render(documentFragment));
+//    }
 
     private void listProperty(PrintStream out, String propertyName, String propertyValue, boolean quiet) {
         if (!/*commandLineArgs.*/quiet && propertyName != null)

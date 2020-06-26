@@ -310,9 +310,23 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     private void patchProtocols(Element protocols) {
-        NodeList nodes = protocols.getElementsByTagNameNS(IRP_PROTOCOL_NS, PROTOCOL_NAME);
-        for (int i = 0; i < nodes.getLength(); i++)
-            patchProtocol((Element) nodes.item(i));
+        NodeList nodes = protocols.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            switch (node.getNodeType()) {
+                case Node.ELEMENT_NODE: {
+                    Element e = (Element) node;
+                    if (e.getLocalName().equals(PROTOCOL_NAME))
+                        patchProtocol(e);
+                }
+                break;
+                case Node.COMMENT_NODE:
+                    logger.log(Level.WARNING, "Comment between protocols \"<!--{0}-->\" ignored", node.getTextContent());
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private void patchProtocol(Element current) {
@@ -819,10 +833,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
         private Map<String, List<String>> map;
         private Map<String, List<DocumentFragment>> xmlMap;
+        private List<String> comments;
 
         UnparsedProtocol() {
             map = new LinkedHashMap<>(APRIORI_SIZE); // want to preserve order
             xmlMap = new HashMap<>(APRIORI_SIZE);
+            comments = new ArrayList<>(1);
         }
 
         UnparsedProtocol(String irp) {
@@ -901,26 +917,37 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
-                if (node.getNodeType() != Node.ELEMENT_NODE)
-                    continue;
-                Element e = (Element) node;
-                switch (e.getLocalName()) {
-                    case IRP_NAME:
-                        addProperty(IRP_NAME, e.getTextContent());
+                switch (node.getNodeType()) {
+                    case Node.ELEMENT_NODE:
+                        parseProtocolChild((Element) node);
                         break;
-                    case DOCUMENTATION_NAME:
-                        addXmlProperty(DOCUMENTATION_NAME, nodeListToDocumentFragment(e.getChildNodes()));
-                        break;
-                    case PARAMETER_NAME:
-                        boolean isXml = e.getAttribute(TYPE_NAME).toLowerCase(Locale.US).equals(XML_NAME);
-                        if (isXml)
-                            addXmlProperty(e.getAttribute(NAME_NAME), nodeListToDocumentFragment(e.getChildNodes()));
-                        else
-                            addProperty(e.getAttribute(NAME_NAME), e.getTextContent());
+                    case Node.COMMENT_NODE:
+                        comments.add(node.getTextContent());
                         break;
                     default:
-                        throw new ThisCannotHappenException("unknown tag: " + e.getTagName());
+                        break;
                 }
+            }
+        }
+
+
+        private void parseProtocolChild(Element e) {
+            switch (e.getLocalName()) {
+                case IRP_NAME:
+                    addProperty(IRP_NAME, e.getTextContent());
+                    break;
+                case DOCUMENTATION_NAME:
+                    addXmlProperty(DOCUMENTATION_NAME, nodeListToDocumentFragment(e.getChildNodes()));
+                    break;
+                case PARAMETER_NAME:
+                    boolean isXml = e.getAttribute(TYPE_NAME).toLowerCase(Locale.US).equals(XML_NAME);
+                    if (isXml)
+                        addXmlProperty(e.getAttribute(NAME_NAME), nodeListToDocumentFragment(e.getChildNodes()));
+                    else
+                        addProperty(e.getAttribute(NAME_NAME), e.getTextContent());
+                    break;
+                default:
+                    throw new ThisCannotHappenException("unknown tag: " + e.getTagName());
             }
         }
 
@@ -987,6 +1014,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
         Element toElement(Document doc) {
             Element element = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PROTOCOL_NAME);
+            for (String comment : comments)
+                element.appendChild(doc.createComment(comment));
             for (Map.Entry<String, List<String>> kvp : map.entrySet()) {
                 switch (kvp.getKey()) {
                     case NAME_NAME:

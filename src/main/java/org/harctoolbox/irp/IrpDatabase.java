@@ -583,10 +583,14 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     private void expand(int depth, String name) throws IrpParseException {
         UnparsedProtocol p = protocols.get(name.toLowerCase(Locale.US));
-        if (!p.getIrp().contains("{"))
+        String irp = p.getIrp();
+        if (irp == null)
+            return;
+
+        if (!irp.contains("{"))
             throw new IrpParseException(p.getIrp(), "`{' not found.");
 
-        if (!p.getIrp().startsWith("{")) {
+        if (!irp.startsWith("{")) {
             String p_name = p.getIrp().substring(0, p.getIrp().indexOf('{')).trim();
             UnparsedProtocol ancestor = protocols.get(p_name.toLowerCase(Locale.US));
             if (ancestor != null) {
@@ -942,6 +946,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         }
 
         private NamedProtocol toNamedProtocol() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
+            if (getIrp() == null)
+                throw new IrpInvalidArgumentException("Irp missing from protocol named " + getName());
+
             return new NamedProtocol(getName(), getCName(), getIrp(), getHtmlDocumentation(),
                     getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(FREQUENCY_LOWER_NAME), getFirstProperty(FREQUENCY_UPPER_NAME),
                     getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
@@ -1000,8 +1007,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                         element.appendChild(param);
                         param.setAttribute(NAME_NAME, kvp.getKey());
                         param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.PRESERVE); // to prevent extra white space from being inserted
-                        doc.adoptNode(documentFragment);
-                        param.appendChild(documentFragment);
+                        if (documentFragment != null) {
+                            doc.adoptNode(documentFragment);
+                            param.appendChild(documentFragment);
+                        }
                     });
             });
 

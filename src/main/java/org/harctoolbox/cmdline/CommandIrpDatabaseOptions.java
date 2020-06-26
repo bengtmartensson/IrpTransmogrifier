@@ -37,13 +37,13 @@ public class CommandIrpDatabaseOptions extends CommandBasicOptions {
 
     @Parameter(names = {"-i", "--irp"}, description = "Explicit IRP string to use as protocol definition.")
     public String irp = null;
-    
+
     @Parameter(names = {"--validate"}, description = "Validate IRP database files against the schema, abort if not valid.")
     public boolean validate = false;
 
    public IrpDatabase setupDatabase() throws UsageException, IrpParseException, IOException, UnknownProtocolException, SAXException {
         if (configFiles != null && irp != null)
-            throw new UsageException("At most one of configfile and irp can be specified");
+            throw new UsageException("At most one of --configfile and --irp can be specified");
 
         IrpDatabase.setValidating(validate);
 

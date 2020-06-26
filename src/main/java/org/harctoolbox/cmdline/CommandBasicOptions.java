@@ -34,6 +34,6 @@ public class CommandBasicOptions extends CommandLogOptions {
     @Parameter(names = {"-q", "--quiet"}, description = "Quitest possible operation, typically to be used from scripts.")
     public boolean quiet = false;
 
-    @Parameter(names = {"-v", "--version"}, description = "Report version. Deprecated; use the command \"version\" instead.")
+    @Parameter(names = {      "--version"}, description = "Report version. Deprecated; use the command \"version\" instead.")
     public boolean versionRequested = false;
 }

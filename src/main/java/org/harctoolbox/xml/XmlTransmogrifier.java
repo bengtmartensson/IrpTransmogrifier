@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import javax.xml.transform.TransformerException;
 import org.harctoolbox.ircore.IrCoreUtils;
-import static org.harctoolbox.ircore.IrCoreUtils.EXTENDED_LATIN1_NAME;
 import org.harctoolbox.irp.IrpUtils;
 import org.harctoolbox.irp.Version;
 import org.w3c.dom.Document;
@@ -95,7 +94,7 @@ public final class XmlTransmogrifier {
 
     public static class CommandLineArguments {
         @Parameter(names = {"-e", "--encoding"}, description = "Output encoding")
-        private String encoding = EXTENDED_LATIN1_NAME;
+        private String encoding = XmlUtils.DEFAULT_CHARSETNAME;
 
         @Parameter(names = {"-h", "-?", "--help"}, description = "Print help text")
         private boolean helpRequested = false;

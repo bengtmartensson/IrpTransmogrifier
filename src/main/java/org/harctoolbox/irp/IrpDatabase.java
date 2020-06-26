@@ -226,8 +226,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     // The key is the protocol name folded to lower case. Case preserved name is in UnparsedProtocol.name.
     private Map<String, UnparsedProtocol> protocols;
-
     private Map<String, String> aliases;
+    private final List<String> comments;
 
     public IrpDatabase(Reader reader) throws IOException, IrpParseException, SAXException {
         this(openXmlReader(reader));
@@ -262,6 +262,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         this.version = new StringBuilder(64);
         this.protocols = protocols;
         this.aliases = new LinkedHashMap<>(8);
+        this.comments = new ArrayList<>(4);
         expand();
         rebuildAliases();
     }
@@ -288,7 +289,28 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public void patch(Document document) {
         Element root = document.getDocumentElement();
         appendToVersion(root.getAttribute("version"));
-        NodeList nodes = root.getElementsByTagNameNS(IRP_PROTOCOL_NS, PROTOCOL_NAME);
+        NodeList nodes = document.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            switch (node.getNodeType()) {
+                case Node.ELEMENT_NODE: {
+                    Element el = (Element) node;
+                    String name = el.getLocalName();
+                    if (name.equals(PROTOCOLS_NAME))
+                        patchProtocols(el);
+                }
+                break;
+                case Node.COMMENT_NODE:
+                    comments.add(node.getTextContent());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void patchProtocols(Element protocols) {
+        NodeList nodes = protocols.getElementsByTagNameNS(IRP_PROTOCOL_NS, PROTOCOL_NAME);
         for (int i = 0; i < nodes.getLength(); i++)
             patchProtocol((Element) nodes.item(i));
     }
@@ -330,6 +352,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
                 "type=\"text/xsl\" href=\"IrpProtocols2html.xsl\"");
         doc.appendChild(pi);
+        comments.forEach((String comment) -> {
+            doc.appendChild(doc.createComment(comment));
+        });
         Element root = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PROTOCOLS_NAME);
         root.setAttribute(W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME, W3C_XML_SCHEMA_INSTANCE_NS_URI);
         root.setAttribute(XINCLUDE_NAMESPACE_ATTRIBUTE_NAME, XINCLUDE_NAMESPACE_URI);
@@ -345,10 +370,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return toDocument(protocols.keySet());
     }
 
-    public Document toDocument(Iterable<String> list) {
+    public Document toDocument(Iterable<String> protocolNames) {
         Document doc = emptyDocument();
         Element root = doc.getDocumentElement();
-        for (String protocolName : list)
+        for (String protocolName : protocolNames)
             root.appendChild(protocols.get(protocolName.toLowerCase(Locale.US)).toElement(doc));
 
         return doc;

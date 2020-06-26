@@ -173,6 +173,7 @@ public final class XmlUtils {
 
         factory.setNamespaceAware(isNamespaceAware);
         factory.setXIncludeAware(isXIncludeAware);
+        factory.setIgnoringElementContentWhitespace(true);
         if (schema != null) {
             factory.setSchema(schema);
             factory.setValidating(false);

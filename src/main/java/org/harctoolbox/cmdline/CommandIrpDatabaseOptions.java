@@ -32,7 +32,7 @@ public class CommandIrpDatabaseOptions extends CommandBasicOptions {
     public List<String> blackList = null;
 
     @Parameter(names = {"-c", "--configfiles"}, listConverter = FileListParser.class,
-            description = "Pathname(s) of IRP database file(s) in XML format. Default is the one in the jar file.")
+            description = "Pathname(s) of IRP database file(s) in XML format. Default is the one in the jar file. Can be given several times.")
     public List<File> configFiles = null;
 
     @Parameter(names = {"-i", "--irp"}, description = "Explicit IRP string to use as protocol definition.")

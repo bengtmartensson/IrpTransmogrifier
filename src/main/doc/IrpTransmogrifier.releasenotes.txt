@@ -3,13 +3,21 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
-Version 1.2.7(?, planned for 2020-12-31
+Version 1.2.7 (planned for 2020-07-03)
 
+* Improvements in list --dump. #184, #183.
+* Remove -v as command line option.
+* New option --xslt by decode and analyze. #182.
+* API: Fix usage of UnsupportedEncodingException. #181
+* Replace option --encoding by separate options for input and output. #180.
 * Protocols: Kaseikyo family protocols now "prefer-over"-ed Kaseikyo. #177
 * anylyze with --tsv: layout fixes.
+* New main-class XmlTransmogrifier: allows command line validation, reformatting, transformations.
 * Implemented local XML Entity resolver (for accessing common Schemas locally, not over tne net).
-* New option --validate.
-* Fixes to the schema irp-protocols.xsd.
+* API: new package org.harctoolbox.xml. Some classes relocated to this.
+* New option --validate. #173.
+* Fixes to the schema irp-protocols.xsd. #174, #172.
+* API: New function Protocol.fillInDefaults(Map<String,Long>)
 * New option --fatgirr.
 * Bugfixes and improvements in analyze --girr.
 

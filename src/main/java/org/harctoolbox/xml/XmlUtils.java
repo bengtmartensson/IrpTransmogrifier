@@ -79,6 +79,7 @@ public final class XmlUtils {
     public static final String HTML_NAMESPACE_ATTRIBUTE_NAME        = XMLNS_ATTRIBUTE + ":html";
     public static final String XML_NAMESPACE_ATTRIBUTE_NAME         = XMLNS_ATTRIBUTE + ":xml";
     public static final String XINCLUDE_NAMESPACE_ATTRIBUTE_NAME    = XMLNS_ATTRIBUTE + ":xi";
+    public static final String IRP_NAMESPACE_ATTRIBUTE_NAME         = XMLNS_ATTRIBUTE + ":irp";
     public static final String HTML_NAMESPACE_URI                   = "http://www.w3.org/1999/xhtml";
     public static final String XSLT_NAMESPACE_URI                   = "http://www.w3.org/1999/XSL/Transform";
     public static final String SCHEMA_LOCATION_ATTRIBUTE_NAME       = "xsi:schemaLocation";
@@ -173,7 +174,7 @@ public final class XmlUtils {
 
         factory.setNamespaceAware(isNamespaceAware);
         factory.setXIncludeAware(isXIncludeAware);
-        factory.setIgnoringElementContentWhitespace(true);
+        //factory.setIgnoringElementContentWhitespace(true);
         if (schema != null) {
             factory.setSchema(schema);
             factory.setValidating(false);

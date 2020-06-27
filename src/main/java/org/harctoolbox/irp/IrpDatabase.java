@@ -52,9 +52,11 @@ import static org.harctoolbox.xml.XmlUtils.W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME;
 import static org.harctoolbox.xml.XmlUtils.XINCLUDE_NAMESPACE_ATTRIBUTE_NAME;
 import static org.harctoolbox.xml.XmlUtils.XINCLUDE_NAMESPACE_URI;
 import static org.harctoolbox.xml.XmlUtils.XML_NAMESPACE_ATTRIBUTE_NAME;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
@@ -110,6 +112,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public static final String PROTOCOL_NAME_NAME = "protocolName";
     public static final String PROTOCOL_CNAME_NAME = "cProtocolName";
     public static final String META_DATA_NAME = "metaData";
+    public static final String YES_NAME = "yes";
+    public static final String NO_NAME = "no";
 
     private static boolean validating = false;
     private static Schema schema = null;
@@ -228,6 +232,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     private Map<String, UnparsedProtocol> protocols;
     private Map<String, String> aliases;
     private final List<String> comments;
+    private final Map<String, String> globalAttributes;
 
     public IrpDatabase(Reader reader) throws IOException, IrpParseException, SAXException {
         this(openXmlReader(reader));
@@ -263,6 +268,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         this.protocols = protocols;
         this.aliases = new LinkedHashMap<>(8);
         this.comments = new ArrayList<>(4);
+        this.globalAttributes = new HashMap<>(4);
         expand();
         rebuildAliases();
     }
@@ -288,6 +294,25 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     public void patch(Document document) {
         Element root = document.getDocumentElement();
+        NamedNodeMap attributes = root.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Attr attr = (Attr) attributes.item(i);
+            switch (attr.getName()) {
+                case W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME:
+                case XmlUtils.HTML_NAMESPACE_ATTRIBUTE_NAME:
+                case XmlUtils.XML_NAMESPACE_ATTRIBUTE_NAME:
+                case XmlUtils.XINCLUDE_NAMESPACE_ATTRIBUTE_NAME:
+                case XmlUtils.IRP_NAMESPACE_ATTRIBUTE_NAME:
+                case XMLNS_ATTRIBUTE:
+                case SCHEMA_LOCATION_ATTRIBUTE_NAME:
+                case VERSION_NAME:
+                    // Nothing, already known
+                    break;
+
+                default:
+                    globalAttributes.put(attr.getName(), attr.getValue());
+            }
+        }
         appendToVersion(root.getAttribute("version"));
         NodeList nodes = document.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -376,6 +401,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         root.setAttribute(XMLNS_ATTRIBUTE, HTML_NAMESPACE_URI);
         root.setAttribute(SCHEMA_LOCATION_ATTRIBUTE_NAME, IRP_PROTOCOL_NS + " " + IRP_PROTOCOL_SCHEMA_LOCATION);
         root.setAttribute(VERSION_NAME, version.toString());
+        globalAttributes.entrySet().forEach((kvp) -> {
+            root.setAttribute(kvp.getKey(), kvp.getValue());
+        });
         doc.appendChild(root);
         return doc;
     }
@@ -1014,53 +1042,52 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
         Element toElement(Document doc) {
             Element element = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PROTOCOL_NAME);
-            for (String comment : comments)
+            element.setAttribute(NAME_NAME, getName());
+            if (!isUsable())
+                element.setAttribute(USABLE_NAME, NO_NAME);
+            comments.forEach((comment) -> {
                 element.appendChild(doc.createComment(comment));
+            });
+            Element irp = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + IRP_NAME);
+            irp.appendChild(doc.createCDATASection(getIrp()));
+            element.appendChild(irp);
+            DocumentFragment docu = getHtmlDocumentation();
+            if (docu != null) {
+                Element docEl = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + DOCUMENTATION_NAME);
+                docEl.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.PRESERVE); // to prevent extra white space from being inserted
+                doc.adoptNode(docu);
+                docEl.appendChild(docu);
+                element.appendChild(docEl);
+            }
+
             for (Map.Entry<String, List<String>> kvp : map.entrySet()) {
                 switch (kvp.getKey()) {
                     case NAME_NAME:
-                        element.setAttribute(NAME_NAME, kvp.getValue().get(0));
-                        break;
                     case USABLE_NAME:
-                        element.setAttribute(USABLE_NAME, Boolean.toString(!kvp.getValue().get(0).equals("no")));
-                        break;
-                    case IRP_NAME: {
-                        Element irp = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + IRP_NAME);
-                        irp.appendChild(doc.createCDATASection(kvp.getValue().get(0)));
-                        element.appendChild(irp);
-                    }
-                    break;
-                    case DOCUMENTATION_NAME:
-                        try {
-                            String docXml = "<?xml version=\"1.0\"?><irp:documentation xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:irp=\"http://www.harctoolbox.org/irp-protocols\">" + kvp.getValue() + "</irp:documentation>";
-                            Document miniDoc = XmlUtils.parseStringToXmlDocument(docXml, true, false);
-                            Element root = miniDoc.getDocumentElement();
-                            element.appendChild(doc.adoptNode(root));
-                        } catch (SAXException ex) {
-                            logger.log(Level.WARNING, "{0} {1}", new Object[]{kvp.getValue().get(0), ex.getMessage()});
-                        }
+                    case IRP_NAME:
                         break;
                     default: {
                         kvp.getValue().stream().map((s) -> {
                             Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
                             param.setAttribute(NAME_NAME, kvp.getKey());
                             param.setTextContent(s);
-                        return param;
-                    }).forEachOrdered((param) -> {
-                        element.appendChild(param);
-                    });
+                            return param;
+                        }).forEachOrdered((param) -> {
+                            element.appendChild(param);
+                        });
                     }
                 }
             }
 
-            xmlMap.entrySet().forEach((kvp) -> {
+            xmlMap.entrySet().stream().filter((kvp) -> !(kvp.getKey().equals(DOCUMENTATION_NAME))).forEachOrdered((kvp) -> {
                 List<DocumentFragment> list = kvp.getValue();
-                if (list != null)
+                if (!(list == null))
                     list.forEach((documentFragment) -> {
                         Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
-                        element.appendChild(param);
                         param.setAttribute(NAME_NAME, kvp.getKey());
+                        param.setAttribute(TYPE_NAME, XML_NAME);
                         param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.PRESERVE); // to prevent extra white space from being inserted
+                        element.appendChild(param);
                         if (documentFragment != null) {
                             doc.adoptNode(documentFragment);
                             param.appendChild(documentFragment);

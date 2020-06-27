@@ -161,6 +161,9 @@ public final class IrpTransmogrifier extends CmdLineProgram {
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR,
                     command.equals("render") ? "IrSequence does not end with a gap."
                     : ex.getLocalizedMessage() + ". Consider using --trailinggap.");
+        } catch (NamedProtocol.TooDeepPreferOversException ex) {
+            return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_INTERNAL_FAILURE,
+                    "Too many level of prefer-overs (" + NamedProtocol.TooDeepPreferOversException.MAX_NESTED_PREFER_OVERS + ") for protocol \"" + ex.getMessage() + "\"");
         } catch (IrpException | IrCoreException | UsageException | FileNotFoundException ex) {
             // Exceptions likely from silly user input, just print the exception
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());

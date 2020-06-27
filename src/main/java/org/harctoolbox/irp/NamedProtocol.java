@@ -31,7 +31,6 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.ircore.OddSequenceLengthException;
-import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.xml.DumbHtmlRenderer;
 import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
@@ -45,7 +44,7 @@ import org.w3c.dom.Element;
  */
 public final class NamedProtocol extends Protocol implements HasPreferOvers,Comparable<NamedProtocol> {
     private final static Logger logger = Logger.getLogger(NamedProtocol.class.getName());
-    private final static int MAXLEVEL = 10;
+    private final static int MAX_NESTED_PREFER_OVERS = 10;
 
     public static Document toDocument(Iterable<NamedProtocol> protocols) {
         Document document = XmlUtils.newDocument();
@@ -134,13 +133,13 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return result;
     }
 
-    public Set<String> preferredOvers(IrpDatabase irpDatabase) throws InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
+    public Set<String> preferredOvers(IrpDatabase irpDatabase) throws InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, TooDeepPreferOversException {
         return preferredOvers(irpDatabase, 0);
     }
 
-    public Set<String> preferredOvers(IrpDatabase irpDatabase, int level) throws UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException {
-        if (level >= MAXLEVEL)
-            throw new ThisCannotHappenException("MAXLEVEL reached, probably circular prefer-overs");
+    public Set<String> preferredOvers(IrpDatabase irpDatabase, int level) throws UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, TooDeepPreferOversException {
+        if (level >= MAX_NESTED_PREFER_OVERS)
+            throw new TooDeepPreferOversException(name);
 
         HashSet<String> result = new HashSet<>(16);
         for (PreferOver prefOver : preferOver) {
@@ -167,16 +166,16 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         });
     }
 
-    public void dumpPreferOvers(PrintStream out, IrpDatabase irpDatabase) {
+    public void dumpPreferOvers(PrintStream out, IrpDatabase irpDatabase) throws TooDeepPreferOversException {
         dumpPreferOvers(out, irpDatabase, 0);
     }
 
-    public void dumpPreferOvers(PrintStream out, IrpDatabase irpDatabase, int level) {
-        if (level >= MAXLEVEL)
-            throw new ThisCannotHappenException("MAXLEVEL (= " + MAXLEVEL + ") reached, probably circular prefer-overs");
+    public void dumpPreferOvers(PrintStream out, IrpDatabase irpDatabase, int level) throws TooDeepPreferOversException {
+        if (level >= MAX_NESTED_PREFER_OVERS)
+            throw new TooDeepPreferOversException(name);
 
         //out.println(IrCoreUtils.tabs(level) + this.name + ":");
-        preferOver.forEach((prefOver) -> {
+        for (PreferOver prefOver : preferOver) {
             String r = prefOver.toBeRemoved();
             try {
                 out.println(IrCoreUtils.tabs(level+1) + prefOver);
@@ -187,7 +186,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
             } catch (InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException | NameUnassignedException ex) {
                 Logger.getLogger(NamedProtocol.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
+        }
     }
 
     /**
@@ -495,5 +494,13 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     @Override
     public int compareTo(NamedProtocol namedProtocol) {
         return IrCoreUtils.lexicalCompare(this.name.compareTo(namedProtocol.name), this.toIrpString().compareTo(namedProtocol.toIrpString()));
+    }
+
+    public static class TooDeepPreferOversException extends IrpException {
+        public static final int MAX_NESTED_PREFER_OVERS = NamedProtocol.MAX_NESTED_PREFER_OVERS;
+
+        private TooDeepPreferOversException(String name) {
+            super(name);
+        }
     }
 }

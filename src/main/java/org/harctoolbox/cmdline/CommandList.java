@@ -116,7 +116,7 @@ public class CommandList extends AbstractCommand {
         return "This command list miscellaneous properties of the protocol(s) given as arguments.";
     }
 
-    public void list(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException, UnsupportedEncodingException {
+    public void list(PrintStream out, CommandCommonOptions commandLineArgs, IrpDatabase irpDatabase) throws UsageException, InvalidNameException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, UnknownProtocolException, UnsupportedEncodingException, NamedProtocol.TooDeepPreferOversException {
         CmdUtils.checkForOption("list", protocols);
         if (checkSorted) {
             String offender = irpDatabase.checkSorted();

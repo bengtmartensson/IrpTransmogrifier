@@ -679,4 +679,12 @@ public class IrpTransmogrifierNGTest {
         result = execute("--validate -c src/main/resources/IrpProtocols.xml,src/test/resources/IrpProtocols-silly.xml list");
         assertNull(result);
     }
+
+    // Test that list --prefer-overs succeeds
+    @Test(enabled = true)
+    public void testCircularPreferOvers() {
+        System.out.println("testCircularPreferOvers");
+        String result = execute("-c src/main/resources/IrpProtocols.xml list --prefer-overs nec1");
+        assertTrue(result != null);
+    }
 }

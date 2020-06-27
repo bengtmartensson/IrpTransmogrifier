@@ -5,6 +5,8 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 Version 1.2.7 (planned for 2020-07-03)
 
+* Better check for circular prefer-overs, option --prefer-overs. Resolves #170.
+* Recognize NULL as argument to --out.  Resolves #186.
 * Improvements in list --dump. #184, #183.
 * Remove -v as command line option.
 * New option --xslt by decode and analyze. #182.

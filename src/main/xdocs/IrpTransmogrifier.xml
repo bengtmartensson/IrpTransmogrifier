@@ -35,6 +35,10 @@
                 <td>Update for version 1.2.6.
                     More of an improvement and clarification than a description of new features.</td>
             </tr>
+            <tr>
+                <td>2020-06-27</td>
+                <td>Update for version 1.2.7: IRP database maintenance.</td>
+            </tr>
         </table>
 
         <section>
@@ -488,10 +492,12 @@
                                 For these, an entry in the patch file overwrites the original entry. </li>
                         </ul>
 
-                    <p>Syntax and semantics of the file is believed to be essentially self explaing.
-                        The exact syntax,
-                        is given in <a href="http://www.harctoolbox.org/schemas/irp-protocols.xsd">the schema</a>
-                        and are therefore not repeated here.</p>
+                        <p>Syntax and semantics of the file is believed to be essentially self explaing.
+                            The exact syntax is given by <a href="http://www.harctoolbox.org/schemas/irp-protocols.xsd">the schema</a>,
+                            and is therefore not repeated here.</p>
+
+                        <p>Note that the program contains some functions for the
+                        <a href="#IRP+database+maintenance">maintenance of the data base</a>.</p>
                     <section>
                         <title>Protocol parameters</title>
                         <p>Most protocol parameters are given as the <code>parameter</code> element. However, the protocol name, its IRP, and its
@@ -847,6 +853,35 @@
                     The form of the final answer can be influenced by a number of different parameters.
                 </p>
 
+            </section>
+
+            <section>
+                <title>IRP database maintenance</title>
+                <p>
+                    The command line program also contains some functions for maintenance of the IRP database, described next.</p>
+                <section>
+                    <title>Validation</title>
+                    <p>An IRP database is required to be <a href="#The+Configuration+file%2FIRP+protocol+database">valid with respect to the a W3C schema</a>.
+                        For this, the common option <code>--validate</code> makes the program's XML parser read all files in validating mode,
+                        and stops if the input is not conforming.
+                    </p>
+                </section>
+
+                <section>
+                    <title>Output of parsed database</title>
+                    <p>The parsed database (possibly after merging of several files) can be output using the <code>list --dump</code> command.
+                        This option generate an XML file on the output. All other output is suppressed.
+                        This output can be, possibly after minimal hand editing (update version?) used as new <code>IrpProtocols.xml</code>.
+                    </p>
+                </section>
+
+                <section>
+                    <title>Other options</title>
+                    <p>With the command <code>list --prefer-overs</code>, the protocol's <code>prefer-over</code>s are printed, transitively.
+                    The option <code>--check-sorted</code> checks the correct (alphabetic) sorting of the commands (with respect to their names).
+                    There are also a number of other options listing properties of the individual protocols,
+                    for example <code>--classify, --display, --warning, --weight</code>.</p>
+                    </section>
             </section>
         </section>
 

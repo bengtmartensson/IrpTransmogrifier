@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -308,8 +309,8 @@ public final class IrCoreUtils {
             return null;
 
         String realFilename = filename.startsWith("+") ? filename.substring(1) : filename;
-        return filename.equals("-")
-                ? System.out
+        return filename.equals("-") ? System.out
+                : filename.equals("NULL") ? new PrintStream(new NullOutputStream(), false, DUMB_CHARSET_NAME)
                 : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, encoding);
     }
 
@@ -774,5 +775,16 @@ public final class IrCoreUtils {
     }
 
     private IrCoreUtils() {
+    }
+
+    private static class NullOutputStream extends OutputStream {
+
+        NullOutputStream() {
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            // nothing
+        }
     }
 }

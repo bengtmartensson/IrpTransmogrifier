@@ -680,11 +680,11 @@ public class IrpTransmogrifierNGTest {
         assertNull(result);
     }
 
-    // Test that list --prefer-overs succeeds
+    // Test that list --prefer-overs succeeds, i.e. no circular --prefer-overs
     @Test(enabled = true)
     public void testCircularPreferOvers() {
         System.out.println("testCircularPreferOvers");
-        String result = execute("-c src/main/resources/IrpProtocols.xml list --prefer-overs nec1");
+        String result = execute("-c src/main/resources/IrpProtocols.xml list --prefer-overs");
         assertTrue(result != null);
     }
 }

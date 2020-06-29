@@ -1,8 +1,6 @@
-Input:	NEC1-f16: {D=51,E=80,F=53},	beg=0, end=79, reps=3
-Power off:	NEC1-f16: {D=28,E=80,F=53},	beg=0, end=79, reps=3
-Power On:	NEC1-f16: {D=28,E=80,F=53},	beg=0, end=79, reps=3
-Vol+:	NEC-f16: {D=161,E=80,F=53},	beg=0, end=67	{NEC-f16: {D=161,E=80,F=53},	beg=68, end=135	{NEC-f16: {D=161,E=80,F=53},	beg=136, end=203	{NEC-f16: {D=161,E=80,F=53},	beg=204, end=271}	NEC2-f16: {D=161,E=80,F=53},	beg=136, end=271, reps=2}	NEC2-f16: {D=161,E=80,F=53},	beg=68, end=271, reps=3}
-	NEC2-f16: {D=161,E=80,F=53},	beg=0, end=271, reps=4
-Vol-:	NEC-f16: {D=162,E=80,F=53},	beg=0, end=67	{NEC-f16: {D=162,E=80,F=53},	beg=68, end=135	{NEC-f16: {D=162,E=80,F=53},	beg=136, end=203	{NEC-f16: {D=162,E=80,F=53},	beg=204, end=271}	NEC2-f16: {D=162,E=80,F=53},	beg=136, end=271, reps=2}	NEC2-f16: {D=162,E=80,F=53},	beg=68, end=271, reps=3}
-	NEC2-f16: {D=162,E=80,F=53},	beg=0, end=271, reps=4
-Mute:	NEC1-f16: {D=48,E=80,F=53},	beg=0, end=83, reps=4
+Input:		NEC1-f16: {D=51,E=80,F=53},	beg=0, end=79, reps=3
+Power off:		NEC1-f16: {D=28,E=80,F=53},	beg=0, end=79, reps=3
+Power On:		NEC1-f16: {D=28,E=80,F=53},	beg=0, end=79, reps=3
+Vol+:		NEC2-f16: {D=161,E=80,F=53},	beg=0, end=271, reps=4
+Vol-:		NEC2-f16: {D=162,E=80,F=53},	beg=0, end=271, reps=4
+Mute:		NEC1-f16: {D=48,E=80,F=53},	beg=0, end=83, reps=4

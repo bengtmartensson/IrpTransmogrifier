@@ -415,8 +415,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     public Document toDocument(Iterable<String> protocolNames) {
         Document doc = emptyDocument();
         Element root = doc.getDocumentElement();
-        for (String protocolName : protocolNames)
+        for (String protocolName : protocolNames) {
+            root.appendChild(doc.createTextNode(IrCoreUtils.LINEFEED));
             root.appendChild(protocols.get(protocolName.toLowerCase(Locale.US)).toElement(doc));
+        }
 
         return doc;
     }
@@ -818,12 +820,27 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     private static class UnparsedProtocol {
         private static final int APRIORI_SIZE = 4;
 
-        private static DocumentFragment nodeListToDocumentFragment(NodeList childNodes) {
-            Document doc = XmlUtils.newDocument();
+        private static DocumentFragment nodeToDocumentFragment(Node node, boolean preserve) {
+            return nodeListToDocumentFragment(node.getChildNodes(), preserve);
+        }
+
+        private static DocumentFragment nodeListToDocumentFragment(NodeList childNodes, boolean preserveSpace) {
+            Document doc = XmlUtils.newDocument(true);
             DocumentFragment fragment = doc.createDocumentFragment();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node node = childNodes.item(i);
-                fragment.appendChild(doc.importNode(node, true));
+                if (preserveSpace)
+                    fragment.appendChild(doc.importNode(node, true));
+                else {
+                    if (node.getNodeType() == Node.TEXT_NODE) {
+                        if (preserveSpace || !node.getTextContent().matches(IrCoreUtils.WHITESPACE))
+                            fragment.appendChild(doc.createTextNode(node.getTextContent()));
+                    } else {
+                        Node importedNode = doc.importNode(node, false);
+                        fragment.appendChild(importedNode);
+                        importedNode.appendChild(doc.importNode(nodeToDocumentFragment(node, preserveSpace), true));
+                    }
+                }
             }
             return fragment;
         }
@@ -902,6 +919,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             patchMap(xmlMap, patchProtocol.xmlMap);
         }
 
+        private void addXmlProperty(String key, Node node, boolean preserve) {
+            DocumentFragment fragment = nodeToDocumentFragment(node, preserve);
+            fragment.setUserData(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.hasSpacePreserve(node), null);
+            addXmlProperty(key, fragment);
+        }
+
         private void addXmlProperty(String key, DocumentFragment fragment) {
             List<DocumentFragment> list = xmlMap.get(key);
             if (list == null) {
@@ -965,12 +988,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                     addProperty(IRP_NAME, e.getTextContent());
                     break;
                 case DOCUMENTATION_NAME:
-                    addXmlProperty(DOCUMENTATION_NAME, nodeListToDocumentFragment(e.getChildNodes()));
+                    addXmlProperty(DOCUMENTATION_NAME, e, XmlUtils.hasSpacePreserve(e));
                     break;
                 case PARAMETER_NAME:
                     boolean isXml = e.getAttribute(TYPE_NAME).toLowerCase(Locale.US).equals(XML_NAME);
                     if (isXml)
-                        addXmlProperty(e.getAttribute(NAME_NAME), nodeListToDocumentFragment(e.getChildNodes()));
+                        addXmlProperty(e.getAttribute(NAME_NAME), e, false);
                     else
                         addProperty(e.getAttribute(NAME_NAME), e.getTextContent());
                     break;
@@ -1054,7 +1077,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             DocumentFragment docu = getHtmlDocumentation();
             if (docu != null) {
                 Element docEl = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + DOCUMENTATION_NAME);
-                docEl.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.PRESERVE); // to prevent extra white space from being inserted
+                Object userData = docu.getUserData(XmlUtils.XML_SPACE_ATTRIBUTE_NAME);
+                if (userData != null && (Boolean) userData)
+                    docEl.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.PRESERVE); // to prevent extra white space from being inserted
                 doc.adoptNode(docu);
                 docEl.appendChild(docu);
                 element.appendChild(docEl);
@@ -1086,7 +1111,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                         Element param = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME);
                         param.setAttribute(NAME_NAME, kvp.getKey());
                         param.setAttribute(TYPE_NAME, XML_NAME);
-                        param.setAttribute(XmlUtils.XML_SPACE_ATTRIBUTE_NAME, XmlUtils.PRESERVE); // to prevent extra white space from being inserted
                         element.appendChild(param);
                         if (documentFragment != null) {
                             doc.adoptNode(documentFragment);

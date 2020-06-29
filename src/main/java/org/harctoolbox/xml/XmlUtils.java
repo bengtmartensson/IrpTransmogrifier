@@ -60,6 +60,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -198,6 +199,19 @@ public final class XmlUtils {
 
     public static Document newDocument() {
         return newDocument(false);
+    }
+
+    /**
+     * Returns true if the node given as argument has the attribute xml:space, equal to &quot;preserve&quot;
+     * @param node Node (Element) to investigate.
+     * @return true iff xml:space=&quot;preserve&quot;.
+     */
+    public static boolean hasSpacePreserve(Node node) {
+        NamedNodeMap attrs = node.getAttributes();
+        if (attrs == null)
+            return false;
+        Node att = attrs.getNamedItem(XML_SPACE_ATTRIBUTE_NAME);
+        return att != null && att.getTextContent().equals(PRESERVE);
     }
 
     public static Map<String, Element> createIndex(Element root, String tagName, String idName) {
@@ -415,6 +429,9 @@ public final class XmlUtils {
         root.setAttribute(attName, attValue);
         doc.appendChild(root);
         root.appendChild(doc.importNode(fragment, true));
+        Object userDatum = fragment.getUserData(XML_SPACE_ATTRIBUTE_NAME);
+        if (userDatum != null && ((Boolean) userDatum))
+            root.setAttribute(XML_SPACE_ATTRIBUTE_NAME, PRESERVE);
         return doc;
     }
 

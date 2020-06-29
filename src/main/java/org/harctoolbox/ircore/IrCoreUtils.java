@@ -112,6 +112,10 @@ public final class IrCoreUtils {
 
     public static final Charset UTF8 = Charset.forName(UTF8_NAME);
 
+    public static final String WHITESPACE = "\\s+";
+
+    public static final String LINEFEED = "\n";
+
     static {
         Map<String, Integer> map = new LinkedHashMap<>(4);
         map.put("0b", 2);

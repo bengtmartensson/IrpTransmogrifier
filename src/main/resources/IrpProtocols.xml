@@ -402,6 +402,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:irp>
             <![CDATA[{30.3k,512}<-1,1|1,-1>(1,-5,1023:10, -44, (1,-5,1:1,F:6,D:3,-236)+ ,1,-5,1023:10,-44)[F:0..63,D:0..7]]]>
         </irp:irp>
+        <irp:parameter name="alt_name">Motorola</irp:parameter>
         <irp:parameter name="uei-executor">00A5[D,0;F]</irp:parameter>
         <irp:parameter name="prefer-over">Blaupunkt_relaxed</irp:parameter>
     </irp:protocol>

@@ -22,13 +22,13 @@ import org.harctoolbox.ircore.IrCoreUtils;
 @SuppressWarnings("PublicField")
 public class CommandBasicOptions extends CommandLogOptions {
 
-    @Parameter(names = {"-e", "--encoding", "--iencoding"}, description = "Encoding used to read input.")
+    @Parameter(names = {"-e", "--encoding", "--iencoding"}, converter = EncodingParser.class, description = "Encoding used to read input.")
     public String inputEncoding = IrCoreUtils.UTF8_NAME;
 
     @Parameter(names = {"-o", "--output"}, description = "Name of output file. Default: stdout.")
     public String output = null;
 
-    @Parameter(names = {      "--oencoding"}, description = "Encoding used in generated output.")
+    @Parameter(names = {      "--oencoding"}, converter = EncodingParser.class, description = "Encoding used in generated output.")
     public String outputEncoding = IrCoreUtils.UTF8_NAME;
 
     @Parameter(names = {"-q", "--quiet"}, description = "Quitest possible operation, typically to be used from scripts.")

@@ -42,6 +42,7 @@ public class IrpTransmogrifierNGTest {
     static String execute(String commandLine) {
         return execute(CmdUtils.shellSplit(commandLine));
     }
+
     static String execute(String[] args) {
         return CmdUtils.execute(IrpTransmogrifier.class, args);
     }
@@ -686,5 +687,14 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testCircularPreferOvers");
         String result = execute("-c src/main/resources/IrpProtocols.xml list --prefer-overs");
         assertTrue(result != null);
+    }
+
+   // Test that list --prefer-overs succeeds, i.e. no circular --prefer-overs
+    @Test(enabled = true)
+    public void testUTF_8() {
+        System.out.println("testUTF_8");
+        String expected = "RI2 – 1: \tSIM2: {F=129}, beg=0, end=35";
+        String result = execute("-c src/main/resources/IrpProtocols.xml --ienc utf-8 --oenc utf-8 decode  --namedinput src/test/txt/SIM2.txt");
+        assertEquals(result, expected);
     }
 }

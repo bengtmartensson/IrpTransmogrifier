@@ -313,8 +313,8 @@ public final class IrCoreUtils {
             return null;
 
         String realFilename = filename.startsWith("+") ? filename.substring(1) : filename;
-        return filename.equals("-") ? System.out
-                : filename.equals("NULL") ? new PrintStream(new NullOutputStream(), false, DUMB_CHARSET_NAME)
+        return filename.equals("-") ? new PrintStream(System.out, false, encoding)
+                : filename.equals("NULL") ? new PrintStream(new NullOutputStream(), false, encoding)
                 : new PrintStream(new FileOutputStream(realFilename, filename.startsWith("+")), false, encoding);
     }
 

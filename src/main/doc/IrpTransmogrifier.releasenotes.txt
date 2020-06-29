@@ -5,6 +5,9 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 Version 1.2.7 (planned for 2020-07-03)
 
+* Merged rmProtocols.xml from RemoteMaster commit r1712.
+* Reformatted IrpProtocols.xml using list --dump.
+* Now allows attribute xml:space in <irp:documentation>.
 * Better check for circular prefer-overs, option --prefer-overs. Resolves #170.
 * Recognize NULL as argument to --out.  Resolves #186.
 * Improvements in list --dump. #184, #183.
@@ -13,7 +16,7 @@ Version 1.2.7 (planned for 2020-07-03)
 * API: Fix usage of UnsupportedEncodingException. #181
 * Replace option --encoding by separate options for input and output. #180.
 * Protocols: Kaseikyo family protocols now "prefer-over"-ed Kaseikyo. #177
-* anylyze with --tsv: layout fixes.
+* analyze with --tsv: layout fixes.
 * New main-class XmlTransmogrifier: allows command line validation, reformatting, transformations.
 * Implemented local XML Entity resolver (for accessing common Schemas locally, not over tne net).
 * API: new package org.harctoolbox.xml. Some classes relocated to this.

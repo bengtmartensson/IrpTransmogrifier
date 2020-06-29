@@ -161,12 +161,11 @@ public class IrpDatabaseNGTest {
     @Test
     public void testGetCName1() throws UnknownProtocolException {
         System.out.println("getCName1");
-        String name = "Blaupunkt_relaxed";
-        String expResult = "Blaupunkt_relaxed";
+        String name = "B&O repeat";
+        String expResult = "B_O_repeat";
         String result = instance.getCName(name);
         assertEquals(result, expResult);
     }
-
 
     /**
      * Test of getMatchingNamesRegexp method, of class IrpDatabase.

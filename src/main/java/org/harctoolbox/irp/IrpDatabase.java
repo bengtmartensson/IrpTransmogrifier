@@ -259,16 +259,20 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         rebuildAliases();
     }
 
-    private IrpDatabase() throws IrpParseException {
-        this(new LinkedHashMap<>(16));
-    }
-
-    private IrpDatabase(Map<String, UnparsedProtocol> protocols) throws IrpParseException {
+    /**
+     * Returns an empty IrpDatabase.
+     */
+    public IrpDatabase() {
         this.version = new StringBuilder(64);
-        this.protocols = protocols;
+        this.protocols = new LinkedHashMap<>(8);
         this.aliases = new LinkedHashMap<>(8);
         this.comments = new ArrayList<>(4);
         this.globalAttributes = new HashMap<>(4);
+    }
+
+    private IrpDatabase(Map<String, UnparsedProtocol> protocols) throws IrpParseException {
+        this();
+        this.protocols = protocols;
         expand();
         rebuildAliases();
     }

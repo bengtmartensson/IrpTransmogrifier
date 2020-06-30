@@ -280,6 +280,13 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         rebuildAliases();
     }
 
+    public IrpDatabase(Element protocolsElement) throws IrpParseException {
+        this();
+        patchProtocols(protocolsElement);
+        expand();
+        rebuildAliases();
+    }
+
     public void patch(Reader reader) throws IOException, SAXException {
         patch(openXmlReader(reader));
     }
@@ -320,8 +327,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             switch (node.getNodeType()) {
                 case Node.ELEMENT_NODE: {
                     Element el = (Element) node;
-                    String name = el.getLocalName();
-                    if (name.equals(PROTOCOLS_NAME))
+                    String name = el.getTagName();
+                    if ((IRP_NAMESPACE_PREFIX + ":" + PROTOCOLS_NAME).equals(name))
                         patchProtocols(el);
                 }
                 break;
@@ -341,7 +348,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             switch (node.getNodeType()) {
                 case Node.ELEMENT_NODE: {
                     Element e = (Element) node;
-                    if (e.getLocalName().equals(PROTOCOL_NAME))
+                    if ((IRP_NAMESPACE_PREFIX + ":" + PROTOCOL_NAME).equals(e.getTagName()))
                         patchProtocol(e);
                 }
                 break;
@@ -983,14 +990,14 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
 
         private void parseProtocolChild(Element e) {
-            switch (e.getLocalName()) {
-                case IRP_NAME:
+            switch (e.getTagName()) {
+                case IRP_NAMESPACE_PREFIX + ":" + IRP_NAME:
                     addProperty(IRP_NAME, e.getTextContent());
                     break;
-                case DOCUMENTATION_NAME:
+                case IRP_NAMESPACE_PREFIX + ":" + DOCUMENTATION_NAME:
                     addXmlProperty(DOCUMENTATION_NAME, e, XmlUtils.hasSpacePreserve(e));
                     break;
-                case PARAMETER_NAME:
+                case IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME:
                     boolean isXml = e.getAttribute(TYPE_NAME).toLowerCase(Locale.US).equals(XML_NAME);
                     if (isXml)
                         addXmlProperty(e.getAttribute(NAME_NAME), e, false);

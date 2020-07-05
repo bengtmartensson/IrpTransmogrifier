@@ -174,7 +174,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2020-06-29"
+               version="2020-07-05"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
@@ -538,14 +538,10 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:irp>
             <![CDATA[{40k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-15){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
         </irp:irp>
-        <irp:documentation>
-                        There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
+        <irp:documentation xml:space="preserve">There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
             The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
             The various Parm values correspond to three different frequencies (the 38k in the above) and two different lead-out times (the -50 in the above).
             The corresponding values are:
-
-
-
             <ul>
                 <li>Parm=0 : 40k, -15</li>
                 <li>Parm=1 : 40k, -50</li>
@@ -1937,20 +1933,11 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:irp>
             <![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,<-2,2|2,-2>(T:1),D:8,S:4,F:8,-100m)*,T=1-T)[D:0..255,S:0..15,F:0..255,T@:0..1=0]]]>
         </irp:irp>
-        <irp:documentation xml:space="preserve">This protocol is commonly used in Sky and Sky+ remotes.</irp:documentation>
+        <irp:documentation xml:space="preserve">The executors for this protocol do not toggle T.
+	    This no-toggle version is commonly used in Sky and Sky+ remotes.</irp:documentation>
         <irp:parameter name="prefer-over">RC6-6-20-notoggle</irp:parameter>
         <irp:parameter name="uei-executor">0020[6,D,S;F]</irp:parameter>
-        <irp:parameter name="uei-executor">0020:2[6,D,S,T;F]</irp:parameter>
-        <irp:parameter name="absolute-tolerance">300</irp:parameter>
-    </irp:protocol>
-
-    <irp:protocol name="RC6-6-20-notoggle">
-        <irp:irp>
-            <![CDATA[{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,6:3,<-2,2|2,-2>(T:1),D:8,S:4,F:8,-100m)*[D:0..255,S:0..15,F:0..255,T:0..1=0]]]>
-        </irp:irp>
-        <irp:documentation xml:space="preserve">Version of <a href="#RC6-6-20">RC6-6-20</a> where T does not toggle.</irp:documentation>
-        <irp:parameter name="uei-executor">0020[6,D,S;F]</irp:parameter>
-        <irp:parameter name="uei-executor">0020:2[6,D,S,T;F]</irp:parameter>
+        <irp:parameter name="uei-executor">0020:2[6,D,S;F]</irp:parameter>
         <irp:parameter name="absolute-tolerance">300</irp:parameter>
     </irp:protocol>
 
@@ -1966,6 +1953,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:irp>
             <![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,M:3,<-2,2|2,-2>(T:1),D:8,S:12,F:8,-100m)*,T=1-T)[D:0..255,S:0..4095,F:0..255,M:0..7,T@:0..1=0]]]>
         </irp:irp>
+        <irp:documentation xml:space="preserve">The executor for this protocol does not toggle T.</irp:documentation>
         <irp:parameter name="uei-executor">0240[D,S,M,0;F]</irp:parameter>
         <irp:parameter name="absolute-tolerance">300</irp:parameter>
     </irp:protocol>
@@ -1978,6 +1966,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
             Exceptions: RC6-0-16 is displayed as simply <a href="#RC6">RC6</a>,
             RC6-6-24  is displayed as <a href="#Replay">Replay</a>,
             and some RC6-6-32 which is displayed as <a href="#MCE">MCE</a>.
+	    The executor for this protocol supports both toggle and non-toggle behaviours for T.
         </irp:documentation>
         <irp:parameter name="uei-executor">012A:2[D,(OEM1&lt;&lt;8)+OEM2:8,M;F]</irp:parameter>
         <irp:parameter name="absolute-tolerance">300</irp:parameter>

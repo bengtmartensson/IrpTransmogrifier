@@ -3,10 +3,10 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
-Version 1.2.7 (planned for 2020-07-03)
+2020-07-05: Version 1.2.7
 
 * Add Motorola as alt_name for Blaupunkt, #187. Remove Blaupunkt_relaxed.
-* Merged rmProtocols.xml from RemoteMaster commit r1712.
+* Merged rmProtocols.xml from RemoteMaster commit r1712 as well as r1714.
 * Reformatted IrpProtocols.xml using list --dump.
 * Now allows attribute xml:space in <irp:documentation>.
 * Better check for circular prefer-overs, option --prefer-overs. Resolves #170.

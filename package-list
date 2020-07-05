@@ -3,3 +3,4 @@ org.harctoolbox.cmdline
 org.harctoolbox.ircore
 org.harctoolbox.irp
 org.harctoolbox.lirc
+org.harctoolbox.xml

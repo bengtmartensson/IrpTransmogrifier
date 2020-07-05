@@ -212,7 +212,7 @@ endif
 
 nukeempty:
 	find . -name \*.diff -size 0 -exec rm \{\} \;
-	-ls -l *.diff
+	-ls -l *.diff || echo "No differences encountered!"
 
 clean:
 	rm -f *.diff *.out

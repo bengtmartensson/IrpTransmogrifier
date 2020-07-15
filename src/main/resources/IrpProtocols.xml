@@ -174,7 +174,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2020-07-05"
+               version="2020-07-15"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
@@ -1281,6 +1281,8 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="alt_name">RC6-6-32</irp:parameter>
         <irp:parameter name="uei-executor">012A:2[D,S;F]</irp:parameter>
         <irp:parameter name="uei-executor">012A[D,S;F]</irp:parameter>
+        <irp:parameter name="uei-executor">012A:2(RC6-M-32){OEM1=128}[OEM1,(S&lt;&lt;8)+D:7,6,0,2;F]</irp:parameter>
+        <irp:parameter name="uei-executor">012A(RC6-6-32){OEM1=128}[OEM1,(S&lt;&lt;8)+D:7,2;F]</irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="MCIR-2-kbd">
@@ -1653,9 +1655,27 @@ C3=D:1:2 + #(F&44) + #(D&2)
         </irp:documentation>
         <irp:parameter name="absolute-tolerance">50</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
-        <irp:parameter name="uei-executor">0173:1[D,S,X;F]</irp:parameter>
-        <irp:parameter name="uei-executor">0173:3[D,S,X;F]</irp:parameter>
-        <irp:parameter name="uei-executor">01E1:2[D,S;F,X]</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="0173:1{Y=T,Z=-1,T=Y-2*Z:1}[D,S,X:7+(Y&lt;&lt;7),Z;F]">
+                <rm:assignment target="X">X:7+(Y&lt;&lt;7)</rm:assignment>
+                <rm:assignment target="Y">-1</rm:assignment>
+                <rm:assignment target="T">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="0173:3{Y=T,Z=-1,T=Y-2*Z:1}[D,S,X:7+(Y&lt;&lt;7),Z;F]">
+                <rm:assignment target="X">X:7+(Y&lt;&lt;7)</rm:assignment>
+                <rm:assignment target="Y">-1</rm:assignment>
+                <rm:assignment target="T">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01E1:2{Y=T,Z=-1,T=Y-2*Z:1}[D,S,Z;F,X:7+(Y&lt;&lt;7)]">
+                <rm:assignment target="X">X:7+(Y&lt;&lt;7)</rm:assignment>
+                <rm:assignment target="Y">-1</rm:assignment>
+                <rm:assignment target="T">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="Nova Pace">
@@ -1825,9 +1845,9 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="uei-executor">005F(;D==~S:8)[D;F,F]</irp:parameter>
         <irp:parameter name="uei-executor">006A(;D==~S:8)[D?0,D?1,D?2;??,F,F]</irp:parameter>
         <irp:parameter name="uei-executor">006A:JP1(;D==~S:8)[D?0,D?1,D?2,D?3;??,F,F]</irp:parameter>
-        <irp:parameter name="prefer-over">(162&lt;=D &amp;&amp; D&lt;=165) || D==168 || D==170 || D==173 || D==175 ; NEC2</irp:parameter>
+        <irp:parameter name="prefer-over">(160&lt;=D &amp;&amp; D&lt;=165) || D==168 || D==170 || D==171 || D==173 || D==175 ; NEC2</irp:parameter>
         <irp:parameter name="frequency-lower">39700</irp:parameter>
-        <irp:parameter name="frequency-upper">41000</irp:parameter>
+        <irp:parameter name="frequency-upper">42000</irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="Pioneer-Mix">
@@ -1936,8 +1956,8 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:documentation xml:space="preserve">The executors for this protocol do not toggle T.
 	    This no-toggle version is commonly used in Sky and Sky+ remotes.</irp:documentation>
         <irp:parameter name="prefer-over">RC6-6-20-notoggle</irp:parameter>
-        <irp:parameter name="uei-executor">0020[6,D,S;F]</irp:parameter>
-        <irp:parameter name="uei-executor">0020:2[6,D,S;F]</irp:parameter>
+        <irp:parameter name="uei-executor">0020(;T==0)[6,D,S;F]</irp:parameter>
+        <irp:parameter name="uei-executor">0020:2[6,D,S,T;F]</irp:parameter>
         <irp:parameter name="absolute-tolerance">300</irp:parameter>
     </irp:protocol>
 
@@ -1949,12 +1969,27 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="uei-executor">0058:2(RC6-M-16)[D,M;F]</irp:parameter>
     </irp:protocol>
 
+    <irp:protocol name="RC6-M-24">
+        <irp:irp>
+            <![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,M:3,<-2,2|2,-2>(T:1),D:8,S:8,F:8,^105m)*,T=1-T)[D:0..255,S:0..255,F:0..255,M:0..7,T@:0..1=0]]]>
+        </irp:irp>
+        <irp:documentation xml:space="preserve">This is a generic version of Replay that supports M values other than 6.
+            The RC6-M-24 executor for this protocol supports both toggle and non-toggle behaviours for T.</irp:documentation>
+        <irp:parameter name="uei-executor">0092:3(ReplayTV (Official);M==6&amp;&amp;T==0)[D,S;F]</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="0092:3{X=-1,TS=T,T=X:1-2*X:1:1}[D,S,M,X;F]">
+                <rm:assignment target="T">TS</rm:assignment>
+                <rm:assignment target="TS">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+    </irp:protocol>
+
     <irp:protocol name="RC6-M-28">
         <irp:irp>
             <![CDATA[{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,M:3,<-2,2|2,-2>(T:1),D:8,S:12,F:8,-100m)*,T=1-T)[D:0..255,S:0..4095,F:0..255,M:0..7,T@:0..1=0]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">The executor for this protocol does not toggle T.</irp:documentation>
-        <irp:parameter name="uei-executor">0240[D,S,M,0;F]</irp:parameter>
+        <irp:parameter name="uei-executor">0240(;T==0)[D,S,M,0;F]</irp:parameter>
         <irp:parameter name="absolute-tolerance">300</irp:parameter>
     </irp:protocol>
 
@@ -1968,8 +2003,19 @@ C3=D:1:2 + #(F&44) + #(D&2)
             and some RC6-6-32 which is displayed as <a href="#MCE">MCE</a>.
 	    The executor for this protocol supports both toggle and non-toggle behaviours for T.
         </irp:documentation>
-        <irp:parameter name="uei-executor">012A:2[D,(OEM1&lt;&lt;8)+OEM2:8,M;F]</irp:parameter>
         <irp:parameter name="absolute-tolerance">300</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="012A:2{X=-1,Y=-1,TS=T,T=X-2*Y}(;Y&lt;2)[OEM1,(OEM2&lt;&lt;8)+D:8,M,X,Y;F]">
+                <rm:assignment target="T">TS</rm:assignment>
+                <rm:assignment target="TS">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="012A(RC6-6-32;M==6&amp;&amp;X&lt;2){X=-1,TS=T,T=-X}[OEM1,(OEM2&lt;&lt;8)+D:8,X;F]">
+                <rm:assignment target="T">TS</rm:assignment>
+                <rm:assignment target="TS">-1</rm:assignment>
+            </rm:deployment>
+        </irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="RC6-M-56">
@@ -2061,6 +2107,8 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="alt_name">RC6A</irp:parameter>
         <irp:parameter name="uei-executor">0092[D,S;F]</irp:parameter>
         <irp:parameter name="uei-executor">0092:3(ReplayTV (Official))[D,S;F]</irp:parameter>
+        <irp:parameter name="uei-executor">0092:3(RC6-M-24)[D,S,6,0;F]</irp:parameter>
+        <irp:parameter name="prefer-over">RC6-M-24</irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="Revox">

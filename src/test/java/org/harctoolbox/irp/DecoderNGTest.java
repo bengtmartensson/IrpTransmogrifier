@@ -189,11 +189,11 @@ public class DecoderNGTest {
         result = decoder.decodeIrSignal(irSignal, params);
         assertTrue(result.contains("Pioneer"));
 
-        irSignal = new IrSignal(irSignal, 41000.0);
+        irSignal = new IrSignal(irSignal, 42000.0);
         result = decoder.decodeIrSignal(irSignal, params);
         assertTrue(result.contains("Pioneer"));
 
-        irSignal = new IrSignal(irSignal, 41001.0);
+        irSignal = new IrSignal(irSignal, 42001.0);
         result = decoder.decodeIrSignal(irSignal, params);
         assertFalse(result.contains("Pioneer"));
 

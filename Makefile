@@ -24,6 +24,7 @@ IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
 
 IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml
 UPLOADDIR_DIR := ftp://bengt-martensson.de/harctoolbox/
+RMPROTOCOLS := ~/jp1/remotemaster/rmProtocols.xml
 
 GH_PAGES := $(TOP)/gh-pages
 ORIGINURL := $(shell git remote get-url origin)
@@ -108,5 +109,11 @@ clean:
 	mvn clean
 	rm -f all-protocols.xml lirc.xml pom.xml.versionsBackup
 	rm -rf $(GH_PAGES)
+
+# Probably only for my own usage
+merge:
+	./irptransmogrifier -c $(RMPROTOCOLS) -o IrpProtocols.xml list --dump
+	mv src/main/resources/IrpProtocols.xml src/main/resources/IrpProtocols.xml.old
+	mv IrpProtocols.xml src/main/resources/IrpProtocols.xml
 
 .PHONY: clean $(PROJECT_JAR)-test release

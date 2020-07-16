@@ -1,8 +1,12 @@
 package org.harctoolbox.irp;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.xml.DumbHtmlRenderer;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
@@ -348,5 +352,24 @@ public class IrpDatabaseNGTest {
         assertNull(doc);
 
         assertFalse(irpDatabase.isKnown("covfefe"));
+    }
+
+    /**
+     * Test of render method, of class IrpDatabase.
+     */
+    @Test
+    public void testRender() throws Exception {
+        System.out.println("render");
+        String protocolName = "rc5";
+        Map<String, Long> params = new HashMap<>(2);
+        params.put("D", 0L);
+        params.put("F", 0L);
+        IrpDatabase irpDatabase = new IrpDatabase((String) null);
+        IrSignal result = instance.render("rc5", params);
+        String str = Pronto.toString(result);
+        assertEquals(str, "0000 0073 0000 000D 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0CC8");
+        result = instance.render("RC5", params);
+        str = Pronto.toString(result);
+        assertEquals(str, "0000 0073 0000 000D 0020 0020 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0CC8");
     }
 }

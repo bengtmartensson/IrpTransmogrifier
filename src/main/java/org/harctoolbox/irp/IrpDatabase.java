@@ -233,6 +233,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     private Map<String, String> aliases;
     private final List<String> comments;
     private final Map<String, String> globalAttributes;
+    private final Map<String, Protocol> recycledProtocols;
 
     public IrpDatabase(Reader reader) throws IOException, IrpParseException, SAXException {
         this(openXmlReader(reader));
@@ -268,6 +269,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         this.aliases = new LinkedHashMap<>(8);
         this.comments = new ArrayList<>(4);
         this.globalAttributes = new HashMap<>(4);
+        this.recycledProtocols = new HashMap<>(16);
     }
 
     private IrpDatabase(Map<String, UnparsedProtocol> protocols) throws IrpParseException {
@@ -721,10 +723,44 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return list;
     }
 
-    public Protocol getProtocol(String protocolName) throws UnknownProtocolException, UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
+    /**
+     * Returns a Protocol with the prescribed name.
+     * As opposed to {@link #getProtocol(String)}, the Protocol is guaranteed to be newly constructed,
+     * and it will not be recycled.
+     * @param protocolName
+     * @return Protocol, guaranteed new.
+     * @throws UnknownProtocolException
+     * @throws UnsupportedRepeatException
+     * @throws NameUnassignedException
+     * @throws InvalidNameException
+     * @throws IrpInvalidArgumentException
+     */
+    public Protocol getNonRecycledProtocol(String protocolName) throws UnknownProtocolException, UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         if (!isKnown(protocolName))
             throw new UnknownProtocolException(protocolName);
         return new Protocol(getIrp(protocolName));
+    }
+
+    /**
+     * Returns a Protocol with the prescribed name. If this has been called
+     * previously with the same argument, the previously constructed Protocol is
+     * recycled and returned. See also {@link  #getNonRecycledProtocol(String)}.
+     *
+     * @param protocolName
+     * @return Protocol, possibly recycled.
+     * @throws UnknownProtocolException
+     * @throws UnsupportedRepeatException
+     * @throws NameUnassignedException
+     * @throws InvalidNameException
+     * @throws IrpInvalidArgumentException
+     */
+    public Protocol getProtocol(String protocolName) throws UnknownProtocolException, UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
+        Protocol protocol = recycledProtocols.get(protocolName.toLowerCase(Locale.US));
+        if (protocol == null) {
+            protocol = getNonRecycledProtocol(protocolName);
+            recycledProtocols.put(protocolName.toLowerCase(Locale.US), protocol);
+        }
+        return protocol;
     }
 
     public Protocol getProtocolExpandAlias(String protocolName) throws UnknownProtocolException, UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {

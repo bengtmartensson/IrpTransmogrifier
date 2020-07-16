@@ -21,3 +21,4 @@ Checklist for release (for maintainer)
     IrpTransmogrifier.releasenotes.txt wholesite.html wholesite.pdf
     to harctoolbox.org.
 12. make clean.
+13. (If applicable) Close Milestones etc.

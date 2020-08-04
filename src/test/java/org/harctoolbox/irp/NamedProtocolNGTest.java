@@ -45,8 +45,8 @@ public class NamedProtocolNGTest {
         Decoder.DecoderParameters params = new Decoder.DecoderParameters();
         params.setRemoveDefaultedParameters(true);
         Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);
-        assertEquals(result.size(), 4);
-        assertEquals(result.get("XMP-1").toString(), "XMP-1: {D=0,F=0,S=33}");
+        assertEquals(result.size(), 2);
+        assertEquals(result.get("XMPff-1").toString(), "XMPff-1: {D=0,F=0,S=33}");
 
         params.setRelativeTolerance(0.3); // Destroys decoding
         params.setOverride(true);
@@ -55,6 +55,6 @@ public class NamedProtocolNGTest {
 
         params.setOverride(false); // Make decoding work again
         result = decoder.decodeIrSignal(irSignal, params);
-        assertEquals(result.size(), 4);
+        assertEquals(result.size(), 2);
     }
 }

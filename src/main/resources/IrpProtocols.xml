@@ -2574,6 +2574,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:irp>
             <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,[-80.4m][-80.4m][-13.8m]){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]]]>
         </irp:irp>
+        <irp:parameter name="prefer-over">XMP</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
         <irp:parameter name="absolute-tolerance">100</irp:parameter>
     </irp:protocol>
@@ -2583,6 +2584,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
             <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,[-80.4m][-80.4m][-13.8m]){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S + S::4 + T + 256*F + 16*F + F + F::4) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
         </irp:irp>
         <irp:parameter name="prefer-over">XMPff</irp:parameter>
+        <irp:parameter name="prefer-over">XMP-1</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
         <irp:parameter name="absolute-tolerance">100</irp:parameter>
     </irp:protocol>
@@ -2592,6 +2594,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
             <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,[-80.4m][-80.4m][-13.8m]){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
         </irp:irp>
         <irp:parameter name="prefer-over">XMPff</irp:parameter>
+        <irp:parameter name="prefer-over">XMP-2</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
         <irp:parameter name="absolute-tolerance">100</irp:parameter>
     </irp:protocol>

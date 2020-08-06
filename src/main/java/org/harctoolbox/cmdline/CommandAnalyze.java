@@ -460,7 +460,7 @@ public class CommandAnalyze extends AbstractCommand {
                                     ? (names.get(i) + (commandLineArgs.tsvOptimize ? "" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1)))
                                     : ("#" + i + "\t"));
                         Protocol protocol = protocols.get(i);
-                        Iterable<String> parameters = parameterNames.isEmpty() ? protocol.getDefinitions().toMap().keySet() : parameterNames;
+                        Iterable<String> parameters = parameterNames.isEmpty() ? protocol.getDefinitions().getNames() : parameterNames;
                         printParameters(parameters, protocol);
                     }
                 }

@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -317,6 +318,9 @@ public final class NameEngine extends IrpObject implements AggregateLister, Iter
         return root;
     }
 
+    public Set<String> getNames() {
+        return map.keySet();
+    }
 
     public Map<String, Long> toMap() {
         HashMap<String, Long> result = new HashMap<>(map.size());

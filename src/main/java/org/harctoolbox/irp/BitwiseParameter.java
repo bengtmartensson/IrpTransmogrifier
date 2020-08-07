@@ -313,7 +313,7 @@ public final class BitwiseParameter {
      */
     public boolean check(long payload, long bitmask) throws SignalRecognitionException {
         if (!this.isConsistent(payload))
-            throw new SignalRecognitionException("BitwiseParameter " + toString() + " not consistent with previously read data");
+            throw new SignalRecognitionException("BitwiseParameter " + toString() + " not consistent with previously read data = " + payload);
         return covers(bitmask);
     }
 

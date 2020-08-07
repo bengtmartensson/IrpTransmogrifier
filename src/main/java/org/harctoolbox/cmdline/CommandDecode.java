@@ -20,6 +20,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,9 @@ import org.harctoolbox.irp.Decoder;
 import org.harctoolbox.irp.ElementaryDecode;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.IrpParseException;
+import org.harctoolbox.irp.ProtocolListDomFactory;
+import org.harctoolbox.xml.XmlUtils;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 @SuppressWarnings("FieldMayBeFinal")
@@ -61,6 +65,9 @@ public class CommandDecode extends AbstractCommand {
 
     @Parameter(names = {"-f", "--frequency"}, converter = FrequencyParser.class, description = "Set modulation frequency.")
     private Double frequency = null;
+
+    @Parameter(names = {"-g", "--girr"}, description = "Generate output in Girr format (only)")
+    private boolean girr = false;
 
     @Parameter(names = {"-l", "--ignoreleadinggarbage"}, description = "Accept decodes starting with undecodable pairs.")
     private boolean ignoreLeadingGarbage = false;
@@ -165,8 +172,7 @@ public class CommandDecode extends AbstractCommand {
                 List<IrSignal> signals = xslt == null
                         ? irSignalParser.readThings(input, commandLineArgs.inputEncoding, false)
                         : irSignalParser.readThings(input, xslt, commandLineArgs.inputEncoding, false);
-                for (IrSignal irSignal : signals)
-                    decode(irSignal, null, 0);
+                decode(signals);
             } else if (namedInput != null) {
                 ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
                     return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
@@ -174,9 +180,7 @@ public class CommandDecode extends AbstractCommand {
                 Map<String, IrSignal> signals = xslt == null
                         ? irSignalParser.readNamedThings(namedInput, commandLineArgs.inputEncoding)
                         : irSignalParser.readNamedThings(namedInput, xslt, commandLineArgs.inputEncoding);
-                int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
-                for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
-                    decode(kvp.getValue(), kvp.getKey(), maxNameLength);
+                decode(signals);
             } else {
                 MultiParser prontoRawParser = MultiParser.newIrCoreParser(args);
                 IrSignal irSignal = prontoRawParser.toIrSignal(frequency, trailingGap);
@@ -186,7 +190,47 @@ public class CommandDecode extends AbstractCommand {
             }
         }
 
-        private void decode(IrSignal irSig, String name, int maxNameLength) throws InvalidArgumentException {
+        private void decode(List<IrSignal> signals) throws InvalidArgumentException, UnsupportedEncodingException {
+            if (girr) {
+                ProtocolListDomFactory factory = new ProtocolListDomFactory(radix);
+                for (IrSignal irSignal : signals) {
+                    Decoder.AbstractDecodesCollection<? extends ElementaryDecode> decodes = mkDecodes(irSignal);
+                    factory.add(decodes);
+                }
+                printAsGirr(factory);
+            } else {
+                for (IrSignal irSignal : signals)
+                    decode(irSignal, null, 0);
+            }
+        }
+
+        private void decode(Map<String, IrSignal> signals) throws InvalidArgumentException, UnsupportedEncodingException {
+            if (girr) {
+                ProtocolListDomFactory factory = new ProtocolListDomFactory(radix);
+                for (Map.Entry<String, IrSignal> kvp : signals.entrySet()) {
+                    Decoder.AbstractDecodesCollection<? extends ElementaryDecode> decodes = mkDecodes(kvp.getValue());
+                    factory.add(decodes, kvp.getKey());
+                }
+                printAsGirr(factory);
+            } else {
+                int maxNameLength = IrCoreUtils.maxLength(signals.keySet());
+                for (Map.Entry<String, IrSignal> kvp : signals.entrySet())
+                    decode(kvp.getValue(), kvp.getKey(), maxNameLength);
+            }
+        }
+
+        private void decode(IrSignal irSig, String name, int maxNameLength) throws InvalidArgumentException, UnsupportedEncodingException {
+            Decoder.AbstractDecodesCollection<? extends ElementaryDecode> decodes = mkDecodes(irSig);
+            if (girr) {
+                ProtocolListDomFactory factory = new ProtocolListDomFactory(radix);
+                factory.add(decodes);
+                printAsGirr(factory);
+            } else {
+                printDecodes(decodes, name, maxNameLength);
+            }
+        }
+
+        private Decoder.AbstractDecodesCollection<? extends ElementaryDecode> mkDecodes(IrSignal irSig) throws InvalidArgumentException {
             Objects.requireNonNull(irSig, "irSignal must be non-null");
             IrSignal irSignal = frequency != null ? new IrSignal(irSig, frequency) : irSig;
             Decoder.AbstractDecodesCollection<? extends ElementaryDecode> decodes;
@@ -209,7 +253,7 @@ public class CommandDecode extends AbstractCommand {
             } else
                 decodes = decoder.decodeLoose(irSignal, decoderParams);
 
-            printDecodes(decodes, name, maxNameLength);
+            return decodes;
         }
 
         private Decoder.DecoderParameters newDecoderParameters() {
@@ -222,6 +266,11 @@ public class CommandDecode extends AbstractCommand {
             if (name != null)
                 out.print(name + ":" + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - name.length() + 1)));
             decodes.println(out, radix, commandLineArgs.tsvOptimize ? "\t" : " ", commandLineArgs.quiet);
+        }
+
+        private void printAsGirr(ProtocolListDomFactory factory) throws UnsupportedEncodingException {
+            Document doc = factory.toDocument();
+            XmlUtils.printDOM(out, doc, commandLineArgs.outputEncoding, "");
         }
     }
 }

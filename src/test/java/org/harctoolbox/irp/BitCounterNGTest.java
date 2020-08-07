@@ -1,5 +1,7 @@
 package org.harctoolbox.irp;
 
+import java.util.List;
+import java.util.Map;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -130,5 +132,31 @@ public class BitCounterNGTest {
         assertEquals(bitCounter.toString(), "**0*0");
         bitCounter.aggregate(0L);
         assertEquals(bitCounter.toString(), "**0*0");
+    }
+
+    /**
+     * Test of toIntSequence method, of class BitCounter.
+     */
+    @Test
+    public void testToIntSequence() {
+        System.out.println("toIntSequence");
+        BitCounter bitCounter = new BitCounter(true);
+        assertEquals(bitCounter.toString(), "");
+        bitCounter.aggregate(16L, 2);
+        assertEquals(bitCounter.toString(), "*0000");
+        bitCounter.aggregate(8L, 4);
+        assertEquals(bitCounter.toString(), "**000");
+        bitCounter.aggregate(8L, 4);
+        assertEquals(bitCounter.toString(), "**000");
+        bitCounter.aggregate(2L, 4);
+        assertEquals(bitCounter.toString(), "**0*0");
+        bitCounter.aggregate(0L);
+        assertEquals(bitCounter.toString(), "**0*0");
+        List result = bitCounter.toIntSequence();
+        assertEquals(result.size(), 4);
+        assertEquals(result.get(0), 2);
+        assertEquals(result.get(1), 1);
+        assertEquals(result.get(2), 1);
+        assertEquals(result.get(3), 1);
     }
 }

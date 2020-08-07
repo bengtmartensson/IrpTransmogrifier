@@ -17,8 +17,10 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
@@ -87,6 +89,32 @@ public final class BitCounter {
     @Override
     public String toString() {
         return toString("");
+    }
+
+    public List<Integer> toIntSequence() {
+        List<Integer> list = new ArrayList<>(16);
+        boolean lastVarying = getType(numberBits - 1) == BitCounterType.varying;
+        int length = 1;
+        for (int i = numberBits - 2; i >=0; i--) {
+            boolean varying = getType(i) == BitCounterType.varying;
+            if (varying == lastVarying)
+                length++;
+            else {
+                list.add(length);
+                length = 1;
+                lastVarying = varying;
+            }
+        }
+        list.add(length);
+        return list;
+    }
+
+    public String toIntSequenceString() {
+        List<Integer> list = toIntSequence();
+        StringJoiner stringJoiner = new StringJoiner(",");
+        for (Integer len : list)
+            stringJoiner.add(Integer.toString(len));
+        return stringJoiner.toString();
     }
 
     public void aggregate(long x, int length) {

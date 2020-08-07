@@ -430,7 +430,8 @@ public class CommandAnalyze extends AbstractCommand {
                     out.println("Bit usage analysis:");
                     Map<String, BitCounter> bitStatistics = BitCounter.scrutinizeProtocols(protocols);
                     bitStatistics.entrySet().forEach((kvp) -> {
-                        out.println(kvp.getKey() + "\t" + kvp.getValue().toString() + (lsb ? " (note: lsb-first)" : ""));
+                        out.println(kvp.getKey() + "\t" + kvp.getValue().toString() + (lsb ? " (note: lsb-first)" : "")
+                        + "\t" + kvp.getValue().toIntSequenceString());
                     });
                     //#if duplicates
                     try {

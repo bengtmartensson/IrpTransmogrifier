@@ -837,7 +837,7 @@ public final class Decoder {
         }
 
         @Override
-        public ElementaryDecode getDecode() {
+        public Decode getDecode() {
             return trunk;
         }
     }
@@ -986,7 +986,7 @@ public final class Decoder {
         }
 
         @Override
-        public ElementaryDecode getDecode() {
+        public Decode getDecode() {
             return this;
         }
     }

@@ -18,13 +18,14 @@ this program. If not, see http://www.gnu.org/licenses/.
 package org.harctoolbox.irp;
 
 import java.util.Map;
+import org.harctoolbox.irp.Decoder.Decode;
 
 /**
  * Represents an object that represents a decode in some way.
  */
 public interface ElementaryDecode extends HasPreferOvers {
 
-    public ElementaryDecode getDecode();
+    public Decode getDecode();
 
     public Map<String, Long> getMap();
 }

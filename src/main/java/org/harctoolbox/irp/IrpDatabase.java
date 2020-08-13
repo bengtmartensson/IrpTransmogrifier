@@ -879,13 +879,18 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                 if (preserveSpace)
                     fragment.appendChild(doc.importNode(node, true));
                 else {
-                    if (node.getNodeType() == Node.TEXT_NODE) {
-                        if (preserveSpace || !node.getTextContent().matches(IrCoreUtils.WHITESPACE))
-                            fragment.appendChild(doc.createTextNode(node.getTextContent()));
-                    } else {
-                        Node importedNode = doc.importNode(node, false);
-                        fragment.appendChild(importedNode);
-                        importedNode.appendChild(doc.importNode(nodeToDocumentFragment(node, preserveSpace), true));
+                    switch (node.getNodeType()) {
+                        case Node.TEXT_NODE:
+                            if (preserveSpace || !node.getTextContent().matches(IrCoreUtils.WHITESPACE))
+                                fragment.appendChild(doc.createTextNode(node.getTextContent()));
+                            break;
+                        case Node.COMMENT_NODE:
+                            break;
+                        default:
+                            Node importedNode = doc.importNode(node, false);
+                            fragment.appendChild(importedNode);
+                            importedNode.appendChild(doc.importNode(nodeToDocumentFragment(node, preserveSpace), true));
+                            break;
                     }
                 }
             }

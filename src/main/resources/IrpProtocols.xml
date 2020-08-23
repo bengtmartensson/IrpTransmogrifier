@@ -94,25 +94,31 @@ but ignored by IrpTransmogrifier. They may be used by another program.
 Additional notes on usage in RMIR:
 
 Within an irp:protocol element, an irp:parameter with name uei-executor is read by RMIR in the decoding
-of learned signals and the conversion of a set of signals to a device upgrade.  The content of this
-parameter is either an executor descriptor or, with its attribute type set to "xml", an XML fragment
-that includes an executor descriptor.  An executor descriptor is a string that identifies, for the protocol
-concerned, a unique executor in the protocols.ini file of RMIR.  It also specifies how the parameter values
-contained in a signal decode may be mapped to the device and command parameters of the executor for the
-executor to reproduce that signal.  The syntax and semantics of an executor descriptor are specified in
-the document Executor Descriptor Notation:
+of learned signals, the conversion of a set of signals to a device upgrade and import and export between
+a Girr file or an IRScope ict file and a device upgrade.  There may be multiple irp:parameter entries
+within the same irp:protocol element.  The content of an irp:parameter entry is either an executor
+descriptor or, with its attribute type set to "xml", an XML fragment that usually includes an executor
+descriptor.  XML fragments that do not include an executor descriptor affect only the display of learned
+signal decodes in RMIR.  Conversion, import and export cannot be performed in these cases.
+
+An executor descriptor is a string that identifies, for the protocol concerned, a unique executor in the
+protocols.ini file of RMIR.  It also specifies how the parameter values contained in a signal decode may be
+mapped to the device and command parameters of the executor for the executor to reproduce that signal.  The
+syntax and semantics of an executor descriptor are specified in the document Executor Descriptor Notation:
 http://www.hifi-remote.com/forums/dload.php?action=file&file_id=25672
 
-The executor that is used for the decode shown in the Learned Signals tab of RMIR is selected as follows.
-The uei-executor parameters of type XML are are considered first, followed by the remaining ones.  The
-executor used is the first that is valid for the decode concerned.  An executor is valid for a decode if
-it has no qualifier or if the qualifier evaluates true for that decode.
+The uei-executor entry that applies to a decode shown in the Learned Signals tab of RMIR is selected as
+follows.  The entries that contain an executor descriptor are considered first, with those of type XML
+taking precedence over any others.  The entry that applies is the first that is valid for the decode concerned.
+An executor is valid for a decode if its executor descriptor has no qualifier or if the qualifier evaluates
+true for that decode.  If there are no valid entries with an executor descriptor then one without such a
+descriptor applies, if such an entry is present.
 
 If the uei-executor has type "xml" then its content uses the XML name space
 rm=https://sourceforge.net/projects/controlremote/files/RemoteMaster.
 This content is a single rm:deployment element with an attribute "executor" whose value is the executor
-descriptor.  This element may also contain the following additional elements and will normally contain
-at least one of them:
+descriptor.  An empty string is used to signify the absence of an executor descriptor.  This element may
+also contain the following additional elements and will normally contain at least one of them:
 
 rm:assignment: This may occur multiple times.  It has a single attribute "target" whose value is the name
 of a parameter of the protocol, or an additional name that is defined by the assignment.  The content of
@@ -127,10 +133,16 @@ and apply only to the evaluation of those device parameter values displayed in R
  the display of that name in RMIR.  An illustration of these features is given below.
 
 rm:translator:  Like rm:assignment, this may occur multiple times with a single attribute "target".  Its
-allowed values are the names assigned after the evaluation of all rm:assignments.  This is used when a
-name evaluates to a choice index, to allow RMIR to display the choice value rather than the numerical choice
-index.  The content of the element has the form <choice name> = <choice list>, where the choice list is a
-list of choice values separated by vertical bars.
+allowed values are the names assigned after the evaluation of all rm:assignments.  It has three uses,
+(a) when a name evaluates to a choice index, it allows RMIR to display the choice value rather than the
+numerical choice index, (b) it allows two or more values to be combined for display, such as time=xx:yy
+rather than hrs=xx, mins=yy, and (c) for names whose values are displayed as numbers, it allows an alternate
+radix to be used instead of the default base 10.  For (a) the content of the element has the form
+<choice name> = <choice list>, where the choice list is a list of choice values separated by vertical bars.
+For (b) it again is a list separated by vertical bars, but here the first item is a format string as in
+Java String.format(..) and the following items are the names whose values are the arguments of the format
+string.  For (c) the content is the radix prefix, selected from the list 0b, 0q, 0 and 0x for base 2, 4,
+8, 16 respectively and the value is displayed with the corresponding prefix.
 
 rm:protocolName:  This may occur at most once.  It has no attributes and its content is a display name for
 the protocol that RMIR will use in place of the value of the name attribute of the protocol.
@@ -174,7 +186,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2020-08-07"
+               version="2020-08-23"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
@@ -2390,12 +2402,30 @@ C3=D:1:2 + #(F&44) + #(D&2)
     </irp:protocol>
 
     <irp:protocol name="TCL_AC">
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01FF:JP1TCL[;modesw,mode,temp,swing,fan,timesw,time]">
+	        <rm:assignment target="mode2">mode</rm:assignment>
+		<rm:assignment target="hr">time/6</rm:assignment>
+		<rm:assignment target="min">(time%6)*10</rm:assignment>
+		<!--rm:assignment target="time">-1</rm:assignment-->
+		<rm:translator target="modesw">modesw|Off|On</rm:translator>
+                <rm:translator target="timesw">timesw|Off|On</rm:translator>
+		<rm:translator target="mode2">mode2|-|heat|dry|unit|-|-|-|fan|feel</rm:translator>
+		<rm:translator target="mode">%s/%s|modesw|mode2</rm:translator>
+		<rm:translator target="fan">fan|n/a|sleep|low|med|-|high</rm:translator>
+		<rm:translator target="swing">swing|Off|-|-|-|-|-|-|On</rm:translator>
+		<rm:translator target="time">%s/%02d:%02d|timesw|hr|min</rm:translator>
+            </rm:deployment>
+	</irp:parameter>
         <irp:irp><![CDATA[
-         {38.2k,394}<1,-1|1,-3>(8,-4,M:40,F1:8,F2:8,F3:8,F4:8,0:32,chksum:8,1,-50m){M=0x000126cb23,chksum=21+F1+F2+F3+F4}[F1:0..255,F2:0..255,F3:0..255,F4:0..255]
-                  ]]>
+         {38.2k,394}<1,-1|1,-3>(8,-4,M:40,modesw:-3,timesw:1,2:4,mode:8,~temp:5,0:3,fan:3,swing:3,timesw:1,0:1,time:8,0:24,chksum:8,1,-50m)
+	 {M=0x000126cb23,chksum=21+32+(4*modesw)+(72*timesw)+mode+(~temp)+fan+(swing<<3)+time}
+         [modesw:0..1,timesw:0..1,mode:0..8,temp:0..31,fan:0..5,swing:0..7,time:0..144]
+        ]]>
         </irp:irp>
         <irp:documentation>Protocol used by air conditioning devices by TCL and others.
-            See <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=16473">this thread</a>
+            See <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=16473">this thread</a>,
+            <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=102541">this thread</a>,
             and <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=102534">this thread</a>.
         </irp:documentation>
     </irp:protocol>

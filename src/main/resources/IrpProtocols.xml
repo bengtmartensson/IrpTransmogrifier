@@ -1413,7 +1413,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="NEC-Shirriff">
         <irp:irp>
-            <![CDATA[{38.4k,msb,564}<1,-1|1,-3>(16,-8,data:length,1,-1) [data:0..UINT32_MAX,length:1..64]]]>
+            <![CDATA[{38.4k,msb,564}<1,-1|1,-3>(16,-8,data:length,1,^108m) [data:0..UINT32_MAX,length:1..64]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">Like <a href="#NEC1">NEC1</a> but without <a href="#repeat">repeat</a>, just one large parameter, and msb bit order, no ending silence, and undetermined payload length.
             This is how NEC protocols are referred to in the Arduino <a href="https://github.com/z3t0/Arduino-IRremote">IRremote</a> project, originated by Ken Shirriff.
@@ -1423,7 +1423,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="NEC-Shirriff-32">
         <irp:irp>
-            <![CDATA[{38.4k,msb,564}<1,-1|1,-3>(16,-8,data:32,1,-1) [data:0..UINT32_MAX]]]>
+            <![CDATA[{38.4k,msb,564}<1,-1|1,-3>(16,-8,data:32,1,^108m) [data:0..UINT32_MAX]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">The <a href="#NEC-Shirriff">NEC-Shirriff</a> protocol with payload length set to 32, making it viable for decoding.</irp:documentation>
     </irp:protocol>

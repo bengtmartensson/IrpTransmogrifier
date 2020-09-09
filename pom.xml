@@ -125,6 +125,10 @@
                                     <name>appName</name>
                                     <value>${project.artifactId}</value>
                                 </parameter>
+                                <parameter>
+                                    <name>commitId</name>
+                                    <value>${git.commit.id}</value>
+                                </parameter>
                             </parameters>
                             <fileMappers>
                                 <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
@@ -362,6 +366,24 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.2</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dateFormat>yyyyMMdd</dateFormat><!--  human-readable part of the version number -->
+                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+                    <generateGitPropertiesFile>false</generateGitPropertiesFile><!-- somehow necessary. otherwise the variables are not available in the pom -->
+                </configuration>
             </plugin>
         </plugins>
     </build>

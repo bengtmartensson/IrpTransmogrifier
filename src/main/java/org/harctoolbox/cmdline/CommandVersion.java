@@ -45,6 +45,7 @@ public class CommandVersion extends AbstractCommand {
             out.println(Version.version);
         else {
             out.println(Version.versionString);
+            out.println("commitId: " + Version.commitId);
             //setupDatabase();
             out.println("Database: " + (commandLineArgs.configFiles != null ? commandLineArgs.configFiles : "")
                     + " version: " + irpDatabase.getConfigFileVersion());

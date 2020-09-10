@@ -436,7 +436,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         return doc;
     }
 
-    public Document toXml(List<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
+    public Document toXml(Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
         Document document = XmlUtils.newDocument();
         Element root = document.createElement("NamedProtocols");
         root.setAttribute(PROG_VERSION_NAME, Version.versionString);
@@ -689,7 +689,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         }
     }
 
-    public void remove(List<String> blackList) throws UnknownProtocolException {
+    public void remove(Iterable<String> blackList) throws UnknownProtocolException {
         if (blackList == null)
             return;
 
@@ -706,7 +706,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     private void removeAliases(String protocolName) {
-        ArrayList<String> result = new ArrayList<>(4);
+        List<String> result = new ArrayList<>(4);
         aliases.entrySet().stream().filter((kvp) -> (kvp.getValue().equals(protocolName))).forEachOrdered((kvp) -> {
             result.add(kvp.getKey());
         });
@@ -1032,7 +1032,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
                 }
             }
         }
-
 
         private void parseProtocolChild(Element e) {
             switch (e.getTagName()) {

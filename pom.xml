@@ -7,7 +7,7 @@
     <groupId>org.harctoolbox</groupId>
     <artifactId>IrpTransmogrifier</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.8-SNAPSHOT</version>
+    <version>1.2.8</version>
     <name>${project.artifactId}</name>
     <licenses>
         <license>
@@ -188,7 +188,7 @@
                 </dependencies>
             </plugin>
 
-            <!-- Generate target/generated-sources/antlr4/org/harctoolbox/IrpMaster/TODO[Parser,Lexer].java from
+            <!-- Generate target/generated-sources/antlr4/org/harctoolbox/irp/Irp[Parser,Lexer].java from
             src/main/antrlr4/Irp.g4 -->
             <plugin>
                 <groupId>org.antlr</groupId>
@@ -492,7 +492,7 @@
     <dependencies>
         <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId> <!-- invokes ST4 -->
+            <artifactId>antlr4</artifactId> <!-- transitively includes ST4, antlr-runtime, antlr4-runtime -->
             <version>4.7.2</version>
             <exclusions>
                 <exclusion>

@@ -298,17 +298,19 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     -C, --commentStart
       Character(s) to be considered starting a line comment in input and
       namedInput files.
-    -c, --configfile
-      Pathname of IRP database file in XML format. Default is the one in the
-      jar file.
-    -e, --encoding
-      Encoding used in generated output.
-      Default: UTF-8
+    -c, --configfiles
+      Pathname(s) of IRP database file(s) in XML format. Default is the one in
+      the jar file. Can be given several times.
+    --describe
+      Print a possibly longer documentation for the present command.
     -f, --frequencytolerance
       Frequency tolerance in Hz. Negative disables frequency check. Default:
       2000.0.
-    -h, --help, -?
-      Display help message. Deprecated; use the command "help" instead.
+    -h, -?, --help
+      Print help for this command.
+    -e, --encoding, --iencoding
+      Encoding used to read input.
+      Default: UTF-8
     -i, --irp
       Explicit IRP string to use as protocol definition.
     --logclasses
@@ -329,6 +331,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     -g, --minrepeatgap
       Minimum gap required to end a repetition.
       Default: 5000.0
+    --oencoding
+      Encoding used in generated output.
+      Default: UTF-8
     -o, --output
       Name of output file. Default: stdout.
     -O, --override
@@ -356,7 +361,10 @@ Usage: IrpTransmogrifier [options] [command] [command options]
     -u, --url-decode
       URL-decode protocol names, (understanding %20 for example).
       Default: false
-    -v, --version
+    --validate
+      Validate IRP database files against the schema, abort if not valid.
+      Default: false
+    --version
       Report version. Deprecated; use the command "version" instead.
       Default: false
     -x, --xmllog
@@ -421,7 +429,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print (possible longer) documentation as HTML.
             Default: false
           -i, --irp
-            List IRP form, as given in the database (unparsed).
+            List IRP form, as given in the database (unparsed, i.e. preserving
+            comments and whitespace, not taking --radix into account).
             Default: false
           -m, --mindiff
             Compute minimal difference between contained durations.
@@ -437,7 +446,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -r, --radix
             Radix of parameter output.
-            Default: 16
+            Default: 10
           --stringtree
             Produce stringtree.
             Default: false
@@ -499,6 +508,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -f, --frequency
             Set modulation frequency.
+          -g, --girr
+            Generate output in Girr format (only)
+            Default: false
           -h, -?, --help
             Print help for this command.
           -l, --ignoreleadinggarbage
@@ -531,6 +543,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -T, --trailinggap
             Trailing gap (in micro seconds) added to sequences of odd length.
+          --xslt
+            File/URL name of XSLT transformation that will be applied to
+            --input or --namedinput argument
 
     demodulate      Demodulate IrSequence given as argument (EXPERIMENTAL).
       Usage: demodulate [options] durations in micro seconds, alternatively
@@ -573,6 +588,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -e, --extent
             Output the last gap as an extent.
+            Default: false
+          --fatgirr
+            Generate Girr file in fat format (EXPERIMENTAL).
             Default: false
           -f, --frequency
             Modulation frequency of raw signal.
@@ -631,6 +649,13 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -T, --trailinggap
             Dummy trailing gap (in micro seconds) added to sequences of odd
             length.
+          --validate
+            Validate that the resulted protocol can be used for rendering and
+            produces the same signal.
+            Default: false
+          --xslt
+            File/URL name of XSLT transformation that will be applied to
+            --input or --namedinput argument
 
     code      Generate code for the given target(s)
       Usage: code [options] protocols

@@ -2,9 +2,10 @@ Checklist for release (for maintainer)
 
 0. Check in good code ;-). Check that tests run ok, javadoc is ok.
    Update subtree common.
-1. Update pom.xml (Bump version) and releasenotes, and checkin.
-   Update versions of dependencies. For this, can use
-   make setversion NEWVERSION=x.y.z.
+1. Update pom.xml (Bump version; can use make setversion NEWVERSION=x.y.z.)
+   Check/update version of IrpProtocols.xml.
+   Update releasenotes.
+   Checkin.
 2. push, make sure Travis build is ok.
 3. make tag.
 4. mvn install

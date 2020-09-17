@@ -3,6 +3,22 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
+2020-09-17: Version 1.2.8
+
+* Support commitId in Version. Given out from "version" command.
+* Set a sensible lead-out on protocols NEC-Shirriff and NEC-Shirriff-32.
+* Bugfix for comments within irp:protocol/irp:parameter[@type='xml"]. #191.
+* irp-protocols.xsd: Allow xml:space in <irp:documentation>. #188.
+* New option decode --girr.
+* New protocols TCL_AC, keeprite.
+* Error message improvements.
+* analyze --bit-usage now computes lengths of constant/varying segments.
+* Fix problem with analyze/--parametertable. #190.
+* IrpDatenbase: Recycle get-ted Protocols. #189.
+* IrpProtocols.xml: NECx2: put reject-repeatless=true
+* Merge rmProtocols from remotemaster, several times.
+
+===============================================================================
 2020-07-05: Version 1.2.7
 
 * Add Motorola as alt_name for Blaupunkt, #187. Remove Blaupunkt_relaxed.

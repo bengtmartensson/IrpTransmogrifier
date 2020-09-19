@@ -6,9 +6,9 @@ Checklist for release (for maintainer)
    Check/update version of IrpProtocols.xml.
    Update releasenotes.
    Checkin.
-2. push, make sure Travis build is ok.
-3. make tag.
-4. mvn install
+2. mvn clean, mvn install; make sure commitId is OK.
+3. push, make sure Travis build is ok.
+4. make tag.
 5. Create release on GitHub, using just created tag. Upload
    *.bin.zip. releasenotes, checksums.
 6. Delete CI build.

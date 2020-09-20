@@ -21,23 +21,7 @@ of a block discouraged.
 
 ## Build process
 
-[Apache Maven](https://maven.apache.org] is used for builds.
+[Apache Maven](https://maven.apache.org) is used for builds.
 Normal builds must not require Internet access.
 All parameters (URLs, version numbers etc.) should be contained therein within /project/properties.
-(Other programs can then extract that information, see `tools/get-jdk-tar.sh` for an example.)
-
-## Git branches
-
-(This section stolen from LIRC, with minor editing.)  We basically use the branching
-scheme described
-[here](http://nvie.com/posts/a-successful-git-branching-model). However,
-what is called 'devel' in that document we call 'master'. Likewise,
-what is called 'master' there we call 'release'. In short:
-
-* master is the current development, from time to time unstable.
-* release contains the last stable version, and also all tagged releases.
-* When a release is upcoming, we fork a release branch from master. This
-is kept stable, only bug fixes are allowed. Eventually it is merged into
-release and tagged.
-* Other branches are feature branches for test and review. They can not
-be trusted, and are often rewritten.
+(Other programs can then extract that information, see `common/xslt/extract_project_version.xsl` for an example.)

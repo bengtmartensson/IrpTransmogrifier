@@ -3,6 +3,10 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
+202*-*-*: Version 1.2.10
+
+Version 1.2.9: There is no version 1.2.9.
+
 2020-09-17: Version 1.2.8
 
 * Support commitId in Version. Given out from "version" command.

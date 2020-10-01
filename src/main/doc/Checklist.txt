@@ -20,6 +20,9 @@ Checklist for release (for maintainer)
 10 cd build/site/en/; make clean; make site
 11. Upload IrpTransmogrifier.html IrpTransmogrifier.pdf
     IrpTransmogrifier.releasenotes.txt wholesite.html wholesite.pdf
+    IrScrutinizer.version
     to harctoolbox.org.
 12. make clean.
 13. (If applicable) Close Milestones etc.
+
+Problems with deployment: log in to oss.sonatype.org (Jira id), examine "Staging repositories".

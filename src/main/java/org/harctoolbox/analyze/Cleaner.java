@@ -161,7 +161,7 @@ public class Cleaner {
                 if (duration == lastDuration)
                     continue;
                 lastDuration = duration;
-                long noHits = rawHistogram.get(duration).total();
+                int noHits = rawHistogram.get(duration).total();
                 long term = noHits * duration;
                 sum += term;
                 if (term < 0 || sum < 0)

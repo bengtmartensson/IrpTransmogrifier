@@ -10,6 +10,5 @@ set APPLICATIONHOME=%~dp0
 
 REM Normally no need to change the rest of the file
 set JAR=%APPLICATIONHOME%\IrpTransmogrifier-${project.version}-jar-with-dependencies.jar
-set STDIR=%APPLICATIONHOME%\st
 
 "%JAVA%" -jar "%JAR%" %*

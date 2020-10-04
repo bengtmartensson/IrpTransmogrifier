@@ -1320,7 +1320,7 @@ parameter_spec:
                 <p>
                     If none of this is not possible or wanted, IrpTransmogrifier can of course be installed separately.
                     The latest released version can be found
-                    <a href="https://github.com/bengtmartensson/IrpTransmogrifier/releases/tag/latest">here</a>.
+                    <a href="https://github.com/bengtmartensson/IrpTransmogrifier/releases/latest">here</a>.
                     The program is basically just an executable jar-file.
                     There is no "installer". Instead,
                     unpack the binary distribution in a preferably empty directory. Start the program by invoking the wrapper

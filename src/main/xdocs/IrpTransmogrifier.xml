@@ -1328,6 +1328,8 @@ parameter_spec:
                     from the command line.
                     Modify and/or relocate the wrapper(s) if desired or necessary.
                     Do not double click the wrappers, since this program runs only from the command line.
+                    Also, do not use the wrapper <code>irptransmogrifier</code> in the top directory of the source tree:
+                    it is intended only for development in the source tree; and is not intended for deployment.
                 </p>
                 <p>The Macintosh app for IrScrutinizer presently does not come with support for running IrpTransmogrifier as command line program.</p>
                 <p>The program presently requires Java 8 JRE or later to run. Some distributions of IrScrutinizer

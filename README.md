@@ -132,10 +132,13 @@ in the `pom.xml` of the importing project.
 
 ## Installation
 Unpack the binary distribution in a new, empty directory. Start the program by invoking the wrapper
-(`irptransmobrifier.bat` on Windows, `irptransmogrifier.sh` on Unix-like systems like Linux and MacOS.)
+(`irptransmogrifier.bat` on Windows, `irptransmogrifier.sh` on Unix-like systems like Linux and MacOS.)
 from the command line.
 Modify and/or relocate the wrapper(s) if desired or necessary.
 Do not double click the wrappers, since this program runs only from the command line.
+
+Also, do not use the wrapper `irptransmogrifier` in the top top directory of the source tree.
+This is intended for development only, not by users.
 
 ## Building from sources
 The project uses [Maven](https://maven.apache.org/) as build system. Any modern IDE should be able

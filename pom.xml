@@ -345,29 +345,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <!-- compute checksums -->
-                    <!-- I know the checksum-maven-plugin, but it does not do what I want) -->
-                    <execution>
-                        <id>mk-checksums</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${basedir}/common/scripts/mkchecksums.sh</executable>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                            <arguments>
-                                <argument>${project.artifactId}-${project.version}-bin.zip</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
                 <version>4.0.2</version>
@@ -484,6 +461,41 @@
                             </execution>
                         </executions>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mk-checksums</id>
+            <activation>
+                <file>
+                    <exists>/bin/sh</exists> <!-- good enough for now :-) -->
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.6.0</version>
+                    <executions>
+                        <!-- compute checksums -->
+                        <!-- I know the checksum-maven-plugin, but it does not do what I want) -->
+                        <execution>
+                            <id>mk-checksums</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                            <configuration>
+                                <executable>${basedir}/common/scripts/mkchecksums.sh</executable>
+                                <workingDirectory>${project.build.directory}</workingDirectory>
+                                <arguments>
+                                    <argument>${project.artifactId}-${project.version}-bin.zip</argument>
+                                </arguments>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
                 </plugins>
             </build>
         </profile>

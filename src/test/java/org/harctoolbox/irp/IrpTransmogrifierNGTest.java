@@ -218,7 +218,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("analyze1");
         String args = "-a 10 -r 0.01 analyze --validate --radix 16 -M 32 -t 1p 0000 0073 0000 0012 000F 000A 0006 000A 0006 000A 0006 001B 0006 000A 0006 000A 0006 001B 0006 0015 0006 000A 0006 001B 0006 000A 0006 0015 0006 0010 0006 000A 0006 0015 0006 000A 0006 0015 0006 0C90";
         String result = execute(args);
-        assertEquals(result, "{36.0k,1p,msb}<6,-10|6,-16|6,-21|6,-27>(15,-10,A:32,6,-89m)*{A=0xc38c922}\nValidation succeeded!");
+        assertEquals(result, "{36.0k,1p,msb}<6,-10|6,-16|6,-21|6,-27>(15,-10,A:32,6,-89m)*{A=0xc38c922}" + IrCoreUtils.LINE_SEPARATOR + "Validation succeeded!");
     }
 
     @Test(enabled = true)
@@ -261,7 +261,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeNoRepeatedNec");
         String args = "decode --debug nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293";
         String result = execute(args);
-        assertEquals(result.split("\r?\n")[0].substring(0,21), "NEC: {D=12,F=56,S=34}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0].substring(0,21), "NEC: {D=12,F=56,S=34}");
     }
 
     @Test(enabled = true)
@@ -269,7 +269,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeRepeatedNec1");
         String args = "decode -p nec1 -r  +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193";
         String result = execute(args);
-        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}");
     }
 
     @Test(enabled = true)
@@ -277,7 +277,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testDecodeNec1OneDitto");
         String args = "decode -p nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193";
         String result = execute(args);
-        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1");
     }
 
     @Test(enabled = true)
@@ -286,10 +286,10 @@ public class IrpTransmogrifierNGTest {
         String sequence = NEC1INTRO + " " + NEC1DITTO + " " + NEC1INTRO + " " + NEC1DITTO + " " + NEC1DITTO + "+1234 -54678";
         String args = "decode -p nec1 " + sequence;
         String result = execute(args);
-        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {UNDECODED. length=78}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {UNDECODED. length=78}");
         args = "decode -p nec1 --recursive " + sequence;
         result = execute(args);
-        assertEquals(result.split("\r?\n")[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {NEC1: {D=12,F=56,S=34}, beg=72, end=147, reps=2 {UNDECODED. length=2}}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {NEC1: {D=12,F=56,S=34}, beg=72, end=147, reps=2 {UNDECODED. length=2}}");
     }
 
     @Test(enabled = true)
@@ -620,56 +620,56 @@ public class IrpTransmogrifierNGTest {
     public void testHelp() {
         System.out.println("testHelp");
         String result = execute("help");
-        assertEquals(result.substring(0, 73), "Usage: IrpTransmogrifier [options] [command] [command options]\n  Options:");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "Usage: IrpTransmogrifier [options] [command] [command options]");
     }
 
     @Test(enabled = true)
     public void testDashHelp() {
         System.out.println("testDashHelp");
         String result = execute("--help");
-        assertEquals(result.substring(0, 73), "Usage: IrpTransmogrifier [options] [command] [command options]\n  Options:");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "Usage: IrpTransmogrifier [options] [command] [command options]");
     }
 
     @Test(enabled = true)
     public void testHelpShort() {
         System.out.println("testHelpShort");
         String result = execute("help --short");
-        assertEquals(result.substring(0, 72), "Usage: IrpTransmogrifier [options] [command] [command options]\nCommands:");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "Usage: IrpTransmogrifier [options] [command] [command options]");
     }
 
     @Test(enabled = true)
     public void testHelpCommon() {
         System.out.println("testHelpCommon");
         String result = execute("help --common");
-        assertEquals(result.substring(0, 116), "Common options:\n    -a, --absolutetolerance\n      Absolute tolerance in microseconds, used when comparing durations.");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "Common options:");
     }
 
     @Test(enabled = true)
     public void testHelpDashHelp() {
         System.out.println("testHelpDashHelp");
         String result = execute("help --help");
-        assertEquals(result.substring(0, 72), "Describe the syntax of program and commands.\nUsage: help [options] comma");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "Describe the syntax of program and commands.");
     }
 
     @Test(enabled = true)
     public void testHelpDescribe() {
         System.out.println("testHelpDescribe");
         String result = execute("help --describe");
-        assertEquals(result.substring(0, 72), "This command list the syntax for the command(s) given as argument,\ndefau");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "This command list the syntax for the command(s) given as argument,");
     }
 
     @Test(enabled = true)
     public void testHelpList() {
         System.out.println("testHelpList");
         String result = execute("help list");
-        assertEquals(result.substring(0, 72), "List protocols and their properites.\nUsage: list [options] List of proto");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "List protocols and their properites.");
     }
 
     @Test(enabled = true)
     public void testListHelp() {
         System.out.println("testListHelp");
         String result = execute("list --help");
-        assertEquals(result.substring(0, 72), "List protocols and their properites.\nUsage: list [options] List of proto");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "List protocols and their properites.");
     }
 
     @Test(enabled = true)

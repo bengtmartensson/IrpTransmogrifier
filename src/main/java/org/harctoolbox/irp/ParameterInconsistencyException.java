@@ -24,6 +24,6 @@ public final class ParameterInconsistencyException extends SignalRecognitionExce
     }
 
     ParameterInconsistencyException(String name, BitwiseParameter expected, BitwiseParameter parameter) {
-        super("Conflicting assignments of " + name + ", expexcted: " + expected + ", gotten: " + parameter);
+        super("Conflicting assignments of " + name + ", expected: " + expected + ", gotten: " + parameter);
     }
 }

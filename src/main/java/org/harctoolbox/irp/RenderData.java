@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.OddSequenceLengthException;
@@ -31,6 +32,15 @@ public final class RenderData extends Traverser {
         super(generalSpec, nameEngine);
         evaluatedIrStreamList = new ArrayList<>(2);
         push();
+    }
+
+    @Override
+    public String toString() {
+        StringJoiner joiner = new StringJoiner(";");
+        for (EvaluatedIrStream eis : evaluatedIrStreamList) {
+            joiner.add(eis.toString());
+        }
+        return joiner.toString();
     }
 
     private EvaluatedIrStream currentEvaluatedIrStream() {

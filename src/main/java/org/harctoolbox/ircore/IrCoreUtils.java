@@ -341,7 +341,7 @@ public final class IrCoreUtils {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static InputStream getInputSteam(String filename) throws FileNotFoundException, IOException {
+    public static InputStream getInputStream(String filename) throws FileNotFoundException, IOException {
         if (filename == null || filename.isEmpty() || filename.equals("-"))
             return System.in;
         try {
@@ -353,7 +353,7 @@ public final class IrCoreUtils {
     }
 
     public static InputStreamReader getInputReader(String filename, String encoding) throws FileNotFoundException, IOException {
-        InputStream inputStream = getInputSteam(filename);
+        InputStream inputStream = getInputStream(filename);
         return new InputStreamReader(inputStream, encoding);
     }
 

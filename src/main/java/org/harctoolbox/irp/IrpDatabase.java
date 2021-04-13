@@ -211,7 +211,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
     }
 
     private static InputStream mkStream(String file) throws IOException {
-        return (file == null || file.isEmpty()) ? IrpDatabase.class.getResourceAsStream(DEFAULT_CONFIG_FILE) : IrCoreUtils.getInputSteam(file);
+        return (file == null || file.isEmpty()) ? IrpDatabase.class.getResourceAsStream(DEFAULT_CONFIG_FILE) : IrCoreUtils.getInputStream(file);
     }
 
     public static IrpDatabase newDefaultIrpDatabase() {

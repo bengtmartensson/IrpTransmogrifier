@@ -148,7 +148,7 @@ public final class XmlUtils {
 
     public static Document openXmlFile(String string, String schemaString, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
         Schema schema = readSchema(schemaString);
-        InputStream inputStream = IrCoreUtils.getInputSteam(string);
+        InputStream inputStream = IrCoreUtils.getInputStream(string);
         return openXmlStream(inputStream, schema, isNamespaceAware, isXIncludeAware);
     }
 
@@ -167,7 +167,7 @@ public final class XmlUtils {
     }
 
     public static Document openXmlThing(String thing, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
-        return openXmlStream(IrCoreUtils.getInputSteam(thing), schema, isNamespaceAware, isXIncludeAware);
+        return openXmlStream(IrCoreUtils.getInputStream(thing), schema, isNamespaceAware, isXIncludeAware);
     }
 
     private static DocumentBuilder newDocumentBuilder(Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) {
@@ -328,7 +328,7 @@ public final class XmlUtils {
     public static Schema readSchema(String schemaString) throws SAXException, FileNotFoundException, IOException {
         if (schemaString == null || schemaString.isEmpty())
             return null;
-        InputStream inputStreanm = IrCoreUtils.getInputSteam(schemaString);
+        InputStream inputStreanm = IrCoreUtils.getInputStream(schemaString);
         return readSchema(inputStreanm);
     }
 

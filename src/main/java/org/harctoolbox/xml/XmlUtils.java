@@ -132,24 +132,19 @@ public final class XmlUtils {
     }
 
     public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
-        DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
-        return builder.parse(file);
+        return openXmlSource(new InputSource(file.getCanonicalPath()), schema, isNamespaceAware, isXIncludeAware);
     }
 
     public static Document openXmlFile(File file, File schemaFile, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
-        Schema schema = readSchema(schemaFile);
-        return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
+        return openXmlFile(file, readSchema(schemaFile), isNamespaceAware, isXIncludeAware);
     }
 
     public static Document openXmlFile(File file, String schemaString, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
-        Schema schema = readSchema(schemaString);
-        return openXmlFile(file, schema, isNamespaceAware, isXIncludeAware);
+        return openXmlFile(file, readSchema(schemaString), isNamespaceAware, isXIncludeAware);
     }
 
     public static Document openXmlFile(String string, String schemaString, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
-        Schema schema = readSchema(schemaString);
-        InputStream inputStream = IrCoreUtils.getInputStream(string);
-        return openXmlStream(inputStream, schema, isNamespaceAware, isXIncludeAware);
+        return openXmlThing(string, readSchema(schemaString), isNamespaceAware, isXIncludeAware);
     }
 
     public static Document openXmlFile(File file) throws IOException, SAXException {
@@ -158,16 +153,32 @@ public final class XmlUtils {
 
     // NOTE: By silly reader, makes null as InputStream, producing silly error messages.
     public static Document openXmlReader(Reader reader, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
-        return openXmlStream((new InputSource(reader)).getByteStream(), schema, isNamespaceAware, isXIncludeAware);
+        return openXmlSource(new InputSource(reader), schema, isNamespaceAware, isXIncludeAware);
     }
 
     public static Document openXmlStream(InputStream stream, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
+        return openXmlSource(new InputSource(stream), schema, isNamespaceAware, isXIncludeAware);
+    }
+
+    public static Document openXmlSource(InputSource inputSource, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException{
         DocumentBuilder builder = newDocumentBuilder(schema, isNamespaceAware, isXIncludeAware);
-        return builder.parse(stream);
+        return builder.parse(inputSource);
     }
 
     public static Document openXmlThing(String thing, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
-        return openXmlStream(IrCoreUtils.getInputStream(thing), schema, isNamespaceAware, isXIncludeAware);
+        return openXmlSource(getInputSource(thing), schema, isNamespaceAware, isXIncludeAware);
+    }
+
+    /**
+     * Opens a Url, an input file, or returns stdin.
+     *
+     * @param filename: file name, empty, null or "-"
+     * @return InputSource
+     */
+    public static InputSource getInputSource(String filename) {
+        if (filename == null || filename.isEmpty() || filename.equals("-"))
+            return new InputSource(System.in);
+        return new InputSource(filename);
     }
 
     private static DocumentBuilder newDocumentBuilder(Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) {

@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -1460,10 +1459,10 @@ class MyEntityResolver implements EntityResolver {
             + "</xs:schema>\n";
 
     public static InputStream getStream(String systemId) throws FileNotFoundException, MalformedURLException, IOException {
-        return systemId.equals(XML_XSD_URI) ? mkInputStream(XML_XSD) //new FileInputStream("/home/bengt/harctoolbox/HarcSchemas/xml.xsd")
-                : systemId.equals(XHTML_XSD_URI) ? mkInputStream(XHTML_XSD) // new FileInputStream("/home/bengt/harctoolbox/HarcSchemas/xhtml1-strict.xsd")
-                : systemId.equals(XINCLUDE_XSD_URI) ? mkInputStream(XINCLUDE_XDS) //new FileInputStream("/home/bengt/harctoolbox/HarcSchemas/XInclude.xsd")
-                : systemId.startsWith("http") ? (new URL(systemId)).openStream()
+        return systemId.equals(XML_XSD_URI) ? mkInputStream(XML_XSD)
+                : systemId.equals(XHTML_XSD_URI) ? mkInputStream(XHTML_XSD)
+                : systemId.equals(XINCLUDE_XSD_URI) ? mkInputStream(XINCLUDE_XDS)
+                : systemId.startsWith("http") || systemId.startsWith("file:") ? null // Invokes the standard methods
                 : MyEntityResolver.class.getClassLoader().getResourceAsStream(systemId);
     }
 
@@ -1474,6 +1473,6 @@ class MyEntityResolver implements EntityResolver {
     @Override
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
         InputStream inputStream = getStream(systemId);
-        return new InputSource(inputStream);
+        return inputStream == null ? null : new InputSource(inputStream);
     }
 }

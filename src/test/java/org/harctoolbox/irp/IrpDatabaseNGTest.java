@@ -317,6 +317,14 @@ public class IrpDatabaseNGTest {
         assertTrue(nec1PreferOvers.contains("Pioneer"));
 
         irpDatabase.patch(new File("src/test/resources/IrpProtocols-test.xml"));
+
+        // Test that xinclude worked
+        irpDatabase.getNamedProtocol("donald");
+
+        // Test that xinclude fallback worked
+        irpDatabase.getNamedProtocol("covid-19");
+
+        // Test that removal of nec2 worked
         try {
             irpDatabase.getNamedProtocol("nec2");
             fail();

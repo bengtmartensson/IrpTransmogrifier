@@ -169,6 +169,10 @@ public final class XmlUtils {
         return openXmlSource(getInputSource(thing), schema, isNamespaceAware, isXIncludeAware);
     }
 
+    public static Document openXmlThing(String thing) throws IOException, SAXException {
+        return openXmlThing(thing, null, true, true);
+    }
+
     /**
      * Opens a Url, an input file, or returns stdin.
      *
@@ -176,9 +180,9 @@ public final class XmlUtils {
      * @return InputSource
      */
     public static InputSource getInputSource(String filename) {
-        if (filename == null || filename.isEmpty() || filename.equals("-"))
-            return new InputSource(System.in);
-        return new InputSource(filename);
+        return (filename == null || filename.isEmpty() || filename.equals("-"))
+                ? new InputSource(System.in)
+                : new InputSource(filename);
     }
 
     private static DocumentBuilder newDocumentBuilder(Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) {
@@ -508,6 +512,8 @@ public final class XmlUtils {
             this.baseURI = baseURI;
 
             InputStream resourceAsStream = MyEntityResolver.getStream(systemId);
+            if (resourceAsStream == null)
+                resourceAsStream = (new URL(systemId)).openStream();
             try (BufferedInputStream inputStream = new BufferedInputStream(resourceAsStream)) {
                 synchronized (inputStream) {
                     ByteArrayOutputStream buf = new ByteArrayOutputStream();

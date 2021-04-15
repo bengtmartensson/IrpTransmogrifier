@@ -191,6 +191,14 @@ public final class XmlUtils {
         factory.setNamespaceAware(isNamespaceAware);
         factory.setXIncludeAware(isXIncludeAware);
         //factory.setIgnoringElementContentWhitespace(true);
+
+        try {
+            // Turn of generating xml:base attributes in expanded xincludes (causes validation errors).
+            // See https://xerces.apache.org/xerces2-j/features.html#xinclude.fixup-base-uris
+            factory.setFeature("http://apache.org/xml/features/xinclude/fixup-base-uris", false);
+        } catch (ParserConfigurationException ex) {
+            throw new ThisCannotHappenException(ex);
+        }
         if (schema != null) {
             factory.setSchema(schema);
             factory.setValidating(false);

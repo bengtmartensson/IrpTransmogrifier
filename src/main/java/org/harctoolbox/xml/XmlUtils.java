@@ -99,13 +99,17 @@ public final class XmlUtils {
     public static final String GIRR_NAMESPACE_URI                   = "http://www.harctoolbox.org/Girr";
     public static final String IRP_NAMESPACE_URI                    = "http://www.harctoolbox.org/irp-protocols";
     public static final String XINCLUDE_NAMESPACE_URI               = "http://www.w3.org/2001/XInclude";
-    public static final String GIRR_COMMENT                         = "This file is in the Girr (General IR Remote) format, see http://www.harctoolbox.org/Girr.html";
-    public static final String GIRR_VERSION_NAME                    = "girrVersion";
-    public static final String GIRR_VERSION                         = "1.1";
-    public static final String GIRR_SCHEMA_LOCATION                 = "http://www.harctoolbox.org/Girr http://www.harctoolbox.org/schemas/girr_ns-" + GIRR_VERSION + ".xsd";
     public static final String IRP_SCHEMA_LOCATION                  = "http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd";
     public static final String IRP_PREFIX                           = "irp";
+
+    // In order to generate simple Girr files, without invoking the Girr library
+    // (which would mean circular dependencies)
+    // we here duplicate some Girr XML constants
     public static final String GIRR_PREFIX                          = "girr";
+    public static final String GIRR_COMMENT                         = "This file is in the Girr (General IR Remote) format, see http://www.harctoolbox.org/Girr.html";
+    public static final String GIRR_VERSION_NAME                    = "girrVersion";
+    public static final String GIRR_VERSION                         = "1.2";
+    public static final String GIRR_SCHEMA_LOCATION                 = "http://www.harctoolbox.org/Girr http://www.harctoolbox.org/schemas/girr_ns-" + GIRR_VERSION + ".xsd";
 
     private static final Logger logger = Logger.getLogger(XmlUtils.class.getName());
 

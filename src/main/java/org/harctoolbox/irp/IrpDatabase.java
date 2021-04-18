@@ -755,6 +755,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
      * @throws IrpInvalidArgumentException
      */
     public Protocol getProtocol(String protocolName) throws UnknownProtocolException, UnsupportedRepeatException, NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
+        if (protocolName == null || protocolName.isEmpty())
+            return null;
+
         Protocol protocol = recycledProtocols.get(protocolName.toLowerCase(Locale.US));
         if (protocol == null) {
             protocol = getNonRecycledProtocol(protocolName);

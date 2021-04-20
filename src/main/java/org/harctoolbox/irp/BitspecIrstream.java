@@ -275,8 +275,8 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         return irStream.startingDuratingType(DurationType.gap, gapFlashBitSpecs);
     }
 
-    boolean hasVariation(boolean recursive) {
-        return irStream.hasVariation(recursive);
+    boolean hasVariation(boolean recursive, Pass pass) {
+        return irStream.hasVariation(recursive, pass);
     }
 
     boolean startsWithFlash() {

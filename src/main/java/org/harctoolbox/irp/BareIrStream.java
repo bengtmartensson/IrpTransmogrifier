@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -148,14 +149,16 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return false; // give up
     }
 
-    public boolean hasVariation(boolean recursive) {
+    public boolean hasVariation(boolean recursive, Pass pass) {
         for (IrStreamItem irStreamItem : irStreamItems) {
             if (irStreamItem instanceof Variation)
-                return true;
+                return ((Variation) irStreamItem).hasPart(pass);
             if (recursive && irStreamItem instanceof BitspecIrstream)
-                return ((BitspecIrstream) irStreamItem).hasVariation(recursive);
+                if (((BitspecIrstream) irStreamItem).hasVariation(recursive, pass))
+                    return true;
             if (recursive && irStreamItem instanceof BareIrStream)
-                return ((BareIrStream) irStreamItem).hasVariation(recursive);
+                if (((BareIrStream) irStreamItem).hasVariation(recursive, pass))
+                    return true;
         }
         return false; // give up
     }

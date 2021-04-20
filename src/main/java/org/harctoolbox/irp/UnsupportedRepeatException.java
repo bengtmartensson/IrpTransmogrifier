@@ -23,6 +23,10 @@ package org.harctoolbox.irp;
 public final class UnsupportedRepeatException extends IrpException {
 
     public UnsupportedRepeatException() {
-        super("More than one infinite repeat found. This is not supported.");
+        super("More than one infinite repeat found. This is unsupported.");
+    }
+
+    public UnsupportedRepeatException(String str) {
+        super(str);
     }
 }

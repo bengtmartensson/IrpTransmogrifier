@@ -549,7 +549,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
 
     <irp:protocol name="DirecTV_P0">
         <irp:irp>
-            <![CDATA[{40k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-15){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
+            <![CDATA[{40k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-15)+{C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
             The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
@@ -576,7 +576,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
 
     <irp:protocol name="DirecTV_P1">
         <irp:irp>
-            <![CDATA[{40k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
+            <![CDATA[{40k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50)+{C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
             The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
@@ -604,7 +604,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
 
     <irp:protocol name="DirecTV_P2">
         <irp:irp>
-            <![CDATA[{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-15){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
+            <![CDATA[{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-15)+{C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
             The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
@@ -633,7 +633,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
     <irp:protocol name="DirecTV_P3">
         <!--irp:parameter name="uei-executor">0162[D;F]</irp:parameter-->
         <irp:irp>
-            <![CDATA[{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
+            <![CDATA[{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50)+{C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
             The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
@@ -661,7 +661,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
 
     <irp:protocol name="DirecTV_P4">
         <irp:irp>
-            <![CDATA[{57k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-15){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
+            <![CDATA[{57k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-15)+{C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
             The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
@@ -689,7 +689,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
 
     <irp:protocol name="DirecTV_P5">
         <irp:irp>
-            <![CDATA[{57k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
+            <![CDATA[{57k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50)+{C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">There are six variants of the DirecTV protocol, distinguished in RemoteMaster by the parameter "Parm" on the Setup page.
             The Parm value is shown in the Misc field of DecodeIR.  The IRP notation above corresponds to the default Parm=3.
@@ -1762,7 +1762,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="OrtekMCE_relaxed">
         <irp:irp>
-            <![CDATA[{38.6k,480}<1,-1|-1,1>([][P=1][P=2],4,-1,D:5,P:2,F:6,C:4,-48m)+{C=3+#D+#P+#F}[D:0..31,F:0..63]]]>
+            <![CDATA[{38.6k,480}<1,-1|-1,1>([][P=1][P=2],4,-1,D:5,P:2,F:6,C:4,-48m)*{C=3+#D+#P+#F}[D:0..31,F:0..63]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">This is a <a href="#relaxed">relaxed version</a> of the <a href="#OrtekMCE">OrtekMCE protocol</a>, in that it lacks the <a href="#intro">intro sequence</a>.
         </irp:documentation>
@@ -2072,7 +2072,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="RCA(Old)">
         <irp:irp>
-            <![CDATA[{58k,460,msb}<1,-2|1,-4>([40][8],-8,D:4,F:8,~D:4,~F:8,2,-16)[D:0..15,F:0..255]]]>
+            <![CDATA[{58k,460,msb}<1,-2|1,-4>([40][8],-8,D:4,F:8,~D:4,~F:8,2,-16)+[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">See <a href="#RCA">RCA</a>.
         </irp:documentation>
@@ -2092,7 +2092,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="RCA-38(Old)">
         <irp:irp>
-            <![CDATA[{38.7k,460,msb}<1,-2|1,-4>([40][8],-8,D:4,F:8,~D:4,~F:8,2,-16)[D:0..15,F:0..255]]]>
+            <![CDATA[{38.7k,460,msb}<1,-2|1,-4>([40][8],-8,D:4,F:8,~D:4,~F:8,2,-16)+[D:0..15,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">See <a href="#RCA-38">RCA-38</a>.</irp:documentation>
     </irp:protocol>
@@ -2522,7 +2522,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="Velodyne">
         <irp:irp>
-            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,~C:4,S:4,15:4,D:4,T:4,F:8,210u,-79m){C=(8+S:4+S:4:4+15+D+T+F:4+F:4:4)&15}[D:0..15,S:0..255,F:0..255]]]>
+            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,~C:4,S:4,15:4,D:4,T:4,F:8,210u,-79m)+{C=(8+S:4+S:4:4+15+D+T+F:4+F:4:4)&15}[D:0..15,S:0..255,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">Velodyne is a close relative of <a href="#XMP">XMP</a>.</irp:documentation>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
@@ -2599,7 +2599,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="XMP">
         <irp:irp>
-            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4), C2=-(S+S::4+T+F+F::4+F::8+F::12) }[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]]]>
+            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m)+{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4), C2=-(S+S::4+T+F+F::4+F::8+F::12) }[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve"><a href="http://www.hifi-remote.com/wiki/index.php/XMP#XMP.2C_XMP-1_and_XMP-2">DecodeIR documentation</a>.
         </irp:documentation>
@@ -2610,7 +2610,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="XMP-1">
         <irp:irp>
-            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,-80.4m){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S + S::4 + T + 256*F + 16*F + F + F::4) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
+            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,-80.4m)+{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S + S::4 + T + 256*F + 16*F + F + F::4) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
         </irp:irp>
         <irp:parameter name="prefer-over">XMP</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
@@ -2620,7 +2620,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="XMP-2">
         <irp:irp>
-            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
+            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m)+{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
         </irp:irp>
         <irp:parameter name="prefer-over">XMP</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
@@ -2630,7 +2630,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="XMPff">
         <irp:irp>
-            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,[-80.4m][-80.4m][-13.8m]){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]]]>
+            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,[-80.4m][-80.4m][-13.8m])+{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]]]>
         </irp:irp>
         <irp:parameter name="prefer-over">XMP</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
@@ -2639,7 +2639,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="XMPff-1">
         <irp:irp>
-            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,[-80.4m][-80.4m][-13.8m]){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S + S::4 + T + 256*F + 16*F + F + F::4) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
+            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,[-80.4m][-80.4m][-13.8m])+{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S + S::4 + T + 256*F + 16*F + F + F::4) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
         </irp:irp>
         <irp:parameter name="prefer-over">XMPff</irp:parameter>
         <irp:parameter name="prefer-over">XMP-1</irp:parameter>
@@ -2649,7 +2649,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="XMPff-2">
         <irp:irp>
-            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,[-80.4m][-80.4m][-13.8m]){ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
+            <![CDATA[{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8][T=9],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,[-80.4m][-80.4m][-13.8m])+{ C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12) }[D:0..255, S:0..255, F:0..255, OEM:0..255=68]]]>
         </irp:irp>
         <irp:parameter name="prefer-over">XMPff</irp:parameter>
         <irp:parameter name="prefer-over">XMP-2</irp:parameter>
@@ -2659,7 +2659,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="Zaptor-36">
         <irp:irp>
-            <![CDATA[{36k,330,msb}<-1,1|1,-1>([][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m){C = (D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]]]>
+            <![CDATA[{36k,330,msb}<-1,1|1,-1>([][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m)*{C = (D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">T=0 for all frames except the last, T=1 for last frame, E is a checksum seed. A protocol so far seen only in the Motorola Zaptor.</irp:documentation>
         <irp:parameter name="uei-executor">01CD[D,S,E,0;F]</irp:parameter>
@@ -2667,7 +2667,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="Zaptor-56">
         <irp:irp>
-            <![CDATA[{56k,330,msb}<-1,1|1,-1>([][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m){C = (D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]]]>
+            <![CDATA[{56k,330,msb}<-1,1|1,-1>([][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m)*{C = (D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">T=0 for all frames except the last, T=1 for last frame, E is a checksum seed. A protocol so far seen only in the Motorola Zaptor.</irp:documentation>
         <irp:parameter name="uei-executor">01CD[D,S,E,1;F]</irp:parameter>

@@ -2,7 +2,9 @@
 # Ad hoc wrapper, for development in the source tree ONLY.
 # It is not intended for deployment.
 
-if [ ! -d target ] ; then
+IRPHOME="$(dirname -- "$(readlink -f -- "${0}")" )"
+
+if [ ! -d ${IRPHOME}/target ] ; then
     echo "This wrapper, $(readlink -f -- "${0}"), is intended for development ONLY."  1>&2
     echo "It is NOT intended for deployment!"                               1>&2
     echo "Instructions for installing given in http://www.harctoolbox.org/IrpTransmogrifier.html#Installation" 1>&2
@@ -11,7 +13,6 @@ if [ ! -d target ] ; then
 fi
 
 JAVA=java
-IRPHOME="$(dirname -- "$(readlink -f -- "${0}")" )"
 VERSION=`xpath -q -e  '/project/version/text()' ${IRPHOME}/pom.xml`
 JAR=${IRPHOME}/target/IrpTransmogrifier-${VERSION}-jar-with-dependencies.jar
 CONFIG=${IRPHOME}/src/main/resources/IrpProtocols.xml

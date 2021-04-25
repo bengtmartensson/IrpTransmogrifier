@@ -7,6 +7,7 @@ import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ModulatedIrSequence;
+import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -83,8 +84,8 @@ public class ProtocolNGTest {
         mce = new Protocol("{36k,444,msb}<-1,1|1,-1>((6,-2,1:1,6:3,-2,2,OEM1:8,S:8,T:1,D:7,F:8,^107m)*,T=1-T){OEM1=128}[D:0..127,S:0..255,F:0..255,T@:0..1=0]");
         lumagen = new Protocol("{38.4k,416,msb}<1,-6|1,-12>(D:4,C:1,F:7,1,-26)*{C=(#F+1)&1}[D:0..15,F:0..127]");
         arctech  = new Protocol("{0k,388}<1,-3|3,-1>(<0:2|2:2>((D-1):4,(S-1):4),40:7,F:1,0:1,-10.2m)*[D:1..16,S:1..16,F:0..1]");
-        xmp  = new Protocol("{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m){C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12)}[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]");
-        directv  = new Protocol("{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50){C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]");
+        xmp  = new Protocol("{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,F:16,210u,-80.4m)+{C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+F+F::4+F::8+F::12)}[F:0..65535,D:0..255,S:0..255,OEM:0..255=68]");
+        directv  = new Protocol("{38k,600,msb}<1,-1|1,-2|2,-1|2,-2>([10][5],-2,D:4,F:8,C:4,1,-50)+{C=7*(F:2:6)+5*(F:2:4)+3*(F:2:2)+(F:2)}[D:0..15,F:0..255]");
         samsung36  = new Protocol("{37.9k,560,33%}<1,-1|1,-3>(4500u,-4500u,D:8,S:8,1,-9,E:4,F:8,~F:8,1,^108m)*[D:0..255,S:0..255,F:0..255,E:0..15]");
         tivo  = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,U:4,~F:4:4,1,-78,(16,-4,1,-173)*)[D:133..133=133,S:48..48=48,F:0..255,U:0..15]");
         denonK  = new Protocol("{37k,432}<1,-1|1,-3>(8,-4,84:8,50:8,0:4,D:4,S:4,F:12,((D*16)^S^(F*16)^(F:8:4)):8,1,-173)*[D:0..15,S:0..15,F:0..4095]");
@@ -96,11 +97,11 @@ public class ProtocolNGTest {
         entone  = new Protocol("{36k,444,msb}<-1,1|1,-1>(6,-2,1:1,M:3,<-2,2|2,-2>(T:1),0xE60396FFFFF:44,F:8,0:4,-131.0m)*{M=6,T=0}[F:0..255]");
         rs200  = new Protocol("{35.7k,msb}<50p,-120p|21p,-120p>(25:6,(H4-1):2,(H3-1):2,(H2-1):2,(H1-1):2,P:1,(D-1):3,F:2,0:2,sum:4,-1160p)*{P=~(#(D-1)+#F):1,sum=9+((H4-1)*4+(H3-1))+((H2-1)*4+(H1-1))+(P*8+(D-1))+F*4}[H1:1..4,H2:1..4,H3:1..4,H4:1..4,D:1..6,F:0..2]");
         solidtek16  = new Protocol("{38k}<-624,468|468,-624>(S=0,(1820,-590,0:1,D:4,F:7,S:1,C:4,1:1,-143m,S=1)3){C=F:4:0+F:3:4+8*S}[D:0..15,F:0..127]");
-        zaptor  = new Protocol("{36k,330,msb}<-1,1|1,-1>([][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m){C=(D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]");
-        xmp1  = new Protocol("{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,-80.4m){C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+256*F+16*F+F+F::4)}[D:0..255,S:0..255,F:0..255,OEM:0..255=68]");
+        zaptor  = new Protocol("{36k,330,msb}<-1,1|1,-1>([][T=0][T=1],8,-6,2,D:8,T:1,S:7,F:8,E:4,C:4,-74m)*{C=(D:4+D:4:4+S:4+S:3:4+8*T+F:4+F:4:4+E)&15}[D:0..255,S:0..127,F:0..127,E:0..15]");
+        xmp1  = new Protocol("{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,C1:4,S:4,15:4,OEM:8,D:8,210u,-13.8m,S:4:4,C2:4,T:4,S:4,(F*256):16,210u,-80.4m)+{C1=-(S+S::4+15+OEM+OEM::4+D+D::4),C2=-(S+S::4+T+256*F+16*F+F+F::4)}[D:0..255,S:0..255,F:0..255,OEM:0..255=68]");
         rc5x  = new Protocol("{36k,msb,889}<1,-1|-1,1>((1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T)[D:0..31,S:0..127,F:0..63,T@:0..1=0]");
         iodatan  = new Protocol("{38k,550}<1,-1|1,-3>(16,-8,x:7,D:7,S:7,y:7,F:8,C:4,1,^108m)*{n=F:4^F:4:4^C:4}[D:0..127,S:0..127,F:0..255,C:0..15=0,x:0..127=0,y:0..127=0]");
-        velodyne  = new Protocol("{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,~C:4,S:4,15:4,D:4,T:4,F:8,210u,-79m){C=(8+S:4+S:4:4+15+D+T+F:4+F:4:4)&15}[D:0..15,S:0..255,F:0..255]");
+        velodyne  = new Protocol("{38k,136,msb}<210u,-760u|210u,-896u|210u,-1032u|210u,-1168u|210u,-1304u|210u,-1449u|210u,-1576u|210u,-1712u|210u,-1848u|210u,-1984u|210u,-2120u|210u,-2256u|210u,-2392u|210u,-2528u|210u,-2664u|210u,-2800u>([T=0][T=8],S:4:4,~C:4,S:4,15:4,D:4,T:4,F:8,210u,-79m)+{C=(8+S:4+S:4:4+15+D+T+F:4+F:4:4)&15}[D:0..15,S:0..255,F:0..255]");
         p_48_nec1  = new Protocol("{38.4k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,E:8,~E:8,1,^108m,(16,-4,1,^108m)*)[D:0..255,S:0..255=255-D,F:0..255,E:0..255]");
         barco  = new Protocol("{0k,10}<1,-5|1,-15>(1,-25,D:5,F:6,1,-25,1,-120m)*[D:0..31,F:0..63]");
         nec1_nofreq  = new Protocol("{564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*) [D:0..255,S:0..255=255-D,F:0..255]");
@@ -955,5 +956,61 @@ public class ProtocolNGTest {
         assertTrue(result);
         result = nec1.constantSequence(IrSignal.Pass.ending);
         assertTrue(result);
+    }
+
+    /**
+     * Test that some invalid variation/repeat combinations thows UnsupportedRepeatException.
+     * @throws NameUnassignedException
+     * @throws InvalidNameException
+     * @throws IrpInvalidArgumentException
+     */
+    @Test
+    public void testSillyVariants() throws NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
+        System.out.println("sillyVariants");
+        try {
+            new Protocol("{100}<1,-1|1,-3>([1][2],-10,10:10,1,-100m)");
+            fail();
+        } catch (UnsupportedRepeatException ex) {
+        }
+        try {
+            new Protocol("{}<1,-1|1,-3>([11][22],-100)*");
+            fail();
+        } catch (UnsupportedRepeatException ex) {
+        }
+    }
+
+    /**
+     * Test of rendering of Variants.
+     * @throws org.harctoolbox.irp.NameUnassignedException
+     * @throws org.harctoolbox.irp.InvalidNameException
+     * @throws org.harctoolbox.irp.IrpInvalidArgumentException
+     * @throws org.harctoolbox.irp.UnsupportedRepeatException
+     * @throws org.harctoolbox.irp.DomainViolationException
+     * @throws org.harctoolbox.ircore.OddSequenceLengthException
+     */
+    @Test
+    public void testProtocolVariant() throws NameUnassignedException, InvalidNameException, IrpInvalidArgumentException, UnsupportedRepeatException, DomainViolationException, OddSequenceLengthException {
+        System.out.println("constantSequence");
+        Protocol protocol = new Protocol("{}<1,-1|1,-3>([11][22][33],-100)+");
+        IrSignal irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+        assertEquals(irSignal.toString(true), "Freq=38000Hz[+11,-100][+22,-100][+33,-100]");
+        protocol = new Protocol("{}<1,-1|1,-3>([11][22],-100)+");
+        irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+        assertEquals(irSignal.toString(true), "Freq=38000Hz[+11,-100][+22,-100][]");
+        protocol = new Protocol("{}<1,-1|1,-3>([11][22][],-100)+");
+        irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+        assertEquals(irSignal.toString(true), "Freq=38000Hz[+11,-100][+22,-100][]");
+        protocol = new Protocol("{}<1,-1|1,-3>([11][22][33],-100)+");
+        irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+        assertEquals(irSignal.toString(true), "Freq=38000Hz[+11,-100][+22,-100][+33,-100]");
+        protocol = new Protocol("{}<1,-1|1,-3>(111,-222,[11][][33],-100)+");
+        irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+        assertEquals(irSignal.toString(true), "Freq=38000Hz[+111,-222,+11,-100][+111,-222][+111,-222,+33,-100]");
+        protocol = new Protocol("{}<1,-1|1,-3>(111,-222,[11][][33],-100)+");
+        irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+        assertEquals(irSignal.toString(true), "Freq=38000Hz[+111,-222,+11,-100][+111,-222][+111,-222,+33,-100]");
+        protocol = new Protocol("{}<1,-1|1,-3>(111,-222,[11][22][33],-100)+");
+        irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+        assertEquals(irSignal.toString(true), "Freq=38000Hz[+111,-222,+11,-100][+111,-222,+22,-100][+111,-222,+33,-100]");
     }
 }

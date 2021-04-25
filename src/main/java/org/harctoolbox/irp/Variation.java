@@ -210,6 +210,12 @@ public final class Variation extends IrpObject implements IrStreamItem {
         return intro.hasExtent() || repeat.hasExtent() || ending.hasExtent();
     }
 
+    public boolean hasPart(Pass part) {
+        if (part == null)
+            return true;
+        return ! select(part).isEmpty();
+    }
+
     @Override
     public Set<String> assignmentVariables() {
         Set<String> list = intro.assignmentVariables();

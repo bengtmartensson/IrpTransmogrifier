@@ -116,7 +116,7 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
 
     @Override
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
-        return hasVariation(false) ? pass
+        return hasVariation(false, null) ? pass
                 : (pass == IrSignal.Pass.repeat || pass == IrSignal.Pass.ending) && isInfiniteRepeat() ? IrSignal.Pass.repeat
                 : null;
     }
@@ -208,8 +208,11 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         int repetitions = numberRepetitions(pass);
         if (evaluateTheRepeat(pass))
             state = IrSignal.Pass.repeat;
-        for (int i = 0; i < repetitions; i++)
-            list.addAll(bareIrStream.extractPass(pass, state));
+        if (pass == Pass.ending && hasVariationWithEnding())
+            list.addAll(bareIrStream.extractPass(Pass.ending, Pass.ending));
+        else
+            for (int i = 0; i < repetitions; i++)
+                list.addAll(bareIrStream.extractPass(pass, state));
         return list;
     }
 
@@ -230,12 +233,12 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         return nod != null ? getMinRepeats() * bareIrStream.numberOfDurations(bitSpecLength) : null;
     }
 
-    public boolean hasVariation(boolean recursive) {
-        return bareIrStream.hasVariation(recursive);
+    public boolean hasVariation(boolean recursive, Pass pass) {
+        return bareIrStream.hasVariation(recursive, pass);
     }
 
     boolean isRPlus() {
-        return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true);
+        return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true, null);
     }
 
     @Override
@@ -321,6 +324,10 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
 
     boolean hasVariationWithIntroEqualsRepeat() {
         return bareIrStream.hasVariationWithIntroEqualsRepeat();
+    }
+
+    boolean hasVariationWithEnding() {
+        return bareIrStream.hasVariation(true, Pass.ending);
     }
 
     @Override

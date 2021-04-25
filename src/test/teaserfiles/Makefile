@@ -208,7 +208,7 @@ endif
 	$(ICTPARSE) "$<" > "$@"
 
 %.diffuse: %.out | %.exp
-	diffuse $< $*.exp
+	kdiff3 $< $*.exp
 
 nukeempty:
 	find . -name \*.diff -size 0 -exec rm \{\} \;

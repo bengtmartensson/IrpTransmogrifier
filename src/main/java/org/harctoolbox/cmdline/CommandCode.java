@@ -155,7 +155,7 @@ public class CommandCode extends AbstractCommand {
         }
 
         private void createXmlProtocols(List<String> protocolNames) throws UnsupportedEncodingException {
-            Document document = irpDatabase.toXml(protocolNames, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance, commandLineArgs.override);
+            Document document = irpDatabase.toDocument(protocolNames, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance, commandLineArgs.override);
             XmlUtils.printDOM(out, document, commandLineArgs.outputEncoding, "Irp");
         }
 

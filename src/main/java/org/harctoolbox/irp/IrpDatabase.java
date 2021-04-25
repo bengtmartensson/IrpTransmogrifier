@@ -293,6 +293,12 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         rebuildAliases();
     }
 
+    public void patch(IrpDatabase irpDatabase) {
+        appendToVersion(irpDatabase.getVersion());
+        for (UnparsedProtocol protocol : irpDatabase.protocols.values())
+            patchProtocol(protocol);
+    }
+
     public void patch(Reader reader) throws IOException, SAXException {
         patch(openXmlReader(reader));
     }
@@ -399,7 +405,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         expand(protocolName);
     }
 
-    private Document emptyDocument() {
+    private Document mkDocument() {
         Document doc = XmlUtils.newDocument(true);
         ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
                 "type=\"text/xsl\" href=\"IrpProtocols2html.xsl\"");
@@ -407,37 +413,56 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         comments.forEach((String comment) -> {
             doc.appendChild(doc.createComment(comment));
         });
+        return doc;
+    }
+
+    private Element mkRoot(Document doc) {
         Element root = doc.createElementNS(IRP_PROTOCOL_NS, IRP_NAMESPACE_PREFIX + ":" + PROTOCOLS_NAME);
         root.setAttribute(W3C_SCHEMA_NAMESPACE_ATTRIBUTE_NAME, W3C_XML_SCHEMA_INSTANCE_NS_URI);
         root.setAttribute(XINCLUDE_NAMESPACE_ATTRIBUTE_NAME, XINCLUDE_NAMESPACE_URI);
         root.setAttribute(XML_NAMESPACE_ATTRIBUTE_NAME, XML_NS_URI);
         root.setAttribute(XMLNS_ATTRIBUTE, HTML_NAMESPACE_URI);
         root.setAttribute(SCHEMA_LOCATION_ATTRIBUTE_NAME, IRP_PROTOCOL_NS + " " + IRP_PROTOCOL_SCHEMA_LOCATION);
-        root.setAttribute(VERSION_NAME, version.toString());
+        if (version.length() > 0)
+            root.setAttribute(VERSION_NAME, version.toString());
         globalAttributes.entrySet().forEach((kvp) -> {
             root.setAttribute(kvp.getKey(), kvp.getValue());
         });
-        doc.appendChild(root);
-        return doc;
+        return root;
     }
 
     public Document toDocument() {
         return toDocument(protocols.keySet());
     }
 
-    public Document toDocument(Iterable<String> protocolNames) {
-        Document doc = emptyDocument();
-        Element root = doc.getDocumentElement();
+    public Document toDocument(Iterable<String> protocolsNames) {
+        Document document = mkDocument();
+        Element root = toElement(document, protocolsNames);
+        document.appendChild(root);
+        return document;
+    }
+
+    public Document toDocument(Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
+        Document document = mkDocument();
+        Element root = toElement(document, protocolNames, absoluteTolerance, relativeTolerance, frequencyTolerance, override);
+        document.appendChild(root);
+        return document;
+    }
+
+    public Element toElement(Document doc) {
+        return toElement(doc, protocols.keySet());
+    }
+
+    public Element toElement(Document doc, Iterable<String> protocolNames) {
+        Element root = mkRoot(doc);
         for (String protocolName : protocolNames) {
             root.appendChild(doc.createTextNode(IrCoreUtils.LINEFEED));
             root.appendChild(protocols.get(protocolName.toLowerCase(Locale.US)).toElement(doc));
         }
-
-        return doc;
+        return root;
     }
 
-    public Document toXml(Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
-        Document document = XmlUtils.newDocument();
+    public Element toElement(Document document, Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
         Element root = document.createElement("NamedProtocols");
         root.setAttribute(PROG_VERSION_NAME, Version.versionString);
         root.setAttribute(VERSION_NAME, this.getConfigFileVersion());
@@ -459,7 +484,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
             }
         });
 
-        return document;
+        return root;
     }
 
     /**
@@ -538,6 +563,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
 
     public int size() {
         return protocols.size();
+    }
+
+    public boolean isEmpty() {
+        return size() == 0;
     }
 
     public List<String> getMatchingNamesRegexp(String regexp) {

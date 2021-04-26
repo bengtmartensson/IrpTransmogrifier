@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.ircore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +40,7 @@ import java.util.StringJoiner;
  * @see ModulatedIrSequence
  *
  */
-public class IrSequence implements Cloneable {
+public class IrSequence implements Cloneable, Serializable {
 
     private static final double EPSILON = 0.001;
     public static final double DUMMYGAPDURATION = 50000d; // should not translate to 0000 in Pronto

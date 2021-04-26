@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ import org.xml.sax.SAXException;
  * It reads a configuration file containing definitions for IR format in the IRP-Notation.
  */
 // NOTE: The program must work also if the schema cannot be retrieved.
-public final class IrpDatabase implements Iterable<NamedProtocol> {
+public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable {
     private static final Logger logger = Logger.getLogger(IrpDatabase.class.getName());
 
     public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml";
@@ -896,7 +897,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol> {
         }
     }
 
-    private static class UnparsedProtocol {
+    private static class UnparsedProtocol implements Serializable {
         private static final int APRIORI_SIZE = 4;
 
         private static DocumentFragment nodeToDocumentFragment(Node node, boolean preserve) {

@@ -73,7 +73,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
 
     private final String name;
     private final String cName;
-    private final DocumentFragment htmlDocumentation;
+    private final transient DocumentFragment htmlDocumentation; // TODO: serialization...
     private final Double absoluteTolerance;
     private final Double relativeTolerance;
     private final Double frequencyTolerance;

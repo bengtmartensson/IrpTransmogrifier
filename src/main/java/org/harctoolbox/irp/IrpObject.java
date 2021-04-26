@@ -17,6 +17,7 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ import org.harctoolbox.xml.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public abstract class IrpObject implements XmlExport {
+public abstract class IrpObject implements XmlExport, Serializable {
 
     private final static int DEFAULT_RADIX = 10;
 

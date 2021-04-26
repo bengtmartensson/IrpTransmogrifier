@@ -16,6 +16,7 @@ this program. If not, see http://www.gnu.org/licenses/.
  */
 package org.harctoolbox.ircore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
  *
  */
 
-public final class IrSignal implements Cloneable {
+public final class IrSignal implements Cloneable, Serializable {
     private static final Logger logger = Logger.getLogger(IrSignal.class.getName());
     public static final IrSignal EMPTY = new IrSignal();
 

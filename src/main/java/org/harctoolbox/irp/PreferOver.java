@@ -17,12 +17,13 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public final class PreferOver {
+public final class PreferOver implements Serializable {
 
     public static List<PreferOver> parse(Iterable<String> strings) {
         if (strings == null)

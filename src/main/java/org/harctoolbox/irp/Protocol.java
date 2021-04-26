@@ -78,7 +78,7 @@ public class Protocol extends IrpObject implements AggregateLister {
     private final NameEngine memoryVariables;
     private Boolean interleavingFlash = null;
     private Boolean interleavingGap = null;
-    private ParserDriver parserDriver = null;
+    private transient ParserDriver parserDriver = null;
     private final Class<? extends AbstractDecoder> decoderClass;
     private String irp;
 

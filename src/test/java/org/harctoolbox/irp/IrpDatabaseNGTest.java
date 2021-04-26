@@ -364,6 +364,7 @@ public class IrpDatabaseNGTest {
 
     /**
      * Test of render method, of class IrpDatabase.
+     * @throws java.lang.Exception
      */
     @Test
     public void testRender() throws Exception {
@@ -372,7 +373,6 @@ public class IrpDatabaseNGTest {
         Map<String, Long> params = new HashMap<>(2);
         params.put("D", 0L);
         params.put("F", 0L);
-        IrpDatabase irpDatabase = new IrpDatabase((String) null);
         IrSignal result = instance.render("rc5", params);
         String str = Pronto.toString(result);
         assertEquals(str, "0000 0073 0000 000D 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0CC8");

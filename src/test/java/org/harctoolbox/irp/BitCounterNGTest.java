@@ -1,7 +1,6 @@
 package org.harctoolbox.irp;
 
 import java.util.List;
-import java.util.Map;
 import static org.testng.Assert.*;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;

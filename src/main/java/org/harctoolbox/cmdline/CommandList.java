@@ -64,7 +64,7 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"--documentation"}, description = "Print (possible longer) documentation, as a dumb rendering of the HTML documenation.")
     private boolean documentation = false;
 
-    @Parameter(names = {"-d", "--dump"}, description = "Print the IRP data base as DOC tree stringified.")
+    @Parameter(names = {"-d", "--dump"}, description = "Print the IRP data base as DOC tree stringified, including initial XML comments.")
     private boolean dump = false;
 
     @Parameter(names = {"--gui", "--display"}, description = "Display parse diagram.")
@@ -90,7 +90,7 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"-p", "--parsedirp"}, hidden = true, description = "List IRP form, as parsed.")
     private boolean parsedIrp = false;
 
-    @Parameter(names = {"--prefer-overs"}, description = "List all protocol's prefer-overs, recursively")
+    @Parameter(names = {"--prefer-overs"}, description = "List all protocol's prefer-overs, recursively.")
     private boolean preferOvers = false;
 
     @Parameter(names = {"--name"}, description = "List protocol name, also if --quiet is given.")
@@ -107,6 +107,9 @@ public class CommandList extends AbstractCommand {
 
     @Parameter(names = {"--warnings"}, description = "Issue warnings for some problematic IRP constructs.")
     private boolean warnings = false;
+
+    @Parameter(names = {"-x", "--xml"}, description = "Like dump, but without XML comments.")
+    private boolean xml = false;
 
     @Parameter(description = "List of protocols (default all)")
     private List<String> protocols = new ArrayList<>(8);
@@ -136,8 +139,8 @@ public class CommandList extends AbstractCommand {
         if (list.isEmpty())
             throw new UsageException("No protocol matched.");
 
-        if (dump) {
-            Document document = irpDatabase.toDocument(list);
+        if (dump || xml) {
+            Document document = irpDatabase.toDocument(list, dump);
             XmlUtils.printDOM(out, document, commandLineArgs.outputEncoding, "Irp Documentation");
             return;
         }

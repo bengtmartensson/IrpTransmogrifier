@@ -406,14 +406,15 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
         expand(protocolName);
     }
 
-    private Document mkDocument() {
+    private Document mkDocument(boolean includeComments) {
         Document doc = XmlUtils.newDocument(true);
         ProcessingInstruction pi = doc.createProcessingInstruction("xml-stylesheet",
                 "type=\"text/xsl\" href=\"IrpProtocols2html.xsl\"");
         doc.appendChild(pi);
-        comments.forEach((String comment) -> {
-            doc.appendChild(doc.createComment(comment));
-        });
+        if (includeComments)
+            comments.forEach((String comment) -> {
+                doc.appendChild(doc.createComment(comment));
+            });
         return doc;
     }
 
@@ -437,14 +438,18 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
     }
 
     public Document toDocument(Iterable<String> protocolsNames) {
-        Document document = mkDocument();
+        return toDocument(protocolsNames, true);
+    }
+
+    public Document toDocument(Iterable<String> protocolsNames, boolean includeComments) {
+        Document document = mkDocument(includeComments);
         Element root = toElement(document, protocolsNames);
         document.appendChild(root);
         return document;
     }
 
     public Document toDocument(Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
-        Document document = mkDocument();
+        Document document = mkDocument(true);
         Element root = toElement(document, protocolNames, absoluteTolerance, relativeTolerance, frequencyTolerance, override);
         document.appendChild(root);
         return document;

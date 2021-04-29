@@ -86,6 +86,7 @@ public final class XmlUtils {
     public static final String SCHEMA_LOCATION_ATTRIBUTE_NAME       = "xsi:schemaLocation";
     public static final String XML_LANG_ATTRIBUTE_NAME              = XML_NS_PREFIX + ":lang";
     public static final String XML_SPACE_ATTRIBUTE_NAME             = XML_NS_PREFIX + ":space";
+    public static final String XML_BASE_ATTRIBUTE_NAME              = XML_NS_PREFIX + ":base";
     public static final String ENCODING_ATTRIBUTE_NAME              = "encoding";
     public static final String PRESERVE                             = "preserve";
     public static final String ENGLISH                              = "en";

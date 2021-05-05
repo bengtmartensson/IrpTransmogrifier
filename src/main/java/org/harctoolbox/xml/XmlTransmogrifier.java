@@ -25,11 +25,25 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.irp.IrpUtils;
 import org.harctoolbox.irp.Version;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -41,6 +55,16 @@ public final class XmlTransmogrifier {
     private static void usage(int exitcode) {
         argumentParser.usage();
         System.exit(exitcode);
+    }
+
+    // Not really tested
+    private static NodeList evaluateXpath(Node node, String xpath, MyResolver resolver) throws XPathExpressionException {
+        XPath xpather = XPathFactory.newInstance().newXPath();
+        if (resolver != null)
+            xpather.setNamespaceContext(resolver);
+        XPathExpression xpathExpression = xpather.compile(xpath);
+        NodeList nodeList = (NodeList) xpathExpression.evaluate(node, XPathConstants.NODESET);
+        return nodeList;
     }
 
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -70,7 +94,23 @@ public final class XmlTransmogrifier {
         }
 
         try {
-            Document doc = XmlUtils.openXmlFile(commandLineArgs.argument, commandLineArgs.schema, true, true);
+            Document doc = XmlUtils.openXmlFile(commandLineArgs.argument, commandLineArgs.schema, commandLineArgs.nameSpaceAware, true);
+
+            if (commandLineArgs.xpath != null) {
+                MyResolver resolver = commandLineArgs.nameSpaceAware ? new MyResolver(doc) : null;
+                NodeList nodeList = evaluateXpath(doc, commandLineArgs.xpath, resolver);
+                Element root = doc.createElement("xpath-result");
+                doc.replaceChild(root, doc.getDocumentElement());
+                int size = nodeList.getLength();
+                root.setAttribute("xpath", commandLineArgs.xpath);
+                root.setAttribute("size", Integer.toString(size));
+
+                for (int i = 0; i < size; i++) {
+                    Node node = nodeList.item(i);
+                    root.appendChild(node);
+                }
+            }
+
             if (!commandLineArgs.print) {
                 System.out.println("Use the --print option if you want output.");
                 System.exit(IrpUtils.EXIT_SUCCESS);
@@ -82,7 +122,7 @@ public final class XmlTransmogrifier {
                 Document stylesheet = XmlUtils.openXmlFile(commandLineArgs.stylesheet, null, true, true);
                 XmlUtils.printDOM(out, doc, commandLineArgs.encoding, stylesheet, new HashMap<>(0), false);
             }
-        } catch (SAXException | IOException | TransformerException ex) {
+        } catch (SAXException | IOException | TransformerException | XPathExpressionException ex) {
             ex.printStackTrace();
             System.exit(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE);
         }
@@ -99,6 +139,9 @@ public final class XmlTransmogrifier {
         @Parameter(names = {"-h", "-?", "--help"}, description = "Print help text")
         private boolean helpRequested = false;
 
+        @Parameter(names = {"-n", "--namespaceaware"}, description = "Use name space aware parser")
+        private boolean nameSpaceAware = false;
+
         @Parameter(names = {"-o", "--output"}, description = "Output file; \"-\" for stdout")
         private String output = "-";
 
@@ -108,10 +151,62 @@ public final class XmlTransmogrifier {
         @Parameter(names = {"-s", "--schema"}, description = "URL/Filename of schema for validation")
         private String schema = null;
 
+        @Parameter(names = {"--xpath"}, description = "XPath to apply to the document, before stylesheet processing (untested).")
+        private String xpath = null;
+
         @Parameter(names = {"--xslt"}, description = "URL/filename of stylesheet")
         private String stylesheet = null;
 
         @Parameter(required = true, description = "URL/Filename or - for stdin")
         private String argument = "-";
+    }
+
+    // Not really tested
+    private static class MyResolver implements NamespaceContext {
+
+        Map<String, String> prefixNamespace;
+        Map<String, String> namespacePrefix;
+
+        MyResolver() {
+            prefixNamespace = new HashMap<>(0);
+            namespacePrefix = new HashMap<>(0);
+        }
+
+        MyResolver(Document document) {
+            NamedNodeMap attrs = document.getDocumentElement().getAttributes();
+            prefixNamespace = new HashMap<>(attrs.getLength());
+            namespacePrefix = new HashMap<>(attrs.getLength());
+
+            // If there is a default, non-null namespace, assign the prefix "default" to it.
+            String defaultNsAttribute = document.getDocumentElement().getAttribute(XMLNS_ATTRIBUTE);
+            if (! defaultNsAttribute.isEmpty()) {
+                prefixNamespace.put("default", defaultNsAttribute);
+                namespacePrefix.put(defaultNsAttribute, "default");
+            }
+
+            for (int i = 0; i < attrs.getLength(); i++) {
+                Node att = attrs.item(i);
+                String namespaceURI = att.getNamespaceURI();
+                if (namespaceURI != null && namespaceURI.equals(XMLNS_ATTRIBUTE_NS_URI)) {
+                    prefixNamespace.put(att.getLocalName(), att.getNodeValue());
+                    namespacePrefix.put(att.getNodeValue(), att.getLocalName());
+                }
+            }
+        }
+
+        @Override
+        public String getNamespaceURI(String prefix) {
+            return prefixNamespace.get(prefix);
+        }
+
+        @Override
+        public String getPrefix(String namespaceURI) {
+            return namespacePrefix.get(namespaceURI);
+        }
+
+        @Override
+        public Iterator<String> getPrefixes(String namespaceURI) {
+            return prefixNamespace.keySet().iterator();
+        }
     }
 }

@@ -64,13 +64,11 @@ public final class RecognizeData extends Traverser implements Cloneable {
                 params.getAbsoluteTolerance(), params.getRelativeTolerance(), params.getMinimumLeadout(), pass);
     }
 
-    // Just for testing, do not use for anything else
-    RecognizeData() {
+    public RecognizeData() {
         this(new NameEngine());
     }
 
-    // Just for testing, do not use for anything else
-    RecognizeData(NameEngine nameEngine) {
+    public RecognizeData(NameEngine nameEngine) {
         this(new GeneralSpec(), nameEngine, new ParameterSpecs(), new IrSequence(), 0, false, new ParameterCollector(), new Decoder.DecoderParameters(), IrSignal.Pass.intro);
     }
 
@@ -120,7 +118,7 @@ public final class RecognizeData extends Traverser implements Cloneable {
         this.parameterCollector = parameterCollector;
     }
 
-    void add(String name, BitwiseParameter parameter) throws ParameterInconsistencyException {
+    public void add(String name, BitwiseParameter parameter) throws ParameterInconsistencyException {
         Expression expression = getNameEngine().getPossiblyNull(name);
         if (expression == null) {
             parameterCollector.add(name, parameter);
@@ -140,11 +138,11 @@ public final class RecognizeData extends Traverser implements Cloneable {
     }
 
 
-    void add(Name name, BitwiseParameter value) throws ParameterInconsistencyException {
+    public void add(Name name, BitwiseParameter value) throws ParameterInconsistencyException {
         add(name.toString(), value);
     }
 
-    void add(String name, long value) throws ParameterInconsistencyException {
+    public void add(String name, long value) throws ParameterInconsistencyException {
         add(name, new BitwiseParameter(value));
     }
 

@@ -13,8 +13,7 @@ if [ ! -d ${IRPHOME}/target ] ; then
 fi
 
 JAVA=java
-VERSION=`xpath -q -e  '/project/version/text()' ${IRPHOME}/pom.xml`
-JAR=${IRPHOME}/target/IrpTransmogrifier-${VERSION}-jar-with-dependencies.jar
+JAR=$(echo ${IRPHOME}/target/IrpTransmogrifier-*-jar-with-dependencies.jar )
 CONFIG=${IRPHOME}/src/main/resources/IrpProtocols.xml
 
 exec "${JAVA}" -jar "${JAR}" -c "${CONFIG}" "$@"

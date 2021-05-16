@@ -146,6 +146,10 @@ public final class RecognizeData extends Traverser implements Cloneable {
         add(name, new BitwiseParameter(value));
     }
 
+    public BitwiseParameter remove(String name) {
+        return parameterCollector.remove(name);
+    }
+
     public boolean isOn() {
         return Duration.isOn(position);
     }

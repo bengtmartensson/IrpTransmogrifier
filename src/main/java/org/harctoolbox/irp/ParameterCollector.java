@@ -102,6 +102,10 @@ public final class ParameterCollector implements Cloneable {
         add(name, new BitwiseParameter(value, bitmask));
     }
 
+    BitwiseParameter remove(String name) {
+        return map.remove(name);
+    }
+
     private void overwrite(String name, BitwiseParameter parameter) {
         logger.log(Level.FINER, "Overwriting {0} = {1}", new Object[]{name, parameter});
         map.put(name, parameter);

@@ -32,6 +32,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -176,6 +177,23 @@ public final class XmlUtils {
 
     public static Document openXmlThing(String thing) throws IOException, SAXException {
         return openXmlThing(thing, null, true, true);
+    }
+
+    public static Document openXmlUrlOrFile(String thing, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
+        try {
+            URL url = new URL(thing);
+            return openXmlUrl(url, schema, isNamespaceAware, isXIncludeAware);
+        } catch (MalformedURLException ex) {
+            return openXmlFile(new File(thing), schema, isNamespaceAware, isXIncludeAware);
+        }
+    }
+
+    public static Document openXmlUrl(URL url, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
+        URLConnection urlConnection = url.openConnection();
+        try (InputStream in = urlConnection.getInputStream()) {
+            InputStreamReader reader = new InputStreamReader(in);
+            return openXmlReader(reader, schema, isNamespaceAware, isXIncludeAware);
+        }
     }
 
     /**

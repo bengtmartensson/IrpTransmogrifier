@@ -1,5 +1,7 @@
 package org.harctoolbox.irp;
 
+import java.util.HashMap;
+import java.util.Map;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -94,5 +96,38 @@ public class ParameterSpecsNGTest {
         assertFalse(nec1.hasNonStandardParameters());
         ParameterSpecs instance = new ParameterSpecs("[D:0..255,S:0..255,Z:0..255]");
         assertTrue(instance.hasNonStandardParameters());
+    }
+
+    /**
+     * Test of compare method, of class ParameterSpecs.
+     */
+    @Test
+    public void testCompare() {
+        System.out.println("compare");
+        ParameterSpecs instance = rc5;
+        int result = instance.compare("january", "february");
+        assertTrue(result > 0);
+        result = instance.compare("D", "F");
+        assertTrue(result < 0);
+        result = instance.compare("F", "F");
+        assertTrue(result == 0);
+    }
+
+    /**
+     * Test of sort method, of class ParameterSpecs.
+     */
+    @Test
+    public void testSort() {
+        System.out.println("sort");
+        Map<String, Long> unsortedMap = new HashMap<>(8);
+        unsortedMap.put("january", 1L);
+        unsortedMap.put("february", 2L);
+        unsortedMap.put("F", 3L);
+        unsortedMap.put("D", 4L);
+        unsortedMap.put("T", 0L);
+        Map<String, Long> sortedMap = rc5.sort(unsortedMap);
+        String[] expResult = new String []{ "T", "D", "F", "february", "january" };
+        String[] result = sortedMap.keySet().toArray(new String[5]);
+        assertEquals(result, expResult);
     }
 }

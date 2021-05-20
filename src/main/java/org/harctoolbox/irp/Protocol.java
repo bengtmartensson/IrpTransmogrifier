@@ -762,8 +762,12 @@ public class Protocol extends IrpObject implements AggregateLister {
         return generalSpec;
     }
 
-    protected ParameterSpecs getParameterSpecs() {
+    public ParameterSpecs getParameterSpecs() {
         return parameterSpecs;
+    }
+
+    public Map<String, Long> sort(Map<String, Long> map) {
+        return parameterSpecs.sort(map);
     }
 
     /**

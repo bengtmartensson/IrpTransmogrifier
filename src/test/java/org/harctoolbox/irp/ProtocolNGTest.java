@@ -1,5 +1,6 @@
 package org.harctoolbox.irp;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
@@ -1012,5 +1013,23 @@ public class ProtocolNGTest {
         protocol = new Protocol("{}<1,-1|1,-3>(111,-222,[11][22][33],-100)+");
         irSignal = protocol.toIrSignal(NameEngine.EMPTY);
         assertEquals(irSignal.toString(true), "Freq=38000Hz[+111,-222,+11,-100][+111,-222,+22,-100][+111,-222,+33,-100]");
+    }
+
+    /**
+     * Test of sort method, of class Protocol.
+     */
+    @Test
+    public void testSort() {
+        System.out.println("sort");
+        Map<String, Long> unsortedMap = new HashMap<>(8);
+        unsortedMap.put("january", 1L);
+        unsortedMap.put("february", 2L);
+        unsortedMap.put("F", 3L);
+        unsortedMap.put("D", 4L);
+        unsortedMap.put("T", 0L);
+        Map<String, Long> sortedMap = rc5.sort(unsortedMap);
+        String[] expResult = new String []{ "D", "F", "T", "february", "january" };
+        String[] result = sortedMap.keySet().toArray(new String[5]);
+        assertEquals(result, expResult);
     }
 }

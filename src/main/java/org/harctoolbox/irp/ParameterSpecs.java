@@ -19,6 +19,7 @@ package org.harctoolbox.irp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -27,11 +28,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public final class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>,AggregateLister {
+public final class ParameterSpecs extends IrpObject implements Iterable<ParameterSpec>,AggregateLister,Comparator<String> {
 
     private Map<String, ParameterSpec> map = new LinkedHashMap<>(3);
 
@@ -62,6 +64,26 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         list.forEach((ps) -> {
             map.put(ps.getName(), ps);
         });
+    }
+
+    @Override
+    public int compare(String first, String second) {
+        Objects.requireNonNull(first);
+        Objects.requireNonNull(second);
+        for (String parameterName : map.keySet()) {
+            if (first.equals(parameterName))
+                return second.equals(parameterName) ? 0 : -1;
+            if (second.equals(parameterName))
+                return 1;
+        }
+        // None were found, fallback to lexicographic order
+        return first.compareTo(second);
+    }
+
+    public Map<String, Long> sort(Map<String, Long> unsortedMap) {
+        TreeMap<String, Long> sortedMap = new TreeMap<>(this);
+        sortedMap.putAll(unsortedMap);
+        return sortedMap;
     }
 
     @Override

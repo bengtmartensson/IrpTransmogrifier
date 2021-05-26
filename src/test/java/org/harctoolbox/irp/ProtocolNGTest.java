@@ -966,6 +966,7 @@ public class ProtocolNGTest {
      * @throws IrpInvalidArgumentException
      */
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testSillyVariants() throws NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         System.out.println("sillyVariants");
         try {

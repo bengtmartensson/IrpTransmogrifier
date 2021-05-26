@@ -17,6 +17,8 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import org.harctoolbox.ircore.IrCoreUtils;
@@ -26,17 +28,14 @@ import org.w3c.dom.Element;
 public final class ParameterSpec extends IrpObject {
     private static final int WEIGHT = 1;
     private static Random random;
-    private static final String[] standardNames = { "D", "S", "F", "T" };
+    private static final List<String> STANDARD_NAMES = Arrays.asList( "D", "S", "F", "T" );
 
     static {
         random = new Random();
     }
 
     public static boolean isStandardName(String name) {
-        for (String n : standardNames)
-            if (name.equals(n))
-                return true;
-        return false;
+        return STANDARD_NAMES.contains(name);
     }
 
     public static void initRandom(long seed) {

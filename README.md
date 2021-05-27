@@ -1,4 +1,5 @@
-# IrpTransmogrifier [![Build Status](https://travis-ci.org/bengtmartensson/IrpTransmogrifier.svg?branch=master)](https://travis-ci.org/bengtmartensson/IrpTransmogrifier)
+# IrpTransmogrifier
+[![Java CI with Maven + Upload](https://github.com/bengtmartensson/IrpTransmogrifier/actions/workflows/maven.yml/badge.svg)](https://github.com/bengtmartensson/IrpTransmogrifier/actions/workflows/maven.yml)
 
 Parser for IRP notation protocols, with rendering, code generation, recognition applications.
 

@@ -210,7 +210,6 @@ public class IrpDatabaseNGTest {
     @Test
     public void testGetProtocol() {
         System.out.println("getProtocol");
-        Protocol result;
         try {
             instance.getProtocol("covfefe");
             fail();
@@ -369,7 +368,6 @@ public class IrpDatabaseNGTest {
     @Test
     public void testRender() throws Exception {
         System.out.println("render");
-        String protocolName = "rc5";
         Map<String, Long> params = new HashMap<>(2);
         params.put("D", 0L);
         params.put("F", 0L);

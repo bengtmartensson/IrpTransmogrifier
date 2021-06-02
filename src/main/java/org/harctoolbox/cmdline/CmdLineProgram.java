@@ -61,6 +61,7 @@ public abstract class CmdLineProgram {
         argumentParser.addCommand(commandHelp);
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     protected CmdLineProgram(CommandBasicOptions commandLineArgs, String progName) {
         this(System.out, commandLineArgs, progName);
     }

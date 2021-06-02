@@ -150,7 +150,6 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         logger.log(recognizeData.logRecordEnterWithIrStream(this));
         List<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
-        IrSignal.Pass pass = null;
         int currentLevel = recognizeData.getLevel();
         recognizeData.setLevel(currentLevel + 1);
         irStream.decode(recognizeData, stack, isLast);

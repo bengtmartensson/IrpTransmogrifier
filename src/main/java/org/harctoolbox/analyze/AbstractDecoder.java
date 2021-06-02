@@ -20,7 +20,6 @@ package org.harctoolbox.analyze;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.BitDirection;
@@ -40,7 +39,7 @@ import org.harctoolbox.irp.RepeatMarker;
 
 public abstract class AbstractDecoder {
 
-    private static final Logger logger = Logger.getLogger(AbstractDecoder.class.getName());
+    //private static final Logger logger = Logger.getLogger(AbstractDecoder.class.getName());
 
     static final Class<?>[] decoders = {
         TrivialDecoder.class,

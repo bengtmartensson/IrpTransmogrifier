@@ -102,10 +102,6 @@ public class DumbHtmlRenderer {
         return "\n\n" + render(element.getChildNodes(), true).trim();
     }
 
-    private static String renderUl(Element element) {
-        return "\n" + render(element.getChildNodes(), true) + "\n";
-    }
-
     private static String renderLi(Element element) {
         return "\n* " + render(element.getChildNodes(), true).trim();
     }

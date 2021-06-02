@@ -315,7 +315,7 @@ public class ProtocolNGTest {
 
         ModulatedIrSequence sequence = new ModulatedIrSequence(IrSequence.concatenate(nrc17Intro, nrc17Ending), 38000.0);
         try {
-            Decoder.Decode decode = nrc17.recognize(sequence, true, true);
+            nrc17.recognize(sequence, true, true);
             fail();
         } catch (SignalRecognitionException ex) {
         }

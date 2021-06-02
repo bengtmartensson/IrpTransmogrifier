@@ -59,7 +59,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         this(new Name(name), new Number(width), new Number(0), complement, false);
     }
 
-    private FiniteBitField(long data, long width, long chop, boolean complement, boolean reverse) throws InvalidNameException {
+    public FiniteBitField(long data, long width, long chop, boolean complement, boolean reverse) throws InvalidNameException {
         this(new Number(data), new Number(width), new Number(chop), complement, reverse);
     }
 

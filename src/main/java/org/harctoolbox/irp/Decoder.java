@@ -17,7 +17,6 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -90,10 +89,6 @@ public final class Decoder {
     }
 
     private final Map<String, NamedProtocol> parsedProtocols;
-
-    private Decoder(File irpDatabasePath) throws IOException, IrpParseException, SAXException {
-        this(new IrpDatabase(irpDatabasePath), null);
-    }
 
     public Decoder(IrpDatabase irpDatabase) throws IrpParseException {
         this(irpDatabase, null);

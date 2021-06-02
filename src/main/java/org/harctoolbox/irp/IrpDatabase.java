@@ -296,8 +296,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
 
     public void patch(IrpDatabase irpDatabase) {
         appendToVersion(irpDatabase.getVersion());
-        for (UnparsedProtocol protocol : irpDatabase.protocols.values())
+        irpDatabase.protocols.values().forEach(protocol -> {
             patchProtocol(protocol);
+        });
     }
 
     public void patch(Reader reader) throws IOException, SAXException {

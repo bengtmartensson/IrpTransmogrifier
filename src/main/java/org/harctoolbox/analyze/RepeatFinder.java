@@ -193,10 +193,6 @@ public final class RepeatFinder {
         private double lastGap;
         private double repeatsDuration;
 
-        private RepeatFinderData() {
-            setup(0, 0, 0, 0);
-        }
-
         public RepeatFinderData(int length) {
             setup(length, 0, 0, 0);
         }

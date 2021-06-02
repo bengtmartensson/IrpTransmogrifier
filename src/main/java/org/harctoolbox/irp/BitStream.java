@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import java.math.BigInteger;
 import java.util.Objects;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -28,7 +27,7 @@ import org.w3c.dom.Element;
 
 final class BitStream extends IrpObject implements Evaluatable {
 
-    private static final Logger logger = Logger.getLogger(BitStream.class.getName());
+    //private static final Logger logger = Logger.getLogger(BitStream.class.getName());
     private static final int WEIGHT = 2;
 
     private long length;

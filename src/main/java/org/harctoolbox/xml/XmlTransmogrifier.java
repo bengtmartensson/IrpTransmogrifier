@@ -67,7 +67,7 @@ public final class XmlTransmogrifier {
         return nodeList;
     }
 
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
+    @SuppressWarnings({"UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})
     public static void main(String[] args) {
         CommandLineArguments commandLineArgs = new CommandLineArguments();
         argumentParser = new JCommander(commandLineArgs);

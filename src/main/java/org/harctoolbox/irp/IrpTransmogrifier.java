@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.transform.TransformerException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.harctoolbox.analyze.NoDecoderMatchException;
@@ -54,7 +53,7 @@ public final class IrpTransmogrifier extends CmdLineProgram {
     /**
      * Configuration file to use if none specified. Taken from main jar file.
      */
-    private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
+    //private static final Logger logger = Logger.getLogger(IrpTransmogrifier.class.getName());
 
     /**
      *

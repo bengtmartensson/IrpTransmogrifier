@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -32,7 +31,7 @@ import org.w3c.dom.Element;
  */
 public abstract class Expression extends PrimaryItem {
 
-    private static final Logger logger = Logger.getLogger(Expression.class.getName());
+    //private static final Logger logger = Logger.getLogger(Expression.class.getName());
     public static final Expression TRUE = newExpression(1L);
     public static final Expression FALSE = newExpression(0L);
 
@@ -114,12 +113,6 @@ public abstract class Expression extends PrimaryItem {
 
     protected Expression(ParseTree ctx) {
         super(ctx);
-    }
-
-    private Expression(ParseTree ctx, ParserDriver parserDriver, Expression old) {
-        super(ctx);
-        this.parserDriver = parserDriver;
-
     }
 
     public String toStringTree() {

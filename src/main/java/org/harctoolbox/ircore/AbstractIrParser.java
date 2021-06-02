@@ -18,11 +18,10 @@ package org.harctoolbox.ircore;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public abstract class AbstractIrParser {
 
-    private final static Logger logger = Logger.getLogger(AbstractIrParser.class.getName());
+    //private final static Logger logger = Logger.getLogger(AbstractIrParser.class.getName());
 
     // IRremote writes spaces after + and -, sigh...
     protected static String fixIrRemoteSilliness(String str) {

@@ -39,7 +39,6 @@ public class ModulatedIrSequenceNGTest {
         System.out.println("clone");
         try {
             ModulatedIrSequence instance = new ModulatedIrSequence(new double[]{1, 3, 4, 5}, 12345d, 0.45);
-            ModulatedIrSequence expResult = null;
             ModulatedIrSequence result = instance.clone();
             assertTrue(result.approximatelyEquals(instance));
         } catch (OddSequenceLengthException ex) {

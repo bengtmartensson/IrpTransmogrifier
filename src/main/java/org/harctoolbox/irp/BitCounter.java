@@ -112,8 +112,9 @@ public final class BitCounter {
     public String toIntSequenceString() {
         List<Integer> list = toIntSequence();
         StringJoiner stringJoiner = new StringJoiner(",");
-        for (Integer len : list)
+        list.forEach(len -> {
             stringJoiner.add(Integer.toString(len));
+        });
         return stringJoiner.toString();
     }
 

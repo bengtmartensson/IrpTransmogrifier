@@ -20,7 +20,6 @@ package org.harctoolbox.cmdline;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.PrintStream;
-import java.util.logging.Logger;
 import org.harctoolbox.irp.IrpDatabase;
 import org.harctoolbox.irp.Version;
 
@@ -29,7 +28,7 @@ import org.harctoolbox.irp.Version;
 @Parameters(commandNames = {"version"}, commandDescription = "Report version and license.")
 public class CommandVersion extends AbstractCommand {
 
-    private static final Logger logger = Logger.getLogger(CommandVersion.class.getName());
+    //private static final Logger logger = Logger.getLogger(CommandVersion.class.getName());
 
     @Parameter(names = {"-s", "--short"}, description = "Issue only the version number of the program proper.")
     @SuppressWarnings("FieldMayBeFinal")

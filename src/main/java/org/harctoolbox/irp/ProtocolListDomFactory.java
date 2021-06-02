@@ -195,6 +195,7 @@ public class ProtocolListDomFactory {
     }
 
     public void add(Decoder.AbstractDecodesCollection<? extends ElementaryDecode> decodes) {
+        @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
         String commandName = "unnamed_" + Integer.toString(counter++);
         add(decodes, commandName);
     }

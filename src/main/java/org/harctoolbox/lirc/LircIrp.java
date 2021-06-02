@@ -210,12 +210,10 @@ public final class LircIrp {
             list.addAll(lengthTwoBareIrStream("foot"));
             list.addAll(ending());
 
-            int outerRepeatMax = Integer.MAX_VALUE;
             Long repeatMin = remote.getUnaryParameters("min_repeat");
             LircRemote.Pair repeatPair = remote.getBinaryParameters("repeat");
             RepeatMarker repeatMarker;
             if ((repeatPair != null && !repeatPair.isTrivial()) || remote.hasFlag("NO_HEAD_REP") || remote.hasFlag("NO_FOOT_REP")) {
-                outerRepeatMax = repeatMin != null ? repeatMin.intValue() : 1;
                 List<IrStreamItem> repeatList = new ArrayList<>(4);
                 if (remote.hasFlag("REPEAT_HEADER"))
                     repeatList.addAll(lengthTwoBareIrStream("header"));

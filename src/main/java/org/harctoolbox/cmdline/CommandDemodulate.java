@@ -21,7 +21,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.ircore.ModulatedIrSequence;
@@ -31,7 +30,7 @@ import org.harctoolbox.ircore.OddSequenceLengthException;
 @Parameters(commandNames = {"demodulate"}, commandDescription = "Demodulate IrSequence given as argument (EXPERIMENTAL).")
 public class CommandDemodulate extends AbstractCommand {
 
-    private static final Logger logger = Logger.getLogger(CommandDemodulate.class.getName());
+    //private static final Logger logger = Logger.getLogger(CommandDemodulate.class.getName());
 
     @Parameter(names = {"-t", "--threshold"}, description = "Threshold used for demodulating, in micro seconds.", converter = NameEngineParser.class)
     @SuppressWarnings("FieldMayBeFinal")

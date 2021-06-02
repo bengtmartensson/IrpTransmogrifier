@@ -31,13 +31,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 @SuppressWarnings("FieldMayBeFinal")
 @Parameters(commandNames = {"help"}, commandDescription = "Describe the syntax of program and commands.")
 public class CommandHelp extends AbstractCommand {
 
-    private static final Logger logger = Logger.getLogger(CommandHelp.class.getName());
+    //private static final Logger logger = Logger.getLogger(CommandHelp.class.getName());
 
     private static String padString(String name, int length) {
         StringBuilder stringBuilder = new StringBuilder(name);

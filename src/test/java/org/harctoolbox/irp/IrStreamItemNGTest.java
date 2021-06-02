@@ -29,29 +29,12 @@ public class IrStreamItemNGTest {
     public void tearDownMethod() throws Exception {
     }
 
-
-    /**
-     * Test of evaluate method, of class IrStreamItem.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testEvaluate() throws Exception {
-        System.out.println("evaluate");
-        BitSpec bitSpec = null;
-        //IrStreamItem instance = newIrStreamItem("10");
-
-        //assertEquals(result, expResult);
-
-    }
-
     /**
      * Test of newIrStreamItem method, of class IrStreamItem.
      */
     @Test
     public void testNewIrStreamItem_String() {
         System.out.println("newIrStreamItem");
-        String str = "";
-        IrStreamItem expResult = null;
         IrStreamItem result = IrStreamItem.newIrStreamItem("42");
         assertTrue(result instanceof Flash);
         result = IrStreamItem.newIrStreamItem("answer=42");

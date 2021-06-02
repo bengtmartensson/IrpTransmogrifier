@@ -18,7 +18,6 @@ package org.harctoolbox.irp;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Logger;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -36,7 +35,7 @@ public abstract class BitField extends IrpObject implements Numerical, EquationS
      * Max length of a BitField in this implementation.
      */
     public static final int MAXWIDTH = Long.SIZE - 1; // = 63
-    private static final Logger logger = Logger.getLogger(BitField.class.getName());
+    //private static final Logger logger = Logger.getLogger(BitField.class.getName());
 
     public static BitField newBitField(String str) {
         return newBitField(new ParserDriver(str));

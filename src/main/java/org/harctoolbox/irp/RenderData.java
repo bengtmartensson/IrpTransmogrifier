@@ -37,9 +37,9 @@ public final class RenderData extends Traverser {
     @Override
     public String toString() {
         StringJoiner joiner = new StringJoiner(";");
-        for (EvaluatedIrStream eis : evaluatedIrStreamList) {
+        evaluatedIrStreamList.forEach(eis -> {
             joiner.add(eis.toString());
-        }
+        });
         return joiner.toString();
     }
 

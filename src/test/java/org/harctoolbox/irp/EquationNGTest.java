@@ -33,6 +33,7 @@ public class EquationNGTest {
      * @throws org.harctoolbox.irp.NameUnassignedException
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testSolve() throws NameUnassignedException {
         System.out.println("solve");
         Expression lhs = Expression.newExpression("c*9/5 + 32");
@@ -51,6 +52,7 @@ public class EquationNGTest {
      * @throws org.harctoolbox.irp.NameUnassignedException
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testSolveFail() throws NameUnassignedException {
         System.out.println("solveFail");
         Expression lhs = Expression.newExpression("32 + c*9/5");
@@ -67,6 +69,7 @@ public class EquationNGTest {
      * @throws org.harctoolbox.irp.ParameterInconsistencyException
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testSolveGraham() throws NameUnassignedException, InvalidNameException, ParameterInconsistencyException {
         System.out.println("solve");
         Expression lhs = Expression.newExpression("H:1:3^H:1:2");
@@ -90,6 +93,7 @@ public class EquationNGTest {
      * @throws org.harctoolbox.irp.ParameterInconsistencyException
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testSolveGraham2() throws NameUnassignedException, InvalidNameException, ParameterInconsistencyException {
         System.out.println("solve");
         Expression lhs = Expression.newExpression("H:1:2^H:1:3");

@@ -75,18 +75,6 @@ public class ParameterSpecsNGTest {
     }
 
     /**
-     * Test of check method, of class ParameterSpecs.
-     */
-    @Test
-    public void testCheck() {
-        System.out.println("check");
-        NameEngine nameEngine = null;
-
-
-
-    }
-
-    /**
      * Test of hasNonStandardParameters method, of class ParameterSpecs.
      */
     @Test

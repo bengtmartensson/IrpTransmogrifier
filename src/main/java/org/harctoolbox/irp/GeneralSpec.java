@@ -75,7 +75,7 @@ public final class GeneralSpec extends IrpObject implements AggregateLister {
      * Copy constructor.
      * @param src
      */
-    private GeneralSpec(GeneralSpec src) {
+    public GeneralSpec(GeneralSpec src) {
         super(src.getParseTree());
         this.bitDirection = src.bitDirection;
         this.unit = src.unit;

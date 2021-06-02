@@ -19,7 +19,6 @@ package org.harctoolbox.analyze;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.IrSequence;
@@ -33,7 +32,7 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
 
 public class CleanerParser extends MultiParser {
 
-    private final static Logger logger = Logger.getLogger(CleanerParser.class.getName());
+    //private final static Logger logger = Logger.getLogger(CleanerParser.class.getName());
     private final double absoluteTolerance;
     private final double relativeTolerance;
     private Cleaner cleaner = null;

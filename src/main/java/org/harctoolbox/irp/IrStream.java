@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
@@ -36,11 +35,10 @@ import org.w3c.dom.Element;
  */
 public final class IrStream extends IrpObject implements IrStreamItem,AggregateLister {
 
-    private static final Logger logger = Logger.getLogger(IrStream.class.getName());
+    //private static final Logger logger = Logger.getLogger(IrStream.class.getName());
 
     private final RepeatMarker repeatMarker; // must not be null!
     private final BareIrStream bareIrStream;
-    //private final ParserRuleContext parseTree;
 
     public IrStream(String str) {
         this(new ParserDriver(str));
@@ -197,7 +195,6 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs, boolean isLast) throws SignalRecognitionException {
         // Don't care to log anything here...
-        Pass pass = null;
         bareIrStream.decode(recognizeData, bitSpecs, isLast);
     }
 

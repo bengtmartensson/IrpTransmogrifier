@@ -310,15 +310,6 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         return bitCodes.stream().anyMatch((bitCode) -> (bitCode.hasExtent()));
     }
 
-    private List<Map<String, Object>> propertiesMap(boolean reverse, GeneralSpec generalSpec, NameEngine nameEngine) {
-        List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
-        bitCodes.stream().map((bitCode) -> bitCode.propertiesMap(generalSpec, nameEngine)).forEach((map) -> {
-            list.add(map);
-        });
-
-        return list;
-    }
-
     Set<String> assignmentVariables() {
         Set<String> list = new HashSet<>(1);
         bitCodes.stream().forEach((bitCode) -> {
@@ -357,16 +348,15 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         }
         if (isStandardBiPhase(new GeneralSpec(), new NameEngine())) {
             map.put("standardBiPhase", true);
-            //try {
-                map.put("biPhaseHalfPeriod", averageDuration(generalSpec, nameEngine));
-            //} catch (IrpException ex) {
-            //}
+            map.put("biPhaseHalfPeriod", averageDuration(generalSpec, nameEngine));
             map.put("biPhaseInverted", bitCodes.get(0).getIrStreamItems().get(0) instanceof Flash);
         }
         map.put("lsbFirst", generalSpec.getBitDirection() == BitDirection.lsb);
         if (numberOfDurations() != null)
             map.put("numberOfDurations", Integer.toString(numberOfDurations()));
-        map.put("list", propertiesMap(false, generalSpec, nameEngine));
+        List<Map<String, Object>> list = new ArrayList<>(bitCodes.size());
+        bitCodes.stream().map((bitCode) -> bitCode.propertiesMap(generalSpec, nameEngine)).forEach(list::add);
+        map.put("list", list);
         return map;
     }
 

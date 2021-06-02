@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.irp.NonUniqueBitCodeException;
 import org.harctoolbox.lirc.LircCommand;
@@ -37,7 +36,7 @@ import org.harctoolbox.lirc.LircRemote;
 @Parameters(commandNames = {"lirc"}, commandDescription = "Convert Lirc configuration files to IRP form.")
 public class CommandLirc extends AbstractCommand {
 
-    private static final Logger logger = Logger.getLogger(CommandLirc.class.getName());
+    //private static final Logger logger = Logger.getLogger(CommandLirc.class.getName());
 
     @Parameter(names = {"-c", "--commands"}, description = "Also list the commands if the remotes.")
     private boolean commands = false;

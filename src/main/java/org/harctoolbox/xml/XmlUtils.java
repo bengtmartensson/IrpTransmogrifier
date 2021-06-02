@@ -190,8 +190,7 @@ public final class XmlUtils {
 
     public static Document openXmlUrl(URL url, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
         URLConnection urlConnection = url.openConnection();
-        try (InputStream in = urlConnection.getInputStream()) {
-            InputStreamReader reader = new InputStreamReader(in);
+        try (InputStreamReader reader = new InputStreamReader(urlConnection.getInputStream(), IrCoreUtils.UTF8)) {
             return openXmlReader(reader, schema, isNamespaceAware, isXIncludeAware);
         }
     }
@@ -348,6 +347,7 @@ public final class XmlUtils {
         }
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static void printDOM(Document doc) {
         try {
             printDOM(System.out, doc, IrCoreUtils.UTF8_NAME, null);

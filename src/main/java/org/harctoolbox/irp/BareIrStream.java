@@ -250,7 +250,6 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         logger.log(recognizeData.logRecordEnter(this));
         int currentLevel = recognizeData.getLevel();
         recognizeData.setLevel(currentLevel + 1);
-        IrSignal.Pass pass = null;
         for (Iterator<IrStreamItem> it = irStreamItems.iterator(); it.hasNext();) {
             IrStreamItem irStreamItem = it.next();
             irStreamItem.decode(recognizeData, bitSpecStack, isLast && !it.hasNext());

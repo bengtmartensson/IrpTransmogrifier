@@ -156,7 +156,6 @@ public class NameEngineNGTest {
     @Test
     public void testToIrpString() {
         System.out.println("toIrpString");
-        String expResult = "";
         String result = instance.toIrpString();
         assertEquals(result, "{A=11,B=22,C=33,D=(A-B),E=(A-(#(C-D))),F=255}");
     }

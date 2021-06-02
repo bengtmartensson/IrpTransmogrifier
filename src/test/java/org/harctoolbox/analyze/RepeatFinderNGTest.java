@@ -70,7 +70,6 @@ public class RepeatFinderNGTest {
     @Test
     public void testFindRepeat_ModulatedIrSequence2() {
         System.out.println("findRepeat2");
-        IrSignal irSignal;
         try {
             int[] arr = new int[]{
                 2336, 646, 572, 621, 1168, 621,
@@ -120,7 +119,6 @@ public class RepeatFinderNGTest {
     @Test
     public void testFindRepeat_ModulatedIrSequence3() {
         System.out.println("findRepeat3");
-        IrSignal irSignal;
         try {
             int[] arr = new int[]{
                 334, 1687, 334, 1687, 334, 2696, 334, 1687, 334, 2696, 334, 5750,

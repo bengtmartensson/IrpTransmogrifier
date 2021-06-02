@@ -570,7 +570,6 @@ public class IrCoreUtilsNGTest {
         List<String> list = new ArrayList<>(10);
         list.add("xyz");
         list.add("78");
-        boolean expResult = false;
         assertFalse(IrCoreUtils.hasDuplicatedElements(list));
         list.add("xyz");
         assertTrue(IrCoreUtils.hasDuplicatedElements(list));

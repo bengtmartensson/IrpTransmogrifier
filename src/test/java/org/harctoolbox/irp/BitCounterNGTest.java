@@ -137,6 +137,7 @@ public class BitCounterNGTest {
      * Test of toIntSequence method, of class BitCounter.
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testToIntSequence() {
         System.out.println("toIntSequence");
         BitCounter bitCounter = new BitCounter(true);

@@ -23,6 +23,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.harctoolbox.ircore.ThisCannotHappenException;
@@ -241,8 +242,9 @@ public class CommandList extends AbstractCommand {
     }
 
     private void listDocumentFragment(PrintStream out, DocumentFragment fragment, boolean quiet, String encoding) throws UnsupportedEncodingException {
+        Objects.requireNonNull(fragment);
         Document document = XmlUtils.wrapDocumentFragment(fragment, "http://www.w3.org/1999/xhtml", "div", "class", "protocol-documentation");
-        if (!/*commandLineArgs.*/quiet && fragment != null)
+        if (! quiet)
             out.print("html=");
         XmlUtils.printHtmlDOM(out, document, encoding);
         out.println();

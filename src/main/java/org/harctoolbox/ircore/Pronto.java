@@ -383,9 +383,5 @@ public abstract class Pronto {
         public NonProntoFormatException(String string, int pos) {
             super("Position " + pos + ": \"" + string + "\" is not a four digit hexadecimal string.");
         }
-
-        private NonProntoFormatException(NumberFormatException ex) {
-            super(ex);
-        }
     }
 }

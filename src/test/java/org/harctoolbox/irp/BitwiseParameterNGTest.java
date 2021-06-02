@@ -37,7 +37,6 @@ public class BitwiseParameterNGTest {
         System.out.println("isConsistentWith");
         long val = 0x1234L;
         BitwiseParameter instance = new BitwiseParameter(0x34, 255);
-        boolean expResult = false;
         assertTrue(instance.isConsistent(val));
         assertTrue(instance.isConsistent(0x1234));
         assertFalse(instance.isConsistent(0x35));
@@ -127,7 +126,6 @@ public class BitwiseParameterNGTest {
     @Test
     public void testIsConsistent_BitwiseParameter() {
         System.out.println("isConsistent");
-        BitwiseParameter parameter = null;
         BitwiseParameter instance = new BitwiseParameter(3, 3);
         assertTrue(instance.isConsistent(new BitwiseParameter(1023)));
         assertFalse(instance.isConsistent(new BitwiseParameter(1024)));

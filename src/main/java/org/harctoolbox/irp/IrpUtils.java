@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.antlr.v4.gui.TreeViewer;
@@ -55,8 +54,6 @@ public final class IrpUtils {
     public final static String IRP_NOTATION_URL = "http://www.hifi-remote.com/wiki/index.php?title=IRP_Notation";
     public final static String DECODEIR_URL = "http://www.hifi-remote.com/wiki/index.php?title=DecodeIR";
     public final static String C_IDENTIFIER_REGEXP = "[A-Za-z_][A-Za-z0-9_]*";
-
-    private final static Level enteringExitingLevel = Level.FINER;
 
     @SuppressWarnings("null")
     public static long variableGet(Map<String, Long> map, String name) {

@@ -186,7 +186,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2020-12-31"
+               version="2021-06-03"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
@@ -309,8 +309,14 @@ ordering is not required but it improves the readability of the entry.
         <irp:documentation xml:space="preserve"><a href="#relaxed">Relaxed version</a> of the Anthem protocol.</irp:documentation>
         <irp:parameter name="decode-only">true</irp:parameter>
         <irp:parameter name="uei-executor" type="xml">
-            <rm:deployment executor="0123[D,S,F:-2:6;F:6]">
+            <rm:deployment executor="0123(Anthem)[D,S,Unit;F:6]">
                 <rm:protocolName>Anthem</rm:protocolName>
+                <rm:commentItem>Non-standard repeats</rm:commentItem>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="0123(Anthem Combo)[D,S;F,Unit]">
+                <rm:protocolName>Anthem Combo</rm:protocolName>
                 <rm:commentItem>Non-standard repeats</rm:commentItem>
             </rm:deployment>
         </irp:parameter>
@@ -1957,10 +1963,8 @@ C3=D:1:2 + #(F&44) + #(D&2)
             <![CDATA[{36k,msb,889}<1,-1|-1,1>((1,~S:1:6,T:1,D:5,-4,S:6,F:6,^114m)*,T=1-T) [D:0..31,S:0..127,F:0..63,T@:0..1=0]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">In Philips' (the creator of the protocol) terminology, "D" is called "System", "S" is called "Command", and F is called "Data".</irp:documentation>
-        <irp:parameter name="uei-executor">00F2[D,S&gt;63;S,F]</irp:parameter>
-        <irp:parameter name="uei-executor">0073[D?0,F&gt;63?0,D?1,F&gt;63?1,D?2,F&gt;63?2,D?3,F&gt;63?3;1,F,,S]</irp:parameter>
-        <irp:parameter name="uei-executor">00F2[D,S:1:6;S:6,F]</irp:parameter>
-        <irp:parameter name="uei-executor">0073[D?0,F:1:6?0,D?1,F:1:6?1,D?2,F:1:6?2,D?3,F:1:6?3;1,F:6,,S]</irp:parameter>
+        <irp:parameter name="uei-executor">00F2[D,S:1:6;S:6,F:6]</irp:parameter>
+        <irp:parameter name="uei-executor">0073[D?0,S:1:6?0,D?1,S:1:6?1,D?2,S:1:6?2,D?3,S:1:6?3;1,F:6,,??,S:6]</irp:parameter>
         <irp:parameter name="relative-tolerance">0.1</irp:parameter>
     </irp:protocol>
 
@@ -2548,41 +2552,82 @@ C3=D:1:2 + #(F&44) + #(D&2)
         </irp:documentation>
     </irp:protocol>
 
-    <irp:protocol name="X10">
+    <irp:protocol name="X10-command">
         <irp:irp>
-            <![CDATA[{40.8k,565}<2,-12|7,-7>(7,-7,F:5,~F:5,21,-7)*[F:0..31]]]>
+            <![CDATA[{38.4k,570}<2,-12|7,-7>(7,-7,C:4,1:1,~C:4,0:1,21,-7)*[C:0..15]]]>
         </irp:irp>
-        <irp:documentation xml:space="preserve">X10 and <a href="#X10.n">X10.n</a>  are two variants of the same home automation protocol.
-            They differ in that X10.<i>n</i> has a distinctive start frame that carries a sequence number,
-            the <i>n</i> of the protocol name, in addition to F.
-            The repeat frames, and all frames of the X10 version, only carry the F.
-            The value of <i>n</i> runs from 0 to 15 (or some lower value) and then restarts again at 0.
-            It is incremented on each successive keypress.
-            A valid X10.<i>n</i> signal must have at least one repeat frame.
+        <irp:documentation xml:space="preserve">This protocol is used to send X10 command codes to an IR543 receiver or compatible device.
         </irp:documentation>
-        <irp:parameter name="uei-executor">01DF</irp:parameter>
+        <irp:parameter name="prefer-over">X10.n</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01DF(;G:1:4==0){G=8*C:1|4*C:1:1|2*C:1:2|C:1:3,C=-1}[;G+16]">
+                <rm:protocolName>X10</rm:protocolName>
+                <rm:translator target="G">Cmd=all off|all lights on|turn on|turn off|dim|brighten|all lights off|(reserved)|
+                    hail req|hail ack|preset dim|cmd11|cmd12|status is on|status is off|status req</rm:translator>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="003F(;G:1:4==0){G=C,C=-1}[;G+16]">
+                <rm:protocolName>X10.n</rm:protocolName>
+            </rm:deployment>
+        </irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="X10-device">
+        <irp:irp>
+            <![CDATA[{38.4k,570}<2,-12|7,-7>(7,-7,D:4,0:1,~D:4,1:1,21,-7)*[D:0..15]]]>
+        </irp:irp>
+        <irp:documentation xml:space="preserve">This protocol is used to send X10 device (unit) selection codes to an IR543 receiver
+            or compatible device.
+            Devices are numbered from 1 to 16.
+        </irp:documentation>
+        <irp:parameter name="prefer-over">X10.n</irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01DF(;G:1:4==0){A=(10*D:1:2)^(D&amp;10),G=(D&amp;5|A&amp;10)^12,A=-1,D=-1}[;G]">
+                <rm:protocolName>X10</rm:protocolName>
+                <rm:translator target="G">DevNbr=1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16</rm:translator>
+            </rm:deployment>
+        </irp:parameter>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="003F(;G:1:4==0){G=D,D=-1}[;G]">
+                <rm:protocolName>X10.n</rm:protocolName>
+            </rm:deployment>
+        </irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="X10-house">
+        <irp:irp>
+            <![CDATA[{38.4k,570}<2,-12|7,-7>(7,-7,H:4,~H:4,21,-7)*[H:0..15]]]>
+        </irp:irp>
+        <irp:documentation xml:space="preserve">This protocol is used to send a house code to an IR543AH receiver or compatible device.
+            More basic X10 receivers such as the IR543 do not accept the house code as an IR signal.
+            The house code is a letter in the range A-P.
+        </irp:documentation>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01FF:JP1X10H{A=(10*H:1:2)^(H&amp;10),G=(H&amp;5|A&amp;10)^12,A=-1,H=-1}[;G]">
+                <rm:protocolName>X10H</rm:protocolName>
+                <rm:translator target="G">HouseCode=A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P</rm:translator>
+            </rm:deployment>
+        </irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="X10.n">
         <irp:irp>
             <![CDATA[{40.8k,565}<2,-12|7,-7>(F:5,N:-4,21,-7,(7,-7,F:5,~F:5,21,-7)+,N=(N+1)%16)[F:0..31,N@:0..15=0]]]>
         </irp:irp>
-        <irp:documentation xml:space="preserve">See <a href="#X10">X10</a>.
+        <irp:documentation xml:space="preserve">
+            This protocol is a UEI version of the protocol used to send X10 device (unit) and command codes to an
+            IR543 receiver or compatible device.
+            This protocol sends a non-functional first frame that is ignored by the receiver before sending the true X10 signal.
+            The true X10 signal is that of the X10-device and X10-command protocols.
+            For receivers that accept the house code as an IR signal, the X10-house protocol is used to send that value.
         </irp:documentation>
-        <irp:parameter name="uei-executor">003F</irp:parameter>
         <irp:parameter name="reject-repeatless">true</irp:parameter>
-    </irp:protocol>
-
-    <irp:protocol name="X10_18">
-        <irp:irp>
-            <![CDATA[{40.8k,565}<2,-12|7,-7>(7,-7,F:9,~F:9,21,-7)*[F:0..511]]]>
-        </irp:irp>
-    </irp:protocol>
-
-    <irp:protocol name="X10_8">
-        <irp:irp>
-            <![CDATA[{40.8k,565}<2,-12|7,-7>(7,-7,F:4,~F:4,21,-7)*[F:0..15]]]>
-        </irp:irp>
+        <irp:parameter name="uei-executor" type="xml">
+            <rm:deployment executor="01DF">
+                <rm:commentItem>Has non-functional first frame</rm:commentItem>
+            </rm:deployment>
+        </irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="Xiaomi">

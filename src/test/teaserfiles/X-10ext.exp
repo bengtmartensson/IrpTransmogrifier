@@ -1,65 +1,65 @@
-unnamed_0:	
+unnamed_0:		X10-device: {D=3},	beg=0, end=47, reps=2
 48:	
 E1:	
 4B:	
-Preset 1:	
-Preset 2:	
+Preset 1:		X10-command: {C=5},	beg=0, end=23, reps=1
+Preset 2:		X10-command: {C=13},	beg=0, end=23, reps=1
 A5:	
 0F:	
 Cmnd 49:	
 96:	
-Lights On:	
-10:	
-11:	
-12:	
+Lights On:		X10-command: {C=8},	beg=0, end=23, reps=1
+10:		X10-device: {D=15},	beg=0, end=47, reps=2
+11:		X10-device: {D=12},	beg=0, end=47, reps=2
+12:		X10-device: {D=13},	beg=0, end=47, reps=2
 56:	
-13:	
-14:	
-15:	
+13:		X10-device: {D=0},	beg=0, end=47, reps=2
+14:		X10-device: {D=1},	beg=0, end=47, reps=2
+15:		X10-device: {D=2},	beg=0, end=47, reps=2
 16:	
 F0:	
 5A:	
 0:	
-1:	
-?Bright :	
-2:	
+1:		X10-device: {D=6},	beg=0, end=47, reps=2
+?Bright:		X10-command: {C=10},	beg=0, end=95, reps=4
+2:		X10-device: {D=7},	beg=0, end=47, reps=2
 B4:	
-3:	
-4:	
+3:		X10-device: {D=4},	beg=0, end=47, reps=2
+4:		X10-device: {D=5},	beg=0, end=47, reps=2
 1E:	
-5:	
-6:	
-7:	
+5:		X10-device: {D=8},	beg=0, end=47, reps=2
+6:		X10-device: {D=9},	beg=0, end=47, reps=2
+7:		X10-device: {D=10},	beg=0, end=47, reps=2
 8:	
-9:	
+9:		X10-device: {D=14},	beg=0, end=47, reps=2
 63:	
-  ? Dim:	
-Units Off:	
-A:	
-B:	
+? Dim:		X10-command: {C=2},	beg=0, end=95, reps=4
+Units Off:		X10-command: {C=0},	beg=0, end=23, reps=1
+A:		X10-house: {H=6},	beg=0, end=39, reps=2
+B:		X10-house: {H=7},	beg=0, end=39, reps=2
 24:	
-C:	
+C:		X10-house: {H=4},	beg=0, end=39, reps=2
 69:	
-D:	
-E:	
-F:	
-G:	
-?Off:	
-H:	
-I:	
-J:	
-K:	
-L:	
-M:	
-N:	
-O:	
-P:	
+D:		X10-house: {H=5},	beg=0, end=39, reps=2
+E:		X10-house: {H=8},	beg=0, end=39, reps=2
+F:		X10-house: {H=9},	beg=0, end=39, reps=2
+G:		X10-house: {H=10},	beg=0, end=39, reps=2
+?Off:		X10-command: {C=12},	beg=0, end=23, reps=1
+H:		X10-house: {H=11},	beg=0, end=39, reps=2
+I:		X10-house: {H=14},	beg=0, end=39, reps=2
+J:		X10-house: {H=15},	beg=0, end=39, reps=2
+K:		X10-house: {H=12},	beg=0, end=39, reps=2
+L:		X10-house: {H=13},	beg=0, end=39, reps=2
+M:		X10-house: {H=0},	beg=0, end=39, reps=2
+N:		X10-house: {H=1},	beg=0, end=39, reps=2
+O:		X10-house: {H=2},	beg=0, end=39, reps=2
+P:		X10-house: {H=3},	beg=0, end=39, reps=2
 C3:	
 2D:	
 32:	
 78:	
 D2:	
 3C:	
-?On:	
+?On:		X10-command: {C=4},	beg=0, end=23, reps=1
 40:	
 87:	

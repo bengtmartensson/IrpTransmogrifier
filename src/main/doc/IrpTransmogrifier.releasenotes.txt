@@ -3,10 +3,20 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
-202*-*-*: Version 1.2.10
+2021-06-??: Version 1.2.10. This version is considered "Long Time Stable".
 
+* Many small or internal fixes to the API, wrappers, tests, documentation, the build process.
+* Added xpath processing to XmlTransmogrifier.
+* Clarified Variations and remote marker; some constructs now disallowed, #200.
+* New options --xml.
+* Fixed broken xinclude, #199.
+* Updated X10 protocols (mostly by Graham).
+* Updated Apple protocol.
+
+===============================================================================
 Version 1.2.9: There is no version 1.2.9.
 
+===============================================================================
 2020-09-17: Version 1.2.8
 
 * Support commitId in Version. Given out from "version" command.

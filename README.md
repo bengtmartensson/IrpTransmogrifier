@@ -64,7 +64,8 @@ are recognizable.  It is not guaranteed that new protocols automatically will be
 #### Loose matches, Guessing
 Many captured signals are not quite correct according to their protocol. However, the firmware in a receiving device is often "forgiving",
 and accepts slightly flawed signals. It is thus desirable for a program of this type to find a near match, "guess", when an real match fails.
-The program currently does not implement this, however, it is [planned](https://github.com/bengtmartensson/IrpTransmogrifier/issues/42).
+This is known as loose mode, opposite of "strict" mode. For practical reasons, the loose mode is the default in the command line usage.
+The strict mode is enabled using the decode option `--strict`.
 
 ### Code generation for rendering and/or decoding
 For a particular protocol, generate target code (C, C++, Java, Python,...) that can render or decode signals
@@ -425,7 +426,8 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             HTML documenation.
             Default: false
           -d, --dump
-            Print the IRP data base as DOC tree stringified.
+            Print the IRP data base as DOC tree stringified, including initial
+            XML comments.
             Default: false
           -h, -?, --help
             Print help for this command.
@@ -446,7 +448,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             List the normal form.
             Default: false
           --prefer-overs
-            List all protocol's prefer-overs, recursively
+            List all protocol's prefer-overs, recursively.
             Default: false
           -r, --radix
             Radix of parameter output.
@@ -459,6 +461,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -w, --weight
             Compute weight of the protocols.
+            Default: false
+          -x, --xml
+            Like dump, but without XML comments.
             Default: false
 
     render      Render signal from parameters
@@ -680,7 +685,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
           -s, --stdirectory
             Directory containing st (string template) files for code
             generation.
-            Default: /home/bengt/harctoolbox/IrpTransmogrifier/src/main/st
+            Default: st
         * -t, --target
             Target(s) for code generation. Use ? for a list.
             Default: []

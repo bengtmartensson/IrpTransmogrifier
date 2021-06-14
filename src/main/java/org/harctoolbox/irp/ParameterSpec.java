@@ -173,7 +173,7 @@ public final class ParameterSpec extends IrpObject {
 
     public long random(Random rng) {
         long interval = getMax() - getMin() + 1;
-        return interval <= Integer.MAX_VALUE ? randomSimple(rng) : randomHairy(rng);
+        return (interval <= Integer.MAX_VALUE && interval > 0) ? randomSimple(rng) : randomHairy(rng);
     }
 
     private long randomSimple(Random rng) {

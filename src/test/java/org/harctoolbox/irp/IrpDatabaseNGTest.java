@@ -1,6 +1,7 @@
 package org.harctoolbox.irp;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.DocumentFragment;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class IrpDatabaseNGTest {
@@ -377,5 +379,18 @@ public class IrpDatabaseNGTest {
         result = instance.render("RC5", params);
         str = Pronto.toString(result);
         assertEquals(str, "0000 0073 0000 000D 0020 0020 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0CC8");
+    }
+
+    @Test
+    public void testSetDocumentation() throws Exception {
+        IrpDatabase db = new IrpDatabase(CONFIGFILE);
+        String protoname = "akord";
+        String expected = "Protocol found in Akord HDMI switches. Similar to NEC1, but with different timing. "
+          + "See [forum thread](http://www.hifi-remote.com/forums/viewtopic.php?p=137873).";
+        String doc = db.getDocumentation(protoname);
+        String netsi = "Nobody expects the spanish inquisition!";
+        db.setDocumentation(protoname, netsi);
+        doc = db.getDocumentation(protoname);
+        assertEquals(doc, netsi);
     }
 }

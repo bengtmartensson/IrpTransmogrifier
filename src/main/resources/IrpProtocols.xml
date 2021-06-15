@@ -658,6 +658,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:parameter name="frequency-tolerance">1000</irp:parameter>
         <irp:parameter name="prefer-over">DirecTV_P2</irp:parameter>
         <irp:parameter name="prefer-over">DirecTV_3FG</irp:parameter>
+        <irp:parameter name="alt_name">DirecTV</irp:parameter>
         <irp:parameter name="uei-executor" type="xml">
             <rm:deployment executor="0162{Parm=3}[D,Parm;F]">
                 <rm:protocolName>DirecTV</rm:protocolName>

@@ -2551,6 +2551,134 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:parameter name="uei-executor">0111:2byte[D,S,U;F]</irp:parameter>
     </irp:protocol>
 
+    <irp:protocol name="Tivo unit=0">
+        <irp:irp>
+            <![CDATA[Tivo{U=0}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=1">
+        <irp:irp>
+            <![CDATA[Tivo{U=1}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=10">
+        <irp:irp>
+            <![CDATA[Tivo{U=10}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=11">
+        <irp:irp>
+            <![CDATA[Tivo{U=11}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=12">
+        <irp:irp>
+            <![CDATA[Tivo{U=12}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=13">
+        <irp:irp>
+            <![CDATA[Tivo{U=13}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=14">
+        <irp:irp>
+            <![CDATA[Tivo{U=14}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=15">
+        <irp:irp>
+            <![CDATA[Tivo{U=15}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=2">
+        <irp:irp>
+            <![CDATA[Tivo{U=2}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=3">
+        <irp:irp>
+            <![CDATA[Tivo{U=3}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=4">
+        <irp:irp>
+            <![CDATA[Tivo{U=4}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=5">
+        <irp:irp>
+            <![CDATA[Tivo{U=5}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=6">
+        <irp:irp>
+            <![CDATA[Tivo{U=6}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=7">
+        <irp:irp>
+            <![CDATA[Tivo{U=7}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=8">
+        <irp:irp>
+            <![CDATA[Tivo{U=8}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Tivo unit=9">
+        <irp:irp>
+            <![CDATA[Tivo{U=9}[D:133..133=133,S:48..48=48,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>Kludge protocol for compatibility with DecodeIR and irdb.</irp:documentation>
+        <irp:parameter name="decodable">false</irp:parameter>
+    </irp:protocol>
+
     <irp:protocol name="Velleman">
         <irp:irp>
             <![CDATA[{38k,msb}<700,-5060|700,-7590>(1:1,T:1,D:3,F:6,700,-55m)* [D:0..7,F:0..63,T@:0..1=0]]]>

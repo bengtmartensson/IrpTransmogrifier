@@ -378,4 +378,21 @@ public class IrpDatabaseNGTest {
         str = Pronto.toString(result);
         assertEquals(str, "0000 0073 0000 000D 0020 0020 0020 0020 0040 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0020 0CC8");
     }
+
+    /**
+     * Test of expandAlias method, of class IrpDatabase.
+     */
+    @Test
+    public void testExpandAlias() throws Exception {
+        System.out.println("expandAlias");
+        String protocol = "Motorola";
+        String expResult = "Blaupunkt";
+        String result = instance.expandAlias(protocol);
+        assertEquals(result, expResult);
+
+        protocol = "halleluja";
+        expResult = "halleluja";
+        result = instance.expandAlias(protocol);
+        assertEquals(result, expResult);
+    }
 }

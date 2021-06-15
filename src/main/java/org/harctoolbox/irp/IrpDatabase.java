@@ -506,7 +506,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
     }
 
     public String expandAlias(String protocol) {
-        return isAlias(protocol) ? aliases.get(protocol.toLowerCase(Locale.US)) : protocol;
+        String expanded = aliases.get(protocol.toLowerCase(Locale.US));
+        return expanded != null ? expanded : protocol;
     }
 
     public boolean isKnown(String protocol) {
@@ -856,16 +857,17 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
 
     private void buildAliases(UnparsedProtocol proto) {
         List<String> altNameList = proto.getProperties(ALT_NAME_NAME);
-        if (altNameList == null)
+        if (altNameList == null || altNameList.isEmpty())
             return;
-        String nameLower = proto.getName().toLowerCase(Locale.US);
+
+        String realName = proto.getName();
         altNameList.stream().map((altName) -> {
             String old = aliases.get(altName.toLowerCase(Locale.US));
-            if (old != null && !old.equals(nameLower))
+            if (old != null && !old.equals(realName))
                 logger.log(Level.WARNING, "alt_name \"{0}\" defined more than once, to different targets. Keeping the last.", altName);
             return altName;
         }).forEachOrdered((altName) -> {
-            aliases.put(altName.toLowerCase(Locale.US), proto.getName().toLowerCase(Locale.US));
+            aliases.put(altName.toLowerCase(Locale.US), realName);
         });
     }
 

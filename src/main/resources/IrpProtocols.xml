@@ -1723,7 +1723,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
         </irp:irp>
         <irp:documentation xml:space="preserve">The Nokia32 protocol is one variation of the RCMM 1.5 protocol developed by Philips.
             RCMM refers to X as "System" and to D:2,S:4:4 as "Customer".
-            The parameters have been taken from <a href="http://www.sbprojects.com/knowledge/ir/rcmm.php">SB-projects</a>.
+            The parameters have been taken from <a href="https://www.sbprojects.net/knowledge/ir/rcmm.php">SB-projects</a>.
         </irp:documentation>
         <irp:parameter name="absolute-tolerance">50</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
@@ -1787,7 +1787,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
             <![CDATA[{500,38k,25%}<-1,1|1,-1>(1,-5,1:1,254:8,255:8,-28, (1,-5,1:1,F:8,D:8,-220)*, 1,-5,1:1,254:8,255:8,-200)[D:0..255,F:0..255]]]>
         </irp:irp>
         <irp:documentation xml:space="preserve">Taken from <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=1044">John Fine's contribution</a> (fixed),
-            modified for the setup <a href="http://www.sbprojects.com/knowledge/ir/nrc17.php">here</a>.
+            modified for the setup <a href="https://www.sbprojects.net/knowledge/ir/nrc17.php">here</a>.
         </irp:documentation>
         <irp:parameter name="uei-executor">00BD:2[D;F]</irp:parameter>
         <irp:parameter name="uei-executor">00BD[D,F:1:7;F:8]</irp:parameter>

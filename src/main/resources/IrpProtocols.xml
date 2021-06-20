@@ -1692,6 +1692,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
             RCMM refers to X as "System" and to D:2,S:4:4 as "Customer".
             The parameters have been taken from <a href="https://www.sbprojects.net/knowledge/ir/rcmm.php">SB-projects</a>.
         </irp:documentation>
+        <irp:parameter name="alt_name">RCMM32</irp:parameter>
         <irp:parameter name="absolute-tolerance">50</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
         <irp:parameter name="prefer-over">Nokia32_endframe</irp:parameter>

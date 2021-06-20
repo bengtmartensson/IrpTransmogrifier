@@ -301,19 +301,19 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
         });
     }
 
-    public void patch(Reader reader) throws IOException, SAXException {
+    public void patch(Reader reader) throws IOException, SAXException, IrpParseException {
         patch(openXmlReader(reader));
     }
 
-    public void patch(File file) throws IOException, SAXException {
+    public void patch(File file) throws IOException, SAXException, IrpParseException {
         patch(openXmlFile(file));
     }
 
-    public void patch(String file) throws IOException, SAXException {
+    public void patch(String file) throws IOException, SAXException, IrpParseException {
         patch(new File(file));
     }
 
-    public void patch(Document document) {
+    public void patch(Document document) throws IrpParseException {
         Element root = document.getDocumentElement();
         NamedNodeMap attributes = root.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++) {
@@ -353,6 +353,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
                     break;
             }
         }
+        expand();
+        rebuildAliases();
     }
 
     private void patchProtocols(Element protocols) {

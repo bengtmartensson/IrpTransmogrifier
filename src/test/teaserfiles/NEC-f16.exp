@@ -25,8 +25,8 @@ Left:		NEC1-f16: {D=134,E=114,F=2,S=228},	beg=0, end=75, reps=2
 Right:		NEC1-f16: {D=134,E=116,F=2,S=228},	beg=0, end=71, reps=1
 Enter:		NEC1-f16: {D=134,E=115,F=2,S=228},	beg=0, end=75, reps=2
 Escape:		NEC1-f16: {D=134,E=117,F=2,S=228},	beg=0, end=75, reps=2
-Play:		NEC1-y1: {D=134,F=2,S=228},	beg=0, end=79, reps=3
-Stop:		NEC1-y3: {D=134,F=2,S=228},	beg=0, end=75, reps=2
+Play:		NEC1-Yamaha: {D=134,F=2,S=228,Y=1},	beg=0, end=79, reps=3
+Stop:		NEC1-Yamaha: {D=134,F=2,S=228,Y=3},	beg=0, end=75, reps=2
 Pause:		NEC1-f16: {D=134,E=126,F=2,S=228},	beg=0, end=75, reps=2
 Rewind:		NEC1-f16: {D=134,E=120,F=2,S=228},	beg=0, end=75, reps=2
 FastForward:		NEC1-f16: {D=134,E=123,F=2,S=228},	beg=0, end=75, reps=2

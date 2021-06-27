@@ -1,4 +1,4 @@
-Scene 1 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-y1: {D=122,F=0},	beg=0, end=67
-Scene 2 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-y1: {D=122,F=3},	beg=0, end=67
-Scene 3 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-y1: {D=122,F=6},	beg=0, end=67
-Scene 4 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-y1: {D=122,F=9},	beg=0, end=67
+Scene 1 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-Yamaha: {D=122,F=0,Y=1},	beg=0, end=67
+Scene 2 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-Yamaha: {D=122,F=3,Y=1},	beg=0, end=67
+Scene 3 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-Yamaha: {D=122,F=6,Y=1},	beg=0, end=67
+Scene 4 button for Yamaha htr5063.  Protocol appears to be the same one Rob worked out for his "gap helper" upgrade.  Any idea what the EFC or OBC would be?:		NEC1-Yamaha: {D=122,F=9,Y=1},	beg=0, end=67

@@ -3,8 +3,12 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
-2021-06-??: Version 1.2.10. This version is considered "Long Time Stable".
+2021-06-27: Version 1.2.10. This version is considered "Long Time Stable".
 
+* New protocols NEC-Yamaha and NEC1-Yamaha.
+* Make RCMM32 an alias to Nokia32.
+* Merge protocol fixes from rmProtocols.xml of RMIR, latest snapshot. #208.
+* Make DirecTV an alias to DirecTV_P3. #206.
 * Many small or internal fixes to the API, wrappers, tests, documentation, the build process.
 * Added xpath processing to XmlTransmogrifier.
 * Clarified Variations and remote marker; some constructs now disallowed, #200.

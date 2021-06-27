@@ -24,5 +24,6 @@ Checklist for release (for maintainer)
     to harctoolbox.org.
 12. make clean.
 13. (If applicable) Close Milestones etc.
+14. Set version to *.*.*-SNAPSHOT.
 
 Problems with deployment: log in to oss.sonatype.org (Jira id), examine "Staging repositories".

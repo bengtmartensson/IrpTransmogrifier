@@ -626,6 +626,17 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
         return prot.getHtmlDocumentation();
     }
 
+    public void setDocumentation(String protocolName, String string) throws UnknownProtocolException {
+        setDocumentation(protocolName, XmlUtils.stringToDocumentFragment(string));
+    }
+
+    public void setDocumentation(String protocolName, DocumentFragment fragment) throws UnknownProtocolException {
+        UnparsedProtocol prot = getUnparsedProtocol(protocolName);
+        List<DocumentFragment> list = new ArrayList<>(1);
+        list.add(fragment);
+        prot.setXmlProperties(DOCUMENTATION_NAME, list);
+    }
+
     public String getDocumentationExpandAlias(String protocolName) throws UnknownProtocolException {
         return getDocumentation(expandAlias(protocolName));
     }

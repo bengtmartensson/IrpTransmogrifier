@@ -1,6 +1,7 @@
 package org.harctoolbox.irp;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.DocumentFragment;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class IrpDatabaseNGTest {
@@ -394,5 +396,16 @@ public class IrpDatabaseNGTest {
         expResult = "halleluja";
         result = instance.expandAlias(protocol);
         assertEquals(result, expResult);
+    }
+
+    @Test
+    public void testSetDocumentation() throws Exception {
+        IrpDatabase db = new IrpDatabase(CONFIGFILE);
+        String protoname = "akord";
+        String doc = db.getDocumentation(protoname);
+        String netsi = "Nobody expects the spanish inquisition!";
+        db.setDocumentation(protoname, netsi);
+        doc = db.getDocumentation(protoname);
+        assertEquals(doc, netsi);
     }
 }

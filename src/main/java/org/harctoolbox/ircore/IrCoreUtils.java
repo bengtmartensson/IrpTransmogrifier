@@ -478,7 +478,7 @@ public final class IrCoreUtils {
         if (special && (s.equals("*") || s.equals("'*'")))
             return ALL; // Just to help Windows' victims, who cannot otherwise pass a *.
         //s.equals("#") ? some :
-        return parseWithPrefix(str, defaultRadix);
+        return parseWithPrefix(s, defaultRadix);
     }
 
     public static long parseWithPrefix(String s, int defaultRadix) {

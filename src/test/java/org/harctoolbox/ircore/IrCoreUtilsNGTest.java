@@ -732,4 +732,17 @@ public class IrCoreUtilsNGTest {
         } catch (UnsupportedEncodingException ex) {
         }
     }
+
+    /**
+     * Test of parseLong method, of class IrCoreUtils.
+     */
+    @Test
+    public void testParseLong_String_boolean() {
+        System.out.println("parseLong");
+        String str = "123..456";
+        boolean special = true;
+        long expResult = 123L;
+        long result = IrCoreUtils.parseLong(str, special);
+        assertEquals(result, expResult);
+    }
 }

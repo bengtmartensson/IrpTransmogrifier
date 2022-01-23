@@ -186,7 +186,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2021-06-27"
+               version="2022-01-23"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 

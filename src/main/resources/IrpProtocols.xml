@@ -75,9 +75,9 @@ for example with missing parts or non-matching checksums.
 
 The following define protocol-private values of otherwise global parameters:
 
-absolutetolerance
+absolute-tolerance
     See Numerical equality between durations. Current default: 100.0.
-relativetolerance
+relative-tolerance
     See Numerical equality between durations. Current default: 0.3.
 frequency-tolerance
     Tolerance in Hz for frequency comparisons. Set to -1 to disable frequency check. Current default: 2000.0.
@@ -570,7 +570,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
                 <li>Parm=5 : 57k, -50</li>
             </ul>
         </irp:documentation>
-        <irp:parameter name="min-leadout">7000</irp:parameter>
+        <irp:parameter name="minimum-leadout">7000</irp:parameter>
         <irp:parameter name="frequency-tolerance">1000</irp:parameter>
         <irp:parameter name="prefer-over">DirecTV_3FG</irp:parameter>
         <irp:parameter name="uei-executor" type="xml">
@@ -626,7 +626,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
                 <li>Parm=5 : 57k, -50</li>
             </ul>
         </irp:documentation>
-        <irp:parameter name="min-leadout">7000</irp:parameter>
+        <irp:parameter name="minimum-leadout">7000</irp:parameter>
         <irp:parameter name="frequency-tolerance">1000</irp:parameter>
         <irp:parameter name="prefer-over">DirecTV_3FG</irp:parameter>
         <irp:parameter name="uei-executor" type="xml">
@@ -684,7 +684,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
                 <li>Parm=5 : 57k, -50</li>
             </ul>
         </irp:documentation>
-        <irp:parameter name="min-leadout">7000</irp:parameter>
+        <irp:parameter name="minimum-leadout">7000</irp:parameter>
         <irp:parameter name="frequency-tolerance">1000</irp:parameter>
         <irp:parameter name="prefer-over">DirecTV_3FG</irp:parameter>
         <irp:parameter name="uei-executor" type="xml">
@@ -1474,7 +1474,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="NEC1">
         <!--irp:parameter name="prefer-over">NEC1-f16</irp:parameter-->
-        <!--irp:parameter name="frequencyTolerance">100</irp:parameter>
+        <!--irp:parameter name="frequency-tolerance">100</irp:parameter>
         <irp:parameter name="relative-tolerance">0.04</irp:parameter>
         <irp:parameter name="absolute-tolerance">20</irp:parameter-->
         <irp:irp>

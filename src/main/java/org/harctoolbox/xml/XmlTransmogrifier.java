@@ -123,7 +123,7 @@ public final class XmlTransmogrifier {
                 XmlUtils.printDOM(out, doc, commandLineArgs.encoding, stylesheet, new HashMap<>(0), false);
             }
         } catch (SAXException | IOException | TransformerException | XPathExpressionException ex) {
-            ex.printStackTrace();
+            System.err.println(ex.getMessage());
             System.exit(IrpUtils.EXIT_FATAL_PROGRAM_FAILURE);
         }
         System.exit(IrpUtils.EXIT_SUCCESS);
@@ -157,7 +157,7 @@ public final class XmlTransmogrifier {
         @Parameter(names = {"--xslt"}, description = "URL/filename of stylesheet")
         private String stylesheet = null;
 
-        @Parameter(required = true, description = "URL/Filename or - for stdin")
+        @Parameter(required = true, description = "Input URL/Filename or - for stdin. Will be validated if a --schema argument is given.")
         private String argument = "-";
     }
 

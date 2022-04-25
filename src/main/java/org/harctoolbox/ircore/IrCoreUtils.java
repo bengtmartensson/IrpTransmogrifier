@@ -284,8 +284,13 @@ public final class IrCoreUtils {
         return n == Long.SIZE ? -1L : (1L << n) - 1;
     }
 
+    /**
+     * Makes a C identifier of the argument.
+     * @param name
+     * @return its argument made C friendly
+     */
     public static String toCName(String name) {
-        String newName = name.replaceAll("[^0-9A-Za-z_]", "");
+        String newName = name.replaceAll("[^0-9A-Za-z_]", "_");
         return newName.matches("\\d.*") ? ("X" + newName) : newName;
     }
 

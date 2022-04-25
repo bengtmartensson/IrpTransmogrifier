@@ -93,9 +93,15 @@ public final class IrpUtils {
         return prefix + map.get(name) + postfix;
     }
 
+    // Keep for now for compatibility reasons; nuke sometimes later
+    /**
+     * Makes a C identifier of the argument.
+     * @deprecated Use IrCoreUtils.toCName instead
+     * @param s
+     * @return its argument made C friendly
+     */
     public static String toCIdentifier(String s) {
-        String rep = s.replaceAll("[^_0-9a-zA-Z]", "_");
-        return rep.matches("^\\d.*$") ? ("x" + rep) : rep;
+        return IrCoreUtils.toCName(s);
     }
 
     static Map<String, Object> propertiesMap(int noProps, Object object) {

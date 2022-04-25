@@ -1,7 +1,6 @@
 package org.harctoolbox.irp;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.w3c.dom.DocumentFragment;
-import org.xml.sax.SAXException;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class IrpDatabaseNGTest {
@@ -145,32 +143,6 @@ public class IrpDatabaseNGTest {
         } catch (UnknownProtocolException ex) {
         }
         assertEquals(instance.getNameExpandAlias("rc6-6-32"), "MCE");
-    }
-
-    /**
-     * Test of getCName method, of class IrpDatabase.
-     * @throws org.harctoolbox.irp.UnknownProtocolException
-     */
-    @Test
-    public void testGetCName() throws UnknownProtocolException {
-        System.out.println("getCName");
-        String name = "48-nec1";
-        String expResult = "x48_NEC1";
-        String result = instance.getCName(name);
-        assertEquals(result, expResult);
-    }
-
-    /**
-     * Test of getCName method, of class IrpDatabase.
-     * @throws org.harctoolbox.irp.UnknownProtocolException
-     */
-    @Test
-    public void testGetCName1() throws UnknownProtocolException {
-        System.out.println("getCName1");
-        String name = "B&O repeat";
-        String expResult = "B_O_repeat";
-        String result = instance.getCName(name);
-        assertEquals(result, expResult);
     }
 
     /**

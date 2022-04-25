@@ -484,10 +484,12 @@ public class IrCoreUtilsNGTest {
     @Test
     public void testToCName() {
         System.out.println("toCName");
-        String name = "Donald J. Trump";
-        String expResult = "DonaldJTrump";
-        String result = IrCoreUtils.toCName(name);
-        assertEquals(result, expResult);
+        assertEquals("xyz0",   IrCoreUtils.toCName("xyz0"));
+        assertEquals("X0xyz0", IrCoreUtils.toCName("0xyz0"));
+        assertEquals("xy_z0",  IrCoreUtils.toCName("xy$z0"));
+        assertEquals("xyzA0",  IrCoreUtils.toCName("xyzA0"));
+        assertEquals("xyz0_",  IrCoreUtils.toCName("xyz0ä"));
+        assertEquals("xyz0_x", IrCoreUtils.toCName("xyz0\tx"));
     }
 
     /**

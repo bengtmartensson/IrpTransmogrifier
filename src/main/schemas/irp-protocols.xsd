@@ -61,7 +61,6 @@
                 </xs:choice>
             </xs:sequence>
             <xs:attributeGroup ref="name"/>
-            <xs:attributeGroup ref="c-name"/>
             <xs:attributeGroup ref="usable"/>
         </xs:complexType>
     </xs:element>
@@ -119,14 +118,6 @@
             <xs:documentation>Name of a protocol or parameter. May contain "funny" characters.</xs:documentation>
         </xs:annotation>
         <xs:attribute name="name" use="required" type="xs:string">
-        </xs:attribute>
-    </xs:attributeGroup>
-
-    <xs:attributeGroup name="c-name">
-        <xs:annotation>
-            <xs:documentation>Name of the protocol, as valid C identifier. Since a default C name can be computed, usage is discouraged.</xs:documentation>
-        </xs:annotation>
-        <xs:attribute name="c-name" type="xs:string">
         </xs:attribute>
     </xs:attributeGroup>
 

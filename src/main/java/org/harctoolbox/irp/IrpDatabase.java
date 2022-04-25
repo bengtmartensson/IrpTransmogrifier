@@ -82,7 +82,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
     public static final String PROTOCOL_NAME = "protocol";
     public static final String PROTOCOLS_NAME = "protocols";
     public static final String NAME_NAME = "name";
-    public static final String CNAME_NAME = "c-name";
     public static final String IRP_NAME = "irp";
     public static final String IRP_ELEMENT_NAME = "Irp";
     public static final String USABLE_NAME = "usable";
@@ -139,7 +138,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
     static boolean isKnownKeyword(String key) {
         return key.equals(PROTOCOL_NAME)
                 || key.equals(NAME_NAME)
-                || key.equals(CNAME_NAME)
                 || key.equals(IRP_NAME)
                 || key.equals(USABLE_NAME)
                 || key.equals(DOCUMENTATION_NAME)
@@ -559,12 +557,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
     public String getName(String name) throws UnknownProtocolException {
         UnparsedProtocol prot = getUnparsedProtocol(name);
         return prot.getName();
-    }
-
-    public String getCName(String name) throws UnknownProtocolException {
-        UnparsedProtocol prot = getUnparsedProtocol(name);
-        String storedCName = prot.getCName();
-        return storedCName != null ? storedCName : IrpUtils.toCIdentifier(prot.getName());
     }
 
     public String getNameExpandAlias(String name) throws UnknownProtocolException {
@@ -1068,9 +1060,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
 
             String name = element.getAttribute(NAME_NAME);
             addProperty(NAME_NAME, name);
-            String cName = element.getAttribute(CNAME_NAME);
-            if (!cName.isEmpty())
-                addProperty(CNAME_NAME, cName);
             NodeList nodeList = element.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
@@ -1135,10 +1124,6 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
             return getFirstProperty(NAME_NAME);
         }
 
-        String getCName() {
-            return getFirstProperty(CNAME_NAME);
-        }
-
         String getIrp() {
             return getFirstProperty(IRP_NAME);
         }
@@ -1157,7 +1142,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
             if (getIrp() == null)
                 throw new IrpInvalidArgumentException("Irp missing from protocol named " + getName());
 
-            return new NamedProtocol(getName(), getCName(), getIrp(), getHtmlDocumentation(),
+            return new NamedProtocol(getName(), getIrp(), getHtmlDocumentation(),
                     getFirstProperty(FREQUENCY_TOLERANCE_NAME), getFirstProperty(FREQUENCY_LOWER_NAME), getFirstProperty(FREQUENCY_UPPER_NAME),
                     getFirstProperty(ABSOLUTE_TOLERANCE_NAME), getFirstProperty(RELATIVE_TOLERANCE_NAME),
                     getFirstProperty(MINIMUM_LEADOUT_NAME), getFirstProperty(DECODABLE_NAME), getFirstProperty(REJECT_REPEATLESS_NAME), getProperties(PREFER_OVER_NAME), map);

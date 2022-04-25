@@ -58,10 +58,6 @@ public class CommandList extends AbstractCommand {
     @Parameter(names = {"-c", "--classify"}, description = "Classify the protocol(s).")
     private boolean classify = false;
 
-    // Using c-names is deprecated, therefore hidden
-    @Parameter(names = {"--cname"}, hidden = true, description = "List C name of the protocol(s).")
-    private boolean cName = false;
-
     @Parameter(names = {"--documentation"}, description = "Print (possible longer) documentation, as a dumb rendering of the HTML documenation.")
     private boolean documentation = false;
 
@@ -163,9 +159,6 @@ public class CommandList extends AbstractCommand {
             if (!commandLineArgs.quiet || this.name || all)
                 // Use one line for the first, relatively short items
                 listProperty(out, "name", irpDatabase.getName(protocolName), commandLineArgs.quiet);
-
-            if (cName)
-                listProperty(out, "cName", irpDatabase.getCName(protocolName), commandLineArgs.quiet);
 
             if (irp || all)
                 listProperty(out, "irp", irpDatabase.getIrp(protocolName), commandLineArgs.quiet);

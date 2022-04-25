@@ -72,7 +72,6 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     }
 
     private final String name;
-    private final String cName;
     private final transient DocumentFragment htmlDocumentation; // TODO: serialization...
     private final Double absoluteTolerance;
     private final Double relativeTolerance;
@@ -85,14 +84,13 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     private final Map<String, List<String>> auxParameters;
     private final boolean rejectRepeatless;
 
-    public NamedProtocol(String name, String cName, String irp, DocumentFragment htmlDocumentation, String frequencyTolerance,
+    public NamedProtocol(String name, String irp, DocumentFragment htmlDocumentation, String frequencyTolerance,
             String frequencyLower, String frequencyUpper,
             String absoluteTolerance, String relativeTolerance, String minimumLeadout, String decodable, String rejectRepeatless,
             List<String> preferOver, Map<String, List<String>> map)
             throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
         super(irp);
         this.name = name;
-        this.cName = cName;
         this.htmlDocumentation = htmlDocumentation;
         this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : null;
         this.frequencyLower = frequencyLower != null ? Double.parseDouble(frequencyLower) : null;
@@ -110,7 +108,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     }
 
     public NamedProtocol(String name, String irp, DocumentFragment documentation) throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException {
-        this(name, IrpUtils.toCIdentifier(name), irp, documentation, null, null, null, null, null, null, null, null, null, new HashMap<>(0));
+        this(name, irp, documentation, null, null, null, null, null, null, null, null, null, new HashMap<>(0));
     }
 
     public Set<String> preferredOvers() {
@@ -268,7 +266,6 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     public int hashCode() {
         int hash = super.hashCode();
         hash = 41 * hash + Objects.hashCode(this.name);
-        hash = 41 * hash + Objects.hashCode(this.cName);
         hash = 41 * hash + Objects.hashCode(this.htmlDocumentation);
         hash = 41 * hash + Objects.hashCode(this.absoluteTolerance);
         hash = 41 * hash + Objects.hashCode(this.relativeTolerance);
@@ -288,7 +285,6 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         NamedProtocol other = (NamedProtocol) obj;
         return super.equals(obj)
                 && name.equals(other.name)
-                && cName.equals(other.cName)
                 && htmlDocumentation.equals(other.htmlDocumentation)
                 && Double.compare(absoluteTolerance, other.absoluteTolerance) == 0
                 && Double.compare(relativeTolerance, other.relativeTolerance) == 0
@@ -328,10 +324,6 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     @Override
     public String getName() {
         return name;
-    }
-
-    public String getCName() {
-        return cName != null ? cName : IrCoreUtils.toCName(name);
     }
 
     public DocumentFragment getDocumentation() {
@@ -422,7 +414,6 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
     public Element toElement(Document document, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
         Element root = super.toElement(document);
         root.setAttribute(IrpDatabase.NAME_NAME, getName());
-        root.setAttribute(IrpDatabase.CNAME_NAME, getCName());
         root.setAttribute(IrpDatabase.ABSOLUTE_TOLERANCE_NAME, Double.toString(getAbsoluteTolerance(absoluteTolerance, override)));
         root.setAttribute(IrpDatabase.RELATIVE_TOLERANCE_NAME, Double.toString(getRelativeTolerance(relativeTolerance, override)));
         root.setAttribute(IrpDatabase.FREQUENCY_TOLERANCE_NAME, Double.toString(getFrequencyTolerance(frequencyTolerance, override)));
@@ -481,7 +472,6 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
             map.put(kvp.getKey(), kvp.getValue());
         });
         map.put(IrpDatabase.PROTOCOL_NAME_NAME, getName());
-        map.put(IrpDatabase.PROTOCOL_CNAME_NAME, getCName());
         map.put(IrpDatabase.IRP_NAME, getIrp());
         map.put(IrpDatabase.DOCUMENTATION_NAME, IrCoreUtils.javaifyString(DumbHtmlRenderer.render(getDocumentation())));
         putParameter(map, IrpDatabase.RELATIVE_TOLERANCE_NAME, userRelativeTolerance, relativeTolerance);

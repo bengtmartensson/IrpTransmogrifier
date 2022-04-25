@@ -22,12 +22,6 @@ as a defining document.
 This document is read by IrpTransmogrifier with XInclude processing enabled, so
 it is possible to use include documents according to the XInclude standard.
 
-Usage of the attribute "c-name" in the irp:protocol element is now discouraged:
-For code generation, a valid C name has to be formed from the protocol name,
-which may be invalid as C identifier. IrpTransmogrifier has a rule for this
-(IrpUtils.toCIdentifier(String)). The attribute allows for overriding this rule;
-however, this is hardly ever necessary or even meaningful.
-
 Semantics of some of the elements:
 
 irp:parameter: The irp:parameter can be used to define all sort of information associated with

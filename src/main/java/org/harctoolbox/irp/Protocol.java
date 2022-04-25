@@ -196,6 +196,11 @@ public class Protocol extends IrpObject implements AggregateLister {
         return bitspecIrStream.constant(definitions);
     }
 
+    public boolean nonEmptySequence(IrSignal.Pass pass) {
+        BareIrStream sequence = bitspecIrstream.extractPass(pass);
+        return ! sequence.isEmpty(definitions);
+    }
+
     public boolean constantNonEmptySequence(IrSignal.Pass pass) {
         BareIrStream sequence = bitspecIrstream.extractPass(pass);
         if (sequence.isEmpty(definitions))
@@ -795,7 +800,9 @@ public class Protocol extends IrpObject implements AggregateLister {
         str.append("\t").append(isSonyType() ? "sony\t" : "\t");
         str.append(startsWithFlash() ? "SWD\t" : "\t");
         str.append(hasVariation(true, null) ? "variation\t" : "\t");
-        str.append(isRPlus() ? "R+" : "");
+        str.append(nonEmptySequence(Pass.intro) ? "I" : "");
+        str.append(nonEmptySequence(Pass.repeat) ? (isRPlus() ? "R+" : "R*") : "");
+        str.append(nonEmptySequence(Pass.ending) ? "E\t" : "\t");
         str.append(constantNonEmptySequence(Pass.intro) ? "constIntro" : "");
         str.append(constantNonEmptySequence(Pass.repeat) ? "constRepeat" : "");
         return str.toString();

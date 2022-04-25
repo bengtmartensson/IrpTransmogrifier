@@ -430,7 +430,7 @@ public class IrpTransmogrifierNGTest {
         String result = execute("--irp {40.244k,398,msb}<1,-1|-1,1>(1,A:31,F:1,F:8,D:23,D:8,0:4,-19.5m)*{A=0x7fe08080}[F:0..1,D:0..255] list -c");
         String expResult = "name=user_protocol"
                 + IrCoreUtils.LINE_SEPARATOR
-                + "classification=398\t40244\t\tBiphase\t\t\t\t\t\t\t\tSWD";
+                + "classification=398\t40244\t\tBiphase\t\t\t\t\t\t\t\tSWD\t\tR*";
         assertEquals(result, expResult);
     }
 

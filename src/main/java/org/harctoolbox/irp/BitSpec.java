@@ -384,4 +384,10 @@ public final class BitSpec extends IrpObject implements AggregateLister {
     public boolean constant(NameEngine nameEngine) {
         return bitCodes.stream().noneMatch((bitCode) -> (!bitCode.constant(nameEngine)));
     }
+
+    @Override
+    public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
+        for (BareIrStream bitCode: bitCodes)
+            bitCode.createParameterSpecs(parameterSpecs);
+    }
 }

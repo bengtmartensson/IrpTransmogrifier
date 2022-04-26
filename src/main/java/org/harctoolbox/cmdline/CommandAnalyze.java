@@ -118,6 +118,9 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"-p", "--parametertable"}, description = "Create parameter table.")
     private boolean parameterTable = false;
 
+    @Parameter(names = {"-P", "--parameterspecs"}, description = "Compute a dumb parameter specs in the IRP.")
+    private boolean parameterSpecs = false;
+
     @Parameter(names = {"-u", "--maxmicroseconds"}, description = "Maximal duration to be expressed as micro seconds.")
     private double maxMicroSeconds = Burst.Preferences.DEFAULT_MAX_MICROSECONDS;
 
@@ -388,6 +391,8 @@ public class CommandAnalyze extends AbstractCommand {
                     if (statistics)
                         out.println(analyzer.toTimingsString(noSignal));
                     for (Protocol protocol : protocolList) {
+                        if (parameterSpecs)
+                            protocol.createParameterSpecsIfPossible();
                         printAnalyzedProtocol(protocol, radix, params.isPreferPeriods(), true, true);
                         if (validate) {
                             if (inputSignal != null)
@@ -400,6 +405,10 @@ public class CommandAnalyze extends AbstractCommand {
                 }
             } else {
                 List<Protocol> protocols = analyzer.searchBestProtocol(params, decoder, commandLineArgs.regexp);
+                if (parameterSpecs || girr || fatgirr)
+                    protocols.forEach(protocol -> {
+                        protocol.createParameterSpecsIfPossible();
+                    });
 
                 if (girr || fatgirr) {
                     Document doc = ProtocolListDomFactory.protocolListToDom(analyzer, protocols, names, radix, fatgirr);

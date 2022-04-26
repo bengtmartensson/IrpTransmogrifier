@@ -285,4 +285,11 @@ public final class Variation extends IrpObject implements IrStreamItem {
     public boolean constant(NameEngine nameEngine) {
         return intro.constant(nameEngine) && repeat.constant(nameEngine) && ending.constant(nameEngine);
     }
+
+    @Override
+    public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
+        intro.createParameterSpecs(parameterSpecs);
+        repeat.createParameterSpecs(parameterSpecs);
+        ending.createParameterSpecs(parameterSpecs);
+    }
 }

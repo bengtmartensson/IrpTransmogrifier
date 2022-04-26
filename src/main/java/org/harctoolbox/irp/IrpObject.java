@@ -157,4 +157,8 @@ public abstract class IrpObject implements XmlExport, Serializable {
     public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
         return null;
     }
+
+    // Default implementation, often overridden
+    public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
+    }
 }

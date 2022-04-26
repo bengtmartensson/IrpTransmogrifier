@@ -472,4 +472,10 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     public boolean constant(NameEngine nameEngine) {
         return irStreamItems.stream().noneMatch((irStreamItem) -> (!irStreamItem.constant(nameEngine)));
     }
+
+    @Override
+    public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
+        for (IrStreamItem irStreamItem : irStreamItems)
+            irStreamItem.createParameterSpecs(parameterSpecs);
+    }
 }

@@ -104,6 +104,10 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return result;
     }
 
+    public void replace(ParameterSpecs newParameterSpecs) {
+        map = newParameterSpecs.map;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
@@ -324,5 +328,14 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
 
     public int size() {
         return map.size();
+    }
+
+    public void tweak(String name, long min, long max) throws InvalidNameException {
+        ParameterSpec oldSpec = map.get(name);
+        if (oldSpec == null) {
+            ParameterSpec newSpec = new ParameterSpec(name, false, min, max);
+            map.put(name, newSpec);
+        } else
+            oldSpec.tweak(min, max);
     }
 }

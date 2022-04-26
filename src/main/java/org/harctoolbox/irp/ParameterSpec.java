@@ -232,4 +232,11 @@ public final class ParameterSpec extends IrpObject {
         long n = (long) Math.ceil(((double) (getMin() - x))/modulus);
         return x + n*modulus;
     }
+
+    void tweak(long min, long max) {
+        if (min < getMin())
+            this.min = new Number(min);
+        if (max > getMax())
+            this.max = new Number(max);
+    }
 }

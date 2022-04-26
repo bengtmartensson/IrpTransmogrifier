@@ -167,7 +167,7 @@ public class ProtocolListDomFactory {
 
     private Element mkProtocols() {
         protocolsWithoutDefs = new HashMap<>(4);
-        protocols.stream().map((protocol) -> new Protocol(protocol.getGeneralSpec(), protocol.getBitspecIrstream(), new NameEngine(), null)).forEachOrdered((withoutDefs) -> {
+        protocols.stream().map((protocol) -> new Protocol(protocol.getGeneralSpec(), protocol.getBitspecIrstream(), new NameEngine(), protocol.getParameterSpecs())).forEachOrdered((withoutDefs) -> {
             protocolsWithoutDefs.put(withoutDefs.hashCode(), withoutDefs);
         });
         Element protocolsElement = doc.createElementNS(XmlUtils.IRP_NAMESPACE_URI, XmlUtils.IRP_PREFIX + ":protocols");

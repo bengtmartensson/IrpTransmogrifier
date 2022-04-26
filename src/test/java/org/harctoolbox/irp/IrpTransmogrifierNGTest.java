@@ -76,9 +76,14 @@ public class IrpTransmogrifierNGTest {
         String args = "-a 10 -r 0.01 analyze --radix 16 -M 32 -t 1p 0000 0073 0000 0012 000F 000A 0006 000A 0006 000A 0006 001B 0006 000A 0006 000A 0006 001B 0006 0015 0006 000A 0006 001B 0006 000A 0006 0015 0006 0010 0006 000A 0006 0015 0006 000A 0006 0015 0006 0C90";
         String result = execute(args);
         assertEquals(result, "{36.0k,1p,msb}<6,-10|6,-16|6,-21|6,-27>(15,-10,A:32,6,-89m)*{A=0xc38c922}");
-        args = "-a 10 -r 0.04 analyze --radix 16 -M 16 -t 1p 0000 0073 0000 0012 000F 000A 0006 000A 0006 000A 0006 001B 0006 000A 0006 000A 0006 001B 0006 0015 0006 000A 0006 001B 0006 000A 0006 0015 0006 0010 0006 000A 0006 0015 0006 000A 0006 0015 0006 0C90";
+
+        args = "-a 10 -r 0.01 analyze --parameterspecs --radix 16 -M 32 -t 1p 0000 0073 0000 0012 000F 000A 0006 000A 0006 000A 0006 001B 0006 000A 0006 000A 0006 001B 0006 0015 0006 000A 0006 001B 0006 000A 0006 0015 0006 0010 0006 000A 0006 0015 0006 000A 0006 0015 0006 0C90";
         result = execute(args);
-        assertEquals(result, "{36.0k,1p,msb}<6,-10|6,-16|6,-21|6,-27>(15,-10,A:16,B:16,6,-89m)*{A=0xc38,B=0xc922}");
+        assertEquals(result, "{36.0k,1p,msb}<6,-10|6,-16|6,-21|6,-27>(15,-10,A:32,6,-89m)*{A=0xc38c922}[A:0x0..0xffffffff]");
+
+        args = "-a 10 -r 0.04 analyze --parameterspecs --radix 16 -M 16 -t 1p 0000 0073 0000 0012 000F 000A 0006 000A 0006 000A 0006 001B 0006 000A 0006 000A 0006 001B 0006 0015 0006 000A 0006 001B 0006 000A 0006 0015 0006 0010 0006 000A 0006 0015 0006 000A 0006 0015 0006 0C90";
+        result = execute(args);
+        assertEquals(result, "{36.0k,1p,msb}<6,-10|6,-16|6,-21|6,-27>(15,-10,A:16,B:16,6,-89m)*{A=0xc38,B=0xc922}[A:0x0..0xffff,B:0x0..0xffff]");
     }
 
     /**
@@ -87,9 +92,9 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze2() {
         System.out.println("analyze2");
-        String args = "-r 0.1 -a 100.0 analyze --radix 16 --chop 30000 --ire --maxparameterwidth 32 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
+        String args = "-r 0.1 -a 100.0 analyze --parameterspecs --radix 16 --chop 30000 --ire --maxparameterwidth 32 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +573 -96193";
         String result = execute(args);
-        assertEquals(result, "{573,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m,(16,-4,1,-96m)*){A=0x30441ce3}");
+        assertEquals(result, "{573,msb}<1,-1|1,-3>(16,-8,A:32,1,-44m,(16,-4,1,-96m)*){A=0x30441ce3}[A:0x0..0xffffffff]");
     }
 
     /**
@@ -168,6 +173,7 @@ public class IrpTransmogrifierNGTest {
         String args = "-a 100.0 -r 0.1 analyze --maxparameterwidth 32 " + ACDATA;
         String result = execute(args);
         assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:32,B:32,C:32,D:16,4,-10m){A=0xc4d36480,B=0x4c0b0,C=0x40000000,D=0x1e3}");
+
         args = "-a 100.0 -r 0.1 analyze --maxparameterwidth 1024 --decoder pwm2 " + ACDATA;
         result = execute(args);
         assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:112,4,-10m){A=0xc4d364800004c0b04000000001e3}");
@@ -208,9 +214,9 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyzeParameterWidths() {
         System.out.println("analyzeParameterWidths");
-        String args = "analyze  --parameterwidths D:8,S:8,F:8 +7668 -3969 +486 -459 +486 -459 +486 -459 +486 -459 +486 -999 +486 -459 +486 -459 +486 -459 +486 -999 +486 -999 +486 -999 +486 -999 +486 -459 +486 -999 +486 -999 +486 -999 +486 -459 +486 -999 +486 -459 +486 -459 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -39690";
+        String args = "analyze  --parameterspecs --parameterwidths D:8,S:8,F:8 +7668 -3969 +486 -459 +486 -459 +486 -459 +486 -459 +486 -999 +486 -459 +486 -459 +486 -459 +486 -999 +486 -999 +486 -999 +486 -999 +486 -459 +486 -999 +486 -999 +486 -999 +486 -459 +486 -999 +486 -459 +486 -459 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -999 +486 -459 +486 -999 +486 -459 +486 -999 +486 -39690";
         String result = execute(args);
-        assertEquals(result, "{477,msb}<1,-1|1,-2>(16,-3969u,D:8,S:8,F:8,A:8,1,-39.69m){A=0xb5,D=0x8,F=0x4a,S=0xf7}");
+        assertEquals(result, "{477,msb}<1,-1|1,-2>(16,-3969u,D:8,S:8,F:8,A:8,1,-39.69m){A=0xb5,D=0x8,F=0x4a,S=0xf7}[D:0x0..0xff,S:0x0..0xff,F:0x0..0xff,A:0x0..0xff]");
     }
 
     @Test(enabled = true)

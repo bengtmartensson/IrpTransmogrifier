@@ -145,4 +145,6 @@ public interface IrStreamItem extends XmlExport {
      * @return IrStreamItem of the same type.
      */
     public IrStreamItem substituteConstantVariables(Map<String, Long> constantVariables);
+
+    void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException;
 }

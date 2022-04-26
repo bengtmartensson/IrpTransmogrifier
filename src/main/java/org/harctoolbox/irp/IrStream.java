@@ -199,6 +199,11 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     @Override
+    public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
+        bareIrStream.createParameterSpecs(parameterSpecs);
+    }
+
+    @Override
     @SuppressWarnings("AssignmentToMethodParameter")
     public List<IrStreamItem> extractPass(Pass pass, Pass state) {
         List<IrStreamItem> list = new ArrayList<>(8);

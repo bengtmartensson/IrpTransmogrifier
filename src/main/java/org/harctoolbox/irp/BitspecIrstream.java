@@ -361,4 +361,10 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     public boolean constant(NameEngine nameEngine) {
         return bitSpec.constant(nameEngine) && irStream.constant(nameEngine);
     }
+
+    @Override
+    public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
+        bitSpec.createParameterSpecs(parameterSpecs);
+        irStream.createParameterSpecs(parameterSpecs);
+    }
 }

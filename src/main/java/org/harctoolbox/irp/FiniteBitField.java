@@ -445,4 +445,14 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     private long assignmentNeededBitmask(RecognizeData recognizeData) {
         return getWidth(recognizeData).longValueExact() << getChop(recognizeData).longValueExact();
     }
+
+    @Override
+    public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
+        if (! (data instanceof Name))
+            throw new InvalidNameException(data.toIrpString() + " cannot be used in createParameterSpecs");
+
+        String name = data.toString();
+        long max = (1L << (long) this.numberOfBits()) - 1L;
+        parameterSpecs.tweak(name, 0L, max);
+    }
 }

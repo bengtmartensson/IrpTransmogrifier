@@ -307,9 +307,9 @@ public class Protocol extends IrpObject implements AggregateLister {
      */
     public IrSignal toIrSignal(NameEngine nameEngine) throws DomainViolationException, NameUnassignedException, IrpInvalidArgumentException, InvalidNameException, OddSequenceLengthException {
         initializeDefinitions();
+        nameEngine.add(definitions);
         parameterSpecs.check(nameEngine);
         fetchMemoryVariables(nameEngine);
-        nameEngine.add(definitions);
 
         IrSequence intro = toIrSequence(nameEngine, Pass.intro);
         IrSequence repeat = toIrSequence(nameEngine, Pass.repeat);
@@ -970,6 +970,21 @@ public class Protocol extends IrpObject implements AggregateLister {
             }
         }
         return result;
+    }
+
+    public void createParameterSpecs() throws InvalidNameException {
+        ParameterSpecs paramSpecs = new ParameterSpecs();
+        bitspecIrstream.createParameterSpecs(paramSpecs); // may throw
+        // Got here only if no thows
+        parameterSpecs.replace(paramSpecs);
+    }
+
+    public void createParameterSpecsIfPossible() {
+        try {
+            createParameterSpecs();
+        } catch (InvalidNameException ex) {
+            logger.log(Level.WARNING, null, ex);
+        }
     }
 
     /**

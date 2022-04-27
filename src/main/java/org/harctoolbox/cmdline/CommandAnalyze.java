@@ -69,7 +69,7 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"-a", "--all"}, description = "List all decoder outcomes, instead of only the one with lowest weight.")
     private boolean allDecodes = false;
 
-    @Parameter(names = {"-b", "--bit-usage"}, description = "Create bit usage report. (Not with --all)")
+    @Parameter(names = {"-b", "--bit-usage"}, description = "Create bit usage report. (Not with --all.)")
     private boolean bitUsage = false;
 
     @Parameter(names = {"-c", "--chop"}, description = "Chop input sequence into several using threshold (in milliseconds) given as argument.")
@@ -85,16 +85,16 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"-e", "--extent"}, description = "Output the last gap as an extent.")
     private boolean extent = false;
 
-    @Parameter(names = {"--eliminate-vars"}, description = "Eliminate variables in output form")
+    @Parameter(names = {"--eliminate-vars"}, description = "Eliminate variables in output form.")
     private boolean eliminateVars = false;
 
-    @Parameter(names = {"--fatgirr"}, description = "Generate Girr file in fat format (EXPERIMENTAL).")
+    @Parameter(names = {"--fatgirr"}, description = "Generate Girr file in fat format. Inhibits all other output.")
     private boolean fatgirr = false;
 
     @Parameter(names = {"-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
     private Double frequency = null;
 
-    @Parameter(names = {"-g", "--girr"}, description = "Generate Girr file (EXPERIMENTAL).")
+    @Parameter(names = {"-g", "--girr"}, description = "Generate Girr file. Inhibits all other output.")
     private boolean girr = false;
 
     @Parameter(names = {"-i", "--input"}, description = "File/URL from which to take inputs, one sequence per line.")
@@ -413,65 +413,63 @@ public class CommandAnalyze extends AbstractCommand {
                 if (girr || fatgirr) {
                     Document doc = ProtocolListDomFactory.protocolListToDom(analyzer, protocols, names, radix, fatgirr);
                     XmlUtils.printDOM(out, doc, commandLineArgs.outputEncoding, "");
-                    logger.warning("--girr and --fatgirr suppress all other output!");
-                    return;
-                }
-
-                int maxNameLength = IrCoreUtils.maxLength(names);
-                for (int i = 0; i < protocols.size(); i++) {
-                    if (protocols.size() > 1)
-                        out.print(names.isEmpty()
-                                ? ("#" + i + "\t")
-                                : (names.get(i) + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1))));
-                    if (statistics)
-                        out.println(analyzer.toTimingsString(i));
-                    printAnalyzedProtocol(protocols.get(i), radix, params.isPreferPeriods(), statistics, timings);
-                    if (validate) {
-                        if (inputSignal != null)
-                            validate(protocols.get(i), inputSignal);
-                        else
-                            out.println("Validation for current case not implemented.");
-                    }
-                }
-
-                if (bitUsage) {
-                    out.println();
-                    out.println("Bit usage analysis:");
-                    Map<String, BitCounter> bitStatistics = BitCounter.scrutinizeProtocols(protocols);
-                    bitStatistics.entrySet().forEach((kvp) -> {
-                        out.println(kvp.getKey() + "\t" + kvp.getValue().toString() + (lsb ? " (note: lsb-first)" : "")
-                        + "\t" + kvp.getValue().toIntSequenceString());
-                    });
-                    //#if duplicates
-                    try {
-                        DuplicateFinder duplicateFinder = new DuplicateFinder(protocols, bitStatistics);
-                        out.println("Duplicates analysis:");
-                        Map<String, DuplicateFinder.DuplicateCollection> duplicates = duplicateFinder.getDuplicates();
-                        duplicates.entrySet().forEach((kvp) -> {
-                            out.println(kvp.getKey() + "\t" + kvp.getValue().toString()
-                                    // wrong, and confusing...  + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
-                                    + (lsb ? " (note: lsb-first)" : ""));
-                        });
-                    } catch (NameUnassignedException ex) {
-                        logger.warning("Duplicates analysis not possible due to different variables in the protocols.");
-                    }
-                    //#endif duplicates
-                }
-
-                if (parameterTable) {
-                    out.println();
-                    out.print("Parameter table:");
-                    for (int i = 0; i < parameterNames.size(); i++)
-                        out.print("\t" + parameterNames.get(i) + ":" + parameterWidths.get(i));
-                    out.println();
+                } else {
+                    int maxNameLength = IrCoreUtils.maxLength(names);
                     for (int i = 0; i < protocols.size(); i++) {
                         if (protocols.size() > 1)
-                            out.print(names != null
-                                    ? (names.get(i) + (commandLineArgs.tsvOptimize ? "" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1)))
-                                    : ("#" + i + "\t"));
-                        Protocol protocol = protocols.get(i);
-                        Iterable<String> parameters = parameterNames.isEmpty() ? protocol.getDefinitions().getNames() : parameterNames;
-                        printParameters(parameters, protocol);
+                            out.print(names.isEmpty()
+                                    ? ("#" + i + "\t")
+                                    : (names.get(i) + (commandLineArgs.tsvOptimize ? "\t" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1))));
+                        if (statistics)
+                            out.println(analyzer.toTimingsString(i));
+                        printAnalyzedProtocol(protocols.get(i), radix, params.isPreferPeriods(), statistics, timings);
+                        if (validate) {
+                            if (inputSignal != null)
+                                validate(protocols.get(i), inputSignal);
+                            else
+                                out.println("Validation for current case not implemented.");
+                        }
+                    }
+
+                    if (bitUsage) {
+                        out.println();
+                        out.println("Bit usage analysis:");
+                        Map<String, BitCounter> bitStatistics = BitCounter.scrutinizeProtocols(protocols);
+                        bitStatistics.entrySet().forEach((kvp) -> {
+                            out.println(kvp.getKey() + "\t" + kvp.getValue().toString() + (lsb ? " (note: lsb-first)" : "")
+                                    + "\t" + kvp.getValue().toIntSequenceString());
+                        });
+                        //#if duplicates
+                        try {
+                            DuplicateFinder duplicateFinder = new DuplicateFinder(protocols, bitStatistics);
+                            out.println("Duplicates analysis:");
+                            Map<String, DuplicateFinder.DuplicateCollection> duplicates = duplicateFinder.getDuplicates();
+                            duplicates.entrySet().forEach((kvp) -> {
+                                out.println(kvp.getKey() + "\t" + kvp.getValue().toString()
+                                        // wrong, and confusing...  + "\t" + kvp.getValue().getRecommendedParameterWidthsAsString()
+                                        + (lsb ? " (note: lsb-first)" : ""));
+                            });
+                        } catch (NameUnassignedException ex) {
+                            logger.warning("Duplicates analysis not possible due to different variables in the protocols.");
+                        }
+                        //#endif duplicates
+                    }
+
+                    if (parameterTable) {
+                        out.println();
+                        out.print("Parameter table:");
+                        for (int i = 0; i < parameterNames.size(); i++)
+                            out.print("\t" + parameterNames.get(i) + ":" + parameterWidths.get(i));
+                        out.println();
+                        for (int i = 0; i < protocols.size(); i++) {
+                            if (protocols.size() > 1)
+                                out.print(names != null
+                                        ? (names.get(i) + (commandLineArgs.tsvOptimize ? "" : IrCoreUtils.spaces(maxNameLength - names.get(i).length() + 1)))
+                                        : ("#" + i + "\t"));
+                            Protocol protocol = protocols.get(i);
+                            Iterable<String> parameters = parameterNames.isEmpty() ? protocol.getDefinitions().getNames() : parameterNames;
+                            printParameters(parameters, protocol);
+                        }
                     }
                 }
             }

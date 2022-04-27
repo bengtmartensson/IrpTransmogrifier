@@ -1,6 +1,6 @@
-FM:		NEC1-Yamaha: {D=127,F=88,S=1,Y=1},	beg=0, end=67
-AM:		NEC1-Yamaha: {D=127,F=85,S=1,Y=1},	beg=0, end=67
-Preset up:		NEC1-Yamaha: {D=127,F=91,S=1,Y=1},	beg=0, end=67
-Preset down:		NEC1-Yamaha: {D=127,F=94,S=1,Y=1},	beg=0, end=67
-Tuning up:		NEC1-Yamaha: {D=127,F=97,S=1,Y=1},	beg=0, end=67
-Tuning down:		NEC1-Yamaha: {D=127,F=100,S=1,Y=1},	beg=0, end=67
+FM:		NEC1-Yamaha: {D=127,S=1,F=88,Y=1},	beg=0, end=67
+AM:		NEC1-Yamaha: {D=127,S=1,F=85,Y=1},	beg=0, end=67
+Preset up:		NEC1-Yamaha: {D=127,S=1,F=91,Y=1},	beg=0, end=67
+Preset down:		NEC1-Yamaha: {D=127,S=1,F=94,Y=1},	beg=0, end=67
+Tuning up:		NEC1-Yamaha: {D=127,S=1,F=97,Y=1},	beg=0, end=67
+Tuning down:		NEC1-Yamaha: {D=127,S=1,F=100,Y=1},	beg=0, end=67

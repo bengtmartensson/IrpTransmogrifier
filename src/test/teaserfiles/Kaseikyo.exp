@@ -1,10 +1,10 @@
-Number 1:	Kaseikyo: {D=10,E=11,F=3,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 2:	Kaseikyo: {D=10,E=12,F=4,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 3:	Kaseikyo: {D=10,E=13,F=5,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 4:	Kaseikyo: {D=10,E=14,F=6,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 5:	Kaseikyo: {D=10,E=15,F=7,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 6:	Kaseikyo: {D=10,E=0,F=8,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 7:	Kaseikyo: {D=10,E=1,F=9,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 8:	Kaseikyo: {D=10,E=2,F=10,M=1,N=170,S=18},	beg=0, end=499, reps=5
-Number 9:	Kaseikyo: {D=10,E=3,F=11,M=1,N=170,S=18},	beg=0, end=399, reps=4	{UNDECODED. length=100}
-Number 0:	Kaseikyo: {D=10,E=4,F=12,M=1,N=170,S=18},	beg=0, end=499, reps=5
+Number 1:		Kaseikyo: {D=10,S=18,F=3,E=11,M=1,N=170},	beg=0, end=499, reps=5
+Number 2:		Kaseikyo: {D=10,S=18,F=4,E=12,M=1,N=170},	beg=0, end=499, reps=5
+Number 3:		Kaseikyo: {D=10,S=18,F=5,E=13,M=1,N=170},	beg=0, end=499, reps=5
+Number 4:		Kaseikyo: {D=10,S=18,F=6,E=14,M=1,N=170},	beg=0, end=499, reps=5
+Number 5:		Kaseikyo: {D=10,S=18,F=7,E=15,M=1,N=170},	beg=0, end=499, reps=5
+Number 6:		Kaseikyo: {D=10,S=18,F=8,E=0,M=1,N=170},	beg=0, end=499, reps=5
+Number 7:		Kaseikyo: {D=10,S=18,F=9,E=1,M=1,N=170},	beg=0, end=499, reps=5
+Number 8:		Kaseikyo: {D=10,S=18,F=10,E=2,M=1,N=170},	beg=0, end=499, reps=5
+Number 9:		Kaseikyo: {D=10,S=18,F=11,E=3,M=1,N=170},	beg=0, end=399, reps=4	{UNDECODED. length=100}
+Number 0:		Kaseikyo: {D=10,S=18,F=12,E=4,M=1,N=170},	beg=0, end=499, reps=5

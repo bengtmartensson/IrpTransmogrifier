@@ -1,13 +1,13 @@
 Vol+ NEC2:		NEC2: {D=31,F=223},	beg=0, end=271, reps=4
 Vol- NEC2:		NEC2: {D=31,F=95},	beg=0, end=203, reps=3
-Mute:		NECx2: {D=67,F=57,S=83},	beg=0, end=203, reps=3
-Up:		NECx2: {D=67,F=13,S=83},	beg=0, end=271, reps=4
-Down:		NECx2: {D=67,F=21,S=83},	beg=0, end=271, reps=4
-Left:		NECx-f16: {D=67,F=37,S=83},	beg=0, end=67
-Right:		NECx-f16: {D=67,F=29,S=83},	beg=0, end=67
-OK:		NECx2: {D=67,F=5,S=83},	beg=0, end=203, reps=3
-Play:		NECx-f16: {D=44,F=4,S=44},	beg=0, end=67	{UNDECODED. length=18}
-Pause:		NECx-f16: {D=44,F=79,S=44},	beg=0, end=67	{UNDECODED. length=18}
-Rewind:		NECx-f16: {D=44,F=6,S=44},	beg=0, end=67	{UNDECODED. length=18}
-FFWD:		NECx-f16: {D=44,F=7,S=44},	beg=0, end=67	{UNDECODED. length=18}
-Stop:		NECx-f16: {D=44,F=5,S=44},	beg=0, end=67	{UNDECODED. length=6}
+Mute:		NECx2: {D=67,S=83,F=57},	beg=0, end=203, reps=3
+Up:		NECx2: {D=67,S=83,F=13},	beg=0, end=271, reps=4
+Down:		NECx2: {D=67,S=83,F=21},	beg=0, end=271, reps=4
+Left:		NECx-f16: {D=67,S=83,F=37},	beg=0, end=67
+Right:		NECx-f16: {D=67,S=83,F=29},	beg=0, end=67
+OK:		NECx2: {D=67,S=83,F=5},	beg=0, end=203, reps=3
+Play:		NECx-f16: {D=44,S=44,F=4},	beg=0, end=67	{UNDECODED. length=18}
+Pause:		NECx-f16: {D=44,S=44,F=79},	beg=0, end=67	{UNDECODED. length=18}
+Rewind:		NECx-f16: {D=44,S=44,F=6},	beg=0, end=67	{UNDECODED. length=18}
+FFWD:		NECx-f16: {D=44,S=44,F=7},	beg=0, end=67	{UNDECODED. length=18}
+Stop:		NECx-f16: {D=44,S=44,F=5},	beg=0, end=67	{UNDECODED. length=6}

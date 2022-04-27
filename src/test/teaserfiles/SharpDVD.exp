@@ -1,10 +1,10 @@
-1:	SharpDVD: {D=0,F=1,S=26},	beg=0, end=299, reps=3
-2:	SharpDVD: {D=0,F=2,S=26},	beg=0, end=499, reps=5
-3:	SharpDVD: {D=0,F=3,S=26},	beg=0, end=399, reps=4
-4:	SharpDVD: {D=0,F=4,S=26},	beg=0, end=399, reps=4
-5:	SharpDVD: {D=0,F=5,S=26},	beg=0, end=399, reps=4
-6:	SharpDVD: {D=0,F=6,S=26},	beg=0, end=399, reps=4
-7:	SharpDVD: {D=0,F=7,S=26},	beg=0, end=299, reps=3
+1:		SharpDVD: {D=0,S=26,F=1},	beg=0, end=299, reps=3
+2:		SharpDVD: {D=0,S=26,F=2},	beg=0, end=499, reps=5
+3:		SharpDVD: {D=0,S=26,F=3},	beg=0, end=399, reps=4
+4:		SharpDVD: {D=0,S=26,F=4},	beg=0, end=399, reps=4
+5:		SharpDVD: {D=0,S=26,F=5},	beg=0, end=399, reps=4
+6:		SharpDVD: {D=0,S=26,F=6},	beg=0, end=399, reps=4
+7:		SharpDVD: {D=0,S=26,F=7},	beg=0, end=299, reps=3
 8:	
-9:	SharpDVD: {D=0,F=9,S=26},	beg=0, end=399, reps=4
-10/0:	SharpDVD: {D=0,F=10,S=26},	beg=0, end=299, reps=3
+9:		SharpDVD: {D=0,S=26,F=9},	beg=0, end=399, reps=4
+10/0:		SharpDVD: {D=0,S=26,F=10},	beg=0, end=299, reps=3

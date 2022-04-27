@@ -46,7 +46,7 @@ public class NamedProtocolNGTest {
         params.setRemoveDefaultedParameters(true);
         Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);
         assertEquals(result.size(), 2);
-        assertEquals(result.get("XMPff-1").toString(), "XMPff-1: {D=0,F=0,S=33}");
+        assertEquals(result.get("XMPff-1").toString(), "XMPff-1: {D=0,S=33,F=0}");
 
         params.setRelativeTolerance(0.3); // Destroys decoding
         params.setOverride(true);

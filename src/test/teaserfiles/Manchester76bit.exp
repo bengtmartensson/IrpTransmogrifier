@@ -84,15 +84,15 @@ R4 MOM. TOG. 250MS:
 R4 MOM. TOG. 2S:	
 R4 MOM. TOG. 500MS:	
 R4 MOM. TOG. 5S:	
-RELAY 1 CLOSE:	RTI_Relay: {D=8,F=1},	beg=0, end=137, reps=1
-RELAY 1 OPEN:	RTI_Relay: {D=8,F=0},	beg=0, end=141, reps=1
+RELAY 1 CLOSE:		RTI_Relay: {F=1,D=8},	beg=0, end=137, reps=1
+RELAY 1 OPEN:		RTI_Relay: {F=0,D=8},	beg=0, end=141, reps=1
 RELAY 1 TOGGLE:	
-RELAY 2 CLOSE:	RTI_Relay: {D=4,F=1},	beg=0, end=137, reps=1
-RELAY 2 OPEN:	RTI_Relay: {D=4,F=0},	beg=0, end=141, reps=1
+RELAY 2 CLOSE:		RTI_Relay: {F=1,D=4},	beg=0, end=137, reps=1
+RELAY 2 OPEN:		RTI_Relay: {F=0,D=4},	beg=0, end=141, reps=1
 RELAY 2 TOGGLE:	
-RELAY 3 CLOSE:	RTI_Relay: {D=2,F=1},	beg=0, end=137, reps=1
-RELAY 3 OPEN:	RTI_Relay: {D=2,F=0},	beg=0, end=141, reps=1
+RELAY 3 CLOSE:		RTI_Relay: {F=1,D=2},	beg=0, end=137, reps=1
+RELAY 3 OPEN:		RTI_Relay: {F=0,D=2},	beg=0, end=141, reps=1
 RELAY 3 TOGGLE:	
-RELAY 4 CLOSE:	RTI_Relay: {D=1,F=1},	beg=0, end=137, reps=1
-RELAY 4 OPEN:	RTI_Relay: {D=1,F=0},	beg=0, end=141, reps=1
+RELAY 4 CLOSE:		RTI_Relay: {F=1,D=1},	beg=0, end=137, reps=1
+RELAY 4 OPEN:		RTI_Relay: {F=0,D=1},	beg=0, end=141, reps=1
 RELAY 4 TOGGLE:	

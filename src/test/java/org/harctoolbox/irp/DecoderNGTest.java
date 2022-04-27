@@ -120,7 +120,7 @@ public class DecoderNGTest {
         params.setRemoveDefaultedParameters(false);
         Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(irSignal, params);
         assertEquals(result.size(), 1);
-        assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,F=35,S=243}");
+        assertEquals(result.get("NEC1").toString(), "NEC1: {D=12,S=243,F=35}");
         Decoder.setDebugProtocolRegExp(null);
         params.setRemoveDefaultedParameters(true);
         result = decoder.decodeIrSignal(irSignal, params);

@@ -1,26 +1,26 @@
-sony8_F195:	Sony8: {F=195},	beg=0, end=17
-sony8_F196:	Sony8: {F=196},	beg=0, end=17
-sony8_F197:	Sony8: {F=197},	beg=0, end=17
-sony8_F198:	Sony8: {F=198},	beg=0, end=17
-sony8_F199:	Sony8: {F=199},	beg=0, end=17
-sony8_F200:	Sony8: {F=200},	beg=0, end=17
-sony8_F201:	Sony8: {F=201},	beg=0, end=17
-sony20_D24S115F55:	Sony20: {D=24,F=55,S=115},	beg=0, end=41, reps=1
-sony20_D24S115F56:	Sony20: {D=24,F=56,S=115},	beg=0, end=41, reps=1
-sony20_D24S115F57:	Sony20: {D=24,F=57,S=115},	beg=0, end=41, reps=1
-sony20_D24S115F58:	Sony20: {D=24,F=58,S=115},	beg=0, end=41, reps=1
-sony15_D167F91:	Sony15: {D=167,F=91},	beg=0, end=31, reps=1
-sony15_D167F92:	Sony15: {D=167,F=92},	beg=0, end=31, reps=1
-sony15_D167F93:	Sony15: {D=167,F=93},	beg=0, end=31, reps=1
-sony15_D167F94:	Sony15: {D=167,F=94},	beg=0, end=31, reps=1
-sony15_D167F95:	Sony15: {D=167,F=95},	beg=0, end=31, reps=1
-sony15_D167F96:	Sony15: {D=167,F=96},	beg=0, end=31, reps=1
-sony15_D167F97:	Sony15: {D=167,F=97},	beg=0, end=31, reps=1
-sony15_D167F98:	Sony15: {D=167,F=98},	beg=0, end=31, reps=1
-sony12_D23F70:	Sony12: {D=23,F=70},	beg=0, end=25, reps=1
-sony12_D23F71:	Sony12: {D=23,F=71},	beg=0, end=25, reps=1
-sony12_D23F72:	Sony12: {D=23,F=72},	beg=0, end=25, reps=1
-sony12_D23F73:	Sony12: {D=23,F=73},	beg=0, end=25, reps=1
-sony12_D23F74:	Sony12: {D=23,F=74},	beg=0, end=25, reps=1
-sony12_D23F75:	Sony12: {D=23,F=75},	beg=0, end=25, reps=1
-sony12_D23F76:	Sony12: {D=23,F=76},	beg=0, end=25, reps=1
+sony8_F195:		Sony8: {F=195},	beg=0, end=17
+sony8_F196:		Sony8: {F=196},	beg=0, end=17
+sony8_F197:		Sony8: {F=197},	beg=0, end=17
+sony8_F198:		Sony8: {F=198},	beg=0, end=17
+sony8_F199:		Sony8: {F=199},	beg=0, end=17
+sony8_F200:		Sony8: {F=200},	beg=0, end=17
+sony8_F201:		Sony8: {F=201},	beg=0, end=17
+sony20_D24S115F55:		Sony20: {D=24,S=115,F=55},	beg=0, end=41, reps=1
+sony20_D24S115F56:		Sony20: {D=24,S=115,F=56},	beg=0, end=41, reps=1
+sony20_D24S115F57:		Sony20: {D=24,S=115,F=57},	beg=0, end=41, reps=1
+sony20_D24S115F58:		Sony20: {D=24,S=115,F=58},	beg=0, end=41, reps=1
+sony15_D167F91:		Sony15: {D=167,F=91},	beg=0, end=31, reps=1
+sony15_D167F92:		Sony15: {D=167,F=92},	beg=0, end=31, reps=1
+sony15_D167F93:		Sony15: {D=167,F=93},	beg=0, end=31, reps=1
+sony15_D167F94:		Sony15: {D=167,F=94},	beg=0, end=31, reps=1
+sony15_D167F95:		Sony15: {D=167,F=95},	beg=0, end=31, reps=1
+sony15_D167F96:		Sony15: {D=167,F=96},	beg=0, end=31, reps=1
+sony15_D167F97:		Sony15: {D=167,F=97},	beg=0, end=31, reps=1
+sony15_D167F98:		Sony15: {D=167,F=98},	beg=0, end=31, reps=1
+sony12_D23F70:		Sony12: {D=23,F=70},	beg=0, end=25, reps=1
+sony12_D23F71:		Sony12: {D=23,F=71},	beg=0, end=25, reps=1
+sony12_D23F72:		Sony12: {D=23,F=72},	beg=0, end=25, reps=1
+sony12_D23F73:		Sony12: {D=23,F=73},	beg=0, end=25, reps=1
+sony12_D23F74:		Sony12: {D=23,F=74},	beg=0, end=25, reps=1
+sony12_D23F75:		Sony12: {D=23,F=75},	beg=0, end=25, reps=1
+sony12_D23F76:		Sony12: {D=23,F=76},	beg=0, end=25, reps=1

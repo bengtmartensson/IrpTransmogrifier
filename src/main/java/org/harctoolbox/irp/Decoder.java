@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -944,7 +945,7 @@ public final class Decoder {
             if (map.isEmpty())
                 return "";
             StringJoiner stringJoiner = new StringJoiner(",", "{", "}");
-            map.keySet().stream().sorted().forEach((key) -> {
+            map.keySet().stream().sorted(namedProtocol.getParameterSpecs()).forEach((key) -> {
                 stringJoiner.add(key + "=" + IrCoreUtils.radixPrefix(radix) + Long.toString(map.get(key), radix));
             });
             return stringJoiner.toString();

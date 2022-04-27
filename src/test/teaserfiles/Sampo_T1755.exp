@@ -1,5 +1,5 @@
-Power ON:	Sampo: {D=45,F=7,S=10},	beg=0, end=155, reps=3
-Power OFF:	Sampo: {D=45,F=6,S=10},	beg=0, end=155, reps=3
-Vol +:	Emerson: {D=63,F=6},	beg=0, end=207, reps=4
-Vol -:	Emerson: {D=63,F=7},	beg=0, end=207, reps=4
-Mute:	Emerson: {D=63,F=5},	beg=0, end=155, reps=3
+Power ON:		Sampo: {D=45,S=10,F=7},	beg=0, end=155, reps=3
+Power OFF:		Sampo: {D=45,S=10,F=6},	beg=0, end=155, reps=3
+Vol +:		Emerson: {D=63,F=6},	beg=0, end=207, reps=4
+Vol -:		Emerson: {D=63,F=7},	beg=0, end=207, reps=4
+Mute:		Emerson: {D=63,F=5},	beg=0, end=155, reps=3

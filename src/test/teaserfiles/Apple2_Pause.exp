@@ -1,1 +1,1 @@
-Pause:	NEC-f16: {D=238,E=0,F=95,S=135},	beg=0, end=67	{NEC1-f16: {D=238,E=0,F=5,S=135},	beg=68, end=143, reps=2}
+Pause:		NEC-f16: {D=238,S=135,F=95,E=0},	beg=0, end=67	{NEC1-f16: {D=238,S=135,F=5,E=0},	beg=68, end=143, reps=2}

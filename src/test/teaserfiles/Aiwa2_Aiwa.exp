@@ -1,15 +1,15 @@
-0:	Aiwa: {D=102,F=128,S=0},	beg=0, end=87	{Aiwa: {D=102,F=128,S=0},	beg=88, end=175	Aiwa2: {D=102,F=128,S=0},	beg=88, end=175, reps=1}
-	Aiwa2: {D=102,F=128,S=0},	beg=0, end=175, reps=2
-1:	Aiwa: {D=102,F=129,S=0},	beg=0, end=87	{Aiwa: {D=102,F=129,S=0},	beg=88, end=175	{Aiwa: {D=102,F=129,S=0},	beg=176, end=263	{Aiwa: {D=102,F=129,S=0},	beg=264, end=351	Aiwa2: {D=102,F=129,S=0},	beg=264, end=351, reps=1}	Aiwa2: {D=102,F=129,S=0},	beg=176, end=351, reps=2}	Aiwa2: {D=102,F=129,S=0},	beg=88, end=351, reps=3}
-	Aiwa2: {D=102,F=129,S=0},	beg=0, end=351, reps=4
-up:	Aiwa: {D=102,F=151,S=0},	beg=0, end=87	{Aiwa: {D=102,F=151,S=0},	beg=88, end=175	{Aiwa: {D=102,F=151,S=0},	beg=176, end=263	Aiwa2: {D=102,F=151,S=0},	beg=176, end=263, reps=1}	Aiwa2: {D=102,F=151,S=0},	beg=88, end=263, reps=2}
-	Aiwa2: {D=102,F=151,S=0},	beg=0, end=263, reps=3
-down:	Aiwa: {D=102,F=152,S=0},	beg=0, end=87	{Aiwa: {D=102,F=152,S=0},	beg=88, end=175	{Aiwa: {D=102,F=152,S=0},	beg=176, end=263	Aiwa2: {D=102,F=152,S=0},	beg=176, end=263, reps=1}	Aiwa2: {D=102,F=152,S=0},	beg=88, end=263, reps=2}
-	Aiwa2: {D=102,F=152,S=0},	beg=0, end=263, reps=3
-OK:	Aiwa: {D=102,F=155,S=0},	beg=0, end=87	{Aiwa: {D=102,F=155,S=0},	beg=88, end=175	Aiwa2: {D=102,F=155,S=0},	beg=88, end=175, reps=1}
-	Aiwa2: {D=102,F=155,S=0},	beg=0, end=175, reps=2
-0$1:	Aiwa: {D=8,F=0,S=0},	beg=0, end=99, reps=3
-1$1:	Aiwa: {D=8,F=1,S=0},	beg=0, end=99, reps=3
-left:	Aiwa: {D=8,F=21,S=0},	beg=0, end=99, reps=3
-right:	Aiwa: {D=8,F=18,S=0},	beg=0, end=99, reps=3
-Vol up:	Aiwa: {D=8,F=26,S=0},	beg=0, end=103, reps=4
+0:		Aiwa: {D=102,S=0,F=128},	beg=0, end=87	{Aiwa: {D=102,S=0,F=128},	beg=88, end=175	Aiwa2: {D=102,S=0,F=128},	beg=88, end=175, reps=1}
+	Aiwa2: {D=102,S=0,F=128},	beg=0, end=175, reps=2
+1:		Aiwa: {D=102,S=0,F=129},	beg=0, end=87	{Aiwa: {D=102,S=0,F=129},	beg=88, end=175	{Aiwa: {D=102,S=0,F=129},	beg=176, end=263	{Aiwa: {D=102,S=0,F=129},	beg=264, end=351	Aiwa2: {D=102,S=0,F=129},	beg=264, end=351, reps=1}	Aiwa2: {D=102,S=0,F=129},	beg=176, end=351, reps=2}	Aiwa2: {D=102,S=0,F=129},	beg=88, end=351, reps=3}
+	Aiwa2: {D=102,S=0,F=129},	beg=0, end=351, reps=4
+up:		Aiwa: {D=102,S=0,F=151},	beg=0, end=87	{Aiwa: {D=102,S=0,F=151},	beg=88, end=175	{Aiwa: {D=102,S=0,F=151},	beg=176, end=263	Aiwa2: {D=102,S=0,F=151},	beg=176, end=263, reps=1}	Aiwa2: {D=102,S=0,F=151},	beg=88, end=263, reps=2}
+	Aiwa2: {D=102,S=0,F=151},	beg=0, end=263, reps=3
+down:		Aiwa: {D=102,S=0,F=152},	beg=0, end=87	{Aiwa: {D=102,S=0,F=152},	beg=88, end=175	{Aiwa: {D=102,S=0,F=152},	beg=176, end=263	Aiwa2: {D=102,S=0,F=152},	beg=176, end=263, reps=1}	Aiwa2: {D=102,S=0,F=152},	beg=88, end=263, reps=2}
+	Aiwa2: {D=102,S=0,F=152},	beg=0, end=263, reps=3
+OK:		Aiwa: {D=102,S=0,F=155},	beg=0, end=87	{Aiwa: {D=102,S=0,F=155},	beg=88, end=175	Aiwa2: {D=102,S=0,F=155},	beg=88, end=175, reps=1}
+	Aiwa2: {D=102,S=0,F=155},	beg=0, end=175, reps=2
+0$1:		Aiwa: {D=8,S=0,F=0},	beg=0, end=99, reps=3
+1$1:		Aiwa: {D=8,S=0,F=1},	beg=0, end=99, reps=3
+left:		Aiwa: {D=8,S=0,F=21},	beg=0, end=99, reps=3
+right:		Aiwa: {D=8,S=0,F=18},	beg=0, end=99, reps=3
+Vol up:		Aiwa: {D=8,S=0,F=26},	beg=0, end=103, reps=4

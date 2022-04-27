@@ -1,12 +1,12 @@
-Power:	Replay: {D=230,F=7,S=3},	beg=0, end=51, reps=1
-Power$1:	Replay: {D=230,F=135,S=3},	beg=0, end=51, reps=1
-Power$2:	Replay: {D=230,F=135,S=3},	beg=0, end=51, reps=1
-1:	Replay: {D=230,F=53,S=3},	beg=0, end=47, reps=1
-1$1:	Replay: {D=230,F=181,S=3},	beg=0, end=47, reps=1
-1$2:	Replay: {D=230,F=181,S=3},	beg=0, end=47, reps=1
-Channel Up:	Replay: {D=230,F=2,S=3},	beg=0, end=51, reps=1
-Channel Up$1:	Replay: {D=230,F=130,S=3},	beg=0, end=51, reps=1
-Channel Up$2:	Replay: {D=230,F=130,S=3},	beg=0, end=51, reps=1
-Red:	Replay: {D=230,F=75,S=3},	beg=0, end=47, reps=1
-Red$1:	Replay: {D=230,F=203,S=3},	beg=0, end=49, reps=1
-Red$2:	Replay: {D=230,F=203,S=3},	beg=0, end=49, reps=1
+Power:		Replay: {D=230,S=3,F=7},	beg=0, end=51, reps=1
+Power$1:		Replay: {D=230,S=3,F=135},	beg=0, end=51, reps=1
+Power$2:		Replay: {D=230,S=3,F=135},	beg=0, end=51, reps=1
+1:		Replay: {D=230,S=3,F=53},	beg=0, end=47, reps=1
+1$1:		Replay: {D=230,S=3,F=181},	beg=0, end=47, reps=1
+1$2:		Replay: {D=230,S=3,F=181},	beg=0, end=47, reps=1
+Channel Up:		Replay: {D=230,S=3,F=2},	beg=0, end=51, reps=1
+Channel Up$1:		Replay: {D=230,S=3,F=130},	beg=0, end=51, reps=1
+Channel Up$2:		Replay: {D=230,S=3,F=130},	beg=0, end=51, reps=1
+Red:		Replay: {D=230,S=3,F=75},	beg=0, end=47, reps=1
+Red$1:		Replay: {D=230,S=3,F=203},	beg=0, end=49, reps=1
+Red$2:		Replay: {D=230,S=3,F=203},	beg=0, end=49, reps=1

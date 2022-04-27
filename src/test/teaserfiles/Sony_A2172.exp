@@ -1,5 +1,5 @@
-48 18:	Sony15: {D=48,F=18},	beg=0, end=223, reps=7
-176 120:	Sony15: {D=176,F=120},	beg=0, end=191, reps=6
-26.250 50:	Sony20: {D=26,F=50,S=250},	beg=0, end=251, reps=6
-48 105:	Sony15: {D=48,F=105},	beg=0, end=191, reps=6
-26.11 22:	Sony20: {D=26,F=22,S=11},	beg=0, end=293, reps=7
+48 18:		Sony15: {D=48,F=18},	beg=0, end=223, reps=7
+176 120:		Sony15: {D=176,F=120},	beg=0, end=191, reps=6
+26.250 50:		Sony20: {D=26,S=250,F=50},	beg=0, end=251, reps=6
+48 105:		Sony15: {D=48,F=105},	beg=0, end=191, reps=6
+26.11 22:		Sony20: {D=26,S=11,F=22},	beg=0, end=293, reps=7

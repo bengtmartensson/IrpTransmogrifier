@@ -240,7 +240,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeRc5x");
         String args = "decode --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
         String result = execute(args);
-        assertEquals(result, "RC5x: {D=5,F=32,S=108,T=1}");
+        assertEquals(result, "RC5x: {D=5,S=108,F=32,T=1}");
     }
 
     @Test(enabled = true)
@@ -267,7 +267,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeNoRepeatedNec");
         String args = "decode --debug nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293";
         String result = execute(args);
-        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0].substring(0,21), "NEC: {D=12,F=56,S=34}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0].substring(0,21), "NEC: {D=12,S=34,F=56}");
     }
 
     @Test(enabled = true)
@@ -275,7 +275,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeRepeatedNec1");
         String args = "decode -p nec1 -r  +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193";
         String result = execute(args);
-        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,S=34,F=56}");
     }
 
     @Test(enabled = true)
@@ -283,7 +283,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("testDecodeNec1OneDitto");
         String args = "decode -p nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193";
         String result = execute(args);
-        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,S=34,F=56}, beg=0, end=71, reps=1");
     }
 
     @Test(enabled = true)
@@ -292,10 +292,10 @@ public class IrpTransmogrifierNGTest {
         String sequence = NEC1INTRO + " " + NEC1DITTO + " " + NEC1INTRO + " " + NEC1DITTO + " " + NEC1DITTO + "+1234 -54678";
         String args = "decode -p nec1 " + sequence;
         String result = execute(args);
-        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {UNDECODED. length=78}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,S=34,F=56}, beg=0, end=71, reps=1 {UNDECODED. length=78}");
         args = "decode -p nec1 --recursive " + sequence;
         result = execute(args);
-        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,F=56,S=34}, beg=0, end=71, reps=1 {NEC1: {D=12,F=56,S=34}, beg=72, end=147, reps=2 {UNDECODED. length=2}}");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "NEC1: {D=12,S=34,F=56}, beg=0, end=71, reps=1 {NEC1: {D=12,S=34,F=56}, beg=72, end=147, reps=2 {UNDECODED. length=2}}");
     }
 
     @Test(enabled = true)
@@ -401,7 +401,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeRepeatedNec1Trailing_1");
         String args = "decode  -r --trailinggap 100000 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626 -96193 +9041 -2267 +626";
         String result = execute(args);
-        assertEquals(result.split("\\v+")[0], "NEC1: {D=12,F=56,S=34}");
+        assertEquals(result.split("\\v+")[0], "NEC1: {D=12,S=34,F=56}");
     }
 
     @Test(enabled = true)
@@ -549,7 +549,7 @@ public class IrpTransmogrifierNGTest {
         String result = execute("--blacklist gwts decode " + GRAHAM_PANASONIC);
         assertEquals(result, "No decodes.");
         result = execute("--blacklist gwts,nec-shirriff decode --ignoreleadinggarbage " + GRAHAM_PANASONIC);
-        assertEquals(result, "Panasonic: {D=176,F=17,S=16}, beg=16, end=115, reps=1 {UNDECODED. length=24}");
+        assertEquals(result, "Panasonic: {D=176,S=16,F=17}, beg=16, end=115, reps=1 {UNDECODED. length=24}");
     }
 
     @Test
@@ -567,10 +567,10 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeRc5x");
         String args = "decode --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
         String result = execute(args);
-        assertEquals(result, "RC5x: {D=5,F=32,S=108,T=1}");
+        assertEquals(result, "RC5x: {D=5,S=108,F=32,T=1}");
         args = "--relativetolerance 0.3 decode --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
         result = execute(args);
-        assertEquals(result, "RC5x: {D=5,F=32,S=108,T=1}");
+        assertEquals(result, "RC5x: {D=5,S=108,F=32,T=1}");
         args = "--relativetolerance 0.3 --override decode --strict -p rc5x 0000 0073 0000 000E 0040 0040 0040 0020 0020 0040 0040 0040 0020 00A0 0040 0040 0020 0020 0040 0020 0020 0040 0040 0020 0020 0020 0020 0020 0020 0020 0020 0AC8";
         result = execute(args);
         assertEquals(result, "");
@@ -580,7 +580,7 @@ public class IrpTransmogrifierNGTest {
     public void testBlacklist() {
         System.out.println("testBlackList");
         String result = execute("decode " + GRAHAM_PANASONIC);
-        assertEquals(result, "GwtS: {CRC=255,D=213,F=215}, beg=0, end=15 {UNDECODED. length=124}");
+        assertEquals(result, "GwtS: {D=213,F=215,CRC=255}, beg=0, end=15 {UNDECODED. length=124}");
         result = execute("--blacklist gwts,nec-shirriff decode " + GRAHAM_PANASONIC);
         assertEquals(result, "No decodes.");
     }

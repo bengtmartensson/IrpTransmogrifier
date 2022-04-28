@@ -212,7 +212,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
             throw new ProtocolNotDecodableException(name);
         logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSignal.toString(true)});
 
-        Decoder.DecoderParameters fixedParams = params.adjust(isRejectRepeats(), frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Decoder.DecoderParameters fixedParams = params.select(isRejectRepeats(), frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
         Map<String, Long> parameters = super.recognize(irSignal, fixedParams);
         return parameters;
     }
@@ -222,19 +222,19 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
      * The ModulatedIrSequence should contain intro or (one or many) repeat sequences, and possibly an ending sequence.
      * @param irSequence ModulatedIrSequence to be matched
      * @param beginPos Where the match is effectively started, normally 0.
-     * @param params
+     * @param userSuppliedDecoderParameters
      * @return Decoder.Decode object, containing matching data.
      * @throws SignalRecognitionException
      * @throws org.harctoolbox.irp.Protocol.ProtocolNotDecodableException
       */
-    public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, Decoder.DecoderParameters params)
+    public Decoder.Decode recognize(ModulatedIrSequence irSequence, int beginPos, Decoder.DecoderParameters userSuppliedDecoderParameters)
             throws SignalRecognitionException, ProtocolNotDecodableException {
         if (!isDecodeable())
             throw new ProtocolNotDecodableException(name);
 
         logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSequence.toString(true)});
-        Decoder.DecoderParameters fixedParams = params.adjust(false/*isRejectRepeats()*/, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), fixedParams);
+        Decoder.DecoderParameters actualParameters = userSuppliedDecoderParameters.select(false/*isRejectRepeats()*/, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
+        Decoder.Decode decode = super.recognize(irSequence, beginPos, isRejectRepeats(), actualParameters);
         return new Decoder.Decode(this, decode);
     }
 
@@ -336,54 +336,6 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
 
     public boolean isRejectRepeats() {
         return rejectRepeatless;
-    }
-
-    private double getDoubleWithSubstitute(Double userValue, Double standardValue, double fallback, boolean override) {
-        return override ? getDoubleWithSubstitute(userValue, standardValue, fallback) : getDoubleWithSubstituteNoOverride(userValue, standardValue, fallback);
-    }
-
-    private double getDoubleWithSubstituteNoOverride(Double userValue, Double standardValue, double fallback) {
-        return standardValue != null ? standardValue
-                : userValue != null ? userValue
-                : fallback;
-    }
-
-    private double getDoubleWithSubstitute(Double userValue, Double standardValue, double fallback) {
-        return userValue != null ? userValue
-                : standardValue != null ? standardValue
-                : fallback;
-    }
-
-    public double getRelativeTolerance(Double userValue, boolean override) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, relativeTolerance, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE, override);
-    }
-
-    public double getAbsoluteTolerance(Double userValue, boolean override) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, absoluteTolerance, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE, override);
-    }
-
-    public double getFrequencyTolerance(Double userValue, boolean override) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, frequencyTolerance, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE, override);
-    }
-
-    public double getMinimumLeadout(Double userValue, boolean override) throws NumberFormatException {
-        return getDoubleWithSubstitute(userValue, minimumLeadout, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT, override);
-    }
-
-    public double getRelativeTolerance() {
-        return getRelativeTolerance(null, false);
-    }
-
-    public double getAbsoluteTolerance() {
-        return getAbsoluteTolerance(null, false);
-    }
-
-    public double getFrequencyTolerance() {
-        return getFrequencyTolerance(null, false);
-    }
-
-    public double getMinimumLeadout() {
-        return getMinimumLeadout(null, false);
     }
 
     List<PreferOver> getPreferOver() {

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -133,20 +132,20 @@ public final class Decoder {
     /**
      * Delivers a List of Map of Decodes from a ModulatedIrSequence.
      * @param irSequence
-     * @param params
+     * @param userSuppliedDecoderParameters
      * @return List of decodes.
      */
-    public DecodeTree decode(ModulatedIrSequence irSequence, DecoderParameters params) {
+    public DecodeTree decode(ModulatedIrSequence irSequence, DecoderParameters userSuppliedDecoderParameters) {
         Map<Integer, Map<String, TrunkDecodeTree>> map = new HashMap<>(16);
-        DecodeTree decodes = decode(irSequence, 0, params, 0, map);
-        if (decodes.isEmpty() && params.isIgnoreLeadingGarbage()) {
-            int newStart = irSequence.firstBigGap(0, params.minimumLeadout) + 1;
-            return newStart > 0 ? decode(irSequence, newStart, params, 0, map) : decodes;
+        DecodeTree decodes = decode(irSequence, 0, userSuppliedDecoderParameters, 0, map);
+        if (decodes.isEmpty() && userSuppliedDecoderParameters.isIgnoreLeadingGarbage()) {
+            int newStart = irSequence.firstBigGap(0, userSuppliedDecoderParameters.getMinimumLeadout()) + 1;
+            return newStart > 0 ? decode(irSequence, newStart, userSuppliedDecoderParameters, 0, map) : decodes;
         } else
             return decodes;
     }
 
-    private DecodeTree decode(ModulatedIrSequence irSequence, int position, DecoderParameters params, int level, Map<Integer, Map<String, TrunkDecodeTree>>map) {
+    private DecodeTree decode(ModulatedIrSequence irSequence, int position, DecoderParameters userSuppliedDecoderParameters, int level, Map<Integer, Map<String, TrunkDecodeTree>>map) {
         logger.log(Level.FINE, String.format("level = %1$d position = %2$d", level, position));
         DecodeTree decodeTree = new DecodeTree(irSequence.getLength() - position);
         if (decodeTree.length == 0)
@@ -163,7 +162,7 @@ public final class Decoder {
                 if (p != null && p.containsKey(namedProtocol.getName())) {
                     decode = p.get(namedProtocol.getName());
                 } else {
-                    decode = tryNamedProtocol(namedProtocol, irSequence, position, params, level, map);
+                    decode = tryNamedProtocol(namedProtocol, irSequence, position, userSuppliedDecoderParameters, level, map);
                     if (!map.containsKey(position)) {
                         map.put(position, new HashMap<>(4));
                     }
@@ -176,7 +175,7 @@ public final class Decoder {
             }
         });
 
-        if (!params.isAllDecodes()) {
+        if (!userSuppliedDecoderParameters.isAllDecodes()) {
             decodeTree.reduce(parsedProtocols);
             if (decodeTree.isComplete())
                 decodeTree.removeIncompletes();
@@ -185,15 +184,15 @@ public final class Decoder {
         return decodeTree;
     }
 
-    private TrunkDecodeTree tryNamedProtocol(NamedProtocol namedProtocol, ModulatedIrSequence irSequence, int position, DecoderParameters params, int level, Map<Integer, Map<String, TrunkDecodeTree>>map)
+    private TrunkDecodeTree tryNamedProtocol(NamedProtocol namedProtocol, ModulatedIrSequence irSequence, int position, DecoderParameters userSuppliedDecoderParameters, int level, Map<Integer, Map<String, TrunkDecodeTree>>map)
             throws SignalRecognitionException, NamedProtocol.ProtocolNotDecodableException {
-        Decode decode = namedProtocol.recognize(irSequence, position, params);
-        if (params.isRemoveDefaultedParameters())
+        Decode decode = namedProtocol.recognize(irSequence, position, userSuppliedDecoderParameters);
+        if (userSuppliedDecoderParameters.isRemoveDefaultedParameters())
             decode.removeDefaulteds();
-        if (!params.recursive || decode.endPos == irSequence.getLength() - 1)
+        if (!userSuppliedDecoderParameters.recursive || decode.endPos == irSequence.getLength() - 1)
             return new TrunkDecodeTree(decode, irSequence.getLength());
 
-        DecodeTree rest = decode(irSequence, decode.getEndPos() + 1, params, level + 1, map);
+        DecodeTree rest = decode(irSequence, decode.getEndPos() + 1, userSuppliedDecoderParameters, level + 1, map);
         return new TrunkDecodeTree(decode, rest);
     }
 
@@ -296,10 +295,10 @@ public final class Decoder {
             this.allDecodes = allDecodes;
             this.removeDefaultedParameters = removeDefaultedParameters;
             this.recursive = recursive;
-            this.frequencyTolerance = IrCoreUtils.getFrequencyTolerance(frequencyTolerance);
-            this.absoluteTolerance = IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
-            this.relativeTolerance = IrCoreUtils.getRelativeTolerance(relativeTolerance);
-            this.minimumLeadout = IrCoreUtils.getMinimumLeadout(minimumLeadout);
+            this.frequencyTolerance = frequencyTolerance;
+            this.absoluteTolerance = absoluteTolerance;
+            this.relativeTolerance = relativeTolerance;
+            this.minimumLeadout = minimumLeadout;
             this.override = override;
             this.ignoreLeadingGarbage = ignoreLeadingGarbage;
         }
@@ -316,19 +315,19 @@ public final class Decoder {
             this(strict, false, true, false, frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout, false, false);
         }
 
-        public DecoderParameters adjust(boolean newStrict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
+        public DecoderParameters select(boolean newStrict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
             DecoderParameters copy = new DecoderParameters(strict || newStrict, allDecodes, removeDefaultedParameters, recursive,
-                    pick(frequencyTolerance, this.frequencyTolerance, override),
-                    pick(absoluteTolerance, this.absoluteTolerance, override),
-                    pick(relativeTolerance, this.relativeTolerance, override),
-                    pick(minimumLeadout, this.minimumLeadout, override),
+                    selectValue(frequencyTolerance, this.frequencyTolerance, override),
+                    selectValue(absoluteTolerance, this.absoluteTolerance, override),
+                    selectValue(relativeTolerance, this.relativeTolerance, override),
+                    selectValue(minimumLeadout, this.minimumLeadout, override),
                     override, ignoreLeadingGarbage);
 
             return copy;
         }
 
-        private Double pick(Double standard, Double user, boolean override) {
-            return ((override && user != null) || standard == null) ? user : standard;
+        private Double selectValue(Double databaseValue, Double userValue, boolean override) {
+            return ((override && userValue != null) || databaseValue == null) ? userValue : databaseValue;
         }
 
         @Override
@@ -379,28 +378,28 @@ public final class Decoder {
          * @return the frequencyTolerance
          */
         public Double getFrequencyTolerance() {
-            return frequencyTolerance;
+            return IrCoreUtils.getFrequencyTolerance(frequencyTolerance);
         }
 
         /**
          * @return the absoluteTolerance
          */
         public Double getAbsoluteTolerance() {
-            return absoluteTolerance;
+            return IrCoreUtils.getAbsoluteTolerance(absoluteTolerance);
         }
 
         /**
          * @return the relativeTolerance
          */
         public Double getRelativeTolerance() {
-            return relativeTolerance;
+            return IrCoreUtils.getRelativeTolerance(relativeTolerance);
         }
 
         /**
          * @return the minimumLeadout
          */
         public Double getMinimumLeadout() {
-            return minimumLeadout;
+            return IrCoreUtils.getMinimumLeadout(minimumLeadout);
         }
 
         /**

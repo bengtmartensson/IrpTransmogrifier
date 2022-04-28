@@ -116,4 +116,7 @@ merge:
 	mv src/main/resources/IrpProtocols.xml src/main/resources/IrpProtocols.xml.old
 	mv IrpProtocols.xml src/main/resources/IrpProtocols.xml
 
+all-protocols.xml: $(PROJECT_JAR)
+	./irptransmogrifier --output $@ code --target xml
+
 .PHONY: clean $(PROJECT_JAR)-test release

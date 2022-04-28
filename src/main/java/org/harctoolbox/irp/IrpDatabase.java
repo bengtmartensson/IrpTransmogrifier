@@ -449,9 +449,9 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
         return document;
     }
 
-    public Document toDocument(Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
-        Document document = mkDocument(true);
-        Element root = toElement(document, protocolNames, absoluteTolerance, relativeTolerance, frequencyTolerance, override);
+    public Document toDocument(Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, Double minimumLeadout) {
+        Document document = mkDocument(false);
+        Element root = toElement(document, protocolNames, absoluteTolerance, relativeTolerance, frequencyTolerance, minimumLeadout);
         document.appendChild(root);
         return document;
     }
@@ -469,19 +469,20 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
         return root;
     }
 
-    public Element toElement(Document document, Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
+    public Element toElement(Document document, Iterable<String> protocolNames, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, Double minimumLeadout) {
         Element root = document.createElement("NamedProtocols");
         root.setAttribute(PROG_VERSION_NAME, Version.versionString);
         root.setAttribute(VERSION_NAME, this.getConfigFileVersion());
         root.setAttribute(ABSOLUTE_TOLERANCE_NAME, Double.toString(IrCoreUtils.getAbsoluteTolerance(absoluteTolerance)));
         root.setAttribute(RELATIVE_TOLERANCE_NAME, Double.toString(IrCoreUtils.getRelativeTolerance(relativeTolerance)));
         root.setAttribute(FREQUENCY_TOLERANCE_NAME, Double.toString(IrCoreUtils.getFrequencyTolerance(frequencyTolerance)));
+        root.setAttribute(MINIMUM_LEADOUT_NAME, Double.toString(IrCoreUtils.getMinimumLeadout(minimumLeadout)));
 
         protocolNames.forEach((String pname) -> {
             try {
                 logger.log(Level.FINE, "Processing {0} ...", pname);
                 NamedProtocol protocol = getNamedProtocol(pname);
-                Element element = protocol.toElement(document, absoluteTolerance, relativeTolerance, frequencyTolerance, override);
+                Element element = protocol.toElement(document);
                 root.appendChild(element);
             } catch (NameUnassignedException | ArithmeticException | InvalidNameException | UnsupportedRepeatException | IrpInvalidArgumentException ex) {
                 logger.log(Level.WARNING, "{0}; protocol ignored", ex.getMessage());

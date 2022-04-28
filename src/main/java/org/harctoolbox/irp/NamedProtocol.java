@@ -408,21 +408,15 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
 
     @Override
     public Element toElement(Document document) {
-        return toElement(document, null, null, null, false);
-    }
-
-    public Element toElement(Document document, Double absoluteTolerance, Double relativeTolerance, Double frequencyTolerance, boolean override) {
         Element root = super.toElement(document);
         root.setAttribute(IrpDatabase.NAME_NAME, getName());
-        root.setAttribute(IrpDatabase.ABSOLUTE_TOLERANCE_NAME, Double.toString(getAbsoluteTolerance(absoluteTolerance, override)));
-        root.setAttribute(IrpDatabase.RELATIVE_TOLERANCE_NAME, Double.toString(getRelativeTolerance(relativeTolerance, override)));
-        root.setAttribute(IrpDatabase.FREQUENCY_TOLERANCE_NAME, Double.toString(getFrequencyTolerance(frequencyTolerance, override)));
-        if (frequencyLower != null)
-            root.setAttribute(IrpDatabase.FREQUENCY_LOWER_NAME, Double.toString(frequencyLower));
-        if (frequencyUpper != null)
-            root.setAttribute(IrpDatabase.FREQUENCY_UPPER_NAME, Double.toString(frequencyUpper));
-        root.setAttribute(IrpDatabase.MINIMUM_LEADOUT_NAME, Double.toString(getMinimumLeadout()));
-        XmlUtils.addBooleanAttributeIfTrue(root, IrpDatabase.DECODABLE_NAME, decodable);
+        XmlUtils.addAttributeIfNonNull(root, IrpDatabase.ABSOLUTE_TOLERANCE_NAME, absoluteTolerance);
+        XmlUtils.addAttributeIfNonNull(root, IrpDatabase.RELATIVE_TOLERANCE_NAME, relativeTolerance);
+        XmlUtils.addAttributeIfNonNull(root, IrpDatabase.FREQUENCY_TOLERANCE_NAME, frequencyTolerance);
+        XmlUtils.addAttributeIfNonNull(root, IrpDatabase.FREQUENCY_LOWER_NAME, frequencyLower);
+        XmlUtils.addAttributeIfNonNull(root, IrpDatabase.FREQUENCY_UPPER_NAME, frequencyUpper);
+        XmlUtils.addAttributeIfNonNull(root, IrpDatabase.MINIMUM_LEADOUT_NAME, minimumLeadout);
+        XmlUtils.addBooleanAttributeIfFalse(root, IrpDatabase.DECODABLE_NAME, decodable);
         XmlUtils.addBooleanAttributeIfTrue(root, IrpDatabase.REJECT_REPEATLESS_NAME, rejectRepeatless);
 
         DocumentFragment html = getDocumentation();

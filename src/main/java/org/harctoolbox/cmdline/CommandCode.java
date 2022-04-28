@@ -101,16 +101,21 @@ public class CommandCode extends AbstractCommand {
             STCodeGenerator.setStDir(stDir);
             for (String target : target)
                 // Hardcoded selection of technologies for different targets
-                if (target.equals("?"))
-                    listTargets(out);
-                else if (target.equalsIgnoreCase("xml"))
-                    createXmlProtocols(protocolNames);
-                else if (target.equalsIgnoreCase("dump"))
-                    code(protocolNames, new DumpCodeGenerator());
-                else {
-                    if (!new File(stDir).isDirectory())
-                        throw new IOException("Cannot find stdir = " + new File(stDir).getCanonicalPath());
-                    code(protocolNames, target);
+                switch (target) {
+                    case "?":
+                        listTargets(out);
+                        break;
+                    case "xml":
+                        createXmlProtocols(protocolNames);
+                        break;
+                    case "dump":
+                        code(protocolNames, new DumpCodeGenerator());
+                        break;
+                    default:
+                        if (!new File(stDir).isDirectory())
+                            throw new IOException("Cannot find stdir = " + new File(stDir).getCanonicalPath());
+                        code(protocolNames, target);
+                        break;
                 }
         }
 
@@ -155,7 +160,7 @@ public class CommandCode extends AbstractCommand {
         }
 
         private void createXmlProtocols(List<String> protocolNames) throws UnsupportedEncodingException {
-            Document document = irpDatabase.toDocument(protocolNames, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance, commandLineArgs.override);
+            Document document = irpDatabase.toDocument(protocolNames, commandLineArgs.absoluteTolerance, commandLineArgs.relativeTolerance, commandLineArgs.frequencyTolerance, commandLineArgs.minLeadout);
             XmlUtils.printDOM(out, document, commandLineArgs.outputEncoding, "Irp");
         }
 

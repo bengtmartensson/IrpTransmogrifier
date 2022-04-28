@@ -465,8 +465,18 @@ public final class XmlUtils {
             element.setAttribute(attName, TRUE);
     }
 
+    public static void addBooleanAttributeIfFalse(Element element, String attName, boolean value) {
+        if (!value)
+            element.setAttribute(attName, FALSE);
+    }
+
     public static void addDoubleAttributeAsInteger(Element element, String attName, double value) {
         element.setAttribute(attName, Long.toString(Math.round(value)));
+    }
+
+    public static void addAttributeIfNonNull(Element element, String attName, Object value) {
+        if (value != null)
+          element.setAttribute(attName, value.toString());
     }
 
     public static Document wrapDocumentFragment(DocumentFragment fragment, String namespaceURI, String tagName, String attName, String attValue) {

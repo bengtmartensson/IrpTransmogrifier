@@ -31,6 +31,8 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -534,7 +536,7 @@ public final class XmlUtils {
             try {
                 MyInput input = new MyInput(type, namespaceURI, publicId, systemId, baseURI);
                 return input;
-            } catch (IOException ex) {
+            } catch (IOException | URISyntaxException ex) {
                 throw new ThisCannotHappenException(ex);
             }
         }
@@ -547,14 +549,22 @@ public final class XmlUtils {
         private final String stringData;
         private String baseURI;
 
-        MyInput(String type, String namespaceURI, String publicId, String systemId, String baseURI) throws MalformedURLException, IOException {
+        MyInput(String type, String namespaceURI, String publicId, String systemId, String baseURI) throws URISyntaxException, IOException {
             this.publicId = publicId;
             this.systemId = systemId;
             this.baseURI = baseURI;
 
             InputStream resourceAsStream = MyEntityResolver.getStream(systemId);
-            if (resourceAsStream == null)
-                resourceAsStream = (new URL(systemId)).openStream();
+            if (resourceAsStream == null) {
+                URL url;
+                try {
+                    url = new URL(systemId);
+                } catch (MalformedURLException ex) {
+                    URL base = new URI(baseURI).toURL();
+                    url = new URL(base, systemId);
+                }
+                resourceAsStream = url.openStream();
+            }
             try (BufferedInputStream inputStream = new BufferedInputStream(resourceAsStream)) {
                 synchronized (inputStream) {
                     ByteArrayOutputStream buf = new ByteArrayOutputStream();

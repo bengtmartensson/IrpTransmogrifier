@@ -338,6 +338,30 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return rejectRepeatless;
     }
 
+    public Double getRelativeTolerance() {
+        return relativeTolerance;
+    }
+
+    public Double getAbsoluteTolerance() {
+        return absoluteTolerance;
+    }
+
+    public Double getFrequencyTolerance() {
+        return frequencyTolerance;
+    }
+
+    public Double getFrequencyUpper() {
+        return frequencyUpper;
+    }
+
+    public Double getFrequencyLower() {
+        return frequencyLower;
+    }
+
+    public Double getMinimumLeadout() {
+        return minimumLeadout;
+    }
+
     List<PreferOver> getPreferOver() {
         return Collections.unmodifiableList(preferOver);
     }

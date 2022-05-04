@@ -71,6 +71,10 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return lower <= x && x <= upper;
     }
 
+    private static double getDoubleWithSubstitute(Double value, double fallback) {
+        return value != null ? value : fallback;
+    }
+
     private final String name;
     private final transient DocumentFragment htmlDocumentation; // TODO: serialization...
     private final Double absoluteTolerance;
@@ -338,16 +342,36 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         return rejectRepeatless;
     }
 
+    /**
+     * Returns the parameters relativeTolerance, or null if not assigned.
+     * @return
+     */
     public Double getRelativeTolerance() {
         return relativeTolerance;
+    }
+
+    /**
+     * Returns the parameters relativeTolerance, or the default value if not assigned.
+     * @return
+     */
+    public double getRelativeToleranceWithDefault() {
+        return getDoubleWithSubstitute(relativeTolerance, IrCoreUtils.DEFAULT_RELATIVE_TOLERANCE);
     }
 
     public Double getAbsoluteTolerance() {
         return absoluteTolerance;
     }
 
+    public double getAbsoluteToleranceWithDefault() {
+        return getDoubleWithSubstitute(absoluteTolerance, IrCoreUtils.DEFAULT_ABSOLUTE_TOLERANCE);
+    }
+
     public Double getFrequencyTolerance() {
         return frequencyTolerance;
+    }
+
+    public double getFrequencyToleranceWithDefault() {
+        return getDoubleWithSubstitute(frequencyTolerance, IrCoreUtils.DEFAULT_FREQUENCY_TOLERANCE);
     }
 
     public Double getFrequencyUpper() {
@@ -360,6 +384,10 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
 
     public Double getMinimumLeadout() {
         return minimumLeadout;
+    }
+
+    public double getMinimumLeadoutWithDefault() {
+        return getDoubleWithSubstitute(minimumLeadout, IrCoreUtils.DEFAULT_MINIMUM_LEADOUT);
     }
 
     List<PreferOver> getPreferOver() {

@@ -193,7 +193,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.7.2</version>
+                <version>4.9.3</version>
                 <executions>
                     <execution>
                         <id>antlr</id>
@@ -215,7 +215,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -247,7 +247,7 @@
             <plugin>
                 <!-- Copy resources  in src/main/config to target dir. -->
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
@@ -312,7 +312,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -330,7 +330,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.10.1</version>
                 <configuration>
                     <showDeprecation>true</showDeprecation>
                 </configuration>
@@ -347,7 +347,7 @@
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
-                <version>4.0.2</version>
+                <version>4.9.10</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -505,7 +505,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId> <!-- transitively includes ST4, antlr-runtime, antlr4-runtime -->
-            <version>4.7.2</version>
+            <version>4.9.3</version> <!-- 4.10 and 4.10.1 not working -->
             <exclusions>
                 <exclusion>
                     <groupId>com.ibm.icu</groupId>
@@ -521,12 +521,12 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <scope>compile</scope>
-            <version>1.78</version>
+            <version>1.82</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.3.0</version>
+            <version>7.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.beust</groupId>

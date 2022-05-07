@@ -842,6 +842,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         <irp:documentation xml:space="preserve">Old version of the F12 specification.
         </irp:documentation>
         <irp:parameter name="prefer-over">F12_relaxed</irp:parameter>
+        <irp:parameter name="prefer-over">F12x</irp:parameter>
         <irp:parameter name="uei-executor">001A[D;F]</irp:parameter>
     </irp:protocol>
 

@@ -1,5 +1,5 @@
-HeatMode:	F12_relaxed: {D=3,F=33,S=1},	beg=0, end=215, reps=9
-PowerToggle:	F12_relaxed: {D=3,F=17,S=1},	beg=0, end=71, reps=3
-TempCooler:	F12_relaxed: {D=3,F=65,S=1},	beg=0, end=119, reps=5
-TempHotter:	F12_relaxed: {D=3,F=129,S=1},	beg=0, end=119, reps=5
-Timer:	F12_relaxed: {D=3,F=195,S=1},	beg=0, end=143, reps=6
+HeatMode:		F12x: {D=3,S=1,F=33},	beg=0, end=215, reps=9
+PowerToggle:		F12x: {D=3,S=1,F=17},	beg=0, end=71, reps=3
+TempCooler:		F12x: {D=3,S=1,F=65},	beg=0, end=119, reps=5
+TempHotter:		F12x: {D=3,S=1,F=129},	beg=0, end=119, reps=5
+Timer:		F12x: {D=3,S=1,F=195},	beg=0, end=143, reps=6

@@ -43,6 +43,10 @@
                 <td>2021-06-03</td>
                 <td>Update for version 1.2.10: Minor improvements.</td>
             </tr>
+            <tr>
+                <td>2022-05-07</td>
+                <td>Update for version 1.2.11: Spelling fixes etc.</td>
+            </tr>
         </table>
 
         <section>
@@ -112,7 +116,7 @@
                 <title>Dependencies</title>
                 <p>
                     The program is written entirely in Java, using no native libraries.
-                    Therefore, it runs on anything for which Java (presently version 8) is available.
+                    Therefore, it runs on anything for which Java (presently at least version 8) is available.
                     Except for building (using Maven and a number of its plugins), testing of the program (using TestNG),
                     and of course the Java framework,
                     it depends on <a href="https://www.antlr.org/">ANTLR4</a>,  <a href="https://www.stringtemplate.org/">StringTemplate</a>,
@@ -323,8 +327,8 @@
                 <section id="NumEqDurations">
                     <title>Numerical equality between durations</title>
                     <p>Two durations <em>d1</em> and <em>d2</em> are considered numerically equal,
-                        if <em>either</em> the difference is absolute less or equal than <code>absolutetolerance</code>
-                        <em>or</em> the difference divided by the largest is less than or equal than <code>relativetolerance</code>.
+                        if <em>either</em> the difference is absolute less or equal than <code>absolute-tolerance</code>
+                        <em>or</em> the difference divided by the largest is less than or equal than <code>relative-tolerance</code>.
                         (see <code>IrCoreUtils.approximatelyEquals</code>).
                     </p>
                 </section>
@@ -391,7 +395,7 @@
                         Every duration belonging to a bin is "close" (determined by those parameters) to the bin
                         middle. All the durations within the bin are then replaced by the average of its
                         members. It is thus not guaranteed that the distance between a duration and its replacement
-                        will be consistent with <code>absolutetolerance</code> and <code>relativetolerance</code>.
+                        will be consistent with <code>absolute-tolerance</code> and <code>relative-tolerance</code>.
                     </p>
                     <p>
                         If invoked on a number of IR signals/sequences, the histogram is formed over all sequences, and the corresponding
@@ -415,12 +419,12 @@
                     </p>
                     <dl>
                         <dt>
-                            <code>absolutetolerance</code>
+                            <code>absolute.tolerance</code>
                         </dt>
                         <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
 
                         <dt>
-                            <code>relativetolerance</code>
+                            <code>relative-tolerance</code>
                         </dt>
                         <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
                         <dt>
@@ -535,13 +539,13 @@
                         <p>The following parameters may be given for any protocol in the data base.
                             They override the global values for the current protocol.</p>
                         <dl>
-                            <dt id="absolutetolerance">
-                                <code>absolutetolerance</code>
+                            <dt id="absolute-tolerance">
+                                <code>absolute-tolerance</code>
                             </dt>
                             <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 100.0.</dd>
 
-                            <dt id="relativetolerance">
-                                <code>relativetolerance</code>
+                            <dt id="relative-tolerance">
+                                <code>relative-tolerance</code>
                             </dt>
                             <dd>See <a href="#NumEqDurations">Numerical equality between durations</a>. Current default: 0.3.</dd>
 
@@ -717,7 +721,7 @@
                         <code>frequencytolerance</code>. Setting <code>frequencytolerance</code> negative disables the
                         frequency test, i.e., all values pass the test.
                         </p>
-                        <p>If an assymmetric interval is needed, instead the parameters
+                        <p>If an asymmetric interval is needed, instead the parameters
                             <code>frequency-lower</code> and <code>frequency-upper</code> can instead be used, specifying the
                             lowest and highest frequency that is to be accepted.</p>
                             <p>All of these parameters are to be given in Hz, not kHz.</p>

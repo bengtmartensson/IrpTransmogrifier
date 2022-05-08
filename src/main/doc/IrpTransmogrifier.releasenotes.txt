@@ -3,6 +3,22 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
+2022-05-1x: Version 1.2.11. This version is considered "Long Time Stable".
+
+This version consists mainly of a few extensions, bugfixes and cleanups.
+
+* Bugfix/cleanup on decoder parameter and --override handling. #214.
+* Some cleanup of XML code generation.
+* Decoded protocol parameters (in toString()) now ordered as in the IRP ParameterSpecs. #207.
+* Analyze now optionally generates ParameterSpecs in the IRP. Resolves #202.
+* New protocols: Eufy, F12x, Keeprite. ((From RMIR).
+* Bugfix in  IrpDatabase.toElement(Document ...). #219.
+* Add intro, repeat, ending to --classify output. #218.
+* Remove cName (@c-name in XML) completely. #217.
+* Rename min-leadout to minimum-leading (pull request #212 from seanyoung).
+* Bugfix for IrCoreUtils.parseLong(String, boolean, int). #211.
+* New function IrpDatabase.setDocumentation.
+
 2021-06-27: Version 1.2.10. This version is considered "Long Time Stable".
 
 * New protocols NEC-Yamaha and NEC1-Yamaha.
@@ -32,7 +48,7 @@ Version 1.2.9: There is no version 1.2.9.
 * Error message improvements.
 * analyze --bit-usage now computes lengths of constant/varying segments.
 * Fix problem with analyze/--parametertable. #190.
-* IrpDatenbase: Recycle get-ted Protocols. #189.
+* IrpDatabase: Recycle get-ted Protocols. #189.
 * IrpProtocols.xml: NECx2: put reject-repeatless=true
 * Merge rmProtocols from remotemaster, several times.
 

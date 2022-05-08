@@ -4,14 +4,14 @@ This is an attempt to a high-level "roadmap" (or wishlist :-)) for IrpTransmogri
 The "low-level" issues are kept as [issues](https://github.com/bengtmartensson/IrpTransmogrifier/issues).
 
 ## Current status
-Version 1.2.8 is quite stable and "good". Future changes are expected not to change the working of
+The current version, 1.2.11 is quite stable and "good". Future changes are expected not to change the working of
 the program, or the API, in an incompatible manner.
 
 ## 1. Decoding
-There are presently two issues: [NEC2 signals are erroneously turned NEC, in loose mode](https://github.com/bengtmartensson/IrpTransmogrifier/issues/168)
-and
+There are presently one issue:
 [Decoding of long intra gaps too restrictive](https://github.com/bengtmartensson/IrpTransmogrifier/issues/111).
-Both require fairly non-trivial changes, and not really show stoppers.
+It requires fairly non-trivial changes, and is not really a show stopper.
+It is still planned to address it in the future.
 
 ## 2. Bulk analyze functions
 There are a [number of suggestion](https://github.com/bengtmartensson/IrpTransmogrifier/issues?q=is%3Aopen+is%3Aissue+label%3A%22Component%3A+Analyzer%22)

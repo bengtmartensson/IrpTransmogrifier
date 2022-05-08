@@ -576,7 +576,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             weight.
             Default: false
           -b, --bit-usage
-            Create bit usage report. (Not with --all)
+            Create bit usage report. (Not with --all.)
             Default: false
           -c, --chop
             Chop input sequence into several using threshold (in milliseconds)
@@ -593,18 +593,18 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Print the result of the repeatfinder.
             Default: false
           --eliminate-vars
-            Eliminate variables in output form
+            Eliminate variables in output form.
             Default: false
           -e, --extent
             Output the last gap as an extent.
             Default: false
           --fatgirr
-            Generate Girr file in fat format (EXPERIMENTAL).
+            Generate Girr file in fat format. Inhibits all other output.
             Default: false
           -f, --frequency
             Modulation frequency of raw signal.
           -g, --girr
-            Generate Girr file (EXPERIMENTAL).
+            Generate Girr file. Inhibits all other output.
             Default: false
           -h, -?, --help
             Print help for this command.
@@ -633,6 +633,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: 30.0
           -n, --namedinput
             File/URL from which to take inputs, one line name, data one line.
+          -P, --parameterspecs
+            Compute a dumb parameter specs in the IRP.
+            Default: false
           -p, --parametertable
             Create parameter table.
             Default: false

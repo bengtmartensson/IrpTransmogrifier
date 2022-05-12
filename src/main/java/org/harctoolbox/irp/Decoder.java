@@ -175,7 +175,9 @@ public final class Decoder {
             }
         });
 
-        if (!userSuppliedDecoderParameters.isAllDecodes()) {
+        if (userSuppliedDecoderParameters.isAllDecodes()) {
+            decodeTree.computePreferred(parsedProtocols);
+        } else {
             decodeTree.reduce(parsedProtocols);
             if (decodeTree.isComplete())
                 decodeTree.removeIncompletes();
@@ -233,8 +235,9 @@ public final class Decoder {
         });
         SimpleDecodesSet simpleDecodesSet = new SimpleDecodesSet(decodes);
 
-
-        if (!parameters.isAllDecodes())
+        if (parameters.isAllDecodes())
+            simpleDecodesSet.computePreferred(parsedProtocols);
+        else
             simpleDecodesSet.reduce(parsedProtocols);
         simpleDecodesSet.sort();
         return simpleDecodesSet;
@@ -481,6 +484,7 @@ public final class Decoder {
     public static abstract class AbstractDecodesCollection<T extends ElementaryDecode> implements Iterable<T> {
 
         protected Map<String, T> map;
+        private T preferred;
 
         AbstractDecodesCollection(Iterable<T> iterable, int size) {
             map = new LinkedHashMap<>(size);
@@ -497,6 +501,10 @@ public final class Decoder {
             this.map = new HashMap<>(map);
         }
 
+        public T getPreferred() {
+            return preferred;
+        }
+
         @Override
         public Iterator<T> iterator() {
             return map.values().iterator();
@@ -508,11 +516,21 @@ public final class Decoder {
          * @param parsedProtocols
          */
         void reduce(Map<String, NamedProtocol> parsedProtocols) {
-
             Map<String, T> old = new HashMap<>(map);
             for (Map.Entry<String, T> kvp : old.entrySet())
                 if (toBeRemoved(kvp.getValue(), parsedProtocols))
                     map.remove(kvp.getKey());
+            Iterator<T> it = map.values().iterator();
+            preferred = it.hasNext() ? it.next() : null;
+        }
+
+        void computePreferred(Map<String, NamedProtocol> parsedProtocols) {
+            for (T decode : map.values()) {
+                if (!toBeRemoved(decode, parsedProtocols)) {
+                    preferred = decode;
+                    return;
+                }
+            }
         }
 
         /**

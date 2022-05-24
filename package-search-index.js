@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.harctoolbox.analyze"},{"l":"org.harctoolbox.cmdline"},{"l":"org.harctoolbox.ircore"},{"l":"org.harctoolbox.irp"},{"l":"org.harctoolbox.lirc"},{"l":"org.harctoolbox.xml"}]
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.harctoolbox.analyze"},{"l":"org.harctoolbox.cmdline"},{"l":"org.harctoolbox.ircore"},{"l":"org.harctoolbox.irp"},{"l":"org.harctoolbox.lirc"},{"l":"org.harctoolbox.xml"}];updateSearchResults();

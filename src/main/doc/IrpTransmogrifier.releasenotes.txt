@@ -3,7 +3,7 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
-2022-05-1x: Version 1.2.11.
+2022-05-24: Version 1.2.11.
 
 This version consists mainly of a few extensions, bugfixes and cleanups.
 

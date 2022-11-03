@@ -1727,6 +1727,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
        </irp:documentation>
         <irp:parameter name="prefer-over">NECx-f16</irp:parameter>
         <irp:parameter name="reject-repeatless">true</irp:parameter>
+        <irp:parameter name="alt_name">Samsung32</irp:parameter>
         <irp:parameter name="uei-executor" type="xml">
             <rm:deployment executor="011A:JP1{X=F^E^129,Y=2*X:1+X:1:7,E=-1}(;X:6:1==63)[D?0,S?0,D?1,S?1,D?2,S?2,D?3,S?3;F,??,2,Y]">
                 <rm:protocolName>NECx1-Yamaha</rm:protocolName>

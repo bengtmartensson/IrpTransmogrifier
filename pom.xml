@@ -7,7 +7,7 @@
     <groupId>org.harctoolbox</groupId>
     <artifactId>IrpTransmogrifier</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.11</version>
+    <version>1.2.12-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <licenses>
         <license>
@@ -418,7 +418,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>

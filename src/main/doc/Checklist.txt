@@ -16,7 +16,8 @@ Checklist for release (for maintainer)
 6. Delete CI build.
 7. make deploy. If error, try again. Can take a several hours, even
    days, until it shows up at
-   https://mvnrepository.com/artifact/org.harctoolbox/IrpTransmogrifier
+   https://mvnrepository.com/artifact/org.harctoolbox/
+   Faster: https://repo.maven.apache.org/maven2/org/harctoolbox/
 8. make gh-pages.
 9. cd .../www.harctoolbox.org; make clean; make site.
 #10 cd build/site/en/; make clean; make site

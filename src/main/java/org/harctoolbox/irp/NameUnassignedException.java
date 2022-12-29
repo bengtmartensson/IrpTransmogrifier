@@ -23,7 +23,7 @@ package org.harctoolbox.irp;
 public final class NameUnassignedException extends IrpException {
 
     public NameUnassignedException(String name) {
-        super("Name " + name + " not assigned");
+        super("Name \"" + name + "\" not assigned");
     }
 
 //    public NameUnassignedException(Throwable ex) {

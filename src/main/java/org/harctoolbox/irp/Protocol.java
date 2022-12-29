@@ -256,9 +256,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         if (hasVariation(true, Pass.intro) && this.bitspecIrstream.getIrStream().getRepeatMarker().getMin() == 0)
             throw new UnsupportedRepeatException("Cannot have a variations with non-empty intro in an IrStream with repeat \"*\"; please change to \"+\".");
 
-        if (parameterSpecs.isEmpty()) {
-            logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
-        }
+        Integer numberBits = numberOfBits();
+        if (parameterSpecs.isEmpty() && numberBits != null && numberBits > 0) {
+                logger.log(Level.WARNING, "Parameter specs are missing from protocol. Runtime errors due to unassigned variables are possile. Also silent truncation of parameters can occur. Further messages on parameters will be suppressed.");
+            }
         if (generalSpec == null) {
             // should have been caught during initial parsing
             throw new ThisCannotHappenException("GeneralSpec missing from protocol");
@@ -902,6 +903,11 @@ public class Protocol extends IrpObject implements AggregateLister {
         map.put(name, props);
     }
 
+    @Override
+    public Integer numberOfBits() {
+        return bitspecIrstream.numberOfBits();
+    }
+
     public boolean nonConstantBitFieldLength() {
         return bitspecIrstream.nonConstantBitFieldLength();
     }
@@ -972,9 +978,14 @@ public class Protocol extends IrpObject implements AggregateLister {
         return result;
     }
 
-    public void createParameterSpecs() throws InvalidNameException {
+    private ParameterSpecs computeParameterSpecs() throws InvalidNameException, NameUnassignedException {
         ParameterSpecs paramSpecs = new ParameterSpecs();
         bitspecIrstream.createParameterSpecs(paramSpecs); // may throw
+        return paramSpecs;
+    }
+
+    private void createParameterSpecs() throws InvalidNameException, NameUnassignedException {
+        ParameterSpecs paramSpecs = computeParameterSpecs(); // may throw
         // Got here only if no thows
         parameterSpecs.replace(paramSpecs);
     }
@@ -984,6 +995,8 @@ public class Protocol extends IrpObject implements AggregateLister {
             createParameterSpecs();
         } catch (InvalidNameException ex) {
             logger.log(Level.WARNING, null, ex);
+        } catch (NameUnassignedException ex) {
+            Logger.getLogger(Protocol.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

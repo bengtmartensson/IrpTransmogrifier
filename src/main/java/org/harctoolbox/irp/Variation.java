@@ -120,7 +120,11 @@ public final class Variation extends IrpObject implements IrStreamItem {
 
     @Override
     public Integer numberOfBits() {
-        return null;
+        try {
+            return intro.numberOfBits() + repeat.numberOfBits() + ending.numberOfBits();
+        } catch (NullPointerException ex) {
+            return null;
+        }
     }
 
     @Override

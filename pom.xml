@@ -193,7 +193,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.9.3</version>
+                <version>4.9.3</version> <!-- Newer versions seem not compatible -->
                 <executions>
                     <execution>
                         <id>antlr</id>
@@ -215,7 +215,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -247,7 +247,7 @@
             <plugin>
                 <!-- Copy resources  in src/main/config to target dir. -->
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
@@ -291,7 +291,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.7.0</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -373,7 +373,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.4.1</version>
                         <configuration>
                             <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
                             <show>package</show> <!-- Document also package private classes -->
@@ -391,7 +391,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -404,7 +404,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -442,7 +442,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.6.0</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>make-wrapper-executable</id>
@@ -476,7 +476,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>3.1.0</version>
                     <executions>
                         <!-- compute checksums -->
                         <!-- I know the checksum-maven-plugin, but it does not do what I want) -->
@@ -505,7 +505,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId> <!-- transitively includes ST4, antlr-runtime, antlr4-runtime -->
-            <version>4.9.3</version> <!-- 4.10 and 4.10.1 not working -->
+            <version>4.9.3</version> <!-- 4.10.* and 4.11.* not compatible -->
             <exclusions>
                 <exclusion>
                     <groupId>com.ibm.icu</groupId>

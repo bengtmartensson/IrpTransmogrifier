@@ -189,10 +189,9 @@ public final class IrSignal implements Cloneable, Serializable {
     private void setup(IrSequence introSequence, IrSequence repeatSequence, IrSequence endingSequence, Double frequency, Double dutyCycle) {
         this.frequency = frequency;
         this.dutyCycle = dutyCycle;
-        // If the given intro sequence is identical to the repeat sequence, reject it.
-        this.introSequence = ((introSequence != null) && !introSequence.approximatelyEquals(repeatSequence)) ? introSequence : new IrSequence();
+        this.introSequence  = introSequence  != null ? introSequence  : new IrSequence();
         this.repeatSequence = repeatSequence != null ? repeatSequence : new IrSequence();
-        this.endingSequence = ((endingSequence != null) && !endingSequence.approximatelyEquals(repeatSequence)) ? endingSequence : new IrSequence();
+        this.endingSequence = endingSequence != null ? endingSequence : new IrSequence();
 
         map = new EnumMap<>(Pass.class);
 

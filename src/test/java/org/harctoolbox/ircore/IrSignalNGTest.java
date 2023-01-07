@@ -40,7 +40,7 @@ public class IrSignalNGTest {
         IrSequence irSequence = new IrSequence("12 34 56 78");
         ModulatedIrSequence modulatedIrSequence = new ModulatedIrSequence(irSequence, 38901.23);
         IrSignal instance = new IrSignal(modulatedIrSequence, modulatedIrSequence, irSequence, 33333.3);
-        String expResult = "Freq=33333Hz[][+12,-34,+56,-78][]";
+        String expResult = "Freq=33333Hz[+12,-34,+56,-78][+12,-34,+56,-78][+12,-34,+56,-78]";
         String result = instance.toString(alternatingSigns);
         assertEquals(result, expResult);
     }

@@ -180,7 +180,7 @@ public class ProtocolNGTest {
     }
 
     @Test
-    public void testRandomParametersNec1() throws InvalidNameException {
+    public void testRandomParametersNec1() throws InvalidNameException, ParameterSpecs.EmptyParameterSpecsException {
         System.out.println("randomParametersNec1");
         NameEngine nameEngine = new NameEngine("{D=186,S=13,F=174}");
         Random rng = new Random(42);

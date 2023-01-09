@@ -177,7 +177,8 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
             parameter.check(nameEngine);
     }
 
-    public Map<String, Long> random() {
+    public Map<String, Long> random() throws EmptyParameterSpecsException {
+        checkNonEmpty();
         Map<String, Long> nameEngine = new HashMap<>(map.size());
         map.values().stream().forEach((parameter) -> {
             nameEngine.put(parameter.getName(), parameter.random());
@@ -186,7 +187,8 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return nameEngine;
     }
 
-    public Map<String, Long> random(Random rng) {
+    public Map<String, Long> random(Random rng) throws EmptyParameterSpecsException {
+        checkNonEmpty();
         Map<String, Long> nameEngine = new HashMap<>(map.size());
         map.values().stream().forEach((parameter) -> {
             nameEngine.put(parameter.getName(), parameter.random(rng));
@@ -195,7 +197,8 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return nameEngine;
     }
 
-    public Map<String, Long> randomUsingDefaults() {
+    public Map<String, Long> randomUsingDefaults() throws EmptyParameterSpecsException {
+        checkNonEmpty();
         Map<String, Long> nameEngine = new HashMap<>(map.size());
         map.values().stream().filter((parameter) -> (parameter.getDefault() == null)).forEach((parameter) -> {
             nameEngine.put(parameter.getName(), parameter.random());
@@ -204,7 +207,8 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
         return nameEngine;
     }
 
-    public Map<String, Long> randomUsingDefaults(Random rng) {
+    public Map<String, Long> randomUsingDefaults(Random rng) throws EmptyParameterSpecsException {
+        checkNonEmpty();
         Map<String, Long> nameEngine = new HashMap<>(map.size());
         map.values().stream().filter((parameter) -> (parameter.getDefault() == null)).forEach((parameter) -> {
             nameEngine.put(parameter.getName(), parameter.random(rng));
@@ -337,5 +341,17 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
             map.put(name, newSpec);
         } else
             oldSpec.tweak(min, max);
+    }
+
+    private void checkNonEmpty() throws EmptyParameterSpecsException {
+        if (map.isEmpty())
+            throw new EmptyParameterSpecsException("Cannot call random on empty ParameterSpecs");
+    }
+
+    public static class EmptyParameterSpecsException extends IrpException {
+
+        public EmptyParameterSpecsException(String msg) {
+            super(msg);
+        }
     }
 }

@@ -570,11 +570,11 @@ public class Protocol extends IrpObject implements AggregateLister {
         return toIrpString(radix, usePeriods, tsvOptimized ? "\t" : "");
     }
 
-    public Map<String, Long> randomParameters() {
+    public Map<String, Long> randomParameters() throws ParameterSpecs.EmptyParameterSpecsException {
         return parameterSpecs.random();
     }
 
-    public Map<String, Long> randomParameters(Random random) {
+    public Map<String, Long> randomParameters(Random random) throws ParameterSpecs.EmptyParameterSpecsException {
         return parameterSpecs.random(random);
     }
 

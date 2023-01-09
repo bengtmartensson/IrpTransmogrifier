@@ -106,7 +106,7 @@ public class DecoderNGTest {
                 }
             }
             return true;
-        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException | OddSequenceLengthException ex) {
+        } catch (DomainViolationException | NameUnassignedException | IrpInvalidArgumentException | InvalidNameException | OddSequenceLengthException | ParameterSpecs.EmptyParameterSpecsException ex) {
             throw new ThisCannotHappenException(ex);
         }
     }

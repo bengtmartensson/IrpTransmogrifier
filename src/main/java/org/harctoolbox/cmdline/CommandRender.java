@@ -38,6 +38,7 @@ import org.harctoolbox.irp.IrpParseException;
 import org.harctoolbox.irp.NameEngine;
 import org.harctoolbox.irp.NameUnassignedException;
 import org.harctoolbox.irp.NamedProtocol;
+import org.harctoolbox.irp.ParameterSpecs;
 import org.harctoolbox.irp.UnknownProtocolException;
 import org.harctoolbox.irp.UnsupportedRepeatException;
 
@@ -98,7 +99,7 @@ public class CommandRender extends AbstractCommand {
                 + "it may need to be enclosed within single or double quotes.";
     }
 
-    public void render(PrintStream printStream, IrpDatabase irpDatabase, CommandCommonOptions commonOptions) throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, NamedProtocol.ProtocolNotRenderableException {
+    public void render(PrintStream printStream, IrpDatabase irpDatabase, CommandCommonOptions commonOptions) throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, NamedProtocol.ProtocolNotRenderableException, ParameterSpecs.EmptyParameterSpecsException {
         Renderer renderer = new Renderer(printStream, irpDatabase, commonOptions);
         renderer.render();
     }
@@ -115,7 +116,7 @@ public class CommandRender extends AbstractCommand {
             this.out = printStream;
         }
 
-        private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, NamedProtocol.ProtocolNotRenderableException {
+        private void render() throws UsageException, IOException, OddSequenceLengthException, UnknownProtocolException, InvalidNameException, DomainViolationException, UnsupportedRepeatException, IrpInvalidArgumentException, NameUnassignedException, IrpParseException, NamedProtocol.ProtocolNotRenderableException, ParameterSpecs.EmptyParameterSpecsException {
             if (commandLineArgs.irp == null && (random != nameEngine.isEmpty()))
                 throw new UsageException("Must give exactly one of --nameengine and --random, unless using --irp");
 
@@ -133,7 +134,7 @@ public class CommandRender extends AbstractCommand {
             }
         }
 
-        private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException, NamedProtocol.ProtocolNotRenderableException, IrpParseException {
+        private void render(NamedProtocol protocol) throws OddSequenceLengthException, DomainViolationException, IrpInvalidArgumentException, NameUnassignedException, UsageException, InvalidNameException, NamedProtocol.ProtocolNotRenderableException, IrpParseException, ParameterSpecs.EmptyParameterSpecsException {
             if (nameEngine.isEmpty() && random) {
                 nameEngine = new NameEngine(protocol.randomParameters());
                 logger.log(Level.INFO, nameEngine.toString());

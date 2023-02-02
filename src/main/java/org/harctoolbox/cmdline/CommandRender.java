@@ -61,7 +61,6 @@ public class CommandRender extends AbstractCommand {
     private NameEngine nameEngine = new NameEngine();
 
     @Parameter(names = {"-p", "--pronto", "--ccf", "--hex"}, description = "Generate Pronto hex.")
-
     private boolean pronto = false;
 
     @Parameter(names = {"-P", "--printparameters"}, description = "Print actual parameters values, for example by --random")
@@ -79,7 +78,7 @@ public class CommandRender extends AbstractCommand {
     @Parameter(names = {"--number-repeats"}, description = "Generate an IR sequence containing the given number of repeats")
     private Integer numberRepeats = null;
 
-    @Parameter(description = "protocol(s) or pattern (default all)"/*, required = true*/)
+    @Parameter(description = "protocol(s) or pattern (default all)")
     private List<String> protocols = new ArrayList<>(0);
 
     @Override

@@ -152,12 +152,16 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     public boolean hasVariation(boolean recursive, Pass pass) {
         for (IrStreamItem irStreamItem : irStreamItems) {
             if (irStreamItem instanceof Variation)
-                return ((Variation) irStreamItem).hasPart(pass);
+                if (((Variation) irStreamItem).hasPart(pass))
+                    return true;
             if (recursive && irStreamItem instanceof BitspecIrstream)
                 if (((BitspecIrstream) irStreamItem).hasVariation(recursive, pass))
                     return true;
             if (recursive && irStreamItem instanceof BareIrStream)
                 if (((BareIrStream) irStreamItem).hasVariation(recursive, pass))
+                    return true;
+            if (recursive && irStreamItem instanceof IrStream)
+                if (((IrStream) irStreamItem).hasVariation(recursive, pass))
                     return true;
         }
         return false; // give up
@@ -171,6 +175,8 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
                 return ((BitspecIrstream) irStreamItem).hasVariationWithIntroEqualsRepeat();
             if (irStreamItem instanceof BareIrStream)
                 return ((BareIrStream) irStreamItem).hasVariationWithIntroEqualsRepeat();
+            if (irStreamItem instanceof IrStream)
+                return ((IrStream) irStreamItem).hasVariationWithIntroEqualsRepeat();
         }
         return false; // give up
     }

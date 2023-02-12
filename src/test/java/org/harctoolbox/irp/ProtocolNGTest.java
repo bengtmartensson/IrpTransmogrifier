@@ -1018,14 +1018,12 @@ public class ProtocolNGTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testVariantRepeat() throws NameUnassignedException, InvalidNameException, IrpInvalidArgumentException, UnsupportedRepeatException, DomainViolationException, OddSequenceLengthException {
+    public void testVariantRepeat() throws NameUnassignedException, InvalidNameException, IrpInvalidArgumentException {
         try {
             new Protocol("{}<1,-1|1,-3>([11][22][33],-100)*");
             fail();
         } catch (UnsupportedRepeatException ex) {
             // success!
-        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
-            fail();
         }
 
         try {
@@ -1033,8 +1031,6 @@ public class ProtocolNGTest {
             fail();
         } catch (UnsupportedRepeatException ex) {
             // success!
-        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
-            fail();
         }
 
         try {
@@ -1042,8 +1038,6 @@ public class ProtocolNGTest {
             fail();
         } catch (UnsupportedRepeatException ex) {
             // success!
-        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
-            fail();
         }
 
         try {
@@ -1051,8 +1045,6 @@ public class ProtocolNGTest {
             fail();
         } catch (UnsupportedRepeatException ex) {
             // success!
-        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
-            fail();
         }
     }
 

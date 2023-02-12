@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.harctoolbox.ircore.IrSignal;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.xml.XmlExport;
 
 /**
@@ -40,6 +41,8 @@ public interface IrStreamItem extends XmlExport {
 
     public static IrStreamItem newIrStreamItem(IrpParser.Irstream_itemContext ctx) {
         ParseTree child = ctx.getChild(0);
+        if (child instanceof IrpParser.Infinite_bitfieldContext)
+            throw new ThisCannotHappenException("Infinite Bitfield " + new InfiniteBitField((IrpParser.Infinite_bitfieldContext) child) + " cannot be put into an IrStream.");
         return (child instanceof IrpParser.VariationContext) ? new Variation(((IrpParser.VariationContext) child))
                 : (child instanceof IrpParser.Finite_bitfieldContext) ? FiniteBitField.newFiniteBitField((IrpParser.Finite_bitfieldContext) child)
                 : (child instanceof IrpParser.AssignmentContext) ? new Assignment((IrpParser.AssignmentContext) child)

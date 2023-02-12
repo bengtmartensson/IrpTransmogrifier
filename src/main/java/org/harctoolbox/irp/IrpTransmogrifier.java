@@ -40,6 +40,7 @@ import org.harctoolbox.cmdline.ProgramExitStatus;
 import org.harctoolbox.cmdline.UsageException;
 import org.harctoolbox.ircore.IrCoreException;
 import org.harctoolbox.ircore.OddSequenceLengthException;
+import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.xml.sax.SAXException;
 
 /**
@@ -163,9 +164,9 @@ public final class IrpTransmogrifier extends CmdLineProgram {
         } catch (NamedProtocol.TooDeepPreferOversException ex) {
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_INTERNAL_FAILURE,
                     "Too many level of prefer-overs (" + NamedProtocol.TooDeepPreferOversException.MAX_NESTED_PREFER_OVERS + ") for protocol \"" + ex.getMessage() + "\"");
-        } catch (IrpException | IrCoreException | UsageException | FileNotFoundException ex) {
+        } catch (IrpException | IrCoreException | UsageException | FileNotFoundException | ThisCannotHappenException ex) {
             // Exceptions likely from silly user input, just print the exception
-            return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+            return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_SEMANTIC_USAGE_ERROR, ex.getLocalizedMessage());
         } catch (ParseCancellationException ex) {
             // When we get here,
             // Antlr has already written a somewhat sensible error message on

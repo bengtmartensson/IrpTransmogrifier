@@ -1016,6 +1016,46 @@ public class ProtocolNGTest {
         assertEquals(irSignal.toString(true), "Freq=38000Hz[+111,-222,+11,-100][+111,-222,+22,-100][+111,-222,+33,-100]");
     }
 
+    @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    public void testVariantRepeat() throws NameUnassignedException, InvalidNameException, IrpInvalidArgumentException, UnsupportedRepeatException, DomainViolationException, OddSequenceLengthException {
+        try {
+            new Protocol("{}<1,-1|1,-3>([11][22][33],-100)*");
+            fail();
+        } catch (UnsupportedRepeatException ex) {
+            // success!
+        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
+            fail();
+        }
+
+        try {
+            new Protocol("{}<1,-1|1,-3>(100,-10,([11][22][33])2,-100)*");
+            fail();
+        } catch (UnsupportedRepeatException ex) {
+            // success!
+        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
+            fail();
+        }
+
+        try {
+            new Protocol("{}<1,-1|1,-3>(100,-10,([][22][33])2,([11][22][33])2,-100)*");
+            fail();
+        } catch (UnsupportedRepeatException ex) {
+            // success!
+        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
+            fail();
+        }
+
+        try {
+            new Protocol("{}<1,-1|1,-3>(100,-10,[][22][33],[11][22][33],-100)*");
+            fail();
+        } catch (UnsupportedRepeatException ex) {
+            // success!
+        } catch (InvalidNameException | IrpInvalidArgumentException | NameUnassignedException ex) {
+            fail();
+        }
+    }
+
     /**
      * Test of sort method, of class Protocol.
      */

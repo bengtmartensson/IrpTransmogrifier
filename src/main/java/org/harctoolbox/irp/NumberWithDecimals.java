@@ -54,7 +54,7 @@ public final class NumberWithDecimals extends IrpObject implements Floatable {
         Objects.requireNonNull(child);
         data = (child instanceof IrpParser.Float_numberContext)
                 ? FloatNumber.parse((IrpParser.Float_numberContext) child)
-                : Integer.parseInt(child.getText());
+                : Long.parseLong(child.getText());
     }
 
     public NumberWithDecimals(double d) {

@@ -74,7 +74,7 @@ public class DurationNGTest {
 
             result = Duration.newDuration("55555555555");
             assertTrue(result instanceof Flash);
-            assertEquals(result.toFloat(generalSpec, nameEngine), 11111111111000f, 1e5);
+            assertEquals(result.toFloat(generalSpec, nameEngine), 11111111111000d);
         } catch (IrpInvalidArgumentException | InvalidNameException | NameUnassignedException ex) {
             fail();
         }

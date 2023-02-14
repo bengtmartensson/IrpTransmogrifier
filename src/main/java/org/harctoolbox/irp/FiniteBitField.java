@@ -144,7 +144,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     public String toBinaryString(NameEngine nameEngine) throws NameUnassignedException {
         String str = Long.toBinaryString(toLong(nameEngine));
-        int wid = (int) width.toLong(nameEngine);
+        int wid = (int) getWidth(nameEngine);
         int len = str.length();
         if (len > wid)
             return str.substring(len - wid);
@@ -157,7 +157,11 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public long getWidth(NameEngine nameEngine) throws NameUnassignedException {
-        return width.toLong(nameEngine);
+        long wid = width.toLong(nameEngine);
+        if (wid > MAXWIDTH) {
+            wid = MAXWIDTH;
+        }
+        return wid;
     }
 
     @Override
@@ -186,7 +190,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
         String widthString;
         try {
-            widthString = Long.toString(width.toLong(nameEngine));
+            widthString = Long.toString(getWidth(nameEngine));
         } catch (NameUnassignedException ex) {
             widthString = width.toIrpString(10);
         }

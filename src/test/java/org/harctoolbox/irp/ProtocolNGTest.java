@@ -1056,6 +1056,18 @@ public class ProtocolNGTest {
         }
     }
 
+    @Test
+    public void testLargeBitField() throws NameUnassignedException, InvalidNameException, IrpInvalidArgumentException,
+            UnsupportedRepeatException, DomainViolationException, OddSequenceLengthException {
+        // Bitfield Should be limited to 63, else this will run forever until heap is exhausted
+        Protocol protocol = new Protocol("{38.4k,416,msb}<1,-6|1,-12>(1:1000000000)*");
+
+        IrSignal irSignal = protocol.toIrSignal(NameEngine.EMPTY);
+
+        assertEquals(irSignal.toString(true),
+                "Freq=38400Hz[][+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-2496,+416,-4992][]");
+    }
+
     /**
      * Test of sort method, of class Protocol.
      */

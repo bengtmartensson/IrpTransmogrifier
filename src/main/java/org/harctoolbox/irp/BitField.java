@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2023 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -74,12 +74,15 @@ public abstract class BitField extends IrpObject implements Numerical, EquationS
         return FiniteBitField.newExpression(ctx);
     }
 
-    protected boolean complement;
-    protected PrimaryItem data;
-    protected PrimaryItem chop;
+    private final PrimaryItem data;
+    private final PrimaryItem chop;
+    private final boolean complement;
 
-    protected BitField(ParseTree ctx) {
+    protected BitField(ParseTree ctx, PrimaryItem data, PrimaryItem chop, boolean  complement) {
         super(ctx);
+        this.data = data;
+        this.chop = chop;
+        this.complement = complement;
     }
 
     @Override
@@ -113,12 +116,22 @@ public abstract class BitField extends IrpObject implements Numerical, EquationS
 
     protected abstract BitwiseParameter getWidth(RecognizeData nameResolver) throws NameUnassignedException;
 
-    public long getChop(NameEngine nameResolver) throws NameUnassignedException {
-        return chop.toLong(nameResolver);
+    public PrimaryItem getChop() {
+        return chop;
     }
 
-    protected long getChop() throws NameUnassignedException {
-        return chop.toLong();
+    /**
+     * @return the complement
+     */
+    public boolean isComplement() {
+        return complement;
+    }
+
+    /**
+     * @return the data
+     */
+    public PrimaryItem getData() {
+        return data;
     }
 
     public BitwiseParameter getChop(RecognizeData recognizeData) {

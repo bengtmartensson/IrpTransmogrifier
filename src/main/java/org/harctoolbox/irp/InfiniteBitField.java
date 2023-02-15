@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2023 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,37 +36,39 @@ public final class InfiniteBitField extends BitField {
     }
 
     public InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx) {
-        super(ctx);
-        complement = ! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext);
-        data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
-        chop = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
+        this(ctx,
+                PrimaryItem.newPrimaryItem(ctx.primary_item(0)), // data
+                PrimaryItem.newPrimaryItem(ctx.primary_item(1)), // chop
+                ! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext) // complement
+        );
     }
 
     private InfiniteBitField(PrimaryItem data, PrimaryItem chop, boolean complement) {
-        super(null);
-        this.data = data;
-        this.chop = chop;
-        this.complement = complement;
+        this(null, data, chop, complement);
+    }
+
+    private InfiniteBitField(IrpParser.Infinite_bitfieldContext ctx, PrimaryItem data, PrimaryItem chop, boolean complement) {
+        super(ctx, data, chop, complement);
     }
 
     @Override
     public InfiniteBitField substituteConstantVariables(Map<String, Long> constantVariables) {
-        return new InfiniteBitField(data.substituteConstantVariables(constantVariables),
-                chop.substituteConstantVariables(constantVariables), complement);
+        return new InfiniteBitField(getData().substituteConstantVariables(constantVariables),
+                getChop().substituteConstantVariables(constantVariables), isComplement());
     }
 
     @Override
     public long toLong(NameEngine nameEngine) throws NameUnassignedException {
-        return toLong(data.toLong(nameEngine), chop.toLong(nameEngine), complement);
+        return toLong(getData().toLong(nameEngine), getChop().toLong(nameEngine), isComplement());
     }
 
     @Override
     public BitwiseParameter toBitwiseParameter(RecognizeData recognizeData) {
-        BitwiseParameter payload = this.data.toBitwiseParameter(recognizeData);
+        BitwiseParameter payload = getData().toBitwiseParameter(recognizeData);
         if (payload == null)
             return new BitwiseParameter();
-        long ch = chop.toBitwiseParameter(recognizeData).longValueExact();
-        long value = toLong(payload.getValue(), ch, complement);
+        long ch = getChop().toBitwiseParameter(recognizeData).longValueExact();
+        long value = toLong(payload.getValue(), ch, isComplement());
         return new BitwiseParameter(value, payload.getBitmask() >> ch);
     }
 
@@ -84,36 +86,36 @@ public final class InfiniteBitField extends BitField {
     public String toString(NameEngine nameEngine) {
         String chopString;
         try {
-            chopString = Long.toString(chop.toLong(nameEngine));
+            chopString = Long.toString(getChop().toLong(nameEngine));
         } catch (NameUnassignedException ex) {
-            chopString = chop.toIrpString(10);
+            chopString = getChop().toIrpString(10);
         }
 
         String dataString;
         try {
-            dataString = Long.toString(data.toLong(nameEngine));
+            dataString = Long.toString(getData().toLong(nameEngine));
         } catch (NameUnassignedException ex) {
-            dataString = data.toIrpString(10);
+            dataString = getData().toIrpString(10);
         }
 
-        return (complement ? "~" : "") + dataString + "::" + chopString;
+        return (isComplement() ? "~" : "") + dataString + "::" + chopString;
     }
 
     @Override
     public String toIrpString(int radix) {
-        return (complement ? "~" : "") + data.toIrpString(radix) + "::" + chop.toIrpString(10);
+        return (isComplement() ? "~" : "") + getData().toIrpString(radix) + "::" + getChop().toIrpString(10);
     }
 
     @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);
-        element.setAttribute("complement", Boolean.toString(complement));
+        element.setAttribute("complement", Boolean.toString(isComplement()));
         Element dataElement = document.createElement("Data");
-        dataElement.appendChild(data.toElement(document));
+        dataElement.appendChild(getData().toElement(document));
         element.appendChild(dataElement);
-        if (!(chop instanceof Number && ((Number) chop).toLong() == 0)) {
+        if (!(getChop() instanceof Number && ((Number) getChop()).toLong() == 0)) {
             Element chopElement = document.createElement("Chop");
-            chopElement.appendChild(chop.toElement(document));
+            chopElement.appendChild(getChop().toElement(document));
             element.appendChild(chopElement);
         }
         return element;
@@ -134,9 +136,9 @@ public final class InfiniteBitField extends BitField {
 
     @Override
     public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData recognizeData/*, long oldBitmask*/) throws NameUnassignedException {
-        long ch = getChop(recognizeData.getNameEngine());
+        long ch = getChop().toLong(recognizeData.getNameEngine());
         long payload = rhs.getValue();
-        if (complement)
+        if (isComplement())
             payload = ~payload;
         long bitmask = rhs.getBitmask() << ch;
         payload <<= ch;

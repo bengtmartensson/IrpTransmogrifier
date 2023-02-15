@@ -24,7 +24,10 @@ import org.w3c.dom.Element;
 public final class InfiniteBitField extends BitField {
 
     public static long toLong(long data, long chop, boolean complement) {
-        return toLong(data, MAXWIDTH, chop, complement, false);
+        long x = data >> chop;
+        if (complement)
+            x = ~x;
+        return x;
     }
 
     public InfiniteBitField(String str) {
@@ -74,12 +77,12 @@ public final class InfiniteBitField extends BitField {
 
     @Override
     public long getWidth(NameEngine nameEngine) {
-        return MAXWIDTH;
+        return FiniteBitField.MAXWIDTH;
     }
 
     @Override
     protected BitwiseParameter getWidth(RecognizeData nameResolver) throws NameUnassignedException {
-        return new BitwiseParameter(MAXWIDTH);
+        return new BitwiseParameter(FiniteBitField.MAXWIDTH);
     }
 
     @Override

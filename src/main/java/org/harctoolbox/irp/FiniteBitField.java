@@ -36,8 +36,25 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
 
+    /**
+     * Max length of a BitField in this implementation.
+     */
+    public static final int MAXWIDTH = Long.SIZE - 1; // = 63
+
     public static FiniteBitField newFiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
         return new FiniteBitField(ctx);
+    }
+
+    public static long toLong(long data, long width, long chop, boolean complement, boolean reverse) {
+        long x = data >> chop;
+        if (complement)
+            x = ~x;
+        if (width < MAXWIDTH)
+            x &= IrCoreUtils.ones(width);
+        if (reverse)
+            x = IrCoreUtils.reverse(x, (int) width);
+
+        return x;
     }
 
     private PrimaryItem width;
@@ -67,21 +84,20 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         this(null, data, width, chop, complement, reverse);
     }
 
-    private FiniteBitField(IrpParser.Finite_bitfieldContext ctx, PrimaryItem data, PrimaryItem width, PrimaryItem chop, boolean complement, boolean reverse) throws InvalidNameException {
+    private FiniteBitField(IrpParser.Finite_bitfieldContext ctx, PrimaryItem data, PrimaryItem width, PrimaryItem chop, boolean complement, boolean reverse) {
         super(ctx, data, chop, complement);
         this.width = width;
         this.reverse = reverse;
     }
 
     public FiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
-        super(ctx,
+        this(ctx,
                 PrimaryItem.newPrimaryItem(ctx.primary_item(0)), // data
+                PrimaryItem.newPrimaryItem(ctx.primary_item(1)), // width
                 ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0), // chop
-                !(ctx.getChild(0) instanceof IrpParser.Primary_itemContext) // complement
+                !(ctx.getChild(0) instanceof IrpParser.Primary_itemContext), // complementnReverse = (ctx.getChild(0) instanceof IrpParser.Primary_itemContext) ? 2 : 3;
+                !(ctx.getChild((ctx.getChild(0) instanceof IrpParser.Primary_itemContext) ? 2 : 3) instanceof IrpParser.Primary_itemContext)
         );
-        width = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
-        int locationReverse = (ctx.getChild(0) instanceof IrpParser.Primary_itemContext) ? 2 : 3;
-        reverse = !(ctx.getChild(locationReverse) instanceof IrpParser.Primary_itemContext);
     }
 
     @Override

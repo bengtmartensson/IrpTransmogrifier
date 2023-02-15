@@ -19,7 +19,6 @@ package org.harctoolbox.irp;
 import java.util.Map;
 import java.util.Objects;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.harctoolbox.ircore.IrCoreUtils;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 
 /**
@@ -30,12 +29,6 @@ import org.harctoolbox.ircore.ThisCannotHappenException;
  * @see BitStream
  */
 public abstract class BitField extends IrpObject implements Numerical, EquationSolving {
-
-    /**
-     * Max length of a BitField in this implementation.
-     */
-    public static final int MAXWIDTH = Long.SIZE - 1; // = 63
-    //private static final Logger logger = Logger.getLogger(BitField.class.getName());
 
     public static BitField newBitField(String str) {
         return newBitField(new ParserDriver(str));
@@ -54,18 +47,6 @@ public abstract class BitField extends IrpObject implements Numerical, EquationS
     public static long parse(String str, NameEngine nameEngine) throws NameUnassignedException {
         BitField bitField = newBitField(str);
         return bitField.toLong(nameEngine);
-    }
-
-    public static long toLong(long data, long width, long chop, boolean complement, boolean reverse) {
-        long x = data >> chop;
-        if (complement)
-            x = ~x;
-        if (width < MAXWIDTH)
-            x &= IrCoreUtils.ones(width);
-        if (reverse)
-            x = IrCoreUtils.reverse(x, (int) width);
-
-        return x;
     }
 
     static Expression newExpression(IrpParser.BitfieldContext ctx) {

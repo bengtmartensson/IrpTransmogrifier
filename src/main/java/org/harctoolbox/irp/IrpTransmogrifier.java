@@ -175,7 +175,10 @@ public final class IrpTransmogrifier extends CmdLineProgram {
                 ex.printStackTrace();
             String message = ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() : "IRP parse error";
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_INTERNAL_FAILURE, message);
-        } catch (UnsupportedOperationException | IOException | IllegalArgumentException | SecurityException | TransformerException ex) {
+        } catch (IllegalArgumentException ex) {
+            // Likely silly parameter value from the user. Just report the exception message, hope that it is understandable.
+            return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_USAGE_ERROR, ex.getLocalizedMessage());
+        } catch (UnsupportedOperationException | IOException | SecurityException | TransformerException ex) {
             //if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
             // Likely a programming error or fatal error in the data base. Barf.
             ex.printStackTrace();

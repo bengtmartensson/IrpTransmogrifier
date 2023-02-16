@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.transform.TransformerException;
 import org.harctoolbox.analyze.AbstractDecoder;
@@ -46,6 +47,7 @@ import org.harctoolbox.irp.BitCounter;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.DomainViolationException;
 import org.harctoolbox.irp.DuplicateFinder;
+import org.harctoolbox.irp.FiniteBitField;
 import org.harctoolbox.irp.InvalidNameException;
 import org.harctoolbox.irp.IrpException;
 import org.harctoolbox.irp.IrpInvalidArgumentException;
@@ -128,7 +130,7 @@ public class CommandAnalyze extends AbstractCommand {
     private double maxRoundingError = Burst.Preferences.DEFAULT_MAX_ROUNDING_ERROR;
 
     @Parameter(names = {"-M", "--maxparameterwidth"}, description = "Maximal parameter width.")
-    private int maxParameterWidth = 63;
+    private int maxParameterWidth = FiniteBitField.MAXWIDTH;
 
     @Parameter(names = {"-w", "--parameterwidths"}, description = "Comma separated list of either parameter widths or name:width pairs.")
     private List<String> parameterNamedWidths = new ArrayList<>(4);
@@ -241,6 +243,12 @@ public class CommandAnalyze extends AbstractCommand {
 
             if (IrCoreUtils.numberTrue(input != null, namedInput != null, args != null) != 1)
                 throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
+
+            if (maxParameterWidth > FiniteBitField.MAXWIDTH) {
+                logger.log(Level.WARNING, "The given value of --maxparameterwidth ({0}) is larger than {1}. This is using unspecified behavior, and the correct execution is not guaranteed.",
+                        new Object[]{maxParameterWidth, FiniteBitField.MAXWIDTH});
+                FiniteBitField.setAllowLargeBitfields(true);
+            }
 
             if (input != null) {
                 if (validate)

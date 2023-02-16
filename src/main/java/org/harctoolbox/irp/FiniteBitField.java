@@ -41,8 +41,30 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
      */
     public static final int MAXWIDTH = Long.SIZE - 1; // = 63
 
+    private static boolean allowLargeBitfields = false;
+
     public static FiniteBitField newFiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
         return new FiniteBitField(ctx);
+    }
+
+    /**
+     * @param aAllowLargeBitfields the allowLargeBitfields to set
+     */
+    public static void setAllowLargeBitfields(boolean aAllowLargeBitfields) {
+        allowLargeBitfields = aAllowLargeBitfields;
+    }
+
+    private static void checkWidth(long width) {
+        if (!allowLargeBitfields && width > MAXWIDTH)
+            throw new IllegalArgumentException("Bitfields wider than " + MAXWIDTH + " bits are currently not supported.");
+    }
+
+    private static void checkWidth(PrimaryItem width) {
+        try {
+            checkWidth(width.toLong());
+        } catch (NameUnassignedException ex) {
+            // Assume OK(?)
+        }
     }
 
     public static long toLong(long data, long width, long chop, boolean complement, boolean reverse) {
@@ -86,6 +108,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     private FiniteBitField(IrpParser.Finite_bitfieldContext ctx, PrimaryItem data, PrimaryItem width, PrimaryItem chop, boolean complement, boolean reverse) {
         super(ctx, data, chop, complement);
+        checkWidth(width);
         this.width = width;
         this.reverse = reverse;
     }
@@ -95,8 +118,8 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
                 PrimaryItem.newPrimaryItem(ctx.primary_item(0)), // data
                 PrimaryItem.newPrimaryItem(ctx.primary_item(1)), // width
                 ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0), // chop
-                !(ctx.getChild(0) instanceof IrpParser.Primary_itemContext), // complementnReverse = (ctx.getChild(0) instanceof IrpParser.Primary_itemContext) ? 2 : 3;
-                !(ctx.getChild((ctx.getChild(0) instanceof IrpParser.Primary_itemContext) ? 2 : 3) instanceof IrpParser.Primary_itemContext)
+                !(ctx.getChild(0) instanceof IrpParser.Primary_itemContext), // complement
+                !(ctx.getChild((ctx.getChild(0) instanceof IrpParser.Primary_itemContext) ? 2 : 3) instanceof IrpParser.Primary_itemContext) // reverse
         );
     }
 

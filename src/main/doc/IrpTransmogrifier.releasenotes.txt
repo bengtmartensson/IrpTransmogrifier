@@ -3,6 +3,23 @@ Release Notes for IrpTransmogrifier.
 The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
+===============================================================================
+2023-03-01 (planned): Version 1.2.12.
+
+This version consists of a few bug fixes and clarifications of medium importance.
+Thanks to Sean Young for initiating most of them.
+
+* Per default, disallow BitFields widths > 63. #234
+* Make number parsing consistent (as long). #233.
+* Disallow infinite bitfields to be part of an IrStream. #229.
+* Ensure that irp with * repeat must have all intro variants empty. #231.
+* Remove parameter specs and extent on NEC-Shirriff. Resolves #226.
+* IrSignal: Do not nuke intro- and repeat-sequences because they are identical to the repeat sequence. #222, #223, #224.
+* Protocol.checkSanity(): Do not warn for empty parmeterspecs if no bits in protocol.
+* Sensible implementation of Variation.numberOfBits
+* Set "Samsung32" as synonym for NECx-f16.
+
+===============================================================================
 2022-05-24: Version 1.2.11.
 
 This version consists mainly of a few extensions, bugfixes and cleanups.
@@ -20,6 +37,7 @@ This version consists mainly of a few extensions, bugfixes and cleanups.
 * Bugfix for IrCoreUtils.parseLong(String, boolean, int). #211.
 * New function IrpDatabase.setDocumentation.
 
+===============================================================================
 2021-06-27: Version 1.2.10. This version is considered "Long Time Stable".
 
 * New protocols NEC-Yamaha and NEC1-Yamaha.

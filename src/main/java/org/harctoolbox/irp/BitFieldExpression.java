@@ -99,7 +99,7 @@ final class BitFieldExpression extends PrimaryItemExpression {
 
     @Override
     public PrimaryItem leftHandSide() {
-        return bitField.data;
+        return bitField.getData();
     }
 
     @Override

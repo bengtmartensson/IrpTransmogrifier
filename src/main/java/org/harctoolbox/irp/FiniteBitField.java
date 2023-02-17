@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Bengt Martensson.
+Copyright (C) 2017, 2023 Bengt Martensson.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,8 +36,47 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     private static final Logger logger = Logger.getLogger(FiniteBitField.class.getName());
 
+    /**
+     * Max length of a BitField in this implementation.
+     */
+    public static final int MAXWIDTH = Long.SIZE - 1; // = 63
+
+    private static boolean allowLargeBitfields = false;
+
     public static FiniteBitField newFiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
         return new FiniteBitField(ctx);
+    }
+
+    /**
+     * @param aAllowLargeBitfields the allowLargeBitfields to set
+     */
+    public static void setAllowLargeBitfields(boolean aAllowLargeBitfields) {
+        allowLargeBitfields = aAllowLargeBitfields;
+    }
+
+    private static void checkWidth(long width) {
+        if (!allowLargeBitfields && width > MAXWIDTH)
+            throw new IllegalArgumentException("Bitfields wider than " + MAXWIDTH + " bits are currently not supported.");
+    }
+
+    private static void checkWidth(PrimaryItem width) {
+        try {
+            checkWidth(width.toLong());
+        } catch (NameUnassignedException ex) {
+            // Assume OK(?)
+        }
+    }
+
+    public static long toLong(long data, long width, long chop, boolean complement, boolean reverse) {
+        long x = data >> chop;
+        if (complement)
+            x = ~x;
+        if (width < MAXWIDTH)
+            x &= IrCoreUtils.ones(width);
+        if (reverse)
+            x = IrCoreUtils.reverse(x, (int) width);
+
+        return x;
     }
 
     private PrimaryItem width;
@@ -64,33 +103,32 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     private FiniteBitField(PrimaryItem data, PrimaryItem width, PrimaryItem chop, boolean complement, boolean reverse) throws InvalidNameException {
-        super(null);
-        this.data = data;
+        this(null, data, width, chop, complement, reverse);
+    }
+
+    private FiniteBitField(IrpParser.Finite_bitfieldContext ctx, PrimaryItem data, PrimaryItem width, PrimaryItem chop, boolean complement, boolean reverse) {
+        super(ctx, data, chop, complement);
+        checkWidth(width);
         this.width = width;
-        this.chop = chop;
-        this.complement = complement;
         this.reverse = reverse;
     }
 
     public FiniteBitField(IrpParser.Finite_bitfieldContext ctx) {
-        super(ctx);
-        int index = 0;
-        if (! (ctx.getChild(0) instanceof IrpParser.Primary_itemContext)) {
-            complement = true;
-            index++;
-        }
-        data = PrimaryItem.newPrimaryItem(ctx.primary_item(0));
-        width = PrimaryItem.newPrimaryItem(ctx.primary_item(1));
-        chop = ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0);
-        reverse = ! (ctx.getChild(index+2) instanceof IrpParser.Primary_itemContext);
+        this(ctx,
+                PrimaryItem.newPrimaryItem(ctx.primary_item(0)), // data
+                PrimaryItem.newPrimaryItem(ctx.primary_item(1)), // width
+                ctx.primary_item().size() > 2 ? PrimaryItem.newPrimaryItem(ctx.primary_item(2)) : PrimaryItem.newPrimaryItem(0), // chop
+                !(ctx.getChild(0) instanceof IrpParser.Primary_itemContext), // complement
+                !(ctx.getChild((ctx.getChild(0) instanceof IrpParser.Primary_itemContext) ? 2 : 3) instanceof IrpParser.Primary_itemContext) // reverse
+        );
     }
 
     @Override
     public FiniteBitField substituteConstantVariables(Map<String, Long> constantVariables) {
         try {
-            return new FiniteBitField(data.substituteConstantVariables(constantVariables),
+            return new FiniteBitField(getData().substituteConstantVariables(constantVariables),
                     width.substituteConstantVariables(constantVariables),
-                    chop.substituteConstantVariables(constantVariables), complement, reverse);
+                    getChop().substituteConstantVariables(constantVariables), isComplement(), reverse);
         } catch (InvalidNameException ex) {
             throw new ThisCannotHappenException(ex);
         }
@@ -115,17 +153,17 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public long toLong(NameEngine nameResolver) throws NameUnassignedException {
-        return toLong(data.toLong(nameResolver), width.toLong(nameResolver), chop.toLong(nameResolver), complement, reverse);
+        return toLong(getData().toLong(nameResolver), width.toLong(nameResolver), getChop().toLong(nameResolver), isComplement(), reverse);
     }
 
     @Override
     public BitwiseParameter toBitwiseParameter(RecognizeData nameResolver) {
-        BitwiseParameter payload = this.data.toBitwiseParameter(nameResolver);
+        BitwiseParameter payload = getData().toBitwiseParameter(nameResolver);
         if (payload == null)
             return BitwiseParameter.NULL;
         long wid = width.toBitwiseParameter(nameResolver).longValueExact();
-        long ch = chop.toBitwiseParameter(nameResolver).longValueExact();
-        long value = toLong(payload.getValue(), wid, ch, complement, reverse);
+        long ch = getChop().toBitwiseParameter(nameResolver).longValueExact();
+        long value = toLong(payload.getValue(), wid, ch, isComplement(), reverse);
         long bitmap = IrCoreUtils.ones(wid) & (payload.getBitmask() >> ch);
         return new BitwiseParameter(value, bitmap);
     }
@@ -170,18 +208,18 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
         String chopString = "";
         if (hasChop()) {
             try {
-                chopString =Long.toString(chop.toLong(nameEngine));
+                chopString =Long.toString(getChop().toLong(nameEngine));
             } catch (NameUnassignedException ex) {
-                chopString = chop.toIrpString(10);
+                chopString = getChop().toIrpString(10);
             }
             chopString = ":" + chopString;
         }
 
         String dataString;
         try {
-            dataString = Long.toString(data.toLong(nameEngine));
+            dataString = Long.toString(getData().toLong(nameEngine));
         } catch (NameUnassignedException ex) {
-            dataString = data.toIrpString(10);
+            dataString = getData().toIrpString(10);
         }
 
         String widthString;
@@ -191,13 +229,13 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
             widthString = width.toIrpString(10);
         }
 
-        return (complement ? "~" : "") + dataString + ":" + (reverse ? "-" : "") + widthString + chopString;
+        return (isComplement() ? "~" : "") + dataString + ":" + (reverse ? "-" : "") + widthString + chopString;
     }
 
     @Override
     public String toIrpString(int radix) {
-        return (complement ? "~" : "") + data.toIrpString(radix) + ":" + (reverse ? "-" : "") + width.toIrpString(10)
-                + (hasChop() ? (":" + chop.toIrpString(10)) : "");
+        return (isComplement() ? "~" : "") + getData().toIrpString(radix) + ":" + (reverse ? "-" : "") + width.toIrpString(10)
+                + (hasChop() ? (":" + getChop().toIrpString(10)) : "");
     }
 
     @Override
@@ -221,15 +259,15 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     public Element toElement(Document document) {
         Element element = super.toElement(document);
         element.setAttribute("reverse", Boolean.toString(reverse));
-        element.setAttribute("complement", Boolean.toString(complement));
+        element.setAttribute("complement", Boolean.toString(isComplement()));
         Element dataElement = document.createElement("Data");
-        dataElement.appendChild(data.toElement(document));
+        dataElement.appendChild(getData().toElement(document));
         element.appendChild(dataElement);
         Element widthElement = document.createElement("Width");
         widthElement.appendChild(width.toElement(document));
         element.appendChild(widthElement);
         Element chopElement = document.createElement("Chop");
-        chopElement.appendChild(chop.toElement(document));
+        chopElement.appendChild(getChop().toElement(document));
         element.appendChild(chopElement);
         return element;
     }
@@ -340,10 +378,10 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public BitwiseParameter invert(BitwiseParameter rhs, RecognizeData recognizeData/*, long oldBitmask*/) throws NameUnassignedException {
-        long ch = getChop(recognizeData.getNameEngine());
+        long ch = getChop().toLong(recognizeData.getNameEngine());
         long wid = getWidth(recognizeData.getNameEngine());
         long payload = rhs.getValue();
-        if (complement)
+        if (isComplement())
             payload = ~payload;
         if (reverse)
             payload = IrCoreUtils.reverse(payload, (int) wid);
@@ -426,7 +464,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     @Override
     public Integer guessParameterLength(String name) {
         try {
-            return data.toString().equals(name) ? (int) width.toLong() : null;
+            return getData().toString().equals(name) ? (int) width.toLong() : null;
         } catch (NameUnassignedException ex) {
             return null;
         }
@@ -448,10 +486,10 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
-        if (! (data instanceof Name))
-            throw new InvalidNameException(data.toIrpString() + " cannot be used in createParameterSpecs");
+        if (! (getData() instanceof Name))
+            throw new InvalidNameException(getData().toIrpString() + " cannot be used in createParameterSpecs");
 
-        String name = data.toString();
+        String name = getData().toString();
         long max = (1L << (long) this.numberOfBits()) - 1L;
         parameterSpecs.tweak(name, 0L, max);
     }

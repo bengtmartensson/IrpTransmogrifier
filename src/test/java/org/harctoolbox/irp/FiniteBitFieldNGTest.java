@@ -121,22 +121,19 @@ public class FiniteBitFieldNGTest {
         assertEquals(fbf.toIrpString(), "X:Y");
     }
 
-//    /**
-//     * Test of evaluate method, of class FiniteBitField.
-//     */
-//    @Test
-//    public void testEvaluate() throws Exception {
-//        System.out.println("evaluate");
-//        NameEngine nameEngine = null;
-//        GeneralSpec generalSpec = null;
-//        BitSpec bitSpec = null;
-//        IrSignal.Pass pass = IrSignal.Pass.intro;
-//        double elapsed = 0.0;
-//        FiniteBitField instance = null;
-//        EvaluatedIrStream expResult = null;
-//        EvaluatedIrStream result = instance.evaluate(nameEngine, generalSpec, bitSpec, pass, elapsed);
-//        assertEquals(result, expResult);
-//    }
+    @Test
+    public void testConstructorWide() {
+        System.out.println("testConstructorWide");
+        FiniteBitField.setAllowLargeBitfields(false);
+        try {
+            FiniteBitField bt = new FiniteBitField("12:64:2");
+            fail();
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+        FiniteBitField.setAllowLargeBitfields(true);
+        FiniteBitField bt = new FiniteBitField("12:64:2");
+    }
 
     /**
      * Test of numberOfBits method, of class FiniteBitField.

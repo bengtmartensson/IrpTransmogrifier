@@ -374,6 +374,7 @@ public class IrpDatabaseNGTest {
     public void testSetDocumentation() throws Exception {
         IrpDatabase db = new IrpDatabase(CONFIGFILE);
         String protoname = "akord";
+        @SuppressWarnings("UnusedAssignment")
         String doc = db.getDocumentation(protoname);
         String netsi = "Nobody expects the spanish inquisition!";
         db.setDocumentation(protoname, netsi);

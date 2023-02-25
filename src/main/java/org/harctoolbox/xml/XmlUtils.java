@@ -220,13 +220,13 @@ public final class XmlUtils {
             // Turn of generating xml:base attributes in expanded xincludes (causes validation errors).
             // See https://xerces.apache.org/xerces2-j/features.html#xinclude.fixup-base-uris
             factory.setFeature("http://apache.org/xml/features/xinclude/fixup-base-uris", false);
+            xeePrevention(factory);
         } catch (ParserConfigurationException ex) {
             throw new ThisCannotHappenException(ex);
         }
-        if (schema != null) {
+        if (schema != null)
             factory.setSchema(schema);
-            factory.setValidating(false);
-        }
+        factory.setValidating(false); // Concerns DTD validation only
         DocumentBuilder builder = null;
         try {
             builder = factory.newDocumentBuilder();
@@ -237,6 +237,50 @@ public final class XmlUtils {
             throw new ThisCannotHappenException(ex);
         }
         return builder;
+    }
+
+    // This follows https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+    private static void xeePrevention(DocumentBuilderFactory factory) throws ParserConfigurationException {
+        // This is the PRIMARY defense. If DTDs (doctypes) are disallowed, almost all
+        // XML entity attacks are prevented
+        // Xerces 2 only - http://xerces.apache.org/xerces2-j/features.html#disallow-doctype-decl
+        //FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+        // As stated in the documentation "Feature for Secure Processing (FSP)" is the central mechanism to
+        // help safeguard XML processing. It instructs XML processors, such as parsers, validators,
+        // and transformers, to try and process XML securely.
+        // Exists from JDK6.
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+        // If you can't completely disable DTDs, then at least do the following:
+        // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
+        // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
+        // JDK7+ - http://xml.org/sax/features/external-general-entities
+        //This feature has to be used together with the following one, otherwise it will not protect you from XXE for sure
+        //FEATURE = "http://xml.org/sax/features/external-general-entities";
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+
+        // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
+        // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities
+        // JDK7+ - http://xml.org/sax/features/external-parameter-entities
+        //This feature has to be used together with the previous one, otherwise it will not protect you from XXE for sure
+        //FEATURE = "http://xml.org/sax/features/external-parameter-entities";
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
+        // Disable external DTDs as well
+        //FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+        // and these as well, per Timothy Morgan's 2014 paper: "XML Schema, DTD, and Entity Attacks"
+        // factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+
+        // And, per Timothy Morgan: "If for some reason support for inline DOCTYPEs are a requirement, then
+        // ensure the entity settings are disabled (as shown above) and beware that SSRF attacks
+        // (http://cwe.mitre.org/data/definitions/918.html) and denial
+        // of service attacks (such as billion laughs or decompression bombs via "jar:") are a risk."
+        // remaining parser logic
     }
 
     public static Document newDocument(boolean isNamespaceAware) {

@@ -52,6 +52,14 @@ final class BitStream extends IrpObject implements Evaluatable {
         length = bitField.getWidth(nameEngine);
 
     }
+
+    /**
+     * @return the length
+     */
+    public long getLength() {
+        return length;
+    }
+
     @Override
     public String toIrpString(int radix) {
         return "BitStream(" + data.toString(radix) + ":" + length + ")";

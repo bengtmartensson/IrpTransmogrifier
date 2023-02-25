@@ -159,7 +159,7 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
 
     @Override
     public void render(RenderData renderData, List<BitSpec> inheritedBitSpecs) throws NameUnassignedException {
-        ArrayList<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
+        List<BitSpec> stack = new ArrayList<>(inheritedBitSpecs);
         stack.add(bitSpec);
         renderData.push();
         irStream.render(renderData, stack);

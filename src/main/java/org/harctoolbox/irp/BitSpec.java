@@ -390,4 +390,19 @@ public final class BitSpec extends IrpObject implements AggregateLister {
         for (BareIrStream bitCode: bitCodes)
             bitCode.createParameterSpecs(parameterSpecs);
     }
+
+    public static class IncompatibleBitSpecException extends RuntimeException {
+
+        IncompatibleBitSpecException() {
+            super();
+        }
+
+        IncompatibleBitSpecException(BitSpec bitSpec) {
+            super("Incompatible BitSpec: " + bitSpec);
+        }
+
+        public IncompatibleBitSpecException(Throwable ex) {
+            super(ex);
+        }
+    }
 }

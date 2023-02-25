@@ -850,6 +850,32 @@ public class ProtocolNGTest {
         assertTrue(nameEngine.numericallyEquals(recognizeData));
     }
 
+    @Test(enabled = true)
+    public void testRenderShortBitspec() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, DomainViolationException, OddSequenceLengthException, IrpInvalidArgumentException {
+        System.out.println("renderShortBitspec");
+        NameEngine nameEngine = new NameEngine("{F=0, S=1}");
+        Protocol protocol = new Protocol("{100}<1|2|3|4>(S:1)");
+        try {
+            protocol.toIrSignal(nameEngine);
+            fail();
+        } catch (BitSpec.IncompatibleBitSpecException ex) {
+            // expected
+        }
+    }
+
+    @Test(enabled = true)
+    public void testRenderHierarchicalShortBitspec() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException, DomainViolationException, OddSequenceLengthException {
+        System.out.println("renderHierarchicalShortBitspec");
+        NameEngine nameEngine = new NameEngine("{F=0, S=1}");
+        Protocol protocol = new Protocol("{100}<1,-1|1,-3>(F:1,<1|2|3|4>(S:1))");
+        try {
+            protocol.toIrSignal(nameEngine);
+            fail();
+        } catch (BitSpec.IncompatibleBitSpecException ex) {
+            // expected
+        }
+    }
+
     /**
      * Test of warningFrequency method, of class Protocol.
      */

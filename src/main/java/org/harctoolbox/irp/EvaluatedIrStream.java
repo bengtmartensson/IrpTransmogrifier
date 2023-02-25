@@ -70,8 +70,6 @@ final class EvaluatedIrStream {
         List<Double>times = new ArrayList<>(elements.size()*10);
         double elapsed = 0.0;
         for (Evaluatable element : elements) {
-            if (!(element instanceof Duration))
-                throw new ThisCannotHappenException("EvaluatedIrSequence cannot be (completely) evaluated");
             Duration duration = (Duration) element;
             double time = duration.evaluateWithSign(generalSpec, nameEngine, elapsed);
             if (Math.abs(time) < 0.0001)
@@ -126,6 +124,13 @@ final class EvaluatedIrStream {
                 index += reduce(bitSpec, index);
             else
                 index++;
+        }
+
+        for (Evaluatable element : elements) {
+            if (element instanceof BitStream) {
+                if (((BitStream) element).getLength() % bitSpec.getChunkSize() != 0)
+                    throw new BitSpec.IncompatibleBitSpecException(bitSpec);
+            }
         }
     }
 

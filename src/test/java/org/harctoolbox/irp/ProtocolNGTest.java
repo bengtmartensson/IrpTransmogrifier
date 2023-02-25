@@ -876,6 +876,23 @@ public class ProtocolNGTest {
         }
     }
 
+    @Test(enabled = true)
+    public void testLongBitfieldRuntime() throws Exception {
+        System.out.println("longBitfieldRuntime");
+        FiniteBitField.setAllowLargeBitfields(true);
+        NameEngine nameEngine = new NameEngine("{F=0, S=1000}");
+        Protocol protocol = new Protocol("{100}<1,-1|1,-3>(F:S)");
+        protocol.toIrSignal(nameEngine);
+
+        FiniteBitField.setAllowLargeBitfields(false);
+        try {
+            protocol.toIrSignal(nameEngine);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+    }
+
     /**
      * Test of warningFrequency method, of class Protocol.
      */

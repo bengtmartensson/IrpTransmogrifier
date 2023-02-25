@@ -195,7 +195,9 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     @Override
     public long getWidth(NameEngine nameEngine) throws NameUnassignedException {
-        return width.toLong(nameEngine);
+        long w = width.toLong(nameEngine);
+        checkWidth(w);
+        return w;
     }
 
     @Override

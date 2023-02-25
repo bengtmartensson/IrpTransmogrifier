@@ -9,7 +9,11 @@ https://github.com/bengtmartensson/IrpTransmogrifier/issues
 This version consists of a few bug fixes and clarifications of medium importance.
 Thanks to Sean Young for initiating most of them.
 
+* XML EEP (External Entities Protection) fixes. Resolves #237.
+* Check/enforce max BitField length when rendering. #235.
+* More checks for compatible BitSpecs. #236.
 * Per default, disallow BitFields widths > 63. #234
+* Minor refactoring of *BitField classes.
 * Make number parsing consistent (as long). #233.
 * Disallow infinite bitfields to be part of an IrStream. #229.
 * Ensure that irp with * repeat must have all intro variants empty. #231.

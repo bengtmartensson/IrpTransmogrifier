@@ -4,7 +4,7 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
-2023-03-01 (planned): Version 1.2.12.
+2023-03-01: Version 1.2.12.
 
 This version consists of a few bug fixes and clarifications of medium importance.
 Thanks to Sean Young for initiating most of them.

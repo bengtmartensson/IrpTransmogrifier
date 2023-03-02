@@ -703,4 +703,20 @@ public class IrpTransmogrifierNGTest {
         String result = execute("-c src/main/resources/IrpProtocols.xml --ienc utf-8 --oenc utf-8 decode  --namedinput src/test/txt/SIM2.txt");
         assertEquals(result, expected);
     }
+
+    @Test(enabled = true)
+    public void testParseError() {
+        System.out.println("testParseError");
+        String[] args = new String[]{"--irp", "{}<-1>(1,X3=(8,-7)", "render", "-r"};
+        String result = execute(args);
+        assertNull(result);
+    }
+
+    @Test(enabled = true)
+    public void testLexerError() {
+        System.out.println("testLexerError");
+        String[] args = new String[]{"--irp", "{}<-1>(1,X3=$8,-7)", "render", "-r"};
+        String result = execute(args);
+        assertNull(result);
+    }
 }

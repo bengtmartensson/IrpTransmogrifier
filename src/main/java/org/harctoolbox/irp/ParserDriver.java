@@ -17,8 +17,12 @@ this program. If not, see http://www.gnu.org/licenses/.
 
 package org.harctoolbox.irp;
 
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 /**
  * This class encapsulates the IrpParser.
@@ -31,8 +35,12 @@ public final class ParserDriver {
 
     public ParserDriver(String irpString) {
         lexer = new IrpLexer(CharStreams.fromString(irpString));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(new myErrorListener());
         tokens = new CommonTokenStream(lexer);
         parser = new IrpParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new myErrorListener());
         parser.setErrorHandler(new ErrorStrategy());
     }
 
@@ -43,5 +51,21 @@ public final class ParserDriver {
 
     public IrpParser getParser() {
         return parser;
+    }
+
+    // The default error listener is the ConsoleErrorListener, which prints messages to System.err.
+    // Instead, we encode the message in the exception, which is expected to cancel the parsing.
+
+    private static class myErrorListener extends BaseErrorListener {
+
+        myErrorListener() {
+            super();
+        }
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                int line, int charPositionInLine, String msg, RecognitionException e) {
+            throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg, e);
+        }
     }
 }

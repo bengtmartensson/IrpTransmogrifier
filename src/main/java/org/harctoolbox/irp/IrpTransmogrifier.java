@@ -173,7 +173,7 @@ public final class IrpTransmogrifier extends CmdLineProgram {
             // stderr; that is good enough for now.
             if (commandLineArgs.logLevel.intValue() < Level.INFO.intValue())
                 ex.printStackTrace();
-            String message = ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() : "IRP parse error";
+            String message = ex.getLocalizedMessage() + "\nIRP parse error";
             return new ProgramExitStatus(Version.appName, ProgramExitStatus.EXIT_INTERNAL_FAILURE, message);
         } catch (IllegalArgumentException ex) {
             // Likely silly parameter value from the user. Just report the exception message, hope that it is understandable.

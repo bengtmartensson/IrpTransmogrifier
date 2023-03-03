@@ -68,6 +68,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     public static long toLong(long data, long width, long chop, boolean complement, boolean reverse) {
+        checkWidth(width);
         long x = data >> chop;
         if (complement)
             x = ~x;
@@ -182,7 +183,7 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
 
     public String toBinaryString(NameEngine nameEngine) throws NameUnassignedException {
         String str = Long.toBinaryString(toLong(nameEngine));
-        int wid = (int) width.toLong(nameEngine);
+        int wid = (int) getWidth(nameEngine);
         int len = str.length();
         if (len > wid)
             return str.substring(len - wid);

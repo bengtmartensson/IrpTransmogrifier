@@ -120,6 +120,21 @@ public class ExpressionNGTest {
     }
 
     @Test
+    public void testLongBitFieldExpression() throws InvalidNameException, NameUnassignedException {
+        Expression expr = Expression.newExpression("D:S");
+        NameEngine names = new NameEngine("{D=255,S=10000}");
+        FiniteBitField.setAllowLargeBitfields(true);
+        expr.toLong(names);
+        FiniteBitField.setAllowLargeBitfields(false);
+        try {
+            expr.toLong(names);
+            fail();
+        } catch (IllegalArgumentException ex) {
+            // expected
+        }
+    }
+
+    @Test
     public void testShortCircuiting() throws InvalidNameException, NameUnassignedException {
         System.out.println("testShortCircuiting");
         NameEngine nameEngine = new NameEngine("{A=1,B=0}");

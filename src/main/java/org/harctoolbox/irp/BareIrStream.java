@@ -167,20 +167,6 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return false; // give up
     }
 
-    public boolean hasVariationWithIntroEqualsRepeat() {
-        for (IrStreamItem irStreamItem : irStreamItems) {
-            if (irStreamItem instanceof Variation)
-                return ((Variation) irStreamItem).introEqualsRepeat();
-            if (irStreamItem instanceof BitspecIrstream)
-                return ((BitspecIrstream) irStreamItem).hasVariationWithIntroEqualsRepeat();
-            if (irStreamItem instanceof BareIrStream)
-                return ((BareIrStream) irStreamItem).hasVariationWithIntroEqualsRepeat();
-            if (irStreamItem instanceof IrStream)
-                return ((IrStream) irStreamItem).hasVariationWithIntroEqualsRepeat();
-        }
-        return false; // give up
-    }
-
     @Override
     public String toIrpString(int radix) {
         StringBuilder str = new StringBuilder(irStreamItems.size()*20);
@@ -279,8 +265,6 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     @SuppressWarnings("AssignmentToMethodParameter")
     public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
         List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());
-        if (pass == IrSignal.Pass.intro && hasVariationWithIntroEqualsRepeat())
-            return list;
 
         for (IrStreamItem irStreamItem : irStreamItems) {
             IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);

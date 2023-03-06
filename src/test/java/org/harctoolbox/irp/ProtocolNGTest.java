@@ -864,6 +864,16 @@ public class ProtocolNGTest {
     }
 
     @Test(enabled = true)
+    public void testRenderVariationWithIntroAndRepeatEqual() throws Exception {
+        System.out.println("renderVariationWithIntroAndRepeatEqual");
+        Protocol protocol = new Protocol("{58k,10}<1,-2|1,-4>([40][40][40],-16)+");
+        IrSignal result = protocol.toIrSignal(NameEngine.EMPTY);
+        IrSequence intro = new IrSequence(new double[]{+400,-160});
+        IrSignal expected = new IrSignal(intro, intro, intro, 58000d);
+        assertTrue(expected.approximatelyEquals(result));
+    }
+
+    @Test(enabled = true)
     public void testRenderHierarchicalShortBitspec() throws InvalidNameException, UnsupportedRepeatException, NameUnassignedException, IrpInvalidArgumentException, DomainViolationException, OddSequenceLengthException {
         System.out.println("renderHierarchicalShortBitspec");
         NameEngine nameEngine = new NameEngine("{F=0, S=1}");

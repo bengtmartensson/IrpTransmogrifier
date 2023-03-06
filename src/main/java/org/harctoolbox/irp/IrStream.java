@@ -324,10 +324,6 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         return bareIrStream.startsWithFlash();
     }
 
-    boolean hasVariationWithIntroEqualsRepeat() {
-        return bareIrStream.hasVariationWithIntroEqualsRepeat();
-    }
-
     boolean hasVariationWithEnding() {
         return bareIrStream.hasVariation(true, Pass.ending);
     }

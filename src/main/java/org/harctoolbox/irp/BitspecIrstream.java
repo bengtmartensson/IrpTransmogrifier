@@ -287,10 +287,6 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         return bitSpec.weight() + irStream.weight();
     }
 
-    boolean hasVariationWithIntroEqualsRepeat() {
-        return irStream.hasVariationWithIntroEqualsRepeat();
-    }
-
     @Override
     public boolean hasExtent() {
         return bitSpec.hasExtent() || irStream.hasExtent();

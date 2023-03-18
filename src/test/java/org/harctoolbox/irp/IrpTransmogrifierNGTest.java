@@ -469,6 +469,14 @@ public class IrpTransmogrifierNGTest {
     }
 
     @Test
+    public void testRenderVariationWithIntroAndRepeatEqual() {
+        System.out.println("renderVariationWithIntroAndRepeatEqual");
+        String result = execute(new String[]{"--irp", "{58k,10}<1,-2|1,-4>([40][40][10],-16)+", "render", "-r"});
+        String expResult = "Freq=58000Hz[+400,-160][+400,-160][+100,-160]";
+        assertEquals(result, expResult);
+    }
+
+    @Test
     public void testExpression() {
         System.out.println("Expression");
         String result = execute("expression -n a=1,b=11 -- -1?a+b:9");

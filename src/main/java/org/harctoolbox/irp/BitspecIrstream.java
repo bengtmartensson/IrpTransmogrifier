@@ -179,7 +179,7 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     public BareIrStream extractPass(IrSignal.Pass pass) {
-        return new BareIrStream(irStream.extractPass(pass, IrSignal.Pass.intro));
+        return irStream.extractPass(pass);
     }
 
     @Override

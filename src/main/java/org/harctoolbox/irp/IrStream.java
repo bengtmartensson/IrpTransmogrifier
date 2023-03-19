@@ -203,6 +203,11 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         bareIrStream.createParameterSpecs(parameterSpecs);
     }
 
+    public BareIrStream extractPass(Pass pass) {
+        List<IrStreamItem> list = extractPass(pass, Pass.intro);
+        return new BareIrStream(list);
+    }
+
     @Override
     @SuppressWarnings("AssignmentToMethodParameter")
     public List<IrStreamItem> extractPass(Pass pass, Pass state) {

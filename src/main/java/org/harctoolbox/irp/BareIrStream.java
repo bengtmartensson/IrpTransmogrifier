@@ -119,7 +119,9 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     @Override
     public int numberOfInfiniteRepeats() {
         int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfInfiniteRepeats()).reduce(sum, Integer::sum);
+        for (IrStreamItem item : irStreamItems)
+            sum += item.numberOfInfiniteRepeats();
+
         return sum;
     }
 

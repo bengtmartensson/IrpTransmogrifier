@@ -1047,7 +1047,7 @@ parameter_spec:
                 <p>
                     Comments in the C syntax (starting with <code>/*</code> and ended by
                     <code>*/</code>) are allowed, and ignored.
-                    Also, C++-style comments ("//", extending to the end of line) are accepted.
+                    Also, C++-style comments ("//", extending to (and including) the end of line) are accepted.
                     (In the specifications, embedded comments in the IRP are not present.)
                 </p>
                 <p>The function <code>list --irp</code> lists the IRP as given in the data base (preserving comments and whitespace),

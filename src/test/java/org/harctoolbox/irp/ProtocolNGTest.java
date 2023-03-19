@@ -1118,4 +1118,12 @@ public class ProtocolNGTest {
         String[] result = sortedMap.keySet().toArray(new String[5]);
         assertEquals(result, expResult);
     }
+
+    /**
+     * Test of line comment of class Protocol.
+     */
+    public void testLineComment() throws Exception {
+        System.out.println("lineComment");
+        Protocol junk = new Protocol("{36k,msb,889}<1,-1|-1,1>((1,~F:1:6,T:1,D:5,F:6,^114m)*,T=1-T)[D:0..31,F:0..127,T@:0..1=0]// Lorem Ipsum\n");
+    }
 }

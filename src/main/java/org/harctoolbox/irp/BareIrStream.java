@@ -65,6 +65,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     private List<IrStreamItem> irStreamItems;
+    private Integer numberInfiniteRepeatsCached = null; // Assume immutability
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) {
         super(ctx);
@@ -78,6 +79,14 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     public BareIrStream(List<IrStreamItem> list) {
         super(null);
         this.irStreamItems = list;
+    }
+
+    private BareIrStream(ParserDriver parserDriver) {
+        this(parserDriver.getParser().bare_irstream());
+    }
+
+    public BareIrStream(String s) {
+        this(new ParserDriver(s));
     }
 
     @Override
@@ -118,11 +127,13 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
 
     @Override
     public int numberOfInfiniteRepeats() {
-        int sum = 0;
-        for (IrStreamItem item : irStreamItems)
-            sum += item.numberOfInfiniteRepeats();
+        if (numberInfiniteRepeatsCached == null) {
+            numberInfiniteRepeatsCached = 0;
+            for (IrStreamItem item : irStreamItems)
+                numberInfiniteRepeatsCached += item.numberOfInfiniteRepeats();
+        }
 
-        return sum;
+        return numberInfiniteRepeatsCached;
     }
 
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {

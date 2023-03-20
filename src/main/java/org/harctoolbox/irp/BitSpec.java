@@ -63,6 +63,7 @@ public final class BitSpec extends IrpObject implements AggregateLister {
     private int chunkSize;
 
     private List<BareIrStream> bitCodes;
+    private Integer numberOfInfiniteRepeatsCached = null; // Assume immutability
 
     public BitSpec(String str) {
         this(new ParserDriver(str).getParser().bitspec());
@@ -145,9 +146,12 @@ public final class BitSpec extends IrpObject implements AggregateLister {
 
     @Override
     public int numberOfInfiniteRepeats() {
-        int sum = 0;
-        sum = bitCodes.stream().map((code) -> code.numberOfInfiniteRepeats()).reduce(sum, Integer::sum);
-        return sum;
+        if (numberOfInfiniteRepeatsCached == null) {
+            numberOfInfiniteRepeatsCached = 0;
+            for (BareIrStream bitCode : bitCodes)
+                numberOfInfiniteRepeatsCached += numberOfInfiniteRepeats();
+        }
+        return numberOfInfiniteRepeatsCached;
     }
 
     public BareIrStream get(int index) {

@@ -148,7 +148,7 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public List<IrStreamItem> extractPass(Pass pass, Pass state) {
+    public BareIrStream extractPass(Pass pass, Pass state) {
         return select(pass).extractPass(pass, state);
     }
 

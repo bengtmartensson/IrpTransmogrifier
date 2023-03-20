@@ -254,8 +254,8 @@ public final class FiniteBitField extends BitField implements IrStreamItem {
     }
 
     @Override
-    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
-        return IrpUtils.mkIrStreamItemList(this);
+    public BareIrStream extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+        return new BareIrStream(this);
     }
 
     @Override

@@ -124,7 +124,7 @@ public interface IrStreamItem extends XmlExport {
 
     public boolean constant(NameEngine nameEngine);
 
-    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state);
+    public BareIrStream extractPass(IrSignal.Pass pass, IrSignal.Pass state);
 
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException;
 

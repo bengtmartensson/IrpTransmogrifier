@@ -64,6 +64,12 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return irStreamItems;
     }
 
+    private static List<IrStreamItem> mkIrStreamItemList(IrStreamItem irStreamItem) {
+        List<IrStreamItem> list = new ArrayList<>(1);
+        list.add(irStreamItem);
+        return list;
+    }
+
     private List<IrStreamItem> irStreamItems;
     private Integer numberInfiniteRepeatsCached = null; // Assume immutability
 
@@ -79,6 +85,10 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     public BareIrStream(List<IrStreamItem> list) {
         super(null);
         this.irStreamItems = list;
+    }
+
+    public BareIrStream(IrStreamItem irStreamItem) {
+        this(mkIrStreamItemList(irStreamItem));
     }
 
     private BareIrStream(ParserDriver parserDriver) {
@@ -276,7 +286,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
 
     @Override
     @SuppressWarnings("AssignmentToMethodParameter")
-    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+    public BareIrStream extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
         List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());
 
         for (IrStreamItem irStreamItem : irStreamItems) {
@@ -286,7 +296,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
                 state = newState;
 
             if (state == pass || pass == null)
-                list.addAll(irStreamItem.extractPass(pass, state));
+                list.addAll(irStreamItem.extractPass(pass, state).getIrStreamItems());
 
             IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
             if (next != null)
@@ -295,7 +305,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
             if (next == IrSignal.Pass.finish)
                 break;
         }
-        return list;
+        return new BareIrStream(list);
     }
 
     @Override

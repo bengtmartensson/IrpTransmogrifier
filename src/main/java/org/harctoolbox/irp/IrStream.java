@@ -204,23 +204,22 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     public BareIrStream extractPass(Pass pass) {
-        List<IrStreamItem> list = extractPass(pass, Pass.intro);
-        return new BareIrStream(list);
+        return extractPass(pass, Pass.intro);
     }
 
     @Override
     @SuppressWarnings("AssignmentToMethodParameter")
-    public List<IrStreamItem> extractPass(Pass pass, Pass state) {
+    public BareIrStream extractPass(Pass pass, Pass state) {
         List<IrStreamItem> list = new ArrayList<>(8);
         int repetitions = numberRepetitions(pass);
         if (evaluateTheRepeat(pass))
             state = IrSignal.Pass.repeat;
         if (pass == Pass.ending && hasVariationWithEnding())
-            list.addAll(bareIrStream.extractPass(Pass.ending, Pass.ending));
+            list.addAll(bareIrStream.extractPass(Pass.ending, Pass.ending).getIrStreamItems());
         else
             for (int i = 0; i < repetitions; i++)
-                list.addAll(bareIrStream.extractPass(pass, state));
-        return list;
+                list.addAll(bareIrStream.extractPass(pass, state).getIrStreamItems());
+        return new BareIrStream(list);
     }
 
     @Override

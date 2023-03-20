@@ -242,8 +242,8 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
-        return IrpUtils.mkIrStreamItemList(this);
+    public BareIrStream extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+        return new BareIrStream(this);
     }
 
     @Override

@@ -160,11 +160,8 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
-        if (!recursive && isInfiniteRepeat())
-            return 0;
-
-        return bareIrStream.numberOfBareDurations(recursive);
+    public Integer numberOfBareDurations() {
+        return bareIrStream.numberOfBareDurations();
     }
 
     @Override

@@ -97,10 +97,8 @@ public class IrStreamNGTest {
     @Test
     public void testNumberOfBareDurations() {
         System.out.println("numberOfBareDurations");
-        int result = instance.numberOfBareDurations(true);
+        int result = instance.numberOfBareDurations();
         assertEquals(result, 8);
-        result = instance.numberOfBareDurations(false);
-        assertEquals(result, 4);
     }
 
     /**

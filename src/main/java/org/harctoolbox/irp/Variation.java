@@ -114,7 +114,7 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations() {
         return null;
     }
 

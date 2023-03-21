@@ -150,7 +150,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations() {
         return 0;
     }
 

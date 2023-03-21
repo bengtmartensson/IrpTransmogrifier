@@ -76,7 +76,7 @@ public interface IrStreamItem extends XmlExport {
      */
     public Integer numberOfBits();
 
-    public Integer numberOfBareDurations(boolean recursive);
+    public Integer numberOfBareDurations();
 
     /**
      * Upper limit of the number of (interleaving) durations in the rendered signal.

@@ -223,7 +223,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     private Element fillElement(Document document, Element element) {
-        Integer nobd = numberOfBareDurations(true);
+        Integer nobd = numberOfBareDurations();
         if (nobd != null)
            element.setAttribute("numberOfBareDurations", Integer.toString(nobd));
         Integer nob = numberOfBits();
@@ -240,10 +240,10 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations() {
         int sum = 0;
         for (IrStreamItem item : irStreamItems) {
-            Integer nobd = item.numberOfBareDurations(recursive);
+            Integer nobd = item.numberOfBareDurations();
             if (nobd == null)
                 return null;
             sum += nobd;
@@ -349,7 +349,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         if (nod != null)
             return nod;
 
-        Integer nobd = numberOfBareDurations(true);
+        Integer nobd = numberOfBareDurations();
         Integer nob = numberOfBits();
         return nobd != null && nob != null ? nobd + bitspecLength*nob : null;
     }

@@ -131,8 +131,8 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
-        return irStream.numberOfBareDurations(recursive);
+    public Integer numberOfBareDurations() {
+        return irStream.numberOfBareDurations();
     }
 
     @Override

@@ -260,7 +260,7 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations() {
         return 1;
     }
 

@@ -244,7 +244,7 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     boolean isRPlus() {
-        return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(null);
+        return repeatMarker.isRPlus() && ! hasVariation(null);
     }
 
     @Override

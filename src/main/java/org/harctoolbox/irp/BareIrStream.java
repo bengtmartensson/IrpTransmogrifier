@@ -172,22 +172,26 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return false; // give up
     }
 
-    public boolean hasVariation(boolean recursive, Pass pass) {
+    public boolean hasVariation(Pass pass) {
         for (IrStreamItem irStreamItem : irStreamItems) {
             if (irStreamItem instanceof Variation)
                 if (((Variation) irStreamItem).hasPart(pass))
                     return true;
-            if (recursive && irStreamItem instanceof BitspecIrstream)
-                if (((BitspecIrstream) irStreamItem).hasVariation(recursive, pass))
+            if (irStreamItem instanceof BitspecIrstream)
+                if (((BitspecIrstream) irStreamItem).hasVariation(pass))
                     return true;
-            if (recursive && irStreamItem instanceof BareIrStream)
-                if (((BareIrStream) irStreamItem).hasVariation(recursive, pass))
+            if (irStreamItem instanceof BareIrStream)
+                if (((BareIrStream) irStreamItem).hasVariation(pass))
                     return true;
-            if (recursive && irStreamItem instanceof IrStream)
-                if (((IrStream) irStreamItem).hasVariation(recursive, pass))
+            if (irStreamItem instanceof IrStream)
+                if (((IrStream) irStreamItem).hasVariation(pass))
                     return true;
         }
-        return false; // give up
+        return false;
+    }
+
+    public boolean hasVariationNonRecursive() {
+        return irStreamItems.stream().anyMatch(irStreamItem -> (irStreamItem instanceof Variation));
     }
 
     @Override

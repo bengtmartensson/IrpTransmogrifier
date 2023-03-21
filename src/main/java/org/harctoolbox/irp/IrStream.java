@@ -114,7 +114,7 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
 
     @Override
     public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
-        return hasVariation(false, null) ? pass
+        return bareIrStream.hasVariationNonRecursive() ? pass
                 : (pass == IrSignal.Pass.repeat || pass == IrSignal.Pass.ending) && isInfiniteRepeat() ? IrSignal.Pass.repeat
                 : null;
     }
@@ -239,12 +239,12 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         return nod != null ? getMinRepeats() * bareIrStream.numberOfDurations(bitSpecLength) : null;
     }
 
-    public boolean hasVariation(boolean recursive, Pass pass) {
-        return bareIrStream.hasVariation(recursive, pass);
+    public boolean hasVariation(Pass pass) {
+        return bareIrStream.hasVariation(pass);
     }
 
     boolean isRPlus() {
-        return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true, null);
+        return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(null);
     }
 
     @Override
@@ -329,7 +329,7 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     boolean hasVariationWithEnding() {
-        return bareIrStream.hasVariation(true, Pass.ending);
+        return bareIrStream.hasVariation(Pass.ending);
     }
 
     @Override

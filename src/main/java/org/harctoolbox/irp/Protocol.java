@@ -250,10 +250,10 @@ public class Protocol extends IrpObject implements AggregateLister {
         if (numberOfInfiniteRepeats() > 1)
             throw new UnsupportedRepeatException();
 
-        if (hasVariation(true, null) && numberOfInfiniteRepeats() == 0)
+        if (hasVariation(null) && numberOfInfiniteRepeats() == 0)
             throw new UnsupportedRepeatException("Variations are not allowed in IrStream without infinite repeat");
 
-        if (hasVariation(true, Pass.intro) && this.bitspecIrstream.getIrStream().getRepeatMarker().getMin() == 0)
+        if (hasVariation(Pass.intro) && this.bitspecIrstream.getIrStream().getRepeatMarker().getMin() == 0)
             throw new UnsupportedRepeatException("Cannot have a variations with non-empty intro in an IrStream with repeat \"*\"; please change to \"+\".");
 
         Integer numberBits = numberOfBits();
@@ -486,8 +486,8 @@ public class Protocol extends IrpObject implements AggregateLister {
         return bitspecIrstream.startsWithFlash();
     }
 
-    public boolean hasVariation(boolean recursive, Pass pass) {
-        return bitspecIrstream.hasVariation(recursive, pass);
+    public boolean hasVariation(Pass pass) {
+        return bitspecIrstream.hasVariation(pass);
     }
 
     public boolean hasExtent() {
@@ -515,7 +515,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         XmlUtils.addBooleanAttributeIfTrue(renderer, "interleavingGapOk", interleavingGapOk());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "sonyType", isSonyType());
         XmlUtils.addBooleanAttributeIfTrue(renderer, "startsWithFlash", startsWithFlash());
-        XmlUtils.addBooleanAttributeIfTrue(renderer, "hasVariation", hasVariation(true, null));
+        XmlUtils.addBooleanAttributeIfTrue(renderer, "hasVariation", hasVariation(null));
         XmlUtils.addBooleanAttributeIfTrue(renderer, "rplus", isRPlus());
         XmlUtils.addDoubleAttributeAsInteger(renderer, "minDiff", minDurationDiff());
         Element generalSpecElement = generalSpec.toElement(document);
@@ -800,7 +800,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         str.append("\t").append(interleavingGapOk() ? "gapint\t" : "\t");
         str.append("\t").append(isSonyType() ? "sony\t" : "\t");
         str.append(startsWithFlash() ? "SWD\t" : "\t");
-        str.append(hasVariation(true, null) ? "variation\t" : "\t");
+        str.append(hasVariation(null) ? "variation\t" : "\t");
         str.append(nonEmptySequence(Pass.intro) ? "I" : "");
         str.append(nonEmptySequence(Pass.repeat) ? (isRPlus() ? "R+" : "R*") : "");
         str.append(nonEmptySequence(Pass.ending) ? "E\t" : "\t");

@@ -98,9 +98,11 @@ public interface IrStreamItem extends XmlExport {
      */
     public TreeSet<Double> allDurationsInMicros(GeneralSpec generalSpec, NameEngine nameEngine);
 
-    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass);
+    public BareIrStream extractPass(IrSignal.Pass pass, IrStream.PassExtractorState state);
 
-    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass);
+    public void updateStateWhenEntering(IrSignal.Pass pass, IrStream.PassExtractorState state);
+
+    public void updateStateWhenExiting(IrSignal.Pass pass, IrStream.PassExtractorState state);
 
     //ParserRuleContext getParseTree();
 
@@ -123,8 +125,6 @@ public interface IrStreamItem extends XmlExport {
     public int weight();
 
     public boolean constant(NameEngine nameEngine);
-
-    public BareIrStream extractPass(IrSignal.Pass pass, IrSignal.Pass state);
 
     public void evaluate(RenderData renderData, List<BitSpec> bitSpecStack) throws NameUnassignedException;
 

@@ -139,8 +139,9 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     public int numberOfInfiniteRepeats() {
         if (numberInfiniteRepeatsCached == null) {
             numberInfiniteRepeatsCached = 0;
-            for (IrStreamItem item : irStreamItems)
+            irStreamItems.forEach(item -> {
                 numberInfiniteRepeatsCached += item.numberOfInfiniteRepeats();
+            });
         }
 
         return numberInfiniteRepeatsCached;
@@ -289,24 +290,18 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    @SuppressWarnings("AssignmentToMethodParameter")
-    public BareIrStream extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+    public BareIrStream extractPass(IrSignal.Pass pass, IrStream.PassExtractorState state) {
         List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());
 
         for (IrStreamItem irStreamItem : irStreamItems) {
-            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
+            irStreamItem.updateStateWhenEntering(pass, state);
 
-            if (newState != null)
-                state = newState;
-
-            if (state == pass || pass == null)
+            if (state.getState() == pass)
                 list.addAll(irStreamItem.extractPass(pass, state).getIrStreamItems());
 
-            IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
-            if (next != null)
-                state = next;
+            irStreamItem.updateStateWhenExiting(pass, state);
 
-            if (next == IrSignal.Pass.finish)
+            if (state.getState() == IrSignal.Pass.finish)
                 break;
         }
         return new BareIrStream(list);

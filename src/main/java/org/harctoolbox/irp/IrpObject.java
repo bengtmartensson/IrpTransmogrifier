@@ -150,12 +150,10 @@ public abstract class IrpObject implements XmlExport, Serializable {
         return IrpUtils.propertiesMap(noProperites, this);
     }
 
-    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
-        return null;
+    public void updateStateWhenEntering(IrSignal.Pass pass, IrStream.PassExtractorState state) {
     }
 
-    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
-        return null;
+    public void updateStateWhenExiting(IrSignal.Pass pass, IrStream.PassExtractorState state) {
     }
 
     // Default implementation, often overridden

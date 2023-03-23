@@ -137,7 +137,7 @@ public final class Assignment extends IrpObject implements IrStreamItem, Numeric
     }
 
     @Override
-    public BareIrStream extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+    public BareIrStream extractPass(IrSignal.Pass pass, IrStream.PassExtractorState state) {
         return new BareIrStream(this);
     }
 

@@ -170,7 +170,17 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public BareIrStream extractPass(Pass pass, Pass state) {
+    public void updateStateWhenEntering(IrSignal.Pass pass, IrStream.PassExtractorState state) {
+        irStream.updateStateWhenEntering(pass, state);
+    }
+
+    @Override
+    public void updateStateWhenExiting(IrSignal.Pass pass, IrStream.PassExtractorState state) {
+        irStream.updateStateWhenExiting(pass, state);
+    }
+
+    @Override
+    public BareIrStream extractPass(Pass pass, IrStream.PassExtractorState state) {
         BareIrStream extractList = irStream.extractPass(pass, state);
         IrStream reducedIrStream = new IrStream(extractList);
         List<IrStreamItem> result = new ArrayList<>(1);

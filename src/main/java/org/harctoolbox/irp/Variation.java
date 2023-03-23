@@ -88,18 +88,6 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
-        return pass;
-    }
-
-    @Override
-    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
-        BareIrStream irStream = select(pass);
-        return irStream.isEmpty() ? Pass.finish : pass;
-    }
-
-
-    @Override
     public int numberOfInfiniteRepeats() {
         return Math.max(numberOfInfiniteRepeats(intro), Math.max(numberOfInfiniteRepeats(repeat), numberOfInfiniteRepeats(ending)));
     }
@@ -148,8 +136,14 @@ public final class Variation extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public BareIrStream extractPass(Pass pass, Pass state) {
-        return select(pass).extractPass(pass, state);
+    public BareIrStream extractPass(Pass pass, IrStream.PassExtractorState state) {
+        return select(state.getState()).extractPass(pass, state);
+    }
+
+    @Override
+    public void updateStateWhenEntering(Pass pass, IrStream.PassExtractorState state) {
+        if (select(state.getState()).isEmpty())
+            state.setState(Pass.finish);
     }
 
     @Override

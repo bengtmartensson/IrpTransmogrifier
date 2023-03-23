@@ -148,8 +148,9 @@ public final class BitSpec extends IrpObject implements AggregateLister {
     public int numberOfInfiniteRepeats() {
         if (numberOfInfiniteRepeatsCached == null) {
             numberOfInfiniteRepeatsCached = 0;
-            for (BareIrStream bitCode : bitCodes)
+            bitCodes.forEach(_item -> {
                 numberOfInfiniteRepeatsCached += numberOfInfiniteRepeats();
+            });
         }
         return numberOfInfiniteRepeatsCached;
     }

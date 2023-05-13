@@ -10,9 +10,7 @@ import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.IrpException;
 import org.harctoolbox.irp.Protocol;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -50,15 +48,6 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
     private static final int[] rc6_m_32_0_1_0_255_0_0 = new int[]{
         2664, 888, 444, 888, 444, 444, 444, 444, 1332, 888, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 888, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 69704
     };
-
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     private static Protocol parse(int[] data) throws OddSequenceLengthException, DecodeException, InvalidArgumentException {
         Analyzer analyzer = new Analyzer(new IrSequence(data), ModulatedIrSequence.DEFAULT_FREQUENCY, false, ABSOLUTE_TOLERANDE, RELATIVE_TOLERANCE);

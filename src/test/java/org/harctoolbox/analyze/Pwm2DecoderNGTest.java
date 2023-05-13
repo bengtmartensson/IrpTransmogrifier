@@ -4,9 +4,7 @@ import org.harctoolbox.ircore.IrSequence;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.Protocol;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -18,14 +16,6 @@ import org.testng.annotations.Test;
 public class Pwm2DecoderNGTest {
     private final static int[] nec12_34_56_durations
             = new int[]{9024, 4512, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 1692, 564, 564, 564, 564, 564, 564, 564, 1692, 564, 1692, 564, 44268};
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     private final IrSequence irSequence;
     private final Analyzer analyzer;

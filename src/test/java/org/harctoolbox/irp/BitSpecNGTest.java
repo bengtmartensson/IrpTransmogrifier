@@ -4,9 +4,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -19,14 +17,6 @@ public class BitSpecNGTest {
     private static final String NOKIA32_BITSPEC = "<164,-276|164,-445|164,-614|164,-783>";
     private static final String NEC1_GENERALSPEC = "{38.4k,564}";
 
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
     public BitSpecNGTest() {
     }
 

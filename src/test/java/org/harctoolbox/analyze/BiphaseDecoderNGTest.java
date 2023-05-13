@@ -7,9 +7,7 @@ import org.harctoolbox.ircore.OddSequenceLengthException;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.Protocol;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -26,14 +24,6 @@ public class BiphaseDecoderNGTest {
         2664, 888, 444, 888, 444, 444, 444, 444, 444, 888, 888, 444, 888, 444, 444, 444, 444, 444, 444, 888, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 888, 444, 444, 84356
         //2664, 888, 444, 888, 444, 444, 444, 444, 1332, 1332, 444, 444, 444, 444, 444, 444, 888, 444, 444, 888, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 444, 888, 444, 444, 84356
     };
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     private final Analyzer rc5;
     private final Analyzer rc6;

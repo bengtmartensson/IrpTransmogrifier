@@ -2,23 +2,13 @@ package org.harctoolbox.irp;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class BitspecIrstreamNGTest {
 
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
     private final BitspecIrstream instance;
     public BitspecIrstreamNGTest() {
         instance = new BitspecIrstream("<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,1,^108m,(16,-4,1,^108m)*)");

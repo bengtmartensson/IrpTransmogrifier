@@ -12,9 +12,7 @@ import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignalParser;
 import org.harctoolbox.ircore.ProntoParser;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -24,14 +22,6 @@ public class RepeatFinderParserNGTest {
             + " 015B 0059 0016 0E6C"
             + " 015B 0055 0016 0E6C"
             + " 015B 0057 0016 0E6C";
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     public RepeatFinderParserNGTest() {
     }

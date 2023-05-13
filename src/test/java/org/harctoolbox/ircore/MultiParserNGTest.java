@@ -2,9 +2,7 @@ package org.harctoolbox.ircore;
 
 import java.util.List;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -25,14 +23,6 @@ public class MultiParserNGTest {
     private static final String ORTEK_MCE_MULTILINE = "+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +480 -480 +960 -480 +480 -48480\n"
             + "+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -48480\r\n"
             + "+1920 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -480 +480 -960 +960 -48480";
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     public MultiParserNGTest() {
     }

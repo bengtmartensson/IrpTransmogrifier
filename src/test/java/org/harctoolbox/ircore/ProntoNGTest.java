@@ -3,7 +3,6 @@ package org.harctoolbox.ircore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -17,17 +16,13 @@ public class ProntoNGTest {
         +9041, 2267, 573, 96193};
     private static final String NEC1_D12_S34_F56 = "0000 006C 0022 0002 015B 00AD 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 06A4 015B 0057 0016 0E6C";
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        nec1 = new IrSignal(necIntArray, 68, 4, 38400d);
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     public ProntoNGTest() throws InvalidArgumentException {
+    }
 
+    @BeforeClass
+    public void setUpClass() throws Exception {
+        nec1 = new IrSignal(necIntArray, 68, 4, 38400d);
     }
 
     @BeforeMethod

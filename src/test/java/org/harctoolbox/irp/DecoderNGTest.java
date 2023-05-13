@@ -10,9 +10,7 @@ import org.harctoolbox.ircore.Pronto;
 import org.harctoolbox.ircore.ThisCannotHappenException;
 import org.harctoolbox.irp.Decoder.Decode;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -21,14 +19,6 @@ public class DecoderNGTest {
     private final static double NRC17_FREQUENCY = 38000d;
     private final static double RC5_FREQUENCY = 36000d;
     private final static String PROTOCOL_NAME = "Humax 4Phase";
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     private final Decoder decoder;
     private final IrSequence nrc17Intro;

@@ -7,9 +7,7 @@ import org.harctoolbox.ircore.ModulatedIrSequence;
 import org.harctoolbox.irp.BitDirection;
 import org.harctoolbox.irp.Protocol;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -22,14 +20,6 @@ public class SerialDecoderNGTest {
     private static final int[] pctv_12_34 = new int[] {
         1664, 6656, 832, 1664, 1664, 4160, 832, 2496, 832, 1664, 1664, 100000
     };
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     private final Analyzer pctv;
     private final ArrayList<Integer> widths;

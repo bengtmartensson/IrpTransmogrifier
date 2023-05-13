@@ -4,9 +4,7 @@ import org.harctoolbox.ircore.InvalidArgumentException;
 import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.Pronto;
 import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -28,14 +26,6 @@ public class ShortProntoNGTest {
     private static final String RC5_1_1_CCF    = "5000 0073 0000 0001 0001 0001";
     private static final String RC5X_1_2_3_CCF = "5001 0073 0000 0002 0001 0002 0003 0000";
     private static final String RC6_1_3_CCF    = "6000 0073 0000 0001 0001 0003";
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
 
     public ShortProntoNGTest() {
     }

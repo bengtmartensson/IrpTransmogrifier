@@ -131,8 +131,8 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
-        return irStream.numberOfBareDurations(recursive);
+    public Integer numberOfBareDurations() {
+        return irStream.numberOfBareDurations();
     }
 
     @Override
@@ -170,16 +170,26 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public List<IrStreamItem> extractPass(Pass pass, Pass state) {
-        List<IrStreamItem> extractList = irStream.extractPass(pass, state);
+    public void updateStateWhenEntering(IrSignal.Pass pass, IrStream.PassExtractorState state) {
+        irStream.updateStateWhenEntering(pass, state);
+    }
+
+    @Override
+    public void updateStateWhenExiting(IrSignal.Pass pass, IrStream.PassExtractorState state) {
+        irStream.updateStateWhenExiting(pass, state);
+    }
+
+    @Override
+    public BareIrStream extractPass(Pass pass, IrStream.PassExtractorState state) {
+        BareIrStream extractList = irStream.extractPass(pass, state);
         IrStream reducedIrStream = new IrStream(extractList);
         List<IrStreamItem> result = new ArrayList<>(1);
         result.add(new BitspecIrstream(bitSpec, reducedIrStream));
-        return result;
+        return new BareIrStream(result);
     }
 
     public BareIrStream extractPass(IrSignal.Pass pass) {
-        return new BareIrStream(irStream.extractPass(pass, IrSignal.Pass.intro));
+        return irStream.extractPass(pass);
     }
 
     @Override
@@ -274,8 +284,8 @@ public final class BitspecIrstream extends IrpObject implements IrStreamItem {
         return irStream.startingDuratingType(DurationType.gap, gapFlashBitSpecs);
     }
 
-    boolean hasVariation(boolean recursive, Pass pass) {
-        return irStream.hasVariation(recursive, pass);
+    boolean hasVariation(Pass pass) {
+        return irStream.hasVariation(pass);
     }
 
     boolean startsWithFlash() {

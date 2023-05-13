@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import org.harctoolbox.ircore.IrSignal;
 import org.harctoolbox.ircore.IrSignal.Pass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -103,6 +104,26 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         return repeatMarker;
     }
 
+    private int getMinRepeats() {
+        return repeatMarker.getMin();
+    }
+
+    private boolean isInfiniteRepeat() {
+        return repeatMarker.isInfinite();
+    }
+
+    @Override
+    public IrSignal.Pass stateWhenEntering(IrSignal.Pass pass) {
+        return hasVariation(false, null) ? pass
+                : (pass == IrSignal.Pass.repeat || pass == IrSignal.Pass.ending) && isInfiniteRepeat() ? IrSignal.Pass.repeat
+                : null;
+    }
+
+    @Override
+    public IrSignal.Pass stateWhenExiting(IrSignal.Pass pass) {
+        return isInfiniteRepeat() ? IrSignal.Pass.ending : null;
+    }
+
     @Override
     public String toIrpString(int radix) {
         return toIrpString(radix, "");
@@ -110,10 +131,6 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
 
     public String toIrpString(int radix, String separator) {
         return "(" + bareIrStream.toIrpString(radix) + ")" + separator + repeatMarker.toIrpString(radix);
-    }
-
-    public boolean hasRepeatSequence() {
-        return isRepeatSequence() || numberOfInfiniteRepeats() > 0;
     }
 
     public boolean isRepeatSequence() {
@@ -143,8 +160,11 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     }
 
     @Override
-    public Integer numberOfBareDurations() {
-        return bareIrStream.numberOfBareDurations();
+    public Integer numberOfBareDurations(boolean recursive) {
+        if (!recursive && isInfiniteRepeat())
+            return 0;
+
+        return bareIrStream.numberOfBareDurations(recursive);
     }
 
     @Override
@@ -164,6 +184,14 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
                 : repeatMarker.getMin() * noir;
     }
 
+    private boolean evaluateTheRepeat(IrSignal.Pass pass) {
+        return pass == IrSignal.Pass.repeat && isInfiniteRepeat();
+    }
+
+    private int numberRepetitions(IrSignal.Pass pass) {
+        return evaluateTheRepeat(pass) ? 1 : getMinRepeats();
+    }
+
     @Override
     public void decode(RecognizeData recognizeData, List<BitSpec> bitSpecs, boolean isLast) throws SignalRecognitionException {
         // Don't care to log anything here...
@@ -175,47 +203,24 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         bareIrStream.createParameterSpecs(parameterSpecs);
     }
 
-    @Override
-    public void updateStateWhenEntering(Pass pass, IrStream.PassExtractorState state) {
-        if (isRepeatSequence()) {
-            if (state.getState() == Pass.intro) {
-                if (hasVariationNonRecursive())
-                    state.setState(pass);
-                else if (pass == Pass.repeat || repeatMarker.getMin() == 0)
-                    state.setState(Pass.repeat);
-            }
-        }
-    }
-
-    @Override
-    public void updateStateWhenExiting(Pass pass, IrStream.PassExtractorState state) {
-        if (isRepeatSequence())
-            state.setState(Pass.ending);
-    }
-
-    @Override
-    public BareIrStream extractPass(Pass pass, PassExtractorState state) {
-        List<IrStreamItem> list = new ArrayList<>(20);
-        int repetitions =
-                (pass == Pass.repeat && repeatMarker.isInfinite()) ? 1
-                : (pass == Pass.ending && hasVariation(Pass.ending)) ? 1
-                : repeatMarker.getMin();
-        updateStateWhenEntering(pass, state);
-        if (repetitions > 0) {
-            BareIrStream extractedStream = bareIrStream.extractPass(pass, state);
-            for (int i = 0; i < repetitions; i++)
-                list.addAll(extractedStream.getIrStreamItems());
-        }
-        updateStateWhenExiting(pass, state);
+    public BareIrStream extractPass(Pass pass) {
+        List<IrStreamItem> list = extractPass(pass, Pass.intro);
         return new BareIrStream(list);
     }
 
-    /**
-     * Extracts a the intro, repeat- or ending sequence as BareIrStream.
-     * The real top level function; main test object.
-     */
-    public BareIrStream extractPass(Pass pass) {
-        return extractPass(pass, new PassExtractorState(Pass.intro));
+    @Override
+    @SuppressWarnings("AssignmentToMethodParameter")
+    public List<IrStreamItem> extractPass(Pass pass, Pass state) {
+        List<IrStreamItem> list = new ArrayList<>(8);
+        int repetitions = numberRepetitions(pass);
+        if (evaluateTheRepeat(pass))
+            state = IrSignal.Pass.repeat;
+        if (pass == Pass.ending && hasVariationWithEnding())
+            list.addAll(bareIrStream.extractPass(Pass.ending, Pass.ending));
+        else
+            for (int i = 0; i < repetitions; i++)
+                list.addAll(bareIrStream.extractPass(pass, state));
+        return list;
     }
 
     @Override
@@ -226,26 +231,21 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     @Override
     public Integer numberOfDurations() {
         return bareIrStream.numberOfDurations() != null
-                ? repeatMarker.getMin() * bareIrStream.numberOfDurations()
+                ? getMinRepeats() * bareIrStream.numberOfDurations()
                 : null;
     }
 
     public Integer numberOfDurations(int bitSpecLength) {
         Integer nod = bareIrStream.numberOfDurations(bitSpecLength);
-        return nod != null ? repeatMarker.getMin() * bareIrStream.numberOfDurations(bitSpecLength) : null;
+        return nod != null ? getMinRepeats() * bareIrStream.numberOfDurations(bitSpecLength) : null;
     }
 
-    public boolean hasVariation(Pass pass) {
-        return bareIrStream.hasVariation(pass);
-    }
-
-    public boolean hasVariationNonRecursive() {
-        return bareIrStream.hasVariationNonRecursive();
+    public boolean hasVariation(boolean recursive, Pass pass) {
+        return bareIrStream.hasVariation(recursive, pass);
     }
 
     boolean isRPlus() {
-        return repeatMarker.isRPlus() && ! hasVariation(null);
-
+        return repeatMarker.isInfinite() && repeatMarker.getMin() > 0 && ! hasVariation(true, null);
     }
 
     @Override
@@ -255,7 +255,7 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
 
     @Override
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine) {
-        int repetitions = repeatMarker.getMin();
+        int repetitions = getMinRepeats();//numberRepetitions(pass);
         if (repetitions == 0)
             return new HashMap<>(0);
 
@@ -329,6 +329,10 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
         return bareIrStream.startsWithFlash();
     }
 
+    boolean hasVariationWithEnding() {
+        return bareIrStream.hasVariation(true, Pass.ending);
+    }
+
     @Override
     public boolean nonConstantBitFieldLength() {
         return bareIrStream.nonConstantBitFieldLength();
@@ -347,26 +351,5 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     @Override
     public boolean constant(NameEngine nameEngine) {
         return bareIrStream.constant(nameEngine);
-    }
-
-    public static class PassExtractorState {
-        private Pass state;
-
-        PassExtractorState(Pass state) {
-            this.state = state;
-        }
-
-        Pass getState() {
-            return state;
-        }
-
-        void setState(Pass state) {
-            this.state = state;
-        }
-
-        @Override
-        public String toString() {
-            return state.toString();
-        }
     }
 }

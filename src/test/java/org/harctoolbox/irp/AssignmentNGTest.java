@@ -115,7 +115,7 @@ public class AssignmentNGTest {
     public void testNumberOfBareDurations() {
         System.out.println("numberOfBareDurations");
         Assignment instance = new Assignment("x = answer*sheldon");
-        int result = instance.numberOfBareDurations(true);
+        int result = instance.numberOfBareDurations();
         assertEquals(result, 0);
     }
 }

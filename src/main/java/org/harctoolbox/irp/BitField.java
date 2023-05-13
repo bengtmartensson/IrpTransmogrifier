@@ -158,7 +158,7 @@ public abstract class BitField extends IrpObject implements Numerical, EquationS
         return null;
     }
 
-    public Integer numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations() {
         return 0;
     }
 

@@ -64,7 +64,14 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return irStreamItems;
     }
 
+    private static List<IrStreamItem> mkIrStreamItemList(IrStreamItem irStreamItem) {
+        List<IrStreamItem> list = new ArrayList<>(1);
+        list.add(irStreamItem);
+        return list;
+    }
+
     private List<IrStreamItem> irStreamItems;
+    private Integer numberInfiniteRepeatsCached = null; // Assume immutability
 
     public BareIrStream(IrpParser.Bare_irstreamContext ctx) {
         super(ctx);
@@ -78,6 +85,18 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     public BareIrStream(List<IrStreamItem> list) {
         super(null);
         this.irStreamItems = list;
+    }
+
+    public BareIrStream(IrStreamItem irStreamItem) {
+        this(mkIrStreamItemList(irStreamItem));
+    }
+
+    private BareIrStream(ParserDriver parserDriver) {
+        this(parserDriver.getParser().bare_irstream());
+    }
+
+    public BareIrStream(String s) {
+        this(new ParserDriver(s));
     }
 
     @Override
@@ -118,9 +137,14 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
 
     @Override
     public int numberOfInfiniteRepeats() {
-        int sum = 0;
-        sum = irStreamItems.stream().map((item) -> item.numberOfInfiniteRepeats()).reduce(sum, Integer::sum);
-        return sum;
+        if (numberInfiniteRepeatsCached == null) {
+            numberInfiniteRepeatsCached = 0;
+            irStreamItems.forEach(item -> {
+                numberInfiniteRepeatsCached += item.numberOfInfiniteRepeats();
+            });
+        }
+
+        return numberInfiniteRepeatsCached;
     }
 
     EvaluatedIrStream evaluate(IrSignal.Pass state, IrSignal.Pass pass, GeneralSpec generalSpec, NameEngine nameEngine) throws NameUnassignedException {
@@ -149,22 +173,26 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         return false; // give up
     }
 
-    public boolean hasVariation(boolean recursive, Pass pass) {
+    public boolean hasVariation(Pass pass) {
         for (IrStreamItem irStreamItem : irStreamItems) {
             if (irStreamItem instanceof Variation)
                 if (((Variation) irStreamItem).hasPart(pass))
                     return true;
-            if (recursive && irStreamItem instanceof BitspecIrstream)
-                if (((BitspecIrstream) irStreamItem).hasVariation(recursive, pass))
+            if (irStreamItem instanceof BitspecIrstream)
+                if (((BitspecIrstream) irStreamItem).hasVariation(pass))
                     return true;
-            if (recursive && irStreamItem instanceof BareIrStream)
-                if (((BareIrStream) irStreamItem).hasVariation(recursive, pass))
+            if (irStreamItem instanceof BareIrStream)
+                if (((BareIrStream) irStreamItem).hasVariation(pass))
                     return true;
-            if (recursive && irStreamItem instanceof IrStream)
-                if (((IrStream) irStreamItem).hasVariation(recursive, pass))
+            if (irStreamItem instanceof IrStream)
+                if (((IrStream) irStreamItem).hasVariation(pass))
                     return true;
         }
-        return false; // give up
+        return false;
+    }
+
+    public boolean hasVariationNonRecursive() {
+        return irStreamItems.stream().anyMatch(irStreamItem -> (irStreamItem instanceof Variation));
     }
 
     @Override
@@ -196,7 +224,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     private Element fillElement(Document document, Element element) {
-        Integer nobd = numberOfBareDurations(true);
+        Integer nobd = numberOfBareDurations();
         if (nobd != null)
            element.setAttribute("numberOfBareDurations", Integer.toString(nobd));
         Integer nob = numberOfBits();
@@ -213,10 +241,10 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    public Integer numberOfBareDurations(boolean recursive) {
+    public Integer numberOfBareDurations() {
         int sum = 0;
         for (IrStreamItem item : irStreamItems) {
-            Integer nobd = item.numberOfBareDurations(recursive);
+            Integer nobd = item.numberOfBareDurations();
             if (nobd == null)
                 return null;
             sum += nobd;
@@ -262,27 +290,21 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
     }
 
     @Override
-    @SuppressWarnings("AssignmentToMethodParameter")
-    public List<IrStreamItem> extractPass(IrSignal.Pass pass, IrSignal.Pass state) {
+    public BareIrStream extractPass(IrSignal.Pass pass, IrStream.PassExtractorState state) {
         List<IrStreamItem> list = new ArrayList<>(irStreamItems.size());
 
         for (IrStreamItem irStreamItem : irStreamItems) {
-            IrSignal.Pass newState = irStreamItem.stateWhenEntering(pass);
+            irStreamItem.updateStateWhenEntering(pass, state);
 
-            if (newState != null)
-                state = newState;
+            if (state.getState() == pass)
+                list.addAll(irStreamItem.extractPass(pass, state).getIrStreamItems());
 
-            if (state == pass || pass == null)
-                list.addAll(irStreamItem.extractPass(pass, state));
+            irStreamItem.updateStateWhenExiting(pass, state);
 
-            IrSignal.Pass next = irStreamItem.stateWhenExiting(state);
-            if (next != null)
-                state = next;
-
-            if (next == IrSignal.Pass.finish)
+            if (state.getState() == IrSignal.Pass.finish)
                 break;
         }
-        return list;
+        return new BareIrStream(list);
     }
 
     @Override
@@ -322,7 +344,7 @@ public final class BareIrStream extends IrpObject implements IrStreamItem {
         if (nod != null)
             return nod;
 
-        Integer nobd = numberOfBareDurations(true);
+        Integer nobd = numberOfBareDurations();
         Integer nob = numberOfBits();
         return nobd != null && nob != null ? nobd + bitspecLength*nob : null;
     }

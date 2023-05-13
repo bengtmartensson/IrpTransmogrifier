@@ -2559,13 +2559,143 @@ C3=D:1:2 + #(F&44) + #(D&2)
         </irp:parameter>
         <irp:irp><![CDATA[
          {38.2k,394}<1,-1|1,-3>(8,-4,M:40,modesw:-3,timesw:1,2:4,mode:8,~temp:5,0:3,fan:3,swing:3,timesw:1,0:1,time:8,0:24,chksum:8,1,-50m)
-            {M=0x000126cb23,chksum=21+32+(4*modesw)+(72*timesw)+mode+(~temp)+fan+(swing<<3)+time}[modesw:0..1,timesw:0..1,mode:0..8,
-            temp:0..31,fan:0..5,swing:0..7,time:0..144]]]>
+            {M=0x000126cb23,chksum=141 + modesw:-3 + (timesw<<3) + mode + ~temp + fan + (swing<<3) + (timesw<<6) + time}
+            [modesw:0..1=0,timesw:0..1=0,mode:0..8=3,temp:0..31,fan:0..5=2,swing:0..7=0,time:0..144=0]]]>
         </irp:irp>
         <irp:documentation>Protocol used by air conditioning devices by TCL and others.
             See <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=16473">this thread</a>,
             <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=102541">this thread</a>,
             and <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=102534">this thread</a>.
+
+            <p>Parameters:</p>
+            <dl>
+                <dt>modesw</dt>
+                <dd>
+                    <table border="1">
+                        <!--thead>
+                            <tr>
+                                <th>value</th>
+                                <th>description</th>
+                            </tr>
+                        </thead-->
+                        <tr>
+                            <td>0</td>
+                            <td>Off</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>On</td>
+                        </tr>
+                    </table>
+                </dd>
+
+                <dt>timesw</dt>
+                <dd>
+                    <table border="1">
+                        <!--thead>
+                            <tr>
+                                <th>value</th>
+                                <th>description</th>
+                            </tr>
+                        </thead-->
+                        <tr>
+                            <td>0</td>
+                            <td>Off</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>On</td>
+                        </tr>
+                    </table>
+                </dd>
+                <dt>mode</dt>
+                <dd>
+                    <table border="1">
+                <!--thead>
+                    <tr>
+                        <th>value</th>
+                        <th>description</th>
+                    </tr>
+                </thead-->
+
+                        <tr>
+                            <td>1</td>
+                            <td>heat</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>dry</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>unit</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>fan</td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>feel</td>
+                        </tr>
+                    </table>
+                </dd>
+                <dt>temp</dt>
+                <dd>Desired temperature in degrees Celsius</dd>
+
+                <dt>fan</dt>
+                <dd>
+                    <table border="1">
+                        <!--thead>
+                            <tr>
+                                <th>value</th>
+                                <th>description</th>
+                            </tr>
+                        </thead-->
+                        <tr>
+                            <td>0</td>
+                            <td>auto</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>sleep</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>low</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>med</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>high</td>
+                        </tr>
+                    </table>
+                </dd>
+                <dt>swing</dt>
+                <dd>
+                    <table border="1">
+                        <!--thead>
+                            <tr>
+                                <th>value</th>
+                                <th>description</th>
+                            </tr>
+                        </thead-->
+                        <tr>
+                            <td>0</td>
+                            <td>Off</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>On</td>
+                        </tr>
+                    </table>
+                </dd>
+                <dt>time</dt>
+                <dd>Timer value, in multiples of 10 minutes</dd>
+            </dl>
         </irp:documentation>
     </irp:protocol>
 

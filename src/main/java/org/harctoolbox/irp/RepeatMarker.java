@@ -132,6 +132,10 @@ public final class RepeatMarker extends IrpObject {
         return max;
     }
 
+    boolean isRPlus() {
+        return isInfinite() && getMin() > 0;
+    }
+
     @Override
     public Element toElement(Document document) {
         Element element = super.toElement(document);

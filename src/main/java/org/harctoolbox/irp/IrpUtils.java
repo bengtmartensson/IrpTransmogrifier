@@ -128,12 +128,6 @@ public final class IrpUtils {
         JOptionPane.showMessageDialog(null, panel, title, JOptionPane.PLAIN_MESSAGE);
     }
 
-    static List<IrStreamItem> mkIrStreamItemList(IrStreamItem irStreamItem) {
-        List<IrStreamItem> list = new ArrayList<>(1);
-        list.add(irStreamItem);
-        return list;
-    }
-
     private IrpUtils() {
     }
 }

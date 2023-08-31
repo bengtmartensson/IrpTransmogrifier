@@ -140,7 +140,7 @@ public final class XmlUtils {
     }
 
     public static Document openXmlFile(File file, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {
-        return openXmlSource(new InputSource(file.getCanonicalPath()), schema, isNamespaceAware, isXIncludeAware);
+        return openXmlSource(new InputSource(file.toURI().toString()), schema, isNamespaceAware, isXIncludeAware);
     }
 
     public static Document openXmlFile(File file, File schemaFile, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException, IOException {

@@ -42,12 +42,20 @@ public class BracketedIrSignalParser extends AbstractIrParser implements IrSigna
         if (s.startsWith("Freq=")) {
             int pos = s.indexOf('H', 6);
             if (pos != -1) {
-                readFrequency = Double.parseDouble(s.substring(5, pos));
+                try {
+                    readFrequency = Double.parseDouble(s.substring(5, pos));
+                } catch (NumberFormatException ex) {
+                    // leaving as null
+                }
                 s = s.substring(pos + 2).trim();
             } else {
                 pos = s.indexOf('[', 6);
                 if (pos != -1) {
-                    readFrequency = Double.parseDouble(s.substring(5, pos));
+                    try {
+                        readFrequency = Double.parseDouble(s.substring(5, pos));
+                    } catch (NumberFormatException ex) {
+                        // leaving as null
+                    }
                     s = s.substring(pos).trim();
                 }
             }

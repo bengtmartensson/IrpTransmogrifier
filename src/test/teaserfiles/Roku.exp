@@ -1,7 +1,7 @@
-Menu:		NEC: {D=234,S=194,F=3},	beg=0, end=67	{NEC2: {D=234,S=194,F=131},	beg=68, end=339, reps=4}
-Play:		NEC: {D=234,S=194,F=76},	beg=0, end=67	{NEC2: {D=234,S=194,F=204},	beg=68, end=271, reps=3}
-Pause:		NEC: {D=234,S=194,F=76},	beg=0, end=67	{NEC2: {D=234,S=194,F=204},	beg=68, end=271, reps=3}
-Rwd:		NEC: {D=234,S=194,F=52},	beg=0, end=67	{NEC2: {D=234,S=194,F=180},	beg=68, end=203, reps=2}
-FFWD:		NEC: {D=234,S=194,F=85},	beg=0, end=67	{NEC2: {D=234,S=194,F=213},	beg=68, end=271, reps=3}
-Skip Back:		NEC: {D=234,S=194,F=120},	beg=0, end=67	{NEC2: {D=234,S=194,F=248},	beg=68, end=271, reps=3}
-OK:		NEC: {D=234,S=194,F=42},	beg=0, end=67	{NEC2: {D=234,S=194,F=170},	beg=68, end=271, reps=3}
+Menu:		Roku: {D=234,S=194,F=3},	beg=0, end=339, reps=4
+Play:		Roku: {D=234,S=194,F=76},	beg=0, end=271, reps=3
+Pause:		Roku: {D=234,S=194,F=76},	beg=0, end=271, reps=3
+Rwd:		Roku: {D=234,S=194,F=52},	beg=0, end=203, reps=2
+FFWD:		Roku: {D=234,S=194,F=85},	beg=0, end=271, reps=3
+Skip Back:		Roku: {D=234,S=194,F=120},	beg=0, end=271, reps=3
+OK:		Roku: {D=234,S=194,F=42},	beg=0, end=271, reps=3

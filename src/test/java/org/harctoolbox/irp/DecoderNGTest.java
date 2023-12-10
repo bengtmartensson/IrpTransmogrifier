@@ -256,7 +256,7 @@ public class DecoderNGTest {
         Decoder.setDebugProtocolRegExp("nec1");
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, null, null, null, null, false, false);
         Decoder.DecodeTree result = instance.decode(irSequence, params);
-        assertEquals(result.size(), 6);
+        assertEquals(result.size(), 5);
         Decoder.TrunkDecodeTree first = result.getAlternative("NEC1");
         assertEquals(first.getName(), "NEC1");
         Decoder.TrunkDecodeTree second = first.getRest().getAlternative("RC5");
@@ -264,7 +264,7 @@ public class DecoderNGTest {
 
         irSequence = new ModulatedIrSequence(IrSequence.concatenate(nec1Intro, rc5Seq), 37000d);
         result = instance.decode(irSequence, params);
-        assertEquals(result.size(), 4);
+        assertEquals(result.size(), 3);
 
         allDecodes = false;
         params = new Decoder.DecoderParameters(strict, allDecodes, removeDefaultedParameters, recursive, null, null, null, null, false, false);

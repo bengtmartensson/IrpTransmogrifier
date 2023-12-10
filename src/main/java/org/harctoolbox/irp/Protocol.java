@@ -269,11 +269,11 @@ public class Protocol extends IrpObject implements AggregateLister {
     public Protocol normalFormProtocol() {
         List<IrStreamItem> list = new ArrayList<>(1);
         list.add(normalFormVariation);
-        return mkProtocol(new BareIrStream(list));
+        return mkProtocolFromNormalFormVariation(new BareIrStream(list));
     }
 
     public Protocol normalForm(IrSignal.Pass pass) {
-        return mkProtocol(normalFormVariation.select(pass));
+        return mkProtocolFromNormalFormVariation(normalFormVariation.select(pass));
     }
 
     public BareIrStream normalBareIrStream(IrSignal.Pass pass) {
@@ -284,8 +284,8 @@ public class Protocol extends IrpObject implements AggregateLister {
         return normalFormVariation.select(pass).isEmpty();
     }
 
-    private Protocol mkProtocol(BareIrStream bareIrStream) {
-        IrStream irStream = new IrStream(bareIrStream, RepeatMarker.newRepeatMarker('*'));
+    private Protocol mkProtocolFromNormalFormVariation(BareIrStream bareIrStream) {
+        IrStream irStream = new IrStream(bareIrStream, RepeatMarker.newRepeatMarker('+'));
         BitspecIrstream normalBitspecIrstream = new BitspecIrstream(bitspecIrstream.getBitSpec(), irStream);
         return new Protocol(generalSpec, normalBitspecIrstream, definitions, parameterSpecs, null);
     }

@@ -1,0 +1,299 @@
+Content-Type: multipart/alternative;
+ boundary="------------UWj2Jc2pgX8j2jp7B00El0Gk"
+Message-ID: <55ae9b71-8b41-a827-3c02-6437a3a12a5a@bengt-martensson.de>
+Date: Tue, 26 Sep 2023 16:38:31 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: Have you seen this wikipedia page on the apple remote protocol?
+Content-Language: en-US
+To: Lyndel McGee <lynniemagoo@yahoo.com>
+References: <1616538003.2579512.1695611832683.ref@mail.yahoo.com>
+ <1616538003.2579512.1695611832683@mail.yahoo.com>
+ <566730021.471648.1695613696692@mail.yahoo.com>
+From: Bengt Martensson <barf@bengt-martensson.de>
+In-Reply-To: <566730021.471648.1695613696692@mail.yahoo.com>
+
+This is a multi-part message in MIME format.
+--------------UWj2Jc2pgX8j2jp7B00El0Gk
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+Hi Lyndel,
+
+thank you for your mails. No, I was not aware of the Wiki article. I 
+have now scrutinized it:
+
+The only significant difference is that D/Command page is 5 (8) bits, 
+and S/Vendor is 11 (8) bits, always constant.
+
+The article does not contain any useful reference for the protocol 
+statements, which is strictly speaking a violation of WP:NOR 
+https://en.wikipedia.org/wiki/Wikipedia:No_original_research . (It 
+contains a number of junk references, though...) The closest there is is 
+a link to a defunct Arduino program, which I happened to find as 
+https://github.com/squeed/AppleRemoteSender.
+
+For this reason, I see no compelling reason to consider the Wiki version 
+as more correct than the present.
+
+I am willing to copy your file to the contributed directory. I will give 
+you credit for it, unless you ask me not to.
+
+Please let me know what you think.
+
+Bengt
+
+On 9/25/23 05:48, Lyndel McGee wrote:
+> Here's a text file with an IRP xml snippet if you'd like to include this.
+>
+> On Sunday, September 24, 2023 at 10:17:12 PM CDT, Lyndel McGee 
+> <lynniemagoo@yahoo.com> wrote:
+>
+>
+> Bengt,  I hope you are doing well.
+>
+> Have you seen this page?  I found this page this weekend and was 
+> floored as I know I've looked for this before.
+>
+> https://en.m.wikipedia.org/wiki/Apple_Remote
+>
+> Based on what I read and the stuff below, We got the bits right but 
+> some other stuff wrong.
+>
+> Your thoughts appreciated.
+> Lyndel
+>
+> P.S. I'm curious to know what the IRP might look like reformatted.
+>
+>
+> Consider this apple code Scrutinizer currently supports.
+>
+> Screenshot_B 238_050 (Device 238 Subdevice 135 function 50 pair ID 254)
+>
+> 0000 006C 0022 0002 015B 00AD 0016 0016 0016 0041 0016 0041 0016 0041 
+> 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 
+> 0016 0016 0016 0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 
+> 0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016 0016 0016 
+> 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 0016 0041 
+> 0016 051E 015B 0057 0016 0E6C
+>
+> When you break it down looking for the 0x43F, from wikipedia you can 
+> see how it changed.
+> 0000 006C 0022 0002
+> 015B 00AD
+> 0016 0016 0016 0041 0016 0041 0016 0041
+> 0016 0016 (command page 0x0E)
+> 0016 0041 0016 0041 0016 0041 0016 0041
+> 0016 0041 0016 0041 0016 0016 0016 0016
+> 0016 0016 0016 0016 0016 0041 (signature - 0x43F bits in reverse)
+> 0016 0041 (checksum - 1)
+> 0016 0016 0016 0041 0016 0016 0016 0016
+> 0016 0041 0016 0041 0016 0016  (function 0x32 - 50)
+> 0016 0016 0016 0041 0016 0041 0016 0041
+> 0016 0041 0016 0041 0016 0041 0016 0041 (pair id - 0xFE - 254)
+> 0016 051E
+> 015B 0057 0016 0E6C
+>
+> We have:
+> 5 bits command page - 0x0E
+> 11 bits 0x43F
+> 1 bit checksum (1)
+> 7 bit function (50)
+> 8 bit device Id (what we call pairId - 0xFE - 254)
+>
+
+--------------UWj2Jc2pgX8j2jp7B00El0Gk
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <div class="moz-cite-prefix">Hi Lyndel,</div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">thank you for your mails. No, I was not
+      aware of the Wiki article. I have now scrutinized it:</div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">The only significant difference is that
+      D/Command page is 5 (8) bits, and S/Vendor is 11 (8) bits, always
+      constant. <br>
+    </div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">The article does not contain any useful
+      reference for the protocol statements, which is strictly speaking
+      a violation of WP:NOR
+      <a class="moz-txt-link-freetext" href="https://en.wikipedia.org/wiki/Wikipedia:No_original_research">https://en.wikipedia.org/wiki/Wikipedia:No_original_research</a> . (It
+      contains a number of junk references, though...) The closest there
+      is is a link to a defunct Arduino program, which I happened to
+      find as <a class="moz-txt-link-freetext" href="https://github.com/squeed/AppleRemoteSender">https://github.com/squeed/AppleRemoteSender</a>. <br>
+    </div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">For this reason, I see no compelling
+      reason to consider the Wiki version as more correct than the
+      present.</div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">I am willing to copy your file to the
+      contributed directory. I will give you credit for it, unless you
+      ask me not to.</div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">Please let me know what you think.</div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">Bengt <br>
+    </div>
+    <div class="moz-cite-prefix"><br>
+    </div>
+    <div class="moz-cite-prefix">On 9/25/23 05:48, Lyndel McGee wrote:<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:566730021.471648.1695613696692@mail.yahoo.com">
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <div> Here's a text file with an IRP xml snippet if you'd like to
+        include this.<br>
+        <br>
+      </div>
+      <div class="yahoo_quoted" style="margin:10px 0px 0px
+        0.8ex;border-left:1px solid #ccc;padding-left:1ex;">
+        <div style="font-family:'Helvetica Neue', Helvetica, Arial,
+          sans-serif;font-size:13px;color:#26282a;">
+          <div> On Sunday, September 24, 2023 at 10:17:12 PM CDT, Lyndel
+            McGee <a class="moz-txt-link-rfc2396E" href="mailto:lynniemagoo@yahoo.com">&lt;lynniemagoo@yahoo.com&gt;</a> wrote: </div>
+          <div><br clear="none">
+          </div>
+          <div><br clear="none">
+          </div>
+          <div>
+            <div dir="ltr">Bengt,  I hope you are doing well.<br
+                clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">Have you seen this page?  I found this page
+              this weekend and was floored as I know I've looked for
+              this before.<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr"><a rel="nofollow noopener noreferrer"
+                shape="rect" target="_blank"
+                href="https://en.m.wikipedia.org/wiki/Apple_Remote"
+                moz-do-not-send="true" class="moz-txt-link-freetext">https://en.m.wikipedia.org/wiki/Apple_Remote</a><br
+                clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">Based on what I read and the stuff below, We
+              got the bits right but some other stuff wrong.<br
+                clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">Your thoughts appreciated.  <br clear="none">
+            </div>
+            <div dir="ltr">Lyndel<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">P.S. I'm curious to know what the IRP might
+              look like reformatted.<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">Consider this apple code Scrutinizer
+              currently supports.<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">Screenshot_B 238_050 (Device 238 Subdevice
+              135 function 50 pair ID 254)<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">0000 006C 0022 0002 015B 00AD 0016 0016 0016
+              0041 0016 0041 0016 0041 0016 0016 0016 0041 0016 0041
+              0016 0041 0016 0041 0016 0041 0016 0041 0016 0016 0016
+              0016 0016 0016 0016 0016 0016 0041 0016 0041 0016 0016
+              0016 0041 0016 0016 0016 0016 0016 0041 0016 0041 0016
+              0016 0016 0016 0016 0041 0016 0041 0016 0041 0016 0041
+              0016 0041 0016 0041 0016 0041 0016 051E 015B 0057 0016
+              0E6C<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">When you break it down looking for the 0x43F,
+              from wikipedia you can see how it changed.<br clear="none">
+            </div>
+            <div dir="ltr">0000 006C 0022 0002 <br clear="none">
+            </div>
+            <div dir="ltr">015B 00AD <br clear="none">
+            </div>
+            <div dir="ltr">0016 0016 0016 0041 0016 0041 0016 0041<br
+                clear="none">
+            </div>
+            <div dir="ltr">0016 0016 (command page 0x0E)<br clear="none">
+            </div>
+            <div dir="ltr">0016 0041 0016 0041 0016 0041 0016 0041<br
+                clear="none">
+            </div>
+            <div dir="ltr">0016 0041 0016 0041 0016 0016 0016 0016 <br
+                clear="none">
+            </div>
+            <div dir="ltr">0016 0016 0016 0016 0016 0041 (signature -
+              0x43F bits in reverse)<br clear="none">
+            </div>
+            <div dir="ltr">0016 0041 (checksum - 1)<br clear="none">
+            </div>
+            <div dir="ltr">0016 0016 0016 0041 0016 0016 0016 0016<br
+                clear="none">
+            </div>
+            <div dir="ltr">0016 0041 0016 0041 0016 0016  (function 0x32
+              - 50)<br clear="none">
+            </div>
+            <div dir="ltr">0016 0016 0016 0041 0016 0041 0016 0041 <br
+                clear="none">
+            </div>
+            <div dir="ltr">0016 0041 0016 0041 0016 0041 0016 0041 (pair
+              id - 0xFE - 254)<br clear="none">
+            </div>
+            <div dir="ltr">0016 051E <br clear="none">
+            </div>
+            <div dir="ltr">015B 0057 0016 0E6C<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+            <div dir="ltr">We have:<br clear="none">
+            </div>
+            <div dir="ltr">5 bits command page - 0x0E<br clear="none">
+            </div>
+            <div dir="ltr">11 bits 0x43F<br clear="none">
+            </div>
+            <div dir="ltr">1 bit checksum (1)<br clear="none">
+            </div>
+            <div dir="ltr">7 bit function (50)<br clear="none">
+            </div>
+            <div dir="ltr">8 bit device Id (what we call pairId - 0xFE -
+              254)<br clear="none">
+            </div>
+            <div dir="ltr"><br clear="none">
+            </div>
+          </div>
+        </div>
+      </div>
+    </blockquote>
+    <p><br>
+    </p>
+  </body>
+</html>
+
+--------------UWj2Jc2pgX8j2jp7B00El0Gk--

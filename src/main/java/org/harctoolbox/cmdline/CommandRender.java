@@ -141,8 +141,8 @@ public class CommandRender extends AbstractCommand {
             if (printParameters)
                 out.println(nameEngine.toString());
 
-            if (!pronto && !raw && !rawWithoutSigns && !modulate && !printParameters)
-                logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto, --modulate, or --printparameters to get output.");
+            if (!pronto && !raw && !rawWithoutSigns && !printParameters)
+                logger.warning("No output requested. Use either --raw, --raw-without-signs, --pronto or --printparameters to get output.");
             NameEngine newNameEngine = new NameEngine(nameEngine);
             IrSignal irSignal = protocol.render(newNameEngine); // modifies its argument
 

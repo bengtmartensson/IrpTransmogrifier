@@ -96,12 +96,12 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         super(irp);
         this.name = name;
         this.htmlDocumentation = htmlDocumentation;
-        this.frequencyTolerance = frequencyTolerance != null ? Double.parseDouble(frequencyTolerance) : null;
-        this.frequencyLower = frequencyLower != null ? Double.parseDouble(frequencyLower) : null;
-        this.frequencyUpper = frequencyUpper != null ? Double.parseDouble(frequencyUpper) : null;
-        this.absoluteTolerance = absoluteTolerance != null ? Double.parseDouble(absoluteTolerance) : null;
-        this.relativeTolerance = relativeTolerance != null ? Double.parseDouble(relativeTolerance) : null;
-        this.minimumLeadout = minimumLeadout != null ? Double.parseDouble(minimumLeadout) : null;
+        this.frequencyTolerance = frequencyTolerance != null ? Double.valueOf(frequencyTolerance) : null;
+        this.frequencyLower = frequencyLower != null ? Double.valueOf(frequencyLower) : null;
+        this.frequencyUpper = frequencyUpper != null ? Double.valueOf(frequencyUpper) : null;
+        this.absoluteTolerance = absoluteTolerance != null ? Double.valueOf(absoluteTolerance) : null;
+        this.relativeTolerance = relativeTolerance != null ? Double.valueOf(relativeTolerance) : null;
+        this.minimumLeadout = minimumLeadout != null ? Double.valueOf(minimumLeadout) : null;
         this.decodable = decodable == null || Boolean.parseBoolean(decodable);
         this.rejectRepeatless = rejectRepeatless != null && Boolean.parseBoolean(rejectRepeatless);
         this.preferOver = PreferOver.parse(preferOver);

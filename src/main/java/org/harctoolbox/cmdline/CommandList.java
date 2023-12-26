@@ -203,7 +203,7 @@ public class CommandList extends AbstractCommand {
 
             if (preferOvers || all) {
                 out.println("preferovers tree:");
-                if (commandLineArgs.quiet && ! this.name && protocol.preferredOvers().size() > 0)
+                if (commandLineArgs.quiet && ! this.name && !protocol.preferredOvers().isEmpty())
                     out.println(irpDatabase.getName(protocolName) + ":");
                 protocol.dumpPreferOvers(out, irpDatabase);
             }

@@ -39,7 +39,7 @@ public abstract class PrimaryItem extends IrpObject implements Numerical, Equati
 
     public static PrimaryItem newPrimaryItem(String name) throws InvalidNameException {
         try {
-            return new Number(Long.parseLong(name));
+            return new Number(Long.valueOf(name));
         } catch (NumberFormatException ex) {
             return name.trim().startsWith("(") ? Expression.newExpression(name) : new Name(name);
         }

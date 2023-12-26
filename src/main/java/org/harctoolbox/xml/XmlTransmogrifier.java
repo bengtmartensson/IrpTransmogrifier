@@ -63,8 +63,7 @@ public final class XmlTransmogrifier {
         if (resolver != null)
             xpather.setNamespaceContext(resolver);
         XPathExpression xpathExpression = xpather.compile(xpath);
-        NodeList nodeList = (NodeList) xpathExpression.evaluate(node, XPathConstants.NODESET);
-        return nodeList;
+        return (NodeList) xpathExpression.evaluate(node, XPathConstants.NODESET);
     }
 
     @SuppressWarnings({"UseOfSystemOutOrSystemErr", "CallToPrintStackTrace"})

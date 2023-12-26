@@ -385,8 +385,7 @@ public final class ModulatedIrSequence extends IrSequence {
     @Override
     @SuppressWarnings("CloneDeclaresCloneNotSupported")
     public ModulatedIrSequence clone() {
-        ModulatedIrSequence result = (ModulatedIrSequence) super.clone();
-        return result;
+        return (ModulatedIrSequence) super.clone();
     }
 
     /**

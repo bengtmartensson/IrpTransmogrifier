@@ -1112,6 +1112,7 @@ public class ProtocolNGTest {
 
     /**
      * Test of line comment of class Protocol.
+     * @throws java.lang.Exception
      */
     public void testLineComment() throws Exception {
         System.out.println("lineComment");

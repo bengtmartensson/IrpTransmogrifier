@@ -61,9 +61,7 @@ final class BitFieldExpression extends PrimaryItemExpression {
 
     @Override
     public Map<String, Object> propertiesMap(boolean eval, GeneralSpec generalSpec, NameEngine nameEngine) {
-        Map<String, Object> map = bitField.propertiesMap(true, generalSpec, nameEngine);
-        //map.put("scalar", true);
-        return map;
+        return bitField.propertiesMap(true, generalSpec, nameEngine);
     }
 
     @Override

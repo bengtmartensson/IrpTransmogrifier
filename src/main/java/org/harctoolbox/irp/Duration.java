@@ -59,13 +59,11 @@ public abstract class Duration extends IrpObject implements IrStreamItem, Floata
 
     public static Duration newDuration(IrpParser.DurationContext d) {
         ParseTree child = d.getChild(0);
-        Duration instance = (child instanceof IrpParser.FlashContext)
+        return (child instanceof IrpParser.FlashContext)
                 ? new Flash((IrpParser.FlashContext) child)
                 : child instanceof IrpParser.GapContext
                 ? new Gap((IrpParser.GapContext) child)
                 : new Extent((IrpParser.ExtentContext) child);
-        //instance.parseTree = (ParserRuleContext) child;
-        return instance;
     }
 
     public static Duration newDuration(IrpParser.ExtentContext e) {

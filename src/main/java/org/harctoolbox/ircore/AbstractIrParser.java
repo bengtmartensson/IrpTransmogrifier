@@ -29,7 +29,7 @@ public abstract class AbstractIrParser {
     }
 
     protected static IrSignal mkIrSignal(List<IrSequence> list, Double frequency) throws OddSequenceLengthException {
-          return (list.size() > 0 && list.size() <= 3)
+          return (!list.isEmpty() && list.size() <= 3)
                 ? new IrSignal(list.get(0), list.size() > 1 ? list.get(1) : null, list.size() > 2 ? list.get(2) : null, frequency, null)
                 : null;
     }

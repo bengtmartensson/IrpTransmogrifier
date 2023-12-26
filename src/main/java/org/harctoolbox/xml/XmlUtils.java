@@ -321,8 +321,7 @@ public final class XmlUtils {
         ByteArrayOutputStream out = new ByteArrayOutputStream(65536);
         XmlUtils.printDOM(out, document, encoding, xslt, new HashMap<>(0), false);
         byte[] data = out.toByteArray();
-        ByteArrayInputStream inStream = new ByteArrayInputStream(data);
-        return inStream;
+        return new ByteArrayInputStream(data);
     }
 
     public static InputStreamReader mkReaderXml(String docu, String xslt, String encoding) throws SAXException, UnsupportedEncodingException, TransformerException, IOException {
@@ -578,8 +577,7 @@ public final class XmlUtils {
         @Override
         public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
             try {
-                MyInput input = new MyInput(type, namespaceURI, publicId, systemId, baseURI);
-                return input;
+                return new MyInput(type, namespaceURI, publicId, systemId, baseURI);
             } catch (IOException | URISyntaxException ex) {
                 throw new ThisCannotHappenException(ex);
             }

@@ -63,8 +63,7 @@ public class BiphaseWithDoubleToggleDecoderNGTest {
         widths.add(8);
         Analyzer.AnalyzerParams paramsRc6 = new Analyzer.AnalyzerParams(36000d, null, BitDirection.msb, true, widths, false);
         AbstractBiphaseDecoder decoder = new BiphaseWithDoubleToggleDecoder(analyzer, paramsRc6);
-        Protocol result = decoder.parse()[0];
-        return result;
+        return decoder.parse()[0];
     }
 
     private static void testStuff(int[] data, String expected) throws IrpException, OddSequenceLengthException, DecodeException, InvalidArgumentException {

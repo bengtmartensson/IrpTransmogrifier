@@ -22,9 +22,13 @@ PROJECT_BIN := $(IRPHOME)/$(PROJECT_NAME)-$(VERSION)-bin.zip
 IRPPROTOCOLS_XML := $(IRPHOME)/IrpProtocols.xml
 #IRPTRANSMOGRIFIER := $(JAVA) -jar $(PROJECT_JAR) --loglevel warning --url-decode
 
-IRPPROTOCOLS_XML := $(JAVA_PROTOCOL_TEST)/src/main/resources/IrpProtocols.xml
 UPLOADDIR_DIR := ftp://bengt-martensson.de/harctoolbox/
-RMPROTOCOLS := ~/jp1/remotemaster/rmProtocols.xml
+
+RMPROTOCOLS_URL := https://sourceforge.net/p/controlremote/code/HEAD/tree/trunk/km/src/main/config/rmProtocols.xml?format=raw
+RMPROTOCOLS := $(IRPHOME)/rmProtocols.xml
+
+IRPTRANSMOGRIFIER := $(JAVA) -jar $(PROJECT_JAR) -c $(IRPPROTOCOLS_XML)
+MERGED := merged.xml
 
 GH_PAGES := $(TOP)/gh-pages
 ORIGINURL := $(shell git remote get-url origin)
@@ -111,12 +115,15 @@ clean:
 	rm -rf $(GH_PAGES)
 
 # Probably only for my own usage
-merge:
-	./irptransmogrifier -c $(RMPROTOCOLS) -o IrpProtocols.xml list --dump
-	mv src/main/resources/IrpProtocols.xml src/main/resources/IrpProtocols.xml.old
-	mv IrpProtocols.xml src/main/resources/IrpProtocols.xml
+merge: $(MERGED)
+
+$(MERGED): $(RMPROTOCOLS) $(PROJECT_JAR)
+	$(IRPTRANSMOGRIFIER) -c $(RMPROTOCOLS) -o $@ --sort list --dump
+
+$(RMPROTOCOLS):
+	curl --output $@ $(RMPROTOCOLS_URL)
 
 all-protocols.xml: $(PROJECT_JAR)
-	./irptransmogrifier --output $@ code --target xml
+	$(IRPTRANSMOGRIFIER) --output $@ code --target xml
 
 .PHONY: clean $(PROJECT_JAR)-test release

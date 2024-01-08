@@ -47,6 +47,10 @@
                 <td>2022-05-07</td>
                 <td>Update for version 1.2.11: Spelling fixes etc.</td>
             </tr>
+            <tr>
+                <td>2024-01-08</td>
+                <td>Minor clarifications: Described predicates in prefer-overs and non-emptyness requirement for repeats.</td>
+            </tr>
         </table>
 
         <section>
@@ -564,7 +568,14 @@
                             </dt>
                             <dd>If a signal has multiple decodes,
                                 the present protocol is preferred over the one mentioned as <code>prefer-over</code>.
-                                May be given several times. (Normally, a special protol should be preferred over a more general one.)
+                                May be given several times.
+                                Alternatively, the content of the element may have two parts: a predicate and a protocol name,
+                                separated by a semi colon ("<code>;</code>").
+                                The predicate is evaluated for the current, to be preferred, protocol and its parameters.
+                                Only if the predicate (which is an <code>expression</code> in the sense of IRP) evaluates to non-zero,
+                                the preferance takes effect.
+                                (See the protocol <code>Pioneer</code> for an example.)
+                                (Normally, a special protol should be preferred over a more general one.)
                             </dd>
 
                             <dt id="alt_name">
@@ -934,7 +945,9 @@
                     Probably 99% of all IR signals fit into the intro/repetition scheme,
                     allowing ending sequence in addition should leave very few practically
                     used IR signals left. In "abstract" IRP notation, these are of the form
-                    A,(B)*,C with A, B, and C being (possibly empty) <code>bare irstream</code>s.</p>
+                    A,(B)*,C with A, B, and C being (possibly empty) <code>bare irstream</code>s.
+                    Not all three may be empty; if B is empty, then C must also be empty.
+                </p>
                 <p>
                     In contrast, the IRP notation reminds of they syntax and
                     semantics of regular expressions: There may be any numbers of (infinite) repeats, and they

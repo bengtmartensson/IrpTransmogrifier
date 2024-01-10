@@ -319,14 +319,12 @@ public final class Decoder {
         }
 
         public DecoderParameters select(boolean newStrict, Double frequencyTolerance, Double absoluteTolerance, Double relativeTolerance, Double minimumLeadout) {
-            DecoderParameters copy = new DecoderParameters(strict || newStrict, allDecodes, removeDefaultedParameters, recursive,
+            return new DecoderParameters(strict || newStrict, allDecodes, removeDefaultedParameters, recursive,
                     selectValue(frequencyTolerance, this.frequencyTolerance, override),
                     selectValue(absoluteTolerance, this.absoluteTolerance, override),
                     selectValue(relativeTolerance, this.relativeTolerance, override),
                     selectValue(minimumLeadout, this.minimumLeadout, override),
                     override, ignoreLeadingGarbage);
-
-            return copy;
         }
 
         private Double selectValue(Double databaseValue, Double userValue, boolean override) {

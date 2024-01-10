@@ -150,13 +150,16 @@ public abstract class IrpObject implements XmlExport, Serializable {
         return IrpUtils.propertiesMap(noProperites, this);
     }
 
+    @SuppressWarnings("NoopMethodInAbstractClass")
     public void updateStateWhenEntering(IrSignal.Pass pass, IrStream.PassExtractorState state) {
     }
 
+    @SuppressWarnings("NoopMethodInAbstractClass")
     public void updateStateWhenExiting(IrSignal.Pass pass, IrStream.PassExtractorState state) {
     }
 
     // Default implementation, often overridden
+    @SuppressWarnings("NoopMethodInAbstractClass")
     public void createParameterSpecs(ParameterSpecs parameterSpecs) throws InvalidNameException {
     }
 }

@@ -213,6 +213,8 @@ public final class IrStream extends IrpObject implements IrStreamItem,AggregateL
     /**
      * Extracts a the intro, repeat- or ending sequence as BareIrStream.
      * The real top level function; main test object.
+     * @param pass
+     * @return
      */
     public BareIrStream extractPass(Pass pass) {
         return extractPass(pass, new PassExtractorState(Pass.intro));

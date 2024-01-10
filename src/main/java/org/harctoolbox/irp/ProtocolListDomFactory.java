@@ -82,7 +82,7 @@ public class ProtocolListDomFactory {
         remote.appendChild(commandSet);
         if (analyzer != null) {
             if (analyzer.isSignalMode())
-                commandSet.appendChild(commandToElement(protocols.get(0), (names != null && names.size() > 0) ? names.get(0) : null,
+                commandSet.appendChild(commandToElement(protocols.get(0), (names != null && !names.isEmpty()) ? names.get(0) : null,
                         analyzer.cleanedIrSequence(0), analyzer.cleanedIrSequence(1), analyzer.cleanedIrSequence(2), fat));
             else
                 for (int i = 0; i < protocols.size(); i++)

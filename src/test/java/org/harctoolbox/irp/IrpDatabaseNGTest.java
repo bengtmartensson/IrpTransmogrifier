@@ -344,6 +344,7 @@ public class IrpDatabaseNGTest {
 
     /**
      * Test of expandAlias method, of class IrpDatabase.
+     * @throws java.lang.Exception
      */
     @Test
     public void testExpandAlias() throws Exception {

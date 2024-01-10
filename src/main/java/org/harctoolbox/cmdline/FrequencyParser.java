@@ -26,6 +26,6 @@ public class FrequencyParser implements IStringConverter<Double> {
     public Double convert(String value) {
         return value.toLowerCase(Locale.US).endsWith("k")
                 ? IrCoreUtils.khz2Hz(Double.parseDouble(value.substring(0, value.length() - 1)))
-                : Double.parseDouble(value);
+                : Double.valueOf(value);
     }
 }

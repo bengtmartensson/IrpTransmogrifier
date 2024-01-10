@@ -152,8 +152,7 @@ public final class LircConfigFile {
 
     static long parseUnsignedLongHex(String s) {
         if (s.length() == 16) {
-            long value = new BigInteger(s, 16).longValue();
-            return value;
+            return new BigInteger(s, 16).longValue();
         }
         return Long.parseLong(s, 16);
     }
@@ -217,9 +216,8 @@ public final class LircConfigFile {
         List<LircCommand> codes = codes();
         gobble("end", "remote");
 
-        LircRemote irRemote = new LircRemote(parameters.name, parameters.flags,
+        return new LircRemote(parameters.name, parameters.flags,
                 parameters.unaryParameters, parameters.binaryParameters, codes, raw, parameters.driver, source);
-        return irRemote;
     }
 
     private void readLine() throws IOException, EofException {
@@ -382,8 +380,7 @@ public final class LircConfigFile {
         String cmdName = words[1];
         consumeLine();
         List<Long> codes = integerList();
-        LircCommand irNCode = new LircCommand(cmdName, codes);
-        return irNCode;
+        return new LircCommand(cmdName, codes);
     }
 
     private List<Long> integerList() throws IOException, EofException {
@@ -392,7 +389,7 @@ public final class LircConfigFile {
             readLine();
             try {
                 for (String w : words)
-                    numbers.add(Long.parseLong(w));
+                    numbers.add(Long.valueOf(w));
             } catch (NumberFormatException ex) {
                 return numbers;
             }

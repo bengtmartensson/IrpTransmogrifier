@@ -242,8 +242,7 @@ public class Protocol extends IrpObject implements AggregateLister {
         Map<String, Long> constantVariables = definitions.getNumericLiterals();
         NameEngine newDefs = definitions.remove(constantVariables.keySet());
         BitspecIrstream newBitspecIrstream = bitspecIrstream.substituteConstantVariables(constantVariables);
-        Protocol newProtocol = new Protocol(this.generalSpec, newBitspecIrstream, newDefs, parameterSpecs);
-        return newProtocol;
+        return new Protocol(this.generalSpec, newBitspecIrstream, newDefs, parameterSpecs);
     }
 
     private void checkSanity() throws UnsupportedRepeatException {

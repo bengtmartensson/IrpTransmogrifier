@@ -43,7 +43,7 @@ public class BracketedIrSignalParser extends AbstractIrParser implements IrSigna
             int pos = s.indexOf('H', 6);
             if (pos != -1) {
                 try {
-                    readFrequency = Double.parseDouble(s.substring(5, pos));
+                    readFrequency = Double.valueOf(s.substring(5, pos));
                 } catch (NumberFormatException ex) {
                     // leaving as null
                 }
@@ -52,7 +52,7 @@ public class BracketedIrSignalParser extends AbstractIrParser implements IrSigna
                 pos = s.indexOf('[', 6);
                 if (pos != -1) {
                     try {
-                        readFrequency = Double.parseDouble(s.substring(5, pos));
+                        readFrequency = Double.valueOf(s.substring(5, pos));
                     } catch (NumberFormatException ex) {
                         // leaving as null
                     }

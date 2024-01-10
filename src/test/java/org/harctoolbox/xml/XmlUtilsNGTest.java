@@ -27,6 +27,7 @@ public class XmlUtilsNGTest {
      * Test of openXmlFile method, of class XmlUtils.
      */
     @Test
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void testOpenXmlFile_File() {
         System.out.println("openXmlFile");
         File file = new File("[.girr");

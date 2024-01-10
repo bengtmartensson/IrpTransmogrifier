@@ -62,11 +62,11 @@ public class MultilineIrSignalParser extends AbstractIrParser implements IrSigna
             String s = getSource().replace(",", " ").trim();
             if (s.startsWith("f=")) {
                 int pos = s.indexOf(' ', 3);
-                frequency = Double.parseDouble(s.substring(2, pos));
+                frequency = Double.valueOf(s.substring(2, pos));
                 s = s.substring(pos + 1).trim();
             } else if (s.startsWith("Freq=")) {
                 int pos = s.indexOf('H', 6);
-                frequency = Double.parseDouble(s.substring(5, pos));
+                frequency = Double.valueOf(s.substring(5, pos));
                 s = s.substring(pos + 2).trim();
             }
             IrSequence irSequence = new IrSequence(s, dummyGap);

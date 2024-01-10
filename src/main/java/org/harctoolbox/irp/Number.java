@@ -71,7 +71,7 @@ public final class Number extends PrimaryItem {
 
     public static java.lang.Number parse(String str, int radix) {
         try {
-            return Long.parseLong(str, radix);
+            return Long.valueOf(str, radix);
         } catch (NumberFormatException ex) {
             return str.equals("UINT8_MAX") ? UINT8_MAX
                     : str.equals("UINT16_MAX") ? UINT16_MAX

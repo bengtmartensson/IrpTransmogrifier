@@ -4,6 +4,22 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
+2024-01-08: Version 1.2.13.
+
+Although many lines of code has changed through refactorizations, the
+present version consists of a few bug fixes and clarifications of medium importance.
+Thanks to Sean Young for some non-trivial challenges (in particular #239!) ;-).
+
+* Protocols: Amazon_fan, Roku-8bit new protocols. Renamed Pioneer->Pioneer-2Part, tweaks to NECx1, NECX-f16 and TCL_AC.
+* Normal-form-IRP now uses +, not *. See #245.
+* Robustness fix for BracketedIrSignalParser (frequency).
+* Misc. code cleanup.
+* Minor documentation update/clarification.
+* Major refactoring for extraction bug. See #239.
+* Do not nuke variants-intros that are equal to the repeats any more. #241.
+* Changed error handling when parsing/lexing: Unknown tokens now stops parsing. #238.
+
+===============================================================================
 2023-03-01: Version 1.2.12.
 
 This version consists of a few bug fixes and clarifications of medium importance.

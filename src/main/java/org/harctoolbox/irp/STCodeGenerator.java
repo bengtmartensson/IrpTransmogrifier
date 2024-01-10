@@ -105,7 +105,6 @@ public final class STCodeGenerator extends CodeGenerator {
         if (itemCodeGenerator == null)
             throw new ThisCannotHappenException("Template \"FileName\" not found."); // FIXME
         itemCodeGenerator.setAttribute("protocolName", protocolName);
-        String fileName = itemCodeGenerator.render();
-        return fileName;
+        return itemCodeGenerator.render();
     }
 }

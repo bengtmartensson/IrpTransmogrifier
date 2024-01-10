@@ -172,6 +172,7 @@ public abstract class CmdLineProgram {
         topLevelLogger.setLevel(commandBasicOptions.logLevel);
     }
 
+    @SuppressWarnings("NoopMethodInAbstractClass")
     public void extraSetup() {
     }
 

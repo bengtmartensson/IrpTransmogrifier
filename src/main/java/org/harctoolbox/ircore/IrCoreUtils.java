@@ -644,8 +644,7 @@ public final class IrCoreUtils {
         if (absoluteOk)
             return true;
         int max = Math.max(Math.abs(x), Math.abs(y));
-        boolean relativeOk = max > 0 && absDiff / (double) max <= relativeTolerance;
-        return relativeOk;
+        return max > 0 && absDiff / (double) max <= relativeTolerance;
     }
 
     public static long maskTo(long data, int width) {
@@ -718,7 +717,7 @@ public final class IrCoreUtils {
         double relTolerance = hasOption ? Double.parseDouble(args[1]) : 0.0;
         ArrayList<Integer> data = new ArrayList<>(args.length);
         for (int i = hasOption ? 2 : 0; i < args.length; i++)
-            data.add(Integer.parseInt(args[i]));
+            data.add(Integer.valueOf(args[i]));
 
         int gcd = approximateGreatestCommonDivider(data, relTolerance);
         System.out.println(gcd);

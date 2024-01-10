@@ -356,7 +356,7 @@ public class CommandAnalyze extends AbstractCommand {
                     parameterWidths.add(width);
                 }
             } else {
-                parameterNamedWidths.stream().map((param) -> Integer.parseInt(param)).forEachOrdered((width) -> {
+                parameterNamedWidths.stream().map((param) -> Integer.valueOf(param)).forEachOrdered((width) -> {
                     parameterWidths.add(width);
                 });
             }

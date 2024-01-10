@@ -6,8 +6,8 @@ Down:		NECx2: {D=67,S=83,F=21},	beg=0, end=271, reps=4
 Left:		NECx-f16: {D=67,S=83,F=37},	beg=0, end=67
 Right:		NECx-f16: {D=67,S=83,F=29},	beg=0, end=67
 OK:		NECx2: {D=67,S=83,F=5},	beg=0, end=203, reps=3
-Play:		NECx-f16: {D=44,S=44,F=4},	beg=0, end=67	{UNDECODED. length=18}
-Pause:		NECx-f16: {D=44,S=44,F=79},	beg=0, end=67	{UNDECODED. length=18}
-Rewind:		NECx-f16: {D=44,S=44,F=6},	beg=0, end=67	{UNDECODED. length=18}
-FFWD:		NECx-f16: {D=44,S=44,F=7},	beg=0, end=67	{UNDECODED. length=18}
-Stop:		NECx-f16: {D=44,S=44,F=5},	beg=0, end=67	{UNDECODED. length=6}
+Play:		NECx1: {D=44,S=44,F=4},	beg=0, end=85, reps=3
+Pause:		NECx1: {D=44,S=44,F=79},	beg=0, end=85, reps=3
+Rewind:		NECx1: {D=44,S=44,F=6},	beg=0, end=85, reps=3
+FFWD:		NECx1: {D=44,S=44,F=7},	beg=0, end=85, reps=3
+Stop:		NECx1: {D=44,S=44,F=5},	beg=0, end=73, reps=1

@@ -82,8 +82,7 @@ final class EvaluatedIrStream {
                 elapsed += Math.abs(time);
             }
         }
-        IrSequence result = mkIrSequence(times);
-        return result;
+        return mkIrSequence(times);
     }
 
     @Override

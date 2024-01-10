@@ -131,8 +131,7 @@ public abstract class AbstractDecoder {
             }
         }
         BitspecIrstream bitspecIrstream = new BitspecIrstream(bitSpec, irStream);
-        Protocol protocol = new Protocol(params.getGeneralSpec(timebase), bitspecIrstream, nameEngine, null, null, getClass());
-        return protocol;
+        return new Protocol(params.getGeneralSpec(timebase), bitspecIrstream, nameEngine, null, null, getClass());
     }
 
     protected Flash newFlash(int flash) {

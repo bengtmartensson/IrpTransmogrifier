@@ -20,6 +20,7 @@ package org.harctoolbox.cmdline;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -66,6 +67,10 @@ import org.xml.sax.SAXException;
 @Parameters(commandNames = {"analyze"}, commandDescription = "Analyze signal: tries to find an IRP form with parameters.")
 public class CommandAnalyze extends AbstractCommand {
 
+    /**
+     * Path name, as found in the jar, of the XSLT style sheet taking raw girr to named input format.
+     */
+    public static final String RAWGIRR2NAMEINPUT = "/rawgirr2named.xsl";
     private static final Logger logger = Logger.getLogger(CommandAnalyze.class.getName());
 
     @Parameter(names = {"-a", "--all"}, description = "List all decoder outcomes, instead of only the one with lowest weight.")
@@ -96,8 +101,11 @@ public class CommandAnalyze extends AbstractCommand {
     @Parameter(names = {"-f", "--frequency"}, converter = FrequencyParser.class, description = "Modulation frequency of raw signal.")
     private Double frequency = null;
 
-    @Parameter(names = {"-g", "--girr"}, description = "Generate Girr file. Inhibits all other output.")
+    @Parameter(names = {"-g", "--girroutput"}, description = "Generate Girr file. Inhibits all other output.")
     private boolean girr = false;
+
+    @Parameter(names = {"-G", "--girrinput"}, description = "Read raw input in Girr format.")
+    private String girrInput = null;
 
     @Parameter(names = {"-i", "--input"}, description = "File/URL from which to take inputs, one sequence per line.")
     private String input = null;
@@ -241,8 +249,8 @@ public class CommandAnalyze extends AbstractCommand {
             if (parameterTable && eliminateVars)
                 throw new UsageException("Parameter table is meaninless together with --eliminate-vars");
 
-            if (IrCoreUtils.numberTrue(input != null, namedInput != null, args != null) != 1)
-                throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
+            if (IrCoreUtils.numberTrue(input != null, namedInput != null, girrInput != null, args != null) != 1)
+                throw new UsageException("Must use exactly one of --input, --namedinput, --girrinput and non-empty arguments");
 
             if (maxParameterWidth > FiniteBitField.MAXWIDTH) {
                 logger.log(Level.WARNING, "The given value of --maxparameterwidth ({0}) is larger than {1}. This is using unspecified behavior, and the correct execution is not guaranteed.",
@@ -275,6 +283,22 @@ public class CommandAnalyze extends AbstractCommand {
                         : thingsLineParser.readNamedThings(namedInput, xslt, commandLineArgs.inputEncoding);
                if (signals.isEmpty())
                     throw new InvalidArgumentException("No parseable sequences found.");
+                analyze(signals);
+            } else if (girrInput != null) {
+                if (validate)
+                    throw new UsageException("Cannot use --validate with --girrinput.");
+
+                ThingsLineParser<ModulatedIrSequence> thingsLineParser = new ThingsLineParser<>(
+                        (List<String> line) -> {
+                            return (MultiParser.newIrCoreParser(line)).toModulatedIrSequence(frequency, trailingGap);
+                        }, commandLineArgs.commentStart
+                );
+                InputStream xsltStream = CommandAnalyze.class.getResourceAsStream(RAWGIRR2NAMEINPUT);
+                Document xsltDoc = XmlUtils.openXmlStream(xsltStream, null, true, true);
+                Map<String, ModulatedIrSequence> signals = thingsLineParser.readNamedThings(girrInput, xsltDoc, commandLineArgs.inputEncoding);
+                if (signals.isEmpty()) {
+                    throw new InvalidArgumentException("No parseable sequences found.");
+                }
                 analyze(signals);
             } else {
                 MultiParser parser = MultiParser.newIrCoreParser(args);

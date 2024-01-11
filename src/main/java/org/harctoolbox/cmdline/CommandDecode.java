@@ -19,6 +19,7 @@ package org.harctoolbox.cmdline;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -66,8 +67,11 @@ public class CommandDecode extends AbstractCommand {
     @Parameter(names = {"-f", "--frequency"}, converter = FrequencyParser.class, description = "Set modulation frequency.")
     private Double frequency = null;
 
-    @Parameter(names = {"-g", "--girr"}, description = "Generate output in Girr format (only)")
+    @Parameter(names = {"-g", "--girroutput"}, description = "Generate output in Girr format (only)")
     private boolean girr = false;
+
+    @Parameter(names = {"-G", "--girrinput"}, description = "Read raw input in Girr format.")
+    private String girrInput = null;
 
     @Parameter(names = {"-l", "--ignoreleadinggarbage"}, description = "Accept decodes starting with undecodable pairs.")
     private boolean ignoreLeadingGarbage = false;
@@ -153,8 +157,8 @@ public class CommandDecode extends AbstractCommand {
         private void decode() throws UsageException, IrpParseException, IOException, InvalidArgumentException, SAXException, TransformerException {
             CmdUtils.checkForOption("decode", args);
 
-            if (IrCoreUtils.numberTrue(input != null, namedInput != null, args != null) != 1)
-                throw new UsageException("Must use exactly one of --input, --namedinput, and non-empty arguments");
+            if (IrCoreUtils.numberTrue(input != null, namedInput != null, girrInput != null, args != null) != 1)
+                throw new UsageException("Must use exactly one of --input, --namedinput, --girrinput and non-empty arguments");
             if (ignoreLeadingGarbage && strict)
                 throw new UsageException("--strict and --ignoreleadinggarbage may not be used together.");
 
@@ -180,6 +184,14 @@ public class CommandDecode extends AbstractCommand {
                 Map<String, IrSignal> signals = xslt == null
                         ? irSignalParser.readNamedThings(namedInput, commandLineArgs.inputEncoding)
                         : irSignalParser.readNamedThings(namedInput, xslt, commandLineArgs.inputEncoding);
+                decode(signals);
+            } else if (girrInput != null) {
+                ThingsLineParser<IrSignal> irSignalParser = new ThingsLineParser<>((List<String> line) -> {
+                    return (MultiParser.newIrCoreParser(line)).toIrSignal(frequency, trailingGap);
+                }, commandLineArgs.commentStart);
+                InputStream xsltStream = CommandAnalyze.class.getResourceAsStream(CommandAnalyze.RAWGIRR2NAMEINPUT);
+                Document xsltDoc = XmlUtils.openXmlStream(xsltStream, null, true, true);
+                Map<String, IrSignal> signals = irSignalParser.readNamedThings(girrInput, xsltDoc, commandLineArgs.inputEncoding);
                 decode(signals);
             } else {
                 MultiParser prontoRawParser = MultiParser.newIrCoreParser(args);

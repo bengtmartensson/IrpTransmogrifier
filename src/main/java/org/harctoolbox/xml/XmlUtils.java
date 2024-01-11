@@ -325,8 +325,12 @@ public final class XmlUtils {
     }
 
     public static InputStreamReader mkReaderXml(String docu, String xslt, String encoding) throws SAXException, UnsupportedEncodingException, TransformerException, IOException {
-        Document document = XmlUtils.openXmlThing(docu, null, true, true);
         Document stylesheet = XmlUtils.openXmlThing(xslt, null, true, true);
+        return mkReaderXml(docu, stylesheet, encoding);
+    }
+
+    public static InputStreamReader mkReaderXml(String docu, Document stylesheet, String encoding) throws SAXException, UnsupportedEncodingException, TransformerException, IOException {
+        Document document = XmlUtils.openXmlThing(docu, null, true, true);
         InputStream inputStream = XmlUtils.renderDOM(document, stylesheet, encoding);
         return new InputStreamReader(inputStream, encoding);
     }

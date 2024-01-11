@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.transform.TransformerException;
 import org.harctoolbox.xml.XmlUtils;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class ThingsLineParser<T> {
@@ -90,6 +91,13 @@ public class ThingsLineParser<T> {
     public Map<String, T> readNamedThings(String namedInput, String xslt, String encoding) throws SAXException, IOException, TransformerException {
         Objects.requireNonNull(xslt);
         try (InputStreamReader reader = XmlUtils.mkReaderXml(namedInput, xslt, encoding)) {
+            return readNamedThings(reader);
+        }
+    }
+
+    public Map<String, T> readNamedThings(String namedInput, Document stylesheet, String encoding) throws SAXException, IOException, TransformerException {
+        Objects.requireNonNull(stylesheet);
+        try (InputStreamReader reader = XmlUtils.mkReaderXml(namedInput, stylesheet, encoding)) {
             return readNamedThings(reader);
         }
     }

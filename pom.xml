@@ -306,6 +306,7 @@
                         <include>IrpProtocols2html.xsl</include>
                         <include>${project.artifactId}.xml</include>
                         <include>irp-protocols.xsd</include>
+                        <include>rawgirr2named.xsl</include>
                     </includes>
                 </configuration>
             </plugin>

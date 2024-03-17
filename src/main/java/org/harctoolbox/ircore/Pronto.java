@@ -298,7 +298,7 @@ public abstract class Pronto {
     }
 
     protected static int[] parseAsInts(List<String> list) throws NonProntoFormatException {
-        String[] x = list.toArray(new String[list.size()]);
+        String[] x = list.toArray(new String[0]);
         return parseAsInts(x, 0);
     }
 

@@ -535,7 +535,7 @@ public class IrpTransmogrifierNGTest {
             args.add("--namedinput");
             args.add(file.getCanonicalPath());
             //System.out.println(String.join(" ", args));
-            String result = execute(args.toArray(new String[args.size()]));
+            String result = execute(args.toArray(new String[0]));
             assertTrue(result != null);
             //System.out.println(result);
         }

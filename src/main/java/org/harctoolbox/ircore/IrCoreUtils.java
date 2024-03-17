@@ -725,10 +725,9 @@ public final class IrCoreUtils {
 
     public static File[] filesInDirMatchingRegExp(File dir, String regexp) {
         Pattern pattern = Pattern.compile(regexp);
-        File[] selected = dir.listFiles((File dir1, String name) -> {
+        return dir.listFiles((File dir1, String name) -> {
             return pattern.matcher(name).matches();
         });
-        return selected;
     }
 
     public static double minDiff(TreeSet<Double> numbers) {

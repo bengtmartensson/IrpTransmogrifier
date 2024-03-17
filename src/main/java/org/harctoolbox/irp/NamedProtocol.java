@@ -217,8 +217,7 @@ public final class NamedProtocol extends Protocol implements HasPreferOvers,Comp
         logger.log(Level.FINE, "Protocol: {0}: \"{1}\", actual data: {2}", new Object[]{getName(), getIrp(), irSignal.toString(true)});
 
         Decoder.DecoderParameters fixedParams = params.select(isRejectRepeats(), frequencyTolerance, absoluteTolerance, relativeTolerance, minimumLeadout);
-        Map<String, Long> parameters = super.recognize(irSignal, fixedParams);
-        return parameters;
+        return super.recognize(irSignal, fixedParams);
     }
 
     /**

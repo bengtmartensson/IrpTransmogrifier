@@ -146,8 +146,8 @@ public abstract class IrpObject implements XmlExport, Serializable {
     public void prerender(RenderData renderData, IrSignal.Pass pass, List<BitSpec> bitSpecs) {
     }
 
-    public Map<String, Object> propertiesMap(int noProperites) {
-        return IrpUtils.propertiesMap(noProperites, this);
+    public Map<String, Object> propertiesMap(int noProperties) {
+        return IrpUtils.propertiesMap(noProperties, this);
     }
 
     @SuppressWarnings("NoopMethodInAbstractClass")

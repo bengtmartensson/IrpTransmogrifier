@@ -104,7 +104,7 @@ public final class Props {
                     boolean status = baseFile.mkdirs();
                     if (!status) {
                         System.err.println("Could not create directory " + baseFile.getAbsolutePath()
-                                + ", saving properites in home direcory");
+                                + ", saving properties in home directory");
                         baseFile = new File(System.getProperty("user.home")); // emergency
                     }
                 }

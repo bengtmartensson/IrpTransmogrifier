@@ -134,8 +134,8 @@ public abstract class Expression extends PrimaryItem {
     }
 
     @Override
-    public Map<String, Object> propertiesMap(int noProperites) {
-        return IrpUtils.propertiesMap(noProperites, "Expression");
+    public Map<String, Object> propertiesMap(int noProperties) {
+        return IrpUtils.propertiesMap(noProperties, "Expression");
     }
 
     @Override

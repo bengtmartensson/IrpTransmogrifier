@@ -1412,7 +1412,7 @@ Commands:
    expression      Evaluate expression given as argument.
    help            Describe the syntax of program and commands.
    lirc            Convert Lirc configuration files to IRP form.
-   list            List protocols and their properites
+   list            List protocols and their properties
    render          Render signal from parameters
    version         Report version
 

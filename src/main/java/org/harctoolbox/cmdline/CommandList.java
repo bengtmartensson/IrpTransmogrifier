@@ -41,7 +41,7 @@ import org.w3c.dom.DocumentFragment;
 
 @SuppressWarnings("FieldMayBeFinal")
 
-@Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properites.")
+@Parameters(commandNames = {"list"}, commandDescription = "List protocols and their properties.")
 public class CommandList extends AbstractCommand {
 
     private static final Logger logger = Logger.getLogger(CommandList.class.getName());

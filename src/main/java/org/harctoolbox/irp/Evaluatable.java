@@ -23,5 +23,5 @@ interface Evaluatable {
 
     public Integer numberOfBitSpecs();
 
-    public Map<String, Object> propertiesMap(int noProperites);
+    public Map<String, Object> propertiesMap(int noProperties);
 }

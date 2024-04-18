@@ -666,14 +666,14 @@ public class IrpTransmogrifierNGTest {
     public void testHelpList() {
         System.out.println("testHelpList");
         String result = execute("help list");
-        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "List protocols and their properites.");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "List protocols and their properties.");
     }
 
     @Test(enabled = true)
     public void testListHelp() {
         System.out.println("testListHelp");
         String result = execute("list --help");
-        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "List protocols and their properites.");
+        assertEquals(result.split(IrCoreUtils.LINE_SEPARATOR)[0], "List protocols and their properties.");
     }
 
     @Test(enabled = true)

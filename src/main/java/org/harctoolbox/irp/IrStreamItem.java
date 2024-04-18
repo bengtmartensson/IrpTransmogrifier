@@ -114,7 +114,7 @@ public interface IrStreamItem extends XmlExport {
 
     public Map<String, Object> propertiesMap(GeneralSpec generalSpec, NameEngine nameEngine);
 
-    public Map<String, Object> propertiesMap(int noProperites);
+    public Map<String, Object> propertiesMap(int noProperties);
 
     public Double microSeconds(GeneralSpec generalSpec, NameEngine nameEngine);
 

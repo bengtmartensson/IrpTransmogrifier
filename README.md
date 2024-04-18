@@ -404,7 +404,7 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Issue only the version number of the program proper.
             Default: false
 
-    list      List protocols and their properites.
+    list      List protocols and their properties.
       Usage: list [options] List of protocols (default all)
         Options:
           -a, --all

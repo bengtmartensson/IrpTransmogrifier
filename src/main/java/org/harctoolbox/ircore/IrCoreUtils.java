@@ -51,6 +51,7 @@ public final class IrCoreUtils {
     public final static long SOME = -3L;
 
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String NEWLINE_REGEX = "\\r?\\n";
 
     private static Map<Integer, String> radixPrefixes;
     private static Map<String, Integer> prefixToRadix;

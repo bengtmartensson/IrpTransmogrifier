@@ -74,7 +74,7 @@ public class CommandHelp extends AbstractCommand {
 
     @Override
     public String description() {
-        return "This command list the syntax for the command(s) given as argument, default all. "
+        return "This command lists the syntax for the command(s) given as argument, default all. "
                 + "Also see the option \"--describe\".";
     }
 

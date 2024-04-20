@@ -673,7 +673,7 @@ public class IrpTransmogrifierNGTest {
     public void testHelpDescribe() {
         System.out.println("testHelpDescribe");
         String result = execute("help --describe");
-        assertEquals(result.split(lineSeparator)[0], "This command list the syntax for the command(s) given as argument,");
+        assertEquals(result.split(lineSeparator)[0], "This command lists the syntax for the command(s) given as argument,");
     }
 
     @Test(enabled = true)

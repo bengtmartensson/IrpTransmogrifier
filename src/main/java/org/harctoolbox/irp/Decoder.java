@@ -263,6 +263,18 @@ public final class Decoder {
             return decodeIrSignal(irSignal, decoderParams);
     }
 
+    public AbstractDecodesCollection<? extends ElementaryDecode> decodeIrSignalWithFallback(IrSignal irSignal, DecoderParameters decoderParams) {
+        SimpleDecodesSet decodes = decodeIrSignal(irSignal, decoderParams);
+        if (!decodes.isEmpty())
+            return decodes;
+
+        if (decoderParams.ignoreLeadingGarbage || (!decoderParams.strict && (irSignal.introOnly() || irSignal.repeatOnly()))) {
+            ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
+            return decode(sequence, decoderParams);
+        }
+        return decodes; // empty
+    }
+
     public static final class DecoderParameters {
 
         private boolean strict;

@@ -264,15 +264,13 @@ public final class Decoder {
     }
 
     public AbstractDecodesCollection<? extends ElementaryDecode> decodeIrSignalWithFallback(IrSignal irSignal, DecoderParameters decoderParams) {
-        SimpleDecodesSet decodes = decodeIrSignal(irSignal, decoderParams);
-        if (!decodes.isEmpty())
-            return decodes;
-
-        if (decoderParams.ignoreLeadingGarbage || (!decoderParams.strict && (irSignal.introOnly() || irSignal.repeatOnly()))) {
-            ModulatedIrSequence sequence = irSignal.toModulatedIrSequence();
-            return decode(sequence, decoderParams);
+        AbstractDecodesCollection<? extends ElementaryDecode> decodes;
+        if (decoderParams.strict || !irSignal.introOnly()) {
+            decodes = decodeIrSignal(irSignal, decoderParams);
+            if (!decodes.isEmpty())
+                return decodes;
         }
-        return decodes; // empty
+        return decode(irSignal.toModulatedIrSequence(), decoderParams);
     }
 
     public static final class DecoderParameters {

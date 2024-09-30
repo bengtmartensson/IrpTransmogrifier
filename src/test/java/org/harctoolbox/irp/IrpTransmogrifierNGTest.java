@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public class IrpTransmogrifierNGTest {
 
-    private static final String IRPPROTOCOLS_XML="src/main/resources/IrpProtocols.xml";
+    private static final String IRPPROTOCOLS_XML = "src/main/resources/IrpProtocols.xml";
     private static final String ACDATA = "3120, 1588, 548, 1068, 524, 1064, 548, 300, 528, 292, 544, 300, 524, 1064, 548, 300, 528, 320, 528, 1060, 520, 1092, 528, 292, 524, 1092, 520, 300, 528, 320, 524, 1064, 520, 1096, 524, 296, 540, 1076, 528, 1056, 552, 296, 520, 300, 548, 1068, 524, 320, 528, 292, 524, 1092, 528, 292, 524, 324, 524, 296, 520, 328, 520, 300, 544, 300, 528, 320, 528, 292, 524, 324, 524, 296, 520, 328, 516, 304, 524, 320, 528, 292, 576, 272, 524, 296, 552, 296, 528, 320, 528, 292, 524, 320, 528, 1060, 528, 320, 528, 292, 576, 1040, 520, 1068, 544, 300, 524, 296, 552, 296, 520, 300, 548, 300, 528, 320, 524, 1060, 524, 324, 520, 1068, 524, 1092, 520, 300, 524, 320, 528, 292, 576, 272, 524, 296, 552, 1064, 524, 320, 528, 292, 524, 328, 520, 296, 520, 328, 520, 300, 524, 320, 528, 292, 576, 272, 524, 296, 572, 276, 520, 324, 520, 300, 528, 320, 528, 292, 524, 320, 528, 292, 524, 324, 520, 300, 580, 268, 528, 292, 576, 272, 520, 324, 524, 296, 520, 328, 520, 300, 528, 316, 528, 292, 524, 324, 524, 296, 572, 276, 520, 300, 576, 272, 524, 320, 548, 272, 556, 292, 556, 264, 548, 1064, 528, 1060, 520, 1068, 556, 1060, 520, 324, 552, 272, 576, 268, 560, 1028, 572, 1044, 524, 10000";
     private static final String ACDATA1 = "4400,4250, 550,1600, 550,1600, 550,1600, 550,1550, 600,500, 550,500, 550,1600, 550,500, 550,550, 550,500, 550,500, 600,500, 550,1600, 550,1550, 550,550, 550,1600, 550,500, 550,500, 550,550, 550,500, 550,550, 550,1550, 550,550, 550,1550, 600,1550, 550,1600, 550,1600, 550,1600, 550,1550, 600,500, 550,1600, 550,500, 550,500, 550,550, 550,500, 600,450, 600,500, 550,500, 550,550, 550,1550, 550,550, 550,1600, 550,1550, 550,1600, 550,550, 550,500, 550,500, 550,550, 550,500, 550,500, 600,500, 550,500, 550,550, 550,500, 550,500, 600,500, 550,500, 550,550, 550,500, 550,500, 600,500, 550,500, 550,550, 550,500, 550,500, 550,550, 550,1600, 550,500, 550,500, 600,500, 550,500, 550,1600, 550,550, 500,550, 550,500, 550,550, 500,550, 550,550, 500,1600, 550,550, 500,550, 550,1600, 550,500, 550,1600, 550,550, 500,550, 550,1550, 550,550, 550";
     private static final String BIPHASE = "0000 0067 0000 0045 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0020 0020 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 0010 031F";
@@ -29,12 +29,12 @@ public class IrpTransmogrifierNGTest {
     private static final String GRAHAM_SONY15 = "0000 0067 000B 0010 0015 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 02D5 0060 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0030 0018 0018 0018 0030 0018 0030 0018 0030 0018 0018 0018 0030 0018 0018 0018 0018 0018 0030 02D5";
 
     /**
-     * JCommander uses "\n" as line separator on all platforms.
-     * See https://github.com/cbeust/jcommander/issues/580
-     * Remove when/if JCommander is fixed.
+     * JCommander uses "\n" as line separator on all platforms. See
+     * https://github.com/cbeust/jcommander/issues/580 Remove when/if JCommander
+     * is fixed.
      */
     private static final String JCOMMANDER_LINE_SEPARATOR = "\n";
-    
+
     static String execute(String commandLine) {
         return execute(CmdUtils.shellSplit(commandLine));
     }
@@ -42,7 +42,7 @@ public class IrpTransmogrifierNGTest {
     static String execute(String[] args) {
         return CmdUtils.execute(IrpTransmogrifier.class, args);
     }
-    
+
     private final String lineSeparator;
 
     public IrpTransmogrifierNGTest() {
@@ -50,7 +50,7 @@ public class IrpTransmogrifierNGTest {
         //System.setProperty("line.separator", "\r\n");
         //System.setProperty("line.separator", "\n");
         //System.setProperty("line.separator", "\r");
-        
+
         lineSeparator = System.getProperty("line.separator");
     }
 
@@ -69,7 +69,6 @@ public class IrpTransmogrifierNGTest {
         assertEquals(frequencyParser.convert("38123").doubleValue(), 38123.0);
         assertEquals(frequencyParser.convert("38.1k").doubleValue(), 38100.0);
     }
-
 
     /**
      * Test of main method, of class IrpTransmogrifier.
@@ -118,8 +117,8 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze3() {
         System.out.println("analyze3");
-        String args = "analyze --radix 16 --maxparameterwidth 32 --ire " +
-                "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
+        String args = "analyze --radix 16 --maxparameterwidth 32 --ire "
+                + "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
                 + "[+9024 -4512 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -39756]";
         String result = execute(args);
         assertEquals(result, "{569,msb}<1,-1|1,-3>(16,-8,A:32,1,-42m,(16,-8,B:32,1,-42m)*){A=0x30441ce3,B=0xff00ff}");
@@ -128,8 +127,8 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testAnalyze3_1() {
         System.out.println("analyze3_1");
-        String args = "analyze --eliminate-vars --radix 16 --maxparameterwidth 32 --ire " +
-                "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
+        String args = "analyze --eliminate-vars --radix 16 --maxparameterwidth 32 --ire "
+                + "[+9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293]"
                 + "[+9024 -4512 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -564 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -1692 +564 -39756]";
         String result = execute(args);
         assertEquals(result, "{569,msb}<1,-1|1,-3>(16,-8,0x30441ce3:32,1,-42m,(16,-8,0xff00ff:32,1,-42m)*)");
@@ -181,7 +180,7 @@ public class IrpTransmogrifierNGTest {
         args = "-a 100.0 -r 0.1 analyze --maxparameterwidth 1024 --decoder pwm2 " + ACDATA;
         result = execute(args);
         assertEquals(result, "{137,msb}<4,-2|4,-8>(23,-1588u,A:112,4,-10m){A=0xc4d364800004c0b04000000001e3}");
-   }
+    }
 
     @Test(enabled = true)
     public void testAnalyze7() {
@@ -189,7 +188,7 @@ public class IrpTransmogrifierNGTest {
         String args = "--absol 200 analyze -M 332 --trailinggap 10000 " + ACDATA1;
         String result = execute(args);
         assertEquals(result, "{539,msb}<1,-1|1,-3>(8,-8,A:88,1,-10m){A=0xf20d05fa01700000210252}");
-   }
+    }
 
     @Test(enabled = true)
     public void testAnalyze8() {
@@ -197,7 +196,7 @@ public class IrpTransmogrifierNGTest {
         String args = "--absol 200 analyze --decode covfefe -M 332 --trailinggap 10000 " + ACDATA1;
         String result = execute(args);
         assertEquals(result, null);
-   }
+    }
 
     @Test(enabled = true)
     public void testAnalyze9() {
@@ -271,7 +270,7 @@ public class IrpTransmogrifierNGTest {
         System.out.println("decodeNoRepeatedNec");
         String args = "decode --debug nec1 +9041 -4507 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -1694 +573 -573 +573 -573 +573 -573 +573 -1694 +573 -1694 +573 -44293";
         String result = execute(args);
-        assertEquals(result.split(lineSeparator)[0].substring(0,21), "NEC: {D=12,S=34,F=56}");
+        assertEquals(result.split(lineSeparator)[0].substring(0, 21), "NEC: {D=12,S=34,F=56}");
     }
 
     @Test(enabled = true)
@@ -340,7 +339,7 @@ public class IrpTransmogrifierNGTest {
         String akaiMitsubishi = "0000 006C 0000 0011 000A 0047 000A 0047 000A 0047 000A 001E 000A 001E 000A 001E 000A 0047 000A 001E 000A 0047 000A 0047 000A 0047 000A 001E 000A 0047 000A 001E 000A 001E 000A 001E 000A 031D";
         String result = execute("-f -1 decode " + akaiMitsubishi);
         System.out.println(result);
-        assertEquals(result,"Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
+        assertEquals(result, "Mitsubishi: {D=71,F=23}, beg=0, end=33, reps=1");
     }
 
     @Test(enabled = true)
@@ -707,7 +706,7 @@ public class IrpTransmogrifierNGTest {
         assertTrue(result != null);
     }
 
-   // Test that list --prefer-overs succeeds, i.e. no circular --prefer-overs
+    // Test that list --prefer-overs succeeds, i.e. no circular --prefer-overs
     @Test(enabled = true)
     public void testUTF_8() {
         System.out.println("testUTF_8");

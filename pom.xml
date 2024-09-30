@@ -519,10 +519,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.beust</groupId>
+            <groupId>org.jcommander</groupId>
             <artifactId>jcommander</artifactId>
-            <scope>compile</scope>
-            <version>1.82</version>
+            <version>1.85</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>

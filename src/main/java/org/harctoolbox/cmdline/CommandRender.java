@@ -78,7 +78,7 @@ public class CommandRender extends AbstractCommand {
     @Parameter(names = {"--number-repeats"}, description = "Generate an IR sequence containing the given number of repeats")
     private Integer numberRepeats = null;
 
-    @Parameter(description = "protocol(s) or pattern (default all)")
+    @Parameter(description = "protocol(s) or pattern (if using --regexp)")
     private List<String> protocols = new ArrayList<>(0);
 
     @Override
@@ -87,9 +87,9 @@ public class CommandRender extends AbstractCommand {
                 + "(\"render\" it). The protocol can be given either by name(s) "
                 + "(or regular expression if using the --regexp option), or, using the "
                 + "--irp options, given explicitly as an IRP form. "
-                + "The parameters can be either given directly with the -n option,"
-                + "or the --random option can be used to generate random, but valid parameters"
-                + "With the --count or --number-repeats option, instead an IR sequence is computed,"
+                + "The parameters can be either given directly with the -n option, "
+                + "or the --random option can be used to generate random, but valid parameters. "
+                + "With the --count or --number-repeats option, instead an IR sequence is computed, "
                 + "containing the desired number of repeats.\n\n"
                 + "The syntax of the name engine is as in the IRP specification, for example: --nameengine {D=12,F=34}. "
                 + "For convenience, the braces may be left out. Space around the equal sign \"=\" and "

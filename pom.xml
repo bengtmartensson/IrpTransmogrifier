@@ -474,29 +474,29 @@
             </activation>
             <build>
                 <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.1</version>
-                    <executions>
-                        <!-- compute checksums -->
-                        <!-- I know the checksum-maven-plugin, but it does not do what I want) -->
-                        <execution>
-                            <id>mk-checksums</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>exec</goal>
-                            </goals>
-                            <configuration>
-                                <executable>${basedir}/common/scripts/mkchecksums.sh</executable>
-                                <workingDirectory>${project.build.directory}</workingDirectory>
-                                <arguments>
-                                    <argument>${project.artifactId}-${project.version}-bin.zip</argument>
-                                </arguments>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <executions>
+                            <!-- compute checksums -->
+                            <!-- I know the checksum-maven-plugin, but it does not do what I want) -->
+                            <execution>
+                                <id>mk-checksums</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${basedir}/common/scripts/mkchecksums.sh</executable>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                    <arguments>
+                                        <argument>${project.artifactId}-${project.version}-bin.zip</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -521,12 +521,12 @@
         <dependency>
             <groupId>org.jcommander</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.85</version>
+            <version>1.85</version> <!-- Latest version supporting Java 8 -->
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.5.1</version> <!-- later versions not coompatible -->
+            <version>7.5.1</version> <!-- later versions not compatible -->
             <exclusions>
                 <exclusion>
                     <groupId>com.beust</groupId>

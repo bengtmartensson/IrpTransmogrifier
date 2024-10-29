@@ -950,6 +950,10 @@ public class Protocol extends IrpObject implements AggregateLister {
     public void removeDefaulteds(Map<String, Long> params) {
         getParameterSpecs().removeDefaulteds(params);
     }
+    
+    public void addDefaulteds(Map<String, Long> params) {
+        getParameterSpecs().addDefaulteds(params);
+    }
 
     public boolean hasNonStandardParameters() {
         return getParameterSpecs().hasNonStandardParameters();

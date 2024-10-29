@@ -110,4 +110,19 @@ public class ParameterSpecsNGTest {
         String[] result = sortedMap.keySet().toArray(new String[5]);
         assertEquals(result, expResult);
     }
+
+    /**
+     * Test of addDefaulteds method, of class ParameterSpecs.
+     * @throws NameUnassignedException
+     */
+    @Test
+    public void testAddDefaulteds() throws NameUnassignedException {
+        System.out.println("addDefaulteds");
+        Map<String, Long> params = new HashMap<>(4);
+        params.put("D", 200L);
+        ParameterSpecs instance = nec1;
+        instance.addDefaulteds(params);
+        assertEquals(params.size(), 2);
+        assertEquals(params.get("S").longValue(), 55L);
+    }
 }

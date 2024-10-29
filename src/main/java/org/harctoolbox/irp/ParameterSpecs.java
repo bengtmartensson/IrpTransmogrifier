@@ -247,6 +247,17 @@ public final class ParameterSpecs extends IrpObject implements Iterable<Paramete
             }
         });
     }
+    
+    public void addDefaulteds(Map<String, Long>params) {
+        NameEngine nameEngine = new NameEngine(params);
+        map.values().stream().filter(parameter -> (parameter.hasDefault() && !params.containsKey(parameter.getName()))).forEachOrdered(parameter -> {
+            try {
+                params.put(parameter.getName(), parameter.getDefault().toLong(nameEngine));
+            } catch (NameUnassignedException ex) {
+                // Just ignore it
+            }
+        });
+    }
 
     public void removeNotInParameterSpec(Map<String, Long> namesMap) {
         List<String> names = new ArrayList<>(namesMap.keySet());

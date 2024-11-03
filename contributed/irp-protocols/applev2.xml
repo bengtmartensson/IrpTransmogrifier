@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- By Lyndel McGee -->
+<irp:protocols xmlns="http://www.w3.org/1999/xhtml"
+               xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
+               xmlns:xi="http://www.w3.org/2001/XInclude"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               version="2024-10-29"
+               xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
+               xmlns:irp="http://www.harctoolbox.org/irp-protocols">
+  <irp:protocol c-name="AppleV2" name="AppleV2">
+        <!-- TODO Need better uei-executor specification -->
+        <irp:parameter name="uei-executor">01E0{S=135,E=PairID}[D?0,E|||D?1,S,D?2,D?3;F,??,0]</irp:parameter>
+        <irp:parameter name="prefer-over">NEC1-f16</irp:parameter>
+        <irp:parameter name="prefer-over">NEC2-f16</irp:parameter>
+        <irp:parameter name="prefer-over">NEC1</irp:parameter>
+        <irp:parameter name="prefer-over">NEC-Shirriff-32</irp:parameter>
+        <irp:parameter name="prefer-over">Apple</irp:parameter>
+        <irp:irp><![CDATA[
+                          {38.4k,564}<1,-1|1,-3>(16,-8,D:5,S:11,C:1,F:7,PairID:8,1,^108m,(16,-4,1,^108m)*)
+                          {C=1-(#D+#F+#S+#PairID)%2,S=1087}
+                          [D:0..31=14,F:0..127,PairID:0..255]
+                ]]></irp:irp>
+        <irp:documentation>Adapted from <a href="https://en.m.wikipedia.org/wiki/Apple_Remote#Technical_details">Wiki</a>.
+        16 bits formatted as follows: device(5 bits) (aka Command Page); subdevice(11 bits):always 0x43F (aka Vendor 1087 decimal);
+        checksum(1bit aka Odd Parity); function(7bits aka Function);
+        PairID(8bits aka Device ID). C=1 if the number of 1 bits in the fields D, S, F,and PairID is even.
+        Apple uses the same framing as <a href="#NEC1">NEC1</a>, where D is the command page.
+        Specify D=14, or D=5 in normal use or specify D=0 for pairing (not recommended).
+        S=1087</irp:documentation>
+    </irp:protocol>
+</irp:protocols>

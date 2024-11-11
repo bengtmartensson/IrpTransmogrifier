@@ -287,6 +287,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
 
     public IrpDatabase(Element protocolsElement) throws IrpParseException {
         this();
+        version.append(protocolsElement.getAttribute(VERSION_NAME));
         patchProtocols(protocolsElement);
         expand();
         rebuildAliases();
@@ -853,6 +854,10 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
 
     private void appendToVersion(String version) {
         if (version.isEmpty())
+            return;
+
+        // If version already ends with the patch version, do not apply again
+        if (this.version.toString().endsWith("+" + version))
             return;
 
         if (this.version.length() > 0)

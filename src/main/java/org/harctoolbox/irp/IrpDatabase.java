@@ -123,6 +123,13 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
     }
 
     public static synchronized void setValidating(boolean newValidating) throws SAXException {
+        if (newValidating && !XmlUtils.canValidate()) {
+            logger.log(Level.WARNING, "Validating not possible, ignoring.");
+            validating = false;
+            schema = null;
+            return;
+        }
+        
         validating = newValidating;
         if (validating) {
             if (schema == null)

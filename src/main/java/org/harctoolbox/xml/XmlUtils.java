@@ -119,11 +119,26 @@ public final class XmlUtils {
 
     private static boolean debug = false;
 
-    private static final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    private static final SchemaFactory schemaFactory;
 
     static {
-        LSResourceResolver resourceResolver = new MyLSResourceResolver();
-        schemaFactory.setResourceResolver(resourceResolver);
+        SchemaFactory sf;
+        try {
+            sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        } catch (IllegalArgumentException ex) {
+            logger.log(Level.WARNING, "SchemaFactory.newInstance failed, validation will not be available!");
+            sf = null;
+        }
+
+        schemaFactory = sf;
+        if (schemaFactory != null) {
+            LSResourceResolver resourceResolver = new MyLSResourceResolver();
+            schemaFactory.setResourceResolver(resourceResolver);
+        }
+    }
+    
+    public static boolean canValidate() {
+        return schemaFactory != null;
     }
 
     public static void setDebug(boolean dbg) {
@@ -405,7 +420,7 @@ public final class XmlUtils {
     }
 
     public static Schema readSchema(Source source) throws SAXException {
-        return schemaFactory.newSchema(source);
+        return canValidate() ? schemaFactory.newSchema(source) : null;
     }
 
     public static Schema readSchema(File schemaFile) throws SAXException {
@@ -417,7 +432,7 @@ public final class XmlUtils {
     }
 
     public static Schema readSchema(URL schemaUrl) throws SAXException {
-        return schemaFactory.newSchema(schemaUrl);
+        return canValidate() ? schemaFactory.newSchema(schemaUrl) : null;
     }
 
     public static Schema readSchema(String schemaString) throws SAXException, FileNotFoundException, IOException {

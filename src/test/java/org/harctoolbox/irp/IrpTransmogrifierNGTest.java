@@ -9,6 +9,7 @@ import java.util.List;
 import org.harctoolbox.cmdline.CmdUtils;
 import org.harctoolbox.cmdline.FrequencyParser;
 import org.harctoolbox.cmdline.ProgramExitStatus;
+import org.harctoolbox.xml.XmlUtils;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
@@ -692,6 +693,10 @@ public class IrpTransmogrifierNGTest {
     @Test(enabled = true)
     public void testValidate() {
         System.out.println("testValidate");
+        if (!XmlUtils.canValidate()) {
+            System.out.println("test skipped, since validation not available on this platform");
+            return;
+        } 
         String result = execute("-c src/main/resources/IrpProtocols.xml,src/test/resources/IrpProtocols-silly.xml list");
         assertTrue(result.length() > 1000);
         result = execute("--validate -c src/main/resources/IrpProtocols.xml,src/test/resources/IrpProtocols-silly.xml list");

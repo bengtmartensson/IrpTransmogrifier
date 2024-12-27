@@ -85,10 +85,11 @@ target-specific parameters to the code generators using the `--parameter` (`-p`)
 
 Targets:
 * [Lircd.conf](http://lirc.org/html/lircd.conf.html) generation from IrScrutinizer. This is based on an XSLT-transformation (`lirc.xsd`) and generates
- [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/harctoolboxbundle/blob/master/IrScrutinizer/src/main/config/exportformats.d/lirc.xml).
+ [an XSLT (version 1) file that can work with IrScrutinizer](https://github.com/bengtmartensson/IrScrutinizer/blob/master/src/main/config/exportformats.d/lirc.xml).
 Handling of definitions as well as expressions as bitfields not implemented, as well as a few other things (search for "omitted" in the above file),
 otherwise works. "90% complete", see [this issue](https://github.com/bengtmartensson/IrpTransmogrifier/issues/6).
-To create: see (or execute) the shell script `tools/generate-lirc.sh`. In short, this generates the xml export, and then invokes
+To create: see the project [IrProtocolGeneration](https://github.com/bengtmartensson/IrProtocolCodeGeneration).
+In short, this generates the xml export, and then invokes
 xslt transformations on that xml file.
 * Java. Essentially for testing. This is essentially working both for rendering and decoding, including a generated test rig
 (see the [test project](https://github.com/bengtmartensson/JavaIrpProtocolTest)). Targets: `java-decoder java-decoder-test java-renderer java-renderer-test`.
@@ -517,7 +518,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -f, --frequency
             Set modulation frequency.
-          -g, --girr
+          -G, --girrinput
+            Read raw input in Girr format.
+          -g, --girroutput
             Generate output in Girr format (only)
             Default: false
           -h, -?, --help
@@ -603,7 +606,9 @@ Usage: IrpTransmogrifier [options] [command] [command options]
             Default: false
           -f, --frequency
             Modulation frequency of raw signal.
-          -g, --girr
+          -G, --girrinput
+            Read raw input in Girr format.
+          -g, --girroutput
             Generate Girr file. Inhibits all other output.
             Default: false
           -h, -?, --help

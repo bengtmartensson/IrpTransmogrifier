@@ -4,6 +4,21 @@ The notation #n refers to issues number n at
 https://github.com/bengtmartensson/IrpTransmogrifier/issues
 
 ===============================================================================
+2024-12-31 (tentatively): Version 1.2.14.
+
+* New protocols: Balboa, Sharp_Old, Sharp_Old{1}, Sharp_Old{2}. Thanx Graham Dixon.
+* Updated protocols: Denon, Sharp, Sunfire. Thanx Graham Dixon.
+* Function also if schemaFactory == null. #260.
+* Fix for IrpDatabase version management.
+* New "contributed" file, from Lyndel McGee, containing alternative Apple protocol definition.
+* New functions [Protocol,ParameterSpecs].addDefaulteds(...).
+* Update JCommander to 1.85.
+* New function Decoder.decodeIrSignalWithFallback(...). IrScrutinizer's #531.
+* Fix for some tests for the Window's line ending, Thanx to Sean Young.
+* Some typos and illegal file names fixed, courtesy of Sean Young,
+* Option --girrinput for the analyze- and decode commands, to read inputs in girr format. #253.
+
+===============================================================================
 2024-01-08: Version 1.2.13.
 
 Although many lines of code has changed through refactorizations, the

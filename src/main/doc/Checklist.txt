@@ -1,10 +1,12 @@
 Checklist for release (for maintainer)
 
 0. Check in good code ;-). Check that tests run ok, javadoc is ok.
+   cd src/test/teaserfiles; make clean; make -j 20 ; make nukeempty
    If necessary, merge rmProtocols.xml from rmir.
    (Ideally) update documentation IrpTransmogrifier,xml.
    Update subtree common. (git subtree pull --prefix common git@github.com:bengtmartensson/HarctoolboxCommon.git master)
    Make sure that all source files are checked in.
+   lirc.xml: In IrProtocolCodeGeneration, make -f tools/Makefile lirc.xml.
 1. Update pom.xml: Bump version; can use make setversion NEWVERSION=x.y.z.)
    Check/update version of IrpProtocols.xml.
    Update releasenotes. Update copyright year(?).

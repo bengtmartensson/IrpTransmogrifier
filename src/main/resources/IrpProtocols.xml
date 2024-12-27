@@ -187,7 +187,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2024-03-14"
+               version="2024-12-27"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
@@ -418,6 +418,14 @@ ordering is not required but it improves the readability of the entry.
         <irp:parameter name="frequency-tolerance">-1</irp:parameter>
     </irp:protocol>
 
+    <irp:protocol name="Balboa">
+        <irp:irp>
+            <![CDATA[{38.5k,500}<2,-2|2,-4>((9,-5,F:8,~F:8,2,-10)3+)[F:0..255]]]>
+        </irp:irp>
+        <irp:documentation>See <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=102450">this thread</a>.</irp:documentation>
+        <irp:parameter name="uei-executor">017B[;F]</irp:parameter>
+    </irp:protocol>
+
     <irp:protocol name="Barco">
         <irp:irp>
             <![CDATA[{0k,10}<1,-5|1,-15>(1,-25, D:5,F:6, 1,-25,1,-120m)*[D:0..31,F:0..63]]]>
@@ -483,7 +491,8 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
 
     <irp:protocol name="Denon">
         <irp:irp>
-            <![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,0:2,1,-165,D:5,~F:8,3:2,1,-165)* [D:0..31,F:0..255]]]>
+            <![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,0:2,1,^67m,(D:5,~F:8,3:2,1,^67m,D:5,F:8,0:2,1,^67m)*)[D:0..31,F:0..255]]]> <!-- ??? -->
+            <!--[CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,0:2,1,-165,D:5,~F:8,3:2,1,-165)* [D:0..31,F:0..255]]]-->
         </irp:irp>
         <irp:documentation xml:space="preserve">A Denon signal has two halves, either one of which is enough to fully decode the information.
             When one half is seen it will be decoded as <a href="#Denon{1}">Denon{1}</a> or <a href="#Denon{2}">Denon{2}</a>.
@@ -492,7 +501,7 @@ This is a moderately robust protocol, but <A href="#spurious">spurious decodes</
         </irp:documentation>
         <irp:parameter name="prefer-over">Denon{1}</irp:parameter>
         <irp:parameter name="prefer-over">Denon{2}</irp:parameter>
-        <irp:parameter name="uei-executor">001C[D;F]</irp:parameter>
+        <irp:parameter name="uei-executor">001C(Denon)[D;F]</irp:parameter>
         <irp:parameter name="uei-executor">009C(Denon Combo (Official))[;D,1,F]</irp:parameter>
         <irp:parameter name="uei-executor">009C:JP1[;D,F]</irp:parameter>
         <irp:parameter name="uei-executor">01C8[;0,D,F,(F:1:7)*4,D:5|(F:7)*32]</irp:parameter>
@@ -2430,7 +2439,8 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="Sharp">
         <irp:irp>
-            <![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,1:2,1,-165,D:5,~F:8,2:2,1,-165)*[D:0..31,F:0..255]]]>
+            <![CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,1:2,1,^67m,(D:5,~F:8,2:2,1,^67m,D:5,F:8,1:2,1,^67m)*)[D:0..31,F:0..255]]]>
+          <!--[CDATA[{38k,264}<1,-3|1,-7>(D:5,F:8,1:2,1,-165,D:5,~F:8,2:2,1,-165)*[D:0..31,F:0..255]]]-->
         </irp:irp>
         <irp:documentation xml:space="preserve">A Sharp signal, which is almost identical to <a href="#Denon">Denon</a>, has two halves,
             either one of which is enough to fully decode the information.
@@ -2439,9 +2449,52 @@ C3=D:1:2 + #(F&44) + #(D&2)
             Sharp, Sharp{1} and Sharp{2} all represent the same protocol when they are correct, but only Sharp is robust.
         </irp:documentation>
         <irp:parameter name="prefer-over">Sharp{1}</irp:parameter>
-        <irp:parameter name="uei-executor">001C[D;F]</irp:parameter>
+        <irp:parameter name="uei-executor">001C(Sharp)[D;F]</irp:parameter>
         <irp:parameter name="uei-executor">009C(Sharp Combo (Official))[;D,0,F]</irp:parameter>
         <irp:parameter name="uei-executor">01AC[;1,D,F,D|(F:7)*32]</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Sharp_Old">
+        <irp:irp>
+            <![CDATA[{38k,264}<1,-3|1,-7>(D:3,F:8,0:1,1,^49m,(D:3,~F:8,1:1,1,^49m,D:3,F:8,0:1,1,^49m)*)[D:0..7,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation xml:space="preserve">A Sharp Old signal has two halves, either one of which is enough to fully decode the information.
+            When one half is seen it will be decoded as <a href="#Sharp Old{1}">Sharp Old{1}</a> or
+            <a href="#Sharp Old{2}">Sharp Old{2}</a>.
+            Sharp Old, Sharp Old{1} and Sharp Old{2} all represent the same protocol when correct, but
+            only Sharp Old is robust.
+        </irp:documentation>
+        <irp:parameter name="prefer-over">Sharp Old{1}</irp:parameter>
+        <irp:parameter name="prefer-over">Sharp Old{2}</irp:parameter>
+        <irp:parameter name="uei-executor">001C(Sharp Old)[D;F]</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Sharp_Old{1}">
+        <irp:irp>
+            <![CDATA[{38k,263}<1,-3|1,-7>(D:3,F:8,0:1,1,^49m)*[D:0..7,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation xml:space="preserve">A Sharp Old signal has two halves, either one of which is enough to fully decode the information.
+            When one half is seen it will be decoded as <a href="#Sharp Old{1}">Sharp Old{1}</a> or
+            <a href="#Sharp Old{2}">Sharp Old{2}</a>.
+            Sharp Old, Sharp Old{1} and Sharp Old{2} all represent the same protocol when correct, but
+            only Sharp Old is robust.
+        </irp:documentation>
+        <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:parameter name="uei-executor">001C(Sharp Old)[D;F]</irp:parameter>
+    </irp:protocol>
+
+    <irp:protocol name="Sharp_Old{2}">
+        <irp:irp>
+            <![CDATA[{38k,263}<1,-3|1,-7>(D:3,~F:8,1:1,1,^49m)*[D:0..7,F:0..255]]]>
+        </irp:irp>
+        <irp:documentation xml:space="preserve">A Sharp Old signal has two halves, either one of which is enough to fully decode the information.
+            When one half is seen it will be decoded as <a href="#Sharp Old{1}">Sharp Old{1}</a> or
+
+            Sharp Old, Sharp Old{1} and Sharp Old{2} all represent the same protocol when correct, but
+            only Sharp Old is robust.
+        </irp:documentation>
+        <irp:parameter name="decode-only">true</irp:parameter>
+        <irp:parameter name="uei-executor">001C(Sharp Old)[D;F]</irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="SharpDVD">
@@ -2578,8 +2631,14 @@ C3=D:1:2 + #(F&44) + #(D&2)
 
     <irp:protocol name="Sunfire">
         <irp:irp>
-            <![CDATA[{38k,560,msb}<1,-1|3,-1>(16,-8, D:4,F:8,~D:4,~F:8, -32)*[D:0..15,F:0..255]]]>
+            <![CDATA[{38k,558,msb}<1,-1|3,-1>(16,-8,D:4,F:8,~D:4,~F:8,-33)*[D:0..15,F:0..255]]]>
         </irp:irp>
+        <irp:documentation xml:space="preserve">This protocol is only for the Sunfire Theater Grand II
+	and III preamps. The earlier Grand I models use the NEC1 protocol with signals very similar to
+	Kenwood.
+        See <a href="http://www.hifi-remote.com/forums/viewtopic.php?t=1182">this thread</a>.
+        </irp:documentation>
+        <irp:parameter name="uei-executor">0191[D;F]</irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="TCL_AC">

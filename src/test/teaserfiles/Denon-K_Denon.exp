@@ -1,4 +1,4 @@
-ChLevel:		Denon{1}: {D=12,F=175},	beg=0, end=31, reps=1
+ChLevel:		Denon: {D=12,F=175},	beg=0, end=31
 DirectionDown:		Denon-K: {D=4,S=1,F=28},	beg=0, end=299, reps=3
 DirectionLeft:		Denon-K: {D=4,S=1,F=29},	beg=0, end=299, reps=3
 DirectionRight:		Denon-K: {D=4,S=1,F=30},	beg=0, end=299, reps=3
@@ -10,7 +10,7 @@ InputDock:		Denon-K: {D=4,S=1,F=717},	beg=0, end=299, reps=3
 InputDvd:		Denon-K: {D=4,S=1,F=720},	beg=0, end=299, reps=3
 InputGame:		Denon-K: {D=4,S=1,F=725},	beg=0, end=299, reps=3
 InputiPod:		Denon-K: {D=4,S=1,F=667},	beg=0, end=299, reps=3
-InputMode:		Denon: {D=12,F=182},	beg=0, end=191, reps=3
+InputMode:		Denon: {D=12,F=182},	beg=0, end=159, reps=2	{Denon{2}: {D=12,F=182},	beg=160, end=191, reps=1}
 InputSat/Cbl:		Denon-K: {D=4,S=1,F=723},	beg=0, end=299, reps=3
 InputSatTu:		Denon-K: {D=4,S=1,F=696},	beg=0, end=299, reps=3
 InputTuner:		Denon-K: {D=4,S=1,F=719},	beg=0, end=299, reps=3
@@ -24,9 +24,9 @@ iPodPreviousTrack:		Denon-K: {D=4,S=1,F=945},	beg=0, end=299, reps=3
 iPodRewind:		Denon-K: {D=4,S=1,F=976},	beg=0, end=299, reps=3
 Menu:		Denon-K: {D=4,S=1,F=35},	beg=0, end=299, reps=3
 ModeDirect/Stereo:		Denon-K: {D=4,S=1,F=305},	beg=0, end=299, reps=3
-ModeSimulation:		Denon: {D=2,F=230},	beg=0, end=191, reps=3
-ModeStandard:		Denon: {D=2,F=228},	beg=0, end=191, reps=3
-MultiEq:		Denon: {D=4,F=157},	beg=0, end=191, reps=3
+ModeSimulation:		Denon: {D=2,F=230},	beg=0, end=159, reps=2	{Denon{2}: {D=2,F=230},	beg=160, end=191, reps=1}
+ModeStandard:		Denon: {D=2,F=228},	beg=0, end=159, reps=2	{Denon{2}: {D=2,F=228},	beg=160, end=191, reps=1}
+MultiEq:		Denon: {D=4,F=157},	beg=0, end=159, reps=2	{Denon{2}: {D=4,F=157},	beg=160, end=191, reps=1}
 Mute:		Denon-K: {D=4,S=1,F=370},	beg=0, end=299, reps=3
 PowerOff:		Denon-K: {D=4,S=1,F=3},	beg=0, end=299, reps=3
 PowerToggle:		Denon-K: {D=4,S=1,F=2},	beg=0, end=299, reps=3
@@ -39,11 +39,11 @@ Select/Ok:		Denon-K: {D=4,S=1,F=31},	beg=0, end=299, reps=3
 Sleep:		Denon-K: {D=4,S=1,F=836},	beg=0, end=299, reps=3
 Source:		Denon-K: {D=4,S=1,F=693},	beg=0, end=299, reps=3
 TuneDown:		Denon-K: {D=4,S=1,F=995},	beg=0, end=299, reps=3
-TunerBand:		Denon: {D=12,F=215},	beg=0, end=191, reps=3
-TunerMemory:		Denon: {D=12,F=76},	beg=0, end=191, reps=3
-TunerShift:		Denon: {D=12,F=205},	beg=0, end=191, reps=3
+TunerBand:		Denon: {D=12,F=215},	beg=0, end=159, reps=2	{Denon{2}: {D=12,F=215},	beg=160, end=191, reps=1}
+TunerMemory:		Denon: {D=12,F=76},	beg=0, end=159, reps=2	{Denon{2}: {D=12,F=76},	beg=160, end=191, reps=1}
+TunerShift:		Denon: {D=12,F=205},	beg=0, end=159, reps=2	{Denon{2}: {D=12,F=205},	beg=160, end=191, reps=1}
 TuneUp:		Denon-K: {D=4,S=1,F=996},	beg=0, end=299, reps=3
-VideoSelect:		Denon: {D=2,F=216},	beg=0, end=191, reps=3
+VideoSelect:		Denon: {D=2,F=216},	beg=0, end=159, reps=2	{Denon{2}: {D=2,F=216},	beg=160, end=191, reps=1}
 VolumeDown:		Denon-K: {D=4,S=1,F=369},	beg=0, end=299, reps=3
 VolumeUp:		Denon-K: {D=4,S=1,F=368},	beg=0, end=299, reps=3
 0:		Denon-K: {D=4,S=1,F=25},	beg=0, end=299, reps=3

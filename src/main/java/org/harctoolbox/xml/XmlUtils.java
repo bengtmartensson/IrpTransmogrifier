@@ -136,7 +136,7 @@ public final class XmlUtils {
             schemaFactory.setResourceResolver(resourceResolver);
         }
     }
-    
+
     public static boolean canValidate() {
         return schemaFactory != null;
     }
@@ -198,9 +198,9 @@ public final class XmlUtils {
 
     public static Document openXmlUrlOrFile(String thing, Schema schema, boolean isNamespaceAware, boolean isXIncludeAware) throws IOException, SAXException {
         try {
-            URL url = new URL(thing);
+            URL url = new URI(thing).toURL();
             return openXmlUrl(url, schema, isNamespaceAware, isXIncludeAware);
-        } catch (MalformedURLException ex) {
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException ex) {
             return openXmlFile(new File(thing), schema, isNamespaceAware, isXIncludeAware);
         }
     }
@@ -617,13 +617,10 @@ public final class XmlUtils {
 
             InputStream resourceAsStream = MyEntityResolver.getStream(systemId);
             if (resourceAsStream == null) {
-                URL url;
-                try {
-                    url = new URL(systemId);
-                } catch (MalformedURLException ex) {
-                    URL base = new URI(baseURI).toURL();
-                    url = new URL(base, systemId);
-                }
+                URI uri = new URI(systemId);
+                URI base = new URI(baseURI);
+                URI resolved = uri.resolve(uri);
+                URL url = resolved.toURL();
                 resourceAsStream = url.openStream();
             }
             try (BufferedInputStream inputStream = new BufferedInputStream(resourceAsStream)) {

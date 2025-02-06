@@ -29,6 +29,8 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -350,9 +352,11 @@ public final class IrCoreUtils {
         if (filename == null || filename.isEmpty() || filename.equals("-"))
             return System.in;
         try {
-            URL url = new URL(filename);
+            URL url = new URI(filename).toURL();
             return url.openStream();
-        } catch (MalformedURLException ex) {
+        } catch (MalformedURLException |
+                IllegalArgumentException | // not absolute
+                URISyntaxException ex) {
             return new FileInputStream(filename);
         }
     }

@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.harctoolbox.ircore.IrCoreUtils;
 import static org.harctoolbox.ircore.IrCoreUtils.EXTENDED_LATIN1_NAME;
 
 /**
@@ -136,9 +137,7 @@ public final class LircConfigFile {
     }
 
     public static List<LircRemote> readRemotesURL(String urlOrFilename, String charsetName) throws MalformedURLException, IOException {
-        URL url = new URL(urlOrFilename);
-        URLConnection urlConnection = url.openConnection();
-        try (InputStream inputStream = urlConnection.getInputStream()) {
+        try (InputStream inputStream = IrCoreUtils.getInputStream(urlOrFilename)) {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charsetName);
             return readRemotes(inputStreamReader, urlOrFilename);
         }

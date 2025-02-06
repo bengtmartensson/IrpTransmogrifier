@@ -38,7 +38,7 @@ public class CommandLirc extends AbstractCommand {
 
     //private static final Logger logger = Logger.getLogger(CommandLirc.class.getName());
 
-    @Parameter(names = {"-c", "--commands"}, description = "Also list the commands if the remotes.")
+    @Parameter(names = {"-c", "--commands"}, description = "Also list the commands in the remotes.")
     private boolean commands = false;
 
     @Parameter(names = {"-r", "--radix"}, hidden = true, description = "Radix for outputting result, default 16.", validateWith = Radix.class) // Too much...?

@@ -129,7 +129,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
             schema = null;
             return;
         }
-        
+
         validating = newValidating;
         if (validating) {
             if (schema == null)
@@ -347,8 +347,8 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
             switch (node.getNodeType()) {
                 case Node.ELEMENT_NODE: {
                     Element el = (Element) node;
-                    String name = el.getTagName();
-                    if ((IRP_NAMESPACE_PREFIX + ":" + PROTOCOLS_NAME).equals(name))
+                    String name = el.getLocalName();
+                    if (name.equals(PROTOCOLS_NAME))
                         patchProtocols(el);
                 }
                 break;
@@ -370,7 +370,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
             switch (node.getNodeType()) {
                 case Node.ELEMENT_NODE: {
                     Element e = (Element) node;
-                    if ((IRP_NAMESPACE_PREFIX + ":" + PROTOCOL_NAME).equals(e.getTagName()))
+                    if (e.getLocalName().equals(PROTOCOL_NAME))
                         patchProtocol(e);
                 }
                 break;
@@ -1089,14 +1089,14 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
         }
 
         private void parseProtocolChild(Element e) {
-            switch (e.getTagName()) {
-                case IRP_NAMESPACE_PREFIX + ":" + IRP_NAME:
+            switch (e.getLocalName()) {
+                case IRP_NAME:
                     addProperty(IRP_NAME, e.getTextContent());
                     break;
-                case IRP_NAMESPACE_PREFIX + ":" + DOCUMENTATION_NAME:
+                case DOCUMENTATION_NAME:
                     addXmlProperty(DOCUMENTATION_NAME, e, XmlUtils.hasSpacePreserve(e));
                     break;
-                case IRP_NAMESPACE_PREFIX + ":" + PARAMETER_NAME:
+                case PARAMETER_NAME:
                     boolean isXml = e.getAttribute(TYPE_NAME).toLowerCase(Locale.US).equals(XML_NAME);
                     if (isXml)
                         addXmlProperty(e.getAttribute(NAME_NAME), e, false);

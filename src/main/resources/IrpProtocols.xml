@@ -187,7 +187,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2024-12-27"
+               version="2025-02-10"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
@@ -2017,7 +2017,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
             No NEC2 signal should fit those rules.
             So you usually can determine whether the decision (by frequency) was wrong by checking the device numbers.
 
-            Many Pioneer commands are sent as combinations of two different Pioneer signals, see <a href="#Pioneer.Mix">Pioneer-Mix</a>.
+            Many Pioneer commands are sent as combinations of two different Pioneer signals, see <a href="#Pioneer-2Part">Pioneer-Mix</a>.
         </irp:documentation>
         <irp:parameter name="uei-executor">00E2(;D==~S:8)[D;F]</irp:parameter>
         <irp:parameter name="uei-executor">007E(;D==~S:8&amp;&amp;F:1:5==0)[D;0,0,0,F]</irp:parameter>

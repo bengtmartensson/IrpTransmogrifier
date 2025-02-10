@@ -7,6 +7,9 @@ TOP := $(realpath $(MYDIR))
 
 include $(MYDIR)/common/makefiles/paths.mk
 
+# This file is not public ;-)
+-include $(MYDIR)/upload_location.mk
+
 INSTALLDIR := /usr/local/share/irptransmogrifier
 BINLINK := /usr/local/bin/irptransmogrifier
 BROWSELINK := /usr/local/bin/irpbrowse
@@ -43,6 +46,8 @@ $(PROJECT_JAR) $(PROJECT_BIN) $(SUMS):
 
 $(PROJECT_JAR)-test:
 	mvn install -Dmaven.test.skip=false
+
+target/IrpProtocols.html: $(PROJECT_JAR)
 
 release: push gh-pages tag deploy
 
@@ -86,15 +91,18 @@ tag:
 	git tag -s -a Version-$(VERSION) -m "Tagging Version-$(VERSION)"
 	git push origin Version-$(VERSION)
 
-upload-harctoolbox:
-	@(cd $(TOP)/../www.harctoolbox.org ; \
-	make clean ; \
-	make site ; \
-	cd build/site/en ; \
-	for file in IrpTransmogrifier.html IrpTransmogrifier.pdf IrpTransmogrifier.releasenotes.txt wholesite.html wholesite.pdf ; do \
-	echo Uploading $$file... ; \
-		curl --netrc --upload-file $$file $(UPLOADDIR_DIR)/$$file;\
-	done )
+#upload-harctoolbox:
+#	@(cd $(TOP)/../www.harctoolbox.org ; \
+#	make clean ; \
+#	make site ; \
+#	cd build/site/en ; \
+#	for file in IrpTransmogrifier.html IrpTransmogrifier.pdf IrpTransmogrifier.releasenotes.txt wholesite.html wholesite.pdf ; do \
+#	echo Uploading $$file... ; \
+#		curl --netrc --upload-file $$file $(UPLOADDIR_DIR)/$$file;\
+#	done )
+
+upload-irpprotocols: target/IrpProtocols.html
+	scp $< $(UPLOAD_LOCATION)
 
 # Only for Unix-like systems
 install: $(PROJECT_BIN) | $(INSTALLDIR)

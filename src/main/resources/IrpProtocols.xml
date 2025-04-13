@@ -9,7 +9,7 @@
 <!--
 Notes for those modifying this file:
 
-Syntax of the XML file is defined in the W3C Schema http://www.harctoolbox.org/schemas/irp-protocols.xsd
+Syntax of the XML file is defined in the W3C Schema https://www.harctoolbox.org/schemas/irp-protocols.xsd
 (although possibly easier to digest for machines than for humans).
 This defines the XML name space irp=http://www.harctoolbox.org/irp-protocols,
 using the prefix irp.
@@ -187,8 +187,8 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2025-02-10"
-               xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
+               version="2025-04-05"
+               xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols https://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
     <irp:protocol name="48-NEC">

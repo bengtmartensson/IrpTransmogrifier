@@ -74,7 +74,7 @@ public final class IrpDatabase implements Iterable<NamedProtocol>, Serializable 
     public static final String DEFAULT_CONFIG_FILE = "/IrpProtocols.xml";
     public static final String IRP_PROTOCOL_NS = "http://www.harctoolbox.org/irp-protocols";
     public static final String IRP_SCHEMA_FILE = "/irp-protocols.xsd";
-    public static final String IRP_PROTOCOL_SCHEMA_LOCATION = "http://www.harctoolbox.org/schemas/irp-protocols.xsd";
+    public static final String IRP_PROTOCOL_SCHEMA_LOCATION = "https://www.harctoolbox.org/schemas/irp-protocols.xsd";
     public static final String IRP_NAMESPACE_PREFIX = "irp";
     private static final int MAX_RECURSION_DEPTH = 5;
 

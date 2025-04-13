@@ -15,7 +15,7 @@ I would like to acknowledge the influence of the [JP1 forum](http://hifi-remote.
 This work surely would not exist without the JP1 forum.
 
 ## Background
-This program can be considered as a successor of [IrpMaster](http://www.harctoolbox.org/IrpMaster,html).
+This program can be considered as a successor of [IrpMaster](https://harctoolbox.org/IrpMaster,html).
 The Irp parser therein is based upon a [ANTLR3 grammar](http://www.antlr.org). The "new version"
 ANTLR4 is really not a new version, but a completely different tool, fixing most of the quirks that were irritating
 in IrpMaster (like the "ugliness" of embedding actions within the grammar, no left recursion, and much more).
@@ -109,7 +109,7 @@ This has been inspired by to the Analyzer and the RepeatFinder in
 ## Protocol Data Base
 The "ini"-file `IrpProtocols.ini` of IrpMaster has been replaced by an XML file,
 per default called `IrpProtocols.xml`. The XML format
-is defined by the W3C schema [irp-protocols](http://www.harctoolbox.org/schemas/irp-protocols.xsd), and has the name space
+is defined by the W3C schema [irp-protocols](https://harctoolbox.org/schemas/irp-protocols.xsd), and has the name space
 `http://www.harctoolbox.org/irp-protocols`. This format has many advantages in
 comparison with the simpler previous format, for example, it can contain embedded XHTLM fragments.
 It also can contain different parameters that can be used by different programs, for example, tolerance parameters
@@ -750,5 +750,5 @@ Usage: IrpTransmogrifier [options] [command] [command options]
 
 
 
-For documentation, see http://www.harctoolbox.org/IrpTransmogrifier.html
+For documentation, see https://harctoolbox.org/IrpTransmogrifier.html
 ```

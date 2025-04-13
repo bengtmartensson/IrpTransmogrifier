@@ -16,7 +16,7 @@
         </license>
     </licenses>
     <description>Parser for IRP notation protocols, with rendering, code generation, recognition applications.</description>
-    <url>http://www.harctoolbox.org</url>
+    <url>https://www.harctoolbox.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.nameLowercase>irptransmogrifier</project.nameLowercase>
@@ -100,7 +100,7 @@
                                 <include>IrpProtocols.xml</include>
                             </includes>
                             <xincludeAware>true</xincludeAware>
-                            <systemId>http://www.harctoolbox.org/schemas/irp-protocols.xsd</systemId>
+                            <systemId>https://www.harctoolbox.org/schemas/irp-protocols.xsd</systemId>
                         </validationSet>
                     </validationSets>
                     <transformationSets>

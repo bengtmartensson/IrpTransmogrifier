@@ -128,7 +128,7 @@
                 </p>
                 <p>
                     In order to avoid circular dependencies,
-                    it is prohibited to use any other <a href="http://www.harctoolbox.org">Harctoolbox software</a>.
+                    it is prohibited to use any other <a href="https://www.harctoolbox.org">Harctoolbox software</a>.
                 </p>
             </section>
 
@@ -450,7 +450,7 @@
                         The configuration file <code>IrpProtocols.ini</code> of IrpMaster has been replaced by an XML file,
                         called <code>IrpProtocols.xml</code>. The XML format
                         is defined by a <a href="Glossary.html#XMLSchema">W3C schema</a>, named
-                        <a href="http://www.harctoolbox.org/schemas/irp-protocols.xsd">irp-protocols</a>,
+                        <a href="https://www.harctoolbox.org/schemas/irp-protocols.xsd">irp-protocols</a>,
                         having the XML name space <code>http://www.harctoolbox.org/irp-protocols</code>.
                         This format has many advantages over
                         the previous, simpler, format, as it gives access to different XML technologies,
@@ -509,7 +509,7 @@
                         </ul>
 
                         <p>Syntax and semantics of the file is believed to be essentially self explaing.
-                            The exact syntax is given by <a href="http://www.harctoolbox.org/schemas/irp-protocols.xsd">the schema</a>,
+                            The exact syntax is given by <a href="https://www.harctoolbox.org/schemas/irp-protocols.xsd">the schema</a>,
                             and is therefore not repeated here.</p>
 
                         <p>Note that the program contains some functions for the

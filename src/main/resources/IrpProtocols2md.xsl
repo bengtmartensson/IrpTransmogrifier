@@ -19,7 +19,7 @@ this program. If not, see http://www.gnu.org/licenses/.
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols http://www.harctoolbox.org/schemas/irp-protocols.xsd"
+                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols https://www.harctoolbox.org/schemas/irp-protocols.xsd"
                 xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
     <xsl:output method="text"/>

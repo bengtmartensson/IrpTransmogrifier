@@ -7,7 +7,7 @@ IRPHOME="$(dirname -- "$(readlink -f -- "${0}")" )"
 if [ ! -d ${IRPHOME}/target ] ; then
     echo "This wrapper, $(readlink -f -- "${0}"), is intended for development ONLY."  1>&2
     echo "It is NOT intended for deployment!"                               1>&2
-    echo "Instructions for installing given in http://www.harctoolbox.org/IrpTransmogrifier.html#Installation" 1>&2
+    echo "Instructions for installing given in https://www.harctoolbox.org/IrpTransmogrifier.html#Installation" 1>&2
     echo "as well as in the README.md."                                     1>&2
     exit 255
 fi

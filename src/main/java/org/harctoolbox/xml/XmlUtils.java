@@ -120,6 +120,8 @@ public final class XmlUtils {
     private static boolean debug = false;
 
     private static final SchemaFactory schemaFactory;
+    
+    private static boolean allowDoctype = false;
 
     static {
         SchemaFactory sf;
@@ -136,13 +138,17 @@ public final class XmlUtils {
             schemaFactory.setResourceResolver(resourceResolver);
         }
     }
-
+    
     public static boolean canValidate() {
         return schemaFactory != null;
     }
 
     public static void setDebug(boolean dbg) {
         debug = dbg;
+    }
+
+    public static void setAllowDoctype(boolean allow) {
+        allowDoctype = allow;
     }
 
     public static Document parseStringToXmlDocument(String string, boolean isNamespaceAware, boolean isXIncludeAware) throws SAXException {
@@ -235,13 +241,14 @@ public final class XmlUtils {
             // Turn of generating xml:base attributes in expanded xincludes (causes validation errors).
             // See https://xerces.apache.org/xerces2-j/features.html#xinclude.fixup-base-uris
             factory.setFeature("http://apache.org/xml/features/xinclude/fixup-base-uris", false);
-            xeePrevention(factory);
+            if (! allowDoctype)
+                xeePrevention(factory);
         } catch (ParserConfigurationException ex) {
             throw new ThisCannotHappenException(ex);
         }
         if (schema != null)
             factory.setSchema(schema);
-        factory.setValidating(false); // Concerns DTD validation only
+        factory.setValidating(allowDoctype); // Concerns DTD validation only
         DocumentBuilder builder = null;
         try {
             builder = factory.newDocumentBuilder();

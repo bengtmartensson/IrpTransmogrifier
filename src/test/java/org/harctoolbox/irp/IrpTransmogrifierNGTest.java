@@ -246,6 +246,23 @@ public class IrpTransmogrifierNGTest {
         String result = execute(args);
         assertEquals(result, "RC5x: {D=5,S=108,F=32,T=1}");
     }
+    
+    @Test(enabled = true)
+    //Ref: https://www.hifi-remote.com/forums/viewtopic.php?p=151256
+    public void testDecodeRc5xFile() {
+        System.out.println("decodeRc5xFile");
+        String args = "decode --namedinput src/test/txt/rc5x.txt";
+        String result = execute(args);
+        String expected = 
+                  "Internet Radio (device selection button): \tRC5x: {D=27,S=53,F=50}, beg=0, end=27, reps=1\n"
+                + "HEOS (device selection button):           \tRC5x: {D=27,S=63,F=10,T=1}, beg=0, end=31, reps=1\n"
+                + "Channel Up:                               \tRC5x: {D=27,S=32,F=20}, beg=0, end=29, reps=1\n"
+                + "Channel Down:                             \tRC5x: {D=27,S=33,F=20,T=1}, beg=0, end=29, reps=1\n"
+                + "Fast Forward:                             \tRC5x: {D=27,S=32,F=1}, beg=0, end=33, reps=1\n"
+                + "Play/Pause:                               \tRC5x: {D=27,S=53,F=1,T=1}, beg=0, end=31, reps=1\n"
+                + "Rewind:                                   \tRC5x: {D=27,S=33,F=1}, beg=0, end=31, reps=1";
+        assertEquals(result, expected);
+    }
 
     @Test(enabled = true)
     public void testDecodeRc5_1() {

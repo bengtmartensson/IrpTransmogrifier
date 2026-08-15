@@ -33,6 +33,7 @@ public class DecoderNGTest {
     private final IrSignal giCable;
     private final IrSignal gi4dtv_2_42;
     private final IrSignal gi4dtv_6_42;
+    private final IrSignal rc5xInternetRadio;
 
     public DecoderNGTest() throws Exception {
         nrc17Intro = new IrSequence(new int[]{500, 2500, 500, 1000, 1000, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 14500, 500, 2500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 1000, 500, 500, 1000, 500, 500, 500, 500, 500, 500, 500, 110000});
@@ -49,6 +50,9 @@ public class DecoderNGTest {
         gi4dtv_6_42 = Pronto.parse("0000 006F 0000 000E 00B9 004A 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 006F 0025 0025 0025 08AC");
 //                                    0000 006F 0000 000E 00B9 004A 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 0025 0025 006F 0025 006F 0025 0025 0025 08AC
 
+        //RC5x: {D=27,S=53,F=50}          0000 0073 0000 000E 0020 0020 0040 0040 0020 0020 0040 0040 0020 0020 0020 00A0 0020 0020 0040 0040 0040 0040 0020 0020 0020 0020 0040 0020 0020 0040 0040 0AC8
+        //Ref: https://www.hifi-remote.com/forums/viewtopic.php?p=151256
+        rc5xInternetRadio = Pronto.parse("0000 0073 0000 000E 0020 001F 0040 003F 0020 001F 0040 003F 0020 001F 0020 00A4 0020 001F 0040 003F 0040 003F 0020 001F 0020 001F 0040 0020 0020 003E 0040 09F1");
         decoder = new Decoder();
     }
 
@@ -120,7 +124,21 @@ public class DecoderNGTest {
         result = decoder.decodeIrSignal(irSignal, params);
         assertEquals(result.size(), 2);
     }
-
+   
+    @Test(enabled = true)
+    public void testDecodeRC5x() {
+        System.out.println("decodeRC5x");
+        Decoder.setDebugProtocolRegExp("rc5x");
+        Decoder.DecoderParameters params = new Decoder.DecoderParameters();
+        Decoder.SimpleDecodesSet result = decoder.decodeIrSignal(rc5xInternetRadio, params);
+        assertEquals(result.size(), 1);
+        Decode first = result.first();
+        System.out.println(first);
+        //ModulatedIrSequence seq = giCable.toModulatedIrSequence();
+        //Decoder.DecodeTree decodes = decoder.decode(seq, params);
+        //assertEquals(decodes.size(), 1);
+    }
+    
     @Test(enabled = true)
     public void testDecodeGICable() {
         System.out.println("decodeGICable");

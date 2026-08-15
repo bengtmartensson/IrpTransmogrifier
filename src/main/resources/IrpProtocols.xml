@@ -187,7 +187,7 @@ ordering is not required but it improves the readability of the entry.
                xmlns:rm="https://sourceforge.net/projects/controlremote/files/RemoteMaster"
                xmlns:xi="http://www.w3.org/2001/XInclude"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               version="2025-05-21"
+               version="2026-08-15"
                xsi:schemaLocation="http://www.harctoolbox.org/irp-protocols https://www.harctoolbox.org/schemas/irp-protocols.xsd"
                xmlns:irp="http://www.harctoolbox.org/irp-protocols">
 
@@ -2137,7 +2137,7 @@ C3=D:1:2 + #(F&44) + #(D&2)
         <irp:documentation xml:space="preserve">In Philips' (the creator of the protocol) terminology, "D" is called "System", "S" is called "Command", and F is called "Data".</irp:documentation>
         <irp:parameter name="uei-executor">00F2[D,S:1:6;S:7,F:6]</irp:parameter>
         <irp:parameter name="uei-executor">0073[D?0,S:1:6?0,D?1,S:1:6?1,D?2,S:1:6?2,D?3,S:1:6?3;1,F:6,,??,S:7]</irp:parameter>
-        <irp:parameter name="relative-tolerance">0.1</irp:parameter>
+        <irp:parameter name="relative-tolerance">0.15</irp:parameter>
     </irp:protocol>
 
     <irp:protocol name="RC6">
